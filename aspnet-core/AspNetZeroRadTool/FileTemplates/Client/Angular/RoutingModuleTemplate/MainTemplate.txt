@@ -1,0 +1,22 @@
+﻿import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {{{Entity_Name_Plural_Here}}Component} from './{{entity_Name_Plural_Here}}.component';
+{{Import_Create_Or_Edit_Component_Here}}
+{{Import_View_Component_Here}}
+
+const routes: Routes = [
+    {
+        path: '',
+        component: {{Entity_Name_Plural_Here}}Component,
+        pathMatch: 'full'
+    },
+    {{Import_Create_Or_Edit_Route_Here}}
+    {{Import_View_Route_Here}}
+];
+
+@NgModule({
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule],
+})
+export class {{Entity_Name_Here}}RoutingModule {
+}

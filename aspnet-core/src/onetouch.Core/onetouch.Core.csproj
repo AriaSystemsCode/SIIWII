@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props"></Import>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>onetouch.Core</AssemblyName>
+    <PackageId>onetouch.Core</PackageId>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <UserSecretsId>MyCompanyName-onetouch-894FDFC1-6482-4A56-926A-3C46C9FE0329</UserSecretsId>
+    <RootNamespace>onetouch</RootNamespace>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\onetouch\*.xml;Net\Emailing\EmailTemplates\default.html" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Net\Emailing\EmailTemplates\InviteNewUser_EN.json" />
+    <None Remove="Net\Emailing\EmailTemplates\InvitePartner_EN.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Net\Emailing\EmailTemplates\InviteNewUser_EN.json" />
+    <EmbeddedResource Include="Net\Emailing\EmailTemplates\InvitePartner_EN.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Abp" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
+    <PackageReference Include="Castle.Windsor.MsDependencyInjection" Version="3.4.0" />
+    <PackageReference Include="PayPalHttp" Version="1.0.1" />
+    <PackageReference Include="Stripe.net" Version="35.11.1" />
+    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
+    <PackageReference Include="TimeZoneConverter" Version="6.0.1" />
+    <PackageReference Include="Abp.AspNetZeroCore" Version="4.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Abp.ZeroCore.IdentityServer4.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Abp.AutoMapper" Version="8.0.0" />
+    <PackageReference Include="Abp.MailKit" Version="8.0.0" />
+    <PackageReference Include="Abp.Zero.Ldap" Version="8.0.0" />
+    <PackageReference Include="Twilio" Version="6.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\onetouch.Application.Shared\onetouch.Application.Shared.csproj" />
+    <ProjectReference Include="..\onetouch.Core.Shared\onetouch.Core.Shared.csproj" />
+  </ItemGroup>
+</Project>

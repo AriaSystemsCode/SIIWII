@@ -1,0 +1,93 @@
+{
+    "conditionalTemplates":[
+		{
+			"placeholder": "{{Use_Import_Admin_Shared_Module_Here}}",
+			"condition": "true",
+			"content": ", AdminSharedModule"
+		},
+		{
+			"placeholder": "{{Import_Admin_Shared_Module_Here}}",
+			"condition": "true",
+			"content": "import {AdminSharedModule} from '@app/admin/shared/admin-shared.module';"
+		},
+		{
+			"placeholder": "{{Import_View_Component_Here}}",
+			"condition": "{{Create_View_Only_Here}} == true",
+			"content": "import {{{Master_Detail_Child_Prefix_Here}}View{{Entity_Name_Here}}{{Is_Modal}}Component} from './{{master_Detail_Child_Prefix_Here}}view-{{entity_Name_Here}}{{Is_Modal_With_Hyphen}}.component';"
+		},
+		{
+			"placeholder": "{{Declare_View_Component_Here}}",
+			"condition": "{{Create_View_Only_Here}} == true",
+			"content": "{{Master_Detail_Child_Prefix_Here}}View{{Entity_Name_Here}}{{Is_Modal}}Component,"
+		},
+		{ 
+			"placeholder": "{{Is_Modal}}",
+			"condition": "{{Is_Non_Modal_CRUD_Page}} == false",
+			"content": "Modal"
+		},
+		{
+			"placeholder": "{{Is_Modal_With_Hyphen}}",
+			"condition": "{{Is_Non_Modal_CRUD_Page}} == false",
+			"content": "-modal"
+		},
+		{
+			"placeholder": "{{Import_Routing_Module_Here}}",
+			"condition": "{{Is_Master_Detail_Page_Child_Here}} == false",
+			"content": "import {{{Entity_Name_Here}}RoutingModule} from './{{entity_Name_Here}}-routing.module';"
+		},
+		{
+			"placeholder": "{{Use_Routing_Module_Here}}",
+			"condition": "{{Is_Master_Detail_Page_Child_Here}} == false",
+			"content": ", {{Entity_Name_Here}}RoutingModule"
+		},
+		{
+			"placeholder": "{{Master_Detail_Child_Export_Here}}",
+			"condition": "{{Is_Master_Detail_Page_Child_Here}} == true",
+			"content": "
+			    exports: [
+                    {{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Plural_Here}}Component,
+                    {{Master_Detail_Child_Prefix_Here}}CreateOrEdit{{Entity_Name_Here}}{{Is_Modal}}Component,
+                    {{Declare_View_Component_Here}}
+                ]
+			"
+		},
+	],
+	"navigationPropertyTemplates":[
+    		{
+    			"placeholder" : "{{Import_Lookup_Tables_Here}}",
+    			"templates" : [
+    					{
+    					"relation" : "single",
+    					"viewType": "LookupTable",
+    					"content" : "import {{{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Here}}{{NP_Foreign_Entity_Name_Here}}LookupTableModalComponent} from './{{master_Detail_Child_Prefix_Here}}{{entity_Name_Here}}-{{nP_Foreign_Entity_Name_Here}}-lookup-table-modal.component';
+    					"
+    					}
+    				]
+    		},
+            {
+    			"placeholder" : "{{Declare_Lookup_Tables_Here}}",
+    			"templates" : [
+    					{
+    					"relation" : "single",
+    					"viewType": "LookupTable",
+    					"content" : "
+    					{{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Here}}{{NP_Foreign_Entity_Name_Here}}LookupTableModalComponent,"
+    					}
+    				]
+    		}
+    	],
+    "navigationPropertyOneToManyTableTemplates": [
+        {
+            "placeholder": "{{Import_Child_Module_Here}}",
+            "content": "
+            import {MasterDetailChild_{{Entity_Name_Here}}_{{NP_OneTwoMany_EntityName_Here}}Module} from '@app/{{nP_OneTwoMany_Menu_Position_Here}}/{{nP_OneTwoMany_Namespace_Relative_Here}}/{{nP_OneTwoMany_EntityNamePlural_Here}}/masterDetailChild_{{Entity_Name_Here}}_{{nP_OneTwoMany_EntityName_Here}}.module';"
+        },
+        {
+            "placeholder": "{{Use_Import_Child_Module_Here}}",
+            "content": ",
+            MasterDetailChild_{{Entity_Name_Here}}_{{NP_OneTwoMany_EntityName_Here}}Module"
+        },
+
+    ]
+    	
+}

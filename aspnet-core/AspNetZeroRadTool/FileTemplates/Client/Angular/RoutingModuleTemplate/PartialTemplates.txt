@@ -1,0 +1,36 @@
+{
+"conditionalTemplates":[
+		{
+			"placeholder": "{{Import_Create_Or_Edit_Component_Here}}",
+			"condition": "{{Is_Non_Modal_CRUD_Page}} == true",
+			"content": "import {CreateOrEdit{{Entity_Name_Here}}Component} from './create-or-edit-{{entity_Name_Here}}.component';"
+		},
+		{
+			"placeholder": "{{Import_View_Component_Here}}",
+			"condition": "{{Is_Non_Modal_CRUD_Page}} == true && {{Create_View_Only_Here}} == true",
+			"content": "import {View{{Entity_Name_Here}}Component} from './view-{{entity_Name_Here}}.component';"
+		},
+		{
+			"placeholder": "{{Import_Create_Or_Edit_Route_Here}}",
+			"condition": "{{Is_Non_Modal_CRUD_Page}} == true",
+			"content": "
+			    {
+                    path: 'createOrEdit',
+                    component: CreateOrEdit{{Entity_Name_Here}}Component,
+                    pathMatch: 'full'
+                },
+			"
+		},
+		{
+			"placeholder": "{{Import_View_Route_Here}}",
+			"condition": "{{Is_Non_Modal_CRUD_Page}} == true && {{Create_View_Only_Here}} == true",
+			"content": "
+			    {
+                    path: 'view',
+                    component: View{{Entity_Name_Here}}Component,
+                    pathMatch: 'full'
+                }
+			"
+		}
+	]
+}

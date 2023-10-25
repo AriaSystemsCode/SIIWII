@@ -1,0 +1,58 @@
+﻿{
+  "IsRegenerate": false,
+  "MenuPosition": "admin",
+  "RelativeNamespace": "SycCounters",
+  "EntityName": "SycCounter",
+  "EntityNamePlural": "SycCounters",
+  "TableName": "SycCounters",
+  "PrimaryKeyType": "long",
+  "BaseClass": "FullAuditedEntity",
+  "EntityHistory": true,
+  "AutoMigration": true,
+  "UpdateDatabase": true,
+  "CreateUserInterface": true,
+  "CreateViewOnly": true,
+  "CreateExcelExport": true,
+  "IsNonModalCRUDPage": false,
+  "IsMasterDetailPage": false,
+  "PagePermission": {
+    "Host": true,
+    "Tenant": true
+  },
+  "Properties": [
+    {
+      "Name": "Counter",
+      "Type": "long",
+      "MaxLength": 0,
+      "MinLength": 0,
+      "Range": {
+        "IsRangeSet": false,
+        "MinimumValue": 0.0,
+        "MaximumValue": 0.0
+      },
+      "Required": false,
+      "Nullable": false,
+      "Regex": "",
+      "UserInterface": {
+        "AdvancedFilter": true,
+        "List": true,
+        "CreateOrUpdate": true
+      }
+    }
+  ],
+  "NavigationProperties": [{
+      "Namespace": "onetouch.SycSegmentIdentifierDefinitions",
+      "ForeignEntityName": "SycSegmentIdentifierDefinition",
+      "IdType": "long",
+      "IsNullable": true,
+      "PropertyName": "SycSegmentIdentifierDefinitionId",
+      "DisplayPropertyName": "Name",
+      "DuplicationNumber": 0,
+      "RelationType": "single",
+      "ViewType": "LookupTable",
+      "IsGeneratedByMasterPage": true
+    },],
+  "NavigationPropertyOneToManyTables": [],
+  "EnumDefinitions": [],
+  "DbContext": null
+}

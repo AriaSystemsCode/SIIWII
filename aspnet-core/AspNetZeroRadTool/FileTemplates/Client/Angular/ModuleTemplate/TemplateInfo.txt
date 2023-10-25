@@ -1,0 +1,4 @@
+{
+	"path" : "app\\{{menu_Position_Here}}\\{{namespace_Relative_Here}}\\{{entity_Name_Plural_Here}}\\{{master_Detail_Child_Prefix_Here}}{{entity_Name_Here}}.module.ts",
+	"condition": "{{Project_Version_Here}} >= 100300"
+}

@@ -1,0 +1,4 @@
+{
+	"path" : "{{Namespace_Here}}.Web.Host\\Controllers\\{{Entity_Name_Plural_Here}}Controller.cs",
+	"condition": "{{Has_File_Prop}} == true && {{Project_Type_Here}} != 'Mvc'"
+}

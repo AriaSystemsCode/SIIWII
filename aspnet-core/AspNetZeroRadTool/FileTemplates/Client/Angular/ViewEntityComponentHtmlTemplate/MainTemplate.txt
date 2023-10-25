@@ -1,0 +1,25 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{l("Details")}}</span>
+                </h4>               
+                {{Modal_Header_Close_Times_Before_V110000_Here}}
+                {{Modal_Header_Close_Times_After_V110000_Here}}
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+{{Property_Looped_Template_Here}}
+{{NP_Looped_Template_Here}}
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button [disabled]="saving" type="button" class="btn btn-primary blue" (click)="close()">{{l("Close")}}</button>
+            </div>
+        </div>
+    </div>
+
+</div>

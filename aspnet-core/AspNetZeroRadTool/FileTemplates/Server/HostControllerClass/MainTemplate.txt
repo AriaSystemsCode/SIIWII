@@ -1,0 +1,27 @@
+﻿using System;
+using System.IO;
+using System.Linq;
+using Abp.IO.Extensions;
+using Abp.UI;
+using Abp.Web.Models;
+using Microsoft.AspNetCore.Authorization;
+using {{Namespace_Here}}.Storage;
+
+namespace {{Namespace_Here}}.Web.Controllers
+{
+    [Authorize]
+    public class {{Entity_Name_Plural_Here}}Controller : {{Project_Name_Here}}ControllerBase
+    {
+        private readonly ITempFileCacheManager _tempFileCacheManager;
+        {{File_Prop_Definitions_Here}}
+
+        public {{Entity_Name_Plural_Here}}Controller(ITempFileCacheManager tempFileCacheManager)
+        {
+            _tempFileCacheManager = tempFileCacheManager;
+        }
+        
+        {{File_Upload_Action_Here}}
+        
+        {{File_Upload_Get_Accepted_File_Types_Here}}
+    }
+}

@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props"></Import>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <RootNamespace>onetouch</RootNamespace>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Migrations\20200305145558_Add_Dynamic_Entity_Parameters.cs" />
+    <Compile Remove="Migrations\20200305145558_Add_Dynamic_Entity_Parameters.Designer.cs" />
+    <Compile Remove="Migrations\20200518170022_Added_AppEntity.cs" />
+    <Compile Remove="Migrations\20200518170022_Added_AppEntity.Designer.cs" />
+    <Compile Remove="Migrations\20200616142154_Add_SycAttachmentCategories_EntityObjectTypeId.cs" />
+    <Compile Remove="Migrations\20200616142154_Add_SycAttachmentCategories_EntityObjectTypeId.Designer.cs" />
+    <Compile Remove="Migrations\20210116160402_AlterAppItem_ParentEntityId2.cs" />
+    <Compile Remove="Migrations\20210116160402_AlterAppItem_ParentEntityId2.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Abp" Version="8.0.0" />
+    <PackageReference Include="LeXun.Extensions.EFCore" Version="6.13.16-rc" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\onetouch.Application.Shared\onetouch.Application.Shared.csproj" />
+    <ProjectReference Include="..\onetouch.Core\onetouch.Core.csproj" />
+  </ItemGroup>
+</Project>

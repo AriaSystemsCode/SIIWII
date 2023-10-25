@@ -1,0 +1,4 @@
+{
+  "MessageSubject": "Welcome to SIIWII Portal, {param1} invited you to join SIIWII Portal",
+  "MessageBody": "<!DOCTYPE html><html><head/><body><p>Hello {param2},<br><br>{param3} {param4} with {param1} has invited you to access our SIIWII Portal to collaborate with us.<br><br>If you want to gain your account access, please click on the following link:<a href=\"{param5}//account/login\">{param5}//account/login</a><br><br>This link will verify your email address, and then you'll officially be a part of the SIIWII Portal community.<br><br><p style=\"text-align:center;\">Domain name:{param6}</p><p style=\"text-align:center;\">Account name:{param7}</p><p style=\"text-align:center;\">User name:{param8}</p><p style=\"text-align:center;\">Temporary Password:{param9}</p><br><br>See you there!<br><br>Kind Regards,<br><br>SIIWII Portal-{param1}</p></body></html>"
+}

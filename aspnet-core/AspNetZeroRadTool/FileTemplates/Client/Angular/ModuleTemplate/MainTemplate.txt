@@ -1,0 +1,22 @@
+﻿import {NgModule} from '@angular/core';
+import {AppSharedModule} from '@app/shared/app-shared.module';
+{{Import_Admin_Shared_Module_Here}}
+{{Import_Routing_Module_Here}}
+import {{{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Plural_Here}}Component} from './{{master_Detail_Child_Prefix_Here}}{{entity_Name_Plural_Here}}.component';
+import {{{Master_Detail_Child_Prefix_Here}}CreateOrEdit{{Entity_Name_Here}}{{Is_Modal}}Component} from './{{master_Detail_Child_Prefix_Here}}create-or-edit-{{entity_Name_Here}}{{Is_Modal_With_Hyphen}}.component';
+{{Import_View_Component_Here}}
+{{Import_Lookup_Tables_Here}}
+{{Import_Child_Module_Here}}
+
+@NgModule({
+    declarations: [
+        {{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Plural_Here}}Component,
+        {{Master_Detail_Child_Prefix_Here}}CreateOrEdit{{Entity_Name_Here}}{{Is_Modal}}Component,
+        {{Declare_View_Component_Here}}
+        {{Declare_Lookup_Tables_Here}}
+    ],
+    imports: [AppSharedModule{{Use_Routing_Module_Here}} {{Use_Import_Admin_Shared_Module_Here}} {{Use_Import_Child_Module_Here}}],
+    {{Master_Detail_Child_Export_Here}}
+})
+export class {{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Here}}Module {
+}

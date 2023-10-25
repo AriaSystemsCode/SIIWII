@@ -1,0 +1,86 @@
+{
+    "conditionalTemplates":[
+        {
+            "placeholder": "{{Portlet_Class_Here}}",
+            "condition": "{{Project_Version_Here}} < 090000",
+            "content": "kt-portlet kt-portlet--mobile"
+        },
+        {
+            "placeholder": "{{Card_Class_Here}}",
+            "condition": "{{Project_Version_Here}} >= 090000",
+            "content": "card card-custom gutter-b"
+        },
+        {
+            "placeholder": "{{Portlet_Body_Here}}",
+            "condition": "{{Project_Version_Here}} < 090000",
+            "content": "kt-portlet__body"
+        },
+        {
+            "placeholder": "{{Card_Body_Here}}",
+            "condition": "{{Project_Version_Here}} >= 090000",
+            "content": "card-body"
+        },
+        {
+            "placeholder": "{{Form_Class_Here}}",
+            "condition": "{{Project_Version_Here}} < 090000",
+            "content": "kt-form"
+        },
+        {
+            "placeholder": "{{Form_Class_Here}}",
+            "condition": "{{Project_Version_Here}} >= 090000",
+            "content": "form"
+        },
+        {
+            "placeholder": "{{PrimeNG_Column_Title_Class_Here}}",
+            "condition": "{{Project_Version_Here}} < 100100",
+            "content": "ui-column-title"
+        },
+        {
+            "placeholder": "{{PrimeNG_Column_Title_Class_Here}}",
+            "condition": "{{Project_Version_Here}} >= 100100",
+            "content": "p-column-title"
+        },
+        {
+             "placeholder": "{{Filter_Form_Group_Before_V110000_Here}}",
+             "condition": "{{Project_Version_Here}} < 110000",
+             "content": "
+                   <div class=\"form-group m-form__group align-items-center\">
+                    <div class=\"input-group\">
+                        <input [(ngModel)]=\"filterText\" name=\"filterText\" autoFocus class=\"form-control m-input\" [placeholder]=\"l('SearchWithThreeDot')\" type=\"text\">
+                        <span class=\"input-group-btn\">
+                            <button (click)=\"getAll()\" class=\"btn btn-primary\" type=\"submit\"><i class=\"flaticon-search-1\"></i></button>
+                        </span>
+                    </div>
+                </div>
+             "
+        },
+        {
+             "placeholder": "{{Filter_Form_Group_After_V110000_Here}}",
+             "condition": "{{Project_Version_Here}} >= 110000",
+             "content": "
+                   <div class=\"my-3\">
+                    <div class=\"input-group\">
+                        <input [(ngModel)]=\"filterText\" name=\"filterText\" autoFocus class=\"form-control m-input\" [placeholder]=\"l('SearchWithThreeDot')\" type=\"text\">
+                        <button (click)=\"getAll()\" class=\"btn btn-primary\" type=\"submit\"><i class=\"flaticon-search-1\"></i></button>
+                    </div>
+                </div>
+             "
+        },
+        {
+             "placeholder": "{{Modal_Header_Close_Times_Before_V110000_Here}}",
+             "condition": "{{Project_Version_Here}} < 110000",
+             "content": "
+                <button type=\"button\" class=\"close\" (click)=\"close()\" aria-label=\"Close\" [disabled]=\"saving\">
+                     <span aria-hidden=\"true\">&times;</span>
+                </button>
+             "
+        },
+        {
+             "placeholder": "{{Modal_Header_Close_Times_After_V110000_Here}}",
+             "condition": "{{Project_Version_Here}} >= 110000",
+             "content": "
+                 <button type=\"button\" class=\"btn-close\" (click)=\"close()\" aria-label=\"Close\" [disabled]=\"saving\"></button>
+             "
+        } 
+    ]
+}

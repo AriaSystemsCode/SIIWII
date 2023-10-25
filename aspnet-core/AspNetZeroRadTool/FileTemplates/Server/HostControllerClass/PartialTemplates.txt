@@ -1,0 +1,81 @@
+{
+"propertyTemplates":[
+		{
+			"placeholder" : "{{File_Prop_Definitions_Here}}",
+			"templates" : [
+					{
+					"type" : "file",
+					"content" : "					
+                        private const long Max{{Property_Name_Here}}Length = 5242880; //5MB
+                        private const string Max{{Property_Name_Here}}LengthUserFriendlyValue = \"5MB\"; //5MB
+                        private readonly string[] {{Property_Name_Here}}AllowedFileTypes = {\"jpeg\", \"jpg\", \"png\"};
+                    "
+					}
+				]
+		},
+		{
+			"placeholder" : "{{File_Upload_Action_Here}}",
+			"templates" : [
+					{
+					"type" : "file",
+					"content" : "
+					   public FileUploadCacheOutput Upload{{Property_Name_Here}}File()
+                       {
+                           try
+                           {
+                               //Check input
+                               if (Request.Form.Files.Count == 0)
+                               {
+                                   throw new UserFriendlyException(L(\"NoFileFoundError\"));
+                               }
+               
+                               var file = Request.Form.Files.First();
+                               if (file.Length > Max{{Property_Name_Here}}Length)
+                               {
+                                   throw new UserFriendlyException(L(\"Warn_File_SizeLimit\", Max{{Property_Name_Here}}LengthUserFriendlyValue));
+                               }
+               
+                               var fileType = Path.GetExtension(file.FileName).Substring(1);
+                               if ({{Property_Name_Here}}AllowedFileTypes != null && {{Property_Name_Here}}AllowedFileTypes.Length > 0 && !{{Property_Name_Here}}AllowedFileTypes.Contains(fileType))
+                               {
+                                   throw new UserFriendlyException(L(\"FileNotInAllowedFileTypes\", {{Property_Name_Here}}AllowedFileTypes));
+                               }
+               
+                               byte[] fileBytes;
+                               using (var stream = file.OpenReadStream())
+                               {
+                                   fileBytes = stream.GetAllBytes();
+                               }
+               
+                               var fileToken = Guid.NewGuid().ToString(\"N\");
+                               _tempFileCacheManager.SetFile(fileToken, new TempFileInfo(file.FileName, fileType, fileBytes));
+                               
+                               return new FileUploadCacheOutput(fileToken);
+                           }
+                           catch (UserFriendlyException ex)
+                           {
+                               return new FileUploadCacheOutput(new ErrorInfo(ex.Message));
+                           }
+                       }
+                    "
+					}
+				]
+		},
+		{
+			"placeholder" : "{{File_Upload_Get_Accepted_File_Types_Here}}",
+			"templates" : [
+					{
+					"type" : "file",
+					"content" : "
+                        public string[] Get{{Property_Name_Here}}FileAllowedTypes()
+                        {
+                            return {{Property_Name_Here}}AllowedFileTypes;
+                        }
+                    "
+					}
+				]
+		}
+	]
+}
+
+

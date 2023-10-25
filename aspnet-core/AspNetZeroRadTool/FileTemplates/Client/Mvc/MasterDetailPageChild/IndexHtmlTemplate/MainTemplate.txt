@@ -1,0 +1,47 @@
+﻿@using {{Namespace_Here}}.Authorization
+@using {{Namespace_Here}}.Web.Areas.{{App_Area_Name_Here}}.Models.{{Entity_Name_Plural_Here}}
+@using {{Namespace_Here}}.Web.Areas.{{App_Area_Name_Here}}.Startup
+@model {{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Plural_Here}}ViewModel
+@{
+    Layout = null;
+}
+<script abp-src="/view-resources/Areas/{{App_Area_Name_Here}}/Views/{{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Plural_Here}}/Index.js" asp-append-version="true"></script>
+<input type="hidden" id="{{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Plural_Here}}Id" value="@Model.{{Master_Detail_Child_Foreign_Property_Name_Here}}"/>
+
+    <div class="{{Portlet_Class_Here}}{{Card_Class_Here}}">
+        {{Portlet_Title_Here}}{{Card_Title_Here}}
+        <div class="{{Portlet_Body_Class_Here}}{{Card_Body_Class_Here}}">
+            <div class="{{Form_Class_Here}}">
+                <div class="row align-items-center mb-4">
+                    <div class="col-xl-12">                    
+                        {{Filter_Form_Group_Before_V110000_Here}}
+                        {{Filter_Form_Group_After_V110000_Here}}
+                    </div>
+                </div>
+			</div>
+                <div id="{{Master_Detail_Child_Prefix_Here}}AdvacedAuditFiltersArea" style="display: none" class="row mb-4">
+                    <div class="col-md-12">
+						{{Seperator_Div_Here}}
+					</div>
+{{Property_Filter_Template_Here}}{{NP_Filter_Template_Here}}
+                </div>
+                <div class="row mb-4">
+                    <div class="col-xl-12">
+                        <span id="{{Master_Detail_Child_Prefix_Here}}ShowAdvancedFiltersSpan" class="text-muted clickable-item"><i class="fa fa-angle-down"></i> @L("ShowAdvancedFilters")</span>
+                        <span id="{{Master_Detail_Child_Prefix_Here}}HideAdvancedFiltersSpan" class="text-muted clickable-item" style="display: none"><i class="fa fa-angle-up"></i> @L("HideAdvancedFilters")</span>
+                    </div>
+                </div>
+            <div class="row align-items-center">
+                <table id="{{Master_Detail_Child_Prefix_Here}}{{Entity_Name_Plural_Here}}Table" class="{{Table_Class_Here}}">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            
+                            <th>@L("Actions")</th>{{Property_Looped_Template_Here}}{{NP_Looped_Template_Here}}
+                            {{NP_OneToMany_Looped_Table_Header_Here}}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>

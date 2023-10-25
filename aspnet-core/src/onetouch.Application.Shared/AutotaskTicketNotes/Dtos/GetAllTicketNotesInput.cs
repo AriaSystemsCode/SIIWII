@@ -1,0 +1,17 @@
+﻿using Abp.Application.Services.Dto;
+using System;
+
+namespace onetouch.AutoTaskTicketNotes.Dtos
+{
+    public class GetAllTicketNotesInput : PagedAndSortedResultRequestDto
+    {
+        public string Filter { get; set; }
+
+        public string TitleFilter { get; set; }
+
+        public string DescriptionFilter { get; set; }
+
+        public string TicketTicketNumberFilter { get; set; }
+
+    }
+}
