@@ -1,0 +1,377 @@
+﻿<div [@routerTransition]>
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet__body">
+                    <form class="kt-form" autocomplete="off" [formGroup]="filterForm"
+                        style=" border-bottom: solid 2px #e5e2e2;">
+                        <div>
+
+                            <div class="row mb-3 justify-content-between">
+                                <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
+                                    <div class="btn-group dropdown list-toolbar-dropdown" dropdown
+                                        *ngIf="showMainFiltersOptions">
+                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0"
+                                            dropdownToggle>
+                                            <span class="list-toolbar-dropdown-filter-selectedItem" style="    font-size: large;
+                                            font-weight: bold;">
+                                                {{
+                                                mainFilterCtrl?.value?.displayName | localize
+                                                }}
+                                            </span>
+                                        </button>
+                                        <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
+                                            <li *ngFor="
+                                                let filter of pageMainFilters
+                                            ">
+                                                <a href="javascript:;" (click)="
+                                                    mainFilterCtrl.setValue(
+                                                        filter
+                                                    );getAppTransactions()
+                                                ">
+                                                    <span>
+                                                        <i [ngClass]="{
+                                                            'visibility-hidden':
+                                                                mainFilterCtrl
+                                                                    ?.value
+                                                                    ?.displayName !=
+                                                                filter?.displayName
+                                                        }"
+                                                            class="flaticon2-check-mark text-success mr-2 icon-sm list-toolbar-dropdown-icon"></i>
+                                                        <span class="list-toolbar-dropdown-title">
+                                                            {{
+                                                            filter?.displayName
+                                                            | localize
+                                                            }}
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="list-toolbar-dropdown-filter-selectedItem font-weight-normal text-dark"
+                                        *ngIf="!showMainFiltersOptions">
+                                        {{ mainFilterCtrl?.value?.displayName | localize }}
+                                    </div>
+                                </div>
+                                <div class="mb-4 col-4 mb-md-0 list-toolbar-search">
+                                    <div class="form-group m-form__group align-items-center">
+                                        <div class="input-group">
+                                            <input [(ngModel)]="filterText" formControlName="search" autoFocus
+                                                class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
+                                                type="text" (focusout)="getAppTransactions()">
+                                            <span class="input-group-btn">
+                                                <button (click)="getAppTransactions()" class="searchBtn" type="submit">
+                                                    <img style="width: 30px; height: 30px"
+                                                        src="../../../assets/landingPage/Iconionic-md-search.png" /></button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-toolbar-divider" *ngIf="showAddButton"></div>
+                                <div class="mb-4 mb-md-0 text-center">
+
+                                    <ng-container *ngIf="showAddButton">
+                                        <div class="btn-group" dropdown>
+                                            <button dropdownToggle type="button"
+                                                class="btn btn-primary bgPurple border-0" data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="false">
+                                                {{"Create new" | localize}} <i class="fa fa-plus pl-2"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations"
+                                                *dropdownMenu>
+                                                <a class="dropdown-item" id="createNewSalesOrder"
+                                                    (click)="createNewSalesOrder()" href="javascript:;">
+                                                    {{'SalesOrder' | localize}}
+                                                </a>
+                                                <a class="dropdown-item" id="createNewSalesOrder"
+                                                    (click)="createNewPurchaseOrder()" href="javascript:;">
+                                                    {{'purchaseOrder' | localize}}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                                <div class="list-toolbar-divider"></div>
+
+                                <div class="text-center">
+                                    <a style="
+                                        padding-right: 4px;
+                                        padding-left: 10px;
+                                    " [title]="'ResetData' | localize"
+                                        class="btn  font-weight-normal text-center text-primary toolbar-btn"
+                                        (click)="resetList()">
+                                        <i class="d-inline-block w-100 flaticon2-reload icon-center purpleColor"></i>
+                                    </a>
+
+                                </div>
+                            </div>
+                            <div class="row " [hidden]="!advancedFiltersAreShown">
+                                <div class="col-md-12">
+                                    <div class="kt-separator kt-separator--border-dashed"></div>
+                                </div>
+
+                                <div class="row w-100 pl-3 pt-3">
+                                    <div class="col-md-3 mr-5">
+                                        <div class="form-group">
+                                            <label for="SellerNameFilter">{{l("SellerName")}}</label>
+                                            <input type="text" class="form-control" id="SellerNameFilter"
+                                                formControlName="sellerNameFilter" [(ngModel)]="sellerNameFilter"
+                                                (keyup)="getAppTransactions()">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mr-5">
+                                        <div class="form-group">
+                                            <label for="BuyerNameFilter">{{l("buyerName")}}</label>
+                                            <input type="text" class="form-control" id="BuyerNameFilter"
+                                                formControlName="buyerNameFilter" [(ngModel)]="buyerNameFilter"
+                                                (keyup)="getAppTransactions()">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="CodeFilter">{{l("Code")}}</label>
+                                            <input type="text" class="form-control" id="CodeFilter"
+                                                formControlName="codeFilter" [(ngModel)]="codeFilter"
+                                                (keyup)="getAppTransactions()">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row w-100 pl-3 pt-3">
+                                    <div class="col-md-3 mr-5">
+                                        <div class="form-group">
+                                            <label for="MinDateFilter">{{l("DateCreateRange")}}</label>
+                                            <div class="input-group">
+                                                <input class="form-control m-input" id="MinCreateDateFilter"
+                                                    formControlName="minCreateDateFilter" type="datetime" bsDatepicker
+                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minCreateDateFilter"
+                                                    (focusout)="getAppTransactions()">
+                                                <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
+                                                <input class="form-control m-input" id="MaxCreateDateFilter"
+                                                    formControlName="maxCreateDateFilter" type="datetime" bsDatepicker
+                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxCreateDateFilter"
+                                                    (focusout)="getAppTransactions()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="MinDateFilter">{{l("DateCompleteRange")}}</label>
+                                            <div class="input-group">
+                                                <input class="form-control m-input" id="MinCompleteDateFilter"
+                                                    formControlName="minCompleteDateFilter" type="datetime" bsDatepicker
+                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minCompleteDateFilter"
+                                                    (focusout)="getAppTransactions()">
+                                                <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
+                                                <input class="form-control m-input" id="MaxCompleteDateFilter"
+                                                    formControlName="maxCompleteDateFilter" type="datetime" bsDatepicker
+                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxCompleteDateFilter"
+                                                    (focusout)="getAppTransactions()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row w-100 pl-3 pt-3 pb-3">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="statusFilter">{{l("Status")}}</label>
+                                            <p-dropdown [ngModel]="statusFilter" [options]="filterStatus"
+                                                (onChange)=" getAppTransactions()" placeholder="Any" [showClear]="true"
+                                                appendTo="body" formControlName="statusFilter">
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-sm-12">
+                                    <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown"
+                                        (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
+                                            class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                    <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown"
+                                        (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
+                                            class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="row align-items-center pt-5  mt-4">
+                        <!--<Primeng-Datatable-Start>-->
+
+
+                        <!--  [lazy]="true" 
+                            (onLazyLoad)="getAppTransactions($event)" 
+                        [globalFilterFields]="['sellerName',
+                            'buyerName',
+                            'entityObjectTypeCode',
+                            'code',
+                            'entityObjectStatusCode',
+                            'creationTime',
+                            'completeDate']"
+                        -->
+                        <div class="primeng-datatable-container col-12" [busyIf]="primengTableHelper.isLoading">
+                            <p-table #dataTable [value]="primengTableHelper.records" [lazy]="true"
+                                (onLazyLoad)="getAppTransactions($event)" [loading]="loading"
+                                rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
+                                [scrollable]="true" ScrollWidth="100%" responsiveLayout="stack" [breakpoint]="'960px'"
+                                [tableStyle]="{'min-width': '50rem'}"
+                                [resizableColumns]="primengTableHelper.resizableColumns"
+                                selectionMode="single"     (selectionChange)="onSelectionChange($event)"
+                                >
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th style="width: 150px" pSortableColumn="sellerCompanyName" class="purpleColor">
+                                            {{l('SellerName')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="sellerCompanyName"></p-sortIcon>
+                                            <!-- <p-columnFilter type="text" field="sellerCompanyName" display="menu"
+                                                class="ml-auto">
+                                            </p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 150px" pSortableColumn="buyerCompanyName" class="purpleColor">
+                                            {{l('BuyerName')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="buyerCompanyName"></p-sortIcon>
+                                            <!-- <p-columnFilter type="text" field="buyerCompanyName" display="menu"
+                                                class="ml-auto">
+                                            </p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 150px" pSortableColumn="entityObjectTypeCode"
+                                            class="purpleColor">
+                                            {{l('TransactionType')}}
+                                            <p-sortIcon class="purpleSortableIcon"
+                                                field="entityObjectTypeCode"></p-sortIcon>
+                                            <!-- <p-columnFilter field="entityObjectTypeCode" matchMode="equals"
+                                                [showMenu]="false">
+                                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                    <p-dropdown [ngModel]="value" [options]="filterTransType"
+                                                        (onChange)="customFilterCallback(filter,$event.value)"
+                                                        placeholder="Any" [showClear]="true" appendTo="body">
+                                                    </p-dropdown>
+                                                </ng-template>
+                                            </p-columnFilter> -->
+
+                                        </th>
+                                        <th style="width: 150px" pSortableColumn="code" class="purpleColor">
+                                            {{l('Transaction #')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="code"></p-sortIcon>
+                                            <!-- <p-columnFilter type="numeric" field="code" display="menu" class="ml-auto">
+                                            </p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 150px" pSortableColumn="entityObjectStatusCode"
+                                            class="purpleColor">
+                                            {{l('Status')}}
+                                            <p-sortIcon class="purpleSortableIcon"
+                                                field="entityObjectStatusCode"></p-sortIcon>
+                                            <!-- <p-columnFilter field="entityObjectStatusCode" matchMode="equals"
+                                                [showMenu]="false">
+                                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                    <p-dropdown [ngModel]="value" [options]="filterStatus"
+                                                        (onChange)="customFilterCallback(filter,$event.value)"
+                                                        placeholder="Any" [showClear]="true" appendTo="body">
+                                                    </p-dropdown>
+                                                </ng-template>
+                                            </p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 150px" pSortableColumn="creationTime" class="purpleColor">
+                                            {{l('DateCreated')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="creationTime"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="creationTime" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 150px" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('CompleteDate')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                    <tr [pSelectableRow]="record">
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l(SellerName')}}</span>
+                                            <span *ngIf="record.sellerCompanyName">
+                                                {{record.sellerCompanyName }}
+                                            </span>
+                                            <span *ngIf="!record.sellerCompanyName">-</span>
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('BuyerName')}}</span>
+                                            <span *ngIf="record.buyerCompanyName">
+                                                {{record.buyerCompanyName}}
+                                            </span>
+                                            <span *ngIf="!record.buyerCompanyName">-</span>
+
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('TransactionType')}}</span>
+                                            <span *ngIf="record.entityObjectTypeCode">
+                                                {{record.entityObjectTypeCode}}
+                                            </span>
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('Transaction #')}}</span>
+                                            <span *ngIf="record.code">
+                                                {{record.code}}
+                                            </span>
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('Status')}}</span>
+                                            <span *ngIf="record.entityObjectStatusCode">
+                                                {{record.entityObjectStatusCode}}
+                                            </span>
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('DateCreated')}}</span>
+                                            <span *ngIf="record.creationTime">
+                                                {{record.creationTime | momentFormat:'L' }}
+                                            </span>
+                                            <span *ngIf="!record.creationTime">-</span>
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('CompleteDate')}}</span>
+                                            <span *ngIf="record.completeDate">
+                                                {{record.completeDate | momentFormat:'L' }}
+                                            </span>
+                                            <span *ngIf="!record.completeDate">-</span>
+                                        </td>
+                                    </tr>
+
+                                </ng-template>
+                            </p-table>
+                            <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                                {{l('NoData')}}
+                            </div>
+                            <div class="primeng-paging-container">
+                                <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage" #paginator
+                                    (onPageChange)="getAppTransactions($event)"
+                                    [totalRecords]="primengTableHelper.totalRecordsCount"
+                                    [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
+                                </p-paginator>
+                                <span class="total-records-count">
+                                    {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
+                                </span>
+                            </div>
+                        </div>
+                        <!--<Primeng-Datatable-End>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<createTransactionModal (modalClose)="closeModal($event)" [roles]="roles" [modalheaderName]="modalheaderName"
+    [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"></createTransactionModal>
+
+    <app-shopping-cart-view-component #shoppingCartModal  ></app-shopping-cart-view-component>
+

@@ -11,7 +11,7 @@
                     class="mr-3 rounded-circle w-100"
                 />
             </div>
-            <div class="w-80">
+            <div class="w-80 pt-1">
                 <div class="d-flex flex-column">
                     <div>
                         <textarea
@@ -27,9 +27,21 @@
                             [required]="true"
                             [maxlength]="maxAcceptedChars"
                         ></textarea>
+                        <ng-container *ngIf="cartStyle;">
+
+                        <button
+                        [disabled]="loginForm.invalid"
+                        [buttonBusy]="saving"
+                        [busyText]="emptyText"
+                        class="send-comment-icon">
+                        <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </ng-container>
                     </div>
                     <div class="d-flex justify-content-between align-item-center">
                         <div class="mt-1 ml-3">
+                            <ng-container *ngIf="!cartStyle;">
+
                             <button
                                 *ngIf="comment.body || hasText"
                                 [disabled]="loginForm.invalid"
@@ -38,6 +50,7 @@
                                 class="btn btn-primary">
                                     {{ "Send" | localize }}
                             </button>
+                            </ng-container>
                         </div>
                         <div class="pr-4">
                             <span

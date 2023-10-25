@@ -1,0 +1,153 @@
+<div class="wrapper-filters border bg-white rounded w-100">
+    <!-- stock available -->
+
+    <div
+        class="stock-availablity pt-2 d-flex align-items-center justify-content-between px-3"
+    >
+        <p class="pt-2 fw-bold fs-6" style="font-weight: 700">
+            Only Available in Stock
+        </p>
+        <div class="switch">
+            <p-inputSwitch
+                [(ngModel)]="stockAvailablty"
+                (onChange)="handleStockChange($event)"
+            ></p-inputSwitch>
+        </div>
+    </div>
+
+    <!-- stock available -->
+
+    <hr />
+
+    <div class="filter-selection">
+        <p-accordion [multiple]="true">
+            <!-- product list -->
+            <p-accordionTab
+                header="Product List"
+                *ngIf="isSellerIdExists"
+                [selected]="true"
+            >
+                <div *ngFor="let list of productList">
+                    <button
+                        (click)="selectCatalog(list)"
+                        [ngClass]="{ selectedCatalog: catalogId === list.id }"
+                        class="btn btn-list w-100 d-flex align-items-center justify-content-lg-start"
+                    >
+                        <span>{{ list.name }}</span>
+                    </button>
+                </div>
+            </p-accordionTab>
+            <!-- product list -->
+            <p-accordionTab header="Departments" [selected]="true">
+                <div class="card flex justify-content-start">
+                    <p-tree
+                        class="w-full md:w-30rem"
+                        [value]="files"
+                        (onNodeExpand)="nodeExpand($event)"
+                        [loading]="loading"
+                        selectionMode="single"
+                        (onNodeSelect)="nodeSelect($event)"
+                        (onNodeUnselect)="nodeUnselect($event)"
+                        [(selection)]="selectedFile"
+                    ></p-tree>
+                </div>
+            </p-accordionTab>
+            <p-accordionTab header="Brands" [selected]="true">
+                <div
+                    *ngFor="let brand of brands"
+                    class="d-flex align-items-center justify-content-lg-start px-2"
+                >
+                    <p-checkbox
+                        name="group1"
+                        [value]="brand.value"
+                        [(ngModel)]="selctedBradns"
+                        inputId="ny"
+                        (onChange)="handlebrandsSelction()"
+                    ></p-checkbox>
+                    <label for="ny">{{ brand.label }}</label>
+                </div>
+            </p-accordionTab>
+            <p-accordionTab header="Price" [selected]="false">
+                <div class="price">
+                    <input
+                        type="number"
+                        name="priceFrom"
+                        class="form-control"
+                        placeholder="from"
+                        [(ngModel)]="min"
+                        (keyup)="handleStartPriceTyping($event)"
+                    />
+                    <span>Price</span>
+                    <input
+                        type="number"
+                        name="priceTo"
+                        class="form-control"
+                        placeholder="to"
+                        [(ngModel)]="max"
+                        (keyup)="handleEndPriceTyping($event)"
+                    />
+                </div>
+            </p-accordionTab>
+            <p-accordionTab header="Start Ship Date" [selected]="false">
+                <div class="ship-date px-3">
+                    <div class="from-ship mb-3">
+                        <span class="text">From</span>
+                        <div class="card flex justify-content-lg-start">
+                            <p-calendar
+                                appendTo="body"
+                                [(ngModel)]="startShipDate"
+                                [showIcon]="true"
+                                style="width: 100%"
+                                placeholder="Start Date"
+                                (ngModelChange)="onStartShipDateChange()"
+                            ></p-calendar>
+                        </div>
+                    </div>
+                    <div class="to-ship">
+                        <span class="text">To</span>
+                        <div class="card flex justify-content-lg-start">
+                            <p-calendar
+                                appendTo="body"
+                                style="width: 100%"
+                                [(ngModel)]="endShipDate"
+                                [showIcon]="true"
+                                placeholder="End Date"
+                                (ngModelChange)="onEndShipDateChange()"
+                            ></p-calendar>
+                        </div>
+                    </div>
+                </div>
+            </p-accordionTab>
+            <p-accordionTab header="Sold-Out Date" [selected]="false">
+                <div class="soldout-date px-3">
+                    <div class="from-soldout mb-3">
+                        <span class="text">From</span>
+                        <div class="card flex justify-content-lg-start">
+                            <p-calendar
+                                appendTo="body"
+                                [(ngModel)]="startSoldout"
+                                [showIcon]="true"
+                                style="width: 100%"
+                                placeholder="Start Date"
+                                (ngModelChange)="onStartSoldOutDateChange()"
+                            ></p-calendar>
+                        </div>
+                    </div>
+                    <div class="to-soldout">
+                        <span class="text">To</span>
+                        <div class="card flex justify-content-lg-start">
+                            <p-calendar
+                                appendTo="body"
+                                style="width: 100%"
+                                [(ngModel)]="endSoldout"
+                                [showIcon]="true"
+                                placeholder="End Date"
+                                (ngModelChange)="onEndSoldOutDateChange()"
+                            ></p-calendar>
+                        </div>
+                    </div>
+                </div>
+            </p-accordionTab>
+        </p-accordion>
+    </div>
+</div>

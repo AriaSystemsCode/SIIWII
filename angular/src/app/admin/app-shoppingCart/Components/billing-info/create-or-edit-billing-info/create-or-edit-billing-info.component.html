@@ -1,0 +1,102 @@
+<div class="tab-cont">
+    <div *ngIf="createOrEditBillingInfo">
+    <div class="container-fluid pt-1 mb-3">
+        <div class="header my-2 d-flex align-items-center justify-content-between">
+            <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
+            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
+                 {{l("Continue")}}
+            </button>
+        </div>
+        <hr class="my-2" />
+        <div class="InfoForm pr-3 thin-scroll">
+            <div class="row ml-1"> 
+                <app-contact  
+                class="w-100"
+                [shipInfoIndex]="1"
+                (loadAddressComponent)="reloadAddresscomponentAPContact($event)"
+                [isCreateOrEdit]="createOrEditBillingInfo"
+                [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                (formValidityChanged)="isContactFormValid($event)"
+                [showDepartment]="activeTab ==shoppingCartoccordionTabs.BillingInfo"
+            ></app-contact>
+            </div>
+        </div>
+        <hr class="my-2" />
+        <app-address 
+        [isCreateOredit]="createOrEditBillingInfo"
+        [contactId]="contactIdApContact"
+        (updateSelectedAddress)="updateApContact($event)"
+        [selectedAddressDetails]="apContactSelectedAdd"
+
+        ></app-address>
+        
+    </div>
+    <div class="container-fluid pt-1">
+        <div class="header my-2 d-flex align-items-center justify-content-between">
+            <h6><span  class="headertxt">  {{l("ARContact")}} : </span></h6>
+            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()"
+             class="continuebtn text-center btn float-right">
+                 {{l("Continue")}}
+            </button>
+        </div>
+        <hr class="my-2" />
+        <div class="InfoForm pr-3 thin-scroll">
+            <div class="row ml-1"> 
+                <app-contact  
+                class="w-100"
+                [shipInfoIndex]="2"
+                (loadAddressComponent)="reloadAddresscomponentARContact($event)"
+                [isCreateOrEdit]="createOrEditBillingInfo"
+                [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                (formValidityChanged)="isContactFormValid($event)"
+                [showDepartment]="activeTab ==shoppingCartoccordionTabs.BillingInfo"
+            ></app-contact>
+            </div>
+        </div>
+        <hr class="my-2" />
+        <app-address 
+        [isCreateOredit]="createOrEditBillingInfo"
+        [contactId]="contactIdARContact"
+        (updateSelectedAddress)="updateArContact($event)"
+        [selectedAddressDetails]="arContactSelectedAdd"
+
+        ></app-address>
+
+
+    </div>
+    <div class="container-fluid pt-1 mb-3 mt-3">
+        <div class="header my-2 d-flex align-items-center justify-content-between">
+            <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
+            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
+                 {{l("Continue")}}
+            </button>
+        </div>
+        <div class="row edit-mode ">
+            <div class="col-6 mb-4">
+                <label class="label mt-1 mb-1">{{l("PaymentTerms")}}:</label>
+                <p-dropdown
+                id="payTerms"
+                [options]="payTermsListList"
+                name="payTerms"
+                styleClass="form-control aria-select"
+                [required]="true"
+                [placeholder]="'PleaseSelect' | localize"
+            >
+            </p-dropdown>
+            </div>
+        </div>
+        </div>
+</div>
+
+
+<div *ngIf="!createOrEditBillingInfo">
+    <app-view-shipping-information
+    [activeTab]="activeTab"
+    [appTransactionsForViewDto]="appTransactionsForViewDto">
+</app-view-shipping-information>
+</div>
+</div>

@@ -59,7 +59,10 @@ export class MaintenanceComponent extends AppComponentBase implements OnInit {
             self.fixWebLogsPanelHeight();
         });
     }
-
+    fixItemsSSIN() {
+        this.showMainSpinner();
+        
+    }
     downloadWebLogs = function () {
         const self = this;
         self._webLogService.downloadWebLogs().subscribe((result) => {

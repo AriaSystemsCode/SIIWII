@@ -182,6 +182,7 @@ export class AppItemsComponent extends AppComponentBase {
         this.isModal  =  inputs.isModal
         this.canAdd  =  inputs.canAdd
         this.pageMainFilters  =  inputs.pageMainFilters
+        console.log(">>", this.pageMainFilters)
         this.filtersFlags  =  inputs.filtersFlags
         this.statusesFlags  =  inputs.statusesFlags
         this.actionsMenuFlags  =  inputs.actionsMenuFlags
@@ -254,6 +255,7 @@ export class AppItemsComponent extends AppComponentBase {
         ];
     }
     filterBody = new GetAllAppItemsInput();
+    @Output() itemEmited :EventEmitter<any> = new EventEmitter<any>()
     getAppItems(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.totalRecords = 10;
@@ -339,6 +341,7 @@ export class AppItemsComponent extends AppComponentBase {
             )
             .subscribe((result) => {
                 this.items = result.items;
+                this.itemEmited.emit(result.items)
                 this.primengTableHelper.totalRecordsCount = result.totalCount;
                 this.primengTableHelper.records = result.items;
             });

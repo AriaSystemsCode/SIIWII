@@ -1,0 +1,25 @@
+<div class="card" (click)="viewProduct(product.id)" >
+    <img
+        class="img"
+        [src]="attachmentBaseUrl + '/' + product?.imageUrl"
+        alt="Card image cap"
+        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+        />
+
+    <div class="card-body">
+        <div class="ssin">
+            {{ product?.manufacturerCode }}
+        </div>
+        <p class="card-text desc fw-bold">
+            {{ product?.name }}
+        </p>
+
+        <div class="d-flex name-price">
+            <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
+             <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
+            <h5 class="price">{{ currency }} {{ product?.price }}</h5>
+        </div>
+    </div>
+</div>
+
+<!-- src="../../../../../assets/placeholders/appitem-placeholder.png" -->

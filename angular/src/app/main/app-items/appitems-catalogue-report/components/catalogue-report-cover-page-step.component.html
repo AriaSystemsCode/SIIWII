@@ -26,6 +26,7 @@
                             #reportTitleInput="ngModel"
                             [ngClass]="{ 'border-danger': false }"
                             [placeholder]="'Enterlinesheetname' | localize"
+                            (keyup)="onChangLinesheetName()"
                         />
                     </div>
 

@@ -335,7 +335,7 @@ selectedRecords=modalRefData.selectedRecords;
     body.dimesion3Name = this.appSizeScaleDto.dimesion3Name 
     body.noOfDimensions = this.appSizeScaleDto.noOfDimensions
     body.name = this.appSizeScaleDto.name
-    if( this.appSizeScalesDetails.length == body.appSizeScalesDetails.length && 
+    if( this.appSizeScalesDetails && this.appSizeScalesDetails?.length == body.appSizeScalesDetails.length && 
       JSON.stringify(this.appSizeScalesDetails) == JSON.stringify(body.appSizeScalesDetails)){
    return   this.notify.error(this.l('No change to Saved!'))
     }
