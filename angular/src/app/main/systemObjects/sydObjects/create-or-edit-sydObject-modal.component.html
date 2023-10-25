@@ -1,0 +1,60 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sydObjectForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sydObject.id">{{l("EditObject")}}</span>
+                        <span *ngIf="!sydObject.id">{{l("CreateNewObject")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+					<div class="form-group m-form__group">
+						<label for="SysObjectTypeName">{{l("ObjectType")}} *</label>
+						<select name="sydObject.objectTypeId" [(ngModel)]="sydObject.objectTypeId" class="form-control" required #t (change)="onTypeChange(t.value)">
+							<option value="">{{l('PleaseSelect')}}</option>
+							<option *ngFor="let item of allSysObjectTypes" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div *ngIf="parentIdEntity" class="form-group m-form__group">
+						<label for="SydObjectName">{{l("Parent")}}</label>
+						<select name="sydObject.parentId" [(ngModel)]="sydObject.parentId" class="form-control" [required]="parentIdEntity">
+							<option value="">{{l('PleaseSelect')}}</option>
+							<option *ngFor="let item of allSydObjects" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+					<div *ngIf="!parentIdEntity" class="form-group m-form__group">
+						<label for="SydObjectName">{{l("Parent")}}</label>
+						<select name="sydObject.parentId" [(ngModel)]="sydObject.parentId" class="form-control" [required]="parentIdEntity">
+							<option value="">{{l('PleaseSelect')}}</option>
+							<option *ngFor="let item of allSysObjectOfEntity" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="SydObject_Name">{{l("Name")}} *</label>
+						<input type="text" id="SydObject_Name" class="form-control" [(ngModel)]="sydObject.name" name="Name"   minlength="2"  maxlength="150"  required/>
+					</div>
+
+					<div class="form-group">
+						<label for="SydObject_Code">{{l("Code")}} *</label>
+						<input type="text" id="SydObject_Code" class="form-control" [(ngModel)]="sydObject.code" name="Code"   minlength="2"  maxlength="150" [readonly]="sydObject.id>0" required/>
+					</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sydObjectForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

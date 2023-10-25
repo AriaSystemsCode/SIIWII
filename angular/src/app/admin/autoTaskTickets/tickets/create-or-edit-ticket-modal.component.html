@@ -1,0 +1,110 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg ticket">
+        <div class="modal-content">
+            <form *ngIf="active" #ticketForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="ticket.id">{{l("EditTicket")}}</span>
+                      <!--   <span *ngIf="!ticket.id">{{l("CreateNewTicket")}}</span> -->
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+								<div class="form-group">
+									<label for="Ticket_Title">{{l("Title")}}</label>
+									<input type="text" #Ticket_Title="ngModel" id="Ticket_Title" class="form-control" [(ngModel)]="ticket.title" name="Title"   minlength="1"  maxlength="255" />
+								    <validation-messages [formCtrl]="Ticket_Title"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="Ticket_TicketNumber">{{l("TicketNumber")}}</label>
+									<input type="text" #Ticket_TicketNumber="ngModel" id="Ticket_TicketNumber" class="form-control" [(ngModel)]="ticket.ticketNumber" name="TicketNumber"   minlength="1"  maxlength="50" />
+								    <validation-messages [formCtrl]="Ticket_TicketNumber"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="Ticket_Description">{{l("Description")}}</label>
+									<input type="text" #Ticket_Description="ngModel" id="Ticket_Description" class="form-control" [(ngModel)]="ticket.description" name="Description"    />
+								    <validation-messages [formCtrl]="Ticket_Description"></validation-messages>
+								</div>
+                                   <!--Sara Start Here -->
+                                <div class="form-group">
+									<label for="Ticket_Queue">{{l("CurrentQueue")  }} </label>
+                                    <p-dropdown [options]="allQueueTypes" styleClass="ticket-dropdown form-control aria-select" [filter]="false"
+                                    name="ticket.queueName" [(ngModel)]="ticket.queueId"></p-dropdown>
+
+                                </div>
+                                <div class="form-group" *ngIf="ticket?.entityAttachments?.length > 0">
+                                    <label >{{l("Attachments")}} :  {{ticket.entityAttachments.length}}</label>
+                                </div>
+
+                        <div class="form-group"  *ngIf="ticket?.entityAttachments?.length > 0">
+
+
+
+
+                                  <div   class="files-uploaded" *ngFor="let attachItem of ticket.entityAttachments;">
+
+                                    <div style="position: relative;" class="uploaded-attchments" >
+                                        <button *ngIf="! ticket.id" class="close" aria-hidden="true" (click)="deleteTicketAttachment(attachItem.id)">
+                                            <i class="fa fa-trash-alt icon-xs " ></i>
+
+                                        </button>
+                                        <img class="img-wrap" src="assets/message/adobe.svg" (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.PDF') || attachItem.fileName.includes('.pdf')" >
+                                        <img class="img-wrap" src="assets/message/excel.svg" (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.xls') || attachItem.fileName.includes('.XLS')">
+                                        <img class="img-wrap"  [src]="getImage(attachItem.fullPath)"   (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.jpg') || attachItem.fileName.includes('.JPG') || attachItem.fileName.includes('.png') || attachItem.fileName.includes('.PNG') || attachItem.fileName.includes('.svg') || attachItem.fileName.includes('.SVG') ">
+                                        <img class="img-wrap" src="assets/message/microsoft-powerpoint.svg" (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.ppt') || attachItem.fileName.includes('.PPT')">
+                                        <img class="img-wrap" src="assets/message/microsoft-word.svg"  (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.doc') || attachItem.fileName.includes('.docs')">
+
+                                            <img class="img-wrap" src="assets/message/document.png" (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                            *ngIf="!attachItem.fileName.includes('.xls') && !attachItem.fileName.includes('.XLS')
+                                            && !attachItem.fileName.includes('.PDF') && !attachItem.fileName.includes('.pdf')
+                                            && !attachItem.fileName.includes('.docs')&& !attachItem.fileName.includes('.doc')
+                                            && !attachItem.fileName.includes('.ppt') && !attachItem.fileName.includes('.jpg')
+                                            && !attachItem.fileName.includes('.svg') && !attachItem.fileName.includes('.png')
+                                            && !attachItem.fileName.includes('.PNG')" >
+
+
+
+                                         </div>
+                                         <p class="display-name mt-2"><span>{{attachItem.fileName}}</span></p>
+
+
+                                        </div>
+                                    </div>
+
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text" style="background-color:#3699FF; color:cornsilk"  id="inputGroupFileAddon01" >Upload Attachment</span>
+                                </div>
+                                <div class="custom-file">
+                                  <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" (change)="handleInputChangeAttachment($event)" >
+                                  <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                </div>
+                            </div>
+
+                                <!--Loop Ends Here -->
+
+
+        <!--Sara End Here -->
+
+
+
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!ticketForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+</div>

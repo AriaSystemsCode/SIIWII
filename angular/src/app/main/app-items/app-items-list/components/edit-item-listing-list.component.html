@@ -1,0 +1,571 @@
+<form #listForm="ngForm" (ngSubmit)="createOrEditAppItemList(listForm)">
+    <div [@routerTransition] style="margin-top: -90px" class="wrapper">
+        <div
+            class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
+        >
+            <div class="kt-subheader kt-grid__item">
+                <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+                            <a
+                                class="text-capitalize text-dark"
+                                type="button"
+                                (click)="backURL()"
+                            >
+                                <i class="fas fa-arrow-left"></i>
+                                {{ "Back" | localize }}
+                            </a>
+                        </h3>
+                        <span
+                            class="kt-subheader__separator kt-subheader__separator--v"
+                        ></span>
+                        <span class="kt-subheader__desc">
+                            {{ "ManageMyLists" | localize }}
+                        </span>
+                        <span class="mr-1"> > </span>
+                        <span class="kt-subheader__desc">
+                            <a
+                                class="text-capitalize text-black-50"
+                                (click)="redirectToAppItemList()"
+                            >
+                                {{ "MyProductLists" | localize }}
+                            </a>
+                        </span>
+                        <span class="mr-1"> > </span>
+                        <span class="kt-subheader__desc">
+                            {{ list?.appItemsList?.name }}
+                        </span>
+                        <span
+                            class="kt-subheader__separator kt-subheader__separator--v"
+                        ></span>
+                        <span class="ml-1 mr-3">
+                            {{
+                                !loading && list?.appItemsList?.published
+                                    ? l("Published")
+                                    : l("NotPublished")
+                            }}
+                            <span class="ml-2">
+                                <i
+                                    class="d-inline-flex flaticon2-information rounded-circle text-white"
+                                    [ngClass]="
+                                        list?.appItemsList?.published
+                                            ? 'bg-success'
+                                            : 'bg-warn bg-warning'
+                                    "
+                                ></i>
+                            </span>
+                        </span>
+                        <span
+                            class="kt-subheader__separator kt-subheader__separator--v"
+                            *ngIf="
+                                !loading &&
+                                list?.appItemsList?.statusCode &&
+                                viewMode
+                            "
+                        ></span>
+                        <span *ngIf="viewMode" class="ml-1 mr-3 text-success">
+                            {{
+                                !loading && list?.appItemsList?.statusCode
+                                    ? l(
+                                          list?.appItemsList?.statusCode
+                                              | titlecase
+                                      )
+                                    : ""
+                            }}
+                        </span>
+                    </div>
+                    <div
+                        class="share-sync my-3 d-flex flex-column align-items-center gap-3 justify-content-end w-50"
+                    >
+                        <div class="d-flex align-items-center gap-3 w-100 justify-content-end">
+                            <button
+                                pButton
+                                pRipple
+                                label="Share"
+                                class="share mr-2"
+                                icon="pi pi-share-alt"
+                                type="button"
+                                (click)="openShareProductListingModal()"
+                            ></button>
+                            <button
+                                pButton
+                                pRipple
+                                label="Sync"
+                                class="sync"
+                                type="button"
+                                icon="pi pi-sync"
+                                [loading]="btnLoader"
+                                [disabled]="!list.showSync"
+                                (click)="syncProduct()"
+                            ></button>
+                        </div>
+                        <div
+                            class="last-updated my-3 d-flex align-items-center gap-3 justify-content-end w-100"
+                        >
+                            <p>Last Updated {{ lastUpdatedDate }}</p>
+                        </div>
+                    </div>
+                    <div class="kt-subheader__toolbar" *ngIf="!viewMode">
+                        <div class="kt-subheader__wrapper">
+                            <button
+                                class="btn btn-success text-capitalize mr-2"
+                                type="button"
+                                (click)="SaveAsDraft()"
+                            >
+                                <span>{{ l("SaveAsDraft") }}</span>
+                            </button>
+                            <button
+                                class="btn btn-primary text-capitalize mr-2"
+                                type="button"
+                                (click)="openMultiSelector()"
+                            >
+                                <span>{{ l("AddProduct(s)") }}</span>
+                            </button>
+                            <button
+                                class="btn btn-primary text-capitalize mr-2"
+                                type="submit"
+                                [buttonBusy]="false"
+                                [busyText]="l('SavingWithThreeDot')"
+                            >
+                                <span>{{ l("SaveChanges") }}</span>
+                            </button>
+                            <button
+                                class="btn rounded bg-secondary"
+                                type="button"
+                                (click)="cancel()"
+                            >
+                                {{ "Cancel" | localize }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
+                *ngIf="viewMode"
+            >
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body">
+                        <div class="row">
+                            <div
+                                class="col-10 d-flex flex-column justify-content-between"
+                            >
+                                <h3
+                                    class="align-items-baseline d-flex kt-subheader__title"
+                                >
+                                    {{ "View" | localize }}
+                                    {{ list?.appItemsList?.name }}
+                                    {{ "List" | localize }}
+                                    <span class="ml-2 mr-2 items-count-icon">
+                                        {{
+                                            list?.appItemsList
+                                                ?.appItemsListItems?.totalCount
+                                        }}
+                                    </span>
+                                    {{ "items" | localize }}
+                                    <p class="border-left ml-3 mr-1 pl-3">
+                                        {{ "ThisListSharedWith" | localize }}:
+                                    </p>
+                                    <div class="users-list">
+                                        <ng-container
+                                            *ngFor="
+                                                let user of list?.appItemsList
+                                                    ?.users;
+                                                index as i
+                                            "
+                                        >
+                                            <img
+                                                [ngStyle]="{
+                                                    left: 10 + i * 20 + 'px',
+                                                    'z-index': i + 1
+                                                }"
+                                                [title]="user.name"
+                                                [src]="
+                                                    user.imageURL ||
+                                                    'assets/common/images/avatar-icon1.jpg'
+                                                "
+                                                alt=""
+                                            />
+                                        </ng-container>
+                                        <span
+                                            class="users-count-icon"
+                                            [ngStyle]="{
+                                                left:
+                                                    10 +
+                                                    list?.appItemsList?.users
+                                                        ?.length *
+                                                        20 +
+                                                    'px',
+                                                'z-index':
+                                                    list?.appItemsList?.users
+                                                        ?.length + 1
+                                            }"
+                                        >
+                                            {{
+                                                list?.appItemsList?.usersCount >
+                                                5
+                                                    ? "+"
+                                                    : ""
+                                            }}
+                                            {{ list?.appItemsList?.usersCount }}
+                                        </span>
+                                    </div>
+                                </h3>
+                            </div>
+                            <div class="col text-right" *ngIf="isRecordOwner">
+                                <div
+                                    class="btn-group dropdown"
+                                    dropdown
+                                    container="body"
+                                    placement="bottom right"
+                                >
+                                    <button
+                                        class="dropdown-toggle btn btn-sm btn-action"
+                                        dropdownToggle
+                                        type="button"
+                                    ></button>
+                                    <ul
+                                        class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                                        *dropdownMenu
+                                    >
+                                        <li>
+                                            <a
+                                                href="javascript:;"
+                                                [ngClass]="{
+                                                    dimmed: !canPublish
+                                                }"
+                                                *ngIf="
+                                                    !list?.appItemsList
+                                                        ?.published &&
+                                                    list?.appItemsList
+                                                        ?.appItemsListItems
+                                                        ?.totalCount > 0 &&
+                                                    list?.appItemsList
+                                                        ?.statusCode == 'ACTIVE'
+                                                "
+                                                (click)="
+                                                    openShareProductListModal()
+                                                "
+                                                >{{ "PublishList" | localize }}
+                                            </a>
+                                            <a
+                                                href="javascript:;"
+                                                [ngClass]="{
+                                                    dimmed: !canPublish
+                                                }"
+                                                *ngIf="
+                                                    list?.appItemsList
+                                                        ?.published
+                                                "
+                                                (click)="unPublish()"
+                                                >{{
+                                                    "UnpublishList" | localize
+                                                }}
+                                            </a>
+                                        </li>
+                                        <li *ngIf="canEdit">
+                                            <a
+                                                href="javascript:;"
+                                                [routerLink]="[
+                                                    '/app/main/productslists/edit',
+                                                    list?.appItemsList?.id
+                                                ]"
+                                                >{{
+                                                    "EditProductsList"
+                                                        | localize
+                                                }}</a
+                                            >
+                                        </li>
+                                        <li>
+                                            <a
+                                                href="javascript:;"
+                                                [ngClass]="{
+                                                    dimmed: !canPrint
+                                                }"
+                                                (click)="printList()"
+                                                >{{
+                                                    "PrintProductsList"
+                                                        | localize
+                                                }}</a
+                                            >
+                                        </li>
+                                        <li *ngIf="canDelete">
+                                            <a
+                                                href="javascript:;"
+                                                (click)="
+                                                    askToConfirmDeleteList()
+                                                "
+                                                >{{
+                                                    "DeleteThisList" | localize
+                                                }}</a
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
+            >
+                <div
+                    class="kt-portlet kt-portlet--mobile"
+                    [ngClass]="{ veiwMode: viewMode }"
+                >
+                    <div class="kt-portlet__body">
+                        <div class="row">
+                            <div
+                                *ngIf="!viewMode"
+                                class="col-12 list-toolbar border-dashed-bottom pb-4"
+                            >
+                                <div class="h3 text-center text-success">
+                                    {{
+                                        !loading &&
+                                        list?.appItemsList?.statusCode
+                                            ? l(
+                                                  list?.appItemsList?.statusCode
+                                                      | titlecase
+                                              )
+                                            : ""
+                                    }}
+                                </div>
+                                <div class="align-items-baseline mb-5 mt-5 row">
+                                    <div
+                                        class="col-lg-1 col-md-3 col-sm-4 col-6"
+                                    >
+                                        <h6>
+                                            <span class="text-danger">*</span
+                                            >{{ "ListName" | localize }}
+                                        </h6>
+                                    </div>
+                                    <div class="col">
+                                        <ng-container
+                                            *ngIf="list?.appItemsList"
+                                        >
+                                            <input
+                                                type="text"
+                                                [required]="true"
+                                                name="name"
+                                                [(ngModel)]="
+                                                    list.appItemsList.name
+                                                "
+                                                class="form-control bg-white form-control-border-grey"
+                                                [ngClass]="{
+                                                    'border-danger': false
+                                                }"
+                                                placeholder="{{
+                                                    'List name' | localize
+                                                }}"
+                                                (blur)="
+                                                    onHeaderInputsBlur($event)
+                                                "
+                                            />
+                                        </ng-container>
+                                    </div>
+                                    <div
+                                        class="col-lg-1 col-md-3 col-sm-4 col-6"
+                                    >
+                                        <span class="text-muted"
+                                            >50 {{ "digits" | localize }}</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="align-items-baseline mb-5 mt-5 row">
+                                    <div
+                                        class="col-lg-1 col-md-3 col-sm-4 col-6"
+                                    >
+                                        <h6>
+                                            <span class="text-danger">*</span
+                                            >{{ "ListCode" | localize }}
+                                        </h6>
+                                    </div>
+                                    <div class="col">
+                                        <ng-container
+                                            *ngIf="list?.appItemsList"
+                                        >
+                                            <input
+                                                type="text"
+                                                [required]="true"
+                                                name="code"
+                                                [(ngModel)]="
+                                                    list.appItemsList.code
+                                                "
+                                                class="form-control bg-white form-control-border-grey"
+                                                [ngClass]="{
+                                                    'border-danger': false
+                                                }"
+                                                [placeholder]="
+                                                    'ListCode' | localize
+                                                "
+                                                (blur)="
+                                                    onHeaderInputsBlur($event)
+                                                "
+                                            />
+                                        </ng-container>
+                                    </div>
+                                    <div
+                                        class="col-lg-1 col-md-3 col-sm-4 col-6"
+                                    >
+                                        <span class="text-muted"
+                                            >50 {{ "digits" | localize }}</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="align-items-baseline mb-5 mt-5 row">
+                                    <div
+                                        class="col-lg-1 col-md-3 col-sm-4 col-6"
+                                    >
+                                        <h6>
+                                            <span class="text-danger">*</span
+                                            >{{ "ListDescription" | localize }}
+                                        </h6>
+                                    </div>
+                                    <div class="col">
+                                        <ng-container
+                                            *ngIf="list?.appItemsList"
+                                        >
+                                            <input
+                                                type="text"
+                                                [required]="true"
+                                                name="description"
+                                                class="form-control bg-white form-control-border-grey"
+                                                [(ngModel)]="
+                                                    list.appItemsList
+                                                        .description
+                                                "
+                                                [ngClass]="{
+                                                    'border-danger': false
+                                                }"
+                                                placeholder="{{
+                                                    'ListDescription' | localize
+                                                }}"
+                                                (blur)="
+                                                    onHeaderInputsBlur($event)
+                                                "
+                                            />
+                                        </ng-container>
+                                    </div>
+                                    <div
+                                        class="col-lg-1 col-md-3 col-sm-4 col-6"
+                                    >
+                                        <span class="text-muted"
+                                            >450 {{ "digits" | localize }}</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="col-12 d-flex flex-column justify-content-between"
+                            >
+                                <div class="row pt-5 pl-5 pr-2">
+                                    <div
+                                        class="col-12"
+                                        [ngClass]="
+                                            singleItemPerRowMode
+                                                ? 'col-md-12 single-item-per-row-layout'
+                                                : 'col-md-6'
+                                        "
+                                        *ngFor="
+                                            let item of list?.appItemsList
+                                                ?.appItemsListItems?.items;
+                                            index as i
+                                        "
+                                    >
+                                        <app-item-list-item-card
+                                            [class]="
+                                                'border-dashed-bottom mb-3 pb-3'
+                                            "
+                                            [singleItemPerRowMode]="
+                                                singleItemPerRowMode
+                                            "
+                                            [item]="item"
+                                            [viewMode]="viewMode"
+                                            (deleteMe)="
+                                                deleteItem($event, item, i)
+                                            "
+                                            (changeStatus)="
+                                                itemStatusChangeHandler(
+                                                    $event,
+                                                    item.itemId,
+                                                    i
+                                                )
+                                            "
+                                            (openVariation)="
+                                                openVariationSelectionModal(
+                                                    $event,
+                                                    item
+                                                )
+                                            "
+                                        >
+                                        </app-item-list-item-card>
+                                    </div>
+                                    <div
+                                        class="font-weight-normal mt-5 p-5 text-center w-100"
+                                        *ngIf="
+                                            list?.appItemsList
+                                                ?.appItemsListItems?.items
+                                                ?.length === 0
+                                        "
+                                    >
+                                        {{
+                                            "ThereAreNoProductsListingsAttachedToThisList"
+                                                | localize
+                                        }}...
+                                    </div>
+                                </div>
+                                <div
+                                    class="primeng-paging-container custom-paginator"
+                                >
+                                    <p-paginator
+                                        [rows]="
+                                            primengTableHelper.defaultRecordsCountPerPage
+                                        "
+                                        #paginator
+                                        [totalRecords]="
+                                            primengTableHelper.totalRecordsCount
+                                        "
+                                        [rowsPerPageOptions]="
+                                            primengTableHelper.predefinedRecordsCountPerPage
+                                        "
+                                        (onPageChange)="
+                                            getAppItemListDetails($event)
+                                        "
+                                    >
+                                    </p-paginator>
+
+                                    <div
+                                        class="total-records-count text-right mr-3"
+                                    >
+                                        {{
+                                            l(
+                                                "TotalRecordsCount",
+                                                primengTableHelper.totalRecordsCount
+                                            )
+                                        }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<app-variations-selection-modal
+    #variationSelectionModal
+    (variationSelectionDone)="onVariationSelectionDone($event)"
+    (cancelDone)="onVariationSelectionCanceled($event)"
+>
+</app-variations-selection-modal>
+
+<app-items-browse-modal
+    #appItemsBrowseModal
+    (apply)="applyHandler($event)"
+    (cancel)="cancelHandler()"
+>
+</app-items-browse-modal>

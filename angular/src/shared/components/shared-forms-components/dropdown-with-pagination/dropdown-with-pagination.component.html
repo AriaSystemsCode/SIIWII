@@ -1,0 +1,21 @@
+<div *ngIf="selectionType == DropdownSelection.Single && active">
+    <p-dropdown
+        [options]="paginationSettings.list"
+        [styleClass]="'w-100'"
+        [name]="title"
+        [(ngModel)]="selectedValue"
+        [placeholder]="l('Select') + ' ' + title"
+        (onChange)="onDropDownChange($event)">
+    </p-dropdown>
+</div>
+
+<div *ngIf="selectionType == DropdownSelection.Multi && active">
+    <p-multiSelect
+        [options]="paginationSettings.list"
+        [styleClass]="'w-100'"
+        [name]="title"
+        [(ngModel)]="selectedValue"
+        [placeholder]="l('Select') + ' ' + title"
+        (onChange)="onMultiSelectChange($event)">
+    </p-multiSelect>
+</div>

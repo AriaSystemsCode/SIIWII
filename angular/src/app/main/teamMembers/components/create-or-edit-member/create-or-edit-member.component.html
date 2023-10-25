@@ -1,0 +1,217 @@
+
+<div [@routerTransition] class="wrapper" >
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
+        <div class="kt-subheader kt-grid__item" *ngIf="active">
+            <div [class]="containerClass">
+                <div class="kt-subheader__main">
+                    <h6 class="kt-subheader__title">
+                        <span>{{ isManualOrExternalContact ? l("ManualContact") : l("TeamMember")  }}</span>
+                    </h6>
+                    <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                    <h6 class="mb-0 mr-2">{{ memberDto?.firstName }} {{  " " }} {{ memberDto?.lastName }}</h6>
+                    <span class="hint">{{ "ProfileInformation" | localize }}</span>
+                </div>
+                <div class="kt-subheader__toolbar">
+                    <div class="kt-subheader__wrapper" >
+                        <button  type="submit" class="btn btn-success btn-1bc5bd w-auto ml-4" (click)="SaveMember()"
+                            [disabled]="!memberForm.form.valid && !memberDto?.parentId">
+                            <span>{{l("SaveChanges")}}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet__body pt-5">
+                    <form #memberForm="ngForm">
+                        <div *ngIf="active" >
+                            <!--Profile Picture-->
+                            <div class="form-group row ">
+                                <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("MyPhoto")}}
+                                </label>
+                                <app-image-upload
+                                    [sycAttachmentCategory]="sycAttachmentCategoryLogo"
+                                    [image]="ProfileImg"
+                                    [staticHeight]="170"
+                                    [showGuidelines]="true"
+                                    (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryLogo)"
+                                    (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)"
+                                >
+                                </app-image-upload>
+                            </div>
+                            <!--  cover photo-->
+                            <div class="form-group row ">
+                                <label class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CoverPhoto")}} </label>
+                                <app-image-upload
+                                    [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                    [image]="coverPhoto"
+                                    [staticHeight]="120"
+                                    [showGuidelines]="true"
+                                    (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryBanner)"
+                                    (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)"
+                                >
+                                </app-image-upload>
+                            </div>
+                            <!--First Name -->
+                            <div class="form-group row">
+                                <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("FirstName")}}
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" id="FirstName" class="form-control" name="FirstName" #FirstNameInput="ngModel" [(ngModel)]="memberDto.firstName" required [placeholder]="'PleaseEnterFirstName' | localize "/>
+                                    <validation-messages [formCtrl]="FirstNameInput"></validation-messages>
+                                </div>
+                            </div>
+                            <!--Sur Name -->
+                            <div class="form-group row">
+                                <label for="SurName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("SurName")}}
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" id="SurName" class="form-control"  name="SurName" #SurNameInput="ngModel" [(ngModel)]="memberDto.lastName" required [placeholder]="'PleaseEnterSurName' | localize"/>
+                                    <validation-messages [formCtrl]="SurNameInput"></validation-messages>
+                                </div>
+                            </div>
+                            <!--Email Address-->
+                            <div class="form-group row">
+                                <label for="Email" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("Email")}}
+                                </label>
+                                <div class="col-md-6">
+                                    <input type="email" id="Email" class="form-control" name="Email"  #emailAddressInput="ngModel" [(ngModel)]="memberDto.eMailAddress" required [placeholder]="'PleaseEnterEmail' | localize"/>
+                                    <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
+                                </div>
+                                <div class="col-md-4" *ngIf="!isManualOrExternalContact">
+                                    <span class="mr-3">{{ "IsPublic" | localize }}</span>
+                                    <p-inputSwitch name="emailAddressIsPublic" [(ngModel)]="memberDto.emailAddressIsPublic"></p-inputSwitch>
+                                </div>
+                            </div>
+                            <!--Language -->
+                            <div class="form-group row">
+                                <label for="language" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    {{l("Language")}}
+                                </label>
+                                <div class="col-md-6">
+                                    <p-dropdown id="language" [options]="allLanguages" styleClass="form-control aria-select" name="Language" [(ngModel)]="memberDto.languageId" ></p-dropdown>
+                                </div>
+                                <div class="col-md-4" *ngIf="!isManualOrExternalContact">
+                                    <span class="mr-3">{{ "IsPublic" | localize }}</span>
+                                    <p-inputSwitch name="languageIsPublic" [(ngModel)]="memberDto.languageIsPublic" aria-valuenow="true"></p-inputSwitch>
+                                </div>
+                            </div>
+                            <!--Branch -->
+                            <div class="form-group row" *ngIf="memberDto.accountId">
+                                <label for="Branch" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("Branch")}}
+                                </label>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" (click)="selectBranch()" id="Branch" class="form-control" name="Branch"  #BranchInput="ngModel" [(ngModel)]="selectedBranchName"  disabled [placeholder]="'PleaseSelectBranch'|localize" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <a class="text-primary text-underline" (click)="selectBranch()">
+                                        {{ ( selectedBranchId ? 'Change' : 'Choose' ) | localize }}
+                                    </a>
+                                </div>
+                            </div>
+                            <!--Join Date -->
+                            <div class="form-group row">
+                                <label for="joinDate" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("JoinDate")}}</label>
+                                <div class="col-md-6">
+                                    <input type="datetime" bsDatepicker id="joinDate" #joinDateCtrl='ngModel' [(ngModel)]="memberDto.joinDate" class="form-control" name="JoinDate" minlength="2" maxlength="100" [placeholder]="'PleaseEnterJoinDate'"
+                                     />
+                                    <validation-messages [formCtrl]="joinDateCtrl"></validation-messages>
+                                </div>
+                                <div class="col-md-4" *ngIf="!isManualOrExternalContact">
+                                    <span class="mr-3">
+                                        {{ "IsPublic" | localize }}
+                                    </span>
+                                    <p-inputSwitch name="joinDateIsPublic" [(ngModel)]="memberDto.joinDateIsPublic" ></p-inputSwitch>
+                                </div>
+                            </div>
+                            <!--User Name -->
+                            <div class="form-group row" *ngIf="!isManualOrExternalContact">
+                                <label for="UserName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("UserName")}}
+                                </label>
+                                <div class="col-md-6">
+                                    <input type="text" id="UserName" name="UserName" class="form-control" minlength="2" maxlength="100"
+                                    required #UserNameNameInput="ngModel" [ngModel]="memberDto.userName" [placeholder]="'PleaseEnterUserName' | localize " readonly/>
+                                    <validation-messages [formCtrl]="UserNameNameInput"></validation-messages>
+                                </div>
+                            </div>
+                            <!--Job Title -->
+                            <div class="form-group row">
+                                <label for="JobTitle" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span>
+                                    {{l("JobTitle")}}
+                                </label>
+                                <div class="col-md-6">
+                                    <input type="text" id="JobTitle" name="JobTitle" class="form-control" minlength="2" maxlength="100"
+                                    required #JobTitleInput="ngModel" [(ngModel)]="memberDto.jobTitle" [placeholder]="'PleaseEnterJobTitle' | localize "/>
+                                    <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
+                                </div>
+                            </div>
+                            <!--Phone -->
+                            <div class="form-group row" *ngFor="let item of phonelist ; let i = index" >
+                                <label for="phone" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Phone")}}</label>
+                                <div class="col-sm-2" *ngIf="phonesLoaded">
+                                    <p-dropdown id="phone" name="phone{{i+1}}TypeId" [options]="allPhoneTypes" [(ngModel)]="memberDto['phone'+(i+1)+'TypeId']"  (onChange)="onPhoneTypeChange($event,i)" ></p-dropdown>
+                                </div>
+                                <div class="col-sm-3">
+                                    <input type="text" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
+                                        name="phone{{i+1}}Number"
+                                        (hasError)="hasErrorphoneNumber($event ,i)"
+                                        (ng2TelOutput)="getNumberphoneNumber($event ,i)"
+                                        (countryChange)="onCountryChangephoneNumber($event,i)"
+                                        (intlTelInputObject)="telInputObjectphoneNumber($event ,i)"
+                                        class="form-control form-control-sm aria-input-text phone-input"
+                                        (input)="onPhoneNumberChange($event.target.value ,i)"
+                                        [(ngModel)]="memberDto['phone'+(i+1)+'Number']"
+                                    />
+                                </div>
+                                <div class="col-sm-1">
+                                        <input type="text" id="PhoneExt" class="form-control" name="phone{{i+1}}Ext"
+                                        minlength="1" maxlength="10" [placeholder]="'Ext.' | localize" [(ngModel)]="memberDto['phone'+(i+1)+'Ext']" />
+                                </div>
+                                <div class="col-sm-2" *ngIf="!isManualOrExternalContact">
+                                    <span class="mr-2">{{ "IsPublic" | localize }}</span>
+                                    <p-inputSwitch name="phone{{i+1}}IsPublic" [(ngModel)]="memberDto['phone'+(i+1)+'IsPublic']" ></p-inputSwitch>
+                                </div>
+                                <div class="col-sm-2">
+                                    <i type="button" *ngIf="phonelist.length < 3 && i == 0" style="size: 10px;" class="fas fa-plus-circle "  (click)="AddPhoneToList()"> </i>
+                                    <i type="button" *ngIf="i > 0" style="size: 10px;" class="fas fa-minus-circle " (click)="removePhoneFromList(i)"> </i>
+                                </div>
+                            </div>
+                            <!-- About -->
+                            <div class="form-group row">
+                                <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("About")}} </label>
+                                <div class="col-md-8">
+                                    <textarea class="form-control z-depth-1 aria-textarea-text" id="About" rows="4" name="About"
+                                        [placeholder]="'PleaseEnterAboutMember' | localize" #AboutInput="ngModel" [(ngModel)]="memberDto.notes" >
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<selectBranchModal
+    #selectBranchModal
+    (branchSelected)="branchSelected($event)"
+    (branchSelectionCanceled)="branchSelectionCanceled()"
+></selectBranchModal>

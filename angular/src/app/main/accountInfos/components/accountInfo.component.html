@@ -1,0 +1,717 @@
+﻿<!--Test-->
+<!--new Test- farag-->
+<div id="account-info" [@routerTransition]>
+  <form #accountInfoForm="ngForm" novalidate autocomplete="off" >
+    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+      <div class="kt-subheader kt-grid__item" style="width: 84.2% !important">
+        <div [class]="containerClass">
+          <div class="kt-subheader__main">
+            <h3 class="kt-subheader__title">
+                <span [ngSwitch]="accountLevel">
+                    <span *ngSwitchCase="accountLevelEnum.Profile" >{{l("MyAccount")}}</span>
+                    <span *ngSwitchCase="accountLevelEnum.External" >{{l("ExternalAccount")}}</span>
+                    <span *ngSwitchCase="accountLevelEnum.Manual" >{{l("ManualAccount")}}</span>
+                </span>
+            </h3>
+            <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            <span class="kt-subheader__desc">
+              <span >{{ accountLevel == accountLevelEnum.Profile ? l('UpdateYourAccountInformation') : l("UpdateAccountInformation") }}</span>
+            </span>
+          </div>
+          <div class="kt-subheader__toolbar">
+              <div class="kt-subheader__wrapper" *ngIf="!viewMode && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit">
+                  <button type="submit" *ngIf="!touched && accountLevel !== accountLevelEnum.Manual && accountInfoTemp.id && !getForEditResult.lastChangesIsPublished" class="btn btn-secondary bg-light" (click)="publishProfile()"
+                      [disabled]="accountInfoForm.form.touched && !canPublish" [buttonBusy]="publishing" [busyText]="l('Publishing')">
+                      <span >
+                          <ng-container *ngIf="accountLevel === accountLevelEnum.Profile; else elseTemplate">
+                              {{l("PublishMyProfileLive")}}
+                          </ng-container>
+                          <ng-template #elseTemplate>
+                              {{l("PublishProfileLive")}}
+                          </ng-template>
+                      </span>
+                  </button>
+                  <button  type="submit" class="btn btn-success btn-1bc5bd w-auto ml-4" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')" (click)="showDialogSaveAccount()"
+                      [disabled]="!accountInfoForm.form.valid || !touched">
+                      <span>{{l("SaveChanges")}}</span>
+                  </button>
+                  <a *ngIf="touched"  class="btn btn-danger w-auto ml-4 text-white" (click)="resetFormData()"  >
+                      <span>{{l("Undo")}}</span>
+                  </a>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="row align-items-start accountinfo-container justify-content-center">
+          <div class="col-lg-3 col-md-3 col-sm-12 sidebar-grid">
+            <div >
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="cover-pd-mr-no cover-logo-sidebar">
+                    <div class="image-upload-logo">
+                      <!-- <input *ngIf="!viewMode && ( currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit || currentTab === accountInfoPageTabsEnum.ProfileView)"  type="file" name="photo"  id="{{ 'upload-photo' + 1 }}"
+                      (change)="fileChange($event,attachmentCategoriesLogo)" accept="image/TIFF,image/JPEG,image/JPG,image/PNG,image/GIF" style="opacity: 0;position: absolute;z-index: 999999;"> -->
+
+                          <img *ngIf="companyLogo != null || companyLogo != undefined"  height="128" class="img-thumbnail img-rounded img-logo-account" style="z-index: 999999999;"  src="{{companyLogo}}"
+                          onerror="this.src='../../../../assets/placeholders/_logo-placeholder.png'"
+                          />
+                    </div>
+                  </div>
+                  <div class="title-sidebar-logo">
+                    <p class="title-company">
+                      {{accountDataForView?.name}}
+                    </p>
+                    <p class="desc-company" *ngIf="false">
+                        {{accountDataForView?.description}}
+                    </p>
+                  </div>
+
+                </div>
+
+              </div>
+              <div class="sidebar-item-data">
+                <div class="row row-item row-item-main-data">
+                  <div class="col-md-4 row-item-title">{{l("Email")}}</div>
+                  <div class="col-md-8 row-item-desc text-right">
+                    <span > {{ accountDataForView?.eMailAddress || '-' }} </span>
+                  </div>
+                </div>
+                <div class="row row-item row-item-main-data">
+                  <div class="col-md-4 row-item-title">{{l("Phone")}}</div>
+                  <div class="col-md-8 row-item-desc text-right">
+                    <span > {{ accountDataForView?.phone1Number || '-' }}</span>
+                  </div>
+                </div>
+                <div class="row row-item row-item-main-data">
+                  <div class="col-md-4 row-item-title">{{l("Website")}}</div>
+                  <div class="col-md-8 row-item-desc text-right">
+                    <span> {{ accountDataForView?.website || '-' }} </span>
+                  </div>
+                </div>
+                <div *ngIf="viewMode && !isHost">
+                    <button type="button" *ngIf="accountDataForView && accountDataForView.status === false && !isHost && !isRecordOwner" class="btn mb-3 mt-4 w-100 btn-success" (click)="connect()" >
+                        {{ "Connect" | localize }}
+                    </button>
+                    <button type="button" *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner" class="btn mb-3 mt-4 w-100 btn-danger" (click)="disConnect()" >
+                        {{ "Disconnect" | localize }}
+                    </button>
+                </div>
+              </div>
+
+              <ul class="nav nav-pills flex-column text-capitalize">
+                <li class="nav-item" *ngIf="false">
+                   <a class="nav-link" >
+                    <img class="sidebar-menu-item-img" src="assets/profile/My-Account-Overview_Default.svg"> {{l("MyAccountOverview")}}
+                    <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link d-flex w-100 justify-content-between" (click)="changeTab( !accountInfoTemp?.id && !accountId ? accountInfoPageTabsEnum.ProfileCreateOrEdit : accountInfoPageTabsEnum.ProfileView  )"  [ngClass]="{'active' :currentTab ==  accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit }">
+                    <span>
+                        <img class="sidebar-menu-item-img" *ngIf="currentTab === accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit" src="assets/profile/My-Account-Information-Activated.svg">
+                        <img class="sidebar-menu-item-img" *ngIf="currentTab !== accountInfoPageTabsEnum.ProfileView && currentTab !== accountInfoPageTabsEnum.ProfileCreateOrEdit" src="assets/profile/My-Account-Information-Default.svg">
+                        <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
+                          {{l("MyProfile")}}
+                        </span>
+                        <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
+                          {{l("AccountProfile")}}
+                        </span>
+                    </span>
+                    <span  (click)="triggerProfile($event)" *ngIf="(accountId || accountDataForView?.id) && !viewMode">
+                        <i [title]=" 'EditMode' | localize " *ngIf="currentTab != accountInfoPageTabsEnum.ProfileCreateOrEdit" class="far fa-edit"></i>
+                        <i [title]=" 'ViewMode' | localize " *ngIf="currentTab == accountInfoPageTabsEnum.ProfileCreateOrEdit" class="far fa-eye"></i>
+                    </span>
+                </a>
+
+                  </li>
+                <li class="nav-item" >
+                  <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)" [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
+                    <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.Branches" src="assets/profile/My-Addresses-Activated.svg">
+                    <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.Branches" src="assets/profile/My-Addresses-Default.svg">
+                    <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
+                      {{l("MyBranches/Addresses")}}
+                    </span>
+                    <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
+                      {{l("AccountBranches/Addresses")}}
+                    </span>
+                  </a>
+                </li>
+
+                <li class="nav-item" *ngIf="false">
+                  <a class="nav-link" disabled>
+                    <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.Lookups" src="assets/profile/My-Lookups-Default.svg">
+                    <span>{{l("MyLookups")}}</span>
+                  </a>
+                </li>
+                <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile && !viewMode">
+                  <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Payments)" [ngClass]="currentTab == accountInfoPageTabsEnum.Payments?'active':''">
+                    <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.Payments" src="assets/payment/payment-icon-active.svg">
+                    <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.Payments" src="assets/payment/payment-icon.svg">
+                    <span> {{l("MyPaymentMethods")}}</span>
+                  </a>
+                </li>
+
+                <li class="nav-item" >
+                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.MembersList)" [ngClass]="currentTab == accountInfoPageTabsEnum.MembersList?'active':''">
+                      <!-- <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.MembersList" src="assets/payment/payment-icon-active.svg">
+                      <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.MembersList" src="assets/payment/payment-icon.svg">-->
+                      <i *ngIf="currentTab == accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3" style="color: #3699ff;width: 22px;"> </i>   
+                      <i *ngIf="currentTab != accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3" style="color: #595d6e;width: 22px;"> </i>   
+                      <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
+                        {{l("MyTeamMembers")}}
+                      </span>
+                      <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
+                        {{l("Contacts")}}
+                      </span>
+                    </a>
+                  </li>
+
+                <!-- Sara Start -->
+
+
+                <!-- <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile && !viewMode">
+                  <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.ViewMember)" [ngClass]="currentTab == accountInfoPageTabsEnum.ViewMember?'active':''">
+                    <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.ViewMember" src="assets/payment/payment-icon-active.svg">
+                    <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.ViewMember" src="assets/payment/payment-icon.svg">{{l("View Member")}}
+                  </a>
+                </li> -->
+                <!--Sara End-->
+
+                <li class="nav-item" *ngIf="false">
+                  <a class="nav-link" disabled >
+                    <img class="sidebar-menu-item-img"  src="assets/profile/My-Settings-Default.svg">{{l("MySettings")}}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col rendered-content">
+            <div class="tab1" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.ProfileCreateOrEdit}" >
+                <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+                    <!--Start My Profile-->
+                    <div class="kt-portlet m-portlet--full-height">
+
+                        <div class="kt-portlet__body" *ngIf="accountInfoTemp">
+                            <div class="row">
+                                <div class="offset-md-2 col-md-9">
+                                    <p class="title-blue">{{l("CompanyInformation")}}</p>
+                                </div>
+                            </div>
+                            <!--Company logo-->
+                            <div class="form-group row ">
+                                <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayLogo")}}
+                                </label>
+                                <app-image-upload
+                                    [sycAttachmentCategory]="sycAttachmentCategoryLogo"
+                                    [image]="companyLogo"
+                                    [staticWidth]="170"
+                                    [showGuidelines]="true"
+                                    (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryLogo)"
+                                    (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)"
+                                >
+                                </app-image-upload>
+                            </div>
+                            <!-- company cover photo-->
+                            <div class="form-group row ">
+                                <label  class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayImages")}} </label>
+                                <app-image-upload
+                                    [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                    [image]="coverPhoto"
+                                    [staticHeight]="120"
+                                    [showGuidelines]="true"
+                                    (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryBanner)"
+                                    (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)"
+                                >
+                                </app-image-upload>
+
+                            </div>
+                            <!--Other Images-->
+                            <div class="form-group row">
+                                <div class="col-sm-10 offset-sm-2 d-flex align-items-center d-flex flex-wrap">
+                                    <!--Other image 1-->
+                                    <div class="m-2">
+                                        <app-image-upload
+                                            [sycAttachmentCategory]="sycAttachmentCategoryImage"
+                                            [image]="OtherImages1"
+                                            [staticHeight]="100"
+                                            (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,1)"
+                                            (removeImage)="removeImage($event,sycAttachmentCategoryImage,1)"
+                                        >
+                                        </app-image-upload>
+                                    </div>
+
+                                    <!--Other image 2-->
+                                    <div class="m-2">
+                                            <app-image-upload
+                                            [sycAttachmentCategory]="sycAttachmentCategoryImage"
+                                            [image]="OtherImages2"
+                                            [staticHeight]="100"
+                                            (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,2)"
+                                            (removeImage)="removeImage($event,sycAttachmentCategoryImage,2)"
+                                            >
+                                        </app-image-upload>
+                                    </div>
+
+                                    <!--Other image 3-->
+                                    <div class="m-2">
+                                        <app-image-upload
+                                            [sycAttachmentCategory]="sycAttachmentCategoryImage"
+                                            [image]="OtherImages3"
+                                            [staticHeight]="100"
+                                            (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,3)"
+                                            (removeImage)="removeImage($event,sycAttachmentCategoryImage,3)"
+                                        >
+                                        </app-image-upload>
+                                    </div>
+                                    <!--Other image 4-->
+                                    <div class="m-2">
+                                        <app-image-upload
+                                            [sycAttachmentCategory]="sycAttachmentCategoryImage"
+                                            [image]="OtherImages4"
+                                            [staticHeight]="100"
+                                            (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,4)"
+                                            (removeImage)="removeImage($event,sycAttachmentCategoryImage,4)"
+                                        >
+                                        </app-image-upload>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-10 offset-sm-2 d-flex align-items-center" *ngIf="sycAttachmentCategoryImage">
+                                    <p class="desc-imageor-video">
+                                        <span>
+                                            {{l("AllowedFileTypesForPhotos")}} :
+                                        </span>
+                                        (<span *ngFor="let type of sycAttachmentCategoryImage.sycAttachmentTypeDto;index as i; first as first;last as last">
+                                            {{ !last ? ( type.extension + "," ) : type.extension }}
+                                        </span>)
+                                        <span>
+                                            {{l("ByMaximum5Megabytes",sycAttachmentCategoryImage?.maxFileSize)}} ,
+                                        </span>
+                                        <span>
+                                            {{l("WithAspectRatio?",sycAttachmentCategoryImage?.aspectRatio)}}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                            <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                <span class="text-danger font-weight-bold">*</span>
+                                {{l("Name")}}
+                            </label>
+                            <div class="col-sm-8">
+
+                                <input type="text" id="AccountInfoTemp_Name" #nameInput="ngModel"
+                                class="form-control form-control-sm aria-input-text" id="colFormLabelSm"
+                                [(ngModel)]="accountInfoTemp.name" name="name" minlength="2" maxlength="250" required
+                                (input)="changeTouchState()"
+                                [placeholder]=" 'PleaseEnterCompanyName...' | localize ">
+
+                                <validation-messages [formCtrl]="nameInput"></validation-messages>
+                            </div>
+                            </div>
+                            <div class="form-group row">
+                            <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                <span class="text-danger font-weight-bold">*</span>
+                                {{l("TradeName")}}
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="text" id="AccountInfoTemp_TradeName" #tradeNameInput="ngModel"
+                                class="form-control form-control-sm aria-input-text" [(ngModel)]="accountInfoTemp.tradeName"
+                                (input)="changeTouchState()"
+                                name="tradeName" minlength="2" maxlength="100" required
+                                [placeholder]="'PleaseEnterTradeName...' | localize " />
+                                <validation-messages [formCtrl]="tradeNameInput"></validation-messages>
+                            </div>
+                            </div>
+                            <div class="form-group row">
+                            <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                <span class="text-danger font-weight-bold">*</span>
+                                {{l("EMailAddress")}}
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="email" id="AccountInfoTemp_EMailAddress" #emailAddressInput="ngModel"
+                                class="form-control form-control-sm aria-input-text" [(ngModel)]="accountInfoTemp.eMailAddress"
+                                (input)="changeTouchState()"
+                                name="eMailAddress" minlength="7" maxlength="100" email [placeholder]=" 'PleaseEnterEmail...' | localize " />
+                                <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
+                            </div>
+                            </div>
+                            <div class="form-group row">
+                            <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                {{l("Website")}}</label>
+                            <div class="col-sm-8">
+
+
+                                <input type="url" id="AccountInfoTemp_Website" #websiteInput="ngModel"
+                                class="form-control form-control-sm aria-input-text" (change)="onWebsiteChange()" [(ngModel)]="accountInfoTemp.website"
+                                (input)="changeTouchState()"
+                                name="website" minlength="5" maxlength="100" url [placeholder]=" 'PleaseEnterWebsite...' | localize " />
+                                <validation-messages [formCtrl]="websiteInput"></validation-messages>
+                                <div class="form-control-feedback" *ngIf="websiteValidation">{{ 'InvalidWebsiteFormat' | localize }}</div>
+                            </div>
+                            </div>
+                            <div class="form-group row">
+                            <label for="colFormLabelSm"
+                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AccountType")}}</label>
+                            <div class="col-sm-8">
+                              <div class="d-flex flex-grow-1" >
+                                    <div class="flex-grow-1 mr-1 account-page">
+                                        <!-- <p-multiSelect
+                                            [options]="allAccountTypes"
+                                            [styleClass]="'form-control pb-5 w-100'"
+                                            [(ngModel)]="accountInfoTemp.accountType"
+                                            name="accountType"
+                                            [selectedItemsLabel]="'{0} types selected'"
+                                            [placeholder]="'SelectAccountTypes' | localize"
+                                            (onChange)="changeTouchState()"
+                                        >
+                                        </p-multiSelect> -->
+                                        <p-dropdown
+                                        *ngIf="accountLevel == accountLevelEnum.Manual"
+                                        (onChange)="changeTouchState()"
+                                        #manualAccountTypeInput="ngModel"
+                                      placeholder="{{ 'Account Type' | localize }} *"
+                                      [options]="accountTypes"
+                                       styleClass="ticket-dropdown form-control aria-select text-left"
+                                        [filter]="false"
+                                       name="accountType" 
+                                       [(ngModel)]="accountInfoTemp.accountTypeId"
+                                      required>
+                                       </p-dropdown>
+                                       <input 
+                                       *ngIf="accountLevel != accountLevelEnum.Manual" type="text" id="AccountInfoTemp_AccountType" #accountTypeInput="ngModel"
+                                       class="form-control form-control-sm aria-input-text" [(ngModel)]="accountInfoTemp.accountType"
+                                       name="accountType" minlength="2" maxlength="100" readonly
+                                       [placeholder]="'AccountType' | localize " />
+                                    </div>
+                                </div> 
+                              
+                            </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                
+                            <label for="colFormLabelSm"
+                                class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                <span class="text-danger font-weight-bold">*</span>
+                                {{l("Currency")}}</label>
+                            <div class="col-sm-8">
+                                <p-dropdown [options]="allCurrencies" styleClass="form-control aria-select" [filter]="false"
+                                name="currencyId" [(ngModel)]="accountInfoTemp.currencyId" required (onChange)="changeTouchState()" [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+                            </div>
+                            </div>
+                            <div class="form-group row">
+                            <label for="colFormLabelSm"
+                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Language")}}</label>
+                            <div class="col-sm-8">
+                                <p-dropdown [options]="allLanguages" styleClass="form-control aria-select" [filter]="false"
+                                name="languageId" [(ngModel)]="accountInfoTemp.languageId" (onChange)="changeTouchState()" [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+
+                            </div>
+                            </div>
+
+                            <div class="form-group row" *ngIf="accountLevel == accountLevelEnum.Manual">
+                                <label for="colFormLabelSm"
+                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
+                                <div class="col-sm-8">
+                                    <p-dropdown [options]="allPriceLevel" styleClass="form-control aria-select" [filter]="false"
+                                    name="PriceLevelId" [(ngModel)]="accountInfoTemp.priceLevel"  (onChange)="changeTouchState()" [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+    
+                                </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="colFormLabelSm"
+                                        class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AccountSSIN")}}</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" id="AccountInfoTemp_AccountSSIN" #AccountSSINInput="ngModel"
+                                        class="form-control form-control-sm aria-input-text" [(ngModel)]="accountInfoTemp.ssin"
+                                        name="accountSSIN"  readonly />
+                                    </div>
+                                    </div>
+
+                            <div class="form-group row">
+                            <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AboutUs")}}
+                                </label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control z-depth-1 aria-textarea-text" id="exampleFormControlTextarea6"
+                                rows="4" [(ngModel)]="accountInfoTemp.notes" name="notes"
+                                (input)="changeTouchState()"
+                                [placeholder]=" 'PleaseEnterAboutUs' | localize "></textarea>
+                            </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                    <!--End My profile-->
+                    <!--Start Classifictions-->
+                    <div class="kt-portlet m-portlet--full-height">
+                        <div class="kt-portlet__head aria-header-block header-no-mr-bt">
+                            <div class="col-md-10">
+                            <div class="kt-portlet__head-label aria-header">
+
+                                <h3 class="kt-portlet__head-title">
+                                {{l("BusinessClassifications")}}<span
+                                    class="aria-sub-header">{{l("SelectYourCompanyBusinessClassifications")}}</span>
+                                </h3>
+
+                            </div>
+                            </div>
+                            <div class="col-md-2  header-block-buttons">
+
+
+                            <button class="btn btn-primary btn-blue" (click)="openSelectClassificationsModal()">
+
+                                <span>{{l("Select")}}</span></button>
+
+                            </div>
+
+                        </div>
+                        <div class="kt-portlet__body body-card-no-mr" style="height: auto;">
+                            <div class="row align-items-center">
+                            <div class="primeng-datatable-container depts-table table-transparent-rows table-transparent-header col-12"
+                                [busyIf]="primengTableHelperClass.isLoading">
+                                <p-table #dataTable [value]="this.primengTableHelperClass.records" dataKey="id" [rowHover]="true"
+                                [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5,10,25,50]" [loading]=""
+                                [paginator]="false" [filterDelay]="0">
+                                    <ng-template pTemplate="header">
+                                        <tr class="bg-row-ebedf5">
+
+                                        <td style="width: 150px" pSortableColumn="code">
+                                            <span class="title-code">{{l('Code')}}</span>
+                                            <p-sortIcon field="record.code"></p-sortIcon>
+                                        </td>
+                                        <td  pSortableColumn="name">
+                                            <span class="title-name">{{l('Name')}}</span>
+                                            <p-sortIcon field="record.name"></p-sortIcon>
+                                        </td>
+                                        <td style="width: 130px"><span class="title-action">{{l('Actions')}}</span></td>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-index let-record="$implicit">
+                                        <tr>
+
+                                        <td style="width:150px;padding-left: 30px !important;">
+                                            {{record.entityObjectClassificationCode}}
+                                        </td>
+                                        <td style="width:150px">
+                                            {{record.entityObjectClassificationName}}
+                                        </td>
+                                        <td style="width: 130px">
+                                            <div class="btn-group dropdown" dropdown container="body">
+                                            <img src="assets/profile/Remove-item-from-list.svg">
+                                            <button class="btn btn-sm btn-remove" (click)="removeClassification(record)">
+                                                {{l("Delete")}}
+                                            </button>
+                                            </div>
+                                        </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                                <div
+                                    class="primeng-paging-container custom-paginator d-flex align-items-end justify-content-between"
+                                >
+                                    <p-paginator
+                                        [rows]="
+                                            primengTableHelperClass.defaultRecordsCountPerPage
+                                        "
+                                        #paginatorClass
+                                        (onPageChange)="getClassifications($event)"
+                                        [totalRecords]="
+                                            accountInfoTemp?.entityClassifications?.length
+                                        "
+                                        [rowsPerPageOptions]="
+                                            primengTableHelperClass.predefinedRecordsCountPerPage
+                                        "
+                                    >
+                                    </p-paginator>
+
+                                    <div
+                                        class="total-records-count text-right mr-3"
+                                    >
+                                        {{
+                                            l(
+                                                "TotalRecordsCount",
+                                                primengTableHelperClass.totalRecordsCount
+                                            )
+                                        }}
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--End Classifications-->
+                    <!--Start Categories-->
+                    <div class="kt-portlet m-portlet--full-height">
+                        <div class="kt-portlet__head aria-header-block header-no-mr-bt">
+                            <div class="col-md-10">
+                            <div class="kt-portlet__head-label aria-header">
+
+                                <h3 class="kt-portlet__head-title">
+                                {{l("Departments")}} <span
+                                    class="aria-sub-header">{{l("SelectYourCompanyDepartments")}}</span>
+                                </h3>
+
+                            </div>
+                            </div>
+                            <div class="col-md-2  header-block-buttons">
+
+
+                            <button class="btn btn-primary btn-blue" (click)="openSelectCategoriesModal()">
+
+                                <span>{{l("Select")}}</span></button>
+
+                            </div>
+
+                        </div>
+                        <div class="kt-portlet__body body-card-no-mr" style="height: auto;">
+
+                            <div class="row align-items-center">
+
+                            <div class="primeng-datatable-container depts-table table-transparent-rows table-transparent-header col-12" [busyIf]="primengTableHelperCateg.isLoading">
+                                <p-table #dataTable [value]="this.primengTableHelperCateg.records" dataKey="id" [rowHover]="true"
+                                [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5,10,25,50]" [loading]=""
+                                [paginator]="false" [filterDelay]="0">
+                                    <ng-template pTemplate="header">
+                                        <tr class="bg-row-ebedf5">
+                                        <td style="width: 150px" pSortableColumn="code">
+                                            <span class="title-code">{{l('Code')}}</span>
+                                            <p-sortIcon field="record.code"></p-sortIcon>
+                                        </td>
+                                        <td pSortableColumn="name">
+                                            <span class="title-name">{{l('Name')}}</span>
+                                            <p-sortIcon field="record.name"></p-sortIcon>
+                                        </td>
+                                        <td style="width: 130px"><span class="title-action">{{l('Actions')}}</span></td>
+
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-record="$implicit" let-index="rowIndex">
+                                        <tr>
+                                        <td style="width:150px">
+                                            {{record.entityObjectCategoryCode}}
+                                        </td>
+                                        <td>
+                                            {{record.entityObjectCategoryName}}
+                                        </td>
+                                        <td style="width: 130px">
+                                            <div class="btn-group dropdown" dropdown container="body">
+                                            <img src="assets/profile/Remove-item-from-list.svg">
+                                            <button class="btn btn-sm btn-remove" (click)="removeCategory(index)">
+                                                {{l("Delete")}}
+                                            </button>
+                                            </div>
+                                        </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+
+                                <div
+                                    class="primeng-paging-container custom-paginator table-transparent-rows d-flex align-items-end justify-content-between"
+                                >
+                                    <p-paginator
+                                        [rows]="
+                                        primengTableHelperCateg.defaultRecordsCountPerPage
+                                        "
+                                        #paginatorCateg
+                                        (onPageChange)="getCategories($event)"
+                                        [totalRecords]="
+                                        accountInfoTemp?.entityCategories?.length
+                                        "
+                                        [rowsPerPageOptions]="
+                                        primengTableHelperCateg.predefinedRecordsCountPerPage
+                                        "
+                                    >
+                                    </p-paginator>
+
+                                    <div
+                                        class="total-records-count text-right mr-3"
+                                    >
+                                        {{
+                                            l(
+                                                "TotalRecordsCount",
+                                                primengTableHelperCateg.totalRecordsCount
+                                            )
+                                        }}
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab2" *ngIf="currentTab == accountInfoPageTabsEnum.Branches">
+                <app-branches
+                [branches]='accountDataForView.branches'
+                [accountId]='accountId'
+                (askToPublish)="askToPublish($event)"
+                [viewMode]="viewMode"
+                ></app-branches>
+            </div>
+            <div class="tab3" *ngIf="currentTab == accountInfoPageTabsEnum.Payments">
+              <app-payment-methods-list
+              [accountId]='accountId'
+              (changeTouchState)="changeTouchState()"
+              ></app-payment-methods-list>
+            </div>
+            <div class="tab4" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.MembersList}">
+                <app-members-list
+                    #memberListComponent
+                    (create)="createOrEditMemberHandler()"
+                    (view)="viewMemberHandler($event)"
+                >
+                </app-members-list>
+            </div>
+            <div class="tab5" *ngIf="currentTab == accountInfoPageTabsEnum.ProfileView">
+                <app-view-profile
+                    [accountData]="accountDataForView"
+                    [isPublished]="isPublished"
+                    [viewMode]="viewMode"
+                    [accountLevel]="accountLevel"
+                    (edit)="triggerProfile()"
+                    (delete)="askToConfirmDeleteAccount()"
+                    (publish)="publishProfile()"
+                    (unPublish)="unPublishProfile()"
+                ></app-view-profile>
+            </div>
+            <div class="tab6" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.CreateOrEditMember}" >
+                <app-create-or-edit-member
+                    (createOrEditDone)="onCreateOrEditDoneHandler($event)"
+                    #createOrEditMember
+                ></app-create-or-edit-member>
+            </div>
+            <div class="tab7"  [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.ViewMember}" >
+                <app-view-member-profile
+                    #viewMemberProfile
+                    (edit)="createOrEditMemberHandler($event)"
+                    (delete)="onDeleteMemberHandler($event)"
+                ></app-view-member-profile>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+  </form>
+</div>
+<confirm-modal
+    [content1]="'ChangesSavedSuccessfully' | localize"
+    [content2]="'NowYouAreReadyToPublishTheChangesLive!' | localize"
+    [buttonYes]="'PublishNow' | localize"
+    [buttonNo]="'PublishLater' | localize"
+    [type]="'saveAccount'"
+    [display]="displaySaveAccount"
+    (buttonClicked)="onEmitButtonSaveYes($event)"
+    [data]="save"
+></confirm-modal>
+
+
+
+
+

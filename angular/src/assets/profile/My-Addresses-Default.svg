@@ -1,0 +1,14 @@
+<svg id="My_Addresses_Default" data-name="My Addresses Default" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <g id="Rectangle_13079" data-name="Rectangle 13079" fill="#fff" stroke="#707070" stroke-width="1" opacity="0">
+    <rect width="22" height="22" stroke="none"/>
+    <rect x="0.5" y="0.5" width="21" height="21" fill="none"/>
+  </g>
+  <g id="Group_116438" data-name="Group 116438" transform="translate(-96.041 -1000.465)">
+    <g id="Group_116436" data-name="Group 116436" transform="translate(99.962 1003.088)">
+      <path id="Path_213" data-name="Path 213" d="M106.876,1020.407a.248.248,0,0,1-.19-.088l-5.139-6.119a6.762,6.762,0,0,1,5.178-11.112h.3A6.762,6.762,0,0,1,112.2,1014.2l-5.139,6.119A.248.248,0,0,1,106.876,1020.407Zm-.151-16.823a6.267,6.267,0,0,0-4.8,10.3l4.95,5.892,4.95-5.892h0a6.267,6.267,0,0,0-4.8-10.3Z" transform="translate(-99.962 -1003.088)" fill="#1e1e1e"/>
+    </g>
+    <g id="Group_116437" data-name="Group 116437" transform="translate(102.826 1005.801)">
+      <path id="Path_214" data-name="Path 214" d="M117.4,1023.865a4.05,4.05,0,1,1,4.05-4.05A4.055,4.055,0,0,1,117.4,1023.865Zm0-7.6a3.554,3.554,0,1,0,3.554,3.554A3.558,3.558,0,0,0,117.4,1016.26Z" transform="translate(-113.345 -1015.765)" fill="#1e1e1e"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,21 @@
+.Posts {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 900px;
+}
+
+.logo {
+    width: 30px;
+    height: 30px;
+}
+
+.userName {
+    font-size: 14px !important;
+    color: #464e5f;
+}
+
+@media screen and (max-width: 1300px) {
+.d-sm-sidebars{
+    display: block !important;
+}
+}

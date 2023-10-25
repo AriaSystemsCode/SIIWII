@@ -1,0 +1,104 @@
+<div [@routerTransition] class="wrapper">
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pt-0" >
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" >
+            <div class="kt-portlet kt-portlet-profile" >
+                <div class="kt-portlet__body kt-portlet-profile-portlet__body">
+                    <div class="row" style="padding: 15px 0;">
+                        <div class="col-md-9">
+                            <p style="color: #464E5F;
+                            font-size: 13px;
+                            font-weight: 600;
+                            margin: 0;">{{l("OrganizationAddress")}}</p>
+                            <p style="    font-size: 12px;
+                            color: #B5B5C3;">{{l("UseOrganizationAddressToAddressAndSubAddress")}}</p>
+                        </div>
+                        <div class="col-md-3" *ngIf="!viewMode && accountLevel == 0">
+                            <button type="submit" *ngIf="!accountLevel" class="btn btn-secondary btn-b5b5c3" (click)="askToPublish.emit(true)"
+                                [buttonBusy]="publishing" [busyText]="l('Publishing')">
+                                <span>{{l("PublishUpdates")}}</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="accountId" class="table-transparent-header table-transparent-rows">
+                <p-treeTable #dataTable [value]="branches" rows="5" [paginator]="false"
+                [lazy]="true" [scrollable]="true" ScrollWidth="100%" [resizableColumns]="true"
+                (onNodeExpand)="getBranches($event)">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 150px" ttSortableColumn="name">
+                                <span class="icon-table">{{l('Name')}}</span>
+                            </th>
+                            <th style="width: 150px" ttSortableColumn="code">
+                                <span class="icon-table">{{l('Code')}}</span>
+                            </th>
+                            <th style="width: 150px" ttSortableColumn="subTotal">
+                                <span class="icon-table">{{l('SubCount')}}</span>
+                            </th>
+                            <th style="width: 130px;text-align: center;" ttSortableColumn="actions">
+                                <span class="icon-table">{{l('Actions')}}</span>
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-i="rowIndex">
+                        <tr [ttRow]="rowNode">
+                            <td style="width:150px" class="td-tree">
+                                <p-treeTableToggler [rowNode]="rowNode" class="branch-name"></p-treeTableToggler>
+                                {{rowData.branch.name}}
+                            </td>
+                            <td style="width:150px" class="td-tree">
+                                {{rowData.branch.code}}
+                            </td>
+                            <td style="width:150px" class="td-tree">
+                                {{rowData.subTotal}}
+                            </td>
+                            <td style="width: 130px;text-align: center;" class="td-tree">
+                                <div class="btn-group dropdown" dropdown container="body" >
+                                <button class="dropdown-toggle btn btn-sm  btn-action"   (mouseover)="changeStyleActionButton($event)" dropdownToggle>
+
+                                </button>
+                                <ul class="dropdown-menu" style="left: -40px;"[ngClass]="dropdownActionmenuhover" *dropdownMenu>
+                                    <li *ngIf="!viewMode">
+                                    <a href="javascript:;" (click)="createBranch(rowNode)">{{l('AddSubBranch')}}</a>
+                                    </li>
+                                    <li *ngIf="!viewMode">
+                                    <a href="javascript:;" (click)="editBranch(rowNode)">{{l('Edit')}}</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" (click)="showBranchDetails(rowNode)">{{l('Branch Details')}}</a>
+                                    </li>
+                                    <li *ngIf="!viewMode">
+                                    <a href="javascript:;" (click)="askToConfirmDelete(rowData.branch,rowNode.parent)">{{l('Delete')}}</a>
+                                    </li>
+                                </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                </p-treeTable>
+            </div>
+            <div *ngIf="!accountId" class="d-flex flex-column justify-content-center kt-portlet mt-3" style="height: 87px;margin-bottom: 0;">
+                <div class="kt-portlet__body">
+                    <div class="text-center font-weight-normal" >
+                        To start adding branches/addresses you must fill your profile info and save it first
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<createOrEditBranchModal  
+    [billingAddressDef]="billingAddressDef"
+    [directShippingAddressDef]="directShippingAddressDef"
+    [distributionCenterAddressDef]="distributionCenterAddressDef"
+    [mailingAddressDef]="mailingAddressDef"
+#createOrEditBranchModal (selectAddress)="selectAddress()"
+(branchAdded)="branchAdded($event)" (branchUpdated)="branchUpdated($event)"></createOrEditBranchModal>
+
+<selectAddressModal  #selectAddressModal (addressSelected)="addressSelected($event)"
+(addNewAddress)="addNewAddress()" (editAddress)="editAddress($event)" (addressSelectionCanceled)="addressSelectionCanceled()"></selectAddressModal>
+
+<createOrEditAddressModal  #createOrEditAddressModal (addressAdded)="addressAdded($event)"
+(addressUpdated)="addressUpdated($event)" (createOrEditaddressCanceled)="createOrEditaddressCanceled()"></createOrEditAddressModal>

@@ -1,0 +1,334 @@
+<div [@routerTransition] class="wrapper" >
+    <div *ngIf="accountData" class="view-profile-wrapper">
+        <div>
+            <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
+
+
+                <div class="kt-subheader kt-grid__item" style="width: 84.2% !important;">
+                    <div [class]="containerClass">
+                        <div class="kt-subheader__main">
+                            <h3 class="kt-subheader__title">
+                                <span>{{l("AccountProfile")}}</span>
+                            </h3>
+                            <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__body p-0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div #viewProfileCover class="view-profile-cover d-flex justify-content-center align-items-center position-relative">
+                                        <!-- <img  src="{{coverPhoto}}" class="w-100 h-100" onerror="this.src='../../../assets/placeholders/_default_cover.jpg'"> -->
+                                        <app-image-display
+                                            [image]="coverPhoto"
+                                            [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                            [staticWidth]="viewProfileCover?.offsetWidth"
+                                            >
+                                        </app-image-display>
+                                        <div class="d-flex view-profile-action-buttons" *ngIf="!viewMode">
+                                            <button class="btn mb-3 mt-4 w-100 btn-success" (click)="editAccount()" >
+                                                {{ "Edit" | localize }}
+                                            </button>
+                                           <!--  <button class="btn mb-3 mt-4 w-100 btn-danger" (click)="deleteAccount()" >
+                                                {{ "Delete" | localize }}
+                                            </button> -->
+                                            <button class="btn mb-3 mt-4 w-100 btn-danger" (click)="publishProfile()" *ngIf="!isPublished &&   accountLevel !=accountLevelEnum.Manual">
+                                                {{ "Publish" | localize }}
+                                            </button>
+                                            <button class="btn mb-3 mt-4 w-100 btn-danger" (click)="unPublishProfile()" *ngIf="isPublished  &&   accountLevel !=accountLevelEnum.Manual">
+                                                {{ "UnPublish" | localize }}
+                                            </button>
+                                        </div>
+
+                                        <div class="d-flex view-profile-action-buttons" *ngIf="accountData.isConnected && showEditConnected">
+                                            <button class="btn mb-3 mt-4 w-100 btn-success" (click)="this.showEditConnected =false" >
+                                                {{ "Edit" | localize }}
+                                            </button>
+                                        </div>
+                                        <div class="d-flex view-profile-action-buttons" *ngIf="accountData.isConnected && !showEditConnected">
+                                            <button class="btn mb-3 mt-4 w-100 btn-success" [disabled]="priceLevel==this.accountData.priceLevel"  (click)="editConnnectedAccount()" >
+                                                {{ "Save" | localize }}
+                                            </button>
+                                            <button class="btn mb-3 mt-4 w-100 btn-danger" (click)="this.showEditConnected =true; this.priceLevel=this.accountData.priceLevel" >
+                                                {{ "Undo" | localize }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 ">
+                                    <div class="dev-logo">
+                                        <app-image-display
+                                            [image]="logoPhoto"
+                                            [sycAttachmentCategory]="sycAttachmentCategoryLogo"
+                                            [classList]="'logo-profile'"
+                                            [staticHeight]="74"
+                                        >
+                                        </app-image-display>
+                                    </div>
+                                    <!-- <img [src]="logoPhoto"  onerror="this.src='../../../assets/placeholders/_logo-placeholder.png';" class="logo-profile ml-4"> -->
+                                </div>
+                                <div class="col title-cover">
+                                    <h4>{{accountData?.name}} <span class="number-connect">, {{accountData?.connections}} {{'MembersAreConnected'|localize}}</span></h4>
+                                    <div   >
+                                        <textarea class="thin-scroll w-100" style="
+                                            height: 120px;
+                                            border: 0;
+                                            outline: 0;
+                                            overflow-y: scroll;
+                                            font-weight: 400;
+                                            font-size: 14px;
+                                        " readonly="">{{accountData?.description}}
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="header">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="address" *ngIf="accountData?.addressLine1 || accountData?.city || accountData?.state || accountData?.zipCode || accountData?.countryName">
+                                        <img class="icon-address" src="assets/accounts/Address.svg">
+
+                                        <p class="title-account" *ngIf="accountData">
+                                            <span>
+                                                {{"Headquarters" | localize}}:
+                                            </span>
+                                            <span *ngIf="accountData && accountData.addressLine1">
+                                                {{ accountData.addressLine1 + ', '}}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.addressLine2">
+                                                {{ accountData.addressLine2 + ', '}}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.city">
+                                                {{ accountData.city + ', '}}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.state">
+                                                {{ accountData.state + ', ' }}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.zipCode">
+                                                {{accountData.zipCode  }}{{accountData.countryName ? ', ' : '' }}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.countryName">
+                                                {{ accountData.countryName  }} .
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="mail" *ngIf="accountData?.website">
+                                        <img class="icon-web" src="assets/accounts/website.svg">
+
+                                        <p class="title-account">{{accountData?.website}}</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile kt-slider">
+                <div class="kt-portlet__body p-0 " *ngIf="!imageObject || imageObject.length > 0;else noImagesAdded">
+                    <div class="row p-28">
+                        <div class="col-md-12">
+                            <div class="arrow text-right">
+                                <span class="arrow-dev" (click)="prevImageClick()" ><img src="assets/accounts/Previous.svg" ><span class="arrow arrow-prev" >{{"Previous"|localize}}</span></span>
+                            <span class="arrow-dev" (click)="nextImageClick()"> <span class="arrow arrow-next" >{{"Next"|localize}}</span><img src="assets/accounts/Next.svg" ></span>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row p-59-15">
+                        <div class="col-md-12">
+                            <ng-image-slider #nav [images]="imageObject" [infinite]="false" [autoSlide]="1"
+                                [imageSize]="{width: 381, height: 300}" slideImage="1"></ng-image-slider>
+                        </div>
+
+                    </div>
+                </div>
+                <ng-template #noImagesAdded>
+                    <div class="kt-portlet__body p-0 ">
+                    <div class="row">
+                    <div class="col-md-12 pb-3 pt-5 text-center">
+                         <p>{{"Noimagestodisplay" | localize}}</p>
+                        </div>
+                </div>
+            </div>
+            </ng-template>
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet__body p-0">
+                    <div class="row p-28">
+                        <div class="col-4" *ngIf="accountData && accountData.accountType">
+                            <p class="title-dev-slider text-left">{{"AccountType" | localize}}</p>
+                        </div>
+                        <div class="col-4" *ngIf="accountData && accountData.ssin">
+                            <p class="title-dev-slider text-left">{{"AccountSSIN" | localize}}</p>
+                        </div>
+                        <div class="col-4" *ngIf="(accountData && accountData.priceLevel && !accountData.isConnected ) ||(accountData  && accountData.isConnected && !showEditConnected) || (accountData  && accountData.isConnected && accountData.priceLevel  && showEditConnected ) ">
+                            <p class="title-dev-slider text-left">{{"PriceLevel" | localize}}</p>
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="categories col-4 pb-3 pt-2" *ngIf="accountData && accountData.accountType">
+                            <!-- div class="account-type" *ngFor="let accountType of accountData.accountType;let i=index;">
+                                <p class="title-tag">{{accountType}}</p>
+                            </div> -->
+                            <div class="account-type">
+                                <p class="title-tag">{{accountData.accountType}}</p>
+                            </div>
+                        </div>
+                        <div class="categories col-4 pb-3 pt-2 " *ngIf="accountData && accountData.ssin">
+                            <div class="account-type">
+                                <p class="title-tag">{{accountData.ssin}}</p>
+                            </div>
+                        </div>
+
+                        <div class="categories col-4 pb-3 pt-2" *ngIf="(accountData && accountData.priceLevel && !accountData.isConnected ) ||(accountData && accountData.priceLevel && accountData.isConnected && showEditConnected )  ">
+                            <div class="account-type">
+                                <p class="title-tag">{{accountData.priceLevel}}</p>
+                            </div>
+                        </div>
+                        
+                        <div  class="categories col-3 pb-3 pt-2" *ngIf="accountData && accountData.isConnected && !showEditConnected">
+                            <p-dropdown [options]="allPriceLevel" styleClass="form-control aria-select title-dev-slider text-left" [filter]="false"
+                            name="PriceLevelId" [(ngModel)]="priceLevel"  [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+
+                        </div>
+                        <div class="col-4 pb-3 text-center" *ngIf="!accountData.accountType || accountData.accountType.length === 0">
+                            <p>{{"NoAccounttypestodisplay" | localize}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div
+        [class]="
+            containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
+        "
+    >
+        <div class="p-4 seeMoreContainer">
+            <div class="row pl-3">
+                <div>
+                    <h6 class="header">{{ "Departments" | localize }}:</h6>
+                </div>
+            </div>
+            <div
+                class="row details pt-4"
+                [ngClass]="{ 'thin-scroll': scrollDepartment }"
+                [ngStyle]="{
+                    'overflow-y': scrollDepartment ? 'scroll' : 'hidden',
+                    height: scrollDepartment
+                        ? maxContainerHeight + 'px'
+                        : 'auto'
+                }" 
+                *ngIf="accountData?.classfications?.length > 0;else noDepartment"
+            >
+                <div class="col-md-12 pb-3 pt-2">
+                    <div
+                        class="seeMoreData"
+                        *ngFor="let department of accountData?.categories; index as i  "
+                    >
+                        <p class="title-tag">{{ department }}</p>
+                    </div>
+                </div>
+                <button
+                    *ngIf="showLessDepartment"
+                    (click)="showDepartment()"
+                    class="btn btn-dark ml-5"
+                >
+                    {{ "Showless" | localize }}
+                </button>
+                <button
+                    *ngIf="showMoreDepartment"
+                    (click)="showDepartment()"
+                    class="btn btn-dark ml-5"
+                >
+                    {{ "showmore" | localize }}
+                </button>
+            </div>
+            <ng-template #noDepartment>
+                <div class="col-md-12 pb-3 pt-2 text-center">
+                    <p>
+                        {{ "NoDepartmentstodisplay" | localize }}
+                    </p>
+                </div>
+            </ng-template>
+        </div>
+        </div>
+        <div
+            [class]="
+                containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
+            "
+        >
+            <div class="p-4 seeMoreContainer">
+                <div class="row pl-3">
+                    <div>
+                        <h6 class="header">
+                            {{ "BusinessClassifications" | localize }}:
+                        </h6>
+                    </div>
+                </div>
+                <div
+                    class="row details pt-4"
+                    [ngClass]="{ 'thin-scroll': scrollClassification }"
+                    [ngStyle]="{
+                        'overflow-y': scrollClassification
+                            ? 'scroll'
+                            : 'hidden',
+                        height: scrollClassification
+                            ? maxContainerHeight + 'px'
+                            : 'auto'
+                    }"
+                    *ngIf="accountData?.classfications?.length > 0;  else noClassification"
+                >
+                    <div class="col-md-12 pb-3 pt-2">
+                        <div
+                            class="seeMoreData"
+                            *ngFor="let classification of accountData?.classfications;index as i"
+                        >
+                            <p class="title-tag">{{ classification }}</p>
+                        </div>
+                    </div>
+                    <button
+                        *ngIf="showLessClassification"
+                        (click)="showClassification()"
+                        class="btn btn-dark ml-5"
+                    >
+                        {{ "Showless" | localize }}
+                    </button>
+                    <button
+                        *ngIf="showMoreClassification"
+                        (click)="showClassification()"
+                        class="btn btn-dark ml-5"
+                    >
+                        {{ "showmore" | localize }}
+                    </button>
+                </div>
+                <ng-template #noClassification>
+                    <div class="col-md-12 pb-3 pt-2 text-center">
+                        <p>
+                            {{
+                                "NoBusinessclassificationstodisplay" | localize
+                            }}
+                        </p>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+
+    </div>
+</div>

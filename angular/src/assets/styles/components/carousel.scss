@@ -1,0 +1,18 @@
+div.carouselContainer ,div.carouselContainer > carousel > div > div > slide > div {
+    height: 700px!important;
+    display: block;
+    width: 100%;
+}
+.carousel-inner {
+    display: block;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+@media only screen and (max-width: 701px) {
+    div.carouselContainer ,div.carouselContainer > carousel > div > div > slide > div {
+        height: 80vh!important;
+        display: block;
+        width: 100%;
+    }
+}

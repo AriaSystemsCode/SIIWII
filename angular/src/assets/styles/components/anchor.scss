@@ -1,0 +1,14 @@
+a {
+    cursor:pointer;
+}
+body a.text-primary {
+    @extend %transition-all-3ms;
+    &:hover {
+        color: darken($blue,50%)!important;
+        @extend %transition-all-3ms;
+    }
+}
+
+.header-link-active {
+    color:$blue!important;
+}

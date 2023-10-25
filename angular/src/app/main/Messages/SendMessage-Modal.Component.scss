@@ -1,0 +1,256 @@
+.MessageDialog {
+    background: #ffffff 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 16px #e1e1ef41;
+    border-radius: 6px 6px 0px 0px;
+    opacity: 1;
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+}
+
+:host ::ng-deep .p-inputtext {
+    border: none !important;
+}
+
+:host
+    ::ng-deep
+    .p-autocomplete.p-autocomplete-multiple
+    .p-autocomplete-multiple-container:not(.p-disabled).p-focus {
+    box-shadow: none !important;
+    //width: 300px !important;
+}
+
+.MessageDialog .Header {
+    // width: 534px;
+    height: 41px;
+    background: #700066 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 16px #e1e1ef41;
+    border-radius: 6px 6px 0px 0px;
+    opacity: 1;
+    margin: -2px;
+}
+
+.MessageDialog .Header label {
+    text-align: left;
+    font: SemiBold 13px/20px Poppins;
+    letter-spacing: 0px;
+    color: #ffffff;
+    opacity: 1;
+}
+
+.MessageDialog .close {
+    float: right;
+    padding-top: 10px;
+    padding-right: 10px;
+    color: #ffffff;
+    opacity: 1;
+}
+
+.MessageDialog .close:hover {
+    color: #ffffff !important;
+}
+.MessageDialog a {
+    color: #212121;
+}
+
+.MessageDialog a:hover {
+    text-decoration: underline !important;
+}
+
+.MessageDialog .sendBtn {
+    align-items: center;
+    border-radius: 4px;
+    box-sizing: border-box;
+    height: 36px;
+    min-width: 80px;
+    background-color: #700066;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.InputText {
+    text-align: left;
+    font: Regular 10px/16px Poppins;
+    letter-spacing: 0px;
+    color: #212121;
+    opacity: 1;
+}
+
+.Input {
+    border: none !important;
+    height: 9px !important;
+}
+.group-input {
+    // height: 33px !important;
+    border-bottom: 2px solid #e1e1ef41;
+    margin-bottom: 2px !important;
+}
+.subject-label {
+    // left: 6px;
+    // position: absolute;
+    // top: 45px;
+}
+.modal.show .modal-dialog {
+    position: fixed;
+    width: 532px;
+    min-height: 150px;
+    bottom: 0px;
+    right: 0px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.icon-upload > input {
+    display: none;
+}
+.modal-body {
+    padding: 5px 5px 0 5px !important;
+}
+.attachments-files {
+    margin-top: -16px;
+    padding-left: 7px; 
+    max-height: 80px;
+    overflow-y: auto;
+}
+
+
+
+.icon-file {
+    padding-right: 3px;
+    padding-bottom: 3px;
+}
+.text-input-label {
+ // font-weight: bold;
+ // font-size: 10.4px !important;
+    font-size: .875rem !important;
+}
+.editor-text {
+    margin-top: 14px;
+}
+.disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+.disabled:hover {
+    cursor: not-allowed !important;
+}
+
+.modal-dialog {
+    /* width: 100%; */
+    width: 300px;
+    position: fixed;
+    bottom: 50%;
+    right: 581px;
+}
+
+.fa-paperclip{
+    color: #700066;
+}
+.modal-header {
+    position: unset !important;
+    background-color: #700066;
+    color: #ffffff;
+}
+.modal-footer {
+    position: unset !important;
+}
+.modal-title span {
+    color: #ffffff;
+}
+.btn-blue {
+    background-color: #700066;
+    color: #ffffff;
+    padding: 10px 0 !important;
+    width: 81px !important;
+}
+.modal-body {
+    padding: 0;
+}
+.mail-icon {
+    position: absolute;
+    z-index: 9999;
+    display: block;
+    width: 1.575rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    top: 4px;
+    left: 9px;
+    color: #aaa;
+}
+.input-mail {
+    padding-left: 36px;
+}
+
+/**/
+.modal-dialog {
+    /* width: 100%; */
+    width: 300px;
+    position: fixed;
+    bottom: 50%;
+    right: 581px;
+}
+.modal-header {
+    position: unset !important;
+    background-color: #700066;
+    color: #ffffff;
+}
+.modal-footer {
+    position: unset !important;
+}
+.modal-title span {
+    color: #ffffff;
+}
+.btn-blue {
+    background-color: #700066;
+    color: #ffffff;
+    padding: 10px 0 !important;
+    width: 81px !important;
+}
+.modal-body {
+    padding: 0;
+}
+.mail-icon {
+    position: absolute;
+    z-index: 9999;
+    display: block;
+    width: 1.575rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    top: 4px;
+    left: 9px;
+    color: #aaa;
+}
+.input-mail {
+    padding-left: 36px;
+}
+
+@media (max-width: 767px){
+.MessageDialog{
+    position: relative;
+    height: 100%;
+}
+
+/* .modal-footer{
+    position: absolute !important;
+    bottom: 0px;
+    border-bottom: 2px solid #e1e1ef41 !important;
+} */
+
+.modal-content{
+    border: none;
+}
+
+.arrow-back{
+    width: 12.65pt;
+    height: 12.65pt;
+}
+
+
+
+
+
+}

@@ -1,0 +1,338 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+                            <span>{{l("SycSegmentIdentifierDefinitions")}}</span>
+                        </h3>
+                        <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                        <span class="kt-subheader__desc">
+                            {{l("SycSegmentIdentifierDefinitionsHeaderInfo")}}
+                        </span>
+                    </div>
+                    <div class="kt-subheader__toolbar">
+                        <div class="kt-subheader__wrapper">
+            				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+                <button *ngIf="isGranted('Pages.Administration.SycSegmentIdentifierDefinitions.Create')" (click)="createSycSegmentIdentifierDefinition()" 
+            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewSycSegmentIdentifierDefinition")}}</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <form class="kt-form" autocomplete="off">
+                    <div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-12">
+                                <div class="form-group m-form__group align-items-center">
+                                    <div class="input-group">
+                                        <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
+                                        <span class="input-group-btn">
+                                            <button (click)="getSycSegmentIdentifierDefinitions()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						 <div class="row" [hidden]="!advancedFiltersAreShown">
+						 	<div class="col-md-12">
+						         <div class="kt-separator kt-separator--border-dashed"></div>
+						     </div>
+
+
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="CodeFilter">{{l("Code")}}</label>
+									<input type="text" class="form-control" id="CodeFilter" name="codeFilter" [(ngModel)]="codeFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="NameFilter">{{l("Name")}}</label>
+									<input type="text" class="form-control" id="NameFilter" name="nameFilter" [(ngModel)]="nameFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinSegmentNumberFilter">{{l("MinMax")}} {{l("SegmentNumber")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinSegmentNumberFilter" [(ngModel)]="minSegmentNumberFilter" placeholder="{{l('MinValue')}}" name="minSegmentNumberFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxSegmentNumberFilter" placeholder="{{l('MaxValue')}}" name="maxSegmentNumberFilter" />
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="SegmentHeaderFilter">{{l("SegmentHeader")}}</label>
+									<input type="text" class="form-control" id="SegmentHeaderFilter" name="segmentHeaderFilter" [(ngModel)]="segmentHeaderFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="SegmentMaskFilter">{{l("SegmentMask")}}</label>
+									<input type="text" class="form-control" id="SegmentMaskFilter" name="segmentMaskFilter" [(ngModel)]="segmentMaskFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinSegmentLengthFilter">{{l("MinMax")}} {{l("SegmentLength")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinSegmentLengthFilter" [(ngModel)]="minSegmentLengthFilter" placeholder="{{l('MinValue')}}" name="minSegmentLengthFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxSegmentLengthFilter" placeholder="{{l('MaxValue')}}" name="maxSegmentLengthFilter" />
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="SegmentTypeFilter">{{l("SegmentType")}}</label>
+									<input type="text" class="form-control" id="SegmentTypeFilter" name="segmentTypeFilter" [(ngModel)]="segmentTypeFilter">
+								</div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="IsAutoGeneratedFilterSelect">{{l("IsAutoGenerated")}}</label>
+								<select class="form-control" name="IsAutoGeneratedFilter" id="IsAutoGeneratedFilterSelect" [(ngModel)]="isAutoGeneratedFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>	
+							<div class="col-md-3">
+								<label for="IsEditableFilterSelect">{{l("IsEditable")}}</label>
+								<select class="form-control" name="IsEditableFilter" id="IsEditableFilterSelect" [(ngModel)]="isEditableFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>	
+							<div class="col-md-3">
+								<label for="IsVisibleFilterSelect">{{l("IsVisible")}}</label>
+								<select class="form-control" name="IsVisibleFilter" id="IsVisibleFilterSelect" [(ngModel)]="isVisibleFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinCodeStartingValueFilter">{{l("MinMax")}} {{l("CodeStartingValue")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinCodeStartingValueFilter" [(ngModel)]="minCodeStartingValueFilter" placeholder="{{l('MinValue')}}" name="minCodeStartingValueFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxCodeStartingValueFilter" placeholder="{{l('MaxValue')}}" name="maxCodeStartingValueFilter" />
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="LookOrFieldNameFilter">{{l("LookOrFieldName")}}</label>
+									<input type="text" class="form-control" id="LookOrFieldNameFilter" name="lookOrFieldNameFilter" [(ngModel)]="lookOrFieldNameFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="SycIdentifierDefinitionCodeFilter">({{l("SycIdentifierDefinition")}}) {{l("Code")}}</label>
+									<input type="text" class="form-control" id="SycIdentifierDefinitionCodeFilter" name="sycIdentifierDefinitionCodeFilter" [(ngModel)]="sycIdentifierDefinitionCodeFilter">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-12">
+                                <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row align-items-center">
+                    <!--<Primeng-Datatable-Start>-->
+                    <div class="primeng-datatable-container col-12"
+                         [busyIf]="primengTableHelper.isLoading">
+                        <p-table #dataTable
+                                     (onLazyLoad)="getSycSegmentIdentifierDefinitions($event)"
+                                     [value]="primengTableHelper.records"
+                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                     [paginator]="false"
+                                     [lazy]="true"
+                                     [scrollable]="true"
+                                     ScrollWidth="100%"
+                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [resizableColumns]="primengTableHelper.resizableColumns">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 130px" [hidden]="!isGrantedAny('Pages.Administration.SycSegmentIdentifierDefinitions.Edit', 'Pages.Administration.SycSegmentIdentifierDefinitions.Delete')">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="sycIdentifierDefinitionFk.code">
+                                        {{l('Code')}}
+                                        <p-sortIcon field="sycIdentifierDefinitionCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="code">
+                                        {{l('Code')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.code"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="name">
+                                        {{l('Name')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.name"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="segmentNumber">
+                                        {{l('SegmentNumber')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.segmentNumber"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="segmentHeader">
+                                        {{l('SegmentHeader')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.segmentHeader"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="segmentMask">
+                                        {{l('SegmentMask')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.segmentMask"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="segmentLength">
+                                        {{l('SegmentLength')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.segmentLength"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="segmentType">
+                                        {{l('SegmentType')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.segmentType"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="isAutoGenerated">
+                                        {{l('IsAutoGenerated')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.isAutoGenerated"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="isEditable">
+                                        {{l('IsEditable')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.isEditable"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="isVisible">
+                                        {{l('IsVisible')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.isVisible"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="codeStartingValue">
+                                        {{l('CodeStartingValue')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.codeStartingValue"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="lookOrFieldName">
+                                        {{l('LookOrFieldName')}}
+                                        <p-sortIcon field="sycSegmentIdentifierDefinition.lookOrFieldName"></p-sortIcon>
+                                    </th>
+
+                                </tr>
+                            </ng-template>                           
+							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                <tr>
+                                    <td style="width: 130px"
+                                        [hidden]="!isGrantedAny('Pages.Administration.SycSegmentIdentifierDefinitions.Edit', 'Pages.Administration.SycSegmentIdentifierDefinitions.Delete')">
+                                       <div class="btn-group dropdown" dropdown container="body">
+                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
+                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
+                                            </button>
+												<ul class="dropdown-menu"  *dropdownMenu>
+												<li>
+													<a href="javascript:;" 
+														(click)="viewSycSegmentIdentifierDefinitionModal.show(record)">{{l('View')}}</a>
+												</li>
+												<li>
+                                                <a href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.SycSegmentIdentifierDefinitions.Edit')" 
+														(click)="createOrEditSycSegmentIdentifierDefinitionModal.show(record.sycSegmentIdentifierDefinition.id)">{{l('Edit')}}</a>												
+                                                </li>
+												<li>
+											        <a  href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.SycSegmentIdentifierDefinitions.Delete')"
+														(click)="deleteSycSegmentIdentifierDefinition(record.sycSegmentIdentifierDefinition)">{{l('Delete')}}</a>
+												</li>
+                                                <li>
+                                                    <a href="javascript:;" *ngIf="entityHistoryEnabled"  
+                                                       (click)="showHistory(record.sycSegmentIdentifierDefinition)">{{l('History')}}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td style="width:150px">
+												<span class="p-column-title"> {{l('Code')}}</span>
+												{{record.sycIdentifierDefinitionCode}}
+											</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Code')}}</span>
+											{{record.sycSegmentIdentifierDefinition.code}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Name')}}</span>
+											{{record.sycSegmentIdentifierDefinition.name}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('SegmentNumber')}}</span>
+											{{record.sycSegmentIdentifierDefinition.segmentNumber}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('SegmentHeader')}}</span>
+											{{record.sycSegmentIdentifierDefinition.segmentHeader}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('SegmentMask')}}</span>
+											{{record.sycSegmentIdentifierDefinition.segmentMask}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('SegmentLength')}}</span>
+											{{record.sycSegmentIdentifierDefinition.segmentLength}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('SegmentType')}}</span>
+											{{record.sycSegmentIdentifierDefinition.segmentType}}
+										</td>
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('IsAutoGenerated')}}</span>
+                                        <div *ngIf="record.sycSegmentIdentifierDefinition.isAutoGenerated" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.sycSegmentIdentifierDefinition.isAutoGenerated" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('IsEditable')}}</span>
+                                        <div *ngIf="record.sycSegmentIdentifierDefinition.isEditable" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.sycSegmentIdentifierDefinition.isEditable" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('IsVisible')}}</span>
+                                        <div *ngIf="record.sycSegmentIdentifierDefinition.isVisible" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.sycSegmentIdentifierDefinition.isVisible" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('CodeStartingValue')}}</span>
+											{{record.sycSegmentIdentifierDefinition.codeStartingValue}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('LookOrFieldName')}}</span>
+											{{record.sycSegmentIdentifierDefinition.lookOrFieldName}}
+										</td>
+
+                                </tr>
+                               
+                            </ng-template>
+                        </p-table>
+						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            {{l('NoData')}}
+                        </div>
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getSycSegmentIdentifierDefinitions($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                                         [showCurrentPageReport]="true"
+                                         [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
+                            >
+                            </p-paginator>
+                        </div>
+                    </div>
+                    <!--<Primeng-Datatable-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditSycSegmentIdentifierDefinitionModal #createOrEditSycSegmentIdentifierDefinitionModal (modalSave)="getSycSegmentIdentifierDefinitions()"></createOrEditSycSegmentIdentifierDefinitionModal>    
+    <viewSycSegmentIdentifierDefinitionModal #viewSycSegmentIdentifierDefinitionModal></viewSycSegmentIdentifierDefinitionModal>
+     <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
+  </div>
+</div>

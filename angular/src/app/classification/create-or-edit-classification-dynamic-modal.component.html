@@ -1,0 +1,86 @@
+<form
+*ngIf="active"
+#classificationForm="ngForm"
+novalidate
+(ngSubmit)="saveClassification(classificationForm)"
+autocomplete="off" class="modal-content-wrapper"
+>
+<div
+    class="modal-header"
+    style="display: block; background-color: #ffffff !important"
+>
+    <h4 class="modal-title" style="display: block">
+        <span *ngIf="classification.id">{{ l("EditClassification") }}</span>
+        <span *ngIf="!classification.id">{{
+            l("AddNewClassification")
+        }}</span>
+    </h4>
+    <p>{{ l("PleaseEnterTheNewclassificationInformation") }}</p>
+    <button
+        style="position: absolute; right: 0; top: 8px"
+        type="button"
+        class="close"
+        (click)="close()"
+        aria-label="Close"
+        [disabled]="saving"
+    >
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body thin-scroll pt-4">
+    <div class="form-group mb-4" *ngIf="classification.parentId">
+        <label for="classification_Name">{{ l("parent") }} *</label>
+        <p class="form-control form-control-sm aria-input-text" >
+            #{{classification.parentId}} - {{parentClassification.name}}
+        </p>
+    </div>
+    <div class="mb-4">
+        <!-- <label>{{ l("Code") }} *</label> -->
+        <app-codes *ngIf="!(classification?.id>0)"
+            [objectType]="entityObjectType"
+            [editMode]=false
+            (getCodeValue)="getCodeValue($event)"></app-codes>
+
+            <app-codes *ngIf="classification?.id>0"
+             [objectType]="entityObjectType"
+             [editMode]=true
+             [code]="classification?.code"
+             (getCodeValue)="getCodeValue($event)"></app-codes>
+           
+    </div>
+
+    <div class="form-group mb-4">
+        <label for="classification_Name">{{ l("Name") }} *</label>
+        <input
+            type="text"
+            id="classification_Name"
+            class="form-control form-control-sm aria-input-text"
+            [(ngModel)]="classification.name"
+            name="Name"
+            minlength="2"
+            maxlength="150"
+            required
+        />
+    </div>
+
+</div>
+<div class="modal-footer">
+    <button
+        [disabled]="saving"
+        type="button"
+        class="btn btn-default btn-gray"
+        (click)="close()"
+    >
+        {{ l("Cancel") }}
+    </button>
+    <button
+        type="submit"
+        class="btn btn-primary blue btn-blue"
+        [disabled]="!classificationForm.form.valid"
+        [buttonBusy]="saving"
+        [busyText]="l('SavingWithThreeDot')"
+    >
+        <span>{{ l("Save") }}</span>
+    </button>
+</div>
+</form>

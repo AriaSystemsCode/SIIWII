@@ -1,0 +1,108 @@
+<form [formGroup]="filterForm" >
+
+    <div class="mb-4 pb-5 pt-1 border-dashed-bottom" >
+        <app-multi-selection-filter
+            #AccountTypeFilter
+            [filterMetaData]="accountTypeFilterMetaData"
+            [formContol]="filterForm.controls.accountTypes"
+            [title]="'AccountTypes' | localize"
+            (onLoadData)="getAccountTypesList(AccountTypeFilter)"
+        >
+        </app-multi-selection-filter>
+    </div>
+
+    <div class="mt-4 mb-4 pb-5 pt-3 border-dashed-bottom">
+        <app-tree-multi-selection-filter
+            #ClassificationFilter
+            [filterMetaData]="classificationsFilterMetaData"
+            [formContol]="filterForm.controls.classifications"
+            [title]="'BusinessClassifications' | localize"
+            (onLoadData)="getClassificationsList(ClassificationFilter)"
+            (onLoadNode)="loadClassificationNode($event)"
+        >
+        </app-tree-multi-selection-filter>
+    </div>
+
+
+    <div class="mt-4 mb-4 pb-5 pt-3 border-dashed-bottom" >
+        <app-tree-multi-selection-filter
+            #CategoryFilter
+            [filterMetaData]="categoriesFilterMetaData"
+            [formContol]="filterForm.controls.categories"
+            [title]="'Departments' | localize"
+            (onLoadData)="getCategoriesList(CategoryFilter)"
+            (onLoadNode)="loadCategoriesNode($event)"
+        >
+        </app-tree-multi-selection-filter>
+    </div>
+
+
+    <div class="mt-4 mb-4 pb-5 pt-3 border-dashed-bottom" >
+        <app-multi-selection-filter
+            #CountryFilter
+            [filterMetaData]="countryFilterMetaData"
+            [formContol]="filterForm.controls.countries"
+            [title]="'Countries' | localize"
+            (onLoadData)="getCountriesList(CountryFilter)"
+            >
+        </app-multi-selection-filter>
+    </div>
+
+
+
+    <div class="mt-4 pt-4" >
+        <h4 class="text-captitalize mb-3">{{"City" | localize}}</h4>
+        <div class="d-flex flex-column d-flex flex-wrap filter-group thin-scroll pl-5 pr-4">
+            <input type="text" formControlName="city" name="city" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
+        </div>
+    </div>
+
+    <div class="mt-4" >
+        <h4 class="text-captitalize mb-3">{{"PostalCode" | localize}}</h4>
+        <div class="d-flex flex-column d-flex flex-wrap filter-group thin-scroll pl-5 pr-4">
+            <input type="text" formControlName="postalCode" name="postalCode" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
+        </div>
+    </div>
+
+    <div class="mt-4 mb-4 pb-5 border-dashed-bottom" >
+        <h4 class="text-captitalize mb-3">{{"State" | localize}}</h4>
+        <div class="d-flex flex-column d-flex flex-wrap filter-group thin-scroll pl-5 pr-4">
+            <input type="text" formControlName="state" name="state" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
+        </div>
+    </div>
+
+
+    <div class="mt-4  mb-4 pb-5 pt-3 border-dashed-bottom" >
+        <app-multi-selection-filter
+            #AccountStatusFilter
+            [filterMetaData]="accountStatusFilterMetaData"
+            [formContol]="filterForm.controls.statuses"
+            [title]="'Status' | localize"
+            (onLoadData)="getAccountStatuses(AccountStatusFilter)"
+            >
+        </app-multi-selection-filter>
+    </div>
+
+    <div class="mt-4 mb-4 pb-5 pt-3 border-dashed-bottom" >
+        <app-multi-selection-filter
+            #CurrencyFilter
+            [filterMetaData]="currencyFilterMetaData"
+            [formContol]="filterForm.controls.currencies"
+            [title]="'Currencies' | localize"
+            (onLoadData)="getCurrenciesList(CurrencyFilter)"
+            >
+        </app-multi-selection-filter>
+    </div>
+
+    <div class="mt-4 mb-4 pb-5 pt-3" >
+        <app-multi-selection-filter
+            #LanguageFilter
+            [filterMetaData]="languageFilterMetaData"
+            [formContol]="filterForm.controls.languages"
+            [title]="'Languages' | localize"
+            (onLoadData)="getLanguagesList(LanguageFilter)"
+            >
+        </app-multi-selection-filter>
+    </div>
+
+</form>

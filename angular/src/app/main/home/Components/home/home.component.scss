@@ -1,0 +1,38 @@
+.middle-content {
+    flex-grow: 1;
+    width: 100%;
+    height: auto;
+    box-shadow: 0 3px 16px rgb(225 225 239 / 25%);
+    border-radius: 6px;
+    // overflow: hidden;
+   // padding-left: 25px;
+}
+.left-sidebar ,.right-sidebar {
+    width: 20%;
+    position: fixed;
+    max-height: 90vh;
+    overflow-y: scroll;
+}
+.left-sidebar {
+    left: 60px;
+}
+.right-sidebar {
+    right: 20px;
+}
+.row {
+    width: 700px;
+    position: relative;
+    margin: 0 auto;
+}
+.container-fluid {
+    margin-top: -40px;
+}
+@media screen and (max-width: 1300px) {
+    .row{
+        width: 100%;
+       // margin-left: 60px;
+    }
+    .left-sidebar ,.right-sidebar {
+        display: none;
+    }
+}

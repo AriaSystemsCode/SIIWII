@@ -1,0 +1,84 @@
+<form #coverPageForm="ngForm" >
+    <div class="d-flex flex-column h-100" >
+        <h5 class="col-12">{{ "Please fill the required linesheet information" | localize }}</h5>
+        <div class="row">
+            <div class="col-12">
+                <div class="align-items-baseline mt-4 pb-5 row">
+                    <label class="col-6 col-lg-3 col-md-3 col-sm-4" for="reportTitle">
+                        <h6>
+                            <span class="text-danger">*</span
+                            > {{ "LinesheetName" | localize }}
+                        </h6>
+                    </label>
+                    <div class="col">
+                        <input
+                            type="text"
+                            [required]="true"
+                            name="reportTitle"
+                            id="reportTitle"
+                            [(ngModel)]="printInfoParam.reportTitle"
+                            class="
+                                form-control
+                                bg-white
+                                form-control-border-grey
+                            "
+                            [maxlength]="250"
+                            #reportTitleInput="ngModel"
+                            [ngClass]="{ 'border-danger': false }"
+                            [placeholder]="'Enterlinesheetname' | localize"
+                        />
+                    </div>
+
+                    <div class="col-6 col-lg-2 col-md-2 col-sm-4">
+                        <span class="text-muted">
+                            250 {{ "digits" | localize }}
+                        </span>
+                        <validation-messages
+                            [formCtrl]="reportTitleInput"
+                        >
+                        </validation-messages>
+                    </div>
+                </div>
+                <div class="align-items-baseline mt-5 row">
+                    <label class="col-6 col-lg-3 col-md-3 col-sm-4" for="account">
+                        <h6>
+                            {{ "PreparedForAccount" | localize }}
+                        </h6>
+                    </label>
+                    <div class="col-md-7 col">
+                        <div class="wide-drop-down" >
+                            <p-autoComplete
+                                [styleClass]="'w-100'"
+                                [inputStyleClass]="'w-100 form-control pl-3 bg-white'"
+                                name="account"
+                                [inputId]="'account'"
+                                [suggestions]="accounts"
+                                [placeholder]="'EnterAccountName' | localize"
+                                (onKeyUp)="searchAccounts($event.target.value)"
+                                (onSelect)="selectAccount($event)"
+                                [(ngModel)]="selectedAccount"
+                                [field]="'name'"
+                                [dataKey]="'id'"
+                                [forceSelection]="true"
+                            >
+                                <ng-template let-account pTemplate="selectedItem">
+                                    <span >{{account.name}}</span>
+                                </ng-template>
+                            </p-autoComplete>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="d-flex flex-row justify-content-between pr-5 w-100" >
+            <button class="btn btn-primary" type="button" (click)="previousStep()">
+                <i class="fa-arrow-left fas ml-3"></i>
+                {{ "Previous" | localize }}
+            </button>
+            <button class="btn btn-primary" [disabled]="coverPageForm.invalid" (click)="continueToNextStep()">
+                {{ "Continue" | localize }}
+                <i class="fa-arrow-right fas ml-3"></i>
+            </button>
+        </div> -->
+    </div>
+</form>

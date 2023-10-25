@@ -1,0 +1,82 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycEntityObjectTypeForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycEntityObjectType.id">{{l("EditEntityObjectType")}}</span>
+                        <span *ngIf="!sycEntityObjectType.id">{{l("CreateNewEntityObjectType")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+					<div class="form-group m-form__group">
+						<label for="SycEntityObjectTypeName">{{l("Parent")}}</label>
+						<select name="sycEntityObjectType.parentId" [(ngModel)]="sycEntityObjectType.parentId" class="form-control" >
+							<option value="">{{l('PleaseSelect')}}</option>
+							<option *ngFor="let item of allSycEntityObjectTypes" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group m-form__group">
+						<label for="SydObjectName">{{l("Object")}}  *</label>
+						<select name="sycEntityObjectType.objectId" [(ngModel)]="sycEntityObjectType.objectId" class="form-control" required>
+							<option value="">{{l('PleaseSelect')}}</option>
+							<option *ngFor="let item of allSydObjects" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="SycEntityObjectType_Code">{{l("Code")}} *</label>
+						<input type="text" id="SycEntityObjectType_Code" class="form-control" [(ngModel)]="sycEntityObjectType.code" name="Code"   minlength="1"  maxlength="10"  [readonly]="sycEntityObjectType.id>0" required/>
+					</div>
+
+					<div class="form-group">
+						<label for="SycEntityObjectType_Name">{{l("Name")}} *</label>
+						<input type="text" id="SycEntityObjectType_Name" class="form-control" [(ngModel)]="sycEntityObjectType.name" name="Name"   minlength="2"  maxlength="150"  required/>
+					</div>
+
+                    <div class="form-group m-form__group">
+						<label for="SycIdentifierDefinitionCode">{{l("SycIdentifierDefinition")}}  *</label>
+						<select name="sycEntityObjectType.sycIdentifierDefinitionId" [(ngModel)]="sycEntityObjectType.sycIdentifierDefinitionId" class="form-control" required>
+							<option value="">{{l('PleaseSelect')}}</option>
+							<option *ngFor="let item of allSycEntityObjectTypeSycIdentifierDefinitionLookupTableDto" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+
+                    <!--<div class="form-group m-form__group">
+                        <label for="SycIdentifierDefinitionCode">{{l("SycIdentifierDefinition")}}</label>
+                        <div class="input-group">
+                            <input class="form-control" id="SycIdentifierDefinitionCode" name="sycIdentifierDefinitionCode" [(ngModel)]="sycIdentifierDefinitionCode" type="text" disabled>     
+                            <div class="input-group-append">
+                                <button class="btn btn-primary blue" (click)="openSelectSycIdentifierDefinitionModal()" type="button"><i class="fa fa-search"></i> {{l("Pick")}}</button>
+                            </div> <div class="input-group-prepend">
+                                <button class="btn btn-danger btn-icon" type="button" (click)="setSycIdentifierDefinitionIdNull()"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <input class="form-control" name="sycEntityObjectType.sycIdentifierDefinitionId" [(ngModel)]="sycEntityObjectType.sycIdentifierDefinitionId" type="text"  hidden>
+                -->
+
+					<div class="form-group">
+						<label for="SycEntityObjectType_ExtraAttributes">{{l("ExtraAttributes")}}</label>
+                        <div class="form-control" contentEditable="false"  [innerText]="sycEntityObjectType.extraAttributes" >
+                        </div>
+					</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycEntityObjectTypeForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+	
+</div>

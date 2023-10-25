@@ -1,0 +1,325 @@
+<div class="container bg-white p-4 mb-4">
+    <div *ngIf="post">
+        <div
+            class="row pb-4"
+            [ngStyle]="{
+                'border-bottom':
+                    post.appPost.description != ''
+                        ? '0.699999988079071px solid #EDEDED'
+                        : 'none'
+            }"
+        >
+            <div class="col-1 mr-4 mr-lg-0 mr-md-0 ">
+                <img
+                    [src]="
+                        profilePicture
+                            ? profilePicture
+                            : 'assets/common/images/default-profile-picture.png'
+                    "
+                    class="mr-3 rounded-circle logo"
+                />
+            </div>
+
+            <div class="col-9">
+                <a class="pt-2 h6"
+                *ngIf="post?.appPost?.accountId"
+                    [routerLink]="[
+                        '/app/main/account/view/',
+                        post?.appPost?.accountId
+                    ]"  >
+                    {{ post.appPost.accountName }}
+                </a>
+                <a class="pt-2 h6"
+                *ngIf="!post?.appPost?.accountId"
+                      >
+                    {{ post.appPost.accountName }}
+                </a>
+                <h6 class="userName">
+                    {{'PostBy' | localize}},<b>{{ post.appPost.userName }} </b> ,
+                    {{ post.appPost.creationDatetime?.toString() | date: "mediumDate" }}
+                </h6>
+            </div>
+
+            <div *ngIf="post.canEdit || isHost" class="text-right PositionRight pr-4">
+                <div class="dropdown" dropdown>
+                    <button
+                        class="btn btn-secondary dropdown-toggle p-0"
+                        type="button"
+                        id="dropdownMenuButton"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        dropdownToggle
+                    >
+                        <div class="three-dots"></div>
+                    </button>
+                    <div
+                        class="dropdown-menu"
+                        aria-labelledby="dropdownMenuButton"
+                        *dropdownMenu
+                    >
+                        <a class="dropdown-item" (click)="editPost()">
+                            <img
+                                src="assets/posts/Edit_ic.svg"
+                                class="mr-3"
+                            />{{ "Editpost" | localize }}
+                        </a>
+                        <a class="dropdown-item" (click)="deletePost()">
+                            <img
+                                src="assets/posts/Delete_ic.svg"
+                                class="mr-3"
+                            />{{ "RemovePost" | localize }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a
+            [ngClass]="post.type == PostType.TEXT ? 'cursor-text' : 'pointer'"
+            (click)="onshowViewPost()"
+        >
+            <div
+                *ngIf="
+                    post.appPost.description && post.appPost.description != ''
+                "
+                class="row p-4 descriptionContainer pointer"
+            >
+                <h6 class="description">{{ post.appPost.description }}</h6>
+            </div>
+
+            <div class="pb-2 pl-4 pointer pr-4 pt-4 row justify-content-center">
+                <div
+                    *ngIf="
+                        post.type == PostType.SINGLEIMAGE &&
+                        post.attachmentsURLs
+                    "
+                    class="w-100"
+                >
+                    <div class="row justify-content-center">
+                        <div
+                            *ngIf="post.attachmentsURLs.length == 1"
+                            style="width: 700px"
+                        >
+                            <div class="row w-100 h-100">
+                                <img
+                                    class="attachmentImage col-12"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[0]
+                                    }}"
+                                />
+                            </div>
+                        </div>
+                        <div
+                        *ngIf="post.attachmentsURLs.length == 2"
+                        style="width: 700px;"
+                        [ngStyle]="{
+                            'height':
+                                getAppEntityForViewDto?.relatedEntityTypeCode.toUpperCase() !=
+                                appEntityTypes[appEntityTypes.EVENT].toString()
+                                .toUpperCase()
+                                    ? '700px'
+                                    : '100%'
+                        }"
+                        [ngClass]="getAppEntityForViewDto?.relatedEntityTypeCode.toUpperCase() !=
+                        appEntityTypes[appEntityTypes.EVENT].toString()
+                        .toUpperCase() ? 'pb-0' : ' pb-5'"
+                    >
+                    <div class="row w-100 h-100" *ngIf="getAppEntityForViewDto?.relatedEntityTypeCode?.toUpperCase() ==
+                    appEntityTypes[appEntityTypes.EVENT]?.toString()?.toUpperCase()">
+                    <div class="w-100" style="position: relative; left: 0; top: 0">
+                        <img
+                        src="{{ attachmentBaseUrl }}/{{
+                            post.attachmentsURLs[1]
+                        }}"
+                            class="evetCover w-100"
+                        />
+
+                        <img
+                        src="{{ attachmentBaseUrl }}/{{
+                            post.attachmentsURLs[0]
+                        }}"
+                            onerror="this.src='../../../../assets/placeholders/_logo-placeholder.png'"
+                            class="eventLogo"
+                        />
+                    </div>
+
+                     </div>
+                        <div class="row w-100 h-100" *ngIf="getAppEntityForViewDto?.relatedEntityTypeCode.toUpperCase() !=
+                        appEntityTypes[appEntityTypes.EVENT]?.toString()?.toUpperCase() ">
+                            <img
+                                class="attachmentImage cover col-6"
+                                src="{{ attachmentBaseUrl }}/{{
+                                    post.attachmentsURLs[0]
+                                }}"
+                            />
+                            <img
+                                class="attachmentImage cover col-6"
+                                src="{{ attachmentBaseUrl }}/{{
+                                    post.attachmentsURLs[1]
+                                }}"
+                            />
+                        </div>
+                    </div>
+
+
+                        <div
+                            *ngIf="post.attachmentsURLs.length == 3"
+                            style="width: 700px; height: 700px"
+                        >
+                            <div class="row w-100 h-50">
+                                <img
+                                    class="attachmentImage cover col-12"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[0]
+                                    }}"
+                                />
+                            </div>
+                            <div class="row w-100 h-50">
+                                <img
+                                    class="attachmentImage cover col-6"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[1]
+                                    }}"
+                                />
+                                <img
+                                    class="attachmentImage cover col-6"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[2]
+                                    }}"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            *ngIf="post.attachmentsURLs.length == 4"
+                            style="width: 700px; height: 700px"
+                        >
+                            <div class="row w-100 h-50">
+                                <img
+                                    class="attachmentImage cover col-12"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[0]
+                                    }}"
+                                />
+                            </div>
+                            <div class="row w-100 h-50">
+                                <img
+                                    class="attachmentImage cover col-4"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[1]
+                                    }}"
+                                />
+                                <img
+                                    class="attachmentImage cover col-4"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[2]
+                                    }}"
+                                />
+                                <img
+                                    class="attachmentImage cover col-4"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[3]
+                                    }}"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            *ngIf="post.attachmentsURLs.length == 5"
+                            style="width: 700px; height: 700px"
+                        >
+                            <div class="row w-100 h-50">
+                                <img
+                                    class="attachmentImage cover col-6"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[0]
+                                    }}"
+                                />
+                                <img
+                                    class="attachmentImage cover col-6"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[1]
+                                    }}"
+                                />
+                            </div>
+                            <div class="row w-100 h-50">
+                                <img
+                                    class="attachmentImage cover col-4"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[2]
+                                    }}"
+                                />
+                                <img
+                                    class="attachmentImage cover col-4"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[3]
+                                    }}"
+                                />
+                                <img
+                                    class="attachmentImage cover col-4"
+                                    src="{{ attachmentBaseUrl }}/{{
+                                        post.attachmentsURLs[4]
+                                    }}"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="post.type == PostType.SINGLEVIDEO || post.type == PostType.NEWSDIGEST" class="_video w-100">
+                    <video
+                        (playing)="playVideo(post.attachmentsURLs[0], $event)"
+                        (click)="playVideo(post.attachmentsURLs[0], $event)"
+                        controls
+                        [attr.src]="attachmentBaseUrl + '/' + post.attachmentsURLs[0] | sanitizeurl"
+                        class="w-100 h-100"
+                    ></video>
+                </div>
+            </div>
+        </a>
+        <div *ngIf="linkUrl && post.type == PostType.TEXT" (click)="InteractionsComponent.createView()">
+            <!-- <iframe
+                class="w-100 h-100"
+                [src]="linkUrl | sanitizeurl"
+                frameborder="0"
+                webkitallowfullscreen
+                mozallowfullscreen
+                allowfullscreen
+            >
+            </iframe> -->
+            <app-link-preview
+                [url]="linkUrl"
+                [title]="post?.urlTitle"
+                [urlPreviewImage]="urlPreviewImage"
+                [maxHeight]="'400px'"
+            >
+            </app-link-preview>
+        </div>
+    </div>
+    <div
+        *ngIf="getAppEntityForViewDto"
+        class="row  p-4 pointer viewContainer"
+    >
+        <div class="col-8 col-sm-9">
+            <h5>
+                {{"LetsView" | localize }}
+                {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }} !
+            </h5>
+        </div>
+        <div class="col-2">
+            <button
+                class="btn btn-primary _Btn pointer"
+                (click)="viewRelatedEntity()"
+            >
+                {{"View" | localize }}
+                {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }}
+            </button>
+        </div>
+    </div>
+    <app-interactions
+        #InteractionsComponent
+        [entityId]="post?.appPost?.appEntityId"
+        [relatedEntityId]="post?.appPost?.appEntityId"
+        [postCreatorUserId]="post?.appPost?.creatorUserId"
+    ></app-interactions>
+
+</div>

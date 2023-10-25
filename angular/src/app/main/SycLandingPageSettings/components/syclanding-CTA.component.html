@@ -1,0 +1,86 @@
+<div class="position-relative ctaContainer d-md-block d-none">
+    <div
+        *ngIf="
+            sycLangingPageSetting &&
+            sycLangingPageSetting.length > 0 &&
+            sycLangingPageSetting.length <= numVisible
+        "
+        class="d-flex flex-row ng-star-inserted position-absolute ctaParentSection"
+    >
+        <div
+            *ngFor="let ctaSection of sycLangingPageSetting; let i = index"
+            class="ctaChildection pt-2 pl-3 ml-4 mr-4"
+            style="width: 20%"
+        >
+            <a 
+            [routerLink]="['/app/main/' +ctaSection.linkPageUrl ]" >
+                <h3>{{ ctaSection.title }}</h3>
+                <img
+                    [src]="attachmentBaseUrl + '/' + ctaSection.image"
+                    alt="defaultImage"
+                    class="d-block ctaImage mr-4"
+                />
+                <h5 class="ctaDescribtion">{{ ctaSection.description }}</h5>
+            </a>
+        </div>
+    </div>
+
+    <div
+        *ngIf="
+            sycLangingPageSetting && sycLangingPageSetting.length > numVisible
+        "
+        class="ctaSlider d-flex flex-row ng-star-inserted position-absolute ctaParentSection"
+    >
+        <p-carousel
+            [value]="sycLangingPageSetting"
+            [numVisible]="numVisible"
+            [numScroll]="numScroll"
+            [circular]="false"
+        >
+            <ng-template let-ctaSection pTemplate="item">
+                <div class="ctaChildection pt-2 pl-3 ml-4 mr-4">
+                    <a 
+                    [routerLink]="['/app/main/' +ctaSection.linkPageUrl ]" >
+                        <h3>{{ ctaSection.title }}</h3>
+                        <app-image-display
+                            [image]="ctaSection.image ? (attachmentBaseUrl + '/' +  ctaSection.image) : '../../../../assets/placeholders/_logo-placeholder.png'"
+                            [sycAttachmentCategory]="sycAttachmentCategoryCTASlider"
+                            [staticHeight]="100"
+                        >
+                        </app-image-display>
+                        <h5 class="ctaDescribtion">
+                            {{ ctaSection.description }}
+                        </h5>
+                    </a>
+                </div>
+            </ng-template>
+        </p-carousel>
+    </div>
+</div>
+
+
+
+<div class="d-md-none d-flex row flexContainer w-100"  *ngIf="sycLangingPageSetting">
+    <div *ngFor="let ctaSection of sycLangingPageSetting" class="col-6  mt-4">
+        <div class="ctaChildection p-4 ml-4 mr-4  h-100 ">
+            <a 
+            [routerLink]="['/app/main/' +ctaSection.linkPageUrl ]" >
+                <app-image-display
+                    [image]="ctaSection.image ? (attachmentBaseUrl + '/' +  ctaSection.image) : '../../../../assets/placeholders/_logo-placeholder.png'"
+                    [sycAttachmentCategory]="sycAttachmentCategoryCTASlider"
+                    [staticHeight]="100"
+                >
+                </app-image-display>
+                <h3>{{ ctaSection.title }}</h3>
+            </a>
+        </div>
+    </div>
+
+    <div class="mr-5 mt-5 pr-5 w-100">
+        <button (click)="ctaSeeMore()" *ngIf=" sycLangingPageSetting.length > numVisible" class="btn btn-primary btnSeeMore ml-5 w-100"
+        >
+            <span>{{ l("SeeMore") }}</span>
+        </button>
+    </div>
+       
+</div>

@@ -1,0 +1,97 @@
+<div [@routerTransition] class="wrapper">
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pt-0" >
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" >
+            <div class="kt-portlet kt-portlet-profile" >
+                <div class="kt-portlet__body kt-portlet-profile-portlet__body">
+                    <div class="row" style="padding: 15px 0;">
+                        <div class="col-md-9 col-6">
+                            <p style="color: #464E5F;
+                            font-size: 13px;
+                            font-weight: 600;
+                            margin: 0;">{{"Mypaymentmethods" | localize}}</p>
+                            <p style="    font-size: 12px;
+                            color: #B5B5C3;">{{"ManagePaymentMethods" | localize}}</p>
+                        </div>
+                        <div class="col-md-3 col-6" style="text-align: right;">
+                            <button button class="btn btn-success btn-primary nexus-bg-primary"  (click)="showCreateOrEditPaymentModal()">
+                                <span>{{"addCreditCard" | localize}}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 payment-list">
+                <div class="row">
+                    <div class="col-12"  *ngIf="dataSource && dataSource.length > 0; else elseTemplate">
+                        <div class="border-grey-light  align-items-center  mb-3 pb-2 pl-3 pt-2 rounded row" *ngFor="let paymentMethod of dataSource;index as i">
+                            <div *ngIf="paymentMethod.cardType==1" class="col-md-1 col-3 mb-md-0 mb-1">
+                                <img width="40px" src="../../../../../assets/payment/Visa.svg" alt="visa card type">
+                            </div>
+                            <div *ngIf="paymentMethod.cardType==1"class="col-9 col-md-5 credit-card-name mb-1 mb-md-0 text-dark">
+                                {{ "Visa" | localize }} <span class="ml-2">{{paymentMethod.cardNumber}}</span>
+                            </div>
+                            <div *ngIf="paymentMethod.cardType==0" class="col-md-1 col-3 mb-md-0 mb-1">
+                                <img width="40px" src="../../../../../assets/payment/MasterCard.svg" alt="visa card type">
+                            </div>
+                            <div *ngIf="paymentMethod.cardType==0"class="col-9 col-md-5 credit-card-name mb-1 mb-md-0 text-dark">
+                                {{ "MasterCard" | localize }}  <span class="ml-2">{{paymentMethod.cardNumber}}</span>
+                            </div>
+                            <div class="col-md-3 col-12 mb-md-0 mb-1  d-flex align-items-center expiration-date nexus-text-grey">
+                                <div [ngClass]='{ "nexus-text-danger" : checkExpirationDate(paymentMethod) }'>
+                                    {{ "ExpireDate" | localize }}  {{ paymentMethod.cardExpirationMonth  }}/{{paymentMethod.cardExpirationYear}}
+                                </div>
+                                <button *ngIf="checkExpirationDate(paymentMethod)" type="button" class="bg-white border-danger btn-sm font-weight-bold ml-1 rounded-circle nexus-text-danger tooltip-btn-sm"
+                                    tooltip="{{'YourCreditCardWillExpireSoon' | localize}}."
+                                    [adaptivePosition]="true"
+                                    tooltipPopupDelay="250"
+                                    tooltipFadeDuration="250"
+                                    placement="top"
+                                    containerClass="more-info-tooltip"
+                                    >i
+                                </button>
+                            </div>
+                            <div class="align-items-center col-6 col-md-2 d-flex is-default mb-1 mb-md-0 text-dark">
+                                <ng-container *ngIf="paymentMethod.isDefault">
+                                    <i class="d-flex fa fa-check-circle mr-1 nexus-text-success"></i>{{'Default' | localize }}
+                                </ng-container>
+                            </div>
+                            <div class="col-md-1 col-6">
+                                <div class="btn-group dropdown" dropdown >
+                                    <button class="dropdown-toggle btn btn-sm btn-action"
+                                        dropdownToggle>
+                                    </button>
+                                    <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
+                                        <li>
+                                            <a href="javascript:;" *ngIf="false">{{'Edit' | localize}}</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;" (click)="askToConfirmDelete(paymentMethod.id,i)" >{{'Delete' | localize}}</a>
+                                        </li>
+                                        <li>
+                                            <a  [ngClass]='{"text-muted":paymentMethod.isDefault}' (click)="setPaymentAsDefault(paymentMethod)" >{{'setAsDefault' | localize}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #elseTemplate>
+                    <div class=" w-100 d-flex border-dashed p-3 align-items-center nexus-border-dashed" >
+                        <a class="nav-link active" (click)="showCreateOrEditPaymentModal()">
+                            <img class="mr-2" width="25px" src="../../../../../assets/payment/payment-icon-active.svg">
+                            <span>{{ "AddCreditOrDebitCards" | localize }}</span>
+                        </a>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
+<createOrEditPaymentMethod #createOrEditPaymentModal
+    (paymentAdded)="addSavedPaymentToList($event)"
+    (paymentUpdated)="updateEditedPaymentOnList($event)"
+></createOrEditPaymentMethod>
+<confirm-modal [content1]="'AreYouSure' | localize" [content2]="'AreYouSureToRemoveThisPaymentMethod?' | localize"
+  [buttonYes]="'Yes,Remove' | localize" [buttonNo]="'CancelAction' | localize" [display]="showConfirm"
+  [type]="'deletePaymentMethod'" (buttonClicked)="onConfirmDelete($event)"></confirm-modal>

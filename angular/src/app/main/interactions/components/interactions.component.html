@@ -1,0 +1,75 @@
+ <hr *ngIf="!parentId" [ngClass]="{'visibility-hidden': !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount}">
+<div *ngIf="!parentId" class="d-flex justify-content-between" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
+    <app-reactions-stats
+        [entityId]="entityId"
+        [usersReactionsStats]="usersReactionsStats"
+        [currentUserReaction]="currentUserReaction.reactionSelected"
+    >
+    </app-reactions-stats>
+    
+    <div *ngIf="!parentId && showFirstBarOnly" class="d-flex justify-content-between  pr-5 pr-md-0"  [ngClass]="{'visibility-hidden' : !usersReactionsStats?.viewersCount }">
+        <app-views-stats
+            [viewsCount]="usersReactionsStats.viewersCount"
+        >
+        </app-views-stats>
+    </div>
+    <div (click)="triggerCommentsList()" *ngIf="usersReactionsStats.commentsCount > 0" class="pr-5 pr-md-0">
+        <app-comments-stats
+            [commentsCount]="usersReactionsStats.commentsCount"
+            [parentId]="parentId"
+        >
+        </app-comments-stats>
+    </div>
+</div>
+
+
+<hr class="mb-4" *ngIf="!parentId">
+<div *ngIf="!showFirstBarOnly" class="d-flex" [ngClass]="parentId ? 'flex-column-reverse' : 'flex-column'">
+    <div [ngStyle]="{'margin-left': parentId ? '25px' : ''}" class="d-flex justify-content-between align-items-center pr-4" [ngClass]="{'visibility-hidden':!entityId}">
+        <div class="d-flex justify-content-between" [ngStyle]="{'gap': parentId ? '5px':'40px'}" [ngClass]="{'pr-5 w-100': parentId}">
+            <div class="d-flex" [ngStyle]="{'gap': parentId ? '5px':'40px'}">
+                <app-reactions-action
+                    [currentUserReaction]="currentUserReaction?.reactionSelected"
+                    (reactionChanged)="changeReaction($event)"
+                    (reactionRemoved)="deleteReaction()"
+                    [showCurrentUserReactionText]="!parentId"
+                >
+                </app-reactions-action>
+                <div *ngIf="parentId" >
+                    <app-reactions-stats
+                        [entityId]="entityId"
+                        [usersReactionsStats]="usersReactionsStats"
+                        [currentUserReaction]="currentUserReaction.reactionSelected"
+                    >
+                    </app-reactions-stats>
+                </div>
+                <a (click)="showAddComment()" [ngClass]="{'border-left pl-3': parentId}">
+                    <span>
+                        <i class="far fa-comments"></i>
+                    </span>
+                    {{ parentId ? 'Reply' : 'Comment' | localize}}
+                </a>
+            </div>
+            <div *ngIf="parentId && usersReactionsStats?.commentsCount > 0" (click)="triggerCommentsList()"  class="pr-5 pr-md-0">
+                <app-comments-stats
+                    [commentsCount]="usersReactionsStats.commentsCount"
+                    [parentId]="parentId"
+                >
+                </app-comments-stats>
+            </div>
+        </div>
+        
+        <div *ngIf="!parentId" class="d-flex justify-content-between  pr-5 pr-md-0"  [ngClass]="{'visibility-hidden' : !usersReactionsStats?.viewersCount }">
+            <app-views-stats
+                [viewsCount]="usersReactionsStats.viewersCount"
+            >
+            </app-views-stats>
+        </div>
+    </div>
+</div>
+
+<app-comment-parent
+    #commentParentComponent
+    (newCommentAdded)="changeCommentCountLocally(1)"
+>
+</app-comment-parent>

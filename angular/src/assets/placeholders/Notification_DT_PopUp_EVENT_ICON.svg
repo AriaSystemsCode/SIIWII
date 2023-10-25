@@ -1,0 +1,16 @@
+<svg id="Notification_DT_PopUp_EVENT_ICON" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="68" height="68" viewBox="0 0 68 68">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_152" data-name="Rectangle 152" width="52.289" height="35.479" fill="#fff"/>
+    </clipPath>
+  </defs>
+  <g id="Ellipse_17" data-name="Ellipse 17" fill="#9a038d" stroke="#707070" stroke-width="1">
+    <circle cx="34" cy="34" r="34" stroke="none"/>
+    <circle cx="34" cy="34" r="33.5" fill="none"/>
+  </g>
+  <g id="Group_308" data-name="Group 308" transform="translate(8 17.975)">
+    <g id="Group_307" data-name="Group 307" clip-path="url(#clip-path)">
+      <path id="Path_212" data-name="Path 212" d="M8.271,4.9V30.887A5.684,5.684,0,0,1,11,32.523h1.5a1.166,1.166,0,0,1,0,2.332H1.166a1.166,1.166,0,1,1,0-2.332h1.5a5.688,5.688,0,0,1,2.732-1.636V4.9a2.661,2.661,0,1,1,2.877,0M20.3,26.9H31.986l5.842,8.576H14.46Zm26.592-22V30.887a5.684,5.684,0,0,1,2.732,1.636h1.5a1.166,1.166,0,1,1,0,2.332H39.789a1.166,1.166,0,1,1,0-2.332h1.5a5.687,5.687,0,0,1,2.732-1.636V4.9a2.661,2.661,0,1,1,2.877,0M26.181,16.469a24.861,24.861,0,0,0,12.18-2.99,14.4,14.4,0,0,0,4.72-4.163V5.365L43,5.293c-1.87,2.348-3.485,4.475-6.146,5.942a22.506,22.506,0,0,1-10.674,2.5,22.507,22.507,0,0,1-10.674-2.5c-1.424-.785-6.107-4.9-6.3-5.87V9.21A14.3,14.3,0,0,0,14,13.48a24.861,24.861,0,0,0,12.18,2.99" transform="translate(0 -0.001)" fill="#fff" fill-rule="evenodd"/>
+    </g>
+  </g>
+</svg>

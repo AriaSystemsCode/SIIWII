@@ -1,0 +1,255 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
+  aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form *ngIf="active" #branchForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+        <div class="modal-header" style="display: block;">
+          <h4 class="modal-title">
+            <span *ngIf="branch.id">{{l("EditBranch")}}</span>
+            <span *ngIf="!branch.id">{{l("AddnewBranchDetails")}}</span>
+          </h4>
+          <p>{{l("PleaseFillTheNewBranchDetailsBelow")}}</p>
+          <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()"
+            aria-label="Close" [disabled]="saving">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="row">
+            <div class="col-md-6">
+              <p class="branch-info">{{l("BranchInformation")}}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="contact-info">{{l("ContactInformation")}}</p>
+            </div>
+          </div>
+          <div class="row align-items-center">
+            <div class="col-md-5">
+                <div class="form-group">
+                <label for="branch_Name">{{l("Name")}} *</label>
+                <input type="text" id="branch_Name" class="form-control form-control-sm aria-input-text"
+                    [(ngModel)]="branch.name" name="Name" minlength="2" maxlength="150" required />
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                         <label for="branch_Code">{{l("Code")}} *</label>
+                          <!--  <input type="text" id="branch_Code" class="form-control form-control-sm aria-input-text"
+                            [(ngModel)]="branch.code" name="Code" minlength="1" maxlength="10" [readonly]="branch.id>0"
+                             /> -->
+                             <app-codes *ngIf="!(branch?.id>0)"
+                             [objectType]="entityObjectType"
+                             [editMode]=false
+                            [code]="branchCode"
+                             (getCodeValue)="getCodeValue($event)"
+                             [styles]="stylesObj" ></app-codes>
+                        
+                             <app-codes *ngIf="branch?.id>0"
+                              [objectType]="entityObjectType"
+                              [editMode]=true
+                              [code]="branchCode"
+                              (getCodeValue)="getCodeValue($event)" 
+                              [styles]="stylesObj"></app-codes> 
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="branch_EMailAddress">{{l("EMailAddress")}}</label>
+                            <div class="input-group mb-3">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text" style="background-color: #F3F6F9;"><img src="assets/profile/mail.svg">
+                                </span>
+                              </div>
+                              <input type="email" id="branch_EMailAddress" #emailAddressInput="ngModel"
+                              class="form-control form-control-sm aria-input-text" [(ngModel)]="branch.eMailAddress"
+                              name="EMailAddress" minlength="7" maxlength="100" email />
+                            </div>
+                            <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+          </div>
+          <div class="row align-items-center">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="branch_TradeName">{{l("TradeName")}} *</label>
+                <input type="text" id="branch_TradeName" #tradeNameInput="ngModel"
+                  class="form-control form-control-sm aria-input-text" [(ngModel)]="branch.tradeName" name="TradeName"
+                  minlength="2" maxlength="100" required />
+                <validation-messages [formCtrl]="tradeNameInput"></validation-messages>
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="row align-items-center">
+                <div class="col-md-4 phone-type mt-4">
+                  <div class="form-group m-form__group">
+                    <p-dropdown [options]="allPhoneTypes" styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
+                    name="branch.phone1TypeId" [(ngModel)]="branch.phone1TypeId" [style]="{'width':'100%'}"></p-dropdown>
+                  </div>
+                </div>
+                <div class="col-md-8 phone-col-ext mt-4">
+                    <div class="form-group m-form__group d-flex">
+                        <div class="phone-ng2-input-wrapper">
+                            <input type="text" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
+                            (hasError)="hasErrorphone1Number($event)" [(ngModel)]="branch.phone1Number" name="Phone1Number" (ng2TelOutput)="getNumberphone1Number($event)"
+                            class="form-control form-control-sm aria-input-text phone-input" (intlTelInputObject)="telInputObjectphone1Number($event)"
+                            (countryChange)="onCountryChangephone1Number($event)" />
+                        </div>
+                        <input type="text" id="branch_Phone1Ex" class="form-control form-control-sm aria-input-text phone-input phone-extenstion"
+                        [(ngModel)]="branch.phone1Ext" name="Phone1Ex" minlength="1" [placeholder]="'| ' + 'Extension' |localize" maxlength="10" />
+                    </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="row align-items-center">
+            <div class="col-md-5">
+              <div class="form-group m-form__group">
+                <label for="AppEntityName5">{{l("Language")}}</label>
+                <p-dropdown [options]="allLanguages" styleClass="form-control  aria-select aria-select-modal" [filter]="false"
+                name="branch.languageId" [(ngModel)]="branch.languageId" [style]="{'width':'100%'}" [placeholder]="'Please select' | localize"></p-dropdown>
+
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="row align-items-center">
+                <div class="col-md-4 phone-type mt-4">
+                  <div class="form-group m-form__group">
+                    <p-dropdown [options]="allPhoneTypes" styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
+                    name="branch.phone2TypeId" [(ngModel)]="branch.phone2TypeId" [style]="{'width':'100%'}"></p-dropdown>
+                  </div>
+                </div>
+                <div class="col-md-8 phone-col-ext mt-4">
+                    <div class="form-group m-form__group d-flex">
+                        <div class="phone-ng2-input-wrapper">
+                            <input type="text" class="form-control-sm aria-input-text phone-input" name="Phone2Number" ng2TelInput
+                                [ng2TelInputOptions]="{initialCountry: 'us'}" (hasError)="hasErrorphone2Number($event)"
+                                (ng2TelOutput)="getNumberphone2Number($event)" [(ngModel)]="branch.phone2Number" (intlTelInputObject)="telInputObjectphone2Number($event)"
+                                (countryChange)="onCountryChangephone2Number($event)" />
+                        </div>
+                    <input type="text" id="branch_Phone2Ex" class="form-control form-control-sm aria-input-text phone-input phone-extenstion"
+                      [(ngModel)]="branch.phone2Ext" name="Phone2Ex" minlength="1" maxlength="10" [placeholder]="'| ' + 'Extension' |localize" />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="row align-items-center">
+            <div class="col-md-5">
+              <div class="form-group m-form__group">
+                <label for="AppEntityName4">{{l("Currency")}}</label>
+                <p-dropdown [options]="allCurrencies" styleClass="form-control aria-select aria-select-modal" [filter]="false"
+                name="branch.currencyId" [(ngModel)]="branch.currencyId" [style]="{'width':'100%'}" [placeholder]="'Please select' | localize"></p-dropdown>
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="row align-items-center">
+                <div class="col-md-4 phone-type mt-4" >
+                  <div class="form-group m-form__group">
+                    <p-dropdown [options]="allPhoneTypes" styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
+                    name="branch.phone3TypeId" [(ngModel)]="branch.phone3TypeId" [style]="{'width':'100%'}"></p-dropdown>
+                  </div>
+                </div>
+                <div class="col-md-8 phone-col-ext mt-4"  >
+                  <div class="form-group m-form__group d-flex">
+                    <div class="phone-ng2-input-wrapper">
+                        <input type="text" class="form-control form-control-sm aria-input-text phone-input" ng2TelInput
+                        [ng2TelInputOptions]="{initialCountry: 'us'}" name="Phone3Number" (hasError)="hasErrorphone3Number($event)"
+                        (ng2TelOutput)="getNumberphone3Number($event)" [(ngModel)]="branch.phone3Number" (intlTelInputObject)="telInputObjectphone3Number($event)"
+                        (countryChange)="onCountryChangephone3Number($event)" />
+                    </div>
+                    <input type="text" id="branch_Phone3Ex" class="form-control form-control-sm aria-input-text phone-input phone-extenstion"
+                        [(ngModel)]="branch.phone3Ext" name="Phone3Ex" minlength="1"  [placeholder]="'| ' + 'Extension' |localize" maxlength="10" />
+                    </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="branch_Website">{{l("Website")}}</label>
+            <input type="url" id="branch_Website" #websiteInput="ngModel"
+              class="form-control form-control-sm aria-input-text" [(ngModel)]="branch.website" name="Website"
+              minlength="5" maxlength="100" url />
+            <validation-messages [formCtrl]="websiteInput"></validation-messages>
+          </div>
+
+
+          <div class="form-group form-group-plus">
+            <label for="branch_Address1">{{l("BillingAddress")}}</label>
+            <button type="button" class="btn btn-plus" (click)="selectAddressClick(1)">
+            </button>
+            <p  class="form-control  aria-input-text address-name">
+                {{ address1.name?  address1.name : '' }}
+                {{ address1.addressLine1?  ' - ' + address1.addressLine1 : '' }}
+                {{ address1.addressLine2?  ' - ' + address1.addressLine2 : '' }}
+                {{ address1.city?  ' - ' + address1.city : '' }}
+                {{ address1.state?  ' - ' + address1.state : '' }}
+                {{ address1.postalCode?  ' - ' + address1.postalCode : '' }}
+                {{ address1.countryIdName?  ' - ' + address1.countryIdName : '' }}
+            </p>
+          </div>
+          <div class="form-group form-group-plus">
+            <label for="branch_Address2">{{l("ShippingAddress")}}</label>
+            <button type="button" class="btn btn-plus" (click)="selectAddressClick(2)">
+            </button>
+            <p  class="form-control  aria-input-text address-name">
+                {{ address2.name?  address2.name : '' }}
+                {{ address2.addressLine1?  ' - ' + address2.addressLine1 : '' }}
+                {{ address2.addressLine2?  ' - ' + address2.addressLine2 : '' }}
+                {{ address2.city?  ' - ' + address2.city : '' }}
+                {{ address2.state?  ' - ' + address2.state : '' }}
+                {{ address2.postalCode?  ' - ' + address2.postalCode : '' }}
+                {{ address2.countryIdName?  ' - ' + address2.countryIdName : '' }}
+            </p>
+          </div>
+          <div class="form-group form-group-plus">
+            <label for="branch_Address3">{{l("DistributionAddress")}}</label>
+            <button type="button" class="btn btn-plus" (click)="selectAddressClick(3)">
+            </button>
+            <p  class="form-control  aria-input-text address-name">
+                {{ address3.name?  address3.name : '' }}
+                {{ address3.addressLine1?  ' - ' + address3.addressLine1 : '' }}
+                {{ address3.addressLine2?  ' - ' + address3.addressLine2 : '' }}
+                {{ address3.city?  ' - ' + address3.city : '' }}
+                {{ address3.state?  ' - ' + address3.state : '' }}
+                {{ address3.postalCode?  ' - ' + address3.postalCode : '' }}
+                {{ address3.countryIdName?  ' - ' + address3.countryIdName : '' }}
+            </p>
+          </div>
+          <div class="form-group form-group-plus">
+            <label for="branch_Address4">{{l("MailingAddress")}}</label>
+            <button type="button" class="btn btn-plus" (click)="selectAddressClick(4)">
+            </button>
+            <p  class="form-control  aria-input-text address-name">
+                {{ address4.name?  address4.name : '' }}
+                {{ address4.addressLine1?  ' - ' + address4.addressLine1 : '' }}
+                {{ address4.addressLine2?  ' - ' + address4.addressLine2 : '' }}
+                {{ address4.city?  ' - ' + address4.city : '' }}
+                {{ address4.state?  ' - ' + address4.state : '' }}
+                {{ address4.postalCode?  ' - ' + address4.postalCode : '' }}
+                {{ address4.countryIdName?  ' - ' + address4.countryIdName : '' }}
+            </p>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button [disabled]="saving" type="button" class="bbtn btn-default btn-gray"
+            (click)="close()">{{l("Cancel")}}</button>
+          <button type="submit" class="btn btn-primary blue  btn-blue" [disabled]="!branchForm.form.valid"
+            [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
+        </div>
+        <selectAddressModal #selectAddressModal (addressSelected)="addressSelected($event)"></selectAddressModal>
+      </form>
+    </div>
+  </div>
+
+</div>

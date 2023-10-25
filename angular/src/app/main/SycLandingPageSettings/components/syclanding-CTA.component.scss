@@ -1,0 +1,60 @@
+.ctaContainer {
+    width: 100%;
+    height: 250px;
+}
+.ctaParentSection {
+   /*  padding-left: 2%; */
+    top: -80px;
+    width: 100%;
+    justify-content: center;
+}
+
+.ctaContainer a:hover {
+    color: black;
+}
+
+.ctaChildection {
+    height: 245px;
+    background-color: #eeeeee;
+    overflow: hidden auto;
+    cursor: pointer;
+    border: 1px solid #e4e4e4;
+    box-shadow: 3px 3px white;
+    border-radius: 10px;
+}
+
+.ctaImage {
+
+    float: left;
+}
+
+.ctaDescribtion {
+    line-height: 1.5;
+}
+
+a {
+    color: black;
+}
+
+
+.cta-sm{
+    background-color: #EFEFEF;
+border-radius: 10px;
+
+}
+
+.flexContainer{
+    flex-wrap: wrap;
+}
+.flexContainerSection{
+    flex: 50%;
+}
+
+.btnSeeMore{
+    color: #700066 !important;
+    background-color: #dedada !important;
+    border: none !important;
+    border-radius: 5px !important;
+    font-weight: bold;
+    font-size: 21pt;
+}

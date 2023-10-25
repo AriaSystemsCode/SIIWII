@@ -1,0 +1,48 @@
+
+<div
+    bsModal
+    #createOrEditModal="bs-modal"
+    class="modal right fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="createOrEditModal"
+    aria-hidden="true"
+    [config]="{ backdrop: 'static' }"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="row m-3">
+                <div class="col-11"></div>
+                <div class="col-1 pt-5 text-right">
+                    <img
+                        src="../../../../../assets/accounts/importAccounts/close.svg"
+                        class="pointer"
+                        (click)="hide()"
+                    />
+                </div>
+            </div>
+
+            <div class="row">
+                <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    class="controls"
+                    readonly
+                    [(ngModel)]="location"
+                    required
+                />
+                <div id="map"></div>
+                <!-- <google-map></google-map> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+<!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzFjh3MbKuFCqF-MzV6E0W2CoZS_E3V2M&callback=initMap&libraries=places&v=weekly"
+    async
+></script>

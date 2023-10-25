@@ -1,0 +1,92 @@
+
+
+<div >
+    <div class="modal-header" style="display: block;background-color: #ffffff !important;">
+        <div class="d-flex align-items-start">
+            <div class="mr-2 pb-3 pl-3 pr-3 pt-3 rounded-circle text-primary share-icon">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div>
+                <h3 class="modal-title" >
+                    {{"SharingOptions" | localize}}
+                </h3>
+                <p class="hint">{{"ChooseSharingOptions" | localize}}</p>
+            </div>
+        </div>
+
+        <button style="position: absolute;right: 8px;top: 8px;" type="button" class="close" (click)="close()"
+        aria-label="Close" [disabled]="saving">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <div class="d-flex">
+                <label class="ml-1 mr-5" for="public">
+                    <input type="radio" id="public" name="publicity" (click)="hideCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="1"> {{"Public" | localize}}
+                </label>
+                <label  for="private">
+                    <input type="radio" id="private"  name="publicity" (click)="showCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="2"> Restricted
+                </label>
+            </div>
+        </div>
+        <h4 class="mb-2 ml-2 mt-3">{{"ShareWith"| localize}}</h4>
+        <div class="bg-light d-flex pb-2 pl-3 pr-3 pt-2 rounded-lg share-search-wrapper">
+            <div class="align-items-center d-flex flex-grow-1">
+                <i class="fa-2x fa-search fas mr-3 text-black-50"></i>
+                <input type="text" class="flex-grow-1 bg-light border-0" #querySearchElem (input)="usersSearch($event.target.value)" [placeholder]="'TypeOrSearchForMembersAndAccounts' | localize">
+            </div>
+            <a (click)="addEmail(querySearchElem)">
+                <i class="fa-2x fa-plus-circle fas text-black-50" ></i>
+            </a>
+            <div [appClickOutside]="true" [anotherElemSkip]="querySearchElem"  class="bg-white flex-column pb-2 pl-3 pr-3 pt-2 shadow thin-scroll user-search-result w-100">
+                <div class="d-flex mb-3 mt-3 user-item bg-hover-light" *ngFor="let user of filteredUsers;index as i" (click)="addSharingItem(user,i)">
+                    <img class="mr-3 rounded-circle" height="30px" src="../../../../../assets/icons/user-icon.jpg" alt="user-icon.jpg">
+                    <div>
+                        <h5 class="mb-1">{{user?.users?.name}} {{user?.surname}} @ {{user?.tenantName}}</h5>
+                        <p class="m-0">{{user?.emailAAddress}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-column selected-users thin-scroll border-dashed-bottom pt-4">
+            <div class="d-flex justify-content-space-between mb-4" *ngFor="let user of publishItemOptions?.itemSharing;index as i">
+                <div class="d-flex flex-grow-1  pl-3">
+                    <img class="mr-3 rounded-circle" height="30px" src="../../../../../assets/icons/user-icon.jpg" alt="user-icon.jpg">
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1" *ngIf="!user.sharedUserEMail">{{user?.sharedUserName}} {{user?.sharedUserSureName}} @ {{user?.sharedUserTenantName}}</h5>
+                        <h5 class="mb-1 text-black-50" *ngIf="user.sharedUserEMail">{{user?.sharedUserEMail}}</h5>
+                    </div>
+                </div>
+                <div class="align-self-center ">
+                    <a class="bg-danger mr-3 pb-1 pl-2 pr-2 pt-1 rounded-circle text-white remove-user" (click)="removeSharingItem(i)">
+                        <i class="fas fa-minus"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-column border-dashed-bottom pb-3 pt-3">
+            <label for="notify" >
+                <input type="checkbox" [disabled]="publishItemOptions.sharingLevel === 1" name="notify" id="notify" [(ngModel)]="_notify" (change)="triggerMessage($event)"> {{"NotifyPeople" | localize}}
+            </label>
+            <textarea aria-placeholder="Message" [placeholder]="'Message' | localize" class="bg-light border-0 p-2" rows="4" [(ngModel)]="publishItemOptions.message" *ngIf="_notify">
+            </textarea>
+        </div>
+
+    </div>
+    <div  class="subscribers" *ngIf="PublishAppItemListingService.sharingStatus !== 0" >You have {{PublishAppItemListingService.subscribersNumber}} Subscribers to this Product </div>
+    <div class="modal-footer">
+        <button type="button"  class="btn btn-outline-primary" [disabled]="!showCloseText && _notify && publishItemOptions.itemSharing.length === 0" (click)="publishListing()" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
+            <!-- <span *ngIf="!_notify">{{"ShareAndPublish" | localize}}</span> -->
+            <!-- <span *ngIf="_notify">{{"NotifyAndPublish" | localize}}</span> -->
+            <span *ngIf="PublishAppItemListingService.sharingStatus === 0  ||  PublishAppItemListingService.sharingStatus === 3">Share</span>
+            <span *ngIf="(PublishAppItemListingService.sharingStatus === 1 || PublishAppItemListingService.sharingStatus === 2) && PublishAppItemListingService.subscribersNumber ===0  ">Make Private</span>
+            <span *ngIf="(PublishAppItemListingService.sharingStatus === 3) && PublishAppItemListingService.subscribersNumber !==0 ">Hide</span>
+            <span  *ngIf=" PublishAppItemListingService.sharingStatus === 4" > Unhide </span>
+        </button>
+        <!-- <button *ngIf="showCloseText" type="button" class="btn btn-outline-primary" (click)="close()" >
+            <span >{{l("Close")}}</span>
+        </button> -->
+    </div>
+</div>
+

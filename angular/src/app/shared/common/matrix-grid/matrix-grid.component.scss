@@ -1,0 +1,23 @@
+input {
+    max-width: 100%;
+}
+.remove-row {
+    right: auto;
+    top: 10px;
+    left: 0px;
+    cursor: pointer;
+}
+.remove-column {
+    right: 0;
+    left: 0px;
+    cursor: pointer;
+    margin: 0 auto;
+    width: 17px;
+    height: 17px;
+    top: 0px;
+}
+p-table  {
+    input[type='number'] {
+        width: 70px;
+    }
+}

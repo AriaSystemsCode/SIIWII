@@ -1,0 +1,78 @@
+<form #SizeRatioForm="ngForm" >
+    <div class="row pl-0" *ngIf="!readOnly">
+        <div class="align-items-end justify-content-between col-9 d-flex pl-0">
+            <div class="row pl-0 w-100">
+                <div class="col d-flex pl-0 align-items-end">
+                    <div class="sizescale-name mr-2 pl-3">
+                        <div *ngIf="appSizeScales?.name">
+                            <input type="text" disabled [value]="appSizeScales.name" class="dimension-input form-control"/>
+                        </div>
+                        <div *ngIf="appSizeRatios" >
+                            <input 
+                                type="text" 
+                                [disabled]="readOnly" 
+                                [(ngModel)]="appSizeRatios.name" 
+                                class="dimension-input form-control"
+                                name="appSizeRatios.name"
+                                (ngModelChange)="sizeRatioNameChanges($event)"
+                                placeholder="{{ 'EnterSizeRatioName' | localize }} *"
+                            />
+                        </div>
+                    </div>
+                    <div class="sizescale-name">
+                        <input type="text" disabled [value]="appSizeRatios?.dimesion1Name" class="dimension-input form-control"/>
+                    </div>
+                </div>
+                <div class="sizescale-name p-0 ratio-item">
+                    <div class="ratio-lable">{{'RatioTotQty' | localize}}</div>
+                    <div class="ratio-qty">
+                        {{totalQty}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="sizescale-name pt-2" *ngIf="!readOnly">
+            <input type="text" [ngClass]="{'visibility-hidden':!appSizeRatios?.dimesion2Name}" disabled [value]="appSizeRatios?.dimesion2Name" class="dimension-input form-control"/>
+            <div *ngIf="appSizeRatios?.dimesion2Name && appSizeRatios?.dimesion1Name" class="text-primary mt-2">*{{'IndividualSizesWillBeDisplayedAs' | localize}} "{{appSizeRatios?.dimesion1Name||'FirstDimensionName' | localize}} - {{appSizeRatios?.dimesion2Name || 'SecondDimensionName'| localize }}" </div>
+        </div>
+        <div class="col ratio-container thin-scroll" [ngClass]='{"mr-5" : !readOnly}'>
+            <div class="d-flex flex-wrap" *ngIf="appSizeRatios?.appSizeScalesDetails">
+                <div class="ratio-item" *ngFor="let sizeScale of appSizeRatios.appSizeScalesDetails;index as i">
+                    <div class="ratio-lable">{{sizeScale.sizeCode}}</div>
+                    <div class="ratio-qty">
+                        <input 
+                            type="number" 
+                            [(ngModel)]='sizeScale.sizeRatio' 
+                            [name]="sizeScale.sizeCode + '-' + i" 
+                            [placeholder]="'Enter' | localize"
+                            (ngModelChange)="calculateQtySum()"
+                            required
+                            [min]="0"
+                            [value]="0"
+                            [readOnly]="readOnly"
+                            [pattern]="sizeScale.sizeRatio > 0 ? patterns.positiveInteger : null"
+                            #sizeRatio="ngModel"
+                        />
+                    </div>
+                    <validation-messages [formCtrl]="sizeRatio" ></validation-messages>
+                </div>
+            </div>
+        </div>
+        <div  class="align-items-center buttons-list d-flex flex-column mt-4 sizescale-name" style="gap:20px" *ngIf="!readOnly">
+            <button class="btn btn-primary w-100" (click)="openSelectSizeRatioModal()" [disabled]="!appSizeScales?.sizeScaleId">{{'SelectSizeRatio'| localize}}</button>
+            <button class="btn btn-primary w-100" (click)="createOrEdit(false)" [disabled]=" !appSizeScales?.sizeScaleId || (appSizeScales?.sizeScaleId && !appSizeRatios?.sizeScaleId) || sizeRatioForm.form.invalid">{{'SaveSizeRatio' | localize}}</button>
+            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" [disabled]="!appSizeScales?.sizeScaleId || sizeRatioForm.form.invalid" style="background-color: #eba461 !important;
+            border: none !important;">{{'SaveAsNewSizeRatio'| localize}}</button>
+        </div>
+        
+    </div>
+</form>
+
+<app-selection-modal
+    #appSelectionModal
+    (_getAll)="handleGetAllSizeRatios($event)"
+    (_submit)="sizeRatioSelectionDoneHandler($event)"
+>
+</app-selection-modal>

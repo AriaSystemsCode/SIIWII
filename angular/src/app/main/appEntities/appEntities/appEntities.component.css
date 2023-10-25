@@ -1,0 +1,178 @@
+.p-accordion-header a{
+background-color: white !important;
+border: none !important;
+color: #464E5F !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+}
+.p-accordion-toggle-icon{
+    color:#464E5F !important;
+    border: none !important;
+}
+.btn-blue-create,.btn-blue-create:hover,.btn-blue-create:focus{
+    background-color: #3699FF;
+    border: none;
+    border-radius: 5px;
+    color:#E1F0FF;
+
+    /* width: 230px !important;; */
+    border-radius: 5px;
+
+ }
+ .btn-p-21,.btn-p-21:hover,.btn-p-21:focus{
+    /* padding: 21px !important; */
+    padding: 9px 23px !important;
+    margin-right: 11px;
+
+ }
+ .btn-white,.btn-white:hover,.btn-white:focus{
+    background-color: #FFFFFF;
+    color:#1BC5BD;
+    border:1px solid #3699FF;
+    /* padding: 20px !important; */
+    padding: 9px 17px !important;
+    border-color: #1BC5BD;
+    margin-right: 16px;
+}
+
+
+.p-table-scrollable-header-box th{
+    background-color: white !important;
+    color: #B5B5C3 !important;
+}
+.p-table-scrollable-header-box td{
+    color: #464E5F !important;
+}
+body .p-accordion .p-accordion-header a:focus {
+    outline: 0 none;
+    outline-offset: 0;
+     box-shadow: none !important;
+    }
+.btn-action{
+    background-color: #E1F0FF;
+    /* z-index: 9999999999999999999999999999999999999999999999999999999; */
+    color: #E1F0FF;
+    background: url('assets/profile/ActionMenu.svg') no-repeat center;
+ }
+ .btn-action:hover{
+    background-color: #E1F0FF !important;
+    /* background: url('assets/profile/Actionmenu-hover.svg') no-repeat center; */
+ }
+ .btn-action:focus{
+    background-color: #2786FB !important;
+    background: url('assets/profile/Actionmenu-hover.png') no-repeat center;
+ }
+ body  .btn.dropdown-toggle{
+    background-color: #E1F0FF;
+        border: none;
+        width: 30px;
+    }
+    body  .btn.dropdown-toggle:active,body  .btn.dropdown-toggle:hover{
+       background-color: #2786FB !important;
+        border: none;
+        width: 30px;
+    }
+
+    body  .nav-link.btn-action:after, body  .btn.btn-action:after{
+        content: "";
+        }
+        .btn-search{
+            background-color: transparent;
+            border: none;
+            padding: 0 20px;
+            height: 47px;
+         }
+         .input-search{
+            background-color: #CCCCCC;
+            border-radius: 4px;
+    /* width: 50px; */
+         }
+         .icon-search{
+             font-size: 22px !important;
+         }
+         .aria-input-text,.aria-select{
+            height: 46px !important;
+            background-color: #F3F6F9 !important;
+            border: none;
+            border-radius: 5px;
+         }
+      .p-accordion-header-text{
+          position: relative;
+      }
+
+.body-according{
+    padding: 15px 5px !important;
+}
+.kt-portlet {
+    margin-top: 31px !important;
+}
+
+body .p-component {
+    /* font-family: "Open Sans", "Helvetica Neue", sans-serif; */
+    font-size: 14px;
+    font-weight: normal !important;
+    font-family: "Poppins" !important;
+}
+/* body .p-accordion .p-accordion-content{
+    padding-left: 0;
+    margin-left: 0;
+}
+tr:after{
+    border-bottom: 1px solid #F3F6F9 !important;
+}
+.form-according{
+    padding-left: 15px !important;
+} */
+.according_desc{
+    position: absolute;
+    top: 12px;
+    left: 162px;
+    color: #B5B5C3;
+}
+.according_desc-17{
+    left: 143px;
+}
+.according_desc-19{
+    left: 135px;
+}
+.according_desc-20{
+    left: 139px;
+}
+.according_desc-21{
+    left: 125px;
+}
+.according_desc-22{
+    left: 156px;
+}
+.according_desc-23{
+    left: 120px;
+}
+.accordion-header {
+    margin-bottom: 0;
+    padding-top: 10px;
+}
+body .p-accordion .p-accordion-header {
+     margin-bottom: 0px !important;
+}
+body .p-accordion{
+    margin-bottom: 20px;
+    padding: 20px;
+}
+#ui-state-default{
+    margin-bottom: 20px !important;
+    padding: 20px;
+}
+body #lookups .p-accordion .p-accordion-header a {
+    padding: 25px 25px 30px 20px;
+}
+.p-accordion-content{
+    /* margin-top: -20px; */
+    margin-bottom: 20px;
+}
+.p-accordion-content-wrapper{
+    margin-top: -20px;
+    margin-bottom: 20px;
+}
+.p-accordion p-accordiontab .p-accordion-tab {
+    margin-bottom: 20px;
+}

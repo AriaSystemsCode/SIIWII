@@ -1,0 +1,15 @@
+.modalCenter {
+    margin: 0 !important;
+    top: 50% !important;
+    /* position: absolute !important; */
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+
+.progress {
+    margin-bottom: 0;
+    background: transparent linear-gradient(180deg, #509AF700 0%, #509AF714 100%) 0% 0% no-repeat padding-box;
+    border: 1px dashed #509AF7;
+    border-radius: 6px;
+    opacity: 1;
+}

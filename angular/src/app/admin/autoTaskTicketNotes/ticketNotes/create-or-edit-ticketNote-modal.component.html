@@ -1,0 +1,109 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #ticketNoteForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="ticketNote.id">{{l("EditTicketNote")}}</span>
+                        <span *ngIf="!ticketNote.id">{{l("CreateNewTicketNote")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+					<div class="form-group m-form__group">
+                        <label for="TicketTicketNumber">{{l("Ticket")}}</label>
+                        <div class="input-group">
+                            <input class="form-control" id="TicketTicketNumber" name="ticketTicketNumber" [(ngModel)]="ticketTicketNumber" type="text" disabled>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary blue" (click)="openSelectTicketModal()" type="button"><i class="fa fa-search"></i> {{l("Pick")}}</button>
+                            </div> <div class="input-group-prepend">
+                                <button class="btn btn-danger btn-icon" type="button" (click)="setTicketIdNull()"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <input class="form-control" name="ticketNote.ticketId" [(ngModel)]="ticketNote.ticketId" type="text"  hidden>
+
+
+								<div class="form-group">
+									<label for="TicketNote_Title">{{l("Title")}}</label>
+									<input type="text" #TicketNote_Title="ngModel" id="TicketNote_Title" class="form-control" [(ngModel)]="ticketNote.title" name="Title"   minlength="1"  maxlength="250" />
+								    <validation-messages [formCtrl]="TicketNote_Title"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="TicketNote_Description">{{l("Description")}}</label>
+									<input type="text" #TicketNote_Description="ngModel" id="TicketNote_Description" class="form-control" [(ngModel)]="ticketNote.description" name="Description"    />
+								    <validation-messages [formCtrl]="TicketNote_Description"></validation-messages>
+								</div>
+               <!--Sara Start Here -->
+
+                        <div *ngIf="ticketNote?.entityAttachments?.length > 0">
+
+									<label >{{l("Attachments")}} :  {{ticketNote?.entityAttachments?.length}}</label>
+								   <!--for="TicketNote_attachments"  <input type="text" #TicketNote_attachments="ngModel" id="TicketNote_attachments" class="form-control" [(ngModel)]="ticketNote.entityAttachments" name="TicketNoteattachments"    /> -->
+								  <div>
+                                          <div class="files-uploaded" *ngFor="let attachItem of ticketNote.entityAttachments;">
+
+
+                                    <div style="position: relative;" class="uploaded-attchments" >
+                                        <button *ngIf="! ticketNote.id" class="close" aria-hidden="true" (click)="deleteTicketNoteAttachment(attachItem.id)">
+                                            <i class="fa fa-trash-alt icon-xs " ></i>
+
+                                        </button>
+                                        <img class="img-wrap" src="assets/message/adobe.svg" (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.PDF') || attachItem.fileName.includes('.pdf')" >
+                                        <img class="img-wrap" src="assets/message/excel.svg" (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.xls') || attachItem.fileName.includes('.XLS')">
+                                        <img class="img-wrap"  [src]="getImage(attachItem.fullPath)"   (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.jpg') || attachItem.fileName.includes('.JPG') || attachItem.fileName.includes('.png') || attachItem.fileName.includes('.PNG') || attachItem.fileName.includes('.svg') || attachItem.fileName.includes('.SVG') ">
+                                        <img class="img-wrap" src="assets/message/microsoft-powerpoint.svg" (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.ppt') || attachItem.fileName.includes('.PPT')">
+                                        <img class="img-wrap" src="assets/message/microsoft-word.svg"  (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                        *ngIf="attachItem.fileName.includes('.doc') || attachItem.fileName.includes('.docs')">
+
+                                            <img class="img-wrap" src="assets/message/document.png" (click)="downloadFile(attachItem.fullPath,attachItem.fileName,attachItem)"
+                                            *ngIf="!attachItem.fileName.includes('.xls') && !attachItem.fileName.includes('.XLS')
+                                            && !attachItem.fileName.includes('.PDF') && !attachItem.fileName.includes('.pdf')
+                                            && !attachItem.fileName.includes('.docs')&& !attachItem.fileName.includes('.doc')
+                                            && !attachItem.fileName.includes('.ppt') && !attachItem.fileName.includes('.jpg')
+                                            && !attachItem.fileName.includes('.svg') && !attachItem.fileName.includes('.png')
+                                            && !attachItem.fileName.includes('.PNG')" >
+
+
+
+                                         </div>
+                                         <p class="display-name mt-2"><span>{{attachItem.fileName}}</span></p>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                          <span class="input-group-text" style="background-color:#3699FF; color:cornsilk"  id="inputGroupFileAddon01" >Upload Attachment</span>
+                                        </div>
+                                        <div class="custom-file">
+                                          <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" (change)="handleInputChangeAttachment($event)" >
+                                          <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                        </div>
+                                    </div>
+
+                                        <!--Loop Ends Here -->
+
+
+                <!--Sara End Here -->
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!ticketNoteForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+<ticketNoteTicketLookupTableModal #ticketNoteTicketLookupTableModal (modalSave)="getNewTicketId()"></ticketNoteTicketLookupTableModal>
+
+</div>

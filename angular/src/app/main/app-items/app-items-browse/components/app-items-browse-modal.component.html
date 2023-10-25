@@ -1,0 +1,34 @@
+<!-- Iteration-13-->
+<div
+    bsModal
+    #BrowseAppItemModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="BrowseAppItemModal"
+    aria-hidden="true"
+    [config]="{ backdrop: 'static' }"
+    style="overflow: auto;"
+>
+    <div class="modal-dialog modal-xl" style="height: 90vh;">
+        <div
+            class="modal-content modal-content-wrapper"
+        >
+            <div class="modal-header">
+                <h4 class="modal-title" >
+                    <p class="desc-menu-item">{{l("SelectFromTheBelow")}} {{" "}}  {{l('Products')}}</p>
+                </h4>
+                <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()" aria-label="Close" >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0  mr-2 big-scroll">
+                <app-app-items
+                    #AppItemsBrowseComponent
+                    (eventTriggered)="eventHandler($event)"
+                >
+                </app-app-items>
+            </div>
+        </div>
+    </div>
+</div>

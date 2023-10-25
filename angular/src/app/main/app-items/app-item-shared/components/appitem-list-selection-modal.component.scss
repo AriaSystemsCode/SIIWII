@@ -1,0 +1,35 @@
+.create-edit-plus-btn {
+    z-index: 1;
+    right: 75px;
+    bottom: 15vh;
+}
+
+.modal-body {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.icon-gt {
+    font-size: 23px;
+}
+
+.list-items-container{
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 800px;
+    width: 100%;
+}
+
+.modal-content-wrapper .modal-body {
+    flex-grow: 1 !important;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+.list-row {
+    transition: all .3s ease-in-out;
+    &:hover {
+        cursor: pointer;
+        background-color: #f0f0f0!important;
+        transition: all .3s ease-in-out;
+    }
+}

@@ -1,0 +1,18 @@
+.logo {
+    width: 45px;
+}
+textarea{
+    border-radius: 10px;
+    border-color: rgb(158, 158, 158);
+    resize: none;
+    padding: 10px;
+    box-shadow: 0 0 3px transparent;
+    overflow: hidden;
+    &:focus {
+        outline: none !important;
+        box-shadow: 0 0 3px #464444;
+    }
+}
+.wrapper {
+    gap: 20px;
+}

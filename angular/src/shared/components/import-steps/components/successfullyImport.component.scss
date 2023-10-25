@@ -1,0 +1,31 @@
+.modalCenter{
+    margin: 0 !important;
+    top: 50% !important;
+    /* position: absolute !important; */
+    left: 50% !important;
+    transform: translate(-50%,-50%) !important;
+}
+.modal-content
+{
+    width: 360px;
+    height: 270px;
+    margin: auto;
+}
+
+._Btn
+{
+    width: 304px;
+    height: 45px;
+    background: #509AF7 0% 0% no-repeat padding-box;
+    border-radius: 6px;
+    opacity: 1;
+    color:white;
+}
+
+._download 
+{
+    text-decoration: underline !important;
+letter-spacing: 0px !important;
+color: #509AF7 !important;
+opacity: 1 !important;;
+}

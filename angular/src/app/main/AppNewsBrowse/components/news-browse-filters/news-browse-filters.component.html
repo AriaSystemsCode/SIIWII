@@ -1,0 +1,25 @@
+<form [formGroup]="filterForm" >
+
+    <div class="mt-4 pt-4">
+        <h4 class="text-captitalize mb-3">{{"FromDate" | localize}}</h4>
+        <div class="row" >
+            <div>
+                <input type="datetime-local" formControlName="startDate" name="startDate" class="form-control" placeholder="{{ 'Choose Date' | localize }}" />
+            </div>
+        </div>
+    </div>
+    <div class="mt-4 pt-4 pb-4 border-dashed-bottom" >
+        <h4 class="text-captitalize mb-3">{{"ToDate" | localize}}</h4>
+        <div class="row" >
+            <div>
+                <input type="datetime-local" formControlName="endDate" name="endDate" class="form-control" placeholder="{{ 'Choose Date' | localize }}" />
+            </div>
+        </div>
+        <div class="text-danger" *ngIf="dateErrorMessage">
+            {{dateErrorMessage}}
+        </div>
+    </div>
+    
+
+  
+</form>

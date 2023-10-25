@@ -1,0 +1,64 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycEntityObjectCategoryForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycEntityObjectCategory.id">{{l("EditEntityObjectCategory")}}</span>
+                        <span *ngIf="!sycEntityObjectCategory.id">{{l("CreateNewEntityObjectCategory")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+					<div class="form-group m-form__group">
+						<label for="SycEntityObjectCategoryName">{{l("Parent")}}</label>
+						<select *ngIf="!allSycEntityObjectCategorysLoading" name="sycEntityObjectCategory.parentId" [(ngModel)]="sycEntityObjectCategory.parentId" class="form-control" >
+							<option value="">{{l('PleaseSelect')}}</option>
+							<option *ngFor="let item of allSycEntityObjectCategorys" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group m-form__group">
+						<label for="SydObjectName">{{l("Object")}}</label>
+						<select *ngIf="!allSydObjectsLoading" name="sycEntityObjectCategory.objectId" [(ngModel)]="sycEntityObjectCategory.objectId" class="form-control" required>
+							<option value="">{{l('PleaseSelect')}}</option>
+							<option *ngFor="let item of allSydObjects" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+
+
+								<div>
+									<!-- <label for="SycEntityObjectCategory_Name">{{l("Code")}} *</label> -->
+									<app-codes *ngIf="!(sycEntityObjectCategory?.id>0)"
+										[objectType]="entityObjectType"
+										[editMode]=false
+										(getCodeValue)="getCodeValue($event)" ></app-codes>
+		   
+										<app-codes *ngIf="sycEntityObjectCategory?.id>0"
+										 [objectType]="entityObjectType"
+										 [editMode]=true
+										 [code]="sycEntityObjectCategory?.code"
+										 (getCodeValue)="getCodeValue($event)" ></app-codes>
+								</div>
+
+								<div class="form-group">
+									<label for="SycEntityObjectCategory_Name">{{l("Name")}} *</label>
+									<input type="text" id="SycEntityObjectCategory_Name" class="form-control" [(ngModel)]="sycEntityObjectCategory.name" name="Name"   minlength="2"  maxlength="150"  required/>
+								</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycEntityObjectCategoryForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

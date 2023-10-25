@@ -1,0 +1,145 @@
+<!-- Iteration-13-->
+<div
+    bsModal
+    #viewPostModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="viewPostModal"
+    aria-hidden="true"
+    [config]="{ backdrop: false , ignoreBackdropClick: true }"
+>
+    <div class="modal-dialog modal-lg">
+        <div
+            class="modal-content"
+            [ngClass]="
+                (post &&
+                    post.attachmentsURLs &&
+                    post.attachmentsURLs.length > 0) ||
+                linkUrl
+                    ? 'contentWithAttach'
+                    : 'contentWithoutAttach'
+            "
+        >
+            <div *ngIf="post" class="row">
+                <div  class="d-block d-md-none p-5 w-100 bg-sm"><img  src="assets/posts/ViewPost_Close_Btn.svg" class="pointer" (click)="hide()"/>
+            </div>
+
+                <div
+                    *ngIf="
+                        post.attachmentsURLs && post.attachmentsURLs.length > 0
+                    "
+                    class="
+                    col-md-6 
+                        carouselContainer
+                        carouselChangePosArrow
+                         mr-0 mr-md-5 
+                    "
+                >
+                    <!-- <carousel
+                        *ngIf="post.type == PostType.SINGLEIMAGE"
+                        [interval]="false"
+                        [showIndicators]="false"
+                    >
+                        <slide *ngFor="let attach of post.attachmentsURLs">
+                            <div class="d-flex flex-column h-100 justify-content-center w-100">
+                                <img [src]="attachmentBaseUrl + '/' + attach" class="carouselImg" />
+                            </div>
+                        </slide>
+                    </carousel> -->
+
+                    <p-carousel
+                    *ngIf="post.type == PostType.SINGLEIMAGE"
+                    [value]="post.attachmentsURLs"
+                    [numVisible]="1"
+                    [numScroll]="1"
+                    [circular]="true"
+                    class="hiddenDotsIndicator"
+                >
+                    <ng-template let-attach pTemplate="item">
+                        <div class="d-flex flex-column h-100 justify-content-center w-100">
+                            <img [src]="attachmentBaseUrl + '/' + attach" class="carouselImg" />
+                        </div>
+                    </ng-template>
+                </p-carousel>
+                
+                    <div *ngIf="post.type == PostType.SINGLEVIDEO || post.type == PostType.NEWSDIGEST">
+                        <video
+                            controls
+                            class="_video"
+                            [attr.src]="attachmentBaseUrl + '/' + post.attachmentsURLs[0] | sanitizeurl"
+                        ></video>
+                    </div>
+                </div>
+                <div
+                    [ngClass]="
+                        (post &&
+                            post.attachmentsURLs &&
+                            post.attachmentsURLs.length > 0) ||
+                        linkUrl
+                            ? 'col-md-5 pl-5 pt-5'
+                            : 'col pt-4 pl-5'
+                    "
+                    class="bg-sm"
+                >
+                    <div class="row">
+                        <div class="mr-4 col-1">
+                            <img
+                                [src]="
+                                    profilePicture
+                                        ? profilePicture
+                                        : 'assets/common/images/default-profile-picture.png'
+                                "
+                                class="rounded-circle logo"
+                            />
+                        </div>
+
+                        <div class="col-9 pl-4">
+                            <a class="pt-2 userName purpleColor"
+                                [routerLink]="[
+                                    '/app/main/account/view/',
+                                    post?.appPost?.accountId
+                                ]"  >
+                                {{ post.appPost.accountName }}
+                            </a>
+                            <h6 class="userName">
+                                {{'PostBy' | localize}},<b>{{ post.appPost.userName }} </b> ,
+                                {{
+                                    post.appPost.creationDatetime?.toString()
+                                        | date: "mediumDate"
+                                }}
+                            </h6>
+                        </div>
+
+                        <div class="col-1 text-right d-md-block d-none">
+                            <img
+                                src="assets/posts/close.svg"
+                                class="pointer"
+                                (click)="hide()"
+                            />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="pl-1 pt-4 descriptionContainer w-100">
+                            <h6
+                                class="description thin-scroll pr-3 pl-3"
+                                [ngStyle]="{
+                                    'overflow-y': !seeMore ? 'scroll' : 'hidden'
+                                }"
+                            >
+                                {{ post.appPost.description }}
+                            </h6>
+                            <a
+                                *ngIf="seeMore"
+                                class="seeMore"
+                                (click)="setSeeMore()"
+                                >…see more</a
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Iteration-13-->

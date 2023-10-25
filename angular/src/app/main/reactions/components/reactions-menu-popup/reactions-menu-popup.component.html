@@ -1,0 +1,17 @@
+<div class="d-flex pl-3 pr-3 pt-1 pb-1">
+    <button class="btn btn-transparent btn-reaction" (click)="setReaction($event, Reactions.Like)"  [title]="Reactions[Reactions.Like] | localize" >
+        <img class="icon-reaction" src='./assets/reactions/{{Reactions[Reactions.Like]}}.png' />
+    </button>
+    <button class="btn btn-transparent btn-reaction" (click)="setReaction($event, Reactions.Celebrate)"  [title]="Reactions[Reactions.Celebrate] | localize" >
+        <img class="icon-reaction" src='./assets/reactions/{{Reactions[Reactions.Celebrate]}}.png' />
+    </button>
+    <button class="btn btn-transparent btn-reaction" (click)="setReaction($event, Reactions.Love)"  [title]="Reactions[Reactions.Love] | localize" >
+        <img class="icon-reaction" src='./assets/reactions/{{Reactions[Reactions.Love]}}.png' />
+    </button>
+    <button class="btn btn-transparent btn-reaction" (click)="setReaction($event, Reactions.Insightful)"  [title]="Reactions[Reactions.Insightful] | localize" >
+        <img class="icon-reaction" src='./assets/reactions/{{Reactions[Reactions.Insightful]}}.png' />
+    </button>
+    <button class="btn btn-transparent btn-reaction" (click)="setReaction($event, Reactions.Curious)"  [title]="Reactions[Reactions.Curious] | localize" >
+        <img class="icon-reaction" src='./assets/reactions/{{Reactions[Reactions.Curious]}}.png' />
+    </button>
+</div>

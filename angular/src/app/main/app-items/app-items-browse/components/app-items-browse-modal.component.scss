@@ -1,0 +1,10 @@
+:host {
+    height: 100%;
+}
+.modal-content-wrapper {
+    justify-content: flex-start!important;
+    .modal-body {
+        max-height: 100%;
+        padding-top: 110px!important;
+    }
+}

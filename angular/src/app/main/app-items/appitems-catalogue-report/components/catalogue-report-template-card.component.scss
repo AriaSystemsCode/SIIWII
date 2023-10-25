@@ -1,0 +1,23 @@
+.catalogue-template-card {
+    border: 1px solid #eee;
+    box-shadow: 1px 1px 4px 1px #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .3s ease-in-out;
+    &.selected, &:hover {
+        box-shadow: 1px 1px 6px 2px #ddd;
+        background-color: #e6f3fd;
+        transition: all .3s ease-in-out;
+    }
+    .catalogue-template-card-image {
+        width: 206px;
+        height: 157px;
+    }
+}
+
+
+input:focus
+{
+    border: 1px solid black !important;
+}

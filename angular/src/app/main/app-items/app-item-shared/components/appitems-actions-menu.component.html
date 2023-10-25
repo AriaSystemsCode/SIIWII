@@ -1,0 +1,97 @@
+<div
+class="btn-group dropdown"
+dropdown
+container="body"
+placement="bottom right"
+*ngIf="!actionsMenuFlags?.allIsHidden"
+>
+    <button
+        class="dropdown-toggle btn btn-sm btn-action"
+        dropdownToggle
+        type="button"
+    ></button>
+    <ul
+        class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+        *dropdownMenu
+    >
+        <li  *ngIf="actionsMenuFlags?.edit && appItemType == AppItemTypeEnum?.product" >
+            <a
+                href="javascript:;"
+                (click)="editItemHandler()"
+                >{{ "Edit" | localize }}</a
+            >
+        </li>
+        <li *ngIf="actionsMenuFlags?.createListing && appItemType == AppItemTypeEnum?.product && !item.listed">
+            <a
+                href="javascript:;"
+                (click)="createListingHandler()"
+                >{{ "CreateNewListing" | localize }}</a
+            >
+        </li>
+        <li *ngIf="actionsMenuFlags?.editListing && appItemType == AppItemTypeEnum?.listing">
+            <a
+                href="javascript:;"
+                (click)="editListingHandler()"
+                >{{ "EditListing" | localize }}</a
+            >
+        </li>
+        <li *ngIf="actionsMenuFlags?.addToList && appItemType == AppItemTypeEnum?.listing">
+            <a
+                href="javascript:;"
+                (click)="openAddtoListModal()"
+                >{{ "AddToList" | localize }}</a
+            >
+        </li>
+        <!-- <li  *ngIf="actionsMenuFlags?.publishOrUnpublish && appItemType == AppItemTypeEnum?.listing && !item.published">
+            <a
+                href="javascript:;"
+                (click)="openShareProductListingModal()"
+                >
+                {{("PublishListing" | localize) }}
+            </a >
+        </li> -->
+        <li  *ngIf="actionsMenuFlags?.publishOrUnpublish && appItemType == AppItemTypeEnum?.listing && item.published">
+            <a
+                href="javascript:;"
+                (click)="unPublishProductListing()"
+                >{{
+                    ("UnpublishListing" | localize)
+                }}</a
+            >
+        </li>
+        <li *ngIf="actionsMenuFlags?.delete">
+            <a href="javascript:;" (click)="askToConfirmDelete()">{{
+                "Delete" | localize
+            }}</a>
+        </li>
+    </ul>
+</div>
+
+<app-appitem-list-selection-modal
+    #itemListSelection
+    (cancel)="onListSelectionCanceled()"
+    (addNew)="openCreateOrEditModal($event)"
+    (selectVariation)="onListSelectionDone($event)"
+    [selectedList]="selectedList"
+></app-appitem-list-selection-modal>
+
+<app-success-right-modal
+    #successRightModal
+    (onClose)="onSuccessClose()"
+></app-success-right-modal>
+
+
+<app-create-or-edit-appitem-list
+    #createOrEditListModal
+    (createOrEditDone)="onCreateOrEditDone($event)"
+    (cancelDone)="onCreateOrEditCanceled($event)"
+>
+</app-create-or-edit-appitem-list>
+
+
+<app-variations-selection-modal
+    #variationSelectionModal
+    (variationSelectionDone)="onVariationSelectionDone($event)"
+    (cancelDone)="onVariationSelectionCanceled($event)"
+>
+</app-variations-selection-modal>

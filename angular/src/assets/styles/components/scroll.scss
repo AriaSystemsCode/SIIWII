@@ -1,0 +1,12 @@
+@import '../base/_mixins.scss';
+
+// custom thin scrollbar
+.thin-scroll,
+.p-table-scrollable-body {
+    @include thin-scroll();
+}
+
+
+.big-scroll{
+    @include thin-scroll(  6px ,6px );
+}

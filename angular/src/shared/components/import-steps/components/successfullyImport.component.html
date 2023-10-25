@@ -1,0 +1,30 @@
+
+
+ <!-- Iteration-8 -->
+ <div bsModal #successfullyImport="bs-modal" class="modal  fade" tabindex="-1" role="dialog"
+  aria-labelledby="successfullyImport" aria-hidden="true" >
+    
+  <div class="modal-dialog modal-lg modalCenter">
+    <div class="modal-content text-center">
+       <div class="border-bottom pb-3">
+        <div class="row pt-4  pb-3" style="justify-content: center;"> 
+     <img src="../../../../assets/accounts/importAccounts/tick-successfully.svg"  />
+ </div>
+ <h4>{{("Import"+ImportTypes[importType]+"successfully") | localize}}</h4>
+
+ <label>{{"Youcandownloadtheimportlogfilebylinkbelow" | localize}}</label>
+</div>
+
+ <div class="pt-3">
+    <a class="_download font-weight-bold" (click)="downloadLogFile()"> {{"DownloadtheImportlogfile" | localize}} </a>
+    <button class="btn btn-secondary  _Btn mr-2 pointer mt-4 " (click)="close()">
+        {{"Close" | localize}}  
+    </button>
+ </div>
+</div>
+</div>
+ 
+</div>
+ 
+
+  <!-- Iteration-8 -->

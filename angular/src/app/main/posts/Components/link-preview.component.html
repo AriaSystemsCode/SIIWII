@@ -1,0 +1,25 @@
+<a
+    [href]="url"
+    class="linkUrl"
+    target="_blank"
+    *ngIf="!hide"
+>
+    <div class="d-flex flex-column justify-content-between">
+        <div *ngIf="urlPreviewImage">
+            <img
+                src="{{ urlPreviewBaseUrl }}/{{ urlPreviewImage }}"
+                alt="website-preview"
+            />
+        </div>
+        <div
+            class="d-flex flex-column flex-grow-1 justify-content-center p-3 url-link-section"
+        >
+            <div>
+                {{ title || url }}
+            </div>
+        </div>
+    </div>
+    <!-- <button type="button" class="close" (click)="close()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button> -->
+</a>

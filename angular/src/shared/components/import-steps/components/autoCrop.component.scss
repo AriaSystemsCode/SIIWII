@@ -1,0 +1,40 @@
+//   <!-- Iteration-8 -->
+.modalCenter{
+    margin: 0 !important;
+    top: 50% !important;
+    /* position: absolute !important; */
+    left: 50% !important;
+    transform: translate(-50%,-50%) !important;
+}
+.btn-crop
+{
+border-radius: 6px;
+width: 175px;
+height: 45px;
+}
+.btn-crop:hover
+{
+    background: #509AF7;
+    color: white;
+}
+
+.modal-body
+{
+    height: 265px !important;
+}
+
+.passed
+{
+    color: #009901;
+}
+.failed{
+    color: #BD0100;
+}
+
+.pointer
+{
+    cursor: pointer;
+}
+
+
+//  <!-- Iteration-8 -->

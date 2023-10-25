@@ -1,0 +1,172 @@
+.topbar {
+    background-color: #4a0d4a;
+    height: 70px;
+    margin-right: 13px !important;
+}
+
+.navbar-brand {
+    font-size: unset;
+    height: 3.5rem;
+}
+
+.rightList {
+    position: absolute;
+    right: 3%;
+    top: 0;
+    border-left: 1px solid rgb(255 252 252 / 50%);
+}
+
+.small {
+    color: white !important;
+}
+
+.dropdown .dropdown-toggle::after {
+    display: none;
+}
+
+.input-group-form {
+    width: 43%;
+}
+
+.bottom-navbar {
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+._navbar-brand {
+    width: 25px !important;
+    height: 25px !important;
+}
+.navbar > .container,
+.navbar > .container-fluid {
+    justify-content: normal !important;
+}
+
+.container {
+    justify-content: normal !important;
+}
+
+.rightSearch {
+    position: absolute;
+    right: 0px;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+    .rightList {
+        position: unset;
+    }
+
+    .navbar-nav {
+        flex-direction: row !important;
+    }
+
+    .navbar-collapse {
+        flex-basis: unset !important;
+    }
+}
+@media only screen and (max-width: 767px) {
+    .input-group-form {
+        width: 64%;
+    }
+
+    .topbar {
+        margin-right: 0px !important;
+    }
+
+    .navbar-brand-sm {
+        position: absolute;
+        left: 0px;
+        padding-left: 25px;
+    }
+}
+
+.Create-New {
+    background-color: white !important;
+    border-color: white !important;
+    color: #4a0d4a !important;
+    margin-right: 10px !important;
+    font-weight: bold !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn i {
+    padding-right: 0.5rem;
+    vertical-align: middle;
+    line-height: 0;
+    color: #f6851d;
+    font-weight: bold;
+}
+
+::ng-deep {
+    .p-menu .p-submenu-header {
+        display: none !important;
+    }
+    .p-dialog .p-dialog-header {
+        background-color: #fff !important;
+        color: #f6851d !important ;
+    }
+    .p-dialog .p-dialog-content {
+        text-align: left !important;
+    }
+    .p-dropdown{
+        width: 100% !important;
+    }
+}
+
+.wrapper {
+    padding: 0px 10px;
+    .user {
+        background-color: #e7e8ef;
+        padding: 2px 10px;
+        .enter {
+            span {
+                color: #4a0d4a;
+                text-transform: capitalize;
+                font-weight: 700;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+        }
+        .date {
+            color: #464e5f;
+            font-size: 12px;
+        }
+    }
+    .seller {
+        .sellerHeader {
+            background-color: #e7e8ef;
+            padding: 2px 10px;
+            span {
+                color: #4a0d4a;
+                text-transform: capitalize;
+                font-weight: 700;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+        }
+        .form {
+            label {
+                color: #464e5f;
+                font-size: 13px !important;
+            }
+        }
+    }
+}
+.footer{
+    background-color: #E7E8EF;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    button{
+        background-color: #4a0d4a;
+        color: #fff;
+        border-radius: 0% !important;
+        padding: 10px 30px;
+        font-size: 13px;
+        margin: 10px 0px;
+    }
+}

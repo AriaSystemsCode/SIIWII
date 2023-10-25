@@ -1,0 +1,228 @@
+<div bsModal #viewEventModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="viewEventModal"
+    aria-hidden="true" [config]="{ backdrop: false , ignoreBackdropClick: true }"  style="overflow-y: scroll;">
+    <div class="modal-dialog modal-lg ">
+        <div class="modal-content h-100">
+            <div class="row  ml-3 mr-3 d-md-block d-none">
+                <div class="col-11"></div>
+                <div class="col-1 pt-5 text-right">
+                    <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="hide()" />
+                </div>
+            </div>
+            <div class="row m-0 pt-4 pb-4 events events-sm d-md-none d-flex flex-row">
+
+                <div class="col-1  text-right pt-2">
+                    <img src="../../../../assets/events/Icon-ionic-ios-arrow-back.svg" class="pointer"
+                        (click)="hide()" />
+                </div>
+
+                <div class="col-9 pt-1 pt-2">
+                    <h4>
+                        {{ "ViewEvent" | localize }}
+                    </h4>
+                </div>
+
+                <div class="mb-5 col-1">
+                    <a class="nav-link active d-flex flex-column text-center"
+                        class="navbar-brand pt-0 d-block d-md-none m-0 rightSearch w-100 h-100"
+                        routerLinkActive="header-link-active">
+                        <img src="../../../assets/landingPage/Icon ionic-md-search.svg" class="navbar-brand" />
+                    </a>
+                </div>
+
+            </div>
+
+
+            <div class="row m-3">
+                <div class="w-100" #viewProfileCover style="position: relative; left: 0; top: 0;height: 200px;">
+                    <div class="cover">
+                        <app-image-display [image]="coverPhoto || coverDefaultImage"
+                            [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                            [staticWidth]="viewProfileCover?.offsetWidth">
+                        </app-image-display>
+                    </div>
+                    <div class="logo">
+                        <app-image-display [image]="logoPhoto || logoDefaultImage"
+                            [sycAttachmentCategory]="sycAttachmentCategoryLogo" [staticHeight]="140">
+                        </app-image-display>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row m-4">
+                <div class="col-6">
+                    <button class="btn btn-primary _Btn pointer" [disabled]="!event?.appEvent?.isPublished" [ngClass]="{
+                            disabled: !event?.appEvent?.isPublished
+                        }" (click)="createPost()">
+                        {{ "Post" | localize }}
+                    </button>
+                </div>
+                <div class="col-6 text-right">
+                    <button class="btn btn-primary _Btn pointer mr-2 w-50 position-relative"
+                        (click)="showResponse = !showResponse" [ngClass]="{
+                            UserResponceDefaultBGBtn:
+                                event?.currentUserResponce !=
+                                responceType.INTEREST,
+                            UserResponceBGBtn:
+                                event?.currentUserResponce ==
+                                responceType.INTEREST  || 
+                                event?.currentUserResponce == responceType.GOING
+                        }">
+                        <i *ngIf="_responceType == responceType.INTEREST" class="fas fa-solid fa-star pr-2"
+                            aria-hidden="true"></i>
+                        <i *ngIf="_responceType == responceType.GOING" class="fas fa fa-check pr-2"
+                            aria-hidden="true"></i>
+
+                        <i *ngIf="_responceType == responceType.NOTINTEREST" class="fas fa fa-times pr-2"
+                            aria-hidden="true"></i>
+
+                        <label *ngIf="_responceType==responceType.OTHER">{{
+                            "RSVP" | localize
+                            }}</label>
+                        <label *ngIf="_responceType!=responceType.OTHER">
+                            {{ responceType[_responceType] | titlecase | localize}} </label>
+                    </button>
+
+                    <div *ngIf="showResponse" style="background-color: #edede8;z-index: 99999;"
+                        class="w-100 pl-3 pt-3 position-absolute">
+                        <div class="row mr-3">
+                            <i class="fas fa-solid fa-star  pl-3" [ngClass]="{
+                                    purpleColor:
+                                        _responceType == responceType.INTEREST
+                                }"></i>
+                            <label for="Interested" [ngClass]="{
+                                purpleColor:
+                                        _responceType == responceType.INTEREST
+                                }" class="col-6 mr-1">
+                                {{ "Interested" | localize }}</label>
+                            <input type="radio" id="Interested" name="eventResponse" class="form-control" [checked]="
+                                    event?.currentUserResponce ==
+                                    responceType.INTEREST
+                                " [value]="responceType.INTEREST" [(ngModel)]="_responceType"
+                                (change)="editEventGuestsResponce()" class="mr-2 accentColor" />
+                        </div>
+
+                        <div class="row mr-3">
+                            <i class="fas fa fa-check  pl-3" aria-hidden="true" [ngClass]="{
+                                purpleColor:
+                                        _responceType == responceType.GOING
+                                }"></i>
+                            <label for="Going" [ngClass]="{
+                                purpleColor:
+                                        _responceType == responceType.GOING
+                                }" class="col-6 mr-1">
+                                {{ "Going" | localize }}</label>
+                            <input type="radio" id="Going" name="eventResponse" class="form-control" [checked]="
+                                    event?.currentUserResponce ==
+                                    responceType.GOING
+                                " [value]="responceType.GOING" [(ngModel)]="_responceType"
+                                (change)="editEventGuestsResponce()" class="mr-2 accentColor" />
+                        </div>
+
+                        <div class="row mr-3">
+                            <i aria-hidden="true" class="fas fa fa-times  pl-3" [ngClass]="{
+                                purpleColor:
+                                        _responceType ==
+                                        responceType.NOTINTEREST
+                                }"></i>
+                            <label for="NOTINTEREST" [ngClass]="{
+                                purpleColor:
+                                        _responceType ==
+                                        responceType.NOTINTEREST
+                                }" class="col col-md-6 mr-2">
+                                {{ "Notinterest" | localize }}</label>
+                            <input type="radio" id="NOTINTEREST" name="eventResponse" class="form-control" [checked]="
+                                    event?.currentUserResponce ==
+                                    responceType.NOTINTEREST
+                                " [value]="responceType.NOTINTEREST" [(ngModel)]="_responceType"
+                                (change)="editEventGuestsResponce()" class="mr-2 accentColor" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row ml-4 mr-4">
+                <div class="col-9">
+                    <div class="eventDetails">
+                        <h6>{{ event?.appEvent?.name }} <br /></h6>
+                        <h6>Event by {{ event?.appEvent?.userName }} <br /></h6>
+                        <h6 *ngIf="event?.appEvent?.isOnLine" class="pt-3">
+                            {{ "Online" | localize }} <br />
+                        </h6>
+                        <h6 *ngIf="!event?.appEvent?.isOnLine" class="pt-3">
+                            {{ "InPerson" | localize }} <br />
+                        </h6>
+                        <h6 *ngIf="event?.appEvent?.guestsCount > 0">
+                            <i class="fas fa-users pr-1 purpleColor"></i>
+                            {{ event?.appEvent?.guestsCount }}
+                            {{ "attendees" | localize }}
+                            <br />
+                        </h6>
+                        <h6>
+                            {{
+                            event?.currentFromDateTime?.toString()
+                            | date: "short":"+timezoneOffset"
+                            }}
+                            -
+                            {{
+                            event?.currentToDateTime?.toString()
+                            | date: "short":"+timezoneOffset"
+                            }}
+                             
+                        </h6>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <h4 class="purpleColor" *ngIf="event?.appEvent?.isPublished; else notPublished">
+                        {{ "Published" | localize }}
+                    </h4>
+                    <ng-template #notPublished>
+                        <h4 style="color: red">
+                            {{ "NotPublished" | localize }}
+                        </h4>
+                    </ng-template>
+                </div>
+            </div>
+            <div class="row m-4" *ngIf="!event?.appEvent?.isOnLine">
+                <i class="fa fa-location-dot fa-map-marker-alt fa-solid pr-2 pt-1 purpleColor"></i>
+                <h4  class="purpleColor">
+                    {{ "Address" | localize }}
+                </h4>
+                <h6 class="col-12 ml-4">{{ eventAddress }}</h6>
+            </div>
+            <div class="row m-4 about">
+                <h4 class="col-12 pt-2 purpleColor">{{ "About" | localize }}</h4>
+                <h6 class="col-12 ml-4">
+                    {{ event?.appEvent?.description }}
+                </h6>
+            </div>
+            <div class="row m-4">
+                <div>
+                    <h4 class="col-12 purpleColor">
+                        {{ "Externaleventlink" | localize }}:
+                    </h4>
+                    <h6 class="col-12 ml-4">
+                        {{ event?.appEvent?.registrationLink }}
+                    </h6>
+                </div>
+            </div>
+            <!--  <div class="row ml-4 mr-4 pl-3" *ngIf="!event?.appEvent?.isOnLine">
+                <h4>
+                    {{ "EventLocation" | localize }}:
+                </h4>
+              <div class="col-1">
+                    <button
+                        class="mapBtn btn btn-secondary"
+                        [disabled]="eventAddress == ''"
+                        [ngClass]="{
+                            disabled: eventAddress == ''
+                        }"
+                        (click)="showAddressOnMap()"
+                    ></button>
+                </div>
+            </div> -->
+        </div>
+    </div>
+</div>
+<!--
+<app-google-map #googleMapModal></app-google-map> -->

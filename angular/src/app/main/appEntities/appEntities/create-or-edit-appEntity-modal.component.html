@@ -1,0 +1,50 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
+aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #appEntityForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header" style="display: block;background-color: #ffffff !important;">
+                    <h4 class="modal-title" style="display: block;">
+                        <span *ngIf="appEntity.id">{{l("Edit")}} {{entityObjectType.label}}</span>
+                        <span *ngIf="!appEntity.id">{{l("CreateNew")}} {{entityObjectType.label}}</span>
+                    </h4>
+                    <p>{{l("PleaseFillTheBelowInformation")}}</p>
+
+                    <button style="position: absolute;right: 8px;top: 8px;" type="button" class="close" (click)="close()"
+                    aria-label="Close" [disabled]="saving">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+
+
+
+								<div class="form-group">
+									<label for="AppEntity_Name">{{l("Name")}} <span class="required">*</span></label>
+									<input type="text" id="AppEntity_Name" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.name" name="Name"     required/>
+								</div>
+
+								<div class="form-group">
+									<label for="AppEntity_Code">{{l("Code")}} <span class="required">*</span></label>
+									<input type="text" id="AppEntity_Code" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.code" name="Code"     required/>
+								</div>
+
+								<div class="form-group">
+									<label for="AppEntity_Notes">{{l("Notes")}}</label>
+									<input type="text" id="AppEntity_Notes" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.notes" name="Notes"    />
+								</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="bbtn btn-default btn-gray" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue  btn-blue btn-save" [disabled]="!appEntityForm.form.valid || uploader.isUploading" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+<confirm-modal-side *ngIf="displaySaveSideBar" [content1]="'Successfully saved' | localize" [content2]="'The product you created is successfully saved You can create another one Or Back to the Lookups list.'"
+[buttonYes]="'No thanks' | localize" [defualtButton]="true" [buttonNo]="'Create another Object' | localize" [type]="'displaySaveSideBar'" [icon]="''" [displayItem]="displaySaveSideBar"
+(buttonClicked)="onEmitButtonSaveYes($event)"></confirm-modal-side>

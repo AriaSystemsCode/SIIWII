@@ -1,0 +1,77 @@
+
+// buttons
+.btn-primary {
+    @include btn($primary-color,$white-color,$primary-color);
+}
+
+.btn-icon-transparent {
+    @include btn(transparent,$primary-color);
+    i {
+        color:$primary-color
+    }
+}
+
+.btn-hover-primary {
+    &:hover,&:focus {
+        background-color: $blue !important;
+        border:1px solid $blue !important;
+        color:$white!important;
+    }
+}
+
+.btn-action
+{
+    background-color: $blue-light !important;
+    background: url('../../profile/ActionMenu.svg') no-repeat center!important;
+    border: none!important;
+    width: 30px!important;
+    &:hover{
+        background-color: $blue-light !important;
+        width: 30px!important;
+        border: none!important;
+    }
+    &:focus{
+        background-color: $blue !important;
+        width: 30px!important;
+        border: none!important;
+        background: url('../../profile/ActionMenu.svg') no-repeat center!important;
+     }
+}
+
+
+.btn-outline-primary {
+    @include btn-outline($primary-color, $white-color, $primary-color, 2px);
+}
+
+.btn {
+    @extend %transition-all-3ms;
+    &:hover, &:focus {
+        @extend %transition-all-3ms;
+    }
+}
+
+
+.create-edit-plus-btn {
+    position: absolute;
+    right: 80px;
+    bottom: 25vh;
+    z-index: 1059;
+}
+
+
+.btn.disabled, .btn:disabled {
+    opacity: .35!important;
+}
+
+.btn-grey {
+    background-color: $off-white!important;
+    color: $grey-6!important;
+    padding: 10px;
+    @extend %transition-all-3ms;
+}
+
+
+.btn-grey:hover {
+    background-color: $grey-1!important;
+    @extend %transition-all-3ms;
+}

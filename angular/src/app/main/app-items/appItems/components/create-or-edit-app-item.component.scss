@@ -1,0 +1,162 @@
+@import '../../../../../assets/styles/base/variables';
+@import '../../../../../assets/styles/base/placeholders';
+
+// to be removed after styling refactor - start
+:host {
+    color: #464E5F;
+}
+
+
+// to be removed from here after removing from style.scss
+.kt-portlet {
+    margin-top: 0 !important;
+}
+
+// to be removed after styling refactor - end
+
+
+.form-control {
+    &:hover {
+        border-color: lighten( $blue, 50% );
+    }
+}
+
+.hint {
+    font-size: .8rem;
+    color: $grey-5;
+}
+
+.custom-header {
+    margin-left: 15rem;
+}
+
+
+.price {
+    width: 6rem;
+}
+
+
+
+.cancel {
+    font-weight: 600;
+}
+
+.image-wrapper {
+    border: 1px solid $grey-1;
+    &.upload {
+        border: none;
+        filter: grayscale(1);
+    }
+    width: 200px;
+    height: 276px;
+    background-color: white;
+    margin-right: 2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    img {
+        max-height: 100%;
+        max-width: 100%;
+    }
+    label {
+        cursor: pointer;
+    }
+    .upload-image-icons {
+        position: relative;
+        width: 150px;
+        height: 90px;
+        @extend %transition-all-3ms;
+    }
+    i {
+        color: #999999;
+    }
+    .left-icon,
+    .right-icon,
+    .middle-icon {
+        position: absolute;
+        @extend %transition-all-3ms;
+    }
+    .left-icon,
+    .right-icon {
+        font-size: 1.9rem;
+    }
+    .middle-icon {
+        top: 0;
+        font-size: 3rem;
+    }
+    .left-icon{
+        left: 0;
+    }
+    .right-icon {
+        right: 0;
+    }
+    .upload-btn.btn {
+        background-color: #c8c8c8!important;
+        color: #000!important;
+        border-color: #c8c8c8!important;
+        font-weight: 500;
+        @extend %transition-all-3ms;
+    }
+    .view-img-overlay {
+        opacity: 0;
+        z-index: 0;
+        @extend %transition-all-3ms;
+    }
+    &:hover {
+        cursor: pointer;
+        box-shadow: 0px 0px 6px #0000001A;
+        @extend %transition-all-3ms;
+        filter: none;
+        .upload-btn.btn {
+            background-color: $blue!important;
+            color: $white!important;
+            border-color: $blue!important;
+            font-weight: 500;
+            @extend %transition-all-3ms;
+        }
+        .upload-image-icons {
+            height: 50px;
+            width: 109px;
+            @extend %transition-all-3ms;
+        }
+        .view-img-overlay {
+            opacity: 1;
+            background-color: rgba(0,0,0,0.5);
+            @extend %transition-all-3ms;
+        }
+        .select-default-image {
+            display: block;
+        }
+    }
+}
+
+.select-default-image {
+    display: none;
+    position: absolute;
+    bottom: -30px;
+}
+
+.item-photos {
+    .item-photos-header {
+        background-color: #3699FF1A;
+    }
+    .item-photos-body {
+        background-color: #F5FAFF;
+    }
+}
+
+input.ng-pristine.ng-invalid.ng-touched,
+textarea.ng-pristine.ng-invalid.ng-touched {
+    border: 1px solid red!important;
+}
+
+
+.add-new-lookup-btn {
+    padding: 0.5rem 0.9rem;
+    border: 1px  solid #999;
+}
+
+
+.aria-tag-wrapper {
+    max-height: 300px;
+    overflow-y: scroll;
+}

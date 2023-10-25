@@ -1,0 +1,168 @@
+<div
+    bsModal
+    #createOrEditModal="bs-modal"
+    class="modal right fade right-modal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="createOrEditPaymentModal"
+    aria-hidden="true"
+    [config]="{ backdrop: 'static' }"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form
+                *ngIf="paymentMethod"
+                #paymentMethodForm="ngForm"
+                novalidate
+                (ngSubmit)="save()"
+                autocomplete="off"
+            >
+                <div
+                    class="modal-header"
+                    style="display: block; background-color: #ffffff !important"
+                >
+                    <h4 class="modal-title" style="display: block">
+                        <span *ngIf="paymentMethod.id">{{ "editPaymentMethod" | localize }}</span>
+                        <span *ngIf="!paymentMethod.id">{{
+                            "AddnewpaymentMethodDetails" | localize
+                        }}</span>
+                    </h4>
+                    <p class="mb-0">{{ "pleaseEnterTheNewpaymentMethodInformation" | localize }}</p>
+                    <button
+                        type="button"
+                        class="close"
+                        (click)="close()"
+                        aria-label="Close"
+                        [disabled]="saving"
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-2">
+                        <label class="text-capitalize tex-dark" for="paymentMethod_cardHolderName">
+                            {{ "nameOnCard" | localize }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="paymentMethod_cardHolderName"
+                            class="form-control  input-bg border-0"
+                            [(ngModel)]="paymentMethod.cardHolderName"
+                            name="cardHolderName"
+                            required
+                            #cardHolderNameInput='ngModel'
+                            [pattern]='patterns.charactersWithSpaces'
+                        />
+                        <span class="text-danger" *ngIf="cardHolderNameInput?.dirty && cardHolderNameInput?.errors?.pattern">Please enter a valid card holder name</span>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="text-capitalize tex-dark" for="paymentMethod_creditCardNumber">
+                            {{ "creditCardNumber" | localize }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="paymentMethod_creditCardNumber"
+                            class="form-control  input-bg border-0"
+                            [(ngModel)]="paymentMethod.cardNumber"
+                            name="cardNumber"
+                            minlength="16"
+                            maxlength="16"
+                            required
+                            #cardNumberInput='ngModel'
+                            [pattern]="patterns.positiveInteger"
+                        />
+                        <span class="text-danger" *ngIf="cardNumberInput?.dirty && (cardNumberInput?.errors?.minlength || cardNumberInput?.errors?.maxlength)">Please enter a valid card number ( 16 length )</span>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="text-capitalize tex-dark" for="paymentMethod_expirationDate">
+                            {{ "expirationDate" | localize }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-2">
+                                    <p-dropdown
+                                        [options]="paymentDataService.months"
+                                        styleClass="form-control  input-bg border-0 text-capitalize"
+                                        [filter]="false"
+                                        name="paymentMethod_expirationDate"
+                                        [(ngModel)]="paymentMethod.cardExpirationMonth"
+                                        [style]="{'width':'100%'}"
+                                        [placeholder]="'month' | localize"
+                                        [required]='true'
+                                    ></p-dropdown>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-2">
+                                    <p-dropdown
+                                        id="paymentMethod_cardExpirationYear"
+                                        name="cardExpirationYear"
+                                        [options]="paymentDataService.years"
+                                        styleClass="form-control  input-bg border-0 text-capitalize"
+                                        [filter]="false"
+                                        [(ngModel)]="paymentMethod.cardExpirationYear"
+                                        [style]="{'width':'100%'}"
+                                        [placeholder]="'year' | localize"
+                                        [required]='true'
+                                    ></p-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="text-capitalize tex-dark" for="paymentMethod_securityCode">
+                            {{ "securityCode" | localize }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="paymentMethod_securityCode"
+                            class="form-control  input-bg border-0"
+                            [(ngModel)]="paymentMethod.securityCode"
+                            name="securityCode"
+                            minlength="3"
+                            maxlength="4"
+                            [pattern]="patterns.positiveInteger"
+                            required
+                        />
+                    </div>
+                    <div class="form-group d-flex align-items-center">
+                        <input
+                            type="checkbox"
+                            id="paymentMethod_isDefault"
+                            class="form-control  checkbox-sm"
+                            [(ngModel)]="paymentMethod.isDefault"
+                            name="isDefault"
+                            width="15px"
+                        />
+                        <div class="ml-2 text-capitalize text-dark">{{ 'useAsDefaultPaymentMethodForThisAccount' | localize }}</div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-start">
+                    <button
+                        type="submit"
+                        class="btn btn-primary blue btn-blue "
+                        [disabled]="paymentMethodForm.form.invalid"
+                        [buttonBusy]="saving"
+                        [busyText]="'SavingWithThreeDot' | localize"
+                    >
+                        <span>{{ "Save" | localize }}</span>
+                    </button>
+                    <button
+                        [disabled]="saving"
+                        type="button"
+                        class="btn btn-default btn-gray"
+                        (click)="close()"
+                    >
+                        {{ "Cancel"| localize }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

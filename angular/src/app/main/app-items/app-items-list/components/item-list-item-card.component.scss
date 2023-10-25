@@ -1,0 +1,69 @@
+@import "../../../../../assets/styles/base/variables";
+$default-font-weight: 400;
+
+.status {
+    font-weight: $default-font-weight + 100;
+    i {
+        color: $white;
+        &::before {
+            background-color: $orange-1;
+            border-radius: 50%;
+        }
+    }
+}
+.single-item {
+    min-width: 0;
+}
+.single-item-photo {
+    width: 100px;
+    height: 141px;
+    background-size: contain;
+    background-image: url("../../../../../assets/placeholders/card-placeholder.png");
+}
+
+.single-item-body {
+    position: relative;
+}
+a.btn {
+    cursor: pointer;
+}
+
+%transition {
+    transition: all 500ms ease-in-out;
+}
+.single-item-per-row-layout {
+    @extend %transition;
+    .single-item-body {
+        @extend %transition;
+        h3 {
+            @extend %transition;
+        }
+        p {
+            @extend %transition;
+            span {
+                @extend %transition;
+            }
+        }
+    }
+}
+
+.single-item {
+    font-weight: $default-font-weight;
+    .single-item-body {
+        h3 {
+            font-weight: $default-font-weight + 100;
+        }
+        p {
+            span {
+                font-weight: $default-font-weight + 100;
+            }
+        }
+    }
+}
+.product-name {
+    font-weight: $default-font-weight + 100;
+}
+
+.brand-name {
+    font-weight: $default-font-weight + 200;
+}

@@ -1,0 +1,10 @@
+<svg id="Mob_Home_LeftMenu_Btn" xmlns="http://www.w3.org/2000/svg" width="35" height="30" viewBox="0 0 35 30">
+  <g id="Group_186" data-name="Group 186" transform="translate(0 -0.183)">
+    <rect id="Rectangle_77" data-name="Rectangle 77" width="35" height="30" rx="5" transform="translate(0 0.183)" fill="#fff"/>
+    <g id="Icon_feather-menu" data-name="Icon feather-menu" transform="translate(8.813 8.155)">
+      <path id="Path_104" data-name="Path 104" d="M4.5,18H21.582" transform="translate(-4.5 -10.461)" fill="none" stroke="#949090" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <path id="Path_105" data-name="Path 105" d="M4.5,9H21.582" transform="translate(-4.5 -9)" fill="none" stroke="#949090" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <path id="Path_106" data-name="Path 106" d="M4.5,27H21.582" transform="translate(-4.5 -11.923)" fill="none" stroke="#949090" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    </g>
+  </g>
+</svg>

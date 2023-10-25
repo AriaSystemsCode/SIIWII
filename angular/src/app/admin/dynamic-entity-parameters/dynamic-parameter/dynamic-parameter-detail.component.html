@@ -1,0 +1,68 @@
+<div [@routerTransition]>
+    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor" *ngIf="dynamicParameter">
+        <div class="kt-subheader kt-grid__item">
+            <div [class]="containerClass">
+                <div class="kt-subheader__main">
+                    <div class="kt-subheader__breadcrumbs">
+                        <a routerLink="/app/admin/dynamic-parameters" routerLinkActive="active"
+                            class="kt-subheader__breadcrumbs-home">
+                            <i class="flaticon2-shelter"></i>
+                            {{"DynamicParameterDetail" | localize}}
+                        </a>
+                        <span class="kt-subheader__breadcrumbs-separator"></span>
+                        <span class="kt-subheader__breadcrumbs-link">
+                            {{dynamicParameter.parameterName}}
+                        </span>
+                    </div>
+                </div>
+                <div class="kt-subheader__toolbar">
+                    <div class="kt-subheader__wrapper">
+                        <button class="btn btn-primary btn-sm"
+                            *ngIf="'Pages.Administration.DynamicParameters.Edit' | permission"
+                            (click)="editDynamicParameter()">
+                            {{'Edit' | localize}}
+                        </button>
+
+                        <button class="btn btn-danger btn-sm"
+                            *ngIf="'Pages.Administration.DynamicParameters.Delete' | permission"
+                            (click)="deleteDynamicParameter()">
+                            {{'Delete' | localize}}
+                        </button>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="kt-portlet">
+                        <div class="kt-portlet__body">
+                            <table class="table border-0 m-0">
+                                <tr>
+                                    <td class="font-weight-bold text-right border-0" style="width:300px">
+                                        {{"ParameterName" | localize}}:
+                                    </td>
+                                    <td class="border-0">{{dynamicParameter.parameterName}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-weight-bold text-right border-0">{{"InputType" | localize}}:</td>
+                                    <td class="border-0">{{dynamicParameter.inputType}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-weight-bold text-right border-0">{{"Permission" | localize}}:</td>
+                                    <td class="border-0">{{dynamicParameter.permission}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <dynamic-parameter-value *ngIf="hasValues" [dynamicParameterId]="dynamicParameterId">
+                    </dynamic-parameter-value>
+
+                    <create-or-edit-dynamic-parameter-modal #createOrEditDynamicParameter (modalSave)="loadData()">
+                    </create-or-edit-dynamic-parameter-modal>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycPlanForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycPlan.id">{{l("EditSycPlan")}}</span>
+                        <span *ngIf="!sycPlan.id">{{l("CreateNewSycPlan")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+					<div class="form-group m-form__group">
+						<label for="SycApplicationName">{{l("SycApplication")}}</label>
+						<select name="sycPlan.applicationId" [(ngModel)]="sycPlan.applicationId" class="form-control" >
+							<option value="">{{l("SelectASycApplication")}}</option>
+							<option *ngFor="let item of allSycApplications" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+
+								<div class="form-group">
+									<label for="SycPlan_Code">{{l("Code")}} *</label>
+									<input type="text" #SycPlan_Code="ngModel" id="SycPlan_Code" class="form-control" [(ngModel)]="sycPlan.code" name="Code"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="SycPlan_Code"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycPlan_Name">{{l("Name")}}</label>
+									<input type="text" #SycPlan_Name="ngModel" id="SycPlan_Name" class="form-control" [(ngModel)]="sycPlan.name" name="Name"   minlength="1"  maxlength="200" />
+								    <validation-messages [formCtrl]="SycPlan_Name"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycPlan_Notes">{{l("Notes")}}</label>
+									<input type="text" #SycPlan_Notes="ngModel" id="SycPlan_Notes" class="form-control" [(ngModel)]="sycPlan.notes" name="Notes"    />
+								    <validation-messages [formCtrl]="SycPlan_Notes"></validation-messages>
+								</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycPlanForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

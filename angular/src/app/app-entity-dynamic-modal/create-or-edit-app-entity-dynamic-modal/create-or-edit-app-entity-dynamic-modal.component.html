@@ -1,0 +1,248 @@
+    <div
+        bsModal
+        #createOreEditLookups="bs-modal"
+        class="modal fade"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="createOreEditLookups"
+        aria-hidden="true"
+    >
+        <div
+            class="modal-dialog right-modal"
+            [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
+            role="document"
+        >
+            <form class="h-100" *ngIf="active" #appEntityForm="ngForm" novalidate (ngSubmit)="save(appEntityForm)" autocomplete="off">
+
+                <div class="modal-content">
+                    <div class="modal-content-wrapper">
+                        <div class="modal-header" style="display: block;background-color: #ffffff !important;">
+                            <h4 class="modal-title text-left" style="display: block;">
+                                <span *ngIf="appEntity?.id">{{l("Edit")}} {{entityObjectType.name}}</span>
+                                <span *ngIf="!appEntity?.id">{{l("CreateNew")}} {{entityObjectType.name}}</span>
+                            </h4>
+                            <p>{{l("PleaseFillTheBelowInformation")}}</p>
+
+                            <button style="position: absolute;right: 8px;top: 8px;" type="button" class="close" (click)="close()"
+                            aria-label="Close" [disabled]="saving">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-left">
+
+                            <div class="form-group">
+                                <label for="AppEntity_Code">
+                                    {{l("Code")}}
+                                    <span class="required">*</span>
+                                    <span class="text-danger ml-3" *ngIf="showCodeErrMsg">{{ 'CodeIsRequired' | localize }}</span>
+                                </label>
+                                <app-codes *ngIf="!appEntity?.id"
+                                    [objectType]="entityObjectType.code"
+                                    [code]="appEntity.code"
+                                    [editMode]=false
+                                    placeHolder="Add your code"
+                                    (getCodeValue)="getCodeValue($event)" >
+                                </app-codes>
+                                <app-codes *ngIf="appEntity?.id"
+                                    [objectType]="entityObjectType.code"
+                                    [editMode]=true
+                                    [code]="appEntity.code"
+                                    (getCodeValue)="getCodeValue($event)" >
+                                </app-codes>
+
+                            </div>
+
+                            <!-- <div class="form-group">
+                                    <label for="AppEntity_Code">{{l("Code")}} <span class="required">*</span></label>
+                                    <input type="text" id="AppEntity_Code" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.code" name="Code"     required/>
+                                </div> -->
+
+                                <div class="form-group">
+                                    <label for="AppEntity_Name">{{l("Name")}} <span class="required">*</span></label>ee
+                                    <input type="text" id="AppEntity_Name" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.name" name="Name"     required/>
+                                </div>
+
+                                <div class="d-flex flex-column" *ngIf="extraAttributes?.length">
+                                    <label for="AppEntity_Code">{{l("Extra Attributes")}} <span class="required">*</span></label>
+                                    <div class="row justify-content-center mt-4">
+                                        <div class="col-12 mb-4"  *ngFor="let extraAttr of extraAttributes">
+                                            <div >
+                                                <div *ngIf="isSize && !isHost">
+                                                    <label>{{extraAttr.name | localize}}</label>
+                                                </div>
+                                                <div class="d-flex align-items-center">
+
+                                                    <div class="wide-drop-down d-flex flex-grow-1 " *ngIf="extraAttr?.lookupData && extraAttr?.acceptMultipleValues">
+                                                        <div class="flex-grow-1 mr-1">
+                                                            <p-multiSelect
+                                                                [options]="extraAttr.lookupData"
+                                                                [styleClass]="'w-100'"
+                                                                [(ngModel)]="extraAttr.selectedValues"
+                                                                name="extraAttr_{{extraAttr.name}}"
+                                                                [placeholder]="l('Select') + ' ' + extraAttr.name"
+                                                                (onChange)="multiValuesExtraAttributeOnChange($event,extraAttr)">
+                                                            </p-multiSelect>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="wide-drop-down flex-grow-1 " *ngIf="extraAttr?.lookupData && !extraAttr?.acceptMultipleValues">
+                                                        <div *ngIf="!isSize">
+                                                            <p-dropdown
+                                                            [options]="extraAttr.lookupData"
+                                                            [styleClass]="'w-100'"
+                                                            [(ngModel)]="extraAttr.selectedValues"
+                                                            name="extraAttr_{{extraAttr.name}}"
+                                                            [placeholder]="l('Select') + ' ' + extraAttr.name"
+                                                            (onChange)="singleValueExtraAttributeOnChange($event,extraAttr)">
+                                                            </p-dropdown>
+                                                        </div>
+                                                        <div *ngIf="isSize && !isHost">
+                                                            <p-dropdown
+                                                            [options]="sizes"
+                                                            [styleClass]="'w-100'"
+                                                            [(ngModel)]="extraAttr.selectedValues"
+                                                            name="extraAttr_{{extraAttr.name}}"
+                                                            [placeholder]="l('Select') + ' ' + extraAttr.name"
+                                                            (onChange)="singleValueExtraAttributeOnChange($event,extraAttr)">
+                                                            </p-dropdown>
+                                                        </div>
+                                                    </div>
+                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
+                                                      <div class="d-flex align-items-baseline justify-content-start ">
+                                                        <input type="text" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
+                                                        name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}" class="form-control"  id="extraAttr{{extraAttr.name}}"
+                                                         [(ngModel)]="extraAttr.selectedValues">
+                                                       <div class="border rounded" class="w-25 " *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  " >
+                                                        <input (colorPickerChange)="onColorChange($event, extraAttr)"
+                                                        *ngIf="extraAttr.name === 'Color HEXA Code' "
+                                                          class="picker" [(colorPicker)]="extraAttr.selectedValues"
+                                                         [style.background]="extraAttr.selectedValues || '#09c' "/>
+                                                       </div>
+                                                      </div>
+                                                    </div>
+                                                    <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
+                                                        <div class="radio-inline mt-2">
+                                                            <label class="radio radio-accent radio-primary mr-4" for="extraAttr{{extraAttr.name}}_1" >
+                                                                <input type="radio" (click)="notLookupExtraAttributeOnChange('true',extraAttr)"
+                                                                name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_1" [value]="'true'" [(ngModel)]="extraAttr.selectedValues"/>
+                                                                {{l("Yes")}}
+                                                            </label>
+                                                            <label class="radio radio-accent radio-primary" for="extraAttr{{extraAttr.name}}_0" >
+                                                                <input type="radio" (click)="notLookupExtraAttributeOnChange('false',extraAttr)" name="extraAttr_{{extraAttr.name}}" id="extraAttr{{extraAttr.name}}_0" [value]="'false'" [(ngModel)]="extraAttr.selectedValues">
+                                                                {{l("No")}}
+                                                            </label>
+                                                            <a *ngIf="extraAttr.selectedValues" class="ml-5 text-underline text-black-50" (click)="resetExtraAttributeSelectedValue(extraAttr)"> Reset</a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Datetime' ">
+                                                        <input type="text" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" name="{{extraAttr.name}}" autocomplete="off" placeholder="{{extraAttr.name}}" class="form-control" bsDatepicker id="extraAttr{{extraAttr.name}}" [(ngModel)]="extraAttr.selectedValues">
+                                                    </div>
+                                                    <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Numeric' ">
+                                                        <input type="number" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}" class="form-control" id="extraAttr{{extraAttr.name}}" [(ngModel)]="extraAttr.selectedValues">
+                                                    </div>
+
+                                                    <!-- <p class="ml-2" *ngIf="extraAttr.isLookup && !extraAttr?.lookupData?.length">{{ "NoData" | localize }} ...</p> -->
+                                                    <!-- <div *ngIf="!isSize || !isColor">
+                                                        <a class="border rounded text-primary add-new-lookup-btn ml-3" *ngIf="extraAttr.isLookup && extraAttr.allowAddNew" (click)="openCreateAppEntityListModal(extraAttr)">
+                                                            <i  class="fas fa-pen"></i>
+                                                        </a>
+                                                    </div> -->
+                                                    <div *ngIf="isColor && isHost">
+                                                        <a class="border rounded text-primary add-new-lookup-btn ml-3" *ngIf="extraAttr.isLookup && extraAttr.allowAddNew" (click)="openCreateAppEntityListModal(extraAttr)">
+                                                            <i  class="fas fa-pen"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            <div class="form-group">
+                                <label for="AppEntity_Notes">{{l("Notes")}}</label>
+                                <input type="text" id="AppEntity_Notes" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.notes" name="Notes"    />
+                            </div>
+                            <div class="row align-items-baseline mb-5 item-photos">
+                                <div class="col-12 item-photos-header pt-4 pb-2">
+                                    <div class="d-flex flex-wrap justify-content-between">
+                                        <div>
+                                            <h6>
+                                                {{ 'EntityPhotos' | localize}}
+                                            </h6>
+                                        </div>
+                                        <div>
+                                            <input type="text" id="AspectRatio" [placeholder]="l('AspectRatio')" class="form-control form-control-sm" [(ngModel)]="aspectRatio" name="aspectRatio" />
+                                        </div>
+                                        <div>
+                                            <button (click)="removeAllAttachments()" type="button" class="bg-white btn btn-hover-primary p-1 text-center" [disabled]="attachmentsSrcs.length == 1">
+                                                <i class="flaticon-delete m-0 p-0"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 item-photos-body pt-4 pb-5" >
+                                    <div class="row pt-3 pb-3 pl-3">
+                                        <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of attachmentsSrcs; index as i">
+                                            <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" for="file_{{i}}">
+                                                <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons">
+                                                    <div class="left-icon">
+                                                        <i class="fa-photo-video fas " ></i>
+                                                    </div>
+                                                    <div class="middle-icon">
+                                                        <i class="fa-clipboard-list fas " ></i>
+                                                    </div>
+                                                    <div class="right-icon">
+                                                        <i class="fas fa-file-video "></i>
+                                                    </div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <a class="btn btn-primary btn-sm mb-3 upload-btn">
+                                                        {{ 'AddAttachedFile' | localize}}
+                                                    </a>
+                                                    <p >
+                                                        {{ 'YouCanSendUpTo25MBInAttachments' | localize}}.
+                                                    </p>
+                                                </div>
+                                                <input type="file" id="file_{{i}}" class="fileImage" #file (change)="fileChange($event,productImageCategory,i,aspectRatio,true)">
+                                            </label>
+                                            <a  *ngIf="attachment" class="d-flex flex-column justify-content-center h-100 align-items-center kt-avatar" >
+                                                <div class="d-flex flex-column justify-content-center h-100 w-100 position-absolute view-img-overlay">
+                                                    <div class="text-center mb-3">
+                                                        <i class="fa-photo-video fas bg-transparent text-white fa-3x" ></i>
+                                                    </div>
+                                                    <div class="text-center">
+                                                        <button type="button" class="btn btn-dark text-white border-lg border-white" (click)="openImageViewer(attachment)">
+                                                            {{ 'ImagePreview' | localize}}
+                                                        </button>
+                                                    </div>
+                                                    <div class="bg-white kt-avatar__upload" for="file" (click)="removePhoto(i)" >
+                                                        <i class="fa fa-times text-danger"></i>
+                                                    </div>
+                                                </div>
+                                                <!-- <img *ngIf="!appItem.entityAttachments && !appItem.entityAttachments.length" src="../../../../../assets/img/Untitled.png"/> -->
+                                                <img *ngIf="attachment" [src]="attachment"/>
+
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()">{{l("Cancel")}}</button>
+                            <button type="submit" class="btn btn-primary blue  btn-blue btn-save" [disabled]="!appEntityForm.form.valid || uploader.isUploading" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+<confirm-modal-side *ngIf="displaySaveSideBar" [content1]="'Successfully saved' | localize" [content2]="'The '+ entityObjectType.code +' you created is successfully saved You can create another one Or Back to the Lookups list.'"
+[buttonNo]="'No thanks' | localize" [defualtButton]="true" [buttonYes]="('Create another' | localize) +' '+ entityObjectType.name" [type]="'displaySaveSideBar'" [icon]="''" [displayItem]="displaySaveSideBar"
+(buttonClicked)="askForAnotherAdd($event)"></confirm-modal-side>

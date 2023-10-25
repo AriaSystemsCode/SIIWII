@@ -1,0 +1,81 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycAttachmentCategoryForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycAttachmentCategory.id">{{l("EditSycAttachmentCategory")}}</span>
+                        <span *ngIf="!sycAttachmentCategory.id">{{l("CreateNewSycAttachmentCategory")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group m-form__group">
+                                <label for="SycAttachmentCategoryName">{{l("Parent")}}</label>
+                                <select name="sycAttachmentCategory.parentId" [(ngModel)]="sycAttachmentCategory.parentId" class="form-control" >
+                                    <option value="">{{l('PleaseSelect')}}</option>
+                                    <option *ngFor="let item of allSycAttachmentCategorys" value="{{item.id}}">{{item.displayName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="SycAttachmentCategory_Code">{{l("Code")}} *</label>
+                                <input type="text" id="SycAttachmentCategory_Code" class="form-control" [(ngModel)]="sycAttachmentCategory.code" name="Code"   minlength="1"  maxlength="20"  required/>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="SycAttachmentCategory_Name">{{l("Name")}} *</label>
+                                <input type="text" id="SycAttachmentCategory_Name" class="form-control" [(ngModel)]="sycAttachmentCategory.name" name="Name"   minlength="2"  maxlength="50"  required/>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="SycAttachmentCategory_Type">{{l("Type")}}</label>
+                                <select name="sycAttachmentCategory.parentId" [(ngModel)]="sycAttachmentCategory.type" class="form-control" >
+                                    <option value="">{{l('PleaseSelect')}}</option>
+                                    <option *ngFor="let item of allSycAttachmentCategorysTypes" value="{{item.value}}">{{item.label}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="SycAttachmentCategory_MaxFileSize">{{l("MaxFileSize")}} ({{l("In")}} Mbs)</label>
+                                <input type="number" [minlength]="1" id="SycAttachmentCategory_MaxFileSize" class="form-control" [(ngModel)]="sycAttachmentCategory.maxFileSize" name="MaxFileSize"    />
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="SycAttachmentCategory_AspecRatio">{{l("AspecRatio")}} ( {{l("Width")}}:{{l("Height")}} )</label>
+                                <input type="text" id="SycAttachmentCategory_AspecRatio" [minLength]="3" required class="form-control" [(ngModel)]="sycAttachmentCategory.aspectRatio" name="AspecRatio"    />
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="SycAttachmentCategory_Message">{{l("Message")}}</label>
+                                <input type="text" id="SycAttachmentCategory_Message" [maxLength]="50" class="form-control" [(ngModel)]="sycAttachmentCategory.message" name="Message"    />
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="SycAttachmentCategory_Attributes">{{l("Attributes")}}</label>
+                                <input type="text" id="SycAttachmentCategory_Attributes" class="form-control" [(ngModel)]="sycAttachmentCategory.attributes" name="Attributes"    />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycAttachmentCategoryForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,45 @@
+﻿<div bsModal #sendMailModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="sendMailModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #addressForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span>{{mailHeader|localize}}</span>
+                    </h4>
+                    <button type="button" style="position: absolute;right: 0;top: 8px;" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                  <div class="input-group">
+                      <img src="assets/profile/mail.svg" class="mail-icon" />
+                   
+                    <input type="email" id="to" class="form-control input-mail" [(ngModel)]="mail.to" name="to"   minlength="1" placeholder='{{l("EnterAnEmail")}}'  maxlength="100" required/>
+                  </div>
+
+					
+								<div class="input-group">
+									<input type="text" id="subject" class="form-control" [(ngModel)]="mail.subject" name="subject"   minlength="2" placeholder='{{l("EnterAnSubject")}}'  maxlength="250"  required/>
+								</div>
+					 
+
+                <div class="input-group" style="height: 400px;
+                overflow: hidden scroll;
+            ">
+                  <div  #mailBody id="body" name="body" class="form-control" [innerHTML]="mail.body"  contenteditable="true" >
+                   
+                  </div>
+                  <!-- <textarea   id="body" name="body" class="form-control" rows="10" cols="30" [(ngModel)]="mail.body"   placeholder='{{l("Hello, Please register to our platform Aria Nexuses, You can do buy Or sell your product easier.")}}' value='{{l("Hello, Please register to our platform Aria Nexuses, You can do buy Or sell your product easier.")}}' required></textarea> -->
+                </div>
+								  
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary blue btn-blue" [disabled]="!addressForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i ></i> <span>{{l("Send")}}</span></button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+</div>
+

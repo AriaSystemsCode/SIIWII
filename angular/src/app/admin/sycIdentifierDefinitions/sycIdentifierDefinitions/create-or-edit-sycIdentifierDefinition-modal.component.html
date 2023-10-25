@@ -1,0 +1,67 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycIdentifierDefinitionForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycIdentifierDefinition.id">{{l("EditSycIdentifierDefinition")}}</span>
+                        <span *ngIf="!sycIdentifierDefinition.id">{{l("CreateNewSycIdentifierDefinition")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                 
+
+
+								<div class="form-group">
+									<label for="SycIdentifierDefinition_Code">{{l("Code")}}</label>
+									<input type="text" #SycIdentifierDefinition_Code="ngModel" id="SycIdentifierDefinition_Code" class="form-control" [(ngModel)]="sycIdentifierDefinition.code" name="Code"   minlength="0"  maxlength="50" />
+								    <validation-messages [formCtrl]="SycIdentifierDefinition_Code"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="SycIdentifierDefinition_IsTenantLevel" class="kt-checkbox">
+										<input id="SycIdentifierDefinition_IsTenantLevel" #SycIdentifierDefinition_IsTenantLevel="ngModel" type="checkbox" name="IsTenantLevel" [(ngModel)]="sycIdentifierDefinition.isTenantLevel"> 
+										{{l("IsTenantLevel")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="SycIdentifierDefinition_IsTenantLevel"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycIdentifierDefinition_NumberOfSegments">{{l("NumberOfSegments")}}</label>
+									<input type="number" #SycIdentifierDefinition_NumberOfSegments="ngModel" id="SycIdentifierDefinition_NumberOfSegments" class="form-control" [(ngModel)]="sycIdentifierDefinition.numberOfSegments" name="NumberOfSegments"   />
+									<validation-messages [formCtrl]="SycIdentifierDefinition_NumberOfSegments"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycIdentifierDefinition_MaxLength">{{l("MaxLength")}}</label>
+									<input type="number" #SycIdentifierDefinition_MaxLength="ngModel" id="SycIdentifierDefinition_MaxLength" class="form-control" [(ngModel)]="sycIdentifierDefinition.maxLength" name="MaxLength"   />
+									<validation-messages [formCtrl]="SycIdentifierDefinition_MaxLength"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycIdentifierDefinition_MinSegmentLength">{{l("MinSegmentLength")}}</label>
+									<input type="number" #SycIdentifierDefinition_MinSegmentLength="ngModel" id="SycIdentifierDefinition_MinSegmentLength" class="form-control" [(ngModel)]="sycIdentifierDefinition.minSegmentLength" name="MinSegmentLength"   />
+									<validation-messages [formCtrl]="SycIdentifierDefinition_MinSegmentLength"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycIdentifierDefinition_MaxSegmentLength">{{l("MaxSegmentLength")}}</label>
+									<input type="number" #SycIdentifierDefinition_MaxSegmentLength="ngModel" id="SycIdentifierDefinition_MaxSegmentLength" class="form-control" [(ngModel)]="sycIdentifierDefinition.maxSegmentLength" name="MaxSegmentLength"   />
+									<validation-messages [formCtrl]="SycIdentifierDefinition_MaxSegmentLength"></validation-messages>
+								</div>
+					
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycIdentifierDefinitionForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

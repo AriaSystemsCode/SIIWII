@@ -1,0 +1,77 @@
+<!-- display top people contributers -->
+<!-- UI  https://lucid.app/lucidchart/80a846c8-f2fd-4a77-bad8-3b3a9693b98f/edit?existing=1&token=f11d6aaea35bd5e87fc270500415170326833ca4-eml%3Dabdelrahman.g%2540ariany.com%26ts%3D1643738227%26uid%3D160359065&docId=80a846c8-f2fd-4a77-bad8-3b3a9693b98f&shared=true&page=u6kPtBC-DqqK#?referringapp=slack -->
+<div *ngIf="itemsToShow" class="bg-white container mb-3 mt-lg-5 p-4 slidesContainer">
+  <!-- display translated title top people contributers -->
+  <h5 class="ranking-header pl-2">{{l("TopIndividualContributors")}}</h5>
+  <div *ngIf="itemsToShow" class="m-auto h-100 w-100">
+    <!-- loop to display top people contributers, each in one row, as image and beside the name -->
+    <div *ngFor="let item of items; let i = index" class="nd-sm-sidebars d-block">
+      <div class="single-item row w-100 align-items-center">
+        <!-- display top people image  with link to the contact page -->
+        <div class="col">
+          <img class="small-image"  *ngIf="item?.accountId>0" [src]="attachmentBaseUrl + '/'  + item?.userImage" alt=""
+          [routerLink]="[ '/app/main/marketplace/contacts/view',item?.accountId ]"
+          onerror="this.src='../../../../../assets/placeholders/ranking-placeholder.png'" />
+ 
+          <img class="small-image" *ngIf="item?.accountId==0" [src]="item?.userImage" alt=""
+          onerror="this.src='../../../../../assets/placeholders/ranking-placeholder.png'" />
+
+        </div>
+        <!-- display top people name with link to the contact page -->
+        <div class="single-item-body col" [ngClass]="true ? '' : 'd-flex flex-row'">
+          <div class="text-blue text-underline">
+
+            <a *ngIf="item?.accountId>0" href="javascript:;"
+              [routerLink]="[ '/app/main/marketplace/contacts/view',item?.accountId ]">{{item?.userName}}</a>
+
+            <a *ngIf="item?.accountId==0" href="javascript:;">{{item?.userName}}</a>
+
+          </div>
+          <div>
+            {{item.jobTitle}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+   
+    <div class="d-sm-sidebars d-none h-100 w-100">
+      <p-carousel class="hiddenDotsIndicator hiddenIndicator  slidersContainerCarousel  h-100 w-100" [numVisible]="1.5"
+     [value]="items"  [circular]="false">
+          <ng-template let-item pTemplate="item">
+            <div 
+            [ngClass]="items.length >1 ? 'slide-md-Section' : 'slide-sm-Section'" >
+                  <!-- display top people image  with link to the contact page -->
+                  
+                    <img [ngClass]="items.length >1 ? 'slide-medium-image' : 'slide-small-image'" *ngIf="item?.accountId>0" [src]="attachmentBaseUrl + '/'  + item?.userImage" alt=""
+                    [routerLink]="[ '/app/main/marketplace/contacts/view',item?.accountId ]"
+                    onerror="this.src='../../../../../assets/placeholders/TopIndividualContributers.png'" />
+           
+                    <img [ngClass]="items.length >1 ? 'slide-medium-image' : 'slide-small-image'" *ngIf="item?.accountId==0" [src]="item?.userImage" alt=""
+                    onerror="this.src='../../../../../assets/placeholders/TopIndividualContributers.png'" />
+                  
+                  <!-- display top people name with link to the contact page -->
+                  <div class="slide-single-item-body pt-3">
+                    <h5>
+                        <a class="text-white" *ngIf="item?.accountId>0" href="javascript:;"
+                          [routerLink]="[ '/app/main/marketplace/contacts/view',item?.accountId ]">{{item?.userName}}</a>
+            
+                        <a class="text-white" *ngIf="item?.accountId==0" href="javascript:;">{{item?.userName}}</a>
+                    </h5>
+                    <span>{{item.jobTitle}}</span>
+                     </div>
+                  </div>
+          </ng-template>
+      </p-carousel>
+  </div>
+
+  </div>
+</div>
+<div *ngIf="!itemsToShow" class="bg-white container mb-3 mt-lg-5 p-4 slidesContainer noslidedata">
+    
+  <img class="small-image" src="" alt=""
+       
+      onerror="this.src='../../../../../assets/placeholders/TopIndividualContributors-placeholder.jpg'" />
+
+</div>

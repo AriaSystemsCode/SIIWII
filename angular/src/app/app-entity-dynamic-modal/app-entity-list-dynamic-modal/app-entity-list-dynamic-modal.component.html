@@ -1,0 +1,82 @@
+
+<div class="modal-content-wrapper" *ngIf="active"  >
+    <div class="modal-header">
+        <h4 class="modal-title" >
+            <p class="desc-menu-item">{{l(entityObjectType.name)}}   {{l("values")}} </p>
+        </h4>
+        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body p-0 thin-scroll mr-2">
+        <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded">
+            <span class="mr-3">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" name="search" id="search" placeholder="Search" (input)="onFilter()" [(ngModel)]="searchQuery" class="form-control bg-white border-0">
+        </div>
+        <div class="d-flex flex-column mb-3" *ngIf="displayedRecords.length">
+            <div class="align-items-center border-dashed-bottom d-flex justify-content-between p-3" *ngFor="let item of displayedRecords;index as i">
+                    <div class="d-flex" [ngClass]="{'t-checkbox-list':acceptMultiValues}">
+                        <label class="mr-4" [ngClass]="acceptMultiValues ? 'kt-checkbox kt-checkbox--dark':'ml-3'" [for]="item.value">
+                            <p-checkbox
+                                *ngIf="acceptMultiValues"
+                                [value]="item.value"
+                                [id]="item.value"
+                                [(ngModel)]="selectedRecords"
+                                [name]="entityObjectType.name"
+                            ></p-checkbox>
+                            <input type="radio" *ngIf="!acceptMultiValues" [value]="item.value" [id]="item.value" [(ngModel)]="selectedRecords" [name]="entityObjectType.name"  />
+                        </label>
+                        {{item.label}}
+                    </div>
+                <div *ngIf="showActions && !item.isHostRecord">
+                    <div class="btn-group dropdown" dropdown container="body" placement='bottom right' >
+                        <button class="dropdown-toggle btn btn-sm btn-action"
+                            dropdownToggle>
+                        </button>
+                        <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"  *dropdownMenu>
+                            <li>
+                                <a (click)="openCreateOrEditModal(item)">{{'Edit' | localize}}</a>
+                            </li>
+                            <li>
+                                <a  (click)="deleteSycEntityObject(item.value,i)" >{{'Delete' | localize}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            <div *ngIf="displayedRecords?.length">
+                <button
+                    class="btn btn-font-hover-brand ml-3"
+                    (click)="showMoreListData()"
+                    *ngIf="showMoreListDataButton"
+                >
+                    {{ 'showmore' | localize }} ...
+                </button>
+            </div>
+            <div class="text-center" *ngIf="displayedRecords?.length === 0">
+                {{ 'NoRecordsFound...' | localize }}
+            </div>
+        </div>
+        <button *ngIf="showAddAction"  title="{{ 'AddNewValue' | localize }}" type="button" class="btn btn-icon btn-primary btn-circle create-edit-btn" (click)="openCreateOrEditModal()">
+            <i class="flaticon2-plus"></i>
+        </button>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="submitSelection()">
+            {{l("Add")}}
+        </button>
+        <button type="button" class="btn btn-default btn-gray" (click)="close()">{{l("Close")}}</button>
+    </div>
+</div>
+
+
+
+<app-create-or-edit-app-entity-dynamic-modal
+    #createOreEditAppEntityModal
+    (cancel)="onCanceledHandler()"
+    (saveDone)="onCreateOrEditDoneHandler()"
+>
+</app-create-or-edit-app-entity-dynamic-modal>

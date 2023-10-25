@@ -1,0 +1,52 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #appTransactionForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="appTransaction.id">{{l("EditAppTransaction")}}</span>
+                        <span *ngIf="!appTransaction.id">{{l("CreateNewAppTransaction")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+
+								<div class="form-group">
+									<label for="AppTransaction_Code">{{l("Code")}} *</label>
+									<input type="text" #AppTransaction_Code="ngModel" id="AppTransaction_Code" class="form-control" [(ngModel)]="appTransaction.code" name="Code"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppTransaction_Code"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTransaction_Date">{{l("Date")}}</label>
+									 <input required class="form-control m-input" #AppTransaction_Date type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTransaction.date" id="AppTransaction_Date" name="AppTransaction_Date">
+									<validation-messages [formCtrl]="AppTransaction_Date"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTransaction_AddDate">{{l("AddDate")}}</label>
+									 <input required class="form-control m-input" #AppTransaction_AddDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTransaction.addDate" id="AppTransaction_AddDate" name="AppTransaction_AddDate">
+									<validation-messages [formCtrl]="AppTransaction_AddDate"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTransaction_EndDate">{{l("EndDate")}}</label>
+									 <input required class="form-control m-input" #AppTransaction_EndDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTransaction.endDate" id="AppTransaction_EndDate" name="AppTransaction_EndDate">
+									<validation-messages [formCtrl]="AppTransaction_EndDate"></validation-messages>
+								</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!appTransactionForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

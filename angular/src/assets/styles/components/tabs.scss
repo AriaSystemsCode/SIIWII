@@ -1,0 +1,9 @@
+.custom-tab {
+    ul.nav.nav-tabs a[role=tab] span {
+        color: #000;
+    }
+}
+
+.size-attr-tabset .nav-link:not(.active) {
+    background-color: #eee;
+}

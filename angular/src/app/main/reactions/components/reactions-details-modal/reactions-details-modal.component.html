@@ -1,0 +1,77 @@
+<div
+    bsModal
+    #modal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="imageCropping"
+    aria-hidden="true"
+    [config]="{ backdrop: 'static' }"
+>
+    <div class="modal-dialog modalCenter" *ngIf="active">
+        <div class="modal-content pl-3">
+            <div >
+                <div class="row pl-3 pr-3 pb-4">
+                    <div class="col-9 pt-4 font-weight-bold">
+                        <h3>
+                            {{'Reactions' | localize}}
+                        </h3>
+                    </div>
+                    <div class="col-3 pt-2 text-right">
+                        <img
+                            src="../../../../assets/accounts/importAccounts/close.svg"
+                            class="pointer"
+                            (click)="hide()"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div class="reactions-body d-flex flex-column">
+                <div class="d-flex border-bottom mb-4 align-items-stretch" *ngIf="reactionsDetails">
+                    <div  *ngFor="let reaction of reactionsDetails; index as i">
+                        <a class="btn d-flex h-100" (click)="changeReactionFilter(i)" [title]="reaction.title | localize" [ngClass]="{'selected':selectedReactionIndex === i}">
+                            <span *ngIf="reaction.reaction == undefined">
+                                {{reaction.title}}
+                            </span>
+                            <img *ngIf="reaction.reaction != undefined" class="icon-reaction" [src]="'assets/reactions/' + Reactions[reaction.reaction] + '.png'"  />
+
+                            <span class="ml-1">
+                                {{reaction?.count}}
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="pl-2 pr-2 mr-2 flex-grow reactions-users thin-scroll" *ngIf="reactionsDetails && selectedReactionIndex !== undefined && reactionsDetails[selectedReactionIndex]">
+                    <div *ngFor="let user of reactionsDetails[selectedReactionIndex].users;last as last" class="align-items-center d-flex mb-3 pb-2" [ngClass]="{'border-bottom':!last}">
+                        <div class="position-relative">
+                            <img
+                                [src]="user.profilePictureUrl || 'assets/common/images/default-profile-picture.png'"
+                                (error)=" handleFailedImage($event)"
+                                class="rounded-circle profile-img"
+                            />
+                            <img class="icon-reaction-small position-absolute" [src]="'assets/reactions/' + Reactions[user.reactionSelected] + '.png'"  />
+                        </div>
+                        <div class="ml-5 d-flex flex-column" >
+                            <h5 class="text-capitalize">
+                                <!-- {{user.userName}} -->
+                                {{user.firstName}}.{{user.lastName}} @{{user.tenancyName}}
+                            </h5>
+                            <div *ngIf="user?.jobTitle || user?.accountName">
+                                <span class="font-weight-500 text-black-50">
+                                    {{user?.jobTitle}}
+                                </span>
+                                <span *ngIf="user?.jobTitle && user?.accountName">
+                                    at
+                                </span>
+                                <span class="font-weight-500 text-black-50">
+                                    {{ user?.accountName }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

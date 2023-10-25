@@ -1,0 +1,224 @@
+
+<div class="modal-content-wrapper"  >
+    <div class="modal-header">
+        <h3 class="modal-title" >
+            <span>{{branchName}} {{l("Branch Details")}}</span>
+        </h3>
+        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()" aria-label="Close" >
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body thin-scroll mr-2">
+        <div *ngIf="!loading" >
+            <div class="mb-5">
+                <h3 class="text-primary mb-4">{{ "BranchInformation" | localize }}</h3>
+                <div class="row">
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "BranchName" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.name ? branch.name : '-'  }}
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "BranchTradeName" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.tradeName ? branch.tradeName : '-'  }}
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "BranchCode" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.code ? branch.code : '-'  }}
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "DefaultLanguage" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.languageName ? branch.languageName : '-'  }}
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "DefaultCurrency" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.currencyName ? branch.currencyName : '-'  }}
+                    </div>
+                </div>
+            </div>
+            <div class="mb-5">
+                <h3 class="text-primary mb-4">{{ "ContactInformation" | localize }}</h3>
+                <div class="row">
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "Email" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.eMailAddress ? branch.eMailAddress : '-'  }}
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "Website" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.website ? branch.website : '-'  }}
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{branch.phone1TypeName | localize}}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.phone1Number ? branch.phone1Number : '-'  }}
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{branch.phone2TypeName | localize}}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.phone2Number ? branch.phone2Number : '-'  }}
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{branch.phone3TypeName | localize}}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        {{ branch.phone3Number ? branch.phone3Number : '-'  }}
+                    </div>
+                </div>
+            </div>
+            <div >
+                <h3 class="text-primary mb-5">{{ "AddressInformation" | localize }}</h3>
+                <div class="row">
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "BillingAddress" | localize }}</p>
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <span *ngIf="billingAddress && billingAddress.addressLine1">
+                            {{ billingAddress.addressLine1 }}
+                        </span>
+                        <span *ngIf="billingAddress && billingAddress.addressLine2">
+                            {{ ', ' + billingAddress.addressLine2 }}
+                        </span>
+                        <span *ngIf="billingAddress && billingAddress.city">
+                            {{ ', ' + billingAddress.city }}
+                        </span>
+                        <span *ngIf="billingAddress && billingAddress.state">
+                            {{ ', ' + billingAddress.state  }}
+                        </span>
+                        <span *ngIf="billingAddress && billingAddress.zipCode">
+                            {{ ', ' +billingAddress.zipCode  }}
+                        </span>
+                        <span *ngIf="billingAddress && billingAddress.countryName">
+                            {{ ', ' + billingAddress.countryName  }}
+                        </span>
+                        <span *ngIf="billingAddress">
+                            .
+                        </span>
+                        <span *ngIf="!billingAddress">
+                            -
+                        </span>
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "ShippingAddress" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <span *ngIf="shippingAddress && shippingAddress.addressLine1">
+                            {{ shippingAddress.addressLine1 }}
+                        </span>
+                        <span *ngIf="shippingAddress && shippingAddress.addressLine2">
+                            {{ ', ' + shippingAddress.addressLine2 }}
+                        </span>
+                        <span *ngIf="shippingAddress && shippingAddress.city">
+                            {{ ', ' + shippingAddress.city }}
+                        </span>
+                        <span *ngIf="shippingAddress && shippingAddress.state">
+                            {{ ', ' + shippingAddress.state  }}
+                        </span>
+                        <span *ngIf="shippingAddress && shippingAddress.zipCode">
+                            {{ ', ' +shippingAddress.zipCode  }}
+                        </span>
+                        <span *ngIf="shippingAddress && shippingAddress.countryName">
+                            {{ ', ' + shippingAddress.countryName  }}
+                        </span>
+                        <span *ngIf="shippingAddress">
+                            .
+                        </span>
+                        <span *ngIf="!shippingAddress">
+                            -
+                        </span>
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "DistributionAddress" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <span *ngIf="distributionAddress && distributionAddress.addressLine1">
+                            {{ distributionAddress.addressLine1 }}
+                        </span>
+                        <span *ngIf="distributionAddress && distributionAddress.addressLine2">
+                            {{ ', ' + distributionAddress.addressLine2 }}
+                        </span>
+                        <span *ngIf="distributionAddress && distributionAddress.city">
+                            {{ ', ' + distributionAddress.city }}
+                        </span>
+                        <span *ngIf="distributionAddress && distributionAddress.state">
+                            {{ ', ' + distributionAddress.state  }}
+                        </span>
+                        <span *ngIf="distributionAddress && distributionAddress.zipCode">
+                            {{ ', ' +distributionAddress.zipCode  }}
+                        </span>
+                        <span *ngIf="distributionAddress && distributionAddress.countryName">
+                            {{ ', ' + distributionAddress.countryName  }}
+                        </span>
+                        <span *ngIf="distributionAddress">
+                            .
+                        </span>
+                        <span *ngIf="!distributionAddress">
+                            -
+                        </span>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <p class="label p-0">{{ "MailingAddress" | localize }}</p>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <span *ngIf="mailingAddress && mailingAddress.addressLine1">
+                            {{ mailingAddress.addressLine1 }}
+                        </span>
+                        <span *ngIf="mailingAddress && mailingAddress.addressLine2">
+                            {{ ', ' + mailingAddress.addressLine2 }}
+                        </span>
+                        <span *ngIf="mailingAddress && mailingAddress.city">
+                            {{ ', ' + mailingAddress.city }}
+                        </span>
+                        <span *ngIf="mailingAddress && mailingAddress.state">
+                            {{ ', ' + mailingAddress.state  }}
+                        </span>
+                        <span *ngIf="mailingAddress && mailingAddress.zipCode">
+                            {{ ', ' +mailingAddress.zipCode  }}
+                        </span>
+                        <span *ngIf="mailingAddress && mailingAddress.countryName">
+                            {{ ', ' + mailingAddress.countryName  }}
+                        </span>
+                        <span *ngIf="mailingAddress">
+                            .
+                        </span>
+                        <span *ngIf="!mailingAddress">
+                            -
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button  type="button" class="btn btn-primary" (click)="close()">{{l("Close")}}</button>
+    </div>
+</div>
+
+
+

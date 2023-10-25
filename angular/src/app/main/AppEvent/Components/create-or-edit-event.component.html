@@ -1,0 +1,1020 @@
+<div
+    bsModal
+    #createOrEditModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="createOrEditModal"
+    aria-hidden="true"
+    [config]="{ backdrop: 'static' }"
+    style="overflow-y: scroll;"
+>
+    <div class="modal-dialog modal-lg d-md-block d-none">
+        <div class="modal-content">
+            <div class="row events ml-3 mr-3">
+                <p-steps
+                    class="col-11 event-steps"
+                    [model]="items"
+                    [readonly]="false"
+                    [activeIndex]="stepnum"
+                    (activeIndexChange)="onactiveIndexChange($event)"
+                ></p-steps>
+                <div class="col-1 pt-5 text-right">
+                    <img
+                        src="../../../../assets/accounts/importAccounts/close.svg"
+                        class="pointer"
+                        (click)="hide()"
+                    />
+                </div>
+            </div>
+            <div class="border-bottom">
+                <div class="row pl-3 pr-3">
+                    <div class="col-9 pt-4">
+                        <h6 *ngIf="event?.id == 0">
+                            {{ "CreateanEvent" | localize }}
+                        </h6>
+                        <h6 *ngIf="event?.id > 0">
+                            {{ "EditanEvent" | localize }}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="row m-3">
+                <form #eventForm="ngForm" class="w-100">
+                    <form #step0Form="ngForm" class="w-100">
+                        <div
+                            class="content border-bottom"
+                            [ngClass]="{ 'd-none': !(stepnum == 0) }"
+                        >
+                            <!--Event Logo-->
+                            <div class="form-group row m-0 pt-4 ">
+                                <label
+                                    for="colFormLabelSm"
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span
+                                    >{{ "EventLogo" | localize }}
+                                </label>
+                                <app-image-upload
+                                class="ml-3"
+                                    [sycAttachmentCategory]="sycAttachmentCategoryLogo"
+                                    [image]="ProfileImg"
+                                    [staticHeight]="120"
+                                    [showGuidelines]="false"
+                                    (imageBrowseDone)="imageBrowseDone($event,0)"
+                                    (removeImage)="removeImage($event,0)"
+                                >
+                                </app-image-upload>
+                            </div>
+                            <!--Event Logo-->
+
+                            <!--Event Cover-->
+                            <div class="form-group row m-0 pt-4">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span>
+                                    {{ "EventCover" | localize }}
+                                </label>
+                                <app-image-upload
+                                    [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                    [image]="coverPhoto"
+                                    [staticHeight]="100"
+                                    [showGuidelines]="true"
+                                    (imageBrowseDone)="imageBrowseDone($event,1)"
+                                    (removeImage)="removeImage($event,1)"
+                                >
+                                </app-image-upload>
+                            </div>
+                            <!--Event Cover-->
+
+                            <!--Event Type-->
+                            <div class="form-group row m-0 pt-4">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form mr-3"
+                                >
+                                    <span class="text-danger">*</span
+                                    >{{ "EventType" | localize }}
+                                </label>
+                                <div class="row col-12">
+                                    <div class="mr-3">
+                                        <input
+                                            type="radio"
+                                            id="online"
+                                            name="isOnline"
+                                            class="form-control"
+                                            [checked]="
+                                                event?.id == 0 ||
+                                                event?.isOnLine
+                                            "
+                                            [value]="true"
+                                            [(ngModel)]="event.isOnLine"
+                                            class="mr-2 radio"
+                                        />
+                                        <label for="online">{{"Online" | localize}}</label>
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            id="inperson"
+                                            name="isOnline"
+                                            [value]="false"
+                                            class="form-control"
+                                            [(ngModel)]="event.isOnLine"
+                                            [checked]="!event?.isOnLine"
+                                            class="mr-2 radio"
+                                        />
+                                        <label for="inperson">{{"InPerson"| localize}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Event Type-->
+
+                            <!--Event Name-->
+                            <div class="form-group row m-0 pt-4">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span>
+                                    {{ "EventName" | localize }}
+                                </label>
+                                <div class="col-12">
+                                    <input
+                                        type="text"
+                                        id="eventName"
+                                        class="form-control"
+                                        name="eventName"
+                                        #eventNameInput="ngModel"
+                                        [(ngModel)]="event.name"
+                                        minlength="10"
+                                        maxlength="90"
+                                        [pattern]="
+                                            patterns.charactersWithoutSpaces
+                                        "
+                                        required
+                                    />
+                                    <validation-messages
+                                        [formCtrl]="eventNameInput"
+                                    ></validation-messages>
+                                </div>
+                            </div>
+                            <!--Event Name-->
+                        </div>
+                    </form>
+
+                    <form #step1Form="ngForm" class="w-100">
+                        <div
+                            class="content border-bottom"
+                            [ngClass]="{ 'd-none': !(stepnum == 1) }"
+                        >
+                            <!--TimeZone-->
+                            <div class="form-group m-0 pb-5">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span>
+                                    {{ "TimeZone" | localize }}
+                                </label>
+                                <div class="col-12">
+                                    <p-dropdown
+                                        [options]="allTimeZone"
+                                        placeholder="Select TimeZone"
+                                        styleClass="ticket-dropdown form-control aria-select"
+                                        name="timeZone"
+                                        [(ngModel)]="event.timeZone"
+                                        required
+                                    ></p-dropdown>
+                                </div>
+                            </div>
+                            <!--TimeZone-->
+                            <!--Start Date &Time-->
+
+                            <div class="form-group m-0 mt-5 mb-5">
+                                <div class="row">
+                                    <label
+                                        class="col-form-label col-form-label-sm label-form col-5 mr-5"
+                                    >
+                                    <img  class="pr-2" src="../../../../assets/events/Calendar.svg">
+                                        {{ "StartDate" | localize }}
+                                    </label>
+                                    <label
+                                        class="col-form-label col-form-label-sm label-form col-5"
+                                    >
+                                    <img  class="pr-2" src="../../../../assets/events/Icon-material-access-time.svg">
+                                    {{ "StartTime" | localize }}
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-5 mr-5">
+                                        <input
+                                            type="datetime"
+                                            bsDatepicker
+                                            id="fromDate"
+                                            #fromDateCtrl="ngModel"
+                                            [(ngModel)]="fromDate"
+                                            class="form-control"
+                                            name="fromDate"
+                                            [minDate]="minDate"
+                                            [placeholder]="
+                                                'Please Enter Start Date'
+                                            "
+                                            (ngModelChange)="
+                                                toDate < $event &&
+                                                    (toDate = $event)
+                                            "
+                                            required
+                                        />
+                                        <validation-messages
+                                            [formCtrl]="fromDateCtrl"
+                                        ></validation-messages>
+                                    </div>
+
+                                    <div class="col-5">
+                                        <timepicker
+                                            id="fromTime"
+                                            name="fromTime"
+                                            [(ngModel)]="fromTime"
+                                            #fromTimeCtrl="ngModel"
+                                            required
+                                        ></timepicker>
+                                        <validation-messages
+                                            [formCtrl]="fromTimeCtrl"
+                                        ></validation-messages>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Start Date &Time-->
+                            <!--End Date &Time-->
+                            <div class="form-group m-0 mt-5 mb-5">
+                                <div class="row">
+                                    <label
+                                        class="col-form-label col-form-label-sm label-form col-5 mr-5"
+                                    >
+                                    <img  class="pr-2" src="../../../../assets/events/Calendar.svg">
+                                        {{ "EndDate" | localize }}
+                                    </label>
+                                    <label
+                                        class="col-form-label col-form-label-sm label-form col-5"
+                                    >
+                                    <img  class="pr-2" src="../../../../assets/events/Icon-material-access-time.svg">
+                                    {{ "EndTime" | localize }}
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-5 mr-5">
+                                        <input
+                                            type="datetime"
+                                            bsDatepicker
+                                            id="toDate"
+                                            #toDateCtrl="ngModel"
+                                            [(ngModel)]="toDate"
+                                            class="form-control"
+                                            name="toDate"
+                                            [minDate]="fromDate"
+                                            [placeholder]="
+                                                'Please Enter End Date'
+                                            "
+                                            required
+                                        />
+                                        <validation-messages
+                                            [formCtrl]="toDateCtrl"
+                                        ></validation-messages>
+                                    </div>
+
+                                    <div class="col-5">
+                                        <timepicker
+                                            id="toTime"
+                                            name="toTime"
+                                            [(ngModel)]="toTime"
+                                            #toTimeCtrl="ngModel"
+                                            required
+                                        ></timepicker>
+                                        <validation-messages
+                                            [formCtrl]="toTimeCtrl"
+                                        ></validation-messages>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--End Date &Time-->
+                        </div>
+                    </form>
+
+                    <form #step2Form="ngForm" class="w-100">
+                        <div
+                            class="content border-bottom"
+                            [ngClass]="{
+                                'd-none': !(stepnum == 2)
+                            }"
+                        >
+                            <!--Event Link-->
+                            <div class="form-group row m-0 pb-5">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span
+                                    >{{ "Externaleventlink" | localize }}
+                                </label>
+                                <div class="col-12">
+                                    <input
+                                        type="url"
+                                        id="eventLink"
+                                        class="form-control"
+                                        name="eventLink"
+                                        #eventLinkInput="ngModel"
+                                        pattern="https?://.*"
+                                        [(ngModel)]="event.registrationLink"
+                                        required
+                                        (keyup)="onChangeEventLink()"
+                                        [maxlength]="acceptEventLinkCharacters"
+                                        placeholder="http(s)://"
+                                    />
+                                    <validation-messages
+                                        [formCtrl]="eventLinkInput"
+                                    ></validation-messages>
+                                </div>
+                                <div class="text-right w-100">
+                                    <span
+                                        >{{ eventLinkWords }} /
+                                        {{ acceptEventLinkCharacters }}
+                                    </span>
+                                </div>
+                            </div>
+                            <!--Event Link-->
+
+                            <!--Event Location-->
+                            <div
+                                class="form-group row m-0"
+                                *ngIf="!event?.isOnLine"
+                            >
+                                <div class="col-12">
+                                    <div
+                                        class="row eventLocation w-100 pt-4 pl-3"
+                                    >
+                                        <div class="col-11">
+                                            {{ "EventLocation" | localize }}
+                                            <i
+                                                class="fa fa-plus ml-2 pointer"
+                                                aria-hidden="true"
+                                                (click)="selectAddress()"
+                                            ></i>
+                                        </div>
+                                      <!--   <div class="col-1">
+                                            <button
+                                                class="mapBtn btn btn-secondary"
+                                                [disabled]="eventAddress == ''"
+                                                [ngClass]="{
+                                                    disabled: eventAddress == ''
+                                                }"
+                                                (click)="showAddressOnMap()"
+                                            ></button>
+                                        </div> -->
+                                        <input
+                                            type="text"
+                                            id="eventAddress"
+                                            name="eventAddress"
+                                            class="w-100 border-0 bg-white form-control"
+                                            readonly
+                                            [(ngModel)]="eventAddress"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Event Location-->
+
+                            <!--Description-->
+                            <div class="form-group row m-0 pt-4">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span>
+                                    {{ "Description" | localize }}
+                                </label>
+
+                                <div class="col-12">
+                                    <textarea
+                                        id="description"
+                                        name="description"
+                                        #description="ngModel"
+                                        rows="10"
+                                        class="border-0 pl-3 pt-0 pb-2 w-100 form-control"
+                                        placeholder="Ex: topics, schedule, etc."
+                                        (keyup)="onChangeDescriptions()"
+                                        [maxlength]="
+                                            acceptDescriptionsCharacters
+                                        "
+                                        [(ngModel)]="event.description"
+                                        [pattern]="
+                                            patterns.charactersWithoutSpaces
+                                        "
+                                        required
+                                    ></textarea>
+                                    <validation-messages
+                                        [formCtrl]="description"
+                                    ></validation-messages>
+                                </div>
+                                <div class="text-right w-100">
+                                    <span>
+                                        {{ descriptionsWords }} /{{
+                                            acceptDescriptionsCharacters
+                                        }}
+                                    </span>
+                                </div>
+                            </div>
+                            <!--Description-->
+
+                            <div class="form-group row m-0">
+                                <div class="col-12 pb-3">
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox"
+                                        [disabled]="disablePublish"
+                                        [(ngModel)]="publishEvent"
+                                        name="Publish"
+                                    />
+                                    <span class="pl-2">
+                                        {{ "Publishtheevent" | localize }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row m-0">
+                                <div class="col-12">
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox"
+                                        [disabled]="disableCreatePostForEvent"
+                                        [(ngModel)]="createPostForEvent"
+                                        name="CreatePost"
+                                    />
+                                    <span class="pl-2"
+                                        >{{ "Createapost" | localize }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="d-flex flex-row ml-0 mr-0 mt-4  w-50 mb-5">
+                        <button
+                            class="btn btn-secondary _Btn mr-2 pointer"
+                            (click)="goPreviousStep()"
+                            [ngClass]="{ 'd-none': stepnum == firstStep,
+                            'previousBtn': stepnum == lastStep }"
+                        >
+                            {{ "Previous" | localize }}
+                        </button>
+
+                        <button
+                            class="btn btn-primary _Btn pointer"
+                            (click)="goNextStep()"
+                            [ngClass]="{
+                                'd-none': stepnum == lastStep,
+                                disabled: disabledNextBtn(stepnum),
+                                'nextBtn': stepnum ==firstStep
+                            }"
+                            [disabled]="disabledNextBtn(stepnum)"
+                        >
+                            {{ "Next" | localize }}
+                        </button>
+
+                        <button
+                            class="btn btn-primary _Btn pointer"
+                            (click)="onSubmit()"
+                            [ngClass]="{
+                                'd-none': stepnum != lastStep
+                            }"
+                            [disabled]="
+                                step0Form.invalid ||
+                                step1Form.invalid ||
+                                step2Form.invalid
+                            "
+                            type="submit"
+                        >
+                            {{ "Submit" | localize }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div class=" modal-lg d-md-none d-block">
+        <div class="modal-content pb-5 w-100">
+            
+            <div class="row m-0 pt-4 pb-4 events events-sm">
+               
+                <div class="col-1  text-right">
+                    <img
+                     src="../../../../assets/events/Icon-ionic-ios-arrow-back.svg" 
+                        class="pointer"
+                        (click)="hide()"
+                    />
+                </div>
+
+                <div class="col pt-1">
+                    <h5 *ngIf="event?.id == 0">
+                        {{ "CreateanEvent" | localize }}
+                    </h5>
+                    <h5 *ngIf="event?.id > 0">
+                        {{ "EditanEvent" | localize }}
+                    </h5>
+                </div>
+
+                <div class="mb-5">
+                    <button
+                    class="btn btn-primary  pointer postBtn ml-5 w-25"
+                    (click)="onSubmit()"
+                    [disabled]="
+                        step0Form.invalid ||
+                        step1Form.invalid ||
+                        step2Form.invalid
+                    "
+                    type="submit"
+                >
+                    {{ "post" | localize }}
+                </button>
+                </div>
+
+            </div>
+           
+            
+
+            <div class="row m-3">
+                <form #eventForm="ngForm" class="w-100">
+                    <form #step0Form="ngForm" class="w-100">
+                        <div
+                            class="content"
+                            [ngClass]="{ 'd-none': !(stepnum == 0) }"
+                        >
+                            <!--Event Logo-->
+                            <div class="form-group row m-0 pt-4">
+                                <label
+                                    for="colFormLabelSm"
+                                    class="col-form-label col-form-label-sm label-form pr-2" 
+                                >
+                                    <span class="text-danger">*</span
+                                    >{{ "EventLogo" | localize }}
+                                </label>
+                                <app-image-upload
+                                class="ml-3"
+                                    [sycAttachmentCategory]="sycAttachmentCategoryLogo"
+                                    [image]="ProfileImg"
+                                    [staticWidth]="120"
+                                    [showGuidelines]="false"
+                                    (imageBrowseDone)="imageBrowseDone($event,0)"
+                                    (removeImage)="removeImage($event,0)"
+                                >
+                                </app-image-upload>
+                            </div>
+                            <!--Event Logo-->
+
+                            <!--Event Cover-->
+                            <div class="form-group row m-0 pt-4">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form pr-2"
+                                >
+                                    <span class="text-danger">*</span>
+                                    {{ "EventCover" | localize }}
+                                </label>
+                                <app-image-upload
+                                class="ml-2"
+                                    [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                    [image]="coverPhoto"
+                                    [staticHeight]="100"
+                                    [showGuidelines]="true"
+                                    (imageBrowseDone)="imageBrowseDone($event,1)"
+                                    (removeImage)="removeImage($event,1)"
+                                >
+                                </app-image-upload>
+                            </div>
+                            <!--Event Cover-->
+
+                            <!--Event Type-->
+                            <div class="form-group row m-0 pt-4">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form mr-3"
+                                >
+                                    <span class="text-danger">*</span
+                                    >{{ "EventType" | localize }}
+                                </label>
+                                <div class="col-12">
+                                    <div class="mr-3">
+                                        <input
+                                            type="radio"
+                                            id="online"
+                                            name="isOnline"
+                                            class="form-control"
+                                            [checked]="
+                                                event?.id == 0 ||
+                                                event?.isOnLine
+                                            "
+                                            [value]="true"
+                                            [(ngModel)]="event.isOnLine"
+                                            class="mr-2 radio"
+                                        />
+                                        <label for="online">{{"Online" | localize}}</label>
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            id="inperson"
+                                            name="isOnline"
+                                            [value]="false"
+                                            class="form-control"
+                                            [(ngModel)]="event.isOnLine"
+                                            [checked]="!event?.isOnLine"
+                                            class="mr-2 radio"
+                                        />
+                                        <label for="inperson">{{"InPerson"| localize}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Event Type-->
+
+                            <!--Event Name-->
+                            <div class="form-group row m-0 pt-4">
+                                <label
+                                class="col-form-label col-form-label-sm label-form w-100"
+                            >
+                                <span class="text-danger">*</span>
+                                {{ "EventName" | localize }}
+                            </label>
+                                <div class="w-75">
+                                    <input
+                                    placeholder="Event Name"
+                                        type="text"
+                                        id="eventName"
+                                        class="form-control ml-3"
+                                        name="eventName"
+                                        #eventNameInput="ngModel"
+                                        [(ngModel)]="event.name"
+                                        minlength="10"
+                                        maxlength="90"
+                                        [pattern]="
+                                            patterns.charactersWithoutSpaces
+                                        "
+                                        required
+                                    />
+                                    <validation-messages
+                                        [formCtrl]="eventNameInput"
+                                    ></validation-messages>
+                                </div>
+                            </div>
+                            <!--Event Name-->
+                        </div>
+                    </form>
+
+                    <form #step1Form="ngForm" class="w-100">
+                        <div
+                            class="content"
+                            [ngClass]="{ 'd-none': !(stepnum == 1) }"
+                        >
+                            <!--TimeZone-->
+                            <div class="form-group m-0 pb-5">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span>
+                                    {{ "TimeZone" | localize }}
+                                </label>
+                                <div class="w-60 pr-2">
+                                    <p-dropdown
+                                        [options]="allTimeZone"
+                                        placeholder="Select TimeZone"
+                                        styleClass="ticket-dropdown form-control aria-select"
+                                        name="timeZone"
+                                        [(ngModel)]="event.timeZone"
+                                        required
+                                    ></p-dropdown>
+                                </div>
+                            </div>
+                            <!--TimeZone-->
+                            <!--Start Date &Time-->
+
+                            <div class="form-group m-0">
+                                    <label
+                                        class="col-form-label col-form-label-sm label-form col-5 mr-5"
+                                    >
+                                        <img  class="pr-2" src="../../../../assets/events/Calendar.svg">
+                                        {{ "StartDate" | localize }}
+                                    </label>
+                               
+                                    <div class="col-5 mr-5 mb-5">
+                                        <input
+                                            type="datetime"
+                                            bsDatepicker
+                                            id="fromDate"
+                                            #fromDateCtrl="ngModel"
+                                            [(ngModel)]="fromDate"
+                                            class="form-control"
+                                            name="fromDate"
+                                            [minDate]="minDate"
+                                            [placeholder]="
+                                                'Please Enter Start Date'
+                                            "
+                                            (ngModelChange)="
+                                                toDate < $event &&
+                                                    (toDate = $event)
+                                            "
+                                            required
+                                        />
+                                        <validation-messages
+                                            [formCtrl]="fromDateCtrl"
+                                        ></validation-messages>
+                                    </div>
+
+                                    <label
+                                    class="col-form-label col-form-label-sm label-form col-5"
+                                >
+                                <img  class="pr-2" src="../../../../assets/events/Icon-material-access-time.svg">
+                                {{ "StartTime" | localize }}
+                                </label>
+                                    <div class="col-5">
+                                        <timepicker
+                                            id="fromTime"
+                                            name="fromTime"
+                                            [(ngModel)]="fromTime"
+                                            #fromTimeCtrl="ngModel"
+                                            required
+                                        ></timepicker>
+                                        <validation-messages
+                                            [formCtrl]="fromTimeCtrl"
+                                        ></validation-messages>
+                                    </div>
+                            </div>
+                            <!--Start Date &Time-->
+                            <!--End Date &Time-->
+                            <div class="form-group m-0 mt-5 mb-5">
+                               
+                                    <label
+                                        class="col-form-label col-form-label-sm label-form col-5 mr-5"
+                                    >
+                                    <img  class="pr-2" src="../../../../assets/events/Calendar.svg">
+                                        {{ "EndDate" | localize }}
+                                    </label>
+                                    
+                              
+                              
+                                    <div class="col-5 mr-5 mb-5">
+                                        <input
+                                            type="datetime"
+                                            bsDatepicker
+                                            id="toDate"
+                                            #toDateCtrl="ngModel"
+                                            [(ngModel)]="toDate"
+                                            class="form-control"
+                                            name="toDate"
+                                            [minDate]="fromDate"
+                                            [placeholder]="
+                                                'Please Enter End Date'
+                                            "
+                                            required
+                                        />
+                                        <validation-messages
+                                            [formCtrl]="toDateCtrl"
+                                        ></validation-messages>
+                                    </div>
+
+                                    <label
+                                        class="col-form-label col-form-label-sm label-form col-5"
+                                    >
+                                    <img  class="pr-2" src="../../../../assets/events/Icon-material-access-time.svg">
+                                    {{ "EndTime" | localize }}
+                                    </label>
+
+                                    <div class="col-5">
+                                        <timepicker
+                                            id="toTime"
+                                            name="toTime"
+                                            [(ngModel)]="toTime"
+                                            #toTimeCtrl="ngModel"
+                                            required
+                                        ></timepicker>
+                                        <validation-messages
+                                            [formCtrl]="toTimeCtrl"
+                                        ></validation-messages>
+                                    </div>
+                            </div>
+                            <!--End Date &Time-->
+                        </div>
+                    </form>
+
+                    <form #step2Form="ngForm" class="w-100">
+                        <div
+                            class="content"
+                            [ngClass]="{
+                                'd-none': !(stepnum == 2)
+                            }"
+                        >
+                            <!--Event Link-->
+                            <div class="form-group  m-0 pb-5">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span
+                                    >{{ "Externaleventlink" | localize }}
+                                </label>
+                                <div class="w-60">
+                                    <input
+                                        type="url"
+                                        id="eventLink"
+                                        class="form-control"
+                                        name="eventLink"
+                                        #eventLinkInput="ngModel"
+                                        pattern="https?://.*"
+                                        [(ngModel)]="event.registrationLink"
+                                        required
+                                        (keyup)="onChangeEventLink()"
+                                        [maxlength]="acceptEventLinkCharacters"
+                                        placeholder="http(s)://"
+                                    />
+                                    <validation-messages
+                                        [formCtrl]="eventLinkInput"
+                                    ></validation-messages>
+                                </div>
+                                <div class="text-right w-100">
+                                    <span
+                                        >{{ eventLinkWords }} /
+                                        {{ acceptEventLinkCharacters }}
+                                    </span>
+                                </div>
+                            </div>
+                            <!--Event Link-->
+
+                            <!--Event Location-->
+                            <div
+                                class="form-group row m-0"
+                                *ngIf="!event?.isOnLine"
+                            >
+                                <div class="col-12">
+                                    <div
+                                        class="row eventLocation w-100 pt-4 pl-3"
+                                    >
+                                        <div class="col-11">
+                                            {{ "EventLocation" | localize }}
+                                            <i
+                                                class="fa fa-plus ml-2 pointer"
+                                                aria-hidden="true"
+                                                (click)="selectAddress()"
+                                            ></i>
+                                        </div>
+                                      <!--   <div class="col-1">
+                                            <button
+                                                class="mapBtn btn btn-secondary"
+                                                [disabled]="eventAddress == ''"
+                                                [ngClass]="{
+                                                    disabled: eventAddress == ''
+                                                }"
+                                                (click)="showAddressOnMap()"
+                                            ></button>
+                                        </div> -->
+                                        <input
+                                            type="text"
+                                            id="eventAddress"
+                                            name="eventAddress"
+                                            class="w-100 border-0 bg-white form-control"
+                                            readonly
+                                            [(ngModel)]="eventAddress"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Event Location-->
+
+                            <!--Description-->
+                            <div class="form-group row m-0 pt-4 w-60">
+                                <label
+                                    class="col-form-label col-form-label-sm label-form"
+                                >
+                                    <span class="text-danger">*</span>
+                                    {{ "Description" | localize }}
+                                </label>
+
+                                <div class="col-12">
+                                    <textarea
+                                        id="description"
+                                        name="description"
+                                        #description="ngModel"
+                                        rows="10"
+                                        class="border-0 pl-3 pt-0 pb-2  form-control"
+                                        placeholder="Ex: topics, schedule, etc."
+                                        (keyup)="onChangeDescriptions()"
+                                        [maxlength]="
+                                            acceptDescriptionsCharacters
+                                        "
+                                        [(ngModel)]="event.description"
+                                        [pattern]="
+                                            patterns.charactersWithoutSpaces
+                                        "
+                                        required
+                                    ></textarea>
+                                    <validation-messages
+                                        [formCtrl]="description"
+                                    ></validation-messages>
+                                </div>
+                                <div class="text-right w-100">
+                                    <span>
+                                        {{ descriptionsWords }} /{{
+                                            acceptDescriptionsCharacters
+                                        }}
+                                    </span>
+                                </div>
+                            </div>
+                            <!--Description-->
+
+                            <div class="form-group row m-0">
+                                <div class="col-12 pb-3">
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox"
+                                        [disabled]="disablePublish"
+                                        [(ngModel)]="publishEvent"
+                                        name="Publish"
+                                    />
+                                    <span class="pl-2">
+                                        {{ "Publishtheevent" | localize }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row m-0">
+                                <div class="col-12">
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox"
+                                        [disabled]="disableCreatePostForEvent"
+                                        [(ngModel)]="createPostForEvent"
+                                        name="CreatePost"
+                                    />
+                                    <span class="pl-2"
+                                        >{{ "Createapost" | localize }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="sm-events w-100">
+                        <p-steps
+                        class="event-sm-steps event-steps"
+                        [model]="items"
+                        [readonly]="false"
+                        [activeIndex]="stepnum"
+                        (activeIndexChange)="onactiveIndexChange($event)"
+                    ></p-steps>
+                    </div>
+                    <div class="d-flex flex-row ml-0 mr-0 mt-4  w-50  mb-5">
+                        <button
+                            class="btn btn-secondary _Btn mr-2 pointer"
+                            (click)="goPreviousStep()"
+                            [ngClass]="{ 'd-none': stepnum == firstStep,
+                            'previousBtn': stepnum == lastStep }"
+                        >
+                            {{ "Previous" | localize }}
+                        </button>
+
+                        <button
+                            class="btn btn-primary _Btn pointer"
+                            (click)="goNextStep()"
+                            [ngClass]="{
+                                'd-none': stepnum == lastStep,
+                                disabled: disabledNextBtn(stepnum),
+                                'nextBtn': stepnum ==firstStep
+                            }"
+                            [disabled]="disabledNextBtn(stepnum)"
+                        >
+                            {{ "Next" | localize }}
+                        </button>
+
+                      
+                    </div>
+                </form>
+            </div>
+           
+        </div>
+    </div>
+
+
+
+</div>
+
+<selectAddressModal
+    #selectAddressModal
+    (addressSelected)="addressSelected($event)"
+    (addNewAddress)="addNewAddress()"
+    (editAddress)="editAddress($event)"
+    (addressSelectionCanceled)="addressSelectionCanceled()"
+></selectAddressModal>
+
+<createOrEditAddressModal
+    #createOrEditAddressModal
+    (addressAdded)="addressAdded($event)"
+    (addressUpdated)="addressUpdated($event)"
+    (createOrEditaddressCanceled)="createOrEditaddressCanceled()"
+></createOrEditAddressModal>
+
+<!-- <app-google-map #googleMapModal></app-google-map> -->

@@ -1,0 +1,68 @@
+@mixin font($font-weight, $font-size, $line-height) {
+    font-size : $font-size!important;
+    line-height : $line-height!important;
+    font-weight : $font-weight!important;
+}
+$font-weight-normal :400;
+$font-weight-medium :500;
+$font-weight-bold :600;
+@mixin font-1-normal {
+    @include font( $font-weight-normal, 12px, 18px ); // search
+}
+@mixin font-2-normal {
+    @include font( $font-weight-normal, 13px, 20px ); // dropdownFilter( sort & mainfilter ), create button, JobTitle, emailValue
+}
+@mixin font-2-medium {
+    @include font( $font-weight-medium, 13px, 20px ); // Member name, Email:
+}
+@mixin font-3-normal {
+    @include font( $font-weight-normal, 14px, 21px ); // sortByValue
+}
+@mixin font-3-medium {
+    @include font( $font-weight-medium, 14px, 21px ); // sortby , 1-48 of over 50,000 results for “Contacts”
+}
+@mixin font-4-medium {
+    @include font( $font-weight-medium, 20px, 29px ); // Member Main filter selected value
+}
+
+
+// toolbar style
+.list-toolbar {
+    .btn-icon i {
+        // font-size: 1.4rem;
+    }
+    .list-toolbar-dropdown-sort-label {
+        @include font-3-medium();
+    }
+    .list-toolbar-dropdown-filter-selectedItem {
+        @include font-4-medium();
+    }
+    .list-toolbar-dropdown-sort-selectedItem {
+        @include font-3-normal();
+    }
+    .list-toolbar-dropdown {
+        .list-toolbar-dropdown-item {
+            .list-toolbar-dropdown-item-icon {
+                @include font-2-normal();
+            }
+            .list-toolbar-dropdown-item-value {
+                @include font-2-normal();
+            }
+        }
+    }
+    .list-toolbar-search {
+        width: 300px;
+        @include font-1-normal()
+    }
+    .list-toolbar-divider {
+        width:2px;
+        height:38px;
+        @include dashed-border('left');
+    }
+    .list-toolbar-btn {
+        @include font-2-normal();
+    }
+    .list-toolbar-data-summary {
+        @include font-3-medium();
+    }
+}

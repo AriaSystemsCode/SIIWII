@@ -1,0 +1,352 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+                            <span>{{l("AppTenantsActivitiesLog")}}</span>
+                        </h3>
+                        <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                        <span class="kt-subheader__desc">
+                            {{l("AppTenantsActivitiesLogsHeaderInfo")}}
+                        </span>
+                    </div>
+                    <div class="kt-subheader__toolbar">
+                        <div class="kt-subheader__wrapper">
+            				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+                <button *ngIf="isGranted('Pages.Administration.AppTenantsActivitiesLogs.Create')" (click)="createAppTenantsActivitiesLog()" 
+            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantsActivitiesLog")}}</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <form class="kt-form" autocomplete="off">
+                    <div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-12">
+                                <div class="form-group m-form__group align-items-center">
+                                    <div class="input-group">
+                                        <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
+                                        <span class="input-group-btn">
+                                            <button (click)="getAppTenantsActivitiesLogs()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label  for="MinActivityDateFilter">{{l("ActivityDateRange")}}</label>
+									<div class="input-group">
+                                        <input class="form-control m-input" id="MinActivityDateFilter" name="MinActivityDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MinValue')}}" [(ngModel)]="minActivityDateFilter">
+			                            <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
+                                        <input class="form-control m-input" id="MaxActivityDateFilter" name="MaxActivityDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MaxValue')}}" [(ngModel)]="maxActivityDateFilter">
+                                        <span class="input-group-btn">
+                                            <button (click)="getAppTenantsActivitiesLogs()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                        </span>
+									</div>
+                                </div>
+                            </div>
+                        </div>
+						 <div class="row" [hidden]="!advancedFiltersAreShown">
+						 	<div class="col-md-12">
+						         <div class="kt-separator kt-separator--border-dashed"></div>
+						     </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinUnitsFilter">{{l("MinMax")}} {{l("Units")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinUnitsFilter" [(ngModel)]="minUnitsFilter" placeholder="{{l('MinValue')}}" name="minUnitsFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxUnitsFilter" placeholder="{{l('MaxValue')}}" name="maxUnitsFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinUnitPriceFilter">{{l("MinMax")}} {{l("UnitPrice")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinUnitPriceFilter" [(ngModel)]="minUnitPriceFilter" placeholder="{{l('MinValue')}}" name="minUnitPriceFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxUnitPriceFilter" placeholder="{{l('MaxValue')}}" name="maxUnitPriceFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinAmountFilter">{{l("MinMax")}} {{l("Amount")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinAmountFilter" [(ngModel)]="minAmountFilter" placeholder="{{l('MinValue')}}" name="minAmountFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxAmountFilter" placeholder="{{l('MaxValue')}}" name="maxAmountFilter" />
+									</div>
+                                </div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="BilledFilterSelect">{{l("Billed")}}</label>
+								<select class="form-control" name="BilledFilter" id="BilledFilterSelect" [(ngModel)]="billedFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>	
+							<div class="col-md-3">
+								<label for="IsManualFilterSelect">{{l("IsManual")}}</label>
+								<select class="form-control" name="IsManualFilter" id="IsManualFilterSelect" [(ngModel)]="isManualFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="InvoiceNumberFilter">{{l("InvoiceNumber")}}</label>
+									<input type="text" class="form-control" id="InvoiceNumberFilter" name="invoiceNumberFilter" [(ngModel)]="invoiceNumberFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label  for="MinInvoiceDateFilter">{{l("InvoiceDateRange")}}</label>
+									<div class="input-group">
+                                        <input class="form-control m-input" id="MinInvoiceDateFilter" name="MinInvoiceDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MinValue')}}" [(ngModel)]="minInvoiceDateFilter">
+			                            <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
+                                        <input class="form-control m-input" id="MaxInvoiceDateFilter" name="MaxInvoiceDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MaxValue')}}" [(ngModel)]="maxInvoiceDateFilter">
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="SycServiceCodeFilter">({{l("SycService")}}) {{l("Code")}}</label>
+									<input type="text" class="form-control" id="SycServiceCodeFilter" name="sycServiceCodeFilter" [(ngModel)]="sycServiceCodeFilter">
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="SycApplicationNameFilter">({{l("SycApplication")}}) {{l("Name")}}</label>
+									<input type="text" class="form-control" id="SycApplicationNameFilter" name="sycApplicationNameFilter" [(ngModel)]="sycApplicationNameFilter">
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="AppTransactionCodeFilter">({{l("AppTransaction")}}) {{l("Code")}}</label>
+									<input type="text" class="form-control" id="AppTransactionCodeFilter" name="appTransactionCodeFilter" [(ngModel)]="appTransactionCodeFilter">
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="SycPlanNameFilter">({{l("SycPlan")}}) {{l("Name")}}</label>
+									<input type="text" class="form-control" id="SycPlanNameFilter" name="sycPlanNameFilter" [(ngModel)]="sycPlanNameFilter">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-12">
+                                <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row align-items-center">
+                    <!--<Primeng-Datatable-Start>-->
+                    <div class="primeng-datatable-container col-12"
+                         [busyIf]="primengTableHelper.isLoading">
+                        <p-table #dataTable
+                                     (onLazyLoad)="getAppTenantsActivitiesLogs($event)"
+                                     [value]="primengTableHelper.records"
+                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                     [paginator]="false"
+                                     [lazy]="true"
+                                     [scrollable]="true"
+                                     ScrollWidth="100%"
+                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [resizableColumns]="primengTableHelper.resizableColumns">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 130px" [hidden]="!isGrantedAny('Pages.Administration.AppTenantsActivitiesLogs.Edit', 'Pages.Administration.AppTenantsActivitiesLogs.Delete')">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="tenantFK.name">
+                                        {{l('TenantName')}}
+                                        <p-sortIcon field="sycApplicationName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="serviceFk.code">
+                                        {{l('SycServiceCode')}}
+                                        <p-sortIcon field="sycServiceCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="activityDate">
+                                        {{l('ActivityDate')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.activityDate"></p-sortIcon>
+                                    </th>
+
+                                    <th style="width: 150px" pSortableColumn="transactionFk.code">
+                                        {{l('AppTransactionCode')}}
+                                        <p-sortIcon field="appTransactionCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="units">
+                                        {{l('Units')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.units"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="unitPrice">
+                                        {{l('UnitPrice')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.unitPrice"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="amount">
+                                        {{l('Amount')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.amount"></p-sortIcon>
+                                    </th>
+                                 
+                                                                    
+                                    <th style="width: 150px" pSortableColumn="planFk.name">
+                                        {{l('SycPlanName')}}
+                                        <p-sortIcon field="sycPlanName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="applicationFk.name">
+                                        {{l('SycApplicationName')}}
+                                        <p-sortIcon field="sycApplicationName"></p-sortIcon>
+                                    </th>  
+                                    <th style="width: 150px" pSortableColumn="billed">
+                                        {{l('Billed')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.billed"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="isManual">
+                                        {{l('IsManual')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.isManual"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="invoiceNumber">
+                                        {{l('InvoiceNumber')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.invoiceNumber"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="invoiceDate">
+                                        {{l('InvoiceDate')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.invoiceDate"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="notes">
+                                        {{l('Notes')}}
+                                        <p-sortIcon field="appTenantsActivitiesLog.notes"></p-sortIcon>
+                                    </th>
+                                </tr>
+                            </ng-template>                           
+							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                <tr>
+                                    <td style="width: 130px"
+                                        [hidden]="!isGrantedAny('Pages.Administration.AppTenantsActivitiesLogs.Edit', 'Pages.Administration.AppTenantsActivitiesLogs.Delete')">
+                                       <div class="btn-group dropdown" dropdown container="body">
+                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
+                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
+                                            </button>
+												<ul class="dropdown-menu"  *dropdownMenu>
+												<li>
+													<a href="javascript:;" 
+														(click)="viewAppTenantsActivitiesLogModal.show(record)">{{l('View')}}</a>
+												</li>
+												<li>
+                                                <a href="javascript:;" *ngIf="record.appTenantsActivitiesLog.isManual && permission.isGranted('Pages.Administration.AppTenantsActivitiesLogs.Edit')" 
+														(click)="createOrEditAppTenantsActivitiesLogModal.show(record.appTenantsActivitiesLog.id)">{{l('Edit')}}</a>												
+                                                </li>
+												<li>
+											        <a  href="javascript:;" *ngIf="record.appTenantsActivitiesLog.isManual && permission.isGranted('Pages.Administration.AppTenantsActivitiesLogs.Delete')"
+														(click)="deleteAppTenantsActivitiesLog(record.appTenantsActivitiesLog)">{{l('Delete')}}</a>
+												</li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td style="width:150px">
+                                        <span class="p-column-title"> {{l('TenantName')}}</span>
+                                        {{record.tenancyName}}
+                                    </td>                                    
+                                    <td style="width:150px">
+												<span class="p-column-title"> {{l('SycServiceCode')}}</span>
+												{{record.sycServiceCode}}
+											</td>
+                                            <td style="width:150px">
+                                                <span class="p-column-title"> {{l('ActivityDate')}}</span>
+                                                <span *ngIf="record.appTenantsActivitiesLog.activityDate">
+                                                    {{record.appTenantsActivitiesLog.activityDate |  momentFormat:'L' }}
+                                                </span>
+                                                <span *ngIf="!record.appTenantsActivitiesLog.activityDate">-</span>
+                                            </td>                                            
+                                   
+                                    <td style="width:150px">
+												<span class="p-column-title"> {{l('AppTransactionCode')}}</span>
+												{{record.appTransactionCode}}
+											</td>
+                                   
+                             
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Units')}}</span>
+											{{record.appTenantsActivitiesLog.units}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('UnitPrice')}}</span>
+											{{record.appTenantsActivitiesLog.unitPrice}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Amount')}}</span>
+											{{record.appTenantsActivitiesLog.amount}}
+										</td>
+                                   
+                                        
+                            <td style="width:150px">
+                                        <span class="p-column-title"> {{l('SycPlanName')}}</span>
+                                        {{record.sycPlanName}}
+                                    </td> 
+                                    <td style="width:150px">
+                                        <span class="p-column-title"> {{l('SycApplicationName')}}</span>
+                                        {{record.sycApplicationName}}
+                                    </td>               
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('Billed')}}</span>
+                                        <div *ngIf="record.appTenantsActivitiesLog.billed" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appTenantsActivitiesLog.billed" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>                        
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('IsManual')}}</span>
+                                        <div *ngIf="record.appTenantsActivitiesLog.isManual" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appTenantsActivitiesLog.isManual" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('InvoiceNumber')}}</span>
+											{{record.appTenantsActivitiesLog.invoiceNumber}}
+										</td>
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('InvoiceDate')}}</span>
+                                        <span *ngIf="record.appTenantsActivitiesLog.invoiceDate">
+											{{record.appTenantsActivitiesLog.invoiceDate |  momentFormat:'L' }}
+                                        </span>
+                                        <span *ngIf="!record.appTenantsActivitiesLog.invoiceDate">-</span>
+                                    </td>
+
+                                </tr>
+                               
+                            </ng-template>
+                        </p-table>
+						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            {{l('NoData')}}
+                        </div>
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getAppTenantsActivitiesLogs($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
+                            </p-paginator>
+                            <span class="total-records-count">
+                                {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
+                            </span>
+                        </div>
+                    </div>
+                    <!--<Primeng-Datatable-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditAppTenantsActivitiesLogModal #createOrEditAppTenantsActivitiesLogModal (modalSave)="getAppTenantsActivitiesLogs()"></createOrEditAppTenantsActivitiesLogModal>    
+    <viewAppTenantsActivitiesLogModal #viewAppTenantsActivitiesLogModal></viewAppTenantsActivitiesLogModal>
+    
+  </div>
+</div>

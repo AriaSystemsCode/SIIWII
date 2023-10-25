@@ -1,0 +1,39 @@
+<a dropdown class="header__topbar-item dropdown" *ngIf="languages.length > 1">
+    <div
+        dropdownToggle
+        class="dropdown-toggle"
+        data-toggle="dropdown"
+        data-offset="30px,0px"
+        aria-expanded="true"
+        aria-haspopup="true"
+    >
+        <span class="">
+            <i  [class]="currentLanguage.icon"></i>
+        </span>
+    </div>
+    <div
+        *dropdownMenu
+        class="
+            dropdown-menu
+            dropdown-menu-fit
+            dropdown-menu-right
+            dropdown-menu-anim
+            dropdown-menu-top-unround
+            dropdown-menu-lg
+        "
+        [attr.aria-label]="l('Languages')"
+    >
+        <ul class="kt-nav kt-margin-t-10 kt-margin-b-10">
+            <li class="kt-nav__item" *ngFor="let language of languages">
+                <a class="kt-nav__link" (click)="changeLanguage(language)">
+                    <span class="kt-nav__link-icon">
+                        <i  [class]="language.icon"></i>
+                    </span>
+                    <span class="kt-nav__link-text">
+                        {{ language.displayName }}
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</a>

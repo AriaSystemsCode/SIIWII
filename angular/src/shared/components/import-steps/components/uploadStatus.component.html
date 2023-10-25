@@ -1,0 +1,54 @@
+
+ <!-- Iteration-8 -->
+ <div bsModal #uploadStatus="bs-modal" class="modal  fade" tabindex="-1" role="dialog"
+  aria-labelledby="uploadStatus" aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-lg modalCenter">
+    <div class="modal-content">
+        <div class="border-bottom">
+       <div class="row pt-4 pl-4 pb-1 pr-4"> 
+           <div class="col-8">
+            <h4 class="font-weight-bold pb-2">{{(ImportTypes[importType]+"uploadstatus") | localize}}</h4>
+
+     <h5> {{("Total"+ImportTypes[importType]) | localize}} <span  class="font-weight-bold passed">{{"Passed:" | localize}} {{uploadingResult?.totalPassedRecords}}</span>,
+        {{"Totaldata" | localize}} <span  class="font-weight-bold failed">{{"Failed:" | localize}}  {{uploadingResult?.totalFailedRecords}}</span>
+      </h5> 
+</div>
+<div class="col-4 text-right">
+    <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="askToClose()"/>
+    </div>
+</div> 
+
+<div class="row pl-5 pb-3" *ngIf="uploadingResult?.totalFailedRecords > 0"> 
+  <a class="_download font-weight-bold" (click)="downloadLogFile()"> {{"DownloadtheImportlogfile" | localize}} </a>
+</div>
+
+</div>
+<div class="modal-body thin-scroll p-0 pl-4 uploadStatusContainer">
+    <ng-container *ngIf="uploadingResult">
+<div *ngFor="let record of uploadingResult.excelRecords" class="border-bottom modal-body pb-4 row">
+        <div class="col-10">
+      <h5>{{record.recordType}} {{record.code}} </h5> 
+      <h6>{{record.name}} </h6>
+          <span class="{{record.status| uppercase}}STATUS font-weight-bold"> {{record.errorMessage}}</span>
+     
+</div>
+
+<div class="Status ml-3   pt-2 text-center">
+  <img src="../../../../assets/accounts/importAccounts/{{record.status | uppercase}}.svg" class="pr-2"/>
+  <span class="{{record.status| uppercase}}STATUS font-weight-bold">{{record.status+"STATUS"|uppercase|localize}}  </span>
+  </div>
+</div>  
+</ng-container>  
+</div>
+
+<div class="pb-4 pl-5 border-top pt-4 mt-4">
+<button class="btn btn-primary  Next-Btn" (click)="GoNextstep()" >{{"Next" | localize}}</button>
+</div>
+
+</div>
+</div>
+</div>
+ 
+
+  <!-- Iteration-8 -->
+ 

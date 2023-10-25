@@ -1,0 +1,26 @@
+<div
+    *ngIf="advSliderItems && advSliderItems.length > 0"
+    class="sliderContainer mb-5 ml-auto mr-auto"
+>
+    <p-carousel
+        [value]="advSliderItems"
+        [numVisible]="numVisible"
+        [numScroll]="numScroll"
+        [circular]="false"
+        [autoplayInterval]="interval"
+        class="sliderImages hiddenIndicator"
+    >
+        <ng-template let-img pTemplate="item">
+            <div class="pt-2" #ads>
+                <div class="d-block">
+                    <app-image-display
+                        [image]="img ? (attachmentBaseUrl + '/' +  img) : '../../../../assets/placeholders/_logo-placeholder.png'"
+                        [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                        [staticWidth]="ads.offsetWidth"
+                    >
+                    </app-image-display>
+                </div>
+            </div>
+        </ng-template>
+    </p-carousel>
+</div>

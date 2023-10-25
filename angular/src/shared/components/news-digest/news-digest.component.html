@@ -1,0 +1,91 @@
+<!-- display news digest  -->
+<!-- UI  https://lucid.app/lucidchart/fd88fed9-b721-4335-9cca-d7745c6ad793/edit?invitationId=inv_6b2ad9a9-24b8-46f2-8928-b7feec4289d3&page=0_0# -->
+
+<div *ngIf="itemsToShow" class="bg-white container mb-3 mt-5 mt-lg-0  slidesContainer upCommingContainer thin-scroll">
+    <div class="row">
+    <div class="justify-content-between ml-3 mr-3 mt-3 row w-100">
+        <div>
+            <h5 class="font-weight-bold">
+                {{ "NewsDigest" | localize }}
+            </h5>
+        </div>
+        <div class="text-right nd-sm-sidebars d-block">
+            <a [routerLink]="newsPageURL" routerLinkActive="header-link-active">
+                {{ "Seeall" | localize }}</a>
+        </div>
+    </div>
+    <!-- loop to display News Digest, each in one row, as image and beside post by and post date -->
+    <div class="m-auto w-100 h-100">
+        <div *ngFor="let item of items; let i = index" class="align-items-center justify-content-around m-2 ng-star-inserted row w-100 nd-sm-sidebars d-flex">
+            <div class="single-item row w-100 align-items-center">
+                <!-- display top post image  with link to the post popup -->
+                <div class="col">
+                    <img *ngIf="item?.entityObjectTypeCode!='SINGLEVIDEO' && item?.entityObjectTypeCode!='NEWSDIGEST'"
+                        class="small-image" [src]="attachmentBaseUrl + '/'  + item?.attachmentsURLs[0]" alt=""
+                        (click)="ShowViewPost(item?.appPost.id)"
+                        onerror="this.src='../../../../../assets/placeholders/ranking-placeholder.png'" />
+
+                    <video *ngIf="item?.entityObjectTypeCode=='SINGLEVIDEO' || item?.entityObjectTypeCode=='NEWSDIGEST'"
+                        (click)="ShowViewPost(item?.appPost.id)"
+                        [attr.src]="attachmentBaseUrl + '/' + item?.attachmentsURLs[0]" class="small-image"></video>
+
+                </div>
+                <!-- display top post by  with link to the post popup -->
+                <div class="single-item-body col" [ngClass]="true ? '' : 'd-flex flex-row'">
+
+                    <div class="text-blue text-underline">
+
+                        <a href="javascript:;"
+                            (click)="ShowViewPost(item?.appPost.id)">{{item?.appPost.description | textSubstring: 12}}</a>
+                    </div>
+                    <div>
+                    
+                            <h6 style="white-space: nowrap">
+                            {{item?.timePassedFromCreation}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-sm-sidebars d-none h-100 w-100">
+
+            <p-carousel class="hiddenDotsIndicator hiddenIndicator  slidersContainerCarousel  h-100 w-100"
+                [numVisible]="1.5" [value]="items" [circular]="false">
+                <ng-template let-item pTemplate="item">
+                    <div [ngClass]="items.length >1 ? 'slide-md-Section' : 'slide-sm-Section'">
+
+                        <img *ngIf="item?.entityObjectTypeCode!='SINGLEVIDEO' && item?.entityObjectTypeCode!='NEWSDIGEST'"
+                            [ngClass]="items.length >1 ? 'slide-medium-image' : 'slide-small-image'"
+                            [src]="attachmentBaseUrl + '/'  + item?.attachmentsURLs[0]" alt=""
+                            (click)="ShowViewPost(item?.appPost.id)"
+                            onerror="this.src='../../../../../assets/placeholders/UpcomingEvents.png'" />
+
+                        <video
+                            *ngIf="item?.entityObjectTypeCode=='SINGLEVIDEO' || item?.entityObjectTypeCode=='NEWSDIGEST'"
+                            (click)="ShowViewPost(item?.appPost.id)"
+                            [attr.src]="attachmentBaseUrl + '/' + item?.attachmentsURLs[0]"
+                            [ngClass]="items.length >1 ? 'slide-medium-image' : 'slide-small-image'"></video>
+
+                        <div class="slide-single-item-body pt-3">
+                            <h5>
+                                <a class="text-black" href="javascript:;"
+                                    (click)="ShowViewPost(item?.appPost.id)">{{item?.appPost.description |
+                                    textSubstring: 10 }} ... </a>
+                            </h5>
+                            <span>
+                                <a class="text-black" href="javascript:;" (click)="ShowViewPost(item?.appPost.id)">
+                                    {{item?.timePassedFromCreation | textSubstring: 20}}</a>
+                            </span>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-carousel>
+
+        </div>
+    </div>
+    </div>
+</div>
+<!-- link to the post popup view chield-->
+<div *ngIf="!itemsToShow" class="bg-white container mb-3 mt-lg-5 p-0 slidesContainer noslidedata">
+    <img class="small-image" src="" alt="" onerror="this.src='../../../../../assets/placeholders/NoNews.png'" />
+</div>

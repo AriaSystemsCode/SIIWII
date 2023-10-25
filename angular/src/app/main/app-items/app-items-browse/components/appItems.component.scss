@@ -1,0 +1,52 @@
+@import "../../../../../assets/styles/base/variables";
+
+.app-items-container{
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 1200px;
+    width: 100%;
+    // max-height: 100%;
+    // min-height: 800px;
+}
+
+
+.thin-scroll::-webkit-scrollbar, .p-table-scrollable-body::-webkit-scrollbar {
+    width: 15px;
+    height: 10px;
+}
+.thin-scroll::-webkit-scrollbar, .p-table-scrollable-body::-webkit-scrollbar {
+    width: 10px;
+    height: 6px;
+}
+
+.selection-bar {
+    gap: 20px;
+    background-color: $purple-dark!important;
+    position: fixed;
+    z-index: 2;
+    top: 70px;
+    .h4 {
+        color: $white;
+        margin: 0;
+    }
+    .selection-bar-actions {
+        padding: 5px 15px;
+        border-radius: 20px;
+        gap: 20px;
+        .actions {
+            gap: 45px;
+        }
+        button {
+            padding: 4px 8px;
+            font-weight: 600;
+            &.btn-primary{
+                background-color: $purple-dark!important;
+                border-color: $white!important;
+            }
+        }
+    }
+}
+
+.importIcons {
+    width: 30px;
+}

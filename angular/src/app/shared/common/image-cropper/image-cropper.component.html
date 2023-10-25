@@ -1,0 +1,92 @@
+<div class="d-flex flex-column justify-content-between">
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">{{title}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row pt-3 pb-3" *ngIf="!noOptions">
+            <div class="col-6 mb-3">
+                <div class="row">
+                    <div class="col-4">{{ "Rotate" | localize }}:</div>
+                    <div class="col-4">
+                        <button class="btn-buttonYes  pb-1 pl-3 pr-3 pt-1" (click)="rotateLeft()">{{ "left" | localize }}</button>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn-buttonYes  pb-1 pl-3 pr-3 pt-1" (click)="rotateRight()">{{ "right" | localize }}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 mb-3">
+                <div class="row">
+                    <div class="col-4">{{ "Flip" | localize }}:</div>
+                    <div class="col-4">
+                        <button class="btn-buttonYes  pb-1 pl-3 pr-3 pt-1" (click)="flipHorizontal()">{{ "HZ" | localize }}</button>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn-buttonYes  pb-1 pl-3 pr-3 pt-1" (click)="flipVertical()">{{ "VC" | localize }}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 mb-3">
+                <div class="row">
+                    <div class="col-4"> {{ "Rotate" | localize }}(deg):
+                        <input *ngIf="transform" [(ngModel)]="transform.rotate" placeholder="Rotation" type="number" (keyup)="changeTransformRef()" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 mb-3">
+                <div class="row">
+                    <div class="col-4">{{ "Zoom" | localize }}:</div>
+                    <div class="col-4">
+                        <button class="btn-buttonYes  pb-1 pl-3 pr-3 pt-1" (click)="zoomOut()">-</button>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn-buttonYes  pb-1 pl-3 pr-3 pt-1" (click)="zoomIn()">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="row">
+                    <div class="col">
+                        <button class="btn-buttonYes  pb-1 pl-3 pr-3 pt-1" (click)="toggleContainWithinAspectRatio()">{{containWithinAspectRatio?'Fill Aspect Ratio':'Contain Within Aspect Ratio'}}</button>
+                    </div>
+                    <div class="col">
+                        <button class="btn-buttonYes  pb-1 pl-3 pr-3 pt-1" (click)="resetImage()">{{ "Resetimage" | localize }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" *ngIf="transform">
+            <div [ngClass]="!noOptions? 'col-6' : 'col-12'">
+                <image-cropper
+                    #imageCropper
+                    [imageChangedEvent]="originalFileChangeEvent"
+                    [maintainAspectRatio]="true"
+                    [containWithinAspectRatio]="containWithinAspectRatio"
+                    [aspectRatio]="aspectRatio"
+                    [onlyScaleDown]="true"
+                    [roundCropper]="false"
+                    [canvasRotation]="canvasRotation"
+                    [transform]="transform"
+                    [alignImage]="!noOptions?'left':'center'"
+                    [style.display]="showCropper ? null : 'none'"
+                    format="png"
+                    (imageCropped)="imageCropped($event)"
+                    (imageLoaded)="imageLoaded()"
+                    (cropperReady)="cropperReady($event)"
+                    (loadImageFailed)="loadImageFailed()"
+                ></image-cropper>
+            </div>
+            <div class="col-6 " *ngIf="!noOptions">
+                <img class="responsive-image"  [src]="croppedImageAsBase64" [style.border]="originalFileChangeEvent ? '1px solid black' : 'none'" />
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="cropDone()">{{'Apply' | localize}}</button>
+        <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">{{'Cancel' | localize}}</button>
+    </div>
+</div>

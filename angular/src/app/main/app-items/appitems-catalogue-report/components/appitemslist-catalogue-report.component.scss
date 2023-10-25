@@ -1,0 +1,53 @@
+@import '../../../../../assets/styles/base/variables';
+
+:host {
+    height: 100%;
+}
+.wizard{
+    max-height: 450px;
+    max-width: 1000px;
+    //height: 450px;
+    width: 1000px;
+}
+
+
+.kt-content {
+    max-width: 1100px;
+}
+
+
+.kt-portlet {
+    margin-top: 45px!important;
+}
+.kt-portlet.isModal{
+    margin-top: 0!important;
+}
+
+
+.fake-circle {
+    background-color: #aaaa;
+    width: 25px;
+    height: 25px;
+    display: block;
+    border-radius: 50%;
+    i {
+        color: $white-color;
+    }
+}
+
+.current-step {
+    color: $primary-color;
+    .fake-circle {
+        background-color: $primary-color;
+    }
+}
+.done-step {
+    color: $success-color;
+    .fake-circle {
+        background-color: $success-color;
+    }
+}
+input:focus
+{
+    border: 1px solid black !important;
+}

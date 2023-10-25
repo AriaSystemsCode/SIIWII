@@ -1,0 +1,51 @@
+.kt-portlet{
+    margin-top: 125px!important;
+    &.veiwMode{
+        margin-top: 10px!important;
+    }
+}
+.users-list {
+    position: relative;
+    width: 350px;
+    height: 30px;
+    img {
+        position: absolute;
+        top: 10px;
+        height: 100%;
+        border-radius: 50%;
+    }
+}
+
+
+
+.items-count-icon ,
+.users-count-icon {
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    border-radius: 50%;
+}
+.users-count-icon {
+    top: 9px;
+    background-color: #F9652A;
+    position: absolute;
+    color: #fff;
+}
+.items-count-icon {
+    background-color: #d1ebff;
+}
+.share-sync{
+    .share{
+        background-color: transparent !important;
+        color: #610061;
+        border-color: #610061;
+    }
+    .sync{
+        background-color: #03BE42 !important;
+        border-color: #03BE42 !important;
+    }
+}

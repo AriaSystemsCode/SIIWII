@@ -1,0 +1,53 @@
+.modalCenter{
+    margin: 0 !important;
+    top: 50% !important;
+    /* position: absolute !important; */
+    left: 50% !important;
+    transform: translate(-50%,-50%) !important;
+}
+.modal-content
+{
+    width: 600px !important;
+}
+.divData
+{
+background: #F4F4F4 0% 0% no-repeat padding-box;
+border-radius: 6px;
+opacity: 1;
+height: 55px;
+width: 258px;
+}
+
+.subdivData
+{    
+    top: 40%;
+    left: 20%;
+}
+.passed
+{
+    color: #009901;
+}
+.failed
+{
+    color: #BD0100;
+}
+
+.filter-group {
+    overflow: hidden !important;
+}
+._Btn
+{
+    width: 177px;
+    height: 45px;
+    border-radius: 6px;
+    opacity: 1;
+    cursor: pointer;
+    border: 1px solid #707070;
+
+}
+
+._Btn:hover
+{
+    background: #509AF7;
+    color: white;
+}

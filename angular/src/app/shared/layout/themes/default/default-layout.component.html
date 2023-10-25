@@ -1,0 +1,139 @@
+<div [@routerTransition]>
+    <div id="kt_header_mobile" class="kt-header-mobile {{currentTheme.baseSettings.header.mobileFixedHeader ? 'kt-header-mobile--fixed':''}}">
+        <div class="kt-header-mobile__logo">
+            <a routerLink="/" target="_blank">
+                <!-- <img *ngIf="!appSession.tenant || !appSession.tenant.logoId" [src]="defaultLogo" alt="logo" height="28" /> -->
+                <!-- <img *ngIf="appSession.tenant && appSession.tenant.logoId" [src]="remoteServiceBaseUrl + '/TenantCustomization/GetTenantLogo?skin=' + currentTheme.baseSettings.menu.asideSkin + '&tenantId=' + appSession.tenant.id + '&id=' + appSession.tenant.logoId" alt="logo" height="38" /> -->
+            </a>
+        </div>
+        <div class="kt-header-mobile__toolbar">
+            <button class="kt-header-mobile__toggler kt-header-mobile__toggler--left" id="kt_aside_mobile_toggler">
+                <span></span>
+            </button>
+            <button ktToggle [options]="userMenuToggleOptions" class="kt-header-mobile__topbar-toggler" id="kt_header_mobile_topbar_toggler">
+                <i class="flaticon-more"></i>
+            </button>
+        </div>
+    </div>
+    <div class="kt-grid kt-grid--hor kt-grid--root">
+        <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
+            <!-- BEGIN: Left Aside -->
+            <button class="kt-aside-close" id="kt_aside_close_btn">
+                <i class="la la-close" [attr.aria-label]="l('Close')"></i>
+            </button>
+            <div id="kt_aside" ktOffcanvas [options]="menuCanvasOptions" class="kt-aside kt-aside--{{currentTheme.baseSettings.menu.fixedAside ? 'fixed':'static'}} kt-grid__item kt-grid kt-grid--desktop kt-grid--hor-desktop">
+                <!-- BEGIN: Brand -->
+                <default-brand></default-brand>
+                <div class="kt-aside__brand-logo kt-aside__brand-name pr-4 text-center">
+                    <p style="font-size: 16px;font-weight: 600;color: #464E5F;padding-bottom: 0;margin: 0;"><a>{{accountSummary?.name}}</a></p>
+                    <p style="font-size: 12px;font-weight: 400;color: #464E5F;padding-bottom: 0;margin: 0;text-align: center;"><a>{{accountSummary?.tradeName}}</a></p>
+                </div>
+                <!-- END: Brand -->
+                <!-- BEGIN: Aside Menu -->
+                <div id="kt_aside_menu_wrapper" class="kt-aside-menu-wrapper kt-grid__item kt-grid__item--fluid">
+                    <side-bar-menu></side-bar-menu>
+                </div>
+                <!-- END: Aside Menu -->
+            </div>
+            <!-- END: Left Aside -->
+            <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor kt-wrapper" id="kt_wrapper">
+                <!-- BEGIN: Header -->
+                <div class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
+
+                      <!-- <div class=" mb-3" style="    display: -webkit-box;
+                      display: -ms-flexbox;
+                      display: flex;
+                      -webkit-box-align: stretch;
+                      -ms-flex-align: stretch;
+                      align-items: stretch;
+                      margin: 0;">
+
+                      </div> -->
+                    <div class="kt-header-menu-wrapper" id="kt_header_menu_wrapper"></div>
+                    <!-- <div class="search-bar" style="width: 43%;
+                    z-index: 99999999999999;
+                    z-index: 99999999999999;
+                    position: relative;
+                    left: 4%;
+                    top: 22%;">
+                        <div class="input-group mb-3" style="">
+                            <div class="input-group-prepend" style="background-color: #EDEDED;height: 39px;width: 77px;
+                            border-radius: 5px;">
+
+                                <div class="btn-group">
+                                    <button class="btn btn-secondary btn-sm dropdown-toggle" style="width:77px;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                      All
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#">Action</a>
+                                        <a class="dropdown-item" href="#">Another action</a>
+                                        <a class="dropdown-item" href="#">Something else here</a>
+                                      </div>
+                                  </div>
+                            </div>
+                            <input type="text" class="form-control" style="background-color: #F3F6F9;height: 39px;" placeholder="I am looking for…">
+                            <div class="input-group-append p-2" style="background-color: #3699FF;height: 39px;    width: 8%;
+                            border-radius: 4px">
+                              <img src="assets/profile/tools-and-utensils-white.svg" style="margin: 0 auto;" >
+                            </div>
+
+                          </div>
+                          <div *ngIf="false" class="save-icon" style="    position: absolute;
+                          width: 32px;
+                          height: 32px;
+                          padding: 5px 0;
+                          text-align: center;
+                          margin-left: 10px;
+                          border-radius: 5px;
+                          background-color: #F3F6F9;
+                          cursor: pointer;
+                          left: 100%;
+                          /* background-color: antiquewhite; */
+                          top: 4%;">
+                            <img src="assets/profile/interface.svg">
+
+                        </div>
+                    </div> -->
+
+                    <topbar [displayMarketPlace]="displayMarketPlace"></topbar>
+
+                </div>
+                <div class="bg-white p-3 align-items-center justify-content-center market-place-bar mb-5 w-100" *ngIf="false" [ngClass]=" displayMarketPlace ? 'd-flex' : 'd-none' ">
+                    <div class="d-flex">
+                        <a *ngIf="('Pages.Marketplace.Accounts' | permission)" class="align-items-center d-flex justify-content-center btn btn-grey mr-2" [routerLink]="['/app/main/marketplace/accounts']" routerLinkActive="header-link-active" >
+                            <i class="fas fa-briefcase"></i>
+                            <div>{{ "Accounts" | localize }}</div>
+                        </a>
+                        <a *ngIf="('Pages.Marketplace.Products' | permission)" class="align-items-center d-flex justify-content-center btn btn-grey mr-2" [routerLink]="['/app/main/marketplace/products']" routerLinkActive="header-link-active">
+                            <i class="fas fa-cart-arrow-down"></i>
+                            <div>{{ "Products" | localize }}</div>
+                        </a>
+                        <a *ngIf="('Pages.Marketplace.Contacts' | permission)" class="align-items-center d-flex justify-content-center btn btn-grey" [routerLink]="['/app/main/marketplace/contacts']" routerLinkActive="header-link-active">
+                            <i class="far fa-user-circle"></i>
+                            <div>{{ "Contacts" | localize }}</div>
+                        </a>
+                    </div>
+                </div>
+                <!-- END: Header -->
+                <div class="d-lg-none p-3 mobile-subscription-warning" *ngIf="subscriptionStatusBarVisible()">
+                    <div 
+                         [ngClass]="{'hidden': !subscriptionStatusBarVisible()}" class="d-inline-block d-sm-none mt-3 ml-3">
+                        <span *ngIf="appSession.tenant.isInTrialPeriod && !subscriptionIsExpiringSoon()" [innerHTML]="getTrialSubscriptionNotification()"></span>
+                        <a *ngIf="subscriptionIsExpiringSoon()" routerLink="/app/admin/subscription-management">
+                            <span *ngIf="subscriptionIsExpiringSoon() && appSession.tenant.isInTrialPeriod"><i class="fa fa-exclamation-circle"></i> {{getExpireNotification("TrialExpireNotification")}}</span>
+                            <span *ngIf="subscriptionIsExpiringSoon() && !appSession.tenant.isInTrialPeriod"><i class="fa fa-exclamation-circle"></i> {{getExpireNotification("SubscriptionExpireNotification")}}</span>
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+
+                    <router-outlet></router-outlet>
+                </div>
+                <footer-bar></footer-bar>
+            </div>
+        </div>
+    </div>
+    <kt-scroll-top></kt-scroll-top>
+</div>

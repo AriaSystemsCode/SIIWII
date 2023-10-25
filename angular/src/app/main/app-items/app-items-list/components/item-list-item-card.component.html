@@ -1,0 +1,120 @@
+<div class="single-item row" [ngClass]="class">
+    <div class="single-item-photo mr-1">
+        <img
+            class="w-100"
+            [src]="attachmentBaseUrl + '/' + item?.imageURL"
+            alt=""
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+        />
+    </div>
+    <div class="single-item-body col"
+    [ngClass]="singleItemPerRowMode ? '' : 'd-flex flex-row'"
+    >
+        <div class="row h-100">
+            <div
+                class="pt-3"
+                [ngClass]="singleItemPerRowMode ? 'col-md-8' : 'col-md-7'"
+            >
+                <h3 class="m-0 mb-2 text-dark">
+                    {{ item.itemName }}
+                </h3>
+                <p class="text-dark mb-2">
+                    {{
+                        item.itemDescription
+                        | textSubstring: 120
+                    }}
+                </p>
+                <div>
+                    <p class="text-dark mb-2" *ngIf="item?.appItemsListItemVariations">
+                        <ng-container *ngFor="let extraAttr of variationSummary.selectedVariations | keyvalue;let last as last">
+                            <b class="extraAttr-label">{{extraAttr?.key | titlecase }}:</b>
+                            {{ extraAttr?.value | arrayToString  }}
+                            <span *ngIf="!last">  |  </span>
+                        </ng-container>
+                    </p>
+                </div>
+            </div>
+            <div
+                class="d-flex flex-column justify-content-around"
+                [ngClass]="singleItemPerRowMode ? 'col-md-4' : 'col-md-5'"
+            >
+                <div class="align-items-end d-flex flex-column justify-content-end">
+                    <!-- <p class="m-0 p-0 mr-2">
+                        {{"ItemAdded"|localize}} July 16, 2020
+                        {{ ("ItemAdded" | localize) + " " + (item.creationTime | date : 'longDate') }}
+                    </p> -->
+                    <div
+                        class="btn-group dropdown"
+                        dropdown
+                        container="body"
+                        placement="bottom right"
+                        *ngIf="!viewMode"
+                    >
+                        <button
+                            class="dropdown-toggle btn btn-sm btn-action"
+                            dropdownToggle
+                            type="button"
+                        ></button>
+                        <ul
+                            class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                            *dropdownMenu
+                        >
+                            <li>
+                                <a href="javascript:;" *ngIf="item.state == StateEnum.ToBeRemoved" (click)="markItemAs(StateEnum.ActiveOrEmpty)">{{
+                                    "Undo" | localize
+                                }}</a>
+                                <a href="javascript:;" *ngIf="item.state == StateEnum.ToBeAdded" (click)="deleteItem()">{{
+                                    "Remove" | localize
+                                }}</a>
+                                <a href="javascript:;" *ngIf="item.state == StateEnum.ActiveOrEmpty" (click)="markItemAs(StateEnum.ToBeRemoved)">{{
+                                    "Remove" | localize
+                                }}</a>
+                            </li>
+                            <li >
+                                <a
+                                    href="javascript:;"
+                                    (click)="
+                                        openVariationModal()
+                                    "
+                                    >{{
+                                        ("Variation" | localize)
+                                    }}</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                    <div *ngIf="item.state != StateEnum.ActiveOrEmpty" [ngClass]="{ 'text-success':item.state == StateEnum.ToBeAdded, 'text-danger':item.state == StateEnum.ToBeRemoved }">
+                        <span [ngSwitch]="item.state">
+                            <span *ngSwitchCase="StateEnum.ToBeAdded" >{{l("DRAFT")}}</span>
+                            <span *ngSwitchCase="StateEnum.ToBeRemoved" >{{l("Removed")}}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="text-right" *ngIf="!viewMode">
+                    <button *ngIf="item.state == StateEnum.ToBeRemoved"
+                        class="btn btn-outline-primary pl-4 pr-4"
+                        (click)="markItemAs(StateEnum.ActiveOrEmpty)"
+                        type="button"
+                    >
+                        {{ "Undo" | localize }}
+                    </button>
+                    <button *ngIf="item.state == StateEnum.ToBeAdded"
+                        class="btn btn-outline-primary pl-4 pr-4"
+                        (click)="deleteItem()"
+                        type="button"
+                    >
+                        {{ "Remove" | localize }}
+                    </button>
+                    <button *ngIf="item.state == StateEnum.ActiveOrEmpty"
+                        class="btn btn-outline-primary pl-4 pr-4"
+                        (click)="markItemAs(StateEnum.ToBeRemoved)"
+                        type="button"
+                    >
+                        {{ "Remove" | localize }}
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>

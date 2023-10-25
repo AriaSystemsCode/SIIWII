@@ -1,0 +1,66 @@
+<!-- Iteration-8 -->
+
+<div bsModal #BrowseFolder="bs-modal" class="modal  fade" tabindex="-1" role="dialog" aria-labelledby="BrowseFolder"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="uploadfilecontainer m-3">
+                <label for="_input">
+                    <img src="../../../../assets/accounts/importAccounts/file-cloud.svg" /><br /><br />
+
+                    <input type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
+                        multiple />
+
+                    <h5>{{"Dropyourfolderhereorclickheretoupload" | localize}} </h5>
+                    <span *ngIf="hasImages">{{"Pleasemakesuretheimagessize5MB, Files supported :xsls,images" | localize}}</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal-lg m-auto  Download  pt-4 pb-4">
+        <div class="row align-items-baseline mb-4" *ngIf="importType==ImportTypes.Items">
+            <div class="col-2 ml-4">
+                <h6><span class="text-danger">*</span>{{ 'ProductType' | localize}}</h6>
+            </div>
+            <div class="col-7 pl-0">
+                <div class="wide-drop-down">
+                    <input type="text" [required]="true" [(ngModel)]="itemType" name="type" readonly
+                        class="form-control bg-white form-control-border-grey"
+                        placeholder="{{ 'ProductType' | localize}}">
+                </div>
+            </div>
+            <div>
+                <a class="text-primary text-underline" (click)="openSelectAppItemTypeModal()">
+                    {{ itemType ? ('Change'|localize) : ('Select'|localize) }}
+                    {{ 'the product type' | localize}}
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-1 pt-2   text-right">
+                <img src="../../../../assets/accounts/importAccounts/info.svg" />
+            </div>
+            <div class="col-6">
+                <h4>{{"Downloadthetemplatefile" | localize}} </h4>
+                <!-- <span> {{"Templatelastupdate" | localize}} {{templateDate}} {{"version"| localize}}  {{templateVersion}}</span> -->
+                <span> {{"TemplateVersion"| localize}} {{templateVersion}}</span>
+            </div>
+            <div class="col-5 pr-4 text-right">
+                <button class="btn btn-primary  Download-Btn" (click)="downloadTemplate()"
+                    [disabled]="importType==ImportTypes.Items && !itemType" [ngClass]="{
+                    disabled: importType==ImportTypes.Items && !itemType
+                }">{{"Download"| localize}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<!-- Iteration-8 -->

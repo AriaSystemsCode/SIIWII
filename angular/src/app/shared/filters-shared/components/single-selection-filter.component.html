@@ -1,0 +1,35 @@
+<div class="align-items-center d-flex justify-content-between mb-2 pr-2">
+    <h4 class="text-captitalize">{{ title }}</h4>
+    <span (click)="triggerListCollapse()" *ngIf="filterMetaData?.collapsedDisplayedListCount < filterMetaData?.listTotalCount">
+        <i
+            class="fas fa-2x text-primary"
+            [ngClass]="
+            collapseListDataCollapseButton ? 'fa-angle-up' : 'fa-angle-down'
+            "
+        ></i>
+    </span>
+</div>
+
+<div class="d-flex flex-column kt-checkbox-list d-flex filter-group thin-scroll" *ngIf="filterMetaData?.displayedList">
+    <label class="radio radio-accent radio-primary" for="{{title}}_{{item.value}}" *ngFor="let item of filterMetaData.displayedList">
+        <input type="radio"
+        class="mr-1"
+        [value]="item.value"
+        [(ngModel)]="selection"
+        name="{{title}}_{{item.value}}"
+        id="{{title}}_{{item.value}}"
+        (ngModelChange)="onSelectionChangeHandler($event)"/>
+        {{item.label}}
+    </label>
+</div>
+
+
+<div>
+    <button
+        class="btn btn-font-hover-brand ml-3"
+        (click)="showMoreListData()"
+        *ngIf="collapseListDataCollapseButton && showMoreListDataButton"
+    >
+        {{ 'showmore' | localize }} ...
+    </button>
+</div>

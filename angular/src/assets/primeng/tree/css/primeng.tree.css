@@ -1,0 +1,62 @@
+.p-tree {
+    width: 100%;
+}
+
+
+span.p-treenode-label {
+    font-family: Poppins !important;
+    line-height: 24px !important;
+    font-size: 14px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
+span.p-treenode-icon {
+    line-height: 24px !important;
+    font-size: 1.2rem !important;
+}
+
+.p-tree .p-chkbox .p-chkbox-icon {
+    margin-left: 0px;
+}
+
+.p-tree .p-treenode-children {
+    padding-left: 20px !important;
+}
+
+.hidden-tree-node {
+    display: none;
+}
+
+p-tree[selectionmode="checkbox"] .p-tree .p-tree-container .p-treenode .p-treenode-content .p-treenode-label.p-highlight {
+    background-color: transparent !important;
+    color: #333 !important;
+    font-weight: 300 !important;
+}
+
+span.p-treenode-label {
+    line-height: 18px !important;
+    font-size: 13px !important;
+}
+
+body .p-tree .p-tree-container .p-treenode .p-treenode-content .p-chkbox .p-chkbox-icon {
+    margin: -1px 0 0 -1px;
+}
+
+body .p-chkbox .p-chkbox-box .p-chkbox-icon {
+    font-size: 16px;
+}
+
+body .p-chkbox .p-chkbox-box {
+    width: 16px;
+    height: 16px;
+}
+
+body .p-chkbox {
+    width: 16px;
+    height: 16px;
+}
+
+body .p-tree .p-tree-container .p-treenode {
+    padding: 0;
+}

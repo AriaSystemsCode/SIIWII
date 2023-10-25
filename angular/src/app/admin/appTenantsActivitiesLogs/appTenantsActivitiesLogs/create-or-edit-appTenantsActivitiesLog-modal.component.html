@@ -1,0 +1,115 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #appTenantsActivitiesLogForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="appTenantsActivitiesLog.id">{{l("EditAppTenantsActivitiesLog")}}</span>
+                        <span *ngIf="!appTenantsActivitiesLog.id">{{l("CreateNewAppTenantsActivitiesLog")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+					<div class="form-group m-form__group">
+						<label for="TenancyName">{{l("Tenant")}}</label>
+						<select name="appTenantsActivitiesLog.tenantId" [(ngModel)]="appTenantsActivitiesLog.tenantId" class="form-control" >
+							<option value="">{{l("SelectTenant")}}</option>
+							<option *ngFor="let item of allTenants" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group m-form__group">
+						<label for="SycServiceCode">{{l("SycService")}}</label>
+						<select name="appTenantsActivitiesLog.serviceId" [(ngModel)]="appTenantsActivitiesLog.serviceId" class="form-control" >
+							<option value="">{{l("SelectASycService")}}</option>
+							<option *ngFor="let item of allSycServices" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group m-form__group">
+						<label for="SycApplicationName">{{l("SycApplication")}}</label>
+						<select name="appTenantsActivitiesLog.applicationId" [(ngModel)]="appTenantsActivitiesLog.applicationId" class="form-control" >
+							<option value="">{{l("SelectASycApplication")}}</option>
+							<option *ngFor="let item of allSycApplications" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group m-form__group">
+						<label for="AppTransactionCode">{{l("AppTransaction")}}</label>
+						<select name="appTenantsActivitiesLog.transactionId" [(ngModel)]="appTenantsActivitiesLog.transactionId" class="form-control" >
+							<option value="">{{l("SelectAAppTransaction")}}</option>
+							<option *ngFor="let item of allAppTransactions" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group m-form__group">
+						<label for="SycPlanName">{{l("SycPlan")}}</label>
+						<select name="appTenantsActivitiesLog.planId" [(ngModel)]="appTenantsActivitiesLog.planId" class="form-control" >
+							<option value="">{{l("SelectASycPlan")}}</option>
+							<option *ngFor="let item of allSycPlans" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+
+								<div class="form-group">
+									<label for="AppTenantsActivitiesLog_ActivityDate">{{l("ActivityDate")}}</label>
+									 <input required class="form-control m-input" #AppTenantsActivitiesLog_ActivityDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTenantsActivitiesLog.activityDate" id="AppTenantsActivitiesLog_ActivityDate" name="AppTenantsActivitiesLog_ActivityDate">
+									<validation-messages [formCtrl]="AppTenantsActivitiesLog_ActivityDate"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTenantsActivitiesLog_Units">{{l("Units")}}</label>
+									<input type="number" #AppTenantsActivitiesLog_Units="ngModel" id="AppTenantsActivitiesLog_Units" class="form-control" [(ngModel)]="appTenantsActivitiesLog.units" name="Units"   />
+									<validation-messages [formCtrl]="AppTenantsActivitiesLog_Units"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTenantsActivitiesLog_UnitPrice">{{l("UnitPrice")}}</label>
+									<input type="number" #AppTenantsActivitiesLog_UnitPrice="ngModel" id="AppTenantsActivitiesLog_UnitPrice" class="form-control" [(ngModel)]="appTenantsActivitiesLog.unitPrice" name="UnitPrice"   />
+									<validation-messages [formCtrl]="AppTenantsActivitiesLog_UnitPrice"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTenantsActivitiesLog_Amount">{{l("Amount")}}</label>
+									<input type="number" #AppTenantsActivitiesLog_Amount="ngModel" id="AppTenantsActivitiesLog_Amount" class="form-control" [(ngModel)]="appTenantsActivitiesLog.amount" name="Amount"   />
+									<validation-messages [formCtrl]="AppTenantsActivitiesLog_Amount"></validation-messages>
+								</div>
+
+								<br/><div class="m-checkbox-list">
+									<label for="AppTenantsActivitiesLog_Billed" class="kt-checkbox">
+										<input id="AppTenantsActivitiesLog_Billed" #AppTenantsActivitiesLog_Billed="ngModel" type="checkbox" name="Billed" [(ngModel)]="appTenantsActivitiesLog.billed">
+										{{l("Billed")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppTenantsActivitiesLog_Billed"></validation-messages>
+								</div>
+
+								<br/>
+
+								<div class="form-group">
+									<label for="AppTenantsActivitiesLog_InvoiceNumber">{{l("InvoiceNumber")}}</label>
+									<input type="text" #AppTenantsActivitiesLog_InvoiceNumber="ngModel" id="AppTenantsActivitiesLog_InvoiceNumber" class="form-control" [(ngModel)]="appTenantsActivitiesLog.invoiceNumber" name="InvoiceNumber"   minlength="1"  maxlength="50" />
+								    <validation-messages [formCtrl]="AppTenantsActivitiesLog_InvoiceNumber"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTenantsActivitiesLog_InvoiceDate">{{l("InvoiceDate")}}</label>
+									 <input required class="form-control m-input" #AppTenantsActivitiesLog_InvoiceDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTenantsActivitiesLog.invoiceDate" id="AppTenantsActivitiesLog_InvoiceDate" name="AppTenantsActivitiesLog_InvoiceDate">
+									<validation-messages [formCtrl]="AppTenantsActivitiesLog_InvoiceDate"></validation-messages>
+								</div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!appTenantsActivitiesLogForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

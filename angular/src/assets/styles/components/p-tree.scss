@@ -1,0 +1,83 @@
+@import '../components/scroll.scss';
+@import '../base/variables';
+// override p-tree
+
+// disable box shadow on focus effect
+
+body .p-tree .p-tree-container .p-treenode .p-treenode-content:focus {
+    box-shadow: none;
+}
+
+.narrow-tree  {
+    .p-tree{
+        padding: 0;
+        .p-tree-container{
+            padding: 0;
+        }
+    }
+}
+
+
+// tree table with custom inner template and action dropdown -- see select categories dynamic model for more info
+
+
+p-tree {
+    .p-tree {
+        border: none;
+    }
+    .p-treenode-content.p-treenode-selectable {
+        padding-top: 0!important;
+        padding-bottom: 0!important;
+        background-color: $white!important;
+        &.p-highlight .p-treenode-label {
+            background-color: $blue!important;
+            color: $white!important;
+        }
+        .p-treenode-label {
+            padding: 5px;
+            transition: all .3s ease-in-out;
+            &:hover {
+                background-color: #eaeaea!important;
+                color: $black!important;
+                transition: all .3s ease-in-out;
+            }
+        }
+        &.p-highlight .p-treenode-label {
+            background-color: #fff!important;
+            color: $black!important;
+            transition: all .3s ease-in-out;
+        }
+    }
+    .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:focus {
+        box-shadow: none!important;
+    }
+    .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:enabled:hover {
+        color: $tree-toggle-color!important;
+    }
+    .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight .p-tree-toggler{
+        color: $tree-toggle-color!important;
+    }
+}
+ p-tree[selectionmode='single'] .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label {
+    background-color: $blue !important;
+    color: $white !important;
+}
+
+
+p-tree .scrollable-tree .p-tree-container {
+    @include thin-scroll();
+}
+
+.p-tree-with-actions {
+    .p-treenode-content.p-treenode-selectable {
+        display: flex!important;
+        align-items: center!important;
+        .p-treenode-label {
+            flex-grow: 1!important;
+            &:hover {
+                background-color: $white!important;
+                color: #000!important;
+            }
+        }
+    }
+}

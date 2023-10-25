@@ -1,0 +1,23 @@
+<div *ngIf="sliderItems && sliderItems.length > 0" class="sliderContainer">
+    <p-carousel
+        [value]="sliderItems"
+        [numVisible]="numVisible"
+        [numScroll]="numScroll"
+        [circular]="false"
+        [autoplayInterval]="interval"
+        class="sliderImages"
+    >
+        <ng-template let-img pTemplate="item">
+            <div class="pt-2" #imgContainer>
+                <div class="d-block">
+                    <app-image-display
+                        [image]="img ? (attachmentBaseUrl + '/' +  img) : '../../../../assets/placeholders/_logo-placeholder.png'"
+                        [sycAttachmentCategory]="sycAttachmentCategoryAutoSlider"
+                        [staticWidth]="imgContainer.offsetWidth"
+                    >
+                    </app-image-display>
+                </div>
+            </div>
+        </ng-template>
+    </p-carousel>
+</div>

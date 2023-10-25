@@ -1,0 +1,41 @@
+input.input-transparent {
+    border: none;
+}
+
+.share-search-wrapper {
+    /* display: flex; */
+    justify-content: space-between;
+    position: relative;
+}
+
+.user-search-result {
+    position: absolute;
+    top: 45px;
+    left:0;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+.selected-users{
+    max-height: 400px;
+    overflow-y: scroll;
+}
+.share-search-wrapper i,.remove-user {
+    opacity: .3;
+}
+.remove-user {
+    background-color: #C70000;
+}
+.share-icon {
+    background-color: #509AF72B;
+}
+
+.subscribers{
+    width: 80%;
+    background-color: #FAFFAE;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    margin: 10px auto;
+}

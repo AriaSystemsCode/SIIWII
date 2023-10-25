@@ -1,0 +1,186 @@
+<div class="single-item mr-1 row" >
+    <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
+        'background-image':
+        account.account.logoUrl ?
+        'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl+ ')'  :
+        ''
+    }"
+    (click)="clickCardHandler()"
+    >
+        <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
+    </div>
+    <div class="single-item-body col " [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
+        <div class="row">
+            <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-11'" >
+                <h3 (click)="clickCardHandler()" class="text-capitalize text-primary card-name" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0 text-dark'">{{account?.account?.name}}</h3>
+                <p  class="text-primary m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
+                    {{ account?.account.description  | textSubstring : 60 }}
+                </p>
+                <p *ngIf="singleItemPerRowMode && account.account.classfications" class="text-dark m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
+                    <b>{{ "Classifications" | localize }}</b> :
+                    <span *ngFor="let class of account.account.classfications;let last = last">
+                        {{ class }}{{ last ? '' : ', ' }}
+                    </span>
+                    <span *ngIf="account.account.classfications.length === 0">
+                        {{ "NotSpecified" | localize }}
+                    </span>
+                </p>
+                <p *ngIf="singleItemPerRowMode && account.account.categories" class="text-dark m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
+                    <b>{{"Categories" | localize}}</b> :
+                    <span *ngFor="let category of account.account.categories;let last = last">
+                        {{ category }}{{ last ? '' : ', ' }}
+                    </span>
+                    <span *ngIf="account.account.categories.length === 0">
+                        {{ "NotSpecified" | localize }}
+                    </span>
+                </p>
+
+                <div class="mb-1 text-dark " >
+                    <b>{{"AccountType" | localize}}: </b>
+                    <!-- <span *ngFor="let accountType of account.account.accountType;let last = last">
+                        {{ accountType }}{{ last ? '' : ', ' }}
+                    </span> -->
+                    <span>
+                        {{ account.account.accountType }}
+                    </span>
+                    
+                    <span *ngIf="account.account.accountType.length === 0">
+                        {{ "NotSpecified" | localize }}
+                    </span>
+                    <span *ngIf="singleItemPerRowMode" >
+                        <span *ngIf="account.account.status !== null && account.account.accountType !== null">|</span>
+                        <b class="ml-1 mr-1" *ngIf="account.account.addressLine1 || account.account.city || account.account.countryName  || account.account.state">
+                            <i class="flaticon-placeholder-2"></i>
+                        </b>
+                        <span *ngIf="account.account.addressLine1">
+                            {{account.account.addressLine1}}
+                        </span>
+                        <span *ngIf="account.account.city">
+                            , {{account.account.city}}
+                        </span>
+                        <span *ngIf="account.account.countryName">
+                            , {{account.account.countryName}}
+                        </span>
+                        <span *ngIf="account.account.state">
+                            , {{account.account.state}} ,
+                        </span>
+                        <b class="ml-1">{{ "Zipcode" | localize }}: </b>
+                        <span >
+                             {{ account.account.zipCode ? account.account.zipCode  : "NotSpecified" | localize }}
+                        </span>
+                    </span>
+                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex" >
+                        <span >
+                            <button *ngIf="account.account.status == false && !isHost && !isRecordOwner"
+                                class="btn btn-outline-primary mr-2 action-button"
+                                (click)="connect()"
+                                >
+                                {{ "Connect" | localize }}
+                            </button>
+                        </span>
+                        <div  *ngIf="account.account.status !== null ">
+                            <span class="connected text-success" *ngIf="account.account.status == true && !account.account.isManual && !isHost && !isRecordOwner">
+                                <span class="mr-1">
+                                    <i
+                                        class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'Connected' | localize }}
+                            </span>
+                            <span class="text-muted" *ngIf="account.account.status == false && !account.account.isManual && !isHost && false">
+                                <span class="mr-1">
+                                    <i
+                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'NotConnected'| localize }}
+                            </span>
+                            <span class="text-muted" *ngIf="account.account.isManual == true ">
+                                <span class="mr-1">
+                                    <i
+                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{ isHost ? ('ExternalAccount'| localize ) : ('ManualAccount' | localize ) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col" >
+                <div class="btn-group dropdown" dropdown *ngIf="false">
+                    <button class="dropdown-toggle btn btn-sm btn-action"
+                        dropdownToggle>
+                    </button>
+                    <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
+                        <li>
+                            <a href="javascript:;"
+                                *ngIf="isManual === false                                                                                                                                                                                                      "
+                                (click)="viewProfile()">{{l('ViewProfile')}}</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"
+                                *ngIf="account.account.status === false && isManual === false && !isHost && !isRecordOwner"
+                                (click)="connect()">{{l('Connect')}}</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"
+                                *ngIf="account.account.status === true && isManual === false && !isHost && !isRecordOwner"
+                                (click)="disconnect()">{{'Disconnect' | localize}}</a>
+                        </li>
+                        <li>
+                            <a *ngIf="isManual===true"
+                                (click)="edit()">{{'Edit' | localize}}</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" *ngIf="isManual === true"
+                                (click)="deleteAccount()">{{ 'Delete' | localize }}</a>
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="single-row-mode-status">
+                    <div *ngIf="singleItemPerRowMode" >
+                        <div *ngIf="account.account.status !== null" class="mr-3">
+                            <span class="connected text-success" *ngIf="account.account.status == true && !account.account.isManual && !isHost && !isRecordOwner">
+                                <span class="mr-1">
+                                    <i
+                                        class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'Connected' | localize }}
+                            </span>
+                            <span class="text-muted" *ngIf="account.account.status == false && !isHost && false">
+                                <span class="mr-1">
+                                    <i
+                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'NotConnected'| localize }}
+                            </span>
+                            <span class="text-muted" *ngIf="account.account.isManual == true">
+                                <span class="mr-1">
+                                    <i
+                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{ isHost ? ('ExternalAccount'| localize ) : ('ManualAccount' | localize ) }}
+                            </span>
+                        </div>
+                        <span >
+                            <button *ngIf="account.account.status == false && !isHost && !isRecordOwner"
+                                class="btn btn-outline-primary mt-4"
+                                (click)="connect()"
+                                >
+                                {{ "Connect" | localize }}
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+

@@ -1,0 +1,44 @@
+<a
+    class="d-flex align-items-center"
+    style="gap: 5px"
+    *ngIf="usersReactionsStats?.reactionsCount > 0"
+    (click)="openReactionsDetailsModal()"
+>
+    <div class="d-flex align-items-center" style="gap: 5px">
+        <img
+            *ngIf="usersReactionsStats?.likeCount > 0"
+            class="icon-reaction"
+            [ngClass]="{'first-reaction':currentUserReaction == Reactions.Like}"
+            src="assets/reactions/{{ Reactions[Reactions.Like] }}-circle.png"
+        />
+        <img
+            *ngIf="usersReactionsStats?.celebrateCount > 0"
+            class="icon-reaction"
+            [ngClass]="{'first-reaction':currentUserReaction == Reactions.Celebrate}"
+            src="assets/reactions/{{ Reactions[Reactions.Celebrate] }}-circle.png"
+        />
+        <img
+            *ngIf="usersReactionsStats?.loverCount > 0"
+            class="icon-reaction"
+            [ngClass]="{'first-reaction':currentUserReaction == Reactions.Love}"
+            src="assets/reactions/{{ Reactions[Reactions.Love] }}-circle.png"
+        />
+        <img
+            *ngIf="usersReactionsStats?.insightfulCount > 0"
+            class="icon-reaction"
+            [ngClass]="{'first-reaction':currentUserReaction == Reactions.Insightful}"
+            src="assets/reactions/{{ Reactions[Reactions.Insightful] }}-circle.png"
+        />
+        <img
+            *ngIf="usersReactionsStats?.curiousCount > 0"
+            class="icon-reaction"
+            [ngClass]="{'first-reaction':currentUserReaction == Reactions.Curious}"
+            src="assets/reactions/{{ Reactions[Reactions.Curious] }}-circle.png"
+        />
+    </div>
+    <div class="reaction-stats">
+        {{ usersReactionsStats?.reactionsCount  }}
+    </div>
+</a>
+<app-reactions-details-modal #reactionsDetailsModal>
+</app-reactions-details-modal>

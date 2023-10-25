@@ -1,0 +1,47 @@
+<div class="modal-content-wrapper" *ngIf="active"  >
+    <div class="modal-header">
+        <h4 class="modal-title" >
+            <span>{{l("ProductTypes")}}</span>
+            <p class="desc-menu-item">{{l("SelectFromTheBelowProductType")}}</p>
+        </h4>
+        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body p-0 thin-scroll mr-2">
+        <p class="title-tree ml-3">{{l("ProductType")}}</p>
+        <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded">
+            <span class="mr-3">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" name="search" id="search" placeholder="Search" #searchInput (input)="onFilter(searchInput.value)" class="form-control bg-white border-0">
+        </div>
+        <p-tree
+            [value]="allRecords"
+            selectionMode="single"
+            [filter]="false"
+            [(selection)]="selectedRecord"
+            (selectionChange)="onSelectionChangeHandler($event)"
+            (onNodeExpand)="loadAppItemTypesNode($event)"
+            [loading]="loading"
+            (onNodeSelect)="onNodeSelect($event)"
+        >
+        </p-tree>
+        <div>
+            <button
+                class="btn btn-font-hover-brand ml-3"
+                (click)="showMoreListData()"
+                *ngIf="showMoreListDataButton"
+            >
+                {{ 'showmore' | localize }} ...
+            </button>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()">{{l("Cancel")}}</button>
+        <button type="submit"  (click)="submitSelection()" class="btn btn-primary blue btn-blue" [disabled]="!selectedRecord" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Select")}}</span></button>
+    </div>
+</div>
+
+
+

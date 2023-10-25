@@ -1,0 +1,38 @@
+<div class="modal right" tabindex="-1" role="dialog"  [ngStyle]="{'display':display}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+                <div class="modal-header" style="display: block;background-color: #ffffff !important;">
+
+                    <button style="position: absolute;right: 0;top: 8px;" type="button" class="close"
+                        aria-label="Close" (click)="onClickNo()">
+                        <span aria-hidden="true">&{{ "times" | localize }} ;</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <ng-container  *ngIf="iconIsText; else elseTemplate">
+                        <span>
+                            <i [ngClass]="icon"></i>
+                        </span>
+                    </ng-container>
+                    <ng-template #elseTemplate>
+                        <img src="{{icon}}">
+                    </ng-template>
+
+                <p class="del-title">{{content1}}</p>
+                <p class="del-desc">{{content2}}</p>
+
+                <button (click)="onClickNo()" type="submit" class="btn btn-primary blue btn-blue {{type}}  mb-3"
+                ><span>{{buttonNo}}</span></button>
+            <button *ngIf="defualtButton" (click)="onClickYes()"  type="button" class="btn btn-default btn-gray mb-3"
+                >{{buttonYes}}</button>
+
+
+
+                </div>
+
+
+        </div>
+    </div>
+</div>

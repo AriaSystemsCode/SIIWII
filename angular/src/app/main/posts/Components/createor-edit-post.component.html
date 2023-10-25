@@ -1,0 +1,394 @@
+<!-- Iteration-13-->
+<div
+    bsModal
+    #createOrEditModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="createOrEditModal"
+    aria-hidden="true"
+    [config]="{ backdrop: false , ignoreBackdropClick: true }"
+>
+    <div class="h-100 m-0 ml-md-auto modal-dialog modal-lg mr-md-auto mt-md-5 createOrEditpost posts-sm">
+        <div 
+            class="modal-content p-md-4 p-0"
+        >
+            <div class="border-bottom d-md-block d-none">
+                <div class="row pb-2">
+                    <div class="col-9">
+                        <h5 class="font-weight-bold">
+                            {{ header | localize }}
+                        </h5>
+                    </div>
+                    <div class="col-3 text-right">
+                        <img
+                            src="../../../../assets/posts/close.svg"
+                            class="pointer"
+                            (click)="askToClose()"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="border-bottom d-md-none d-block">
+                <div class="row m-0 pt-4 pb-4 postsContainer">
+                    <div class="col-1  text-right">
+                        <img
+                         src="../../../../assets/events/Icon-ionic-ios-arrow-back.svg" 
+                            class="pointer"
+                            (click)="askToClose()"
+                        />
+                    </div>
+    
+                    <div class="col pt-1">
+                        <h5 class="font-weight-bold">
+                            {{ header | localize }}
+                        </h5>
+                    </div>
+    
+                    <div class="mb-5">
+                        <button
+                        class="btn btn-primary post_btn pointer postBtn postBtnPos"
+                        (click)="createOrEditPost()"
+                        [disabled]="
+                            !loading &&
+                            (post &&
+                            post?.appPost?.id &&
+                            (post?.appPost?.description == postBody ||
+                                (attachmets.length == 0 &&
+                                    postBody.toString().trim() == ''))
+                                ? 'true'
+                                : !(
+                                      attachmets.length > 0 ||
+                                      postBody.toString().trim() != ''
+                                  ))
+                        "
+                        [ngClass]="{
+                            disabled: !(
+                                attachmets.length > 0 ||
+                                postBody.toString().trim() != ''
+                            )
+                        }"
+                    >
+                        {{ "Post" | localize }}
+                    </button>
+                    </div>
+    
+                </div>
+            </div>
+            <div class="row p-3 ml-3">
+                <img
+                    [src]="
+                        profilePicture
+                            ? profilePicture
+                            : 'assets/common/images/default-profile-picture.png'
+                    "
+                    class="mr-3 rounded-circle logo"
+                />
+                <h6 class="pt-2 userName">{{ userName }}</h6>
+            </div>
+
+            <div
+                class="attachments big-scroll p-2 d-flex flex-column justify-content-between ml-5 w-80"
+                [ngClass]="words == 0 ? 'mb-5' : 'mb-1'"
+                [ngStyle]="{
+                    height: attachmets.length > 0 || hasLink ? '377px' : '120px'
+                }"
+            >
+                <div>
+                    <textarea
+                        id="postBody"
+                        class="border-0 pl-3 pt-0 pb-2 w-100"
+                        placeholder="{{ 'Whatdoyouwanttotalkabout' | localize }}?"
+                        (input)="onChangeBody($event)"
+                        maxlength="1300"
+                        [(ngModel)]="postBody"
+                    ></textarea>
+                </div>
+
+                <div *ngIf="hasLink && typeFile === PostType.TEXT">
+                    <div *ngIf="loading" class="fa-10x text-center">
+                        <i Class="fa fa-spinner fa-pulse"></i>
+                    </div>
+                    <div *ngIf="!loading">
+                        <app-link-preview
+                            [url]="linkUrl"
+                            [urlPreviewImage]="urlPreviewImage"
+                            [title]="urlTitle"
+                            [folderName]="attachmentFolderName"
+                            [maxHeight]="'260px'"
+                        >
+                        </app-link-preview>
+                    </div>
+                </div>
+                <div
+                    *ngIf="typeFile == PostType.SINGLEIMAGE"
+                    class="w-100 mt-2 mb-3"
+                >
+                    <div class="row p-3">
+                        <div
+                            #image1
+                            *ngIf="attachmets.length >= 1 && relatedEntityId == 0 "
+                            class="img-wrap w-100 h-100"
+                            [ngClass]="{
+                                'col-12':
+                                    attachmets.length == 1 ||
+                                    attachmets.length == 3 ||
+                                    attachmets.length == 4,
+                                'col-6  cover':
+                                    attachmets.length == 2 ||
+                                    attachmets.length == 5
+                            }"
+                        >
+                            <img
+                                class="attachmentImage"
+                                (load)="calculateImagesPos($event, 1)"
+                                [src]="(post?.appPost?.id || relatedEntityId > 0 ? attachmentBaseUrl + '/' : '') + attachmetsSrc[0] "
+                            />
+                            <img
+                                *ngIf="!editMode && relatedEntityId == 0"
+                                class="deleteAttachmentImage pointer"
+                                [style.right.px]="image1Right"
+                                src="../../../../assets/posts/delete.svg"
+                                (click)="deleteAttachment(0)"
+                            />
+                        </div>
+
+                        <div
+                            #image2
+                            *ngIf="attachmets.length >= 2"
+                            class="img-wrap w-100 h-100"
+                            [ngClass]="{
+                                'col-6':
+                                    attachmets.length == 2 ||
+                                    attachmets.length == 3 ||
+                                    attachmets.length == 5,
+                                'col-4': attachmets.length == 4
+                            }"
+                        >
+                            <img
+                            *ngIf="relatedEntityId == 0 "
+                                class="attachmentImage cover"
+                                (load)="calculateImagesPos($event, 2)"
+                                [src]=" (post?.appPost?.id || relatedEntityId > 0 ? attachmentBaseUrl + '/' : '') + attachmetsSrc[1]"
+                            />
+                            <img
+                                *ngIf="!editMode && relatedEntityId == 0"
+                                class="deleteAttachmentImage pointer"
+                                src="../../../../assets/posts/delete.svg"
+                                [style.right.px]="image2Right"
+                                (click)="deleteAttachment(1)"
+                            />
+                            <div *ngIf="relatedEntityId >0" class="w-100" style="position: relative; left: 0; top: 0">
+                                <img
+                                [src]="(post?.appPost?.id || relatedEntityId > 0 ? attachmentBaseUrl + '/' : '') + attachmetsSrc[1] "
+                                    class="evetCover"
+                                />
+            
+                                <img
+                                [src]="(post?.appPost?.id || relatedEntityId > 0 ? attachmentBaseUrl + '/' : '') + attachmetsSrc[0] "
+                                    onerror="this.src='../../../../assets/placeholders/_logo-placeholder.png'"
+                                    class="eventLogo"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            #image3
+                            *ngIf="attachmets.length >= 3"
+                            class="img-wrap w-100 h-100"
+                            [ngClass]="{
+                                'col-6': attachmets.length == 3,
+                                'col-4':
+                                    attachmets.length == 4 ||
+                                    attachmets.length == 5
+                            }"
+                        >
+                            <img
+                                class="attachmentImage cover"
+                                (load)="calculateImagesPos($event, 3)"
+                                [src]=" (post?.appPost?.id || relatedEntityId > 0 ? attachmentBaseUrl + '/' : '') + attachmetsSrc[2] "
+                            />
+                            <img
+                                *ngIf="!editMode && relatedEntityId == 0"
+                                class="deleteAttachmentImage pointer"
+                                src="../../../../assets/posts/delete.svg"
+                                [style.right.px]="image3Right"
+                                (click)="deleteAttachment(2)"
+                            />
+                        </div>
+
+                        <div
+                            #image4
+                            *ngIf="attachmets.length >= 4"
+                            class="img-wrap w-100 h-100"
+                            [ngClass]="{
+                                'col-4':
+                                    attachmets.length == 4 ||
+                                    attachmets.length == 5
+                            }"
+                        >
+                            <img
+                                class="attachmentImage cover"
+                                (load)="calculateImagesPos($event, 4)"
+                                [src]=" (post?.appPost?.id || relatedEntityId > 0 ? attachmentBaseUrl + '/' : '') + attachmetsSrc[3]"
+                            />
+                            <img
+                                *ngIf="!editMode && relatedEntityId == 0"
+                                class="deleteAttachmentImage pointer"
+                                src="../../../../assets/posts/delete.svg"
+                                [style.right.px]="image4Right"
+                                (click)="deleteAttachment(3)"
+                            />
+                        </div>
+
+                        <div
+                            #image5
+                            *ngIf="attachmets.length >= 5"
+                            class="img-wrap w-100 h-100"
+                            [ngClass]="{ 'col-4': attachmets.length == 5 }"
+                        >
+                            <img
+                                class="attachmentImage cover"
+                                (load)="calculateImagesPos($event, 5)"
+                                [src]="(post?.appPost?.id || relatedEntityId > 0 ? attachmentBaseUrl + '/' : '') + attachmetsSrc[4]"
+                            />
+                            <img
+                                *ngIf="!editMode && relatedEntityId == 0"
+                                class="deleteAttachmentImage pointer"
+                                src="../../../../assets/posts/delete.svg"
+                                [style.right]="image5Right"
+                                (click)="deleteAttachment(4)"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    *ngIf="
+                       (typeFile == PostType.SINGLEVIDEO ||
+                        typeFile == PostType.NEWSDIGEST )
+                        && attachmets.length > 0
+                    "
+                    class="img-wrap w-100 h-100"
+                >
+                    <img
+                        *ngIf="!editMode && relatedEntityId == 0"
+                        class="deleteAttachmentImage pointer"
+                        style="right: 0px"
+                        src="../../../../assets/posts/delete.svg"
+                        (click)="deleteAttachment(0)"
+                    />
+                    <video
+                        class="_video"
+                        *ngIf="videoUrl"
+                        controls
+                        [attr.src]="(post?.appPost?.id ? attachmentBaseUrl + '/' : '') + videoUrl | sanitizeurl"
+                        (loadedmetadata)="getDuration($event)"
+                    ></video>
+                </div>
+            </div>
+
+            <div class="pl-5 mb-5">
+                <span class="words"
+                    >{{ words }} /{{ acceptBodyCharacters }}
+                    {{ "characters" | localize }}</span
+                >
+            </div>
+
+            <div class="row">
+                <div class="col-8">
+                    <button
+                        class="btn btn-primary post_btn pointer d-md-block d-none postBtn"
+                        (click)="createOrEditPost()"
+                        [disabled]="
+                            !loading &&
+                            (post &&
+                            post?.appPost?.id &&
+                            (post?.appPost?.description == postBody ||
+                                (attachmets.length == 0 &&
+                                    postBody.toString().trim() == ''))
+                                ? 'true'
+                                : !(
+                                      attachmets.length > 0 ||
+                                      postBody.toString().trim() != ''
+                                  ))
+                        "
+                        [ngClass]="{
+                            disabled: !(
+                                attachmets.length > 0 ||
+                                postBody.toString().trim() != ''
+                            )
+                        }"
+                    >
+                        {{ "Post" | localize }}
+                    </button>
+                </div>
+                <div
+                    *ngIf="showAttachmentsIcons"
+                    class="_attachmentsIcons pt-3 pr-3"
+                >
+                    <button
+                    *ngIf="typeFilePassed != PostType.NEWSDIGEST"
+                        class="border-0 _btn btn-secondary"
+                        (click)="show(null, PostType.SINGLEIMAGE)"
+                        [disabled]="!uploadImage"
+                    >
+                        <div [ngClass]="{ disabled: !uploadImage }">
+                            <img src="../../../../assets/posts/image.png" class="mr-2 attachIcons" />
+                        </div>
+                    </button>
+                    <input
+                    *ngIf="typeFilePassed != PostType.NEWSDIGEST"
+                        type="file"
+                        class="d-none"
+                        #imageInput
+                        id="_imageInput"
+                        accept="image/*"
+                        (change)="fileChangeEvent($event, PostType.SINGLEIMAGE)"
+                        multiple
+                    />
+
+                    <button 
+                    *ngIf="typeFilePassed == PostType.SINGLEVIDEO"
+                        class="border-0 _btn btn-secondary"
+                        (click)="show(null, PostType.SINGLEVIDEO)"
+                        [disabled]="!uploadVideo"
+                    >
+                        <div [ngClass]="{ disabled: !uploadVideo }">
+                            <img src="../../../../assets/posts/youtube.png" class="mr-2 attachIcons" />
+                        </div>
+                    </button>
+                    
+                    <input 
+                    *ngIf="typeFilePassed == PostType.SINGLEVIDEO"
+                        type="file"
+                        class="d-none"
+                        #videoInput
+                        id="_videoInput"
+                        accept="video/mp4"
+                        (change)="fileChangeEvent($event, PostType.SINGLEVIDEO)"
+                    />
+
+                <button *ngIf="typeFilePassed == PostType.NEWSDIGEST"
+                    class="border-0 _btn btn-secondary"
+                    (click)="show(null, PostType.NEWSDIGEST)"
+                    [disabled]="!uploadVideo" >
+                    <div [ngClass]="{ disabled: !uploadVideo }">
+                        <img src="../../../../assets/posts/youtube.png" class="mr-2 attachIcons" />
+                    </div>
+                </button>
+                <input *ngIf="typeFilePassed == PostType.NEWSDIGEST"
+                    type="file"
+                    class="d-none"
+                    #newsInput
+                    id="_newsInput"
+                    accept="video/mp4"
+                    (change)="fileChangeEvent($event, PostType.NEWSDIGEST)"
+                />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Iteration-13-->

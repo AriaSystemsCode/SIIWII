@@ -1,0 +1,54 @@
+<div
+class="btn-group dropdown"
+dropdown
+container="body"
+placement="bottom right"
+*ngIf="!actionsMenuFlags?.allIsHidden"
+>
+    <button
+        class="dropdown-toggle btn btn-sm btn-action"
+        dropdownToggle
+        type="button"
+    ></button>
+    <ul
+        class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+        *dropdownMenu
+    >
+        <li  *ngIf="actionsMenuFlags?.view" >
+            <a
+                href="javascript:;"
+                (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
+                >{{"View" | localize}}</a
+            >
+        </li>
+        <li  *ngIf="actionsMenuFlags?.edit && (filterType == EventsFilterTypesEnum.MyEvents)" >
+            <a
+                href="javascript:;"
+                (click)="_triggerEvent(EventsBrowseActionsEvents.Edit)"
+                >{{"Edit" | localize}}</a
+            >
+        </li>
+        <li  *ngIf="actionsMenuFlags?.publishOrUnpublish && (filterType == EventsFilterTypesEnum.MyEvents) && !item.isPublished">
+            <a
+                href="javascript:;"
+                (click)="_triggerEvent(EventsBrowseActionsEvents.Publish)"
+                >
+                {{"Publish" | localize}}
+            </a >
+        </li>
+        <li  *ngIf="actionsMenuFlags?.publishOrUnpublish && (filterType == EventsFilterTypesEnum.MyEvents) && item.isPublished">
+            <a
+                href="javascript:;"
+                (click)="_triggerEvent(EventsBrowseActionsEvents.UnPublish)"
+                >{{"UnPublish" | localize}}</a
+            >
+        </li>
+        <li *ngIf="actionsMenuFlags?.delete && (filterType == EventsFilterTypesEnum.MyEvents)">
+            <a
+                href="javascript:;"
+                (click)="_triggerEvent(EventsBrowseActionsEvents.Delete)">
+                {{"Delete" | localize}}
+            </a>
+        </li>
+    </ul>
+</div>

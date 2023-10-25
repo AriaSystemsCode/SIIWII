@@ -1,0 +1,150 @@
+<div
+    *ngIf="upComingEvents && upComingEvents?.length > 0; else noupComingEvents"
+    class="bg-white container mb-3 mt-5 mt-lg-0  slidesContainer upCommingContainer thin-scroll"
+>
+    <div class="row">
+        <div class="justify-content-between ml-3 mr-3 mt-3 row w-100">
+            <div>
+                <h5 class="font-weight-bold">
+                    {{ "UpcomingEvents" | localize }}
+                </h5>
+            </div>
+            <div class="text-right nd-sm-sidebars d-block">
+                <a
+                    [routerLink]="eventPageURL"
+                    routerLinkActive="header-link-active"
+                >
+                    {{ "Seeall" | localize }}</a
+                >
+            </div>
+        </div>
+        <div
+            class="align-items-center justify-content-around m-2 ng-star-inserted row w-100 nd-sm-sidebars d-flex"
+            *ngFor="let event of upComingEvents"
+        > 
+            <div>
+                <img
+                    src="{{ attachmentBaseUrl }}/{{
+                        event?.appEvent?.logoURL
+                    }} "
+                    onerror="this.src='../../../../assets/placeholders/_logo-placeholder.png'"
+                    class="logo"
+                />
+            </div>
+            <div class="d-flex flex-column">
+                <a (click)="onViewEvent(event?.appEvent?.id)">
+                    {{ event?.appEvent?.name | textSubstring: 12 }}
+                </a>
+
+                <h6 style="white-space: nowrap">
+                    {{
+                        event?.appEvent?.utcFromDateTime
+                            | date: "short":"+timezoneOffset"
+                    }}
+                </h6>
+                <h6 style="white-space: nowrap">
+                    {{
+                        event?.appEvent?.utcToDateTime
+                            | date: "short":"+timezoneOffset"
+                    }}
+                </h6>
+                <h6 *ngIf="event?.appEvent?.isOnLine">
+                    {{ "Online" | localize }} <br />
+                </h6>
+                <h6 *ngIf="!event?.appEvent?.isOnLine">
+                    {{ "InPerson" | localize }}<br />
+                </h6>
+                <h6 *ngIf="event?.appEvent?.guestsCount > 0">
+                    <i class="fas fa-users pr-1"></i>
+                    {{ event?.appEvent?.guestsCount }}
+                    {{ "attendees" | localize }}
+                </h6>
+            </div>
+        </div>
+
+
+        <div class="d-sm-sidebars d-none h-100 w-100">
+            <p-carousel class="hiddenDotsIndicator hiddenIndicator  slidersContainerCarousel  h-100 w-100" [numVisible]="1.5"
+              [value]="upComingEvents"  [circular]="false">
+               
+              <ng-template let-event  pTemplate="item" >
+                        <div  class="d-flex flex-row">
+                    <div 
+                    [ngClass]="upComingEvents.length >1 ? 'slide-md-Section' : 'slide-sm-Section'" >
+                             <img
+                    src="{{ attachmentBaseUrl }}/{{
+                        event?.appEvent?.logoURL
+                    }} "
+                    onerror="this.src='../../../../assets/placeholders/UpcomingEvents.png'"
+                    [ngClass]="upComingEvents.length >1 ? 'slide-medium-image' : 'slide-small-image'" 
+                />
+                <div class="slide-single-item-body pt-3">
+                    <h5>
+                <a class="text-black" (click)="onViewEvent(event?.appEvent?.id)">
+                    {{ event?.appEvent?.name | textSubstring: 12 }}
+                </a>
+            </h5>
+
+                <h6 style="white-space: nowrap">
+                    {{
+                        event?.appEvent?.utcFromDateTime
+                            | date: "short":"+timezoneOffset"
+                    }}
+                </h6>
+                <h6 style="white-space: nowrap">
+                    {{
+                        event?.appEvent?.utcToDateTime
+                            | date: "short":"+timezoneOffset"
+                    }}
+                </h6>
+                <h6 *ngIf="event?.appEvent?.isOnLine">
+                    {{ "Online" | localize }} <br />
+                </h6>
+                <h6 *ngIf="!event?.appEvent?.isOnLine">
+                    {{ "InPerson" | localize }}<br />
+                </h6>
+                <h6 *ngIf="event?.appEvent?.guestsCount > 0">
+                    <i class="fas fa-users pr-1"></i>
+                    {{ event?.appEvent?.guestsCount }}
+                    {{ "attendees" | localize }}
+                </h6>
+                        </div>
+                    </div>
+
+                    <!--  *ngIf="i == upComingEvents.length-1"-->
+                    <!--  <div  
+                    [ngClass]="upComingEvents.length >1 ? 'slide-md-Section' : 'slide-sm-Section'" class="position-relative ml-5">
+                    <h5>
+                <a  [routerLink]="eventPageURL"
+                routerLinkActive="header-link-active" class="text-purple no-underline upcommingSeeAllLink position-absolute">
+                    {{ "Seeall" | localize }}
+                </a>
+            </h5>
+                    </div> -->
+                </div>
+                </ng-template>
+            </p-carousel>
+
+            <div class="border-top  mt-3  pt-1 pl-5 text-center">
+                <a
+                [routerLink]="eventPageURL"
+                routerLinkActive="header-link-active"
+            >
+                {{ "Seeall" | localize }}</a
+            >
+                <i class="fa fa-arrow-circle-right pl-1"></i>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<ng-template #noupComingEvents>
+    <div class="upCommingContainer bg-white container mb-3 mt-5 mt-lg-0  slidesContainer noslidedata" style="overflow: hidden !important;">
+        <img
+            style="z-index: 999999999; width: 100%; height: 100%"
+            src="../../../../assets/placeholders/noupcomingevents.jpg"
+            onerror="this.src='../../../../assets/placeholders/_logo-placeholder.png'"
+        />
+    </div>
+</ng-template>

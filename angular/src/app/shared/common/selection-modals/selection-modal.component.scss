@@ -1,0 +1,16 @@
+:host {
+    height: 100%;
+}
+.create-edit-btn {
+    position: absolute;
+    right: 80px;
+    bottom: 25vh;
+    z-index: 1059;
+}
+.fake-circle {
+    background-color: #aaaa;
+    width: 15px;
+    height: 15px;
+    display: block;
+    border-radius: 50%;
+}

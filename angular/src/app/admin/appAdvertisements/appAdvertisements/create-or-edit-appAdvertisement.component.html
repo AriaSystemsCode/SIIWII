@@ -1,0 +1,470 @@
+﻿<div [@routerTransition]>
+    <div
+        class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
+    >
+        <div class="kt-subheader kt-grid__item">
+            <div [class]="containerClass">
+                <div class="kt-subheader__main">
+                    <h3 class="kt-subheader__title">
+                        <span *ngIf="active && appAdvertisement.id">{{
+                            "EditAppAdvertisement"
+                        }}</span>
+                        <span *ngIf="active && !appAdvertisement.id">{{
+                            l("CreateAppAdvertisement")
+                        }}</span>
+                    </h3>
+                    <span
+                        class="kt-subheader__separator kt-subheader__separator--v"
+                    ></span>
+                    <div class="kt-subheader__breadcrumbs">
+                        <a
+                            [routerLink]="[
+                                '/app/admin/appAdvertisements/appAdvertisements'
+                            ]"
+                            class="kt-subheader__breadcrumbs-home"
+                            ><i class="flaticon2-shelter"></i
+                            >{{ l("AppAdvertisement") }}</a
+                        >
+                        <span
+                            class="kt-subheader__breadcrumbs-separator"
+                        ></span>
+                        <a
+                            class="kt-subheader__breadcrumbs-link kt-subheader__breadcrumbs-link--active"
+                        >
+                            <span *ngIf="active && appAdvertisement.id">{{
+                                l("Edit")
+                            }}</span>
+                            <span *ngIf="active && !appAdvertisement.id">{{
+                                l("Create")
+                            }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet__body">
+                    <app-stepper #cdkStepper [linear]="isLinear">
+                        <cdk-step label="Personal Details" [editable]="isEditable" [optional]="false">
+                            <ng-template cdkStepLabel>
+                                1- {{l("Image")}}
+                            </ng-template>
+                            <!--photo-->
+                            <div >
+                                <div class="form-group row ">
+                                    <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                        <span class="text-danger">*</span>
+                                        {{l("HomeImage")}}
+                                    </label>
+                                    <app-image-upload
+                                        [sycAttachmentCategory]="sycAttachmentCategoryPhoto"
+                                        [image]="homeImage"
+                                        [staticHeight]="170"
+                                        [showGuidelines]="true"
+                                        (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryPhoto)"
+                                        (removeImage)="removeImage($event,sycAttachmentCategoryPhoto)"
+                                    >
+                                    </app-image-upload>
+                                </div>
+                                <!--  cover photo-->
+                                <div class="form-group row ">
+                                    <label class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("MarketPlaceImage")}} </label>
+                                    <app-image-upload
+                                        [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                        [image]="marketPlaceImage"
+                                        [staticHeight]="200"
+                                        [showGuidelines]="true"
+                                        (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryBanner)"
+                                        (removeImage)="removeImage($event,sycAttachmentCategoryBanner)"
+                                    >
+                                    </app-image-upload>
+                                </div>
+                                <div class="form-group row ">
+                                    <label class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("URL")}} </label>
+                                    <input
+                                    type="url"
+                                    #AppAdvertisement_Url="ngModel"
+                                    id="AppAdvertisement_Url"
+                                    class="form-control col-6"
+                                    [(ngModel)]="appAdvertisement.url"
+                                    name="Url"
+                                />
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button
+                                    (click)="cdkStepper.next()"
+                                    [disabled]="!homeImage && !marketPlaceImage"
+                                    class="btn btn-primary blue float-right"
+                                >
+                                    <i class="fas fa-left-arrow"></i>
+                                    <span>{{ l("Next") }}</span>
+                                </button>
+                            </div>
+                        </cdk-step>
+                        <cdk-step [editable]="isEditable" [stepControl]="Step2Form" [optional]="false" *ngIf="false">
+                            <ng-template cdkStepLabel>
+                                <span>Information</span>
+                            </ng-template>
+                            <form #Step2Form="ngForm">
+                                <!-- Code -->
+                                <div class="form-group">
+                                    <label for="AppAdvertisement_Code"
+                                        >{{ l("Code") }} *</label
+                                    >
+                                    <input
+                                        type="text"
+                                        #AppAdvertisement_Code="ngModel"
+                                        id="AppAdvertisement_Code"
+                                        class="form-control"
+                                        [(ngModel)]="appAdvertisement.code"
+                                        name="Code"
+                                        minlength="0"
+                                        maxlength="50"
+                                        required
+                                    />
+                                    <validation-messages
+                                        [formCtrl]="AppAdvertisement_Code"
+                                    ></validation-messages>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="form-group">
+                                    <label for="AppAdvertisement_Description">{{
+                                        l("Description")
+                                    }}</label>
+                                    <textarea
+                                        #AppAdvertisement_Description="ngModel"
+                                        id="AppAdvertisement_Description"
+                                        class="form-control"
+                                        [(ngModel)]="appAdvertisement.description"
+                                        name="Description"
+                                        minlength="0"
+                                        maxlength="100"
+                                        rows="5"
+                                        required
+                                    ></textarea>
+                                    <validation-messages
+                                        [formCtrl]="AppAdvertisement_Description"
+                                    ></validation-messages>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button
+                                        (click)="cdkStepper.previous()"
+                                        class="btn btn-primary blue float-right"
+                                    >
+                                        <i class="fas fa-left-arrow"></i>
+                                        <span>{{ l("Previous") }}</span>
+                                    </button>
+                                    <button
+                                        (click)="cdkStepper.next()"
+                                        [disabled]="Step2Form.invalid"
+                                        class="btn btn-primary blue float-right"
+                                    >
+                                        <i class="fas fa-left-arrow"></i>
+                                        <span>{{ l("Next") }}</span>
+                                    </button>
+                                </div>
+                            </form>
+
+                        </cdk-step>
+                        <cdk-step [editable]="isEditable" [stepControl]="Step3Form" [optional]="false">
+                            <ng-template cdkStepLabel>
+                                2 -{{l("AdsSetup")}}
+                            </ng-template>
+                            <form #Step3Form="ngForm">
+                                <div class="row">
+                                    <div class="col-md-4 col-6">
+                                        <!-- TimeZone -->
+                                        <div class="form-group">
+                                            <label for="AppAdvertisement_TimeZone">{{
+                                                l("TimeZone")
+                                            }}</label>
+                                            <div>
+                                                <p-dropdown
+                                                    [(ngModel)]="appAdvertisement.timeZone"
+                                                    name="TimeZone"
+                                                    [styleClass]="'w-100'"
+                                                    [options]="allTimeZone"
+                                                    #AppAdvertisement_TimeZone="ngModel"
+                                                    id="AppAdvertisement_TimeZone"
+                                                    [required]="true"
+                                                >
+                                                </p-dropdown>
+                                            </div>
+                                            <validation-messages
+                                                [formCtrl]="AppAdvertisement_TimeZone"
+                                            ></validation-messages>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-6">
+                                        <!-- StartDate -->
+                                        <div class="form-group">
+                                            <label for="AppAdvertisement_StartDate">{{
+                                                l("StartDate")
+                                            }}</label>
+                                            <input
+                                                required
+                                                class="form-control m-input"
+                                                #AppAdvertisement_StartDate
+                                                type="datetime"
+                                                bsDatepicker
+                                                datePickerMomentModifier
+                                                [(date)]="appAdvertisement.startDate"
+                                                id="AppAdvertisement_StartDate"
+                                                name="AppAdvertisement_StartDate"
+                                            />
+                                            <validation-messages
+                                                [formCtrl]="AppAdvertisement_StartDate"
+                                            ></validation-messages>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-6">
+                                        <!-- StartTime -->
+                                        <div class="form-group">
+                                            <label for="AppAdvertisement_StartTime">{{
+                                                l("StartTime")
+                                            }}</label>
+                                            <input
+                                                type="time"
+                                                #AppAdvertisement_StartTime="ngModel"
+                                                id="AppAdvertisement_StartTime"
+                                                class="form-control"
+                                                [(ngModel)]="appAdvertisement.startTime"
+                                                name="StartTime"
+                                                required
+                                            />
+                                            <validation-messages
+                                                [formCtrl]="AppAdvertisement_StartTime"
+                                            ></validation-messages>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-6">
+                                        <!-- EndDate -->
+                                        <div class="form-group">
+                                            <label for="AppAdvertisement_EndDate">{{
+                                                l("EndDate")
+                                            }}</label>
+                                            <input
+                                                required
+                                                class="form-control m-input"
+                                                #AppAdvertisement_EndDate
+                                                type="datetime"
+                                                bsDatepicker
+                                                datePickerMomentModifier
+                                                [(date)]="appAdvertisement.endDate"
+                                                id="AppAdvertisement_EndDate"
+                                                name="AppAdvertisement_EndDate"
+                                            />
+                                            <validation-messages
+                                                [formCtrl]="AppAdvertisement_EndDate"
+                                            ></validation-messages>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-6">
+                                        <!-- EndTime -->
+                                        <div class="form-group">
+                                            <label for="AppAdvertisement_EndTime">{{
+                                                l("EndTime")
+                                            }}</label>
+                                            <input
+                                                type="time"
+                                                #AppAdvertisement_EndTime="ngModel"
+                                                id="AppAdvertisement_EndTime"
+                                                class="form-control"
+                                                [(ngModel)]="appAdvertisement.endTime"
+                                                name="EndTime"
+                                                required
+                                            />
+                                            <validation-messages
+                                                [formCtrl]="AppAdvertisement_EndTime"
+                                            ></validation-messages>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 col-sm-3">
+                                        <!-- Tenant Name -->
+                                        <div class="form-group">
+                                            <label for="AppAdvertisement_TenantId">{{
+                                                l("TenantName")
+                                            }}</label>
+                                            <div>
+                                                <p-dropdown
+                                                    [(ngModel)]="appAdvertisement.tenantId"
+                                                    name="TenantId"
+                                                    [styleClass]="'w-100'"
+                                                    [options]="tenants"
+                                                    #AppAdvertisement_TenantId="ngModel"
+                                                    id="AppAdvertisement_TenantId"
+                                                    [required]="true"
+                                                    [filter]="true"
+                                                    filterBy="label,value"
+                                                >
+                                                </p-dropdown>
+                                            </div>
+                                            <validation-messages
+                                                [formCtrl]="AppAdvertisement_TenantId"
+                                            ></validation-messages>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-sm-3">
+                                        <!-- Occurence -->
+                                        <div class="form-group">
+                                           <label for="AppAdvertisement_NumberOfOccurences">{{
+                                               l("Occurence")
+                                           }}</label>
+                                           <input
+                                               type="number"
+                                               #AppAdvertisement_NumberOfOccurences="ngModel"
+                                               id="AppAdvertisement_NumberOfOccurences"
+                                               class="form-control"
+                                               [(ngModel)]="appAdvertisement.numberOfOccurences"
+                                               name="Occurence"
+                                               [pattern]="patterns.positiveNumbersFromOne"
+                                                required
+                                           />
+                                           <validation-messages
+                                               [formCtrl]="AppAdvertisement_NumberOfOccurences"
+                                           ></validation-messages>
+                                       </div>
+                                    </div>
+                                    <div class="col-6 col-sm-3">
+                                        <!-- For -->
+                                        <div class="form-group">
+                                            <label for="AppAdvertisement_PeriodOfView">{{
+                                                l("For")
+                                            }}</label>
+                                            <input
+                                                type="number"
+                                                #AppAdvertisement_PeriodOfView="ngModel"
+                                                id="AppAdvertisement_PeriodOfView"
+                                                class="form-control"
+                                                [(ngModel)]="appAdvertisement.periodOfView"
+                                                name="for"
+                                                [pattern]="patterns.positiveNumbersFromOne"
+                                                required
+                                            />
+                                            <validation-messages
+                                                [formCtrl]="AppAdvertisement_PeriodOfView"
+                                            ></validation-messages>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-sm-3">
+                                        <!-- Every -->
+                                        <div class="form-group">
+                                            <label for="AppAdvertisement_OccuranceUnitOfTime">{{
+                                                l("Every")
+                                            }}</label>
+                                            <div>
+                                                <p-dropdown
+                                                    [(ngModel)]="appAdvertisement.occuranceUnitOfTime"
+                                                    name="Every"
+                                                    [options]="occuranceUnitOfTime"
+                                                    #AppAdvertisement_OccuranceUnitOfTime="ngModel"
+                                                    id="AppAdvertisement_OccuranceUnitOfTime"
+                                                    [required]="true"
+                                                >
+                                                </p-dropdown>
+                                            </div>
+                                            <validation-messages
+                                                [formCtrl]="AppAdvertisement_OccuranceUnitOfTime"
+                                            ></validation-messages>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <button
+                                        (click)="cdkStepper.previous()"
+                                        class="btn btn-primary blue float-right"
+                                    >
+                                        <i class="fas fa-left-arrow"></i>
+                                        <span>{{ l("Previous") }}</span>
+                                    </button>
+                                    <button
+                                        (click)="cdkStepper.next()"
+                                        [disabled]="Step3Form.invalid"
+                                        class="btn btn-primary blue float-right"
+                                    >
+                                        <i class="fas fa-left-arrow"></i>
+                                        <span>{{ l("Next") }}</span>
+                                    </button>
+                                </div>
+
+                            </form>
+                        </cdk-step>
+                        <cdk-step [editable]="isEditable" [stepControl]="Step4Form" [optional]="false">
+                            <ng-template cdkStepLabel>
+                                3 -{{"Publish" | localize}}
+                            </ng-template>
+                            <form #Step4Form="ngForm" >
+
+
+                                <!-- PublishOnHomePage -->
+                                <div style="min-height: 100px;" >
+                                    <label
+                                        for="AppAdvertisement_PublishOnHomePage"
+                                    >
+                                        <input
+                                            #AppAdvertisement_PublishOnHomePage="ngModel"
+                                            id="AppAdvertisement_PublishOnHomePage"
+                                            type="checkbox"
+                                            name="PublishOnHomePage"
+                                            [(ngModel)]="appAdvertisement.publishOnHomePage"
+                                            (ngModelChange)="setApprovalDateTime($event)"
+                                        />
+                                        {{ l("PublishOnHomePage") }}
+                                    </label>
+                                    <validation-messages
+                                        [formCtrl]="AppAdvertisement_PublishOnHomePage"
+                                    ></validation-messages>
+                                </div>
+                                <!-- PublishOnMarketLandingPage -->
+                                <div style="min-height: 100px;" >
+                                    <label
+                                        for="AppAdvertisement_PublishOnMarketLandingPage"
+                                    >
+                                        <input
+                                            #AppAdvertisement_PublishOnMarketLandingPage="ngModel"
+                                            id="AppAdvertisement_PublishOnMarketLandingPage"
+                                            type="checkbox"
+                                            name="publishOnMarketLandingPage"
+                                            [(ngModel)]="appAdvertisement.publishOnMarketLandingPage"
+                                            (ngModelChange)="setApprovalDateTime($event)"
+                                        />
+                                        {{ l("PublishOnMarketLandingPage") }}
+                                    </label>
+                                    <validation-messages
+                                        [formCtrl]="AppAdvertisement_PublishOnMarketLandingPage"
+                                    ></validation-messages>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button
+                                        (click)="cdkStepper.previous()"
+                                        class="btn btn-primary blue float-right"
+                                    >
+                                        <i class="fas fa-left-arrow"></i>
+                                        <span>{{ l("Previous") }}</span>
+                                    </button>
+                                    <button
+                                        (click)="save()"
+                                        class="btn btn-primary blue float-right"
+                                        [disabled]="( (appAdvertisement.publishOnHomePage && !homeImage) || (appAdvertisement.publishOnMarketLandingPage && !marketPlaceImage)  )  && Step3Form.invalid && Step4Form.invalid"
+                                        [buttonBusy]="saving"
+                                        [busyText]="l('SavingWithThreeDot')"
+                                    >
+                                        <i class="fa fa-save"></i>
+                                        <span>{{ l("Submit") }}</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </cdk-step>
+                    </app-stepper>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

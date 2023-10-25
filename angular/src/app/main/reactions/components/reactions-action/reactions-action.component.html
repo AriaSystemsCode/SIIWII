@@ -1,0 +1,19 @@
+<a (mouseenter)="showReactionsPopup = true" (mouseleave)="showReactionsPopup = false" (click)="triggerReaction()" class="position-relative" >
+
+    <span class="align-items-center d-flex" style="gap: 7px;">
+        <img class="icon-reaction" [src]="'assets/reactions/' + ( currentUserReaction ? Reactions[currentUserReaction] : (Reactions[defaultReactionType] + '-black') ) + '.png'" />
+        <span >
+            {{ ( Reactions[currentUserReaction] | localize ) || ( Reactions[defaultReactionType] | localize) }}
+        </span>
+        <!-- <span >
+            {{ Reactions[defaultReactionType] | localize }}
+        </span> -->
+    </span>
+
+    <div class="reactions-wrapper" *ngIf="showReactionsPopup" >
+        <app-reactions-menu-popup
+            (reactionChanged)="handleReactionChange($event)"
+        >
+        </app-reactions-menu-popup>
+    </div>
+</a>

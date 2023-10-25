@@ -1,0 +1,164 @@
+<div [@routerTransition] class="wrapper">
+    <div class="view-profile-wrapper" *ngIf="active">
+        <div >
+            <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
+
+
+                <div class="kt-subheader kt-grid__item">
+                    <div [class]="containerClass">
+                        <div class="kt-subheader__main">
+                            <h6 class="kt-subheader__title">
+                                <span>{{ title | localize }}</span>
+                            </h6>
+                            <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                            <p class="mb-0">{{ contactDisplayName }}</p>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__body p-0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div #viewProfileCover class="dev-cover d-flex justify-content-center align-items-center position-relative">
+                                        <app-image-display
+                                            [image]="coverPhoto || coverDefaultImage"
+                                            [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                            [staticWidth]="viewProfileCover?.offsetWidth"
+                                            [classList]="'img-cover'"
+                                            >
+                                        </app-image-display>
+                                        <div class="d-flex view-profile-action-buttons" >
+                                            <button *ngIf="canEdit" class="btn mb-3 mt-4 w-100 btn-success" (click)="editMember()" >
+                                                {{ "Edit" | localize }}
+                                            </button>
+                                            <button *ngIf="canDelete" class="btn mb-3 mt-4 w-100 btn-danger" (click)="deleteMember()" >
+                                                {{ "Delete" | localize }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="dev-logo">
+                                        <app-image-display
+                                                [image]="logoPhoto || logoDefaultImage"
+                                                [sycAttachmentCategory]="sycAttachmentCategoryLogo"
+                                                [classList]="'logo-profile'"
+                                                [staticHeight]="85"
+                                            >
+                                        </app-image-display>
+                                    </div>
+                                </div>
+                                <div class="col-md-10 title-cover">
+                                    <p>{{memberData?.contact?.firstName}} {{" "}} {{memberData?.contact?.lastName}} </p>
+                                    <p>{{memberData?.contact?.jobTitle}} </p>
+                                    <div class="desc">
+                                        <p>
+                                            {{memberData?.contact?.notes}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet__body p-0 pb-3">
+                    <div class="pb-5 pl-4 pr-4 pt-5 row">
+                        <div class="col-md-12 d-flex align-items-baseline pl-3 pb-3">
+                            <p class="title-dev-slider text-left">{{"Overview" | localize}}</p>
+                        </div>
+                        <div class="col-md-12 d-flex align-items-baseline">
+                            <h6 class="text-right col-2">{{ ( "FirstName" | localize ) + ":"}}</h6>
+                            <p class="text-left col">{{memberData?.contact?.firstName}}</p>
+                        </div>
+                        <hr class="header">
+                        <div class="col-md-12 d-flex align-items-baseline">
+                            <h6 class="text-right col-2">{{ ( "SurName" | localize ) + ":" }}</h6>
+                            <p class="text-left col">{{memberData?.contact?.lastName}}</p>
+                        </div>
+                        <hr class="header">
+                        <div class="col-md-12 d-flex align-items-baseline">
+                            <h6 class="text-right col-2">{{ ( "JobTitle" | localize ) + ":" }}</h6>
+                            <p class="text-left col">{{memberData?.contact?.jobTitle}}</p>
+                        </div>
+                        <hr class="header"  *ngIf="memberData?.contact?.joinDateIsPublic">
+                        <div class="col-md-12 d-flex align-items-baseline" *ngIf="memberData?.contact?.joinDateIsPublic">
+                            <h6 class="text-right col-2">{{ ( "JoinDate" | localize ) + ":" }}</h6>
+                            <p class="text-left col">{{memberData?.contact?.joinDate?.toString()| date: 'short'}}</p>
+                        </div>
+                        <hr class="header" *ngIf="memberData?.contact?.emailAddressIsPublic">
+                        <div class="col-md-12 d-flex align-items-baseline" *ngIf="memberData?.contact?.emailAddressIsPublic">
+                            <h6 class="text-right col-2">{{ ( "Email" | localize ) + ":" }}</h6>
+                            <p class="text-left col">{{memberData?.contact?.eMailAddress}}</p>
+                        </div>
+                        <hr class="header" *ngIf="memberData?.contact?.languageIsPublic">
+                        <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.languageIsPublic">
+                            <h6 class="text-right col-2">{{ ( "Language" | localize ) + ":" }}</h6>
+                            <p class="text-left col">{{memberData?.contact?.languageName}}</p>
+                        </div>
+                        <hr class="header">
+                        <div class="col-md-12 d-flex align-items-baseline">
+                            <h6 class="text-right col-2" >{{ ( "Branch" | localize ) + ":" }}</h6>
+                            <p class="text-left col" *ngIf="memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName">
+                                <span *ngIf="memberData?.branchName">
+                                    {{ memberData?.branchName + ' '}}
+                                </span>
+                                <span *ngIf="memberData?.addressLine1">
+                                    {{ " - " + memberData?.addressLine1 + ', '}}
+                                </span>
+                                <span *ngIf="memberData?.addressLine2">
+                                    {{ memberData?.addressLine2 + ', '}}
+                                </span>
+                                <span *ngIf="memberData?.city">
+                                    {{ memberData?.city + ', '}}
+                                </span>
+                                <span *ngIf="memberData?.state">
+                                    {{ memberData?.state + ', ' }}
+                                </span>
+                                <span *ngIf="memberData?.zipCode">
+                                    {{memberData?.zipCode  }}{{memberData?.countryName ? ', ' : '' }}
+                                </span>
+                                <span *ngIf="memberData?.countryName">
+                                    {{ memberData?.countryName  }}
+                                </span>
+                            </p>
+                        </div>
+                        <hr class="header" *ngIf="memberData?.contact?.phone1IsPublic">
+                        <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.phone1IsPublic">
+                            <h6 class="text-right col-2" >
+                                {{ (memberData?.contact?.phone1TypeName ? (memberData?.contact?.phone1TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
+                            </h6>
+                            <p class="text-left col">{{memberData?.contact?.phone1Number}}</p>
+                        </div>
+                        <hr class="header" *ngIf="memberData?.contact?.phone2IsPublic">
+                        <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.phone2IsPublic">
+                            <h6 class="text-right col-2" >
+                                {{ (memberData?.contact?.phone2TypeName ? (memberData?.contact?.phone2TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
+                            </h6>
+                            <p class="text-left col">{{memberData?.contact?.phone2Number}}</p>
+                        </div>
+                        <hr class="header" *ngIf="memberData?.contact?.phone3IsPublic">
+                        <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.phone3IsPublic">
+                            <h6 class="text-right col-2" >
+                                {{ (memberData?.contact?.phone3TypeName ? (memberData?.contact?.phone3TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
+                            </h6>
+                            <p class="text-left col">{{memberData?.contact?.phone3Number}}</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

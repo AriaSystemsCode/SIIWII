@@ -1,0 +1,24 @@
+// text
+body .text-primary {
+    color: $primary-color!important;
+}
+
+.text-success{
+    color: $success-color!important;
+}
+.text-red {
+    color:$red;
+}
+.text-red1 {
+    color:$red-1;
+}
+
+.long-text-three-dots {
+    text-overflow: ellipsis;
+    overflow: hidden !important;
+}
+
+
+.text-underline {
+    text-decoration: underline!important;
+}

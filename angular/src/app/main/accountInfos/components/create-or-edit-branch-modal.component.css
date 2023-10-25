@@ -1,0 +1,303 @@
+/*Start Address model */
+ /*custom*/
+ .p-chkbox-box :before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: bottom;
+    margin-right: 10px;
+    background-color: black;
+    line-height: 20px;
+    text-align: center;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    font-family: "Font Awesome 5 Solid";
+
+  }
+ .has-search{
+    position: relative;
+}
+.has-search .form-control-icon-search {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  width: 1.575rem;
+  height: 2.375rem;
+  line-height: 2.375rem;
+  text-align: center;
+  pointer-events: none;
+  top: 4px;
+  right: 9px;
+  color: #aaa;
+}
+.aria-input-text,.aria-select{
+    height: 36px !important;
+    background-color: #F3F6F9 !important;
+ }
+ .desc-menu-item{
+    color: #B5B5C3;
+    font-size: 13px;
+}
+.btn-blue{
+    background-color: #3699FF;
+    border: none;
+    width: 127px;
+    /* height: 35px; */
+    border-radius: 5px;
+    margin-right: 8px;
+    padding: 10px !important;
+    width: 140px !important;
+ }
+ .btn-gray{
+    background-color: #E5EAEE;
+    border: none;
+    width: 127px;
+    /* height: 35px; */
+    border-radius: 5px;
+    padding: 10px !important;
+    width: 140px !important;
+ }
+.modal-title{
+    width: 100% !important;
+}
+.modal-footer{
+    direction: rtl;
+    background-color: #F4F4F4;
+    /* position: absolute; */
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+}
+.modal-body{
+    margin-top: 35px;
+    }
+.title-tree{
+    font: SemiBold 15px/var(--unnamed-line-spacing-23) var(--unnamed-font-family-poppins);
+    letter-spacing: var(--unnamed-character-spacing-0);
+    text-align: left;
+    font: SemiBold 15px/23px Poppins;
+    letter-spacing: 0px;
+    color: #1EC5BD;
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 1;
+  }
+  .close-model{
+      background-color: transparent;
+      border: none;
+  }
+ .modal.left .modal-dialog,
+ .modal.right .modal-dialog {
+
+     position: fixed;
+     margin: auto;
+     width: 800px;
+     height: 100%;
+     -webkit-transform: translate3d(0%, 0, 0);
+         -ms-transform: translate3d(0%, 0, 0);
+          -o-transform: translate3d(0%, 0, 0);
+             transform: translate3d(0%, 0, 0);
+ }
+ /* Portrait phones and smaller */
+@media (max-width: 480px) {
+    .modal.left .modal-dialog,
+    .modal.right .modal-dialog {
+        width: 300px;
+    }
+
+}
+.address-name{
+    border: none;
+    padding-left: 68px !important;
+}
+
+ .modal.left .modal-content,
+ .modal.right .modal-content {
+     height: 100%;
+     overflow-y: auto;
+     overflow-x: hidden;
+ }
+
+ .modal.left .modal-body,
+ .modal.right .modal-body {
+     padding: 15px 15px 80px;
+ }
+ /*Right*/
+ .modal.right.fade .modal-dialog {
+    right: -320px;
+    -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+       -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+         -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+            transition: opacity 0.3s linear, right 0.3s ease-out;
+}
+
+.modal.right.fade.in .modal-dialog {
+    right: 0;
+    z-index: 999999999999999999999999999999999999999;
+}
+
+/* ----- MODAL STYLE ----- */
+.modal-content {
+    border-radius: 0;
+    border: none;
+}
+
+.modal-header {
+    border-bottom-color: #EEEEEE;
+    background-color: #FAFAFA;
+    padding-right: 0;
+    height: 74px;
+    background-color: #FFFFFF !important;
+}
+.aria-input-text,.aria-select{
+    height: 40px !important;
+    background-color: #F3F6F9 !important;
+    border: none;
+    border-radius: 5px;
+ }
+
+ .form-group-plus{
+     position: relative;
+ }
+ .btn-plus{
+    background-color: #2786FB;
+
+    /* border-radius: 200px 200px;
+    height: 28px;
+    width: 28px;
+    margin: 0 auto !important;
+*/
+    /* border-radius: 70px 70px;
+    height: 24px;
+    width: 21px;
+    margin: 0 auto !important;
+    text-align: center !important;
+    position: absolute;
+    left: 18px;
+    top: 36px; */
+    background: url('assets/profile/Add-Address.svg') no-repeat;
+    position: absolute;
+    left: 14px;
+    width: 100% inherit;
+    height: 100%;
+    border: none;
+    border-radius: none !important;
+    top: 33px;
+    margin-left: 8px !important;
+    background-repeat: no-repeat;
+    background-size: 100%;
+ }
+ .btn-plus:hover{
+    background-color: transparent !important
+ }
+ .btn-icon-plus{
+    position: absolute;
+    /* left: 10px;
+    top: 6px; */
+    margin: 0 auto;
+    left: 6px;
+    font-size: 25px;
+    top: -5px;
+ }
+ .branch-info,.contact-info{
+     color: #3699FF;
+     font-weight: 600;
+ }
+ #selector select option {
+    color: #333;
+     position: relative;
+     top: 5px;
+   }
+
+   /*==================================================
+   remove the original arrow in select option dropdown
+   ==================================================*/
+
+   #selector {
+     margin: 5px 10%;
+     width: 15%;
+   }
+
+   /* select {
+     -webkit-appearance: none;
+     -moz-appearance: none;
+     -o-appearance:none;
+     appearance:none;
+   }
+
+   select.input-lg {
+     height: 50px !important;
+     line-height:25px !important;
+   }
+
+   select + i.fa {
+     float: right;
+     margin-top: -32px;
+     margin-right: 9px;
+
+     pointer-events: none;
+
+     background-color: #FFF;
+       padding-right: 5px;
+   } */
+   /* select option[value="male"]   { background:url('assets/profile/Down_Arrow.svg');   }
+   select option[value="female"] { background:url('assets/profile/Down_Arrow.svg'); }
+   select option[value="others"] { background:url('assets/profile/Down_Arrow.svg'); } */
+   .select-options option{
+       background-color: white;
+   }
+   .select-phone-type{
+    background-position-x: 90% !important;
+   }
+   .phone-input{
+       /* color:#B5B5C3; */
+       color: #212121;
+   }
+    .phone-col-ext{
+        padding-right: 0;
+    }
+   .exphone{
+    padding-left: 0;margin-top: 3px;margin-left: -5px;border-radius: 11px;
+   }
+   .exphone-1{
+    margin-top: 18px;
+   }
+   .phone-type{
+       margin-top: 6px;
+   }
+   .btn-blue{
+    background-color: #3699FF;
+    border: none;
+    width: 127px;
+    /* height: 31px; */
+    border-radius: 5px;
+    margin-right: 8px;
+ }
+ .btn-gray{
+    background-color: #E5EAEE;
+    border: none;
+    width: 127px;
+    /* height: 31px; */
+    border-radius: 5px;
+ }
+ .aria-select-modal{
+    height: 37px !important;
+    /* background-color: #F3F6F9 !important; */
+    border: none;
+    border-radius: 5px;
+ }
+/*PRIMARYNG*/
+.aria-select-primeng{
+    height: 36px !important;
+    padding: 5px !important;
+ }
+/*End Address model*/
+
+
+.phone-extenstion {
+    width: 85px;
+}
+.phone-ng2-input-wrapper{
+    width: 192px;
+}

@@ -1,0 +1,93 @@
+<div class="h-100 wizard-wrapper">
+    <h5 class="pb-3"> {{ "Please select the data that you will add to the linesheet" | localize }}</h5>
+    <div class="d-flex flex-column h-100 justify-content-between thin-scroll _scroll">
+        <div class="d-flex flex-column flex-wrap">
+            <div class="col-12 pl-5 pr-5 ml-5 mt-5">
+                <div class="align-items-baseline mt-4 pb-5 row">
+                    <label class="pr-4" for="reportTitle">
+                        <h6>
+                            {{ "MyProductsList" | localize }}
+                        </h6>
+                    </label>
+                    <div class="col-6" >
+                        <div class="wide-drop-down" >
+                            <p-autoComplete
+                                [styleClass]="'w-100'"
+                                [inputStyleClass]="'w-100 form-control pl-3 bg-white'"
+                                name="itemList"
+                                [inputId]="'itemList'"
+                                [suggestions]="appItemsLists"
+                                [placeholder]="'EnterProductList' | localize"
+                                (completeMethod)="searchAppItemLists($event?.query)"
+                                [(ngModel)]="selectedAppItemList"
+                                (onSelect)="onSelectItem($event)"
+                                [field]="'name'"
+                                [dataKey]="'id'"
+                                [forceSelection]="true"
+                                [disabled]="disableAppItemsList"
+                            >
+                                <ng-template let-itemList pTemplate="selectedItem">
+                                    <span >{{itemList.appItemsList.name}}</span>
+                                </ng-template>
+                            </p-autoComplete>
+                        </div>
+                    </div>
+                </div>
+                <div class="align-items-baseline  row">
+                    <label class="pr-5" for="MyProductsName">
+                        <h6>
+                            {{ "MyProducts" | localize }}
+                        </h6>
+                    </label>
+                    <div class="col-6">
+                        <input readonly type="text" [required]="true" name="MyProductsName" id="MyProductsName"
+                            [(ngModel)]="myProductsName" class="
+                            form-control
+                            bg-white
+                            form-control-border-grey
+                            Input
+                        " #reportMyProductsNameInput="ngModel" />
+                    </div>
+
+                    <div class="col-1 text-right">
+                        <button class="p-0" [disabled]="printInfoParam.itemsListId && !isValid" (click)="showProductsModal()" style="border: none;"
+                        [ngStyle]="{
+                            'cursor': printInfoParam.itemsListId && !isValid ? 'not-allowed': 'pointer'
+                        }" >
+                            <img src="../../../../../assets/catalogueReport/ReportModal.png"  />
+                        </button>
+
+
+                    </div>
+
+                </div>
+                <div class="align-items-baseline mt-4 row">
+                    <label class="mt-4" for="reportTitle">
+                        <h6 style="color: #3699FF;">
+                            {{ "Numberofselectedproducts" | localize }} ({{numberofselectedproducts}})
+                        </h6>
+                    </label>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="text-right pr-5 w-100 mt-3">
+ 
+        <button class="btn btn-primary" (click)="continueToNextStep()" [disabled]="!isValid" 
+        [ngStyle]="{
+            'cursor': !isValid ? 'not-allowed': 'pointer'
+        }">
+            {{ "Continue" | localize }}
+            <i class="fa-arrow-right fas ml-3"></i>
+            
+        </button>
+    </div>
+
+</div>
+
+
+<app-items-browse-modal #appItemsBrowseModal (apply)="applyHandler($event)" (cancel)="cancelHandler()">
+</app-items-browse-modal>

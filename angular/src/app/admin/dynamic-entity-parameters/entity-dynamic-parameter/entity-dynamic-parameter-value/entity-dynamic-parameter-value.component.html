@@ -1,0 +1,40 @@
+<div [@routerTransition]>
+    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor" *ngIf="initialized">
+        <div class="kt-subheader kt-grid__item">
+            <div [class]="containerClass">
+                <div class="kt-subheader__main">
+                    <h3 class="kt-subheader__title">
+                        <span>{{"EntityDynamicParameterValues" | localize}}</span>
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet  kt-portlet--mobile">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label w-100" style="justify-content: space-between;">
+                        <div class="float-left"><span class="font-weight-bold ">{{'EntityFullName' | localize}}:</span>
+                            {{entityFullName}}
+                        </div>
+                        <div class="float-right"><span class="font-weight-bold ">{{'EntityRowId' | localize}}:</span>
+                            {{entityId}}
+                        </div>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    <entity-dynamic-parameter-value-manager #entityDynamicParameterValueManager
+                        [entityFullName]="entityFullName" [entityId]="entityId">
+                    </entity-dynamic-parameter-value-manager>
+                </div>
+                <div class="kt-portlet__foot">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button type="button" class="btn btn-success pull-right"
+                                (click)="saveAll()">{{'Save' | localize}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

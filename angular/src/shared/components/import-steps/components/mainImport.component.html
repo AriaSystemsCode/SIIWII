@@ -1,0 +1,60 @@
+<!-- Iteration-8 -->
+<BrowseFolderModal
+    #BrowseModal
+    (UploadedFolder)="onUploadedFolder($event)"
+></BrowseFolderModal>
+<app-progress
+    #ProgressModal
+    [progress]="progress"
+    [progressHeader]="progressHeader"
+    [ProgressDetail]="ProgressDetail"
+></app-progress>
+<uploadStatusModal
+    #StatusModal
+    [uploadingResult]="uploadingResult"
+    (onDownloadLogFile)="onDownloadLogFile($event)"
+    (goNextstep)="goNext()"
+    (close)="askToClose($event)"
+    (totalFailedRecords)="ontotalFailedRecords($event)"
+    (totalPassedRecords)="ontotalPassedRecords($event)"
+></uploadStatusModal>
+<autoCropModal
+    #AutoCropModal
+    [imagesList]="imagesList"
+    [imagePassed]="imagePassed"
+    [imageFailed]="imageFailed"
+    [failedImagesIndex]="failedImagesIndex"
+    (autoCrop)="onautoCrop($event)"
+    (finalImages)="onfinalImages($event)"
+    (finishCropping)="onfinishCropping($event)"
+    (close)="askToClose($event)"
+></autoCropModal>
+<imageCroppingModal
+    #imageCroppingModal
+    [finishCropping]="finishCropping"
+    [finalImages]="finalImages"
+    (goNext)="goNext()"
+    [OnChange]="OnChange"
+    (close)="askToClose($event)"
+    (Previous)="imageCroppingGoBack($event)"
+    (finalCountFailed)="onfinalCountFailed($event)"
+    (finalCountPassed)="onfinalCountPassed($event)"
+></imageCroppingModal>
+<importConfirmationModal
+    #importConfirmationModal
+    (close)="askToClose($event)"
+    [finalImages]="finalImages"
+    [finalCountFailed]="finalCountFailed"
+    [finalCountPassed]="finalCountPassed"
+    [totalPassedRecords]="totalPassedRecords"
+    [totalFailedRecords]="totalFailedRecords"
+    (repreateHandler)="onrepreateHandler($event)"
+    (goPrevious)="importConfirmationGoBack()"
+    (goNext)="goNext()"
+></importConfirmationModal>
+<successfullyImportModal
+    #successfullyImportModal
+    (onDownloadLogFile)="onDownloadLogFile($event)"
+    (finishImport)="onFinishImport($event)"
+></successfullyImportModal>
+<!-- Iteration-8 -->

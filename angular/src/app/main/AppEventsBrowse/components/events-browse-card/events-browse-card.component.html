@@ -1,0 +1,91 @@
+<div class="single-item row align-items-center">
+    <div class="single-item-photo mr-1" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+        <img
+            class="w-100"
+            [src]="attachmentBaseUrl + '/' + item.appEvent.logoURL"
+            alt=""
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+        />
+    </div>
+    <div
+        class="single-item-body col"
+        [ngClass]="{ singleItemPerRowMode: 'd-flex flex-row' }"
+    >
+        <div class="row">
+            <div
+                class="pt-3 col"
+            >
+                <h3
+                    class="m-0 mb-2 text-dark cursor-pointer"
+                    (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
+                >
+                    {{ item.appEvent.name | textSubstring: 65 }}
+                </h3>
+                <p class="text-primary mb-2 product-name">
+                    {{ item.appEvent.fromDate?.toString() | date : 'fullDate'  }},
+                    {{ item.appEvent.fromTime?.toString() | date : 'short' }}
+                    {{ item.appEvent.timeZone }}
+                </p>
+                <p
+                    class="text-dark mb-2"
+                >
+                    <span *ngIf="item?.appEvent?.isOnLine">
+                        <i class="fas fa-video"></i>
+                        {{ "Online" | localize }}
+                    </span>
+                    <span *ngIf="!item?.appEvent?.isOnLine">
+                        <i class="fas fa-users-rectangle"></i>
+                        {{ "InPerson" | localize }}
+                    </span>
+                </p>
+                <p
+                    class="text-dark mb-2"
+                    [ngClass]="{ 'd-none': !singleItemPerRowMode }"
+                >
+                    {{ item?.appEvent?.description | textSubstring: 230 }}
+                </p>
+                <p
+                    class="text-dark mb-2"
+                    *ngIf="item.appEvent.guestsCount > 0"
+                >
+                    <span >
+                        <i class="fas fa-users"></i>
+                        <span>
+                            {{item.appEvent.guestsCount}}
+                        </span>
+                        <span>
+                            {{"attendees"}}
+                        </span>
+                    </span>
+                </p>
+                <p
+                    class="text-dark mb-2"
+                    *ngIf="
+                        mainFilterCtrl?.value?.value == EventsFilterTypesEnum.MyEvents &&
+                         statusesFlags?.publicityStatus
+                    "
+                    [ngClass]="item?.appEvent?.isPublished ? 'text-success':'text-warn'"
+                >
+                    {{ ( item?.appEvent?.isPublished ? "Published" : "NotPublished") | localize }}
+                    <span class="ml-2">
+                        <i
+                            class="d-inline-flex flaticon2-information rounded-circle text-white bg-primary"
+                            [ngClass]="item?.appEvent?.isPublished ? 'bg-success':'bg-warn bg-warning'"
+                        ></i>
+                    </span>
+                </p>
+            </div>
+            <div>
+                <app-events-browse-actions-menu
+                        #appEventsActionsMenuComponent
+                        [item]="item.appEvent"
+                        [filterType]="mainFilterCtrl?.value?.value"
+                        [actionsMenuFlags]="actionsMenuFlags"
+                        (triggerEvent)="_triggerEvent($event)"
+                    >
+                </app-events-browse-actions-menu>
+            </div>
+
+        </div>
+    </div>
+</div>

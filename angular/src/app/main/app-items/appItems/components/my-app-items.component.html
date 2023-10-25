@@ -1,0 +1,41 @@
+<app-app-items
+    #AppItemsBrowseComponent
+    (eventTriggered)="eventHandler($event)"
+>
+</app-app-items>
+
+
+<div
+    bsModal
+    #LinesheetModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="LinesheetModal"
+    aria-hidden="true"
+    style="overflow: auto;"
+>
+    <div class="modal-dialog modal-xl" style="height: 90vh;">
+        <div
+            class="modal-content modal-content-wrapper"
+        >
+            <div class="modal-header">
+                <h4 class="modal-title" >
+                    <p class="desc-menu-item">{{l("SelectFromTheBelow")}} {{" "}}  {{l('Products')}}</p>
+                </h4>
+                <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="closeLineSheetModalHandler()" aria-label="Close" >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0  mr-2 big-scroll" *ngIf="showLineSheetModal">
+                <app-appitemslist-catalogue-report
+                    [sessionKey]="multiSelectionInfo.sessionSelectionKey"
+                    [getAllAppItemsInput]="getAllAppItemsInputForLineSheet"
+                    [isModal]="true"
+                    (cancel)="closeLineSheetModalHandler()"
+                >
+                </app-appitemslist-catalogue-report>
+            </div>
+        </div>
+    </div>
+</div>

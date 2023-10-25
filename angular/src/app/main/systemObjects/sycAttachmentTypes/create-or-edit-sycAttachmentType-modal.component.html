@@ -1,0 +1,51 @@
+<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycAttachmentTypeForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycAttachmentType.id">{{l("EditSycAttachmentType")}}</span>
+                        <span *ngIf="!sycAttachmentType.id">{{l("CreateNewSycAttachmentType")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                 
+
+
+								<div class="form-group">
+									<label for="SycAttachmentType_Name">{{l("Name")}} *</label>
+									<input type="text" id="SycAttachmentType_Name" class="form-control" [(ngModel)]="sycAttachmentType.name" name="Name"   minlength="2"  maxlength="30"  required/>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycAttachmentType_Type">{{l("Type")}}</label>
+									<select class="form-control" name="Type" id="SycAttachmentType_Type" [(ngModel)]="sycAttachmentType.type">
+									<option value="1">{{l('Image')}}</option>
+
+									<option value="2">{{l('Video')}}</option>
+
+									<option value="3">{{l('Document')}}</option>
+
+
+									</select>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycAttachmentType_Extension">{{l("Extension")}} *</label>
+									<input type="text" id="SycAttachmentType_Extension" class="form-control" [(ngModel)]="sycAttachmentType.extension" name="Extension"   minlength="1"  maxlength="4"  required/>
+								</div>
+					
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycAttachmentTypeForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

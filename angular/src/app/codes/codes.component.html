@@ -1,0 +1,25 @@
+<div *ngIf="sycSegmentIdentifierDefinitionDto.isVisible">
+    <label for="AppEntity_Code"   [ngClass]="{'d-none':!label}">
+        {{label}}
+    </label>
+
+    <!--<div >
+        {{ code }}
+    </div>
+    
+    class="form-control form-control-sm aria-input-text bg-white form-control-border-grey" 
+    <div *ngIf="!editMode">--> 
+
+    <input type="text" id="AppEntity_Code" 
+     [readonly]="!sycSegmentIdentifierDefinitionDto.isEditable"
+     class="form-control form-control-border-grey"
+     name="Code"  
+     [value]="code ? code : ''"
+     [placeholder]="placeHolder"
+     [ngClass]="classes"
+    (input)="OnGetCodeValue($event)"
+    [readOnly]=readonly
+    [ngStyle]="styles"
+    required/>
+
+</div>

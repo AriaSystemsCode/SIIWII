@@ -1,0 +1,243 @@
+<!-- Iteration-8 -->
+<div
+    bsModal
+    #imageCropping="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="imageCropping"
+    aria-hidden="true"
+    [config]="{ backdrop: 'static' }"
+>
+    <div class="modal-dialog modal-lg modalCenter">
+        <div class="modal-content pl-3">
+            <div class="border-bottom">
+                <div class="row pl-3 pr-3 pb-4">
+                    <div class="col-4 pt-4">
+                        <h6>
+                            {{ "Totalimages" | localize }}
+                            <span class="font-weight-bold">{{
+                                _imagePassed + _imageFailed
+                            }}</span
+                            >,
+                            <span class="font-weight-bold passed"
+                                >{{ "Passed:" | localize }}
+                                {{ _imagePassed }}</span
+                            >,
+                            <span class="font-weight-bold failed">
+                                {{ "Failed:" | localize }}
+                                {{ _imageFailed }}</span
+                            >
+                        </h6>
+                    </div>
+                    <div class="col-5 pt-4 font-weight-bold">
+                        <h3 *ngIf="!finish">
+                            {{ "AutoCropstillinProcessing" | localize }}...
+                        </h3>
+                    </div>
+
+                    <div class="col-3 pt-2 text-right">
+                        <img
+                            src="../../../../assets/accounts/importAccounts/close.svg"
+                            class="pointer"
+                            (click)="askToClose()"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row ml-2 mr-2 pt-4">
+                <div
+                    class="p-2 leftContainer thin-scroll pt-4 mr-2"
+                    (scroll)="onScroll()"
+                >
+                    <div *ngFor="let item of itemsToShow; let i = index">
+                        <div
+                            *ngIf="item.imageExist"
+                            class="mb-3 position-relative img-zoom pointer"
+                        >
+                            <a class="selectImageActive">
+                                <img
+                                    [src]="
+                                        (item.finalStatus ||
+                                            !item.finalStatus) &&
+                                        item.croppedbase64 == ''
+                                            ? item.tempBase64
+                                            : item.croppedbase64
+                                    "
+                                    class="_leftContainer pointer"
+                                    (click)="showImage(item)"
+                                />
+                            </a>
+                            <img
+                                class="position-absolute statusIcon pointer"
+                                [src]="
+                                    item.finalStatus == true
+                                        ? '../../../../assets/accounts/importAccounts/PASSED.svg'
+                                        : '../../../../assets/accounts/importAccounts/FAILED.svg'
+                                "
+                            />
+                            <div
+                                class="position-absolute imageLabel p-0 pointer"
+                            >
+                                <label *ngIf="item.finalStatus"
+                                    >{{ "passedImage" | localize }}
+                                </label>
+                                <label *ngIf="!item.finalStatus"
+                                    >{{ "FailedImage" | localize }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pl-4 pr-4 pt-3 mr-2 center-dev">
+                    <div class="centerContatiner croppertransparntBG">
+                        <img
+                            *ngIf="selectedImage?.finalStatus"
+                            [src]="imageBase64"
+                            class="cropperImageContainer"
+                        />
+                        <image-cropper
+                            *ngIf="!selectedImage?.finalStatus"
+                            [backgroundColor]="'#F4F4F4'"
+                            [imageBase64]="imageBase64"
+                            [alignImage]="'center'"
+                            [maintainAspectRatio]="true"
+                            [aspectRatio]="acceptedRatio"
+                            [disabled]="
+                                selectedImage.finalStatus ? true : false
+                            "
+                            [hideResizeSquares]="
+                                selectedImage.finalStatus ? true : false
+                            "
+                            class="cropperContainer"
+                            (imageCropped)="imageCropped($event)"
+                        ></image-cropper>
+                    </div>
+                    <div
+                        class="row d-flex center-dev w-100 pt-3"
+                        *ngIf="
+                            this.autoCrop != 'true' &&
+                            !selectedImage?.initialStatus
+                        "
+                    >
+                        <div>
+                            <img
+                                *ngIf="!selectedImage?.finalStatus"
+                                class="w-75"
+                                src="../../../../assets/accounts/importAccounts/info.svg"
+                            />
+                        </div>
+                        <div class="p-0 wrap col-7">
+                            <label *ngIf="!selectedImage?.finalStatus">
+                                {{
+                                    "Thisfailedimageneedtocrop.Becauseitoverdimensions"
+                                        | localize
+                                }}
+                            </label>
+                        </div>
+                        <div class="col-2">
+                            <button
+                                class="btn UndoCrop-Btn pointer"
+                                (click)="Undocrop()"
+                                [disabled]="!selectedImage?.finalStatus"
+                                [ngClass]="{
+                                    disabled: !selectedImage?.finalStatus
+                                }"
+                            >
+                                {{ "Undo" | localize }}
+                                <img
+                                    class="pl-2"
+                                    src="../../../../assets/accounts/importAccounts/undo.png"
+                                />
+                            </button>
+                        </div>
+                        <div class="col-2">
+                            <button
+                                class="btn Crop-Btn pointer"
+                                (click)="crop()"
+                                [disabled]="selectedImage?.finalStatus"
+                                [ngClass]="{
+                                    disabled: selectedImage?.finalStatus
+                                }"
+                            >
+                                {{ "Crop" | localize }}
+                                <img
+                                    class="pl-2"
+                                    src="../../../../assets/accounts/importAccounts/Croping.svg"
+                                />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 thin-scroll rightContainer">
+                    <h6 class="mb-3">{{ "Imageinfo" | localize }}</h6>
+                    <label for="code">{{ "code" | localize }}</label>
+                    <input
+                        type="text"
+                        id="code"
+                        [(ngModel)]="selectedImage.code"
+                        class="p-3"
+                        readonly
+                    /><br /><br />
+
+                    <label for="ImageName">{{ "ImageName" | localize }}</label>
+                    <input
+                        type="text"
+                        id="ImageName"
+                        [(ngModel)]="imageName"
+                        class="p-3"
+                        readonly
+                    /><br /><br />
+
+                    <label for="Type">{{ "ImageType" | localize }} </label>
+                    <input
+                        type="text"
+                        id="Type"
+                        [(ngModel)]="selectedImage.imgtype"
+                        class="p-3"
+                        readonly
+                    /><br /><br />
+                    <h6>{{ "Metadata" | localize }}</h6>
+                    <div class="row border-bottom pt-2 pb-3">
+                        <div class="col-6">{{ "Type" | localize }}</div>
+                        <div class="col-6" style="text-align: right">
+                            {{ image.type }}
+                        </div>
+                    </div>
+                    <div class="row border-bottom pt-2 pb-3">
+                        <div class="col-6">{{ "Resolution" | localize }}</div>
+                        <div class="col-6" style="text-align: right">
+                            {{ image.width }}x{{ image.height }}
+                        </div>
+                    </div>
+                    <div class="row pt-2 pb-3">
+                        <div class="col-6">{{ "Size" | localize }}</div>
+                        <div class="col-6" style="text-align: right">
+                            {{ image.size | number }} {{ image.sizeType }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row p-4 border-top mt-4 ml-0 mr-0">
+                <button
+                    class="btn btn-secondary _Btn mr-2 pointer"
+                    (click)="goPreviousStep()"
+                    [disabled]="!finish"
+                    [ngClass]="{ disabled: !finish }"
+                >
+                    {{ "Previous" | localize }}
+                </button>
+                <button
+                    class="btn btn-primary _Btn pointer"
+                    (click)="goNextStep()"
+                    [disabled]="!finish"
+                    [ngClass]="{ disabled: !finish }"
+                >
+                    {{ "Next" | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Iteration-8 -->
+</div>

@@ -1,0 +1,48 @@
+<div [@routerTransition] class="ads p-2 bg-white container mb-3 mt-5 mt-lg-0 p-4 slidesContainer" *ngIf="adsList && adsList?.length > 0; else noads">
+    <div #adsContainer>
+        <ng-container *ngFor="let ads of adsList">
+            <a *ngIf="!ads?.appAdvertisement?.url && ads.accountId;else elseLink" [routerLink]="['/app/main/account/view/',ads.accountId]"  >
+                <app-image-display
+                    [image]="ads?.appAdvertisement?.homeImage ? (attachmentBaseUrl + '/' +  ads.appAdvertisement.homeImage) : '../../../../assets/placeholders/_logo-placeholder.png'"
+                    [sycAttachmentCategory]="sycAttachmentCategoryPhoto"
+                    [staticWidth]="adsContainer.offsetWidth"
+                    [alt]="ads.tenantName + l('advertisement')"
+                >
+                </app-image-display>
+            </a>
+             <ng-template #elseLink>
+            <a  *ngIf="ads?.appAdvertisement?.url" [href]="ads?.appAdvertisement?.url" target="_blank">
+                <app-image-display
+                    [image]="ads?.appAdvertisement?.homeImage ? (attachmentBaseUrl + '/' +  ads.appAdvertisement.homeImage) : '../../../../assets/placeholders/_logo-placeholder.png'"
+                    [sycAttachmentCategory]="sycAttachmentCategoryPhoto"
+                    [staticWidth]="adsContainer.offsetWidth"
+                    [alt]="ads.tenantName + l('advertisement')"
+                >
+                </app-image-display>
+            </a>
+            <a  *ngIf="!ads?.appAdvertisement?.url">
+                <app-image-display
+                    [image]="ads?.appAdvertisement?.homeImage ? (attachmentBaseUrl + '/' +  ads.appAdvertisement.homeImage) : '../../../../assets/placeholders/_logo-placeholder.png'"
+                    [sycAttachmentCategory]="sycAttachmentCategoryPhoto"
+                    [staticWidth]="adsContainer.offsetWidth"
+                    [alt]="ads.tenantName + l('advertisement')"
+                >
+                </app-image-display>
+            </a>
+        </ng-template>
+        </ng-container>
+    </div>
+</div>
+
+
+<ng-template #noads>
+    <div class="ads slidesContainer noslidedata" #noAdsCont>
+        <app-image-display
+            [image]="'../../../../assets/placeholders/noAdv.png'"
+            [sycAttachmentCategory]="sycAttachmentCategoryPhoto"
+            [staticWidth]="noAdsCont.offsetWidth"
+        >
+        </app-image-display>
+    </div>
+</ng-template>
+

@@ -1,0 +1,96 @@
+<form #listForm="ngForm" (ngSubmit)="submitSelection()" >
+    <div
+        bsModal
+        #bsModal="bs-modal"
+        class="modal fade"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="selectListModal"
+        aria-hidden="true"
+    >
+        <div
+            class="modal-dialog right-modal"
+            [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
+            role="document"
+        >
+            <div class="modal-content">
+                <div class="modal-content-wrapper" *ngIf="active"  >
+                    <div class="modal-header">
+                        <h4 class="modal-title" >
+                            <p class="desc-menu-item">{{l(title)}}   {{l("values")}} </p>
+                        </h4>
+                        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="cancel()" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-0 thin-scroll mr-2">
+                        <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded">
+                            <span class="mr-3">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="search" id="search" placeholder="Search" (input)="onFilter()" [(ngModel)]="searchQuery" class="form-control bg-white border-0">
+                        </div>
+                        <div class="d-flex flex-column mb-3" *ngIf="allRecords?.length">
+                            <div class="align-items-center border-dashed-bottom d-flex justify-content-between p-3" *ngFor="let item of allRecords;index as i">
+                                    <div class="d-flex" [ngClass]="{'t-checkbox-list':mode == selectionMode.Multi}">
+                                        <label class="mr-4" [ngClass]="mode == selectionMode.Multi ? 'kt-checkbox kt-checkbox--dark':'ml-3'" [for]="item[valueField]">
+                                            <p-checkbox
+                                                *ngIf="mode == selectionMode.Multi"
+                                                [id]="item[valueField]"
+                                                [(ngModel)]="selectedRecords"
+                                                [value]="item[valueField]"
+                                                [name]="title"
+                                            ></p-checkbox>
+                                            <input type="radio" *ngIf="mode == selectionMode.Single" [value]="item[valueField]" [id]="item[valueField]" [(ngModel)]="selectedRecords" [name]="title"  />
+                                        </label>
+                                        {{item[labelField]}}
+                                    </div>
+                                <div *ngIf="!item.isHostRecord && ( showAdd || showEdit || showDelete )">
+                                    <div class="btn-group dropdown" dropdown container="body" placement='bottom right' >
+                                        <button class="dropdown-toggle btn btn-sm btn-action" type="button"
+                                            dropdownToggle>
+                                        </button>
+                                        <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"  *dropdownMenu>
+                                            <li *ngIf="item.showEdit">
+                                                <a (click)="createOrEdit(item)">{{'Edit' | localize}}</a>
+                                            </li>
+                                            <li *ngIf="item.showDelete">
+                                                <a  (click)="deleteItem(item)" >{{'Delete' | localize}}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                
+                            </div>
+                            <div *ngIf="allRecords?.length">
+                                <button
+                                    class="btn btn-font-hover-brand ml-3"
+                                    (click)="showMoreListData()"
+                                    *ngIf="showMoreListDataButton"
+                                    type="button"
+                                >
+                                    {{ 'showmore' | localize }} ...
+                                </button>
+                            </div>
+                            <div class="text-center" *ngIf="allRecords?.length === 0">
+                                {{ 'NoRecordsFound...' | localize }}
+                            </div>
+                        </div>
+                        <button *ngIf="showAdd"  title="{{ 'AddNewValue' | localize }}" type="button" class="btn btn-icon btn-primary btn-circle create-edit-btn" (click)="createOrEdit()">
+                            <i class="flaticon2-plus"></i>
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" (click)="submitSelection()">
+                            {{l("Add")}}
+                        </button>
+                        <button type="button" class="btn btn-default btn-gray" (click)="cancel()">{{l("Cancel")}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+    
+
+

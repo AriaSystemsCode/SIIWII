@@ -1,0 +1,77 @@
+<app-items-browse-modal
+    #appItemsBrowseModal
+    (apply)="applyHandler($event)"
+    (cancel)="cancelHandler()"
+>
+</app-items-browse-modal>
+
+<div style="margin-top: -90px;" class="wrapper">
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet__body" style="min-height: 80vh;">
+                    <div class="mb-3">
+                        <h2>Product Selector Test Page</h2>                        
+                        <h5 class="mb-5">Add Products and then apply to see your selection</h5>                        
+                        <button class="btn btn-primary" (click)="showBrowseModal()">Add Products</button>  
+                    </div>   
+                    <div class="d-flex" *ngIf="primengTableHelper?.records?.length">
+                        <p-table #dataTable
+                            dataKey="position"
+                            [value]="primengTableHelper.records"
+                            rows="{{primengTableHelper.records.length}}"
+                            [paginator]="false"
+                            responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>
+                                        {{ "image" | localize }}
+                                    </th>
+                                    <th>
+                                        {{ "name" | localize }}
+                                    </th>
+                                    <th>
+                                        {{ "code" | localize}}
+                                    </th>
+                                    <th>
+                                        {{ "description" | localize }}
+                                    </th>
+                                    <th>
+                                        {{ "price" | localize }}
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template  pTemplate="body" let-record="$implicit" let-index ="rowIndex">
+                                <tr >
+                                    <td>
+                                        <img
+                                            style="height:100px"
+                                            [src]="attachmentBaseUrl + '/' + record.appItem.imageUrl"
+                                            alt=""
+                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                        />
+                                    </td>
+                                    <td>
+                                        {{record.appItem.name}}
+                                    </td>
+                                    <td>
+                                        {{record.appItem.code}}
+                                    </td>
+                                    <td>
+                                        {{record.appItem.description | textSubstring: 210}}
+                                    </td>
+                                    <td>
+                                        {{record.appItem.price}}
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>                       
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,62 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{l("Details")}}</span>
+                </h4>
+                <button type="button" class="close" (click)="close()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Code")}} :</h6>
+                        {{ item.sycAttachmentCategory.code }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Name")}} :</h6>
+                        {{ item.sycAttachmentCategory.name }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Attributes")}} :</h6>
+                        {{ item.sycAttachmentCategory.attributes }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("parentCode")}} :</h6>
+                        {{ item.sycAttachmentCategory.parentCode }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Type")}} :</h6>
+                        {{AttachmentTypesEnum[item.sycAttachmentCategory.type] || ''}}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("AspectRatio")}} :</h6>
+                        {{ item.sycAttachmentCategory.aspectRatio }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("MaxFileSize")}} :</h6>
+                        {{ item.sycAttachmentCategory.maxFileSize }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Message")}} :</h6>
+                        {{ item.sycAttachmentCategory.message }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>({{l("SycAttachmentCategory")}}) {{l("Name")}} :</h6>
+                        {{item.sycAttachmentCategoryName}}
+                    </div>
+
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button [disabled]="saving" type="button" class="btn btn-primary blue" (click)="close()">{{l("Close")}}</button>
+            </div>
+        </div>
+    </div>
+
+</div>

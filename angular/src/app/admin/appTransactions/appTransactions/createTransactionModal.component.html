@@ -1,0 +1,410 @@
+<!-- dialog to start new sales order or purchase order -->
+<p-dialog
+    [style]="{ width: '40vw' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
+    [baseZIndex]="10000"
+    [modal]="true"
+    [header]="modalheaderName + ' ' + orderNo"
+    [(visible)]="display"
+    [draggable]="false"
+    [closable]="true"
+    (onHide)="cancel()"
+>
+    <div class="wrapper">
+        <div class="user d-flex align-items-center justify-content-between">
+            <div
+                class="enter d-flex align-items-center justify-content-start gap-2"
+            >
+                <span>Entered By</span>
+                <a href="http://" target="_blank" rel="noopener noreferrer">{{
+                    fullName
+                }}</a>
+            </div>
+            <span class="date">{{ dt }}</span>
+        </div>
+        <div class="w-50 my-4">
+            <p-dropdown
+                [options]="roles"
+                class="w-100"
+                placeholder="Please Select your Role"
+                optionLabel="name"
+                (onChange)="handleRoleChange($event)"
+                #Role
+            ></p-dropdown>
+            <small class="text-danger" *ngIf="isRoleExist">
+                Please Select Role
+            </small>
+        </div>
+
+        <div class="seller">
+            <div class="sellerHeader">
+                <span>Buyer Information</span>
+            </div>
+            <form [formGroup]="orderForm" class="form mt-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="flex align-items-center gap-1 my-2">
+                            <p-checkbox
+                                value="Buyer"
+                                [disabled]="isBuyer"
+                                (click)="$event.stopPropagation()"
+                                (onChange)="selectTempBuyer()"
+                            ></p-checkbox>
+                            <label for="ny" class="p-0 mb-0"
+                                >Temp Account</label
+                            >
+                        </div>
+                    </div>
+                    <!-- buyer company Name -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Buyer Company Name*</label
+                            >
+                            <div *ngIf="isBuyerTempAccount || isCompantIdExist">
+                                <input
+                                    [readonly]="
+                                        !isBuyerTempAccount && isCompantIdExist
+                                    "
+                                    type="text"
+                                    name="Buyer Company Name"
+                                    class="form-control"
+                                    placeholder="Buyer Company Name..."
+                                    formControlName="buyerCompanyName"
+                                />
+                            </div>
+
+                            <div *ngIf="!isCompantIdExist">
+                                <p-dropdown
+                                    *ngIf="!isBuyerTempAccount"
+                                    [options]="buyerCompanies"
+                                    formControlName="buyerCompanyName"
+                                    [filter]="true"
+                                    optionLabel="name"
+                                    placeholder="Please Select Buyer Comapny Name"
+                                    (onFilter)="
+                                        handleBuyerCompanySearch($event)
+                                    "
+                                    (onChange)="
+                                        handleBuyerCompanyChange($event)
+                                    "
+                                ></p-dropdown>
+                            </div>
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('buyerCompanyName')
+                                        ?.hasError('required')
+                                "
+                            >
+                                Buyer company Name is required
+                            </small>
+                        </div>
+                    </div>
+                    <!-- buyer company Name -->
+
+                    <!-- buyer name -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Buyer Contact Name*</label
+                            >
+                            <input
+                                type="text"
+                                name=""
+                                id=""
+                                class="form-control"
+                                placeholder="Buyer Contact Name"
+                                formControlName="buyerName"
+                                *ngIf="isBuyerTempAccount"
+                            />
+                            <p-dropdown
+                                *ngIf="!isBuyerTempAccount"
+                                [options]="buyerContacts"
+                                formControlName="buyerName"
+                                [filter]="true"
+                                optionLabel="name"
+                                [disabled]="buyerComapnyId === 0"
+                                placeholder="Please Select Buyer Name"
+                                (onFilter)="handleBuyerNameSearch($event)"
+                                (onChange)="handleBuyerNameChange($event)"
+                            ></p-dropdown>
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('buyerName')
+                                        ?.hasError('required')
+                                "
+                            >
+                                Buyer Name is required
+                            </small>
+                        </div>
+                    </div>
+                    <!-- buyer name -->
+
+                    <!-- buyer number -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Buyer Mobile Number*
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Buyer Mobile Number..."
+                                formControlName="buyerPhoneNumber"
+                            />
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('buyerPhoneNumber')
+                                        ?.hasError('required')
+                                "
+                            >
+                                phone Number is Required
+                            </small>
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('buyerPhoneNumber')
+                                        ?.hasError('pattern')
+                                "
+                            >
+                                phone Number is Invalid
+                            </small>
+                        </div>
+                    </div>
+                    <!-- buyer number -->
+
+                    <!-- buyer email -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Buyer Email*
+                            </label>
+                            <input
+                                type="text"
+                                name=""
+                                id=""
+                                class="form-control"
+                                placeholder="Buyer Email..."
+                                formControlName="buyerEMailAddress"
+                            />
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('buyerEMailAddress')
+                                        ?.hasError('required')
+                                "
+                            >
+                                Email Address is Required
+                            </small>
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('buyerEMailAddress')
+                                        ?.hasError('email')
+                                "
+                            >
+                                Email Address is Invalid
+                            </small>
+                        </div>
+                    </div>
+                    <!-- buyer email -->
+                </div>
+            </form>
+        </div>
+        <div class="seller">
+            <div class="sellerHeader">
+                <span>Seller Information</span>
+            </div>
+            <form class="form mt-3" [formGroup]="orderForm">
+                <div class="row">
+                    <!-- <div class="col-md-12">
+                        <div class="flex align-items-center gap-1 my-2">
+                            <p-checkbox [disabled]="isSeller" value="Seller" (click)="$event.stopPropagation();" (onChange)="selectTempSeller()"></p-checkbox>
+                            <label for="ny" class="p-0 mb-0">Temp Account</label>
+                        </div>
+                    </div> -->
+                    <!-- Seller company Name -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Seller Company Name*</label
+                            >
+                            <div *ngIf="isSellerCompanyIdExist">
+                                <input
+                                    type="text"
+                                    name="sellerCompanyName"
+                                    class="form-control"
+                                    placeholder="seller Company Name..."
+                                    formControlName="sellerCompanyName"
+                                    readonly
+                                />
+                            </div>
+                            <div *ngIf="!isSellerCompanyIdExist">
+                                <p-dropdown
+                                    [options]="sellerCompanies"
+                                    formControlName="sellerCompanyName"
+                                    [filter]="true"
+                                    optionLabel="name"
+                                    placeholder="Please Select Seller Comapny Name"
+                                    (onFilter)="
+                                        handleSellerCompanySearch($event)
+                                    "
+                                    (onChange)="
+                                        handleSellerCompanyChange($event)
+                                    "
+                                ></p-dropdown>
+                            </div>
+
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('sellerCompanyName')
+                                        ?.hasError('required')
+                                "
+                            >
+                                Seller company Name is required
+                            </small>
+                        </div>
+                    </div>
+                    <!-- Seller company Name -->
+
+                    <!-- seller Name -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Seller Contact Name*</label
+                            >
+                            <p-dropdown
+                                [options]="sellerContacts"
+                                formControlName="sellerName"
+                                [filter]="true"
+                                optionLabel="name"
+                                placeholder="Please Select Seller Contact Name"
+                                (onFilter)="handleSellerNameSearch($event)"
+                                (onChange)="handleSellerNameChange($event)"
+                            ></p-dropdown>
+
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('sellerName')
+                                        ?.hasError('required')
+                                "
+                            >
+                                Seller Name is required
+                            </small>
+                        </div>
+                    </div>
+                    <!-- seller Name -->
+
+                    <!-- mobile Number -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Seller Mobile Number*
+                            </label>
+                            <input
+                                type="text"
+                                name="mobileNumber"
+                                class="form-control"
+                                placeholder="Mobile Number..."
+                                formControlName="sellerPhoneNumber"
+                            />
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('sellerPhoneNumber')
+                                        ?.hasError('required')
+                                "
+                            >
+                                phone Number is Required
+                            </small>
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('sellerPhoneNumber')
+                                        ?.hasError('pattern')
+                                "
+                            >
+                                phone Number is Invalid
+                            </small>
+                        </div>
+                    </div>
+                    <!-- seller mobile number -->
+
+                    <!-- Seller email -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Seller Email*</label
+                            >
+                            <input
+                                type="text"
+                                name="sellerEMailAddress"
+                                class="form-control"
+                                placeholder="Seller Email..."
+                                formControlName="sellerEMailAddress"
+                            />
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('sellerEMailAddress')
+                                        ?.hasError('required')
+                                "
+                            >
+                                Email Address is Required
+                            </small>
+                            <small
+                                class="text-danger"
+                                *ngIf="
+                                    submitted &&
+                                    orderForm
+                                        .get('sellerEMailAddress')
+                                        ?.hasError('email')
+                                "
+                            >
+                                Email Address is Invalid
+                            </small>
+                        </div>
+                    </div>
+                    <!-- Seller email -->
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="footer">
+        <button
+            pButton
+            [loading]="btnLoader"
+            (click)="getStarted()"
+            class="btn"
+        >
+            Let's get started
+        </button>
+    </div>
+</p-dialog>

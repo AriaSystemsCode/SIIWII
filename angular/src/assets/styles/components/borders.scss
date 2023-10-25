@@ -1,0 +1,20 @@
+// borders
+
+.border-dashed-left {
+    @include dashed-border('left')
+}
+
+.border-dashed-top {
+    @include dashed-border('top')
+}
+.border-dashed-bottom {
+    @include dashed-border('bottom')
+}
+.border-dashed-right {
+    @include dashed-border('right')
+}
+
+
+.border-primary {
+    border-color: $blue!important;
+}

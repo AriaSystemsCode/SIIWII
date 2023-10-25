@@ -1,0 +1,13 @@
+<svg id="My_Lookups_Default" data-name="My Lookups Default" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <g id="Rectangle_13079" data-name="Rectangle 13079" fill="#fff" stroke="#707070" stroke-width="1" opacity="0">
+    <rect width="22" height="22" stroke="none"/>
+    <rect x="0.5" y="0.5" width="21" height="21" fill="none"/>
+  </g>
+  <g id="Group_116870" data-name="Group 116870" transform="translate(-287 -50)">
+    <path id="Rectangle_13254" data-name="Rectangle 13254" d="M0,0H18.789a0,0,0,0,1,0,0V0A2.859,2.859,0,0,1,15.93,2.859H2.859A2.859,2.859,0,0,1,0,0V0A0,0,0,0,1,0,0Z" transform="translate(289 64.62)" fill="none" stroke="#1e1e1e" stroke-linejoin="round" stroke-width="0.5"/>
+    <line id="Line_199" data-name="Line 199" x2="2.451" transform="translate(297.169 65.845)" fill="none" stroke="#1e1e1e" stroke-linejoin="round" stroke-width="0.5"/>
+    <path id="Rectangle_13255" data-name="Rectangle 13255" d="M2,0H14.338a2,2,0,0,1,2,2v8.62a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V2A2,2,0,0,1,2,0Z" transform="translate(290.225 54)" fill="none" stroke="#1e1e1e" stroke-linejoin="round" stroke-width="0.5"/>
+    <path id="Path_318" data-name="Path 318" d="M305.571,63.944V62.31H304.2a5.285,5.285,0,0,0-.646-1.558l.972-.972-1.733-1.733-.971.972a7.709,7.709,0,0,0-1.558-.646V57H297.81v1.373a5.285,5.285,0,0,0-1.558.646l-.971-.972-1.733,1.733.972.971a5.285,5.285,0,0,0-.646,1.558H292.5v1.634" transform="translate(-0.641 -0.549)" fill="none" stroke="#1e1e1e" stroke-linejoin="round" stroke-width="0.5"/>
+    <path id="Path_319" data-name="Path 319" d="M303.035,64.768a3.268,3.268,0,1,0-6.535,0" transform="translate(-1.373 -1.373)" fill="none" stroke="#1e1e1e" stroke-linejoin="round" stroke-width="0.5"/>
+  </g>
+</svg>

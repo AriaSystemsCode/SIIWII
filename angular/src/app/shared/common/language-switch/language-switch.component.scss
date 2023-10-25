@@ -1,0 +1,18 @@
+.header__topbar-item {
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.header__topbar-item:hover {
+    color: #2061eb !important;
+    transition: all 0.3s ease-in-out;
+}
+
+.header__topbar-item .dropdown-toggle::after {
+    display: none;
+}
+
+.header__topbar-item i{
+    display:flex;
+}

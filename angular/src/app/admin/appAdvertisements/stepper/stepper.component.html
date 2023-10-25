@@ -1,0 +1,20 @@
+<section class="container ">
+    <!-- The navbar for the wizard -->
+    <div class="d-flex mb-5 justify-content-around">
+        <ng-container *ngFor="let step of steps; let i = index;">
+            <div class="item" [ngClass]="(selectedIndex === i) ? activeClass : ''">
+                <a >
+                    <ng-container *ngIf="step.stepLabel; else showLabelText" [ngTemplateOutlet]="step.stepLabel.template">
+                    </ng-container>
+                    <ng-template #showLabelText>
+                    {{ step.label }}
+                    </ng-template>
+                </a>
+            </div>
+        </ng-container>
+    </div>
+
+    <div >
+      <ng-container [ngTemplateOutlet]="selected.content"></ng-container>
+    </div>
+  </section>

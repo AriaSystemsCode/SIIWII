@@ -1,0 +1,63 @@
+<div class="row justify-content-center align-items-center h-100" [@routerTransition]>
+    <div class="col-lg-5 col-md-7 col-sm-10 col-xs-12 content">
+        <div class="kt-portlet kt-portlet--height-fluid" style="padding:10px;padding-bottom: 20px">
+            <div class="alert alert-solid-brand alert-bold" role="alert">
+                <div class="alert-text" style="font-weight: bold;">{{'YourSessionIsLocked' | localize}}<i class="fa fa-lock float-right"></i></div>
+            </div>
+            <div class="kt-portlet__body kt-portlet__body--fit-y">
+                <!--begin::Widget -->
+                <div class="kt-widget kt-widget--user-profile-4">
+                    <div class="kt-widget__head">
+                        <div class="kt-widget__media">
+                            <img class="kt-widget__img" *ngIf="userInfo && userInfo.profilePicture"
+                                [src]="userInfo.profilePicture" alt="profileimage">
+                        </div>
+                        <div class="kt-widget__content">
+                            <div class="kt-widget__section">
+                                <span class="kt-widget__username">
+                                    {{userInfo.userName}}
+                                </span>
+                                <div class="kt-widget__button">
+                                    Tenant: <span style="font-weight: bold;">{{userInfo.tenant}}</span>
+                                </div>
+                                <form #loginForm="ngForm" class="kt-form mt-4" method="post" novalidate (ngSubmit)="login()">
+                                    <input #userNameOrEmailAddressInput="ngModel"
+                                        [(ngModel)]="loginService.authenticateModel.userNameOrEmailAddress" autoFocus
+                                        class="form-control m-input" type="hidden" autocomplete="new-password"
+                                        name="userNameOrEmailAddress" />
+
+                                    <div class="form-group">
+                                        <input #passwordInput="ngModel"
+                                            [(ngModel)]="loginService.authenticateModel.password"
+                                            class="form-control m-input" type="password" autocomplete="new-password"
+                                            placeholder="{{'Password' | localize}}*" name="password" required
+                                            maxlength="32" />
+                                        <validation-messages [formCtrl]="passwordInput" *ngIf="!passwordInput.touched">
+                                        </validation-messages>
+                                    </div>
+
+                                    <div>
+                                        <div class="mt-4 float-left">
+                                            <label class="kt-checkbox">
+                                                <input class="form-control" [(ngModel)]="loginService.rememberMe"
+                                                    type="checkbox" name="rememberMe"
+                                                    value="true" />{{"RememberMe" | localize}}
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                        <button type="submit"
+                                            class="btn btn-primary btn-elevate kt-login__btn-primary float-right mt-2"
+                                            [disabled]="!loginForm.form.valid">{{"LogIn" | localize}}</button>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Widget -->
+            </div>
+        </div>
+        <a routerLink="/account/login" class="kt-link kt-login__link-forgot w-100 text-center">{{'GoToLoginPage' | localize}}</a>
+    </div>
+</div>

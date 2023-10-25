@@ -1,0 +1,54 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #appTenantPlanForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="appTenantPlan.id">{{l("EditAppTenantPlan")}}</span>
+                        <span *ngIf="!appTenantPlan.id">{{l("CreateNewAppTenantPlan")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+					<div class="form-group m-form__group">
+						<label for="SycPlanName">{{l("SycPlan")}}</label>
+						<select name="appTenantPlan.planId" [(ngModel)]="appTenantPlan.planId" class="form-control" >
+							<option value="">{{l("SelectASycPlan")}}</option>
+							<option *ngFor="let item of allSycPlans" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+
+								<div class="form-group">
+									<label for="AppTenantPlan_AddDate">{{l("AddDate")}}</label>
+									 <input required class="form-control m-input" #AppTenantPlan_AddDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTenantPlan.addDate" id="AppTenantPlan_AddDate" name="AppTenantPlan_AddDate">
+									<validation-messages [formCtrl]="AppTenantPlan_AddDate"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTenantPlan_EndDate">{{l("EndDate")}}</label>
+									 <input required class="form-control m-input" #AppTenantPlan_EndDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTenantPlan.endDate" id="AppTenantPlan_EndDate" name="AppTenantPlan_EndDate">
+									<validation-messages [formCtrl]="AppTenantPlan_EndDate"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="AppTenantPlan_StartDate">{{l("StartDate")}}</label>
+									 <input required class="form-control m-input" #AppTenantPlan_StartDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTenantPlan.startDate" id="AppTenantPlan_StartDate" name="AppTenantPlan_StartDate">
+									<validation-messages [formCtrl]="AppTenantPlan_StartDate"></validation-messages>
+								</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!appTenantPlanForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,14 @@
+:host {
+    height: 100%;
+}
+
+._scroll
+{
+    overflow: hidden auto;
+    height:300px !important;
+}
+
+input:focus
+{
+    border: 1px solid black !important;
+}

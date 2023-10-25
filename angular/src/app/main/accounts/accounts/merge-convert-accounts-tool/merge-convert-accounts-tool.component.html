@@ -1,0 +1,309 @@
+<div class="kt-grid__item kt-grid__item--fluid">
+    <div class="kt-portlet mt-0">
+        <div class="kt-portlet__body">
+            <div class="p-4">
+                <div class="row mb-4">
+                    <div class="col-6 row">
+                        <h5 class="col-3 mr-2" style="white-space: nowrap;">{{'SourceAccountType' | localize}} <span
+                                class="text-danger">*</span></h5>
+                        <select class="form-control col-6" [(ngModel)]="createAccountsInputDto.sourceAccountType"
+                            (change)="onChangeSourceAccountType($event.target.value)">
+                            <option #sourceAccountTypeCombobox *ngFor="let sAccountType of sourceAccountTypes"
+                                [value]="sAccountType.value">
+                                {{sAccountType.value | localize}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-6 row">
+                        <h5 class="mr-3">{{'DestinationAccountType' | localize}} <span class="text-danger">*</span></h5>
+                        <select class="form-control col-6" [(ngModel)]="createAccountsInputDto.targetAccountType"
+                            (change)="onChangeDestinationAccountType($event.target.value)">
+                            <option #destinationAccountTypeCombobox *ngFor="let dAccountType of destinationAccountTypes"
+                                [value]="dAccountType.value">
+                                {{dAccountType.value| localize}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-6 pl-4">
+                        <div class="row">
+                            <h5> {{'DeleteSourceAccount' | localize}} </h5>
+                            <div class="kt-checkbox-list pl-4">
+                                <span class="kt-checkbox">
+                                    <span style="border: none;"><input type="checkbox"
+                                            [(ngModel)]="createAccountsInputDto.deleteSourceAccount"
+                                            id="deleteSourceAccount" name="deleteSourceAccount" /></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 row pl-0">
+                        <div class="row">
+                            <h5> {{'NewDestinantionAccount' | localize}} </h5>
+                            <div class="kt-checkbox-list pl-4">
+                                <span class="kt-checkbox">
+                                    <span style="border: none;">
+                                        <input type="checkbox"
+                                            [disabled]="createAccountsInputDto.targetAccountType?.toString() ==targetAccountEnum[targetAccountEnum.NewTenant] || disableNewDestinantionAccount"
+                                            [checked]="createAccountsInputDto.targetAccountType?.toString() ==targetAccountEnum[targetAccountEnum.NewTenant]"
+                                            [(ngModel)]="newDestinantionAccount" id="NewDestinantionAccount"
+                                            name="NewDestinantionAccount"
+                                            (change)="onchangeNewDestinantionAccount($event.target.checked)" />
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-6 row" *ngIf="!appSession.tenant">
+                        <h5 class="col-3">{{'SourceTenant' | localize}}</h5>
+                        <!--   <select class="form-control col-6" [(ngModel)]="sourceTenant" [disabled]="disableSourceTenant"
+                            (change)="onChangeSourceTenant($event.target.value)">
+                            <option disabled selected="selected" value></option>
+                            <option #sourceTenantCombobox [disabled]="disableSourceTenant"
+                                *ngFor="let sTenant of sourceTenants" [value]="sTenant.id">{{sTenant.displayName}}
+                            </option>
+                        </select> -->
+                        <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
+                            [disabled]="disableSourceTenant" [ngStyle]="{
+                            'background-color': disableSourceTenant ? '#e2e5ec' : 'white'
+                        }" class="
+                        col-6 p-0
+                            InputText
+                            email-autocomplete
+                            sendMessageInputs
+                        " [(ngModel)]="sourceTenant" [forceSelection]="true" [suggestions]="filteredSourceTenant"
+                            (onSelect)="onChangeSourceTenant($event)" (change)="resetSourceAccountData(true)"
+                            (completeMethod)="filterSourceTenant($event)" [minLength]="1" field="name"
+                            name="SingleSelectInputSourceTenant" id="SingleSelectInputSourceTenant" [required]="true"
+                            [multiple]="false">
+                        </p-autoComplete>
+                    </div>
+                    <div class="col-6 row" *ngIf="appSession.tenant">
+                        <h5 class="col-3">{{'SourceAccount' | localize}}<span class="text-danger">*</span></h5>
+                        <!--  <select class="form-control col-6" [(ngModel)]="createAccountsInputDto.sourceAccountId"
+                            [disabled]="disableSourceAccount" (change)="onChangeSourceAccount($event.target.value)">
+                            <option disabled selected="selected" value></option>
+                            <option #sourceAccountCombobox [disabled]="disableSourceAccount"
+                                *ngFor="let sAccount of sourceAccounts" [value]="sAccount.id">
+                                {{sAccount.displayName|localize}}
+                            </option>
+                        </select> -->
+                        <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
+                            [disabled]="disableSourceAccount" [ngStyle]="{
+                        'background-color': disableSourceAccount ? '#e2e5ec' : 'white'
+                    }" class="
+                    col-6 p-0
+                        InputText
+                        email-autocomplete
+                        sendMessageInputs
+                    " [(ngModel)]="sourceAccount" [forceSelection]="true" [suggestions]="filteredSourceAccount"
+                            (onSelect)="onChangeSourceAccount($event)" (change)="resetSourceAccountData()"
+                            (completeMethod)="filterSourceAccount($event)" [minLength]="1" field="name"
+                            name="SingleSelectInputSourceAccount" id="SingleSelectInputSourceAccount" [required]="true"
+                            [multiple]="false">
+                        </p-autoComplete>
+                    </div>
+
+
+                    <div class="col-6 row">
+                        <h5 class="col-3 pl-0">{{'DestinationAccount' | localize}}<span class="text-danger">*</span>
+                        </h5>
+                        <!-- <select class="form-control col-6" [(ngModel)]="destinationAccount"
+                            [disabled]="disableDestinationAccount"
+                            (change)="onChangeDestinationAccount($event.target.value)">
+                            <option disabled selected="selected" value></option>
+                            <option #destinationAccountCombobox [disabled]="disableDestinationAccount"
+                                *ngFor="let dAccount of destinationAccounts" [value]="dAccount.id">
+                                {{dAccount.displayName|localize}}</option>
+                        </select> -->
+                        <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
+                            [disabled]="disableDestinationAccount" [ngStyle]="{
+                        'background-color': disableDestinationAccount ? '#e2e5ec' : 'white'
+                    }" class="
+                    col-6 p-0
+                        InputText
+                        email-autocomplete
+                        sendMessageInputs
+                    " [(ngModel)]="destinationAccount" [forceSelection]="true"
+                            [suggestions]="filteredDestinationAccount" (onSelect)="onChangeDestinationAccount($event)"
+                            (change)="resetDestinationData()" (completeMethod)="filterDestinationAccount($event)"
+                            [minLength]="1" field="name" name="SingleSelectInputDestinationAccount"
+                            id="SingleSelectInputDestinationAccount" [required]="true" [multiple]="false">
+                        </p-autoComplete>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-6 row" *ngIf="!appSession.tenant">
+                        <h5 class="col-3">{{'SourceAccount' | localize}}<span class="text-danger">*</span></h5>
+                        <!-- <select class="form-control col-6" [(ngModel)]="createAccountsInputDto.sourceAccountId"
+                            [disabled]="disableSourceAccount" (change)="onChangeSourceAccount($event.target.value)">
+                            <option disabled selected="selected" value></option>
+                            <option #sourceAccountCombobox [disabled]="disableSourceAccount"
+                                *ngFor="let sAccount of sourceAccounts" [value]="sAccount.id">
+                                {{sAccount.displayName|localize}}
+                            </option>
+                        </select> -->
+                        <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
+                            [disabled]="disableSourceAccount" [ngStyle]="{
+                    'background-color': disableSourceAccount ? '#e2e5ec' : 'white'
+                }" class="
+                col-6 p-0
+                    InputText
+                    email-autocomplete
+                    sendMessageInputs
+                " [(ngModel)]="sourceAccount" [forceSelection]="true" [suggestions]="filteredSourceAccount"
+                            (onSelect)="onChangeSourceAccount($event)" (change)="resetSourceAccountData()"
+                            (completeMethod)="filterSourceAccount($event)" [minLength]="1" field="name"
+                            name="SingleSelectInputSourceAccount" id="SingleSelectInputSourceAccount" [required]="true"
+                            [multiple]="false">
+                        </p-autoComplete>
+
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <div class="accountInfo p-3">
+                            <h6 style="line-height: 2;">
+                                <h5 style="color: #3699ff;" *ngIf="sourceAccountProfileInfo?.id">{{'AccountProfile' |
+                                    localize}}</h5>
+                                <div class="col" *ngIf="sourceAccountProfileInfo?.id">
+                                    <h5>{{sourceAccountProfileInfo?.name}} </h5>
+                                    <h5>{{sourceAccountProfileInfo?.description}}</h5>
+                                    <div>
+                                        <h5>
+                                            <span *ngIf="sourceAccountProfileInfo.addressLine1">
+                                                {{ sourceAccountProfileInfo.addressLine1 + ', '}}
+                                            </span>
+                                            <span *ngIf="sourceAccountProfileInfo.addressLine2">
+                                                {{ sourceAccountProfileInfo.addressLine2 + ', '}}
+                                            </span>
+                                            <span *ngIf="sourceAccountProfileInfo.city">
+                                                {{ sourceAccountProfileInfo.city + ', '}}
+                                            </span>
+                                            <span *ngIf="sourceAccountProfileInfo.state">
+                                                {{ sourceAccountProfileInfo.state + ', ' }}
+                                            </span>
+                                            <span *ngIf="sourceAccountProfileInfo.zipCode">
+                                                {{sourceAccountProfileInfo.zipCode
+                                                }}{{sourceAccountProfileInfo.countryName ? ', ' : '' }}
+                                            </span>
+                                            <span *ngIf="sourceAccountProfileInfo.countryName">
+                                                {{sourceAccountProfileInfo.countryName }} .
+                                            </span>
+                                        </h5>
+                                    </div>
+                                    <br />
+                                    <div *ngIf="sourceAccountProfileInfo?.website">
+                                        <h5>{{sourceAccountProfileInfo.website}}</h5>
+                                    </div>
+                                    <div *ngIf="sourceAccountProfileInfo?.accountType?.length>0">
+                                        <h5>{{'AccountTypes' | localize}}</h5>
+                                        <div class="col"
+                                            *ngFor="let accountType of sourceAccountProfileInfo?.accountType;let i=index;">
+                                            <h6 class="title-tag">{{accountType}}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h5 class="pt-4" style="color: #3699ff;"
+                                    *ngIf="sourceAccountProfileInfo?.branches?.length>0">
+                                    {{'AccountBranches/Addresses' |
+                                    localize}}</h5>
+                                <h5 style="color: #3699ff;" *ngIf="sourceAccountProfileInfo?.branches?.length>0">
+                                    {{'BranchInformation' |
+                                    localize}}</h5>
+                                <div class="col" *ngFor="let Sourchbranch of sourceAccountProfileInfo?.branches">
+                                    <div *ngIf="Sourchbranch?.data?.branch">
+                                        <h5>{{Sourchbranch?.data?.branch?.name}} </h5>
+                                        <h5>{{Sourchbranch?.data?.branch?.tradeName}} </h5>
+                                    </div>
+                                </div>
+
+                            </h6>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="accountInfo p-3">
+                            <h6 style="line-height: 2;">
+                                <h5 style="color: #3699ff;" *ngIf="destinationAccountInfo?.id">{{'AccountProfile'
+                                    | localize}}</h5>
+                                <div class="col" *ngIf="destinationAccountInfo?.id">
+                                    <h5>{{destinationAccountInfo?.name}} </h5>
+                                    <h5>{{destinationAccountInfo?.description}}</h5>
+                                    <div>
+                                        <h5>
+                                            <span *ngIf="destinationAccountInfo.addressLine1">
+                                                {{ destinationAccountInfo.addressLine1 + ', '}}
+                                            </span>
+                                            <span *ngIf="destinationAccountInfo.addressLine2">
+                                                {{ destinationAccountInfo.addressLine2 + ', '}}
+                                            </span>
+                                            <span *ngIf="destinationAccountInfo.city">
+                                                {{ destinationAccountInfo.city + ', '}}
+                                            </span>
+                                            <span *ngIf="destinationAccountInfo.state">
+                                                {{ destinationAccountInfo.state + ', ' }}
+                                            </span>
+                                            <span *ngIf="destinationAccountInfo.zipCode">
+                                                {{destinationAccountInfo.zipCode
+                                                }}{{destinationAccountInfo.countryName ? ', ' : '' }}
+                                            </span>
+                                            <span *ngIf="destinationAccountInfo.countryName">
+                                                {{destinationAccountInfo.countryName }} .
+                                            </span>
+                                        </h5>
+                                    </div>
+                                    <br />
+                                    <div *ngIf="destinationAccountInfo?.website">
+                                        <h5>{{destinationAccountInfo.website}}</h5>
+                                    </div>
+                                    <div *ngIf="destinationAccountInfo?.accountType?.length>0">
+                                        <h5>{{'AccountTypes' | localize}}</h5>
+                                        <div class="col"
+                                            *ngFor="let accountType of destinationAccountInfo?.accountType;let i=index;">
+                                            <h6 class="title-tag">{{accountType}}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h5 class="pt-4" style="color: #3699ff;"
+                                    *ngIf="destinationAccountInfo?.branches?.length>0">
+                                    {{'AccountBranches/Addresses' | localize}}</h5>
+                                <h5 style="color: #3699ff;" *ngIf="destinationAccountInfo?.branches?.length>0">
+                                    {{'BranchInformation' |
+                                    localize}}</h5>
+                                <div class="col" *ngFor="let destinationBranch of destinationAccountInfo?.branches">
+                                    <div *ngIf="destinationBranch?.data?.branch">
+                                        <h5>{{destinationBranch?.data?.branch?.name}} </h5>
+                                        <h5>{{destinationBranch?.data?.branch?.tradeName}} </h5>
+                                    </div>
+                                </div>
+
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-right">
+                    <div class="col">
+                        <button class="btn btn-primary pb-3 pt-3" (click)="onMerge_Convert()"
+                            [disabled]="disableMergeBtn"
+                            *ngIf="!showCloseButton">
+                            <h6 style="font-weight: bold;">{{'Merge/Convert' | localize}}</h6>
+                        </button>
+                        <button class="btn btn-primary pb-3 pt-3" (click)="goBack('app/admin/hostDashboard')"
+                            *ngIf="showCloseButton">
+                            <h6 style="font-weight: bold;">{{'Close' | localize}}</h6>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <app-register-tenant #registerTenantModal (register)="onRegister($event)"></app-register-tenant>
+        </div>
+    </div>
+</div>

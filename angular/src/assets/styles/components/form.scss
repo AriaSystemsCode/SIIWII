@@ -1,0 +1,13 @@
+//control
+.form-control {
+    background-color: $input-bg!important;
+}
+
+.form-control-border-grey {
+    border: 1px solid $grey-1!important;
+    @extend %transition-all-3ms;
+    &:hover,&:focus {
+        border:1px solid $grey-2!important;
+        @extend %transition-all-3ms;
+    }
+}

@@ -1,0 +1,42 @@
+<div
+    bsModal
+    #successModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="successModal"
+    aria-hidden="true"
+>
+    <div
+        class="modal-dialog right-modal"
+        [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
+        role="document"
+    >
+        <div class="modal-content">
+            <div class="modal-content-wrapper">
+                <div class="modal-header flex-column">
+                </div>
+                <div class="modal-body p-0 thin-scroll mr-2 text-center">
+
+                    <div class="d-flex flex-column mb-3">
+                        <div class="text-success">
+                            <i class="bg-success text-white rounded-circle fa-5x far fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <h5>{{l("AddedSuccessfully")}}</h5>
+                    <p>
+                        {{this.l('YourListingIsNowAddedToThe{0}List',listName)}}
+                    </p>
+                    <button
+                        type="button"
+                        class="bg-secondary btn btn-light rounded-lg w-50"
+                        (click)="close()"
+                    >
+                        {{ l("Close") }}
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

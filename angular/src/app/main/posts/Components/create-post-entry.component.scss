@@ -1,0 +1,101 @@
+.container {
+    // width: 876px;
+    height: 95px;
+    background: #ffffff;
+    box-shadow: 0px 3px 16px #e1e1ef41;
+    border-radius: 6px;
+    max-width: 100% !important;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+.PostEntryImage {
+    width: 20px;
+    height: 20px;
+}
+.logo {
+    width: 45px;
+}
+
+._text {
+    text-align: left;
+    font: normal normal medium 18px/27px Poppins;
+    letter-spacing: 0px;
+    color: #212121;
+}
+.btn-createPost {
+    height: 45px;
+    background: #f4f4f4;
+    border-radius: 5px;
+}
+
+.uploadfilecontainer {
+    position: relative;
+    text-align: center;
+    background: #f4f4f4;
+    border-radius: 2px;
+    width: 80px;
+    height: 45px;
+}
+
+#_imageInput,
+#_videoInput {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    top: 0px;
+    left: 0px;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+@media only screen and (max-width:1023px)  {
+    .container
+{
+    height: 150px;
+    margin-top:60px !important
+
+}
+
+.uploadfilecontainer{
+    width: 22%;
+}
+.uploadfile {
+    width: 100%;
+}
+
+}
+
+
+/* 
+@media only screen and (max-width:575px)  {
+    .container
+{
+    max-width: 570px !important;
+
+}
+}
+
+
+@media only screen and (max-width:560px)  {
+    .container
+{
+    max-width: 540px !important;
+
+}
+}
+ 
+
+@media only screen and (max-width:529px)  {
+    .container
+{
+    max-width: 440px !important;
+
+}
+} */

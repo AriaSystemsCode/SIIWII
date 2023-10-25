@@ -1,0 +1,113 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+
+
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+            				<span>{{l("Entity_Name_Plural_Here")}} {{l("Details")}}</span>
+            			</h3>
+            			<span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            			<div class="kt-subheader__breadcrumbs">
+            				<a [routerLink]="['/app/admin/appAdvertisements/appAdvertisements']"
+            					class="kt-subheader__breadcrumbs-home"><i
+            						class="flaticon2-shelter"></i>{{l("AppAdvertisement")}}</a>
+            				<span class="kt-subheader__breadcrumbs-separator"></span>
+            				<a
+            					class="kt-subheader__breadcrumbs-link kt-subheader__breadcrumbs-link--active">
+            					<span>{{l("Details")}}</span>
+            				</a>
+            			</div>
+                    </div>
+                  </div>
+                </div>
+
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <div class="row align-items-center">
+                                     <div class="col-6 mb-3">
+                        <h6>{{l("Code")}} :</h6>
+                        {{ item.appAdvertisement.code }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>({{l("Tenant")}}) {{l("Name")}} :</h6>
+                        {{ item.tenantName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Description")}} :</h6>
+                        {{ item.appAdvertisement.description }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("StartDate")}} :</h6>
+                        {{ item.appAdvertisement.startDate |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("EndDate")}} :</h6>
+                        {{ item.appAdvertisement.endDate |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("StartTime")}} :</h6>
+                        {{ item.appAdvertisement.startTime }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("EndTime")}} :</h6>
+                        {{ item.appAdvertisement.endTime }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("TimeZone")}} :</h6>
+                        {{ item.appAdvertisement.timeZone }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("PublishOnHomePage")}} :</h6>
+                        <div *ngIf="item.appAdvertisement.publishOnHomePage" class="text-left"><i class="fa fa-check-circle kt--font-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.appAdvertisement.publishOnHomePage" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("PublishOnMarketLandingPage")}} :</h6>
+                        <div *ngIf="item.appAdvertisement.publishOnMarketLandingPage" class="text-left"><i class="fa fa-check-circle kt--font-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.appAdvertisement.publishOnMarketLandingPage" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("ApprovalDateTime")}} :</h6>
+                        {{ item.appAdvertisement.approvalDateTime |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("PaymentMethod")}} :</h6>
+                        {{ item.appAdvertisement.paymentMethod }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("InvoiceNumber")}} :</h6>
+                        {{ item.appAdvertisement.invoiceNumber }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("NumberOfOccurences")}} :</h6>
+                        {{ item.appAdvertisement.numberOfOccurences }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("PeriodOfView")}} :</h6>
+                        {{ item.appAdvertisement.periodOfView }}
+                    </div>
+
+                                     <div class="col-6 mb-3">
+                        <h6>({{l("AppEntity")}}) {{l("Name")}} :</h6>
+                        {{item.appEntityName}}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>({{l("User")}}) {{l("Name")}} :</h6>
+                        {{item.userName}}
+                    </div>
+                    <div class="col-6 mb-3" *ngIf="item?.appAdvertisement?.url">
+                        <h6>{{l("URL")}} :</h6>
+                        <a [href]="item.appAdvertisement.url" target="_blank">  {{item.appAdvertisement.url}} </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>

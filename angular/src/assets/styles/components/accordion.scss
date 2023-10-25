@@ -1,0 +1,35 @@
+body .p-accordion {
+    margin-bottom: 0;
+    padding: 0;
+    .p-accordion-header {
+        margin-bottom: 0;
+        padding-top: 0;
+        a {
+            background-color: white !important;
+            border: none !important;
+            color: #464e5f !important;
+            font-size: 14px !important;
+            font-weight: 400 !important;
+            &[role=tab] {
+                padding: 0;
+            }
+            &:focus {
+                outline: 0 none;
+                outline-offset: 0;
+                box-shadow: none !important;
+            }
+        }
+    }
+    .p-accordion-content {
+        margin-bottom: 20px;
+        border: none;
+    }
+    .p-accordion-content-wrapper {
+        margin-top: -20px;
+        margin-bottom: 20px;
+    }
+    .p-accordion-toggle-icon {
+        color: #464e5f !important;
+        border: none !important;
+    }
+}

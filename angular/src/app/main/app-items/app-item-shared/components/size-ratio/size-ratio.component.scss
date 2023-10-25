@@ -1,0 +1,37 @@
+.ratio-item {
+    width: 100px;
+    text-align: center;
+    border: 1px solid #000;
+    margin-left: -1px;
+    margin-top: -1px;
+    .ratio-lable,
+    .ratio-qty {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        input {
+            max-width: 100%;
+            border: 0;
+            padding: 0;
+            text-align: center;
+        }
+    }
+    .ratio-lable {
+        border-bottom: 1px solid #000;
+        color: #000;
+        background-color: #eee;
+    }
+}
+.ratio-container {
+    overflow: scroll;
+    max-width: 100%;
+    max-height: 100%;
+    padding-top: 10px;
+    height: 220px;
+    width: 100%;
+}
+.sizescale-name {
+    width: 200px;
+}
+.dimension-input{
+    text-align: center;
+}

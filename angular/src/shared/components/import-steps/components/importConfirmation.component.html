@@ -1,0 +1,74 @@
+
+ <!-- Iteration-8 -->
+ <div bsModal #importConfirmation="bs-modal" class="modal  fade" tabindex="-1" role="dialog"
+  aria-labelledby="importConfirmation" aria-hidden="true"  [config]="{backdrop: 'static'}">
+    
+  <div class="modal-dialog modal-lg modalCenter">
+    <div class=" modal-content pr-3">
+        
+      
+        <div class="border-bottom">
+            <div class="row pt-4 pl-4 pb-3"> 
+                <div class="col-9">
+                  <h4 class="font-weight-bold pb-2">{{"ImportConfirmation" | localize}} </h4>
+      <!-- <h6>{{"Pleasechoosefromthebelowtheduplicaterecordoption" | localize}} </h6>  -->
+
+     </div>
+     <div class="col-3 text-right">
+         <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="askToClose()"/>
+         </div>
+     </div>  
+     </div>
+     <div class="pl-5 pt-4 pb-3 border-bottom">
+     <span  class="font-weight-bold passed">{{"Passed" | localize}}</span>
+     <div class="row mt-3 mb-3"> 
+     <div class="divData mr-5 position-relative" *ngIf="hasImages"> <h6 class="position-absolute subdivData">{{"Totalpassedimages" | localize}}  <label  class="font-weight-bold"> {{finalCountPassed}}</label></h6></div>
+     <div class=" divData position-relative"> 
+        <h6 class="position-absolute subdivData">{{("Totalpassed"+ImportTypes[importType]) | localize}} 
+            <label  class="font-weight-bold">{{totalPassedRecords}}</label>
+          </h6> 
+        </div>
+     </div>
+
+<span  class="font-weight-bold failed">{{"Failed" | localize}}</span>
+     <div class="row mt-3 mb-3">  
+      <div class=" divData mr-5 position-relative "  *ngIf="hasImages"> <h6 class="position-absolute subdivData">{{"Totalfailedimages" | localize}}  <label  class="font-weight-bold">{{finalCountFailed}} </label></h6> </div>
+      <div class=" divData position-relative"> 
+
+        <h6 class="position-absolute subdivData">{{("Totalfailed"+ImportTypes[importType]) | localize}} 
+            <label  class="font-weight-bold"> {{totalFailedRecords}}</label>
+        </h6>  
+    </div>
+  </div>
+</div>
+
+<div *ngIf="hasDuplication">
+<div class="row pl-5 pt-4">
+    <h6><span style="color:#FF0000">*</span>{{"ChoosetheDuplicatedrecordsoption" | localize}}</h6> 
+</div>
+
+
+<div class="row">
+    <div class="filter-group pl-5 " >
+        <label class="radio radio-accent radio-primary mr-5 mt-3" for="duplicatedOption{{item.value}}" *ngFor="let item of duplicatedOptions">
+            <input type="radio" name="duplicatedOptions" id="duplicatedOption{{item.value}}" [value]="item.value" [(ngModel)]="selectedDuplicatedOption"/>
+            {{item.label| localize}}
+        </label>
+    </div>
+</div>
+</div>
+
+
+<div class="row pl-5 pt-4 pb-4">
+    <button class="btn btn-secondary  _Btn mr-2 pointer" (click)="goPreviousStep()">
+        {{"Previous" | localize}}   
+    </button>
+    <button class="btn btn-primary _Btn pointer" (click)="import()">{{"Import" | localize}} </button>
+</div>
+
+
+</div>
+</div>
+</div>
+
+ <!-- Iteration-8 -->

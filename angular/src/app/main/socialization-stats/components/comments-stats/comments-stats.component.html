@@ -1,0 +1,10 @@
+<div >
+    <a class="comment-stats">
+        <span class="reaction-stats mr-2">
+            {{ commentsCount }}
+        </span>
+        <span>
+            {{ parentId ? ( commentsCount > 1 ? 'Replies' : "Reply" ) :  ( commentsCount > 1 ? 'Comments' : 'Comment' )  | localize }}
+        </span>
+    </a>
+</div>

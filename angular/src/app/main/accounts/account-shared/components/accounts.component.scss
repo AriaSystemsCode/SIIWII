@@ -1,0 +1,12 @@
+@import "../../../../../assets/styles/base/variables";
+.toolbar-btn {
+    color: $primary-color;
+    background-color: $blue-light;
+    border-color: $blue-light;
+    i {
+        color: $primary-color;
+    }
+    &:hover i {
+        color: $white;
+    }
+}

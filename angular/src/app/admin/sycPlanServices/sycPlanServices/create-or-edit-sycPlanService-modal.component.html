@@ -1,0 +1,82 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycPlanServiceForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycPlanService.id">{{l("EditSycPlanService")}}</span>
+                        <span *ngIf="!sycPlanService.id">{{l("CreateNewSycPlanService")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+					<div class="form-group m-form__group">
+						<label for="SycApplicationName">{{l("SycApplication")}}</label>
+						<select name="sycPlanService.applicationId" [(ngModel)]="sycPlanService.applicationId" class="form-control" >
+							<option value="">{{l("SelectASycApplication")}}</option>
+							<option *ngFor="let item of allSycApplications" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group m-form__group">
+						<label for="SycPlanName">{{l("SycPlan")}}</label>
+						<select name="sycPlanService.planId" [(ngModel)]="sycPlanService.planId" class="form-control" >
+							<option value="">{{l("SelectASycPlan")}}</option>
+							<option *ngFor="let item of allSycPlans" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+					<div class="form-group m-form__group">
+						<label for="SycServiceCode">{{l("SycService")}}</label>
+						<select name="sycPlanService.serviceId" [(ngModel)]="sycPlanService.serviceId" class="form-control" >
+							<option value="">{{l("SelectASycService")}}</option>
+							<option *ngFor="let item of allSycServices" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+
+
+								<div class="form-group">
+									<label for="SycPlanService_UnitOfMeasure">{{l("UnitOfMeasure")}}</label>
+									<input type="text" #SycPlanService_UnitOfMeasure="ngModel" id="SycPlanService_UnitOfMeasure" class="form-control" [(ngModel)]="sycPlanService.unitOfMeasure" name="UnitOfMeasure"   minlength="1"  maxlength="50" />
+								    <validation-messages [formCtrl]="SycPlanService_UnitOfMeasure"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycPlanService_UnitPrice">{{l("UnitPrice")}}</label>
+									<input type="number" #SycPlanService_UnitPrice="ngModel" id="SycPlanService_UnitPrice" class="form-control" [(ngModel)]="sycPlanService.unitPrice" name="UnitPrice"   />
+									<validation-messages [formCtrl]="SycPlanService_UnitPrice"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycPlanService_Units">{{l("Units")}}</label>
+									<input type="number" #SycPlanService_Units="ngModel" id="SycPlanService_Units" class="form-control" [(ngModel)]="sycPlanService.units" name="Units"   />
+									<validation-messages [formCtrl]="SycPlanService_Units"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycPlanService_BillingFrequency">{{l("BillingFrequency")}}</label>
+									<input type="text" #SycPlanService_BillingFrequency="ngModel" id="SycPlanService_BillingFrequency" class="form-control" [(ngModel)]="sycPlanService.billingFrequency" name="BillingFrequency"   minlength="1"  maxlength="50" />
+								    <validation-messages [formCtrl]="SycPlanService_BillingFrequency"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycPlanService_MinimumUnits">{{l("MinimumUnits")}}</label>
+									<input type="number" #SycPlanService_MinimumUnits="ngModel" id="SycPlanService_MinimumUnits" class="form-control" [(ngModel)]="sycPlanService.minimumUnits" name="MinimumUnits"   />
+									<validation-messages [formCtrl]="SycPlanService_MinimumUnits"></validation-messages>
+								</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycPlanServiceForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

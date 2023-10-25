@@ -1,0 +1,142 @@
+<div class="single-item row">
+    <div class="single-item-photo mr-1" (click)="viewItemHandler()">
+        <img
+            class="w-100"
+            [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl"
+            alt=""
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+        />
+    </div>
+    <div
+        class="single-item-body col d-flex"
+    >
+        <div class="align-items-center row w-100">
+
+            <div
+                class="pt-3 col"
+                [ngStyle]="{'margin-right.px':browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections ? 50 : 0}"
+            >
+                <h3
+                    class="m-0 mb-2 text-dark cursor-pointer"
+                    (click)="viewItemHandler()"
+                >
+                    {{ "Code" | localize }}: {{ item.appItem.code | textSubstring: 9 }}
+                </h3>
+                <p class="text-primary mb-2 product-name">
+                    {{ item?.appItem?.name | textSubstring: 60 }}
+                </p>
+                <p
+                    class="text-dark mb-2"
+                    [ngClass]="{ 'd-none': !singleItemPerRowMode }"
+                    style="max-width: 70ch;"
+                >
+                    {{ item?.appItem?.description | textSubstring: 180 }}
+                </p>
+                <p
+                    class="text-dark mb-2"
+                    *ngIf="
+                        mainFilterCtrl?.value?.value== 0 && !item?.appItem?.listed && statusesFlags?.listingStatus
+                    "
+                >
+                    {{ "NoListing" | localize }}
+                    <span class="ml-2">
+                        <i
+                            class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                        ></i>
+                    </span>
+                </p>
+                <p
+                    class="text-dark mb-2"
+                    *ngIf="
+                        mainFilterCtrl?.value?.value== 1 &&
+                        !item?.appItem?.published && statusesFlags?.publicityStatus
+                    "
+                >
+                    {{ "NotPublished" | localize }}
+                    <span class="ml-2">
+                        <i
+                            class="bg-warn bg-warning d-inline-flex flaticon2-information rounded-circle text-white"
+                            [ngClass]="
+                                item.appItem.published
+                                    ? 'bg-primary'
+                                    : 'bg-warn bg-warning'
+                            "
+                        ></i>
+                    </span>
+                </p>
+                <p
+                    class="text-dark mb-2"
+                    *ngIf="
+                        mainFilterCtrl?.value?.value== 1 &&
+                        item?.appItem?.published && statusesFlags?.publicityStatus
+                    "
+                >
+                    {{ "Published" | localize }}
+                    <span class="ml-2">
+                        <i
+                            class="bg-success d-inline-flex flaticon2-information rounded-circle text-white"
+                            [ngClass]="
+                                item.appItem.published
+                                    ? 'bg-primary'
+                                    : 'bg-warn bg-warning'
+                            "
+                        ></i>
+                    </span>
+                </p>
+            </div>
+            <ng-container *ngIf="singleItemPerRowMode && (!actionsMenuFlags?.allIsHidden || browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections )">
+                <div
+                    *ngIf="
+                        mainFilterCtrl?.value?.value== 0 && !item?.appItem?.listed && actionsMenuFlags?.createListing
+                    "
+                    class="create-list-btn"
+                >
+                    <button
+                        class="btn btn-outline-primary"
+                        (click)="eventHandler({ event:AppItemBrowseEvents.CreateListing, data:item.appItem.id })"
+                        *ngIf="item?.appItem?.listed === false"
+                    >
+                        {{ "CreateListing" | localize }}
+                    </button>
+                </div>
+
+                <div
+                    *ngIf="mainFilterCtrl?.value?.value== 1 && actionsMenuFlags?.publishOrUnpublish"
+                    class="create-list-btn"
+                >
+                    <button
+                        class="btn btn-outline-primary"
+                        (click)="
+                            !item?.appItem?.published ? AppitemsActionsMenuComponent.openShareProductListingModal() : AppitemsActionsMenuComponent.unPublishProductListing()
+                        "
+                    >
+                        {{
+                            !item?.appItem?.published
+                                ? ("PublishListing" | localize)
+                                : ("UnpublishListing" | localize)
+                        }}
+                    </button>
+                </div>
+            </ng-container>
+            <div class="purple-selection" style="width: 45px;" *ngIf="browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections ">
+                <p-inputSwitch
+                    [(ngModel)]="item.selected"
+                    name="showCode"
+                    (onChange)="handleSelection($event)"
+                    [styleClass]="'purple-selection'"
+                ></p-inputSwitch>
+            </div>
+            <div class="actions-menu" [ngClass]="{'d-none':actionsMenuFlags?.allIsHidden || (browseMode != BrowseModeEnum.Actions && browseMode != BrowseModeEnum.ActionsAndSelections) }">
+                <app-appitems-actions-menu
+                    #AppitemsActionsMenuComponent
+                    [item]="item.appItem"
+                    [appItemType]="mainFilterCtrl?.value?.value"
+                    [actionsMenuFlags]="actionsMenuFlags"
+                    (eventTriggered)="eventHandler($event)"
+                >
+                </app-appitems-actions-menu>
+            </div> 
+
+        </div>
+    </div>
+</div>

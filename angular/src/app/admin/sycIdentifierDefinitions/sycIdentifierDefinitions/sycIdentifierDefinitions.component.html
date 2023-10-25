@@ -1,0 +1,237 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+                            <span>{{l("SycIdentifierDefinitions")}}</span>
+                        </h3>
+                        <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                        <span class="kt-subheader__desc">
+                            {{l("SycIdentifierDefinitionsHeaderInfo")}}
+                        </span>
+                    </div>
+                    <div class="kt-subheader__toolbar">
+                        <div class="kt-subheader__wrapper">
+            				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+                <button *ngIf="isGranted('Pages.Administration.SycIdentifierDefinitions.Create')" (click)="createSycIdentifierDefinition()" 
+            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewSycIdentifierDefinition")}}</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <form class="kt-form" autocomplete="off">
+                    <div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-12">
+                                <div class="form-group m-form__group align-items-center">
+                                    <div class="input-group">
+                                        <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
+                                        <span class="input-group-btn">
+                                            <button (click)="getSycIdentifierDefinitions()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						 <div class="row" [hidden]="!advancedFiltersAreShown">
+						 	<div class="col-md-12">
+						         <div class="kt-separator kt-separator--border-dashed"></div>
+						     </div>
+
+
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="CodeFilter">{{l("Code")}}</label>
+									<input type="text" class="form-control" id="CodeFilter" name="codeFilter" [(ngModel)]="codeFilter">
+								</div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="IsTenantLevelFilterSelect">{{l("IsTenantLevel")}}</label>
+								<select class="form-control" name="IsTenantLevelFilter" id="IsTenantLevelFilterSelect" [(ngModel)]="isTenantLevelFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinNumberOfSegmentsFilter">{{l("MinMax")}} {{l("NumberOfSegments")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinNumberOfSegmentsFilter" [(ngModel)]="minNumberOfSegmentsFilter" placeholder="{{l('MinValue')}}" name="minNumberOfSegmentsFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxNumberOfSegmentsFilter" placeholder="{{l('MaxValue')}}" name="maxNumberOfSegmentsFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinMaxLengthFilter">{{l("MinMax")}} {{l("MaxLength")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinMaxLengthFilter" [(ngModel)]="minMaxLengthFilter" placeholder="{{l('MinValue')}}" name="minMaxLengthFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxMaxLengthFilter" placeholder="{{l('MaxValue')}}" name="maxMaxLengthFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinMinSegmentLengthFilter">{{l("MinMax")}} {{l("MinSegmentLength")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinMinSegmentLengthFilter" [(ngModel)]="minMinSegmentLengthFilter" placeholder="{{l('MinValue')}}" name="minMinSegmentLengthFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxMinSegmentLengthFilter" placeholder="{{l('MaxValue')}}" name="maxMinSegmentLengthFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinMaxSegmentLengthFilter">{{l("MinMax")}} {{l("MaxSegmentLength")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinMaxSegmentLengthFilter" [(ngModel)]="minMaxSegmentLengthFilter" placeholder="{{l('MinValue')}}" name="minMaxSegmentLengthFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxMaxSegmentLengthFilter" placeholder="{{l('MaxValue')}}" name="maxMaxSegmentLengthFilter" />
+									</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-12">
+                                <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row align-items-center">
+                    <!--<Primeng-Datatable-Start>-->
+                    <div class="primeng-datatable-container col-12"
+                         [busyIf]="primengTableHelper.isLoading">
+                        <p-table #dataTable
+                                     (onLazyLoad)="getSycIdentifierDefinitions($event)"
+                                     [value]="primengTableHelper.records"
+                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                     [paginator]="false"
+                                     [lazy]="true"
+                                     [scrollable]="true"
+                                     ScrollWidth="100%"
+                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [resizableColumns]="primengTableHelper.resizableColumns">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 130px" [hidden]="!isGrantedAny('Pages.Administration.SycIdentifierDefinitions.Edit', 'Pages.Administration.SycIdentifierDefinitions.Delete')">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="code">
+                                        {{l('Code')}}
+                                        <p-sortIcon field="sycIdentifierDefinition.code"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="isTenantLevel">
+                                        {{l('IsTenantLevel')}}
+                                        <p-sortIcon field="sycIdentifierDefinition.isTenantLevel"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="numberOfSegments">
+                                        {{l('NumberOfSegments')}}
+                                        <p-sortIcon field="sycIdentifierDefinition.numberOfSegments"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="maxLength">
+                                        {{l('MaxLength')}}
+                                        <p-sortIcon field="sycIdentifierDefinition.maxLength"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="minSegmentLength">
+                                        {{l('MinSegmentLength')}}
+                                        <p-sortIcon field="sycIdentifierDefinition.minSegmentLength"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="maxSegmentLength">
+                                        {{l('MaxSegmentLength')}}
+                                        <p-sortIcon field="sycIdentifierDefinition.maxSegmentLength"></p-sortIcon>
+                                    </th>
+
+                                </tr>
+                            </ng-template>                           
+							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                <tr>
+                                    <td style="width: 130px"
+                                        [hidden]="!isGrantedAny('Pages.Administration.SycIdentifierDefinitions.Edit', 'Pages.Administration.SycIdentifierDefinitions.Delete')">
+                                       <div class="btn-group dropdown" dropdown container="body">
+                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
+                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
+                                            </button>
+												<ul class="dropdown-menu"  *dropdownMenu>
+												<li>
+													<a href="javascript:;" 
+														(click)="viewSycIdentifierDefinitionModal.show(record)">{{l('View')}}</a>
+												</li>
+												<li>
+                                                <a href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.SycIdentifierDefinitions.Edit')" 
+														(click)="createOrEditSycIdentifierDefinitionModal.show(record.sycIdentifierDefinition.id)">{{l('Edit')}}</a>												
+                                                </li>
+												<li>
+											        <a  href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.SycIdentifierDefinitions.Delete')"
+														(click)="deleteSycIdentifierDefinition(record.sycIdentifierDefinition)">{{l('Delete')}}</a>
+												</li>
+                                                <li>
+                                                    <a href="javascript:;" *ngIf="entityHistoryEnabled"  
+                                                       (click)="showHistory(record.sycIdentifierDefinition)">{{l('History')}}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Code')}}</span>
+											{{record.sycIdentifierDefinition.code}}
+										</td>
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('IsTenantLevel')}}</span>
+                                        <div *ngIf="record.sycIdentifierDefinition.isTenantLevel" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.sycIdentifierDefinition.isTenantLevel" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('NumberOfSegments')}}</span>
+											{{record.sycIdentifierDefinition.numberOfSegments}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('MaxLength')}}</span>
+											{{record.sycIdentifierDefinition.maxLength}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('MinSegmentLength')}}</span>
+											{{record.sycIdentifierDefinition.minSegmentLength}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('MaxSegmentLength')}}</span>
+											{{record.sycIdentifierDefinition.maxSegmentLength}}
+										</td>
+
+                                </tr>
+                               
+                            </ng-template>
+                        </p-table>
+						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            {{l('NoData')}}
+                        </div>
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getSycIdentifierDefinitions($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                                         [showCurrentPageReport]="true"
+                                         [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
+                            >
+                            </p-paginator>
+                        </div>
+                    </div>
+                    <!--<Primeng-Datatable-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditSycIdentifierDefinitionModal #createOrEditSycIdentifierDefinitionModal (modalSave)="getSycIdentifierDefinitions()"></createOrEditSycIdentifierDefinitionModal>    
+    <viewSycIdentifierDefinitionModal #viewSycIdentifierDefinitionModal></viewSycIdentifierDefinitionModal>
+     <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
+  </div>
+</div>

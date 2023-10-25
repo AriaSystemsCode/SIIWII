@@ -1,0 +1,85 @@
+@import '../base/variables';
+
+//this is override to p-paginator of the ngprime library
+
+body  p-paginator {
+    // parent element
+    .p-paginator	 {
+        background-color: $paginator-bg!important;
+        border: 0!important;
+        padding: 1rem;
+        // floating all the elements left except dropdown
+        .p-paginator-element,
+        .p-paginator-pages {
+            float: left;
+        }
+        // every element on the paginator except dropdown
+        .p-paginator-element {
+            margin-right: 1rem!important;
+            border-radius: .4rem !important;
+        }
+        //paginator buttons
+        .p-paginator-first,
+        .p-paginator-next,
+        .p-paginator-prev,
+        .p-paginator-last	 {
+            background-color: $pagiantor-paginate-btns-bg!important;
+            &.p-disabled {
+                background-color: $pagiantor-paginate-btns-bg-disabled!important;
+            }
+        }
+        //every page number
+        .p-paginator-page	 {
+            background-color: $pagiantor-page-bg!important;
+            border: 1px solid $pagiantor-page-border-color!important;
+            color: $pagiantor-page-color!important;
+            // &.p-state-active {
+            //     background-color: $pagiantor-page-bg-active!important;
+            //     border: 1px solid $pagiantor-page-border-color-active!important;
+            //     color: $pagiantor-page-color-active!important;
+            // }
+        }
+        //paginator icons
+        .pi-caret-left:before {
+            content: "\e931"; // replaced with left angle
+        }
+        .pi-step-backward:before {
+            content: "\e92d"; // replaced with double left angle
+        }
+        .pi-caret-right:before {
+            content: "\e932"; // replaced with right angle
+        }
+        .pi-step-forward:before {
+            content: "\e92e"; // replaced with double right angle
+        }
+    }
+    p-dropdown {
+        float: right;
+        // .p-dropdown-label {
+        //     padding-right: 3rem!important;
+        // }
+        .p-dropdown-label,
+        .p-dropdown-trigger {
+            background-color: $pagiantor-paginate-btns-bg-disabled;
+        }
+        .pi-chevron-down{
+            content: "\e930";
+        }
+    }
+    &::after {
+        clear: both;
+    }
+}
+button.p-ripple.p-element.p-paginator-page.p-paginator-element.p-link.p-highlight {
+    background-color: #fff!important;
+    border: 1px solid #3699ff!important;
+    color: #3699ff!important;
+    border-radius: 5px;
+}
+.primeng-datatable-container .primeng-paging-container .p-paginator .p-dropdown {
+    height: 2.357rem;
+}
+
+.primeng-datatable-container .primeng-paging-container .p-paginator .p-dropdown {
+    height: 2.357rem!important;
+}

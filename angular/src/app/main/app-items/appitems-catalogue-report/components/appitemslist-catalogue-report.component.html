@@ -1,0 +1,203 @@
+<div [@routerTransition] [ngStyle]="{'margin-top': isModal ? '0!important':'-90px!important'}" class="wrapper">
+    <div
+        class="
+            kt-content
+            kt-grid__item kt-grid__item--fluid
+            kt-grid kt-grid--hor
+            align-items-center
+        "
+        [ngClass]="{'pt-0':isModal}"
+    >
+        <div class="kt-subheader kt-grid__item" *ngIf="!isModal">
+            <div [class]="containerClass">
+                <div class="kt-subheader__main">
+                    <h3 class="kt-subheader__title">
+                        <a
+                            class="text-capitalize text-dark"
+                            type="button"
+                            (click)="redirectToAppItemList()"
+                        >
+                            <i class="fas fa-arrow-left"></i>
+                            {{ "Back" | localize }}
+                        </a>
+                    </h3>
+                    <span
+                        class="
+                            kt-subheader__separator kt-subheader__separator--v
+                        "
+                    ></span>
+                    <span class="kt-subheader__desc">
+                        {{ "Linesheet" | localize }}
+                    </span>
+                    <span class="mr-1" *ngIf="title"> > </span>
+                    <span class="kt-subheader__desc" *ngIf="title">
+                        <a
+                            class="text-capitalize text-black-50"
+                            (click)="redirectToAppItemList()"
+                        >
+                            {{ title | localize }}
+                        </a>
+                    </span>
+                    <span class="mr-1"> > </span>
+                    <span class="kt-subheader__desc"> {{"Print" | localize }} </span>
+                </div>
+            </div>
+        </div>
+
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile h-100" [ngClass]="{ 'isModal': isModal }">
+                <div class="kt-portlet__body d-flex flex-column h-100" [ngClass]="{ 'wizar h-100d' : currentStep != printCatalogueStepsEnum.ReportViewer,'pt-0 pb-0':isModal }">
+                    <ng-template #elseTemplate>
+                        <div class="row">
+                            <div class="col-6">
+                                <h3>{{"Linesheet" | localize }}</h3>
+                            </div>
+                            <div class="col text-left">
+                                <button
+                                    type="button"
+                                    aria-label="Close"
+                                    class="close"
+                                    type="button"
+                                    [title]="'Close' | localize"
+                                    (click)="askToConfirmCancel()"
+                                    style="font-size: 30px; font-weight: 300"
+                                >
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="col-12 d-flex align-items-center mt-3">
+                                <div
+                                    class="
+                                        step
+                                        d-flex
+                                        align-items-center
+                                        mr-4
+                                    "
+                                    *ngFor="let step of steps; last as last"
+                                    [ngClass]="{
+                                        'current-step':
+                                            currentStep ==
+                                            step.printCatalogueStepsEnum,
+                                        'done-step':
+                                            currentStep >
+                                            step.printCatalogueStepsEnum
+                                    }"
+                                >
+                                    <span class="fake-circle mr-2 d-flex align-items-center justify-content-center">
+                                        <i [ngClass]="currentStep == step.printCatalogueStepsEnum ? step.icon : (currentStep > step.printCatalogueStepsEnum ? 'fas fa-check' : '' )  "></i>
+                                    </span>
+                                    {{ step.title }}
+                                    <span class="ml-2" *ngIf="!last">
+                                        . . . . 
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column flex-grow-1 pt-5 pb-1">
+                            <ng-container
+                                *ngIf="active"
+                                
+                            >
+                                <div [ngClass]="{'d-block':currentStep == printCatalogueStepsEnum.DataSelection}" 
+                                    class="h-100 d-none">
+                                    <app-catalogue-report-data-selection-step
+                                        (continue)="dataSelectionDone()"
+                                        [printInfoParam]="printInfoParam"
+                                        [getAllAppItemsInput]="getAllAppItemsInput"
+                                        [itemListId]="itemListId"
+                                        class="h-75"
+                                    >
+                                    </app-catalogue-report-data-selection-step>
+                                </div>
+                            </ng-container>
+
+                            <ng-container
+                                *ngIf="
+                                    currentStep ==
+                                    printCatalogueStepsEnum.ChooseTemplate
+                                "
+                                class="h-100"
+                            >
+                                <app-catalogue-report-choose-template-step
+                                    (continue)="chooseTemplateDone($event)"
+                                    (previous)="templatePrevious()"
+                                    [printInfoParam]="printInfoParam"
+                                    [templates]="templates"
+                                    class="h-100"
+                                >
+                                </app-catalogue-report-choose-template-step>
+                            </ng-container>
+
+                           <!--  <ng-container
+                                *ngIf="active"
+                            >
+                                <div [ngClass]="{'d-block':currentStep == printCatalogueStepsEnum.CoverPage}" 
+                                        class="h-100 d-none">
+                                    <app-catalogue-report-cover-page-step
+                                        (continue)="coverPageDone()"
+                                        (previous)="coverPagePrevious()"
+                                        (searchAccount)="searchAccounts($event)"
+                                        [accounts]="accounts"
+                                        [printInfoParam]="printInfoParam"
+                                        class="h-75"
+                                    >
+                                    </app-catalogue-report-cover-page-step>
+                                </div>
+                            </ng-container> -->
+
+                        
+                            <ng-container
+                                *ngIf="
+                                    currentStep ==
+                                    printCatalogueStepsEnum.DetailInfo
+                                "
+                                class="h-100"
+                            >
+                                <app-catalogue-detail-info-step
+                                    (continue)="DetailInfoDone()"
+                                    (previous)="DetailInfoPrevious()"
+                                     (searchAccount)="searchAccounts($event)"
+                                    [printInfoParam]="printInfoParam"
+                                    [accounts]="accounts"
+                                    class="h-75"
+                                >
+                                </app-catalogue-detail-info-step>
+                            </ng-container>
+
+                            
+                            <ng-container
+                                *ngIf="active"
+                            >
+                                <div [ngClass]="{'d-block':currentStep == printCatalogueStepsEnum.PrintInfo}" 
+                                        class="h-100 d-none">
+                                    <app-catalogue-report-products-print-info
+                                        (continue)="printInfoDone()"
+                                        (previous)="printInfoPrevious()"
+                                        [printInfoParam]="printInfoParam"
+                                        class="h-75"
+                                    >
+                                    </app-catalogue-report-products-print-info>
+                                </div>
+                            </ng-container>
+
+                        </div>
+                    </ng-template>
+                    <ng-container
+                        *ngIf="
+                            currentStep == printCatalogueStepsEnum.ReportViewer;else elseTemplate
+                        "
+                    >
+                        <div [ngClass]="{'visibility-hidden' : printInfoParam.EmailLinesheet}">
+                            <report-viewer
+                                [reportUrl]="reportUrl"
+                                [invokeAction]="invokeAction"
+                                (documentReady)="reportDocumentReadyHandler($event)"
+                            >
+                            </report-viewer>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

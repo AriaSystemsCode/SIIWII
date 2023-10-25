@@ -1,0 +1,120 @@
+<form #MatrixGridForm="ngForm" >
+    
+    <div *ngIf="active" class="matrix-grid-table">
+        <p-table [value]="rows" [columns]="cols.columns" [scrollable]="true" [rowHover]="rowHover"
+            [reorderableColumns]="reorderableColumns" [className]="'text-center'">
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th [ngClass]="{'col-3':cols?.rowHeaderColumn?.label?.toUpperCase() =='CURRENCY'}">
+                        {{cols?.rowHeaderColumn?.label | localize}}
+                        <span class="text-danger" *ngIf="cols?.rowHeaderColumn?.required">*</span>
+                    </th>
+                    <!-- <th *ngFor="let col of columns" pReorderableColumn [pReorderableColumnDisabled]="!col.reorederable"> -->
+                    <th *ngFor="let col of columns;let index = index" pReorderableColumn class="position-relative" >
+                        {{col.label | localize}}
+                        <span class="text-danger" *ngIf="col.required">*</span>
+                        <span *ngIf="canRemoveCols"
+                            class="d-block bg-danger text-white position-absolute aria-tag-action remove-column rounded-circle"
+                            (click)="removeColumns([index])">
+                            <i class="flaticon2-delete"></i>
+                        </span>
+                    </th>
+                    <th *ngIf="canAddCols">
+                        <button class="btn btn-icon" [disabled]="disableAddCols" (click)="_newColumn.emit()">
+                            <span>
+                                <i class="d-inline-flex fa-plus fas text-success"></i>
+                            </span>
+                        </button>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns" let-index="rowIndex">
+                <tr [pReorderableRow]="index">
+                    <td pReorderableRowHandle class="position-relative" [ngClass]="{'col-3':cols?.rowHeaderColumn?.label?.toUpperCase() =='CURRENCY'}">
+                        <div class="ml-2" *ngIf="!rowHeaderIsEditable || (rowHeaderIsEditable && !rowHeaderFormInput);else elseRowHeaderTemp">
+                            {{ rowData?.rowHeader?.label | localize }}
+                        </div>
+                        <ng-template #elseRowHeaderTemp>
+                            <div class="ml-2" [ngSwitch]="rowHeaderFormInput.type">
+                                <span *ngSwitchCase="FormInputType.Select">
+                                    <p-dropdown 
+                                        [options]="rowHeaderFormInput.extraData"
+                                        [styleClass]="rowHeaderFormInput.customClass +' w-100 aria-select-primeng'"
+                                        [style]="rowHeaderFormInput.customStyle"
+                                        [filter]="true" 
+                                        [name]="'rowData.rowHeader.value-'+index" 
+                                        [(ngModel)]="rowData.rowHeader.value"
+                                        [placeholder]="'Select' | localize"
+                                        [required]="rowHeaderFormInput.required"
+                                        [appendTo]="'body'"
+                                        [baseZIndex]="1051"
+                                        [disabled]="rowData.rowHeader.disabled"
+                                        (ngModelChange)="rowHeaderSelectionChange($event,index)"
+                                    >
+                                        <!-- <ng-template let-item pTemplate="selectedItem">
+                                            <span style="vertical-align:middle">{{item.label}}</span>
+                                        </ng-template>
+                                        <ng-template let-item pTemplate="item">
+                                            <div class="ui-helper-clearfix" style="position: relative;height:25px;">
+                                            <div style="font-size:14px;float:right;margin-top:4px">{{item.label}}</div> </div>
+                                        </ng-template> -->
+                                    </p-dropdown>
+                                </span>
+                            </div>
+                        </ng-template>
+                        <span *ngIf="canRemoveRows"
+                            class="d-block bg-danger text-white position-absolute aria-tag-action remove-row rounded-circle"
+                            (click)="removeRows([index])">
+                            <i class="flaticon2-delete"></i>
+                        </span>
+                    </td>
+                    <td *ngFor="let col of columns;index as i">
+                        <div *ngIf="!cellSelectionIsEditable || (cellSelectionIsEditable && !cellSelectionFormInput)else elseCellSelectionTemp">
+                            {{ rowData?.rowValues[i] ? rowData?.rowValues[i][cellLabelField] : '' }}
+                        </div>
+                        <ng-template #elseCellSelectionTemp>
+                            <div [ngSwitch]="cellSelectionFormInput.type">
+                                <span *ngSwitchCase="FormInputType.Number">
+                                    <input 
+                                        type="number" 
+                                        [(ngModel)]='rowData.rowValues[i].value' 
+                                        [ngClass]="cellSelectionFormInput.customClass"
+                                        [ngStyle]="cellSelectionFormInput.customStyle"
+                                        [name]="cellSelectionFormInput.name+'rowData-'+index+'-'+i" 
+                                        [placeholder]="'Enter' | localize"
+                                        [required]="cellSelectionFormInput.required" 
+                                        [disabled]="rowData.rowValues[i].disabled"
+                                        [min]="cellSelectionFormInput.min"
+                                        [pattern]="cellSelectionFormInput.pattern"
+                                    />
+                                </span>
+                                <span *ngSwitchCase="FormInputType.Checkbox">
+                                    <input 
+                                        type="checkbox" 
+                                        [(ngModel)]='rowData.rowValues[i].value' 
+                                        [ngClass]="cellSelectionFormInput.customClass"
+                                        [ngStyle]="cellSelectionFormInput.customStyle"
+                                        [name]="cellSelectionFormInput.name+'rowData-'+index+'-'+i" 
+                                        [placeholder]="'Enter' | localize"
+                                        [required]="cellSelectionFormInput.required" 
+                                        (ngModelChange)="_cellChange.emit()"
+                                        [disabled]="rowData.rowValues[i].disabled"
+                                    />
+                                </span>
+                            </div>
+                        </ng-template>
+                    </td>
+                    <td *ngIf="canAddCols">
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+        <div *ngIf="canAddRows" class="pl-4" >
+            <button class="btn btn-icon" [disabled]="disableAddRows" (click)="_newRow.emit()">
+                <span>
+                    <i class="d-inline-flex fa-plus fas text-success"></i>
+                </span>
+            </button>
+        </div>
+    </div>
+</form>

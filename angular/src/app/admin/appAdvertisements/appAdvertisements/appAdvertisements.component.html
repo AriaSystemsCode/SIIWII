@@ -1,0 +1,1017 @@
+﻿<div [@routerTransition]>
+    <div
+        class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
+    >
+        <div class="kt-subheader kt-grid__item">
+            <div [class]="containerClass">
+                <div class="kt-subheader__main">
+                    <h3 class="kt-subheader__title">
+                        <span>{{ l("AppAdvertisements") }}</span>
+                    </h3>
+                    <span
+                        class="kt-subheader__separator kt-subheader__separator--v"
+                    ></span>
+                    <span class="kt-subheader__desc">
+                        {{ l("AppAdvertisementsHeaderInfo") }}
+                    </span>
+                </div>
+                <div class="kt-subheader__toolbar">
+                    <div class="kt-subheader__wrapper">
+                        <button
+                            *ngIf="
+                                isGranted(
+                                    'Pages.Administration.AppAdvertisements.Create'
+                                )
+                            "
+                            (click)="createAppAdvertisement()"
+                            class="btn btn-primary blue"
+                        >
+                            <i class="fa fa-plus"></i>
+                            {{ l("Advertise") }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet__body">
+                    <form class="kt-form" autocomplete="off">
+                        <div>
+                            <div class="row align-items-center">
+                                <div class="col-xl-12">
+                                    <div
+                                        class="form-group m-form__group align-items-center"
+                                    >
+                                        <div class="input-group">
+                                            <input
+                                                [(ngModel)]="filterText"
+                                                name="filterText"
+                                                autoFocus
+                                                class="form-control m-input"
+                                                [placeholder]="
+                                                    l('SearchWithThreeDot')
+                                                "
+                                                type="text"
+                                            />
+                                            <span class="input-group-btn">
+                                                <button
+                                                    (click)="
+                                                        getAppAdvertisements()
+                                                    "
+                                                    class="btn btn-primary"
+                                                    type="submit"
+                                                >
+                                                    <i
+                                                        class="flaticon-search-1"
+                                                    ></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="row"
+                                [hidden]="!advancedFiltersAreShown"
+                            >
+                                <div class="col-md-12">
+                                    <div
+                                        class="kt-separator kt-separator--border-dashed"
+                                    ></div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="CodeFilter">{{
+                                            l("Code")
+                                        }}</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="CodeFilter"
+                                            name="codeFilter"
+                                            [(ngModel)]="codeFilter"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="MinTenantIdFilter"
+                                            >{{ l("MinMax") }}
+                                            {{ l("TenantId") }}</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="MinTenantIdFilter"
+                                                [(ngModel)]="minTenantIdFilter"
+                                                placeholder="{{
+                                                    l('MinValue')
+                                                }}"
+                                                name="minTenantIdFilter"
+                                            />
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                [(ngModel)]="maxTenantIdFilter"
+                                                placeholder="{{
+                                                    l('MaxValue')
+                                                }}"
+                                                name="maxTenantIdFilter"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="MinStartDateFilter">{{
+                                            l("StartDateRange")
+                                        }}</label>
+                                        <div class="input-group">
+                                            <input
+                                                class="form-control m-input"
+                                                id="MinStartDateFilter"
+                                                name="MinStartDateFilter"
+                                                type="datetime"
+                                                bsDatepicker
+                                                placeholder="{{
+                                                    l('MinValue')
+                                                }}"
+                                                [(ngModel)]="minStartDateFilter"
+                                            />
+                                            <span
+                                                style="
+                                                    line-height: 40px;
+                                                    padding: 0 15px 0 15px;
+                                                "
+                                            >
+                                                &mdash;
+                                            </span>
+                                            <input
+                                                class="form-control m-input"
+                                                id="MaxStartDateFilter"
+                                                name="MaxStartDateFilter"
+                                                type="datetime"
+                                                bsDatepicker
+                                                placeholder="{{
+                                                    l('MaxValue')
+                                                }}"
+                                                [(ngModel)]="maxStartDateFilter"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="MinEndDateFilter">{{
+                                            l("EndDateRange")
+                                        }}</label>
+                                        <div class="input-group">
+                                            <input
+                                                class="form-control m-input"
+                                                id="MinEndDateFilter"
+                                                name="MinEndDateFilter"
+                                                type="datetime"
+                                                bsDatepicker
+                                                placeholder="{{
+                                                    l('MinValue')
+                                                }}"
+                                                [(ngModel)]="minEndDateFilter"
+                                            />
+                                            <span
+                                                style="
+                                                    line-height: 40px;
+                                                    padding: 0 15px 0 15px;
+                                                "
+                                            >
+                                                &mdash;
+                                            </span>
+                                            <input
+                                                class="form-control m-input"
+                                                id="MaxEndDateFilter"
+                                                name="MaxEndDateFilter"
+                                                type="datetime"
+                                                bsDatepicker
+                                                placeholder="{{
+                                                    l('MaxValue')
+                                                }}"
+                                                [(ngModel)]="maxEndDateFilter"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="StartTimeFilter">{{
+                                            l("StartTime")
+                                        }}</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="StartTimeFilter"
+                                            name="startTimeFilter"
+                                            [(ngModel)]="startTimeFilter"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="EndTimeFilter">{{
+                                            l("EndTime")
+                                        }}</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="EndTimeFilter"
+                                            name="endTimeFilter"
+                                            [(ngModel)]="endTimeFilter"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="TimeZoneFilter">{{
+                                            l("TimeZone")
+                                        }}</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="TimeZoneFilter"
+                                            name="timeZoneFilter"
+                                            [(ngModel)]="timeZoneFilter"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="IsApprovedFilterSelect">{{
+                                        l("PublishOnHomePage")
+                                    }}</label>
+                                    <select
+                                        class="form-control"
+                                        name="IsApprovedFilter"
+                                        id="IsApprovedFilterSelect"
+                                        [(ngModel)]="publishOnHomePageFilter"
+                                    >
+                                        <option value="-1">
+                                            {{ l("All") }}
+                                        </option>
+                                        <option value="0">
+                                            {{ l("False") }}
+                                        </option>
+                                        <option value="1">
+                                            {{ l("True") }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="IsApprovedFilterSelect">{{
+                                        l("PublishOnMarketLandingPage")
+                                    }}</label>
+                                    <select
+                                        class="form-control"
+                                        name="IsApprovedFilter"
+                                        id="IsApprovedFilterSelect"
+                                        [(ngModel)]="publishOnMarketLandingPageFilter"
+                                    >
+                                        <option value="-1">
+                                            {{ l("All") }}
+                                        </option>
+                                        <option value="0">
+                                            {{ l("False") }}
+                                        </option>
+                                        <option value="1">
+                                            {{ l("True") }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label
+                                            for="MinApprovalDateTimeFilter"
+                                            >{{
+                                                l("PublishDateTimeRange")
+                                            }}</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                class="form-control m-input"
+                                                id="MinApprovalDateTimeFilter"
+                                                name="MinApprovalDateTimeFilter"
+                                                type="datetime"
+                                                bsDatepicker
+                                                placeholder="{{
+                                                    l('MinValue')
+                                                }}"
+                                                [(ngModel)]="
+                                                    minApprovalDateTimeFilter
+                                                "
+                                            />
+                                            <span
+                                                style="
+                                                    line-height: 40px;
+                                                    padding: 0 15px 0 15px;
+                                                "
+                                            >
+                                                &mdash;
+                                            </span>
+                                            <input
+                                                class="form-control m-input"
+                                                id="MaxApprovalDateTimeFilter"
+                                                name="MaxApprovalDateTimeFilter"
+                                                type="datetime"
+                                                bsDatepicker
+                                                placeholder="{{
+                                                    l('MaxValue')
+                                                }}"
+                                                [(ngModel)]="
+                                                    maxApprovalDateTimeFilter
+                                                "
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="PaymentMethodFilter">{{
+                                            l("PaymentMethod")
+                                        }}</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="PaymentMethodFilter"
+                                            name="paymentMethodFilter"
+                                            [(ngModel)]="paymentMethodFilter"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="MinInvoiceNumberFilter"
+                                            >{{ l("MinMax") }}
+                                            {{ l("InvoiceNumber") }}</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="MinInvoiceNumberFilter"
+                                                [(ngModel)]="
+                                                    minInvoiceNumberFilter
+                                                "
+                                                placeholder="{{
+                                                    l('MinValue')
+                                                }}"
+                                                name="minInvoiceNumberFilter"
+                                            />
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                [(ngModel)]="
+                                                    maxInvoiceNumberFilter
+                                                "
+                                                placeholder="{{
+                                                    l('MaxValue')
+                                                }}"
+                                                name="maxInvoiceNumberFilter"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="MinNumberOfOccurencesFilter"
+                                            >{{ l("MinMax") }}
+                                            {{ l("NumberOfOccurences") }}</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="MinNumberOfOccurencesFilter"
+                                                [(ngModel)]="
+                                                    minNumberOfOccurencesFilter
+                                                "
+                                                placeholder="{{
+                                                    l('MinValue')
+                                                }}"
+                                                name="minNumberOfOccurencesFilter"
+                                            />
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                [(ngModel)]="
+                                                    maxNumberOfOccurencesFilter
+                                                "
+                                                placeholder="{{
+                                                    l('MaxValue')
+                                                }}"
+                                                name="maxNumberOfOccurencesFilter"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="MinPeriodOfViewFilter"
+                                            >{{ l("MinMax") }}
+                                            {{ l("PeriodOfView") }}</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="MinPeriodOfViewFilter"
+                                                [(ngModel)]="
+                                                    minPeriodOfViewFilter
+                                                "
+                                                placeholder="{{
+                                                    l('MinValue')
+                                                }}"
+                                                name="minPeriodOfViewFilter"
+                                            />
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                [(ngModel)]="
+                                                    maxPeriodOfViewFilter
+                                                "
+                                                placeholder="{{
+                                                    l('MaxValue')
+                                                }}"
+                                                name="maxPeriodOfViewFilter"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="AppEntityNameFilter"
+                                            >({{ l("AppEntity") }})
+                                            {{ l("Name") }}</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="AppEntityNameFilter"
+                                            name="appEntityNameFilter"
+                                            [(ngModel)]="appEntityNameFilter"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="UserNameFilter"
+                                            >({{ l("User") }})
+                                            {{ l("Name") }}</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="UserNameFilter"
+                                            name="userNameFilter"
+                                            [(ngModel)]="userNameFilter"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-12">
+                                    <span
+                                        class="clickable-item text-muted"
+                                        *ngIf="!advancedFiltersAreShown"
+                                        (click)="
+                                            advancedFiltersAreShown =
+                                                !advancedFiltersAreShown
+                                        "
+                                        ><i class="fa fa-angle-down"></i>
+                                        {{ l("ShowAdvancedFilters") }}</span
+                                    >
+                                    <span
+                                        class="clickable-item text-muted"
+                                        *ngIf="advancedFiltersAreShown"
+                                        (click)="
+                                            advancedFiltersAreShown =
+                                                !advancedFiltersAreShown
+                                        "
+                                        ><i class="fa fa-angle-up"></i>
+                                        {{ l("HideAdvancedFilters") }}</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="row align-items-center">
+                        <!--<Primeng-Datatable-Start>-->
+                        <div
+                            class="primeng-datatable-container table-transparent-header table-transparent-rows col-12"
+                            [busyIf]="primengTableHelper.isLoading"
+                        >
+                            <p-table
+                                #dataTable
+                                (onLazyLoad)="getAppAdvertisements($event)"
+                                [value]="primengTableHelper.records"
+                                rows="{{
+                                    primengTableHelper.defaultRecordsCountPerPage
+                                }}"
+                                [paginator]="false"
+                                [lazy]="true"
+                                [scrollable]="true"
+                                ScrollWidth="100%"
+                                responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                [resizableColumns]="
+                                    primengTableHelper.resizableColumns
+                                "
+                            >
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th
+                                            style="width: 130px"
+                                            [hidden]="
+                                                !isGrantedAny(
+                                                    'Pages.Administration.AppAdvertisements.Edit',
+                                                    'Pages.Administration.AppAdvertisements.Delete'
+                                                )
+                                            "
+                                        >
+                                            {{ l("Actions") }}
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="publishOnHomePage"
+                                        >
+                                            {{ l("PublishOnHomePage") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.publishOnHomePage"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="publishOnMarketLandingPage"
+                                        >
+                                            {{ l("PublishOnMarketLandingPage") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.publishOnMarketLandingPage"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="approvalDateTime"
+                                        >
+                                            {{ l("PublishDateTime") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.approvalDateTime"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="tenantName"
+                                        >
+                                            {{ l("TenantName") }}
+                                            <p-sortIcon
+                                                field="tenantName"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="timeZone"
+                                        >
+                                            {{ l("TimeZone") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.timeZone"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="startDate"
+                                        >
+                                            {{ l("StartDate") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.startDate"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="startTime"
+                                        >
+                                            {{ l("StartTime") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.startTime"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="endDate"
+                                        >
+                                            {{ l("EndDate") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.endDate"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="endTime"
+                                        >
+                                            {{ l("EndTime") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.endTime"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="numberOfOccurences"
+                                        >
+                                            {{ l("Occurence") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.numberOfOccurences"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="periodOfView"
+                                        >
+                                            {{ l("For") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.periodOfView"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="occuranceUnitOfTime"
+                                        >
+                                            {{ l("Every") }}
+                                            <p-sortIcon
+                                                field="appAdvertisement.occuranceUnitOfTime"
+                                            ></p-sortIcon>
+                                        </th>
+                                        <th
+                                            style="width: 150px"
+                                            pSortableColumn="userFk.name"
+                                        >
+                                            {{ l("CreatedBy") }}
+                                            <p-sortIcon
+                                                field="userName"
+                                            ></p-sortIcon>
+                                        </th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template
+                                    pTemplate="body"
+                                    let-record="$implicit"
+                                    let-i="rowIndex"
+                                >
+                                    <tr>
+                                        <td
+                                            style="width: 130px"
+                                            [hidden]="
+                                                !isGrantedAny(
+                                                    'Pages.Administration.AppAdvertisements.Edit',
+                                                    'Pages.Administration.AppAdvertisements.Delete'
+                                                )
+                                            "
+                                        >
+                                            <div
+                                                class="btn-group dropdown"
+                                                dropdown
+                                                container="body"
+                                            >
+                                                <button
+                                                    class="dropdown-toggle btn btn-sm btn-primary"
+                                                    dropdownToggle
+                                                >
+                                                    <i class="fa fa-cog"></i
+                                                    ><span class="caret"></span>
+                                                    {{ l("Actions") }}
+                                                </button>
+                                                <ul
+                                                    class="dropdown-menu"
+                                                    *dropdownMenu
+                                                >
+                                                    <li>
+                                                        <a
+                                                            *ngIf="
+                                                                permission.isGranted(
+                                                                    'Pages.Administration.AppAdvertisements.Edit'
+                                                                )
+                                                            "
+                                                            [routerLink]="[
+                                                                '/app/admin/appAdvertisements/appAdvertisements/view'
+                                                            ]"
+                                                            [queryParams]="{
+                                                                id: record
+                                                                    .appAdvertisement
+                                                                    .id
+                                                            }"
+                                                        >
+                                                            {{ l("View") }}
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a
+                                                            *ngIf="
+                                                                permission.isGranted(
+                                                                    'Pages.Administration.AppAdvertisements.Edit'
+                                                                )
+                                                            "
+                                                            [routerLink]="[
+                                                                '/app/admin/appAdvertisements/appAdvertisements/createOrEdit'
+                                                            ]"
+                                                            [queryParams]="{
+                                                                id: record
+                                                                    .appAdvertisement
+                                                                    .id
+                                                            }"
+                                                        >
+                                                            {{ l("Edit") }}
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a
+                                                            href="javascript:;"
+                                                            *ngIf="
+                                                                permission.isGranted(
+                                                                    'Pages.Administration.AppAdvertisements.Delete'
+                                                                )
+                                                            "
+                                                            (click)="
+                                                                deleteAppAdvertisement(
+                                                                    record.appAdvertisement
+                                                                )
+                                                            "
+                                                            >{{
+                                                                l("Delete")
+                                                            }}</a
+                                                        >
+                                                    </li>
+                                                    <li>
+                                                        <a
+                                                            href="javascript:;"
+                                                            *ngIf="
+                                                                entityHistoryEnabled
+                                                            "
+                                                            (click)="
+                                                                showHistory(
+                                                                    record.appAdvertisement
+                                                                )
+                                                            "
+                                                            >{{
+                                                                l("History")
+                                                            }}</a
+                                                        >
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("PublishOnHomePage") }}</span
+                                            >
+                                            <div
+                                                *ngIf="
+                                                    record.appAdvertisement
+                                                        .publishOnHomePage
+                                                "
+                                                class="text-center text-success"
+                                            >
+                                                <i
+                                                    class="fa fa-check-circle kt--font-success"
+                                                    title="True"
+                                                ></i>
+                                            </div>
+                                            <div
+                                                *ngIf="
+                                                    !record.appAdvertisement
+                                                        .publishOnHomePage
+                                                "
+                                                class="text-center text-danger"
+                                            >
+                                                <i
+                                                    class="fa fa-times-circle"
+                                                    title="False"
+                                                ></i>
+                                            </div>
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("PublishOnMarketLandingPage") }}</span
+                                            >
+                                            <div
+                                                *ngIf="
+                                                    record.appAdvertisement
+                                                        .publishOnMarketLandingPage
+                                                "
+                                                class="text-center text-success"
+                                            >
+                                                <i
+                                                    class="fa fa-check-circle kt--font-success"
+                                                    title="True"
+                                                ></i>
+                                            </div>
+                                            <div
+                                                *ngIf="
+                                                    !record.appAdvertisement
+                                                        .publishOnMarketLandingPage
+                                                "
+                                                class="text-center text-danger"
+                                            >
+                                                <i
+                                                    class="fa fa-times-circle"
+                                                    title="False"
+                                                ></i>
+                                            </div>
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{
+                                                    l("PublishDateTime")
+                                                }}</span
+                                            >
+                                            <span
+                                                *ngIf="
+                                                    record.appAdvertisement
+                                                        .approvalDateTime
+                                                "
+                                            >
+                                                {{
+                                                    record.appAdvertisement
+                                                        .approvalDateTime
+                                                        | momentFormat: "L"
+                                                }}
+                                            </span>
+                                            <span
+                                                *ngIf="
+                                                    !record.appAdvertisement
+                                                        .approvalDateTime
+                                                "
+                                                >-</span
+                                            >
+                                        </td>
+
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("TenantName") }}</span
+                                            >
+                                            {{ record.tenantName }}
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("TimeZone") }}</span
+                                            >
+                                            {{
+                                                record.appAdvertisement.timeZone
+                                            }}
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("StartDate") }}</span
+                                            >
+                                            <span
+                                                *ngIf="
+                                                    record.appAdvertisement
+                                                        .startDate
+                                                "
+                                            >
+                                                {{
+                                                    record.appAdvertisement
+                                                        .startDate
+                                                        | momentFormat: "L"
+                                                }}
+                                            </span>
+                                            <span
+                                                *ngIf="
+                                                    !record.appAdvertisement
+                                                        .startDate
+                                                "
+                                                >-</span
+                                            >
+                                        </td>
+
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("StartTime") }}</span
+                                            >
+                                            {{
+                                                record.appAdvertisement
+                                                    .startTime
+                                            }}
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("EndDate") }}</span
+                                            >
+                                            <span
+                                                *ngIf="
+                                                    record.appAdvertisement
+                                                        .endDate
+                                                "
+                                            >
+                                                {{
+                                                    record.appAdvertisement
+                                                        .endDate
+                                                        | momentFormat: "L"
+                                                }}
+                                            </span>
+                                            <span
+                                                *ngIf="
+                                                    !record.appAdvertisement
+                                                        .endDate
+                                                "
+                                                >-</span
+                                            >
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("EndTime") }}</span
+                                            >
+                                            {{
+                                                record.appAdvertisement.endTime
+                                            }}
+                                        </td>
+
+
+
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{
+                                                    l("Occurence")
+                                                }}</span
+                                            >
+                                            {{
+                                                record.appAdvertisement
+                                                    .numberOfOccurences
+                                            }}
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("For") }}</span
+                                            >
+                                            {{
+                                                record.appAdvertisement
+                                                    .periodOfView
+                                            }}
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("Every") }}</span
+                                            >
+                                            {{
+                                                record.appAdvertisement
+                                                    .occuranceUnitOfTime
+                                            }}
+                                        </td>
+                                        <td style="width: 150px">
+                                            <span class="p-column-title">
+                                                {{ l("CreatedBy") }}</span
+                                            >
+                                            {{ record.userName }}
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                            <div
+                                class="primeng-no-data"
+                                *ngIf="
+                                    primengTableHelper.totalRecordsCount == 0
+                                "
+                            >
+                                {{ l("NoData") }}
+                            </div>
+                            <div class="primeng-paging-container">
+                                <p-paginator
+                                    [rows]="
+                                        primengTableHelper.defaultRecordsCountPerPage
+                                    "
+                                    #paginator
+                                    (onPageChange)="
+                                        getAppAdvertisements($event)
+                                    "
+                                    [totalRecords]="
+                                        primengTableHelper.totalRecordsCount
+                                    "
+                                    [rowsPerPageOptions]="
+                                        primengTableHelper.predefinedRecordsCountPerPage
+                                    "
+                                    [showCurrentPageReport]="true"
+                                    [currentPageReportTemplate]="
+                                        'TotalRecordsCount'
+                                            | localize
+                                                : primengTableHelper.totalRecordsCount
+                                    "
+                                >
+                                </p-paginator>
+                            </div>
+                        </div>
+                        <!--<Primeng-Datatable-End>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <entityTypeHistoryModal
+            #entityTypeHistoryModal
+        ></entityTypeHistoryModal>
+    </div>
+</div>

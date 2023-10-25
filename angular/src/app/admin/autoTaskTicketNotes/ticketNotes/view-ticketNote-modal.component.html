@@ -1,0 +1,89 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{l("Details")}}</span>
+                </h4>
+                <button type="button" class="close" (click)="close()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Title")}} :</h6>
+                        {{ item.ticketNote.title }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Description")}} :</h6>
+                        {{ item.ticketNote.description }}
+                    </div>
+
+                    <div class="col-6 mb-3">
+                        <h6>({{l("Ticket")}}) {{l("TicketNumber")}} :</h6>
+                        {{item.ticketTicketNumber}}
+                    </div>
+                     <div class="col-6 mb-3">
+                        <h6> {{l("Creator")}} :</h6>
+                        {{item.createUserName}}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6> {{l("Date")}} :</h6>
+                        {{item.ticketNote.createDateTime?.toString() | date:"MM/dd/yyyy" }}
+                    </div>
+                    <div class="col-6 mb-3" *ngIf="item?.attachments?.length > 0" >
+                        <h6> {{l("Attachments")}} :  {{item.attachments.length}}</h6>
+
+                    <!--     Loop here on attachment list  -->
+                    <div class="files-uploaded" *ngFor="let attachItem of item.attachments;">
+
+                        <div class="uploaded-attchments"
+                            *ngIf="attachItem.fileName.includes('.doc') || attachItem.fileName.includes('.docs')">
+                            <img src="assets/message/microsoft-word.svg"
+                                (click)="downloadFile(attachItem.fullPath,attachItem.fileName)">
+
+                        </div>
+                        <div class="uploaded-attchments" *ngIf="attachItem.fileName.includes('.ppt') || attachItem.fileName.includes('.PPT')">
+                            <img src="assets/message/microsoft-powerpoint.svg"
+                                (click)="downloadFile(attachItem.fullPath,attachItem.fileName)">
+
+                        </div>
+                        <div class="uploaded-attchments"
+                            *ngIf="attachItem.fileName.includes('.jpg') || attachItem.fileName.includes('.JPG') || attachItem.fileName.includes('.png') || attachItem.fileName.includes('.PNG') || attachItem.fileName.includes('.svg') || attachItem.fileName.includes('.SVG') ">
+
+                            <img [src]="getImage(attachItem.fullPath)"  height="30px" (click)="downloadFile(attachItem.fullPath,attachItem.fileName)">
+
+                        </div>
+                        <div class="uploaded-attchments" *ngIf="attachItem.fileName.includes('.xls') || attachItem.fileName.includes('.XLS')">
+                            <img src="assets/message/excel.svg" (click)="downloadFile(attachItem.fullPath,attachItem.fileName)">
+
+                        </div>
+                        <div class="uploaded-attchments" *ngIf="attachItem.fileName.includes('.PDF') || attachItem.fileName.includes('.pdf')" >
+                            <img src="assets/message/adobe.svg" (click)="downloadFile(attachItem.fullPath,attachItem.fileName)">
+
+                        </div>
+                         <div class="uploaded-attchments"
+                            *ngIf="!attachItem.fileName.includes('.xls') && !attachItem.fileName.includes('.XLS') && (!attachItem.fileName.includes('.PDF') && !attachItem.fileName.includes('.pdf'))&& !attachItem.fileName.includes('.docs') &&!attachItem.fileName.includes('.doc') &&!attachItem.fileName.includes('.ppt') && !attachItem.fileName.includes('.jpg') && !attachItem.fileName.includes('.svg') && !attachItem.fileName.includes('.png') && !attachItem.fileName.includes('.PNG')">
+                            <img src="assets/message/document.png" (click)="downloadFile(attachItem.fullPath,attachItem.fileName)">
+
+                        </div>
+
+
+                        <p class="display-name"><span>{{attachItem.fileName}}</span></p>
+                    </div>
+                    <!--Loop Ends Here -->
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button [disabled]="saving" type="button" class="btn btn-primary blue" (click)="close()">{{l("Close")}}</button>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,62 @@
+<div>
+    <app-create-post-entry
+        #createPostEntry
+        [profilePicture]="profilePicture"
+        (typeFile)="onTypeFile($event)"
+        (_showCreateOrEdit)="onshowCreateOrEdit($event)"
+        (_showCreateOrEditEvent)="onshowCreateOrEditEvent($event)"
+    >
+    </app-create-post-entry>
+
+
+<div *ngIf="postsToShow" class="m-auto">
+        <div *ngFor="let post of postsToShow; let i = index">
+            <app-post-card
+                [post]="post"
+                (showViewPost)="onshowViewPost($event)"
+                (_deletePost)="ondeletePost($event, i)"
+                (_editPost)="onshowCreateOrEdit($event)"
+                (_viewEvent)="onshowViewEventFromPost($event)"
+                (videoClicked)="playOrpauseVideo($event, post.attachmentsURLs[0])"
+            >
+            </app-post-card>
+            <div *ngIf="(i%5==0) && (i!=0)" class="d-sm-sidebars d-none">
+                <app-trending-posts (viewPost)="showPost($event)"></app-trending-posts>
+            </div>
+            <div *ngIf="(i%9==0) && (i!=0)"  class="d-sm-sidebars d-none">
+                <app-top-people></app-top-people>
+            </div>
+            <div *ngIf="(i%14==0) && (i!=0)"  class="d-sm-sidebars d-none">
+                <app-top-company></app-top-company>
+            </div>
+            <div *ngIf="(i%19==0) && (i!=0)" class="d-sm-sidebars d-none">
+                <app-ads-sidebar></app-ads-sidebar>
+            </div>
+            <div *ngIf="(i%24==0) && (i!=0)" class="d-sm-sidebars d-none">
+                <app-up-comming-event (viewEventModal)="onshowViewEventFromPost($event)"></app-up-comming-event>
+            </div>
+        </div>
+    </div>
+    <app-createor-edit-post
+        #createOrEditModal
+        [profilePicture]="profilePicture"
+        [userName]="userName"
+        (createorEditPost)="onCreateOrEditPost($event)"
+        (type)="onTypeFile($event)"
+        (closeModal)="showEventModal($event)"
+    ></app-createor-edit-post>
+    <app-view-post #viewPostModal></app-view-post>
+    <app-create-or-edit-event
+        #createOrEditEventModal
+        (createPostEvent)="oncreatePostEvent($event,false)"
+    ></app-create-or-edit-event>
+</div>
+<app-view-event
+    #viewEventModal
+    (createPostEvent)="oncreatePostEvent($event,true)"
+></app-view-event>
+
+<app-progress
+    #ProgressModal
+    [progress]="progress"
+></app-progress>

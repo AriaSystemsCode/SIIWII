@@ -1,0 +1,160 @@
+<div dropdownToggle class="kt-header__topbar-wrapper" data-toggle="dropdown" (click)="onClickTabs()"
+    data-offset="30px,0px" aria-expanded="true">
+    <span class="kt-header__topbar-icon kt-header__topbar-icon--primary">
+        <img
+        src="../../../assets/landingPage/notification.png"
+        style="width: 20px; height: 20px"
+        class="m-auto"
+    />
+        <div *ngIf="unreadNotificationCount">
+<!--             <i class="flaticon-alert-2 unread-notification"></i> -->          
+   <span class="kt-badge kt-badge--primary unread-notification-count" style="top: 5px !important">
+                {{unreadNotificationCount}}
+            </span>
+        </div>      
+      <!--   <div *ngIf="!unreadNotificationCount">
+            <i class="flaticon-alarm"></i>
+        </div> -->
+    </span>
+</div>
+
+<div *dropdownMenu
+    class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-lg notification-sm"
+    [ngClass]="dropdownMenudisplay == true?'notification-show':'notification-hide'">
+    <div class="kt-head kt-head--skin-dark  kt-head--fit-x kt-head--fit-b" style="min-height: 80px; background-color: #700066 !important;"
+        [ngStyle]="{'background-size': 'cover'}">
+        <img src="../../../../assets/landingPage/Mob_InsidePage_Header_Back_arrow.png" class="pointer d-block pl-2 pb-2 d-md-none pt-2"
+        style="position: relative;
+        float: left;
+        clear: both;"
+        (click)="onClickTabs()" />
+
+        <span class="kt-head__title"
+            style="padding-left: 13px;font-size: 18px;font-weight: normal;">
+            {{"User Notification" | localize}}
+        </span> 
+        <h3 class="kt-head__title pt-2" *ngIf="unreadNotificationCount>0"
+            style="text-align: right;margin-top: -6px;padding-right: 13px;border-radius: 10px;display: inline-block;float: right;">
+            <span class="btn btn-success btn-sm btn-bold btn-font-md" style="background-color: #F8B111 !important;
+            border: none !important;">
+                {{unreadNotificationCount}} {{"New" | localize}}
+            </span>
+        </h3>
+
+    </div>
+
+
+    <div class="kt-grid-nav kt-grid-nav--skin-light">
+       <!--  <div class="row m-4 wrapper" style="margin-top: -40px !important;">
+            <div class="noti-body">
+                 <tabset class="notification-tabs">
+                    <tab heading="Alerts"> 
+
+                         <div class="row">
+                            <div class="col" style="margin-right: 14px; display: inline-flex;">
+                                <div class="image" style=" margin-right: 14px;"><i class="flaticon-alarm" style="color: white;"></i></div>
+                                <div class="text">
+                                    <p class="title" style="font-size: 11px;color: white;margin: 0;font-weight: 600;">
+                                        {{ "SIIWII" | localize }} </p>
+                                    <p class="desc"
+                                        style="font-size: 9px;color: #B5B5C3;padding-top: 0px;margin-top: 0;">{{ "Completeyourprofile" | localize }}</p>
+                                </div>
+                            </div>
+                        </div> 
+                     </tab> 
+                     <tab heading="Events" class="notification-events">
+                        <div class="row">
+                            <div class="col" style="margin-right: 14px; display: inline-flex;">
+                                <div class="image" style=" margin-right: 14px;"><i class="flaticon-alarm"></i></div>
+                                <div class="text">
+                                    <p class="title"
+                                        style="font-size: 11px;color: #464E5F; margin: 0;font-weight: 600;">{{ "SIIWII" | localize }}</p>
+                                    <p class="desc"
+                                        style="font-size: 9px;color: #B5B5C3;padding-top: 0px; margin-top: 0;">{{ "Completeyourprofile" | localize }}</p>
+                                </div>
+                            </div>
+                        </div>
+                     </tab>
+
+                </tabset> 
+            </div>
+        </div> -->
+        <div class="row ml-2 mt-2">
+            <div class="col" style="margin-right: 14px; display: inline-flex;">
+                <div class="image" style=" margin-right: 14px;"><i class="flaticon-alarm"></i></div>
+                <div class="text">
+                    <p class="title" style="font-size: 11px;margin: 0;font-weight: 600;">
+                        {{ "SIIWII" | localize }} </p>
+                    <p class="desc"
+                        style="font-size: 9px;color: #B5B5C3;padding-top: 0px;margin-top: 0;">{{ "Completeyourprofile" | localize }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="row ml-4 mr-4" (click)="onClickTabs()">
+            <div class="text-left col-8">
+                <a href="javascript:;" class="purpleColor"
+                    (click)="setAllNotificationsAsRead(); $event.preventDefault(); $event.stopPropagation();"
+                    *ngIf="unreadNotificationCount">{{"SetAllAsRead" | localize}}</a>
+                    <a href="javascript:;" style="color: grey !important"
+                    *ngIf="!unreadNotificationCount">{{"SetAllAsRead" | localize}}</a>
+            </div>
+            <div class="text-right col-4">
+                <a (click)="openNotificationSettingsModal()" class="text-right purpleColor"
+                    href="javascript:;">{{"Settings" | localize}}</a>
+            </div>
+        </div>
+        <hr />
+        <div class="kt-notification kt-margin-t-10 kt-margin-b-10 kt-scroll" data-scroll="true" data-height="300"
+            data-mobile-height="200" style="height: 300px; overflow: hidden;">
+            <a *ngFor="let notification of notifications" (click)="openNotificationMessage(notification)"
+                [ngClass]="{'user-notification-item-clickable': notification.url,'user-notification-item-unread': notification.isUnread}"
+                class="kt-notification__item">
+                <div class="kt-notification__item-icon">
+                    <!-- <i class="{{notification.icon}} kt-font-success">
+
+                    </i> -->
+                    <img
+                    class="mr-2"
+                    style="width: 48px;
+                    height: 48px;"
+                    [src]="getNotification_item_icon(notification)"
+                />
+                </div>
+                <div class="kt-notification__item-details">
+                    <div class="kt-notification__item-title" 
+                    [innerHTML]="notification.text | safeHtml "
+                style="overflow-wrap: anywhere;"> 
+                    </div>
+                    <div class="kt-notification__item-time">
+                        {{notification.time | momentFromNow}}
+                        <span *ngIf="notification.isUnread">
+                            <a href="javascript:;" *ngIf="notification.state=='UNREAD'" class="purpleColor"
+                                (click)="setNotificationAsRead(notification); $event.preventDefault(); $event.stopPropagation();">{{"SetAsRead" | localize}}</a>
+                        </span>
+                    </div>
+                </div>
+            </a>
+            <span *ngIf="!notifications.length" class="notification-empty-text p-3">
+                {{"ThereAreNoNotifications" | localize}}
+            </span>
+        </div>
+        <hr *ngIf="notifications.length" />
+        <div *ngIf="notifications.length" class="m-4">
+            <div class="text-center"><a routerLink="notifications" class="purpleColor">{{"SeeAllNotifications" | localize}}</a></div>
+        </div>
+    </div>
+</div>
+<app-view-post #viewPostModal></app-view-post>
+<app-view-event
+    #viewEventModal
+    (createPostEvent)="oncreatePostEvent($event,true)"
+></app-view-event>
+<app-createor-edit-post
+#createOrEditModal
+(createorEditPost)="onCreateOrEditPost($event)"
+(type)="onTypeFile($event)"
+(closeModal)="showEventModal($event)"
+></app-createor-edit-post>
+<app-progress
+    #ProgressModal
+></app-progress>

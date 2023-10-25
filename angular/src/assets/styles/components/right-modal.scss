@@ -1,0 +1,99 @@
+
+/* ----- MODAL STYLE ----- */
+
+.aria-input-text,.aria-select{
+    height: 40px !important;
+    background-color: #F3F6F9 !important;
+    border: none;
+    border-radius: 5px;
+ }
+
+@keyframes right-slide-in {
+    from {
+        right: -400px;
+    }
+    to {
+        right: 0px;
+    }
+}
+
+@keyframes right-slide-out {
+    from {
+        right: 0px;
+    }
+    to {
+        right: -400px;
+    }
+}
+
+.right-modal {
+
+    &.modal-dialog {
+        position: absolute;
+        transition: opacity 0.3s linear, right 0.3s ease-out;
+        margin: auto;
+        width: 400px;
+        height: 100%;
+        right: 0px;
+        -webkit-transform: translate3d(0%, 0, 0);
+        -ms-transform: translate3d(0%, 0, 0);
+        -o-transform: translate3d(0%, 0, 0);
+        transform: translate3d(0%, 0, 0);
+        -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+        -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+        -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+        transition: opacity 0.3s linear, right 0.3s ease-out;
+    }
+    &.slide-right-in {
+        animation: 250ms right-slide-in;
+    }
+    &.slide-right-out {
+        animation: 200ms right-slide-out;
+        right: -400px;
+    }
+    .modal-header {
+        position: static!important;
+    }
+    .modal-content {
+        border-radius: 0;
+        border: none;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .modal-header {
+        border-bottom-color: #EEEEEE;
+        padding-right: 0;
+
+    }
+    .modal-title{
+        width: 100% !important;
+    }
+    .close-model{
+        background-color: transparent;
+        border: none;
+    }
+}
+
+
+button[aria-label=Close] {
+    top: 7px;
+    right: 5px;
+    position: absolute;
+}
+
+.modal-content-wrapper {
+    display: flex!important;
+    justify-content: space-between!important;
+    flex-direction: column;
+    height: 100%;
+    .modal-body {
+        flex-grow: 1!important;
+        max-height: 75vh;
+        overflow-y: scroll;
+    }
+    .modal-footer {
+        position: static!important;
+    }
+}

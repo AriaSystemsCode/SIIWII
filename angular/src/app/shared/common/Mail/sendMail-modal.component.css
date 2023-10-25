@@ -1,0 +1,43 @@
+.modal-dialog{
+    /* width: 100%; */
+    width: 550px;
+    position: fixed;
+    bottom: 0;
+    right: 581px;
+}
+.modal-header{
+  position: unset !important;
+    background-color: #464E5F;
+    color: #FFFFFF;
+}
+.modal-footer{
+  position: unset !important;
+}
+.modal-title span{
+    color: #FFFFFF;
+  }
+  .btn-blue{
+      background-color: #3699FF;
+      color: #FFFFFF;
+      padding: 10px 0 !important;
+      width: 81px !important;
+  }
+  .modal-body{
+    padding: 0;
+  }
+  .mail-icon{
+    position: absolute;
+    z-index: 9999;
+    display: block;
+    width: 1.575rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    top: 4px;
+    left: 9px;
+    color: #aaa;
+  }
+  .input-mail{
+    padding-left: 36px;
+  }

@@ -1,0 +1,46 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycEntityObjectStatusForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycEntityObjectStatus.id">{{l("EditEntityObjectStatus")}}</span>
+                        <span *ngIf="!sycEntityObjectStatus.id">{{l("CreateNewEntityObjectStatus")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                 
+
+					<div class="form-group m-form__group">
+						<label for="SydObjectName">{{l("Object")}}</label>
+						<select name="sycEntityObjectStatus.objectId" [(ngModel)]="sycEntityObjectStatus.objectId" class="form-control" required>
+							<option value="">{{l("SelectASydObject")}}</option>
+							<option *ngFor="let item of allSydObjects" value="{{item.id}}">{{item.displayName}}</option>
+						</select>
+					</div>
+					 
+
+								<div class="form-group">
+									<label for="SycEntityObjectStatus_Code">{{l("Code")}}</label>
+									<input type="text" id="SycEntityObjectStatus_Code" class="form-control" [(ngModel)]="sycEntityObjectStatus.code" name="Code"   minlength="1"  maxlength="10" [readonly]="sycEntityObjectStatus.id>0" required/>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycEntityObjectStatus_Name">{{l("Name")}} *</label>
+									<input type="text" id="SycEntityObjectStatus_Name" class="form-control" [(ngModel)]="sycEntityObjectStatus.name" name="Name"   minlength="2"  maxlength="150"  required/>
+								</div>
+					
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycEntityObjectStatusForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

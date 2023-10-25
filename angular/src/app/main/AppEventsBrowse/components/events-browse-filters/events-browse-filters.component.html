@@ -1,0 +1,63 @@
+<form [formGroup]="filterForm" >
+    <div class="mb-4 border-dashed-bottom"  *ngIf="filtersFlags.timeZone">
+        <app-single-selection-filter
+            #timeZoneFilter
+            [filterMetaData]="timeZonesFilterMetaData"
+            [formContol]="filterForm.controls.timeZone"
+            [title]="'TimeZone' | localize"
+            (onLoadData)="getTimeZonesList(timeZoneFilter)"
+        >
+        </app-single-selection-filter>
+    </div>
+
+    <div class="mt-4 pt-4">
+        <h4 class="text-captitalize mb-3">{{"FromDate" | localize}}</h4>
+        <div class="row" >
+            <div>
+                <input type="datetime-local" formControlName="startDate" name="startDate" class="form-control" placeholder="{{ 'Choose Date' | localize }}" />
+            </div>
+        </div>
+    </div>
+    <div class="mt-4 pt-4 pb-4 border-dashed-bottom" >
+        <h4 class="text-captitalize mb-3">{{"ToDate" | localize}}</h4>
+        <div class="row" >
+            <div>
+                <input type="datetime-local" formControlName="endDate" name="endDate" class="form-control" placeholder="{{ 'Choose Date' | localize }}" />
+            </div>
+        </div>
+        <div class="text-danger" *ngIf="dateErrorMessage">
+            {{dateErrorMessage}}
+        </div>
+    </div>
+    
+
+    <div class="mb-4 mt-4 border-dashed-bottom"  *ngIf="filtersFlags.isOnline">
+        <app-single-selection-filter
+            #EventTypeFilter
+            [filterMetaData]="eventTypeStatusFilterMetaData"
+            [formContol]="filterForm.controls.isOnline"
+            [title]="'EventType' | localize"
+            (onLoadData)="getEventTypeOptionsList(EventTypeFilter)"
+        >
+        </app-single-selection-filter>
+    </div>
+
+    <div class="mt-4 pt-4" >
+        <h4 class="text-captitalize mb-3">{{"City" | localize}}</h4>
+        <div class="d-flex flex-column d-flex flex-wrap filter-group thin-scroll pl-5 pr-4">
+            <input type="text" formControlName="city" name="city" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
+        </div>
+    </div>
+    <div class="mt-4" >
+        <h4 class="text-captitalize mb-3">{{"PostalCode" | localize}}</h4>
+        <div class="d-flex flex-column d-flex flex-wrap filter-group thin-scroll pl-5 pr-4">
+            <input type="text" formControlName="postalCode" name="postalCode" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
+        </div>
+    </div>
+    <div class="mt-4 mb-4 pb-5" >
+        <h4 class="text-captitalize mb-3">{{"State" | localize}}</h4>
+        <div class="d-flex flex-column d-flex flex-wrap filter-group thin-scroll pl-5 pr-4">
+            <input type="text" formControlName="state" name="state" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
+        </div>
+    </div>
+</form>

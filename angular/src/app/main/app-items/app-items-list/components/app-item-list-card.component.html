@@ -1,0 +1,166 @@
+<div class="single-item row w-100" [ngClass]="class">
+    <div class="single-item-photo mr-1">
+        <img
+            class="w-100"
+            [src]="attachmentBaseUrl + '/'  + item?.appItemsList?.imgURL"
+            alt=""
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+        />
+        <div class="count">
+            <b></b>{{item?.appItemsList?.itemsCount > 20 ? '+20' : item?.appItemsList?.itemsCount }}
+        </div>
+    </div>
+    <div class="single-item-body col"
+    [ngClass]="singleItemPerRowMode ? '' : 'd-flex flex-row'"
+    >
+        <div class="row h-100 w-100">
+            <div
+                class="pt-3"
+                [ngClass]="singleItemPerRowMode ? 'col-md-8' : 'col-md-7'"
+            >
+                <h3 class="m-0 mb-2 text-dark">
+                    {{ item?.appItemsList?.name }}
+                </h3>
+                <p class="text-dark mb-2">
+                    {{
+                        item?.appItemsList?.description
+                            | textSubstring: 40
+                    }}
+                </p>
+                <div >
+                    <p class="text-dark mb-2">
+                        {{ "Owner" | localize }} :
+                        <b>{{item?.appItemsList?.creatorUserName}}</b>
+                    </p>
+                    <p
+                        class="text-dark mb-2"
+                        *ngIf="
+                            mainFilterType == ItemsListFilterTypesEnum.MyItemsList &&
+                            !item?.appItemsList?.published 
+                        "
+                    >
+                        {{ "NotPublished" | localize }}
+                        <span class="ml-2">
+                            <i
+                                class="bg-warn bg-warning d-inline-flex flaticon2-information rounded-circle text-white"
+                            ></i>
+                        </span>
+                    </p>
+                    <p
+                        class="text-dark mb-2"
+                        *ngIf="
+                            mainFilterType == ItemsListFilterTypesEnum.MyItemsList &&
+                            item?.appItemsList?.published 
+                        "
+                    >
+                        {{ "Published" | localize }}
+                        <span class="ml-2">
+                            <i
+                                class="bg-success d-inline-flex flaticon2-information rounded-circle text-white"
+                            ></i>
+                        </span>
+                    </p>
+                    <p
+                        class="mb-2 font-weight-bold"
+                        *ngIf="
+                            mainFilterType == ItemsListFilterTypesEnum.MyItemsList &&
+                            item?.appItemsList?.statusCode 
+                        "
+                        [ngClass]="{'text-success' : item?.appItemsList?.statusCode }"
+                    >
+                        {{ item?.appItemsList?.statusCode | localize | titlecase }}
+                    </p>
+                </div>
+
+            </div>
+            <div
+                class="d-flex flex-column justify-content-around"
+                [ngClass]="singleItemPerRowMode ? 'col-md-4' : 'col-md-5'"
+            >
+                <div class="align-items-center d-flex justify-content-end" >
+                    <p class="m-0 p-0 mr-2">{{ ("ItemAdded" | localize) + " " + (item?.appItemsList?.creationTime?.toString() | date : 'longDate') }}</p>
+                    
+                    <div
+                        class="btn-group dropdown"
+                        dropdown
+                        container="body"
+                        placement="bottom right"
+                    >
+                        <button
+                            class="dropdown-toggle btn btn-sm btn-action"
+                            dropdownToggle
+                        ></button>
+                        <ul
+                            class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                            *dropdownMenu
+                        >
+                            <li>
+                                <a
+                                    href="javascript:;"
+                                    [routerLink]="[
+                                        '/app/main/productslists/view',
+                                        item?.appItemsList?.id
+                                    ]"
+                                    >{{ "View" | localize }}</a
+                                >
+                            </li>
+                            <li *ngIf="mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
+                                <a
+                                    href="javascript:;"
+                                    [ngClass]="{
+                                        dimmed: !canPublish
+                                    }"
+                                    *ngIf="!item?.appItemsList?.published && item?.appItemsList?.itemsCount > 0 && item?.appItemsList?.statusCode == 'ACTIVE'"
+                                    (click)="publish()"
+                                    >{{  "PublishList"| localize }}
+                                </a>
+                                <a
+                                    href="javascript:;"
+                                    [ngClass]="{
+                                        dimmed: !canPublish
+                                    }"
+                                    *ngIf="item?.appItemsList?.published"
+                                    (click)="unPublish()"
+                                    >{{ "UnpublishList" | localize }}
+                                </a>
+                            </li>
+                            <li *ngIf="canEdit && mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
+                                <a
+                                    href="javascript:;"
+                                    [routerLink]="[
+                                        '/app/main/productslists/edit',
+                                        item?.appItemsList?.id
+                                    ]"
+                                    >{{ "EditProductsList" | localize }}</a
+                                >
+                            </li>
+                            <li >
+                                <a href="javascript:;" [ngClass]="{ 'dimmed' : !canPrint }" (click)="printList()">{{
+                                    "PrintProductsList" | localize
+                                }}</a>
+                            </li>
+                            <li *ngIf="canDelete && mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
+                                <a href="javascript:;" (click)="deleteList()">{{
+                                    "DeleteThisList" | localize
+                                }}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <button
+                        class="btn btn-outline-primary pl-4 pr-4 mt-2"
+                        [routerLink]="[
+                            '/app/main/productslists/view',
+                            item?.appItemsList?.id
+                        ]"
+                    >
+                        {{ "View" | localize }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,108 @@
+<div class="single-item mr-1 row align-items-center" >
+    <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
+        'background-image':
+        member.imageUrl ?
+        'url(' + attachmentBaseUrl + '/' + member?.imageUrl+ ')'  :
+        ''
+    }"
+    (click)="clickCardHandler()"
+    >
+        <i *ngIf="!member.imageUrl" class="fa-image fas text-black-50"></i>
+    </div>
+    <div class="single-item-body col " [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
+        <div class="row justify-content-between row">
+            <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" >
+                <h3 (click)="clickCardHandler()" class="text-capitalize text-primary card-name" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0 text-dark'">
+                    <div *ngIf="member.firstName || member.surName ">
+                        {{member.firstName}}  {{member.surName}}
+                    </div>
+                </h3>
+
+                <div class="mb-1 text-dark " >
+                    <div class="d-flex flex-column" >
+
+                        <div class="d-flex justify-content-between" [ngClass]=" singleItemPerRowMode ? 'flex-row' : 'flex-column' ">
+                            <div >
+                                {{ member?.jobTitle + ( member?.accountName && member?.jobTitle ? ' ' + l('at') + ' ' : ''   ) + member?.accountName }}
+                             </div>
+                            <div  *ngIf="member.eMailAddress && singleItemPerRowMode"> | </div>
+                            <div *ngIf="member.eMailAddress">
+                               <b>{{ "Email" | localize }} : </b> {{member.eMailAddress}}
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex" >
+
+                        <div  *ngIf="showActiveStatus && member?.userId">
+                            <span class="connected text-success" *ngIf="member.isActive == true">
+                                <span class="mr-1">
+                                    <i
+                                        class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'Active' | localize }}
+                            </span>
+                            <span class="text-muted" *ngIf="member.isActive == false">
+                                <span class="mr-1">
+                                    <i
+                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'NotActive'| localize }}
+                            </span>
+                        </div>
+                        <div *ngIf="!member?.userId">
+                            <span class="connected text-success">
+                                <span class="mr-1">
+                                    <i
+                                        class="success-icon bg-success flaticon2-information d-inline-flex rounded-circle text-white"
+                                    ></i>
+                                </span>
+                                {{'ManualContact' | localize }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-12">
+                <div *ngIf="singleItemPerRowMode" class="text-right" >
+                    <div *ngIf="member.joinDate !== null">
+                        {{ "JoinedAt" | localize }} {{ member.joinDate?.toString() | date : 'M-d-yyyy' }}
+                    </div>
+                    <div *ngIf="showActiveStatus && member?.userId">
+                        <span class="connected text-success" *ngIf="member.isActive == true">
+                            <span class="mr-1">
+                                <i
+                                    class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
+                                ></i>
+                            </span>
+                            {{'Active' | localize }}
+                        </span>
+                        <span class="text-muted" *ngIf="member.isActive == false">
+                            <span class="mr-1">
+                                <i
+                                    class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                ></i>
+                            </span>
+                            {{'NotActive'| localize }}
+                        </span>
+                    </div>
+                    <div *ngIf="!member?.userId">
+                        <span class="connected text-success">
+                            <span class="mr-1">
+                                <i
+                                    class="success-icon bg-success flaticon2-information d-inline-flex rounded-circle text-white"
+                                ></i>
+                            </span>
+                            {{'ManualContact' | localize }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+

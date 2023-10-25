@@ -1,0 +1,69 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #maintainanceForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="maintainance.id">{{l("EditMaintainance")}}</span>
+                        <span *ngIf="!maintainance.id">{{l("CreateNewMaintainance")}}</span>
+                    </h4>                    
+                    
+                <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                     <span aria-hidden="true">&times;</span>
+                </button>
+             
+                    
+                </div>
+                <div class="modal-body">
+                 
+
+
+
+								<div class="form-group">
+									<label for="Maintainance_Name">{{l("Name")}} *</label>
+									<input type="text" #Maintainance_Name="ngModel" id="Maintainance_Name" class="form-control" [(ngModel)]="maintainance.name" name="Name"   minlength="1"  maxlength="250"  required/>
+								    <validation-messages [formCtrl]="Maintainance_Name"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="Maintainance_Description">{{l("Description")}}</label>
+									<input type="text" #Maintainance_Description="ngModel" id="Maintainance_Description" class="form-control" [(ngModel)]="maintainance.description" name="Description"    />
+								    <validation-messages [formCtrl]="Maintainance_Description"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="Maintainance_From">{{l("From")}}</label>
+									 <input required class="form-control m-input" #Maintainance_From type="datetime-local"  [ngModel]="maintainance.from.toString() | date:'yyyy-MM-ddTHH:mm'" id="Maintainance_From" name="Maintainance_From" (ngModelChange)="maintainance.from = dateChanged($event)"/>
+									<validation-messages [formCtrl]="Maintainance_From"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="Maintainance_To">{{l("To")}}</label>
+									 <input required class="form-control m-input" #Maintainance_To type="datetime-local"  [ngModel]="maintainance.to.toString() | date:'yyyy-MM-ddTHH:mm'" id="Maintainance_To" name="Maintainance_To"  (ngModelChange)="maintainance.to = dateChanged($event)">
+									<validation-messages [formCtrl]="Maintainance_To"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="Maintainance_Published" class="kt-checkbox">
+										<input id="Maintainance_Published" #Maintainance_Published="ngModel" type="checkbox" name="Published" [(ngModel)]="maintainance.published"> 
+										{{l("Published")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="Maintainance_Published"></validation-messages>
+								</div>
+								
+					
+							 
+					
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!maintainanceForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

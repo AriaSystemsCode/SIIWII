@@ -1,0 +1,60 @@
+// base variables
+$white : #FFFFFF;
+$white2 : #ECF0F3;
+$off-white : #f4f4f4;
+$grey :#F3F6F9 ;
+$grey-1: #E9EBEE;
+$grey-2: #B5B5C3;
+$grey-3: #ccc;
+$grey-4: #999999;
+$grey-5: #5F6368;
+$grey-6: #464E5F;
+$black: #212121;
+$red: #E60000;
+$red-1: #F64E60;
+$orange: #F9652A;
+$orange-1:#E87D00;
+$blue: #3699FF;
+$blue-light: #E1F0FF;
+$green:#1BC5BD;
+$green-1:#60C453;
+$purple : #ab47bc;
+$purple-dark : #745482;
+
+
+// general
+$primary-color : $blue;
+$secondary-color : $blue;
+// $info-color : $blue;
+// $warning-color : $blue;
+$white-color : $white;
+$success-color:$green;
+
+//form
+$input-bg : $grey;
+
+//scroll
+$scrollbar-color : $grey-3;
+
+//paginator
+$pagiantor-paginate-btns-bg : $blue-light;
+$pagiantor-paginate-btns-bg-disabled : $grey-1;
+$pagiantor-page-color : $black;
+$pagiantor-page-border-color : transparent;
+$pagiantor-page-bg : transparent;
+$pagiantor-page-color-active : $blue;
+$pagiantor-page-border-color-active : $blue;
+$pagiantor-page-bg-active : $white;
+$paginator-bg : transparent;
+
+
+// p-checkbox
+$checkbox-color :#333;
+$checkbox-border-color :#a6a6a6;
+
+// p-tree
+$tree-toggle-color :#a6a6a6;
+
+$bold-color: #700066;
+$light-color: #e2d8e2;
+$orangeBg: rgb(248, 150, 17);

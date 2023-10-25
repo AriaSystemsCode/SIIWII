@@ -1,0 +1,400 @@
+@import "./base/variables";
+@import "./base/placeholders";
+@import "./base/mixins";
+
+// components import
+@import "./components/borders.scss"; // border
+@import "./components/buttons.scss"; // buttons
+@import "./components/form.scss"; // form & inputs
+@import "./components/icons.scss"; // icons
+@import "./components/left-aside-filters.scss"; // left aside filters
+@import "./components/list-toolbar.scss"; // list-toolbar
+@import "./components/p-paginator.scss"; // p-paginator of ngprime
+@import "./components/p-tree.scss"; // p-tree of ngprime
+@import "./components/scroll.scss"; // scroll
+@import "./components/typography.scss"; // typography ( text )
+@import "./components/tag.scss"; // tag
+@import "./components/anchor.scss"; // anchor links ( a )
+@import "./components/drop-down.scss";
+@import "./components/accordion.scss";
+@import "./components/editor.scss";
+@import "./components/tabs.scss";
+@import "./components/right-modal.scss";
+@import "./components/select-button.scss";
+@import "./components/p-table.scss";
+@import "./components/listing-share-modal.scss";
+@import "./components/cropper.scss";
+@import "./components/p-checkbox.scss";
+@import "./components/browse-list.scss";
+@import "./components/view-profile.scss";
+@import "./components/toast.scss";
+@import "./components/carousel.scss";
+@import "./components/switch-input.scss";
+@import "./components/auto-complete.scss";
+@import "./components/p-multi-select.scss";
+@import "./components/p-dialog";
+
+.hint {
+    font-size: 0.8rem;
+    color: $grey-5;
+}
+.visibility-hidden {
+    visibility: hidden;
+}
+.dimmed {
+    opacity: 0.5;
+    background-color: transparent !important;
+    cursor: not-allowed;
+}
+
+:root {
+    overflow: hidden;
+}
+
+body {
+    overflow-y: scroll;
+    max-height: 100vh;
+}
+
+.swal-btn {
+    width: 285px !important;
+    height: 38px !important;
+    border-radius: 6px !important;
+}
+.swal-confirm {
+    margin-bottom: 10px !important;
+}
+
+.swal-title {
+    color: #f64e60 !important;
+}
+
+.swal-icon {
+    margin-left: 40% !important;
+}
+
+.carouselChangePosArrow .carousel-inner,
+.carouselChangePosArrow .item carousel-item,
+.carouselChangePosArrow .carousel {
+    position: static !important;
+}
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+.sendMessageInputs {
+    .p-autocomplete.p-autocomplete-multiple
+        .p-autocomplete-multiple-container
+        .p-autocomplete-input-token {
+        width: 100% !important;
+    }
+}
+
+.events p-steps {
+    margin-top: 40px;
+}
+
+.sm-events .p-steps .p-steps-item {
+    margin-right: 75px;
+}
+.ctaSlider .p-carousel-prev span,
+.ctaSlider .p-carousel-next span,
+.sliderImages .p-carousel-prev span,
+.sliderImages .p-carousel-next span {
+    display: none !important;
+}
+
+.ctaSlider .p-carousel .p-carousel-content .p-carousel-prev,
+.ctaSlider .p-carousel .p-carousel-content .p-carousel-next,
+.sliderImages .p-carousel .p-carousel-content .p-carousel-prev,
+.sliderImages .p-carousel .p-carousel-content .p-carousel-next {
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    margin: 0.2em;
+    color: transparent;
+    transition: color 0.2s;
+    background-size: 100% 100%;
+}
+
+.ctaSlider
+    .p-carousel
+    .p-carousel-content
+    .p-carousel-prev:not(.p-disabled):hover,
+.ctaSlider
+    .p-carousel
+    .p-carousel-content
+    .p-carousel-next:not(.p-disabled):hover,
+.sliderImages
+    .p-carousel
+    .p-carousel-content
+    .p-carousel-prev:not(.p-disabled):hover,
+.sliderImages
+    .p-carousel
+    .p-carousel-content
+    .p-carousel-next:not(.p-disabled):hover {
+    background-color: transparent;
+    color: transparent;
+}
+.sliderImages .p-carousel .p-carousel-content .p-carousel-prev {
+    background-image: url("../landingPage/arrow-right1.svg");
+    left: 3%;
+    z-index: 1;
+}
+
+.hiddenIndicator .p-carousel .p-carousel-content .p-carousel-prev,
+.hiddenIndicator .p-carousel .p-carousel-content .p-carousel-next {
+    display: none;
+}
+
+.sliderImages .p-carousel .p-carousel-content .p-carousel-next {
+    background-image: url("../landingPage/arrow-right1.svg");
+    transform: rotate(180deg);
+    right: 3%;
+    z-index: 1;
+}
+
+.ctaSlider .p-carousel .p-carousel-content .p-carousel-prev {
+    background-image: url("../landingPage/arrow-right2.svg");
+}
+
+.ctaSlider .p-carousel .p-carousel-content .p-carousel-next {
+    background-image: url("../landingPage/arrow-right2.svg");
+    transform: rotate(180deg);
+}
+
+.hiddenDotsIndicator ul.p-carousel-dots-container.p-reset {
+    display: none;
+}
+
+// #kt_header {
+//     width: 85% !important;
+// }
+
+.kt-subheader {
+    // width: 95% !important;
+    margin-right: 13px;
+}
+
+
+.bgPurple{
+    background-color: #700066 !important;
+}
+
+.colorPurple{
+    color: #700066 !important;
+}
+
+.w-80{
+    width: 80% !important;
+}
+.text-black{
+    color: black !important;
+}
+
+.text-purple{
+    color:#700066 !important
+}
+
+.no-underline{
+    text-decoration: none !important;
+}
+
+@media screen and (max-width: 1300px) {
+.slidesContainer{
+   background-color: transparent !important;
+}
+.noslidedata{
+    display:none;
+}
+}
+
+
+/* 
+
+.slidersContainerCarousel .p-carousel.p-component.p-carousel-horizontal , .slidersContainerCarousel .p-carousel-container {
+    width: 100% !important;
+    height:  100% !important;
+} */
+
+.slide-md-Section{
+    width: 90%;
+    height:238.4pt;
+    border: solid 1px #B49BB4;
+    background-color: #EFEFEF;
+    border-radius: 2px 2px 10px 10px;
+}
+
+.slide-sm-Section{
+    width: 198pt;
+    height: 250pt;
+    border: solid 1px #B49BB4;
+    background-color: #EFEFEF;
+    border-radius: 2px 2px 10px 10px;
+}
+
+.slide-single-item{
+    height:151px;
+}
+.slide-single-item-body{
+   background-color:#EFEFEF;
+    width: 100%;
+    position: relative;
+    top: -9px;
+    height: 20%;
+    padding-left: 10px;
+    border-top: solid 2px #e5e2e2;
+}
+.slide-medium-image
+{
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 80%;
+}
+.slide-small-image
+{
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 80%;
+}
+
+.noRLMargin {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+.noRLpadding{ 
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+.event-sm-steps span.p-steps-title{
+    display: none !important;
+}
+
+.event-steps  .p-steps .p-steps-item.p-highlight .p-steps-number {
+    background-color: #700066 !important;
+}
+
+
+@media screen and (max-width: 767px) {
+    .bs-datepicker {
+        left: 20%;
+        position: relative;
+    }
+    .p-steps .p-steps-item .p-menuitem-link{
+        width: 100% !important;
+    }
+    .p-steps .p-steps-item .p-menuitem-link .p-steps-number {
+        border-radius: 5px !important;
+        width: 100% !important;
+        height: 8pt !important;
+        font-size: 0px !important;
+    }
+
+    .p-steps:before{
+    display: none !important;
+    }
+    .sm-events .p-steps .p-steps-item {
+        margin-right: 0px;
+        width: 30% !important;
+        padding-left: 5% !important;
+    }
+    
+.notification-sm{
+    position: fixed !important;
+    top: 0px !important;
+    left: 0px !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.notification-settings .modal-dialog  {
+    height: 100% !important;
+    margin: 0px !important;
+}
+.notification-settings .modal-content {
+    height: 100% !important;
+}
+}
+
+
+
+
+.popup-class {
+    background-color: #9A038D !important; 
+}
+
+.icon-class{
+    border-color: white !important;
+    color: white !important;
+}
+
+ .content-class{
+    color: white !important;
+    font-size: 12pt !important;
+}
+
+ .actions-class {
+    border-top: 1px solid white !important;
+}
+
+
+ .confirm-button-class {
+    background-color: transparent  !important;
+    font-size: 12pt !important;
+    padding-top: 20px !important;
+}
+
+
+
+.confirm-button-class2 {
+    background-color: #f88011  !important;
+}
+.wizard-wrapper {
+    min-height: 350px;
+}
+
+.HtmlEditorInput-sm .p-component.p-editor-container{
+    height: 100%;
+}
+
+.sendUsers ul.p-autocomplete-multiple-container
+{
+    max-height: 80px;
+    overflow-y: auto;
+    width: 97%;
+}
+
+
+.purpleColor {
+    color: #700066 !important;
+}
+
+.kt-notification .kt-notification__item:after {
+color: #700066 !important;
+}
+
+.kt-notification .kt-notification__item:hover .kt-notification__item-details .kt-notification__item-title {
+    color: #700066 !important;
+}
+
+.unread-notification-count {
+    background-color: #f88011 !important;
+}
+
+
+.radio , .checkbox{
+    accent-color: #700066 !important;
+ }
+
+ .kt-switch input:checked ~ span:after {
+    background-color: #700066 !important;
+ }
+
+ .kt-switch input:empty ~ span:before {
+    background-color: #e8ebf1;
+    border: 1px solid #700066 !important;
+ }

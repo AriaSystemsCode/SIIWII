@@ -1,0 +1,58 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycServiceForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycService.id">{{l("EditSycService")}}</span>
+                        <span *ngIf="!sycService.id">{{l("CreateNewSycService")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+
+								<div class="form-group">
+									<label for="SycService_Code">{{l("Code")}} *</label>
+									<input type="text" #SycService_Code="ngModel" id="SycService_Code" class="form-control" [(ngModel)]="sycService.code" name="Code"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="SycService_Code"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycService_Description">{{l("Description")}}</label>
+									<input type="text" #SycService_Description="ngModel" id="SycService_Description" class="form-control" [(ngModel)]="sycService.description" name="Description"    />
+								    <validation-messages [formCtrl]="SycService_Description"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycService_UnitOfMeasure">{{l("UnitOfMeasure")}}</label>
+									<input type="text" #SycService_UnitOfMeasure="ngModel" id="SycService_UnitOfMeasure" class="form-control" [(ngModel)]="sycService.unitOfMeasure" name="UnitOfMeasure"   minlength="1"  maxlength="50" />
+								    <validation-messages [formCtrl]="SycService_UnitOfMeasure"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycService_UnitPrice">{{l("UnitPrice")}}</label>
+									<input type="number" #SycService_UnitPrice="ngModel" id="SycService_UnitPrice" class="form-control" [(ngModel)]="sycService.unitPrice" name="UnitPrice"   />
+									<validation-messages [formCtrl]="SycService_UnitPrice"></validation-messages>
+								</div>
+
+								<div class="form-group">
+									<label for="SycService_Notes">{{l("Notes")}}</label>
+									<input type="text" #SycService_Notes="ngModel" id="SycService_Notes" class="form-control" [(ngModel)]="sycService.notes" name="Notes"    />
+								    <validation-messages [formCtrl]="SycService_Notes"></validation-messages>
+								</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycServiceForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

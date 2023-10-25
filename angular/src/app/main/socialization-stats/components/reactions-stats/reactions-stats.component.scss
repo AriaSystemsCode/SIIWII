@@ -1,0 +1,11 @@
+.icon-reaction {
+    height: 15px;
+}
+.comment-stats:hover,
+.reaction-stats:hover {
+    text-decoration: underline!important;
+    color:rgba(0, 98, 255, 0.698)!important;
+}
+.first-reaction{
+    order: -1;
+}

@@ -1,0 +1,46 @@
+<div bsModal #bsModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="selectListModal" aria-hidden="true">
+    <div class="modal-dialog"  role="document">
+        <div class="modal-content">
+            <div class="modal-content-wrapper" >
+                <div class="modal-header flex-column">
+                    <h3 class="modal-title text-left">
+                        <span> {{ l("ProductAdvancedPricing") }}</span>
+                    </h3>
+                    <button style="position: absolute; right: 0; top: 8px" type="button" class="close"
+                        (click)="cancel()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body thin-scroll text-left">
+                    <app-matrix-grid 
+                        #matrixGrid 
+                        [cols]="cols" 
+                        [rows]="rows" 
+                        [canAddCols]="false"
+                        [canAddRows]="!readOnly"
+                        [rowHover]="true"
+                        [canRemoveRows]="!readOnly"
+                        [rowHeaderFormInput]="rowHeaderFormInput"
+                        [rowHeaderIsEditable]="!readOnly"
+                        [cellSelectionIsEditable]="!readOnly"
+                        [cellSelectionFormInput]="cellSelectionFormInput"
+                        (_newRow)="addNewCurrency()"
+                        (_rowHeaderSelectionChanged)="rowHeaderSelectionChange($event)"
+                        (_formStatusChange)="statusChanged($event)"
+                    >
+                    </app-matrix-grid>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" *ngIf="!readOnly" class="btn btn-primary pl-5 pr-5" (click)="submit()" [disabled]="!isValid"
+                        >
+                        <span>{{ l("Save") }}</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary pl-5 pr-5" (click)="cancel()">
+                        {{ l("Cancel") }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

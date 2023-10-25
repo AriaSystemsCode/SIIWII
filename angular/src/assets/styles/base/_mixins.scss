@@ -1,0 +1,41 @@
+@import './variables';
+@import './placeholders';
+
+@mixin btn( $bg-colour, $text-color, $border-color : $bg-colour ){
+    background-color: $bg-colour!important;
+    color:$text-color!important;
+    border: 1px solid $border-color!important;
+    &:hover,&:focus {
+        background-color: darken($bg-colour,10%)!important;
+        border: 1px solid darken($border-color,10%)!important;
+        cursor: pointer;
+    }
+}
+
+@mixin btn-outline( $border-color, $bg-colour : $transparent, $text-color: $border-color,$border-radius:1px ){
+    background-color: $bg-colour!important;
+    color:$text-color!important;
+    border: $border-radius solid $border-color!important;
+    &:hover,&:focus {
+        background-color: $border-color!important;
+        border: $border-radius solid $bg-colour!important;
+        color: $bg-colour!important;
+        cursor: pointer;
+    }
+}
+
+@mixin dashed-border($postition){
+    border-#{$postition}: 1px dashed $grey-2!important;
+}
+
+
+@mixin thin-scroll( $hzThickness : 6px, $vcThickness : 3px ){
+    scroll-behavior: smooth;
+    &::-webkit-scrollbar {
+        width: $vcThickness;
+        height: $hzThickness;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $scrollbar-color;
+    }
+}

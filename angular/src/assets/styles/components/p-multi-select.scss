@@ -1,0 +1,16 @@
+.account-page .p-element.p-multiselect-label-container {
+    max-width: 457px;
+}
+.p-multiselect:not(.p-disabled):hover {
+    border-color: #212121;
+}
+.p-multiselect:not(.p-disabled).p-focus {
+    border-color: transparent!important;
+    box-shadow: none!important;
+}
+.p-multiselect-label-container {
+    overflow: visible!important;
+}
+.p-multiselect-label.p-placeholder {
+    font-size: 12px;
+}

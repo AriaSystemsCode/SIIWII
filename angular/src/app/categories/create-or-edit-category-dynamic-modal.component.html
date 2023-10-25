@@ -1,0 +1,85 @@
+    <form
+    #categoryForm="ngForm"
+    novalidate
+    (ngSubmit)="saveCategory(categoryForm)"
+        autocomplete="off" class="modal-content-wrapper"
+        >
+        <div
+            *ngIf="active"
+            class="modal-header"
+            style="display: block; background-color: #ffffff !important"
+        >
+            <h4 class="modal-title" style="display: block">
+                <span *ngIf="category.id">{{ l("EditCategory") }}</span>
+                <span *ngIf="!category.id">{{
+                    l("AddNewCategory")
+                }}</span>
+            </h4>
+            <p>{{ l("PleaseEnterTheNewcategoryInformation") }}</p>
+            <button
+                style="position: absolute; right: 0; top: 8px"
+                type="button"
+                class="close"
+                (click)="close()"
+                aria-label="Close"
+                [disabled]="saving"
+            >
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body thin-scroll pt-4">
+            <div class="form-group mb-4" *ngIf="category.parentId">
+                <label for="category_Name">{{ l("parent") }} *</label>
+                <p class="form-control form-control-sm aria-input-text" >
+                    #{{parentCategory.parentId}} - {{parentCategory.name}}
+                </p>
+            </div>
+            <div class="mb-4">
+                <!-- <label>{{ l("Code") }} *</label> -->
+                <app-codes *ngIf="!(category?.id>0)"
+                    [objectType]="entityObjectType"
+                    [editMode]=false
+                    (getCodeValue)="getCodeValue($event)" ></app-codes>
+
+                    <app-codes *ngIf="category?.id>0"
+                     [objectType]="entityObjectType"
+                     [editMode]=true
+                     [code]="category?.code"
+                     (getCodeValue)="getCodeValue($event)" ></app-codes>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="category_Name">{{ l("Name") }} *</label>
+                <input
+                    type="text"
+                    id="category_Name"
+                    class="form-control form-control-sm aria-input-text"
+                    [(ngModel)]="category.name"
+                    name="Name"
+                    minlength="2"
+                    maxlength="150"
+                    required
+                />
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button
+                [disabled]="saving"
+                type="button"
+                class="btn btn-default btn-gray"
+                (click)="close()"
+            >
+                {{ l("Cancel") }}
+            </button>
+            <button
+                type="submit"
+                class="btn btn-primary blue btn-blue"
+                [disabled]="!categoryForm.form.valid"
+                [buttonBusy]="saving"
+                [busyText]="l('SavingWithThreeDot')"
+            >
+                <span>{{ l("Save") }}</span>
+            </button>
+        </div>
+    </form>

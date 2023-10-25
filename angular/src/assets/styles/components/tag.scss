@@ -1,0 +1,41 @@
+@import '../base/variables';
+
+.aria-tag-action {
+    display: none;
+    right: -5px;
+    padding: 0.18rem 0.4rem;
+    top: -10px;
+    line-height: 10px;
+    font-size: 1rem;
+    box-shadow: 0px 0px 6px #00000029;
+    i {
+        font-size: 0.5rem !important;
+    }
+    @extend %transition-all-3ms;
+}
+.undo-tag {
+    color: $blue;
+}
+.remove-tag {
+    color: $red;
+}
+
+.aria-tag {
+    &:hover {
+        border-color: $red!important;
+        @extend %transition-all-3ms;
+        .aria-tag-action {
+            display: block;
+            @extend %transition-all-3ms;
+        }
+    }
+    &.removed {
+        text-decoration: line-through!important;
+        color: $red!important;
+        border-color: $red!important;
+        &:hover {
+            border-color: $blue!important;
+            color: $blue!important;
+        }
+    }
+}

@@ -1,0 +1,54 @@
+<div [hidden]="!active">
+    <form #loginForm="ngForm" (ngSubmit)="saveComment()" >
+        <div class="d-flex wrapper" >
+            <div class="logo">
+                <img
+                    [src]="
+                        profilePicture
+                            ? profilePicture
+                            : 'assets/common/images/default-profile-picture.png'
+                    "
+                    class="mr-3 rounded-circle w-100"
+                />
+            </div>
+            <div class="w-80">
+                <div class="d-flex flex-column">
+                    <div>
+                        <textarea
+                            class="w-100"
+                            name="commentBody"
+                            id="commentBody"
+                            cols="20"
+                            rows="1"
+                            (input)="extendTextAreaHandler($event)"
+                            [placeholder]="(comment.parentId ? 'AddReply' : 'AddComment') | localize"
+                            [(ngModel)]="comment.body"
+                            #CommentTextArea
+                            [required]="true"
+                            [maxlength]="maxAcceptedChars"
+                        ></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between align-item-center">
+                        <div class="mt-1 ml-3">
+                            <button
+                                *ngIf="comment.body || hasText"
+                                [disabled]="loginForm.invalid"
+                                [buttonBusy]="saving"
+                                [busyText]="l('SavingWithThreeDot')"
+                                class="btn btn-primary">
+                                    {{ "Send" | localize }}
+                            </button>
+                        </div>
+                        <div class="pr-4">
+                            <span
+                                >{{ writtenChars }}/{{ maxAcceptedChars }}
+                                {{ "characters" | localize }}</span
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>

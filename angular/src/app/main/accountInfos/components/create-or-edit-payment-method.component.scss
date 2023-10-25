@@ -1,0 +1,112 @@
+/*Start Address model */
+ /*custom*/
+.aria-input-text,.aria-select{
+    height: 36px !important;
+    background-color: #F3F6F9 !important;
+ }
+
+.btn-blue{
+    background-color: #3699FF;
+    border: none;
+    width: 127px;
+    height: 37px!important;
+    border-radius: 5px;
+    margin-right: 8px;
+ }
+
+
+/* ----- MODAL STYLE ----- */
+
+.aria-input-text,.aria-select{
+    height: 40px !important;
+    background-color: #F3F6F9 !important;
+    border: none;
+    border-radius: 5px;
+ }
+
+
+
+   .select-options option{
+       background-color: white;
+   }
+   .select-phone-type{
+    background-position-x: 90% !important;
+   }
+   .phone-input{
+       color:#B5B5C3;
+   }
+
+
+   .btn-blue{
+    background-color: #3699FF;
+    border: none;
+    width: 127px;
+    height: 31px;
+    border-radius: 5px;
+    margin-right: 8px;
+ }
+ .btn-gray{
+    background-color: #E5EAEE;
+    border: none;
+    width: 127px;
+    height: 31px;
+    border-radius: 5px;
+ }
+
+
+.right-modal {
+    .modal-dialog {
+        right: -400px;
+        position: fixed;
+        transition: opacity 0.3s linear, right 0.3s ease-out;
+    }
+    &.fade.in .modal-dialog {
+        margin: auto;
+        width: 400px;
+        height: 100%;
+        right: 0px;
+        -webkit-transform: translate3d(0%, 0, 0);
+        -ms-transform: translate3d(0%, 0, 0);
+        -o-transform: translate3d(0%, 0, 0);
+        transform: translate3d(0%, 0, 0);
+        -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+        -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+        -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+        transition: opacity 0.3s linear, right 0.3s ease-out;
+    }
+    .modal-header {
+        position: static!important;
+    }
+    .modal-footer{
+        background-color: #F4F4F4;
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+    }
+    .modal-content {
+        border-radius: 0;
+        border: none;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .modal-header {
+        border-bottom-color: #EEEEEE;
+        padding-right: 0;
+
+    }
+    .modal-title{
+        width: 100% !important;
+    }
+    .close-model{
+        background-color: transparent;
+        border: none;
+    }
+}
+
+
+button[aria-label=Close] {
+    top: 7px;
+    right: 5px;
+    position: absolute;
+}

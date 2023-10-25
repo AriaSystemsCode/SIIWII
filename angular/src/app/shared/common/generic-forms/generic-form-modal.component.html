@@ -1,0 +1,127 @@
+<form #listForm="ngForm" (ngSubmit)="save(listForm)" >
+    <div
+        bsModal
+        #createOrEditListModal="bs-modal"
+        class="modal fade"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="selectListModal"
+        aria-hidden="true"
+    >
+        <div
+            class="modal-dialog right-modal"
+            [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
+            role="document"
+        >
+            <div class="modal-content">
+                <div class="modal-content-wrapper" *ngIf="active">
+                        <div class="modal-header flex-column">
+                            <h3 class="modal-title text-left">
+                                <span> {{ l("CreateNew") }} {{title | localize}}</span>
+                            </h3>
+                            <p>{{ l("PleaseFillTheBelowInformation") }}</p>
+                            <button
+                                style="position: absolute; right: 0; top: 8px"
+                                type="button"
+                                class="close"
+                                (click)="cancel()"
+                                aria-label="Close"
+                            >
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body thin-scroll text-left">
+                            <div class="form-group" *ngFor="let input of inputList;">
+                                <label for="input.id||input.name" >
+                                    {{ l(input.label) }}
+                                    <span *ngIf="input.required" class="required">*</span>
+                                </label>
+                                <div [ngSwitch]="input.type">
+                                    <span
+                                        *ngSwitchCase="FormInputType.Text"
+                                    >
+                                        <input
+                                            type="text"
+                                            id="input.id||input.name"
+                                            class="form-control form-control-sm aria-input-text"
+                                            [name]="input.name"
+                                            [(ngModel)]="object[input.name]"
+                                            [ngClass]="input.customClass"
+                                            [ngStyle]="input.customStyle"
+                                            #inputRef="ngModel"
+                                            [required]="input.required"
+                                            [pattern]="input.pattern"
+                                        />
+                                        <validation-messages *ngIf="inputRef" [formCtrl]="inputRef"></validation-messages>
+                                    </span>
+                                    <span
+                                        *ngSwitchCase="FormInputType.Email"
+                                    >
+                                        <input
+                                            type="email"
+                                            id="input.id||input.name"
+                                            class="form-control form-control-sm aria-input-text"
+                                            [name]="input.name"
+                                            [ngClass]="input.customClass"
+                                            [ngStyle]="input.customStyle"
+                                            [(ngModel)]="object[input.name]"
+                                            #inputRef="ngModel"
+                                            [required]="input.required"
+                                            [pattern]="input.pattern"
+                                        />
+                                        <validation-messages *ngIf="inputRef" [formCtrl]="inputRef"></validation-messages>
+                                    </span>
+                                    <span
+                                        *ngSwitchCase="FormInputType.Number"
+                                    >
+                                        <input
+                                            type="number"
+                                            id="input.id||input.name"
+                                            class="form-control form-control-sm aria-input-text"
+                                            [name]="input.name"
+                                            [ngClass]="input.customClass"
+                                            [ngStyle]="input.customStyle"
+                                            [(ngModel)]="object[input.name]"
+                                            #inputRef="ngModel"
+                                            [required]="input.required"
+                                            [pattern]="input.pattern"
+                                        />
+                                        <validation-messages *ngIf="inputRef" [formCtrl]="inputRef"></validation-messages>
+                                    </span>
+                                    <app-codes
+                                        *ngSwitchCase="FormInputType.Code"
+                                        [objectType]="input.extraData.entityObjectType"
+                                        [editMode]='input.extraData.editMode'
+                                        [code]="input.initialValue"
+                                        [styles]="input.customStyle"
+                                        [classes]="input.customClass"
+                                        (getCodeValue)="getCodeValue($event)" 
+                                        [readonly]=true>
+                                    </app-codes>
+                                
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                type="submit"
+                                class="btn btn-primary pl-5 pr-5"
+                                [buttonBusy]="saving"
+                                [busyText]="l('SavingWithThreeDot')"
+                            >
+                                <span>{{ l("Save") }}</span>
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary pl-5 pr-5"
+                                (click)="cancel()"
+                            >
+                                {{ l("Cancel") }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    

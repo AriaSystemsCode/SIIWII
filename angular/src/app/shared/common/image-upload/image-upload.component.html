@@ -1,0 +1,84 @@
+<div class="d-flex justify-content-center image-upload-container" [ngStyle]="{'width.px':staticWidth ,'height.px':staticHeight }">
+    <label class="p-0 mb-0 uploadfilecontainer w-100 h-100" for="image{{inputID}}"
+        style="background-image: url({{image}}) no-repeat fixed center;"
+        (drop)="fileChange($event)">
+        <input class="input-file"  type="file" name="image{{inputID}}" id="image{{inputID}}"
+            (change)="fileChange($event)"
+            [accept]="acceptedExtensions"
+            >
+        <app-image-display
+            [staticWidth]="staticWidth"
+            [staticHeight]="staticHeight"
+            [image]="image"
+            [sycAttachmentCategory]="sycAttachmentCategory"
+        >
+        </app-image-display>
+
+        <div *ngIf="!image" class="align-items-center d-flex flex-column h-100 justify-content-center w-100 pl-1 pr-1">
+            <div>
+                {{l("ClickOrDrop")}}
+            </div>
+            <div  *ngIf="sycAttachmentCategory?.aspectRatio && showGuidelines">
+                {{l("AspectRatio?",sycAttachmentCategory?.aspectRatio)}}
+            </div>
+            <div *ngIf="sycAttachmentCategory?.maxFileSize && showGuidelines">
+                {{l("MaxSize?",sycAttachmentCategory?.maxFileSize)}} MB
+            </div>
+            <div *ngIf="sycAttachmentCategory?.message && showGuidelines">
+                {{l(sycAttachmentCategory?.message)}}
+            </div>
+            <div *ngIf="acceptedExtensions && showGuidelines">
+                {{l("SupportedExtensions")}}
+                {{acceptedExtensions}}
+            </div>
+        </div>
+        <img src="assets/profile/Edit_Image.svg" class="image-upload-edit" />
+        <img src="assets/profile/Remove_image.svg" *ngIf="image" class="image-upload-remove" (click)="emitRemoveImage($event)" />
+    </label>
+</div>
+
+<!--
+<div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of attachmentsSrcs; index as i">
+    <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" for="file_{{i}}">
+        <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons">
+            <div class="left-icon">
+                <i class="fa-photo-video fas " ></i>
+            </div>
+            <div class="middle-icon">
+                <i class="fa-clipboard-list fas " ></i>
+            </div>
+            <div class="right-icon">
+                <i class="fas fa-file-video "></i>
+            </div>
+        </div>
+        <div class="text-center">
+            <a class="btn btn-primary btn-sm mb-3 upload-btn">
+                {{ 'AddAttachedFile' | localize}}
+            </a>
+            <p >
+                {{ 'YouCanSendUpTo25MBInAttachments' | localize}}.
+            </p>
+        </div>
+    </label>
+    <a  *ngIf="attachment" class="d-flex flex-column justify-content-center h-100 align-items-center kt-avatar" >
+        <div class="d-flex flex-column justify-content-center h-100 w-100 position-absolute view-img-overlay">
+            <div class="text-center mb-3">
+                <i class="fa-photo-video fas bg-transparent text-white fa-3x" ></i>
+            </div>
+            <div class="text-center">
+                <button type="button" class="btn btn-dark text-white border-lg border-white" (click)="openImageViewer(attachment)">
+                    {{ 'ImagePreview' | localize}}
+                </button>
+            </div>
+            <div class="bg-white kt-avatar__upload" for="file" (click)="removePhoto(i)" >
+                <i class="fa fa-times text-danger"></i>
+            </div>
+        </div>
+        <img *ngIf="attachment" [src]="attachment"/>
+        <a class="select-default-image p-2" [ngClass]="{'d-block' : defaultImageIndex == i}"  (click)="setDefaultImage(i)">
+            <i class="fa fa-check-circle mr-2" [ngClass]="defaultImageIndex == i? 'text-success':'text-grey' "></i>
+            {{ 'IsDefaultImage' | localize}}
+        </a>
+    </a>
+    <input type="file" id="file_{{i}}" class="d-none" #file (change)="fileChange($event,productImageCategory,i,undefined,true)">
+</div> -->

@@ -1,0 +1,58 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{l("Details")}}</span>
+                </h4>
+                <button type="button" class="close" (click)="close()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <h6>{{l("UnitOfMeasure")}} :</h6>
+                        {{ item.sycPlanService.unitOfMeasure }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("UnitPrice")}} :</h6>
+                        {{ item.sycPlanService.unitPrice }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Units")}} :</h6>
+                        {{ item.sycPlanService.units }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("BillingFrequency")}} :</h6>
+                        {{ item.sycPlanService.billingFrequency }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("MinimumUnits")}} :</h6>
+                        {{ item.sycPlanService.minimumUnits }}
+                    </div>
+
+                    <div class="col-6 mb-3">
+                        <h6>({{l("SycApplication")}}) {{l("Name")}} :</h6>
+                        {{item.sycApplicationName}}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>({{l("SycPlan")}}) {{l("Name")}} :</h6>
+                        {{item.sycPlanName}}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>({{l("SycService")}}) {{l("Code")}} :</h6>
+                        {{item.sycServiceCode}}
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button [disabled]="saving" type="button" class="btn btn-primary blue" (click)="close()">{{l("Close")}}</button>
+            </div>
+        </div>
+    </div>
+
+</div>

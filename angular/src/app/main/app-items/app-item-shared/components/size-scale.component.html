@@ -1,0 +1,98 @@
+<form #sizeScaleForm="ngForm" >
+    <div class="row" >
+        <div class="dimension-input" *ngIf="appSizeScaleDto">
+            <input
+                class="form-control"
+                type="text"
+                placeholder="{{ 'EnterSizeScaleName' | localize }} "
+                [(ngModel)]="appSizeScaleDto.name" 
+                name="appSizeScaleDtoName"
+                #sizeScaleName="ngModel"
+                [disabled]="readOnly"
+                [ngClass]="{'visibility-hidden': readOnly && !appSizeScaleDto.name}"
+            />
+            <validation-messages [formCtrl]="sizeScaleName" *ngIf="sizeScaleName.touched"></validation-messages>
+            <ng-container *ngIf="!readOnly || (readOnly && appSizeScaleDto.dimesion2Name)">
+                <input 
+                    class="form-control mt-4"
+                    type="text"
+                    placeholder="{{ 'EnterSecondDimensionName' | localize }} *"
+                    [(ngModel)]="appSizeScaleDto.dimesion2Name" 
+                    (ngModelChange)="dimension2NameOnChange($event)"
+                    name="SizeScaleSecondDimension"
+                    [required]="rows?.length > 0"
+                    [disabled]="readOnly"
+                    #dimension2Name="ngModel"
+                />
+                <validation-messages [formCtrl]="dimension2Name" *ngIf="dimension2Name.touched"></validation-messages>
+            </ng-container>
+            <div class="sizescale-name pt-2" *ngIf="!readOnly && appSizeScaleDto?.dimesion2Name && appSizeScaleDto?.dimesion1Name">
+                <div class="text-primary mt-2">*{{'IndividualSizesWillBeDisplayedAs' | localize}} "{{appSizeScaleDto?.dimesion1Name||'FirstDimensionName' | localize}} - {{appSizeScaleDto?.dimesion2Name || 'SecondDimensionName'| localize }}" </div>
+            </div>
+        </div>
+        <div class="col flex-column">
+            <div class="dimension-input mb-2" *ngIf="appSizeScaleDto">
+                <input
+                    class="form-control"
+                    type="text"
+                    placeholder="{{ 'EnterFirstDimensionName' | localize }} *"
+                    [(ngModel)]="appSizeScaleDto.dimesion1Name" 
+                    (ngModelChange)="dimension1NameOnChange($event)"
+                    name="SizeScaleFirstDimension"
+                    required
+                    [disabled]="readOnly"
+                    #dimension1Name="ngModel"
+                />
+                <validation-messages [formCtrl]="dimension1Name" *ngIf="dimension1Name.touched"></validation-messages>
+            </div>
+            <div>
+                <app-matrix-grid 
+                    #matrixGrid 
+                    [cols]="cols" 
+                    [rows]="rows" 
+        
+                    [canAddCols]="!readOnly"
+                    [canAddRows]="!readOnly"
+                    [disableAddCols]="false"
+                    [disableAddRows]="false"
+        
+                    [canRemoveRows]="!readOnly"
+                    [canRemoveCols]="!readOnly"
+                    
+                    
+                    [rowHover]="false"
+                    [rowHeaderIsEditable]="false"
+                    [rowHeaderColIsEditable]="false"
+                    [colIsEditable]="false"
+                    
+                    [cellSelectionIsEditable]="!readOnly"
+                    [cellSelectionFormInput]="cellSelectionFormInput"
+
+                    [reorderableColumns]="!readOnly"
+                    [reorderableRows]="!readOnly"
+
+                    [cellLabelField]="'code'"
+
+                    (_newRow)="openAppEntityListModal(2)"
+                    (_newColumn)="openAppEntityListModal(1)"
+                    (_cellChange)="mapMatrixGridToAppSizeScaleDto()"
+                >
+                </app-matrix-grid>
+            </div>
+        </div>
+        <div class="align-items-center buttons-list col-2 d-flex flex-column" *ngIf="!readOnly">
+            <button class="btn btn-primary w-100" (click)="openSelectSizeScaleModal()">{{'SelectSizeScale' | localize}}</button>
+            <button class="btn btn-primary w-100" (click)="createOrEdit(false)" [disabled]="!appSizeScaleDto?.sizeScaleId">{{'SaveSizeScale' | localize}}</button>
+            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" style="background-color: #eba461 !important;
+            border: none !important;">{{'SaveAsNewSizeScale' | localize}}</button>
+        </div>
+    </div>
+</form>
+
+<app-selection-modal
+    #appSelectionModal
+    (_getAll)="handleGetAllSizeScales($event)"
+    (_submit)="sizeScaleSelectionDoneHandler($event)"
+    (_cancel)="sizeScaleSelectionCancelHandler()"
+>
+</app-selection-modal>

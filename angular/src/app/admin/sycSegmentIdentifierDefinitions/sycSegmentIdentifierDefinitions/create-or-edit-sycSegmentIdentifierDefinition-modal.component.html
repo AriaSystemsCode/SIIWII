@@ -1,0 +1,123 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #sycSegmentIdentifierDefinitionForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="sycSegmentIdentifierDefinition.id">{{l("EditSycSegmentIdentifierDefinition")}}</span>
+                        <span *ngIf="!sycSegmentIdentifierDefinition.id">{{l("CreateNewSycSegmentIdentifierDefinition")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                 
+
+					<div class="form-group m-form__group">
+                        <label for="SycIdentifierDefinitionCode">{{l("SycIdentifierDefinition")}}</label>
+                        <div class="input-group">
+                            <input class="form-control" id="SycIdentifierDefinitionCode" name="sycIdentifierDefinitionCode" [(ngModel)]="sycIdentifierDefinitionCode" type="text" disabled>     
+                            <div class="input-group-append">
+                                <button class="btn btn-primary blue" (click)="openSelectSycIdentifierDefinitionModal()" type="button"><i class="fa fa-search"></i> {{l("Pick")}}</button>
+                            </div> <div class="input-group-prepend">
+                                <button class="btn btn-danger btn-icon" type="button" (click)="setSycIdentifierDefinitionIdNull()"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <input class="form-control" name="sycSegmentIdentifierDefinition.sycIdentifierDefinitionId" [(ngModel)]="sycSegmentIdentifierDefinition.sycIdentifierDefinitionId" type="text"  hidden>
+		 
+
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_Code">{{l("Code")}}</label>
+									<input type="text" #SycSegmentIdentifierDefinition_Code="ngModel" id="SycSegmentIdentifierDefinition_Code" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.code" name="Code"   minlength="0"  maxlength="50" />
+								    <validation-messages [formCtrl]="SycSegmentIdentifierDefinition_Code"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_Name">{{l("Name")}}</label>
+									<input type="text" #SycSegmentIdentifierDefinition_Name="ngModel" id="SycSegmentIdentifierDefinition_Name" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.name" name="Name"   minlength="0"  maxlength="100" />
+								    <validation-messages [formCtrl]="SycSegmentIdentifierDefinition_Name"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_SegmentNumber">{{l("SegmentNumber")}}</label>
+									<input type="number" #SycSegmentIdentifierDefinition_SegmentNumber="ngModel" id="SycSegmentIdentifierDefinition_SegmentNumber" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.segmentNumber" name="SegmentNumber"   />
+									<validation-messages [formCtrl]="SycSegmentIdentifierDefinition_SegmentNumber"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_SegmentHeader">{{l("SegmentHeader")}}</label>
+									<input type="text" #SycSegmentIdentifierDefinition_SegmentHeader="ngModel" id="SycSegmentIdentifierDefinition_SegmentHeader" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.segmentHeader" name="SegmentHeader"   minlength="0"  maxlength="10" />
+								    <validation-messages [formCtrl]="SycSegmentIdentifierDefinition_SegmentHeader"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_SegmentMask">{{l("SegmentMask")}}</label>
+									<input type="text" #SycSegmentIdentifierDefinition_SegmentMask="ngModel" id="SycSegmentIdentifierDefinition_SegmentMask" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.segmentMask" name="SegmentMask"   minlength="0"  maxlength="50" />
+								    <validation-messages [formCtrl]="SycSegmentIdentifierDefinition_SegmentMask"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_SegmentLength">{{l("SegmentLength")}}</label>
+									<input type="number" #SycSegmentIdentifierDefinition_SegmentLength="ngModel" id="SycSegmentIdentifierDefinition_SegmentLength" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.segmentLength" name="SegmentLength"   />
+									<validation-messages [formCtrl]="SycSegmentIdentifierDefinition_SegmentLength"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_SegmentType">{{l("SegmentType")}}</label>
+									<input type="text" #SycSegmentIdentifierDefinition_SegmentType="ngModel" id="SycSegmentIdentifierDefinition_SegmentType" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.segmentType" name="SegmentType"    />
+								    <validation-messages [formCtrl]="SycSegmentIdentifierDefinition_SegmentType"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="SycSegmentIdentifierDefinition_IsAutoGenerated" class="kt-checkbox">
+										<input id="SycSegmentIdentifierDefinition_IsAutoGenerated" #SycSegmentIdentifierDefinition_IsAutoGenerated="ngModel" type="checkbox" name="IsAutoGenerated" [(ngModel)]="sycSegmentIdentifierDefinition.isAutoGenerated"> 
+										{{l("IsAutoGenerated")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="SycSegmentIdentifierDefinition_IsAutoGenerated"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="SycSegmentIdentifierDefinition_IsEditable" class="kt-checkbox">
+										<input id="SycSegmentIdentifierDefinition_IsEditable" #SycSegmentIdentifierDefinition_IsEditable="ngModel" type="checkbox" name="IsEditable" [(ngModel)]="sycSegmentIdentifierDefinition.isEditable"> 
+										{{l("IsEditable")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="SycSegmentIdentifierDefinition_IsEditable"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="SycSegmentIdentifierDefinition_IsVisible" class="kt-checkbox">
+										<input id="SycSegmentIdentifierDefinition_IsVisible" #SycSegmentIdentifierDefinition_IsVisible="ngModel" type="checkbox" name="IsVisible" [(ngModel)]="sycSegmentIdentifierDefinition.isVisible"> 
+										{{l("IsVisible")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="SycSegmentIdentifierDefinition_IsVisible"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_CodeStartingValue">{{l("CodeStartingValue")}}</label>
+									<input type="number" #SycSegmentIdentifierDefinition_CodeStartingValue="ngModel" id="SycSegmentIdentifierDefinition_CodeStartingValue" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.codeStartingValue" name="CodeStartingValue"   />
+									<validation-messages [formCtrl]="SycSegmentIdentifierDefinition_CodeStartingValue"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycSegmentIdentifierDefinition_LookOrFieldName">{{l("LookOrFieldName")}}</label>
+									<input type="text" #SycSegmentIdentifierDefinition_LookOrFieldName="ngModel" id="SycSegmentIdentifierDefinition_LookOrFieldName" class="form-control" [(ngModel)]="sycSegmentIdentifierDefinition.lookOrFieldName" name="LookOrFieldName"   minlength="0"  maxlength="100" />
+								    <validation-messages [formCtrl]="SycSegmentIdentifierDefinition_LookOrFieldName"></validation-messages>
+								</div>
+					
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!sycSegmentIdentifierDefinitionForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+<sycSegmentIdentifierDefinitionSycIdentifierDefinitionLookupTableModal #sycSegmentIdentifierDefinitionSycIdentifierDefinitionLookupTableModal (modalSave)="getNewSycIdentifierDefinitionId()"></sycSegmentIdentifierDefinitionSycIdentifierDefinitionLookupTableModal>
+		 
+</div>

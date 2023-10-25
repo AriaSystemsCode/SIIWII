@@ -1,0 +1,76 @@
+<div
+    bsModal
+    #selectListModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="selectListModal"
+    aria-hidden="true"
+>
+    <div
+        class="modal-dialog right-modal"
+        [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
+        role="document"
+    >
+        <div class="modal-content">
+            <div class="modal-content-wrapper">
+                <div class="modal-header">
+                    <h3 class="modal-title text-left">
+                        <span> {{ l("MyLists") }}</span>
+                    </h3>
+                    <button
+                        style="position: absolute; right: 0; top: 8px"
+                        type="button"
+                        class="close"
+                        (click)="cancelSelection()"
+                        aria-label="Close"
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body pt-0 thin-scroll"  *ngIf="active" (scroll)="onScroll($event)">
+
+                    <div class="align-items-center border d-flex mb-2 ml-3 mr-3 mt-2 pb-2 pl-3 rounded">
+                        <span class="mr-3">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" name="list_search" id="list_search" [placeholder]="'Search' | localize" [(ngModel)]="searchQuery" (ngModelChange)="filterValues()" class="form-control bg-white border-0">
+                    </div>
+                    <div class="d-flex flex-column mb-3" >
+                        <div *ngFor="let list of lists;index as i" class="list-row align-items-center justify-content-between border-dashed-bottom d-flex pl-3 pr-4 pt-2 pb-2" (click)="triggerVariationSelection(list.appItemsList)" >
+                            <div class="mr-3 flex-grow" >
+                                {{list.appItemsList.name}}
+                            </div>
+                            <div class="icon-gt" title="Select" >
+                                &gt;
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center" *ngIf="lists?.length === 0">
+                        {{ "NoRecordsFound..." | localize }}
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-light border"
+                        (click)="cancelSelection()"
+                    >
+                        {{ l("Close") }}
+                    </button>
+
+                    <button
+                        [disabled]="saving"
+                        title="{{ 'AddNewValue' | localize }}"
+                        type="button"
+                        class="btn btn-icon btn-primary btn-circle create-edit-plus-btn"
+                        (click)="triggerAddNewOutput()"
+                    >
+                        <i class="flaticon2-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<div class="align-items-center d-flex justify-content-between mb-2 pr-2">
+    <h4 class="text-captitalize">{{ title }}</h4>
+    <span (click)="triggerListCollapse()" *ngIf="filterMetaData?.collapsedDisplayedListCount < filterMetaData?.listTotalCount">
+        <i
+            class="fas fa-2x text-primary"
+            [ngClass]="
+            collapseListDataCollapseButton ? 'fa-angle-up' : 'fa-angle-down'
+            "
+        ></i>
+    </span>
+</div>
+
+
+<div class="d-flex flex-column filter-group  thin-scroll narrow-tree" *ngIf="filterMetaData?.displayedList" >
+    <p-tree
+        [value]="filterMetaData.displayedList"
+        selectionMode="single"
+        [(selection)]="selection"
+        (selectionChange)="onSelectionChangeHandler($event)"
+        (onNodeExpand)="loadNode($event)"
+        [styleClass]="'scrollable-tree'"
+    >
+    </p-tree>
+</div>
+
+
+<div>
+    <button
+        class="btn btn-font-hover-brand ml-3"
+        (click)="showMoreListData()"
+        *ngIf="collapseListDataCollapseButton && showMoreListDataButton"
+    >
+        {{ 'showmore' | localize }} ...
+    </button>
+</div>

@@ -1,0 +1,38 @@
+<h6 class="mb-4"> {{ 'AttributesAndOptionsYou’veSelected' | localize }}</h6>
+<div class="row mb-2">
+    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right">{{ 'NumberOfVariations' | localize }}:</div>
+    <div class="col text-left font-weight-bold">{{variations?.length}}</div>
+</div>
+<div class="row mb-2" *ngFor="let extraAttr of selectedVariations | keyvalue">
+    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right">
+        {{extraAttr?.key}}:
+    </div>
+    <div class="col text-left font-weight-bold">{{extraAttr?.value | arrayToString}}</div>
+</div>
+<div class="row mb-2" *ngIf="showPriceRange && minPrice != maxPrice">
+    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" >
+        {{ 'PriceRangedFrom' | localize }}:
+    </div>
+    <div class="col text-left font-weight-bold">
+        {{tenantDefaultCurrency?.symbol}}{{minPrice}} {{'to' | localize}} {{tenantDefaultCurrency?.symbol}}{{maxPrice}}
+    </div>
+</div>
+
+<div class="row mb-2" *ngIf="showPriceRange && minPrice == maxPrice">
+    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" >
+        {{ 'Price' | localize }} :
+    </div>
+    <div class="col text-left font-weight-bold">
+        {{tenantDefaultCurrency?.symbol}}{{minPrice}}
+    </div>
+</div>
+<div class="row mb-2" *ngIf="stockAvailability">
+    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" >
+        {{ 'AvailableQuantity' | localize }} :
+    </div>
+    <div class="col text-left font-weight-bold">
+        {{stockAvailability}}
+    </div>
+</div>
+
+

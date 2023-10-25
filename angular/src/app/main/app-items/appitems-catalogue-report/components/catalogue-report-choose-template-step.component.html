@@ -1,0 +1,19 @@
+<div style="gap: 20px;" class="d-flex flex-column justify-content-between wizard-wrapper">
+    <h5 *ngIf="templates && templates?.length >0"> {{ "Please select one of the available linesheet templates" | localize }}</h5>
+    <div class="_scroll h-100 row thin-scroll">
+        <div class="col-6" *ngFor="let template of templates;index as i">
+            <app-catalogue-report-template-card [index]="i" [template]="template" [printInfoParam]="printInfoParam">
+            </app-catalogue-report-template-card>
+        </div>
+    </div>
+    <div class="d-flex flex-row justify-content-between pr-5 w-100">
+        <button class="btn btn-primary" type="button" (click)="previousStep()">
+            <i class="fa-arrow-left fas ml-3"></i>
+            {{ "Previous" | localize }}
+        </button>
+        <button class="btn btn-primary" (click)="continueToNextStep()">
+            {{ "Continue" | localize }}
+            <i class="fa-arrow-right fas ml-3"></i>
+        </button>
+    </div>
+</div>

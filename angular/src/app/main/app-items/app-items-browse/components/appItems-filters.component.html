@@ -1,0 +1,99 @@
+<form [formGroup]="filterForm" >
+
+    <div class="mb-4" *ngIf="filtersFlags?.appItemType">
+        <app-tree-single-selection-filter
+            #AppItemTypeFilter
+            [filterMetaData]="appItemTypeFilterMetaData"
+            [formContol]="filterForm.controls.appItemType"
+            [title]="'ProductTypes' | localize"
+            [dataObjectName]="'sycEntityObjectType'"
+            (onLoadData)="getAppItemTypesList(AppItemTypeFilter)"
+            (onLoadNode)="loadAppItemTypesNode($event)"
+        >
+        </app-tree-single-selection-filter>
+    </div>
+
+    <div class="mb-4" *ngIf="filtersFlags?.categories">
+        <app-tree-multi-selection-filter
+            #CategoryFilter
+            [filterMetaData]="categoriesFilterMetaData"
+            [formContol]="filterForm.controls.categories"
+            [title]="'ProductCategories' | localize"
+            (onLoadData)="getCategoriesList(CategoryFilter)"
+            (onLoadNode)="loadCategoriesNode($event)"
+        >
+        </app-tree-multi-selection-filter>
+    </div>
+
+    <div class="mb-4" *ngIf="filtersFlags?.classifications">
+        <app-tree-multi-selection-filter
+            #ClassificationFilter
+            [filterMetaData]="classificationsFilterMetaData"
+            [formContol]="filterForm.controls.classifications"
+            [title]="'ProductClassifications' | localize"
+            (onLoadData)="getClassificationsList(ClassificationFilter)"
+            (onLoadNode)="loadClassificationNode($event)"
+        >
+        </app-tree-multi-selection-filter>
+    </div>
+
+    <div class="mb-4"  *ngIf="filtersFlags?.departments">
+        <app-tree-multi-selection-filter
+            #DepartmentFilter
+            [filterMetaData]="departmentsFilterMetaData"
+            [formContol]="filterForm.controls.departments"
+            [title]="'Departments' | localize"
+            (onLoadData)="getDepartmentsList(DepartmentFilter)"
+            (onLoadNode)="loadCategoriesNode($event)"
+        >
+        </app-tree-multi-selection-filter>
+    </div>
+
+     <ng-container *ngIf="filtersFlags?.extraAttributes">
+         <div class="mb-4" *ngFor="let extraAttr of extraAttributesMetaData; let i = index;">
+             <app-multi-selection-filter
+                #ref
+                [filterMetaData]="extraAttr.filterMetaData"
+                [formContol]="extraAttr.formControl"
+                [title]="extraAttr.code | localize"
+                (onLoadData)="getExtraAttributeLookupDataWithPagination(ref,extraAttr)"
+             >
+            </app-multi-selection-filter>
+        </div>
+    </ng-container>
+
+
+    <div class="mb-4"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyItems && filtersFlags?.listingStatus">
+        <app-single-selection-filter
+            #listingStatusFilter
+            [filterMetaData]="listingStatusFilterMetaData"
+            [formContol]="filterForm.controls.listingStatus"
+            [title]="'Status' | localize"
+            (onLoadData)="getListingStatusOptionsList(listingStatusFilter)"
+        >
+        </app-single-selection-filter>
+    </div>
+
+    <div class="mb-4"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyListing  && filtersFlags?.publishStatus">
+        <app-single-selection-filter
+            #publishStatusFilter
+            [filterMetaData]="publishStatusFilterMetaData"
+            [formContol]="filterForm.controls.publishStatus"
+            [title]="'Publicity' | localize"
+            (onLoadData)="getPublishOptionsList(publishStatusFilter)"
+        >
+        </app-single-selection-filter>
+    </div>
+
+    <div class="mb-4"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyListing && filtersFlags?.visibilityStatus">
+        <app-single-selection-filter
+            #visibilityStatusFilter
+            [filterMetaData]="visibilityStatusFilterMetaData"
+            [formContol]="filterForm.controls.visibilityStatus"
+            [title]="'Visibilty' | localize"
+            (onLoadData)="getVisibiltyOptionsList(visibilityStatusFilter)"
+        >
+        </app-single-selection-filter>
+    </div>
+
+</form>

@@ -1,0 +1,64 @@
+ <!-- Iteration-8 -->
+
+ <div bsModal #autoCrop="bs-modal" class="modal  fade" tabindex="-1" role="dialog"
+  aria-labelledby="autoCrop" aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+   <div class="border-bottom">
+        <div class="row p-4"> 
+            <div class="col-10">
+              <h5 class="font-weight-bold pb-1">{{"AutoCrop" | localize}} </h5>
+              
+              <h6> 
+                {{("TotalImagesForPassed"+ImportTypes[importType]) | localize}}    <span class="font-weight-bold">{{imagePassed+imageFailed}}</span>,
+                <span  class="font-weight-bold passed">{{"Passed:" | localize}} {{imagePassed}}</span>,
+               <span class="font-weight-bold failed"> {{"Failed:" | localize}} {{imageFailed}}</span>
+                </h6>
+ </div>`
+ <div class="col-1 text-right">
+     <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="askToClose()"/>
+     </div>
+ </div>  
+ </div>
+ 
+<div class="modal-body border-bottom ml-4 mr-4">
+  <image-cropper #cropperImage
+[imageChangedEvent]="imageChangedEvent" 
+[alignImage]="'center'"  
+[disabled]="true"
+ [maintainAspectRatio]="true" 
+ [containWithinAspectRatio]="false"
+ [onlyScaleDown]="true"
+ [roundCropper]="false"
+ 
+  [aspectRatio]="acceptedRatio" 
+></image-cropper>
+
+</div>
+
+ 
+
+<div class="p-4">
+  <button class="btn btn-primary  mr-5 p-3" (click)="crop('true')">{{"AutoCrop" | localize}} {{imageFailed}} {{"images" | localize}} </button>
+  <button class="btn btn-secondary btn-crop p-3"  (click)="crop('false')">  {{"SkipAutoCropping" | localize}}  </button>
+  </div>  
+
+</div>
+</div>
+</div>
+
+  <div *ngIf="!hideCropper">  
+  <image-cropper #cropperImages  
+  [imageChangedEvent]="imagesChangedEvent" 
+  [alignImage]="'center'" 
+   [maintainAspectRatio]="true" 
+   [containWithinAspectRatio]="false"
+   [onlyScaleDown]="true"
+   [roundCropper]="false"
+    [aspectRatio]="acceptedRatio" 
+  ></image-cropper> 
+</div>
+  
+
+ 
+  <!-- Iteration-8 -->

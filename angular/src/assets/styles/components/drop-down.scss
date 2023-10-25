@@ -1,0 +1,55 @@
+@import '../base/variables';
+
+body .wide-drop-down .p-dropdown {
+    border: 1px solid #dee2e6;
+    padding: 0.2rem 1rem;
+}
+body .wide-drop-down .p-dropdown:hover {
+    border: 1px solid $grey-2 !important;
+}
+
+body .wide-drop-down .p-dropdown .p-dropdown-trigger {
+    padding-right: 4rem;
+}
+
+
+body .dropdown-menu,
+body bs-dropdown-container {
+    z-index: 1060!important;
+}
+
+
+
+.drop-down-btn-without-icon {
+    &.btn.dropdown-toggle:after,
+    &.nav-link.dropdown-toggle:after {
+        content: "";
+    }
+}
+
+.p-dropdown:not(.p-disabled).p-focus {
+    box-shadow: none!important;
+}
+
+
+// fix ticket style issue 
+.ticket-dropdown.form-control {
+    padding: 0.2rem 0.1rem;
+ }
+
+ .linesheet-price {
+    .p-dropdown-label {
+        font-size: 11px!important;
+        font-family: Arial, Helvetica, sans-serif !important;
+    }
+ }
+ p-dropdown .p-dropdown-label-container {
+    overflow: hidden;
+}
+
+.dropdown-menu>.dropdown-item, .dropdown-menu>li>a {
+    color: $grey-6;
+}
+.p-dropdown {
+    align-items: center;
+}
