@@ -117,13 +117,13 @@
                                 id=""
                                 class="form-control"
                                 placeholder="Buyer Contact Name"
-                                formControlName="buyerName"
+                                formControlName="buyerContactName"
                                 *ngIf="isBuyerTempAccount"
                             />
                             <p-dropdown
                                 *ngIf="!isBuyerTempAccount"
                                 [options]="buyerContacts"
-                                formControlName="buyerName"
+                                formControlName="buyerContactName"
                                 [filter]="true"
                                 optionLabel="name"
                                 [disabled]="buyerComapnyId === 0"
@@ -136,7 +136,7 @@
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('buyerName')
+                                        .get('buyerContactName')
                                         ?.hasError('required')
                                 "
                             >
@@ -156,14 +156,22 @@
                                 type="text"
                                 class="form-control"
                                 placeholder="Buyer Mobile Number..."
-                                formControlName="buyerPhoneNumber"
+                                formControlName="buyerContactPhoneNumber"
+                                minlength="5"
+                                maxlength="20"
                             />
+                            <small
+                                class="text-danger"
+                                *ngIf="invalidBuyerPhoneNumber"
+                            >
+                                {{ invalidBuyerPhoneNumber }}
+                            </small>
                             <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('buyerPhoneNumber')
+                                        .get('buyerContactPhoneNumber')
                                         ?.hasError('required')
                                 "
                             >
@@ -174,7 +182,7 @@
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('buyerPhoneNumber')
+                                        .get('buyerContactPhoneNumber')
                                         ?.hasError('pattern')
                                 "
                             >
@@ -196,14 +204,14 @@
                                 id=""
                                 class="form-control"
                                 placeholder="Buyer Email..."
-                                formControlName="buyerEMailAddress"
+                                formControlName="buyerContactEMailAddress"
                             />
                             <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('buyerEMailAddress')
+                                        .get('buyerContactEMailAddress')
                                         ?.hasError('required')
                                 "
                             >
@@ -214,7 +222,7 @@
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('buyerEMailAddress')
+                                        .get('buyerContactEMailAddress')
                                         ?.hasError('email')
                                 "
                             >
@@ -293,7 +301,7 @@
                             >
                             <p-dropdown
                                 [options]="sellerContacts"
-                                formControlName="sellerName"
+                                formControlName="sellerContactName"
                                 [filter]="true"
                                 optionLabel="name"
                                 placeholder="Please Select Seller Contact Name"
@@ -306,7 +314,7 @@
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('sellerName')
+                                        .get('sellerContactName')
                                         ?.hasError('required')
                                 "
                             >
@@ -327,14 +335,16 @@
                                 name="mobileNumber"
                                 class="form-control"
                                 placeholder="Mobile Number..."
-                                formControlName="sellerPhoneNumber"
+                                formControlName="sellerContactPhoneNumber"
+                                minlength="5"
+                                maxlength="20"
                             />
                             <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('sellerPhoneNumber')
+                                        .get('sellerContactPhoneNumber')
                                         ?.hasError('required')
                                 "
                             >
@@ -342,10 +352,16 @@
                             </small>
                             <small
                                 class="text-danger"
+                                *ngIf="invalidSellerPhoneNumber"
+                            >
+                                {{ invalidSellerPhoneNumber }}
+                            </small>
+                            <small
+                                class="text-danger"
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('sellerPhoneNumber')
+                                        .get('sellerContactPhoneNumber')
                                         ?.hasError('pattern')
                                 "
                             >
@@ -363,17 +379,17 @@
                             >
                             <input
                                 type="text"
-                                name="sellerEMailAddress"
+                                name="sellerContactEMailAddress"
                                 class="form-control"
                                 placeholder="Seller Email..."
-                                formControlName="sellerEMailAddress"
+                                formControlName="sellerContactEMailAddress"
                             />
                             <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('sellerEMailAddress')
+                                        .get('sellerContactEMailAddress')
                                         ?.hasError('required')
                                 "
                             >
@@ -384,7 +400,7 @@
                                 *ngIf="
                                     submitted &&
                                     orderForm
-                                        .get('sellerEMailAddress')
+                                        .get('sellerContactEMailAddress')
                                         ?.hasError('email')
                                 "
                             >
@@ -393,6 +409,14 @@
                         </div>
                     </div>
                     <!-- Seller email -->
+
+                    <div class="col-12 my-2">
+                        <div *ngIf="areSame" class="alert alert-danger" role="alert">
+                            <p class="mb-0">
+                                Buyer and Seller are same person please choose another option
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -404,7 +428,8 @@
             (click)="getStarted()"
             class="btn"
         >
-            Let's get started
+        Start Shopping
         </button>
     </div>
 </p-dialog>
+<app-shopping-cart-view-component #shoppingCartModal ></app-shopping-cart-view-component>

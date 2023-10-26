@@ -1,0 +1,478 @@
+<div bsModal #shoppingCartModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="shoppingCartModal" aria-hidden="true" [config]="{ backdrop: false , ignoreBackdropClick: true }"
+    style="overflow-y: scroll;">
+    <div *ngIf="!showCarousel">
+        <ng-container *ngTemplateOutlet="shoppingcartContainer"></ng-container>
+
+    </div>
+
+
+    <div *ngIf="showCarousel">
+        <!-- <p-carousel [circular]="false"> -->
+        <ng-container *ngTemplateOutlet="shoppingcartContainer"></ng-container>
+        <!-- </p-carousel> -->
+    </div>
+
+
+</div>
+
+
+
+<ng-template #shoppingcartContainer>
+
+    <div class="h-100" style="margin: 2em 2em 0em 7em">
+        <div class="modal-content big-scroll pb-5 pl-3">
+            <div class="row topheader">
+                <div class="col-10">
+                    <div class="row bg-white col-4 m-3 p-2  pl-4" style="border-radius: 4px;">
+                        Transactions &nbsp; &nbsp; > &nbsp; &nbsp; {{transactionType}} &nbsp; &nbsp; >
+                        &nbsp; &nbsp;
+                        {{orderId}}
+                    </div>
+                </div>
+                <div class="col p-4 position-absolute text-right">
+                    <button style="background-color: #700066;" (click)="minimizeScreen()" class="btn">
+                        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 9 9" fill="none">
+                            <path d="M7.07074 0.698949L1.83578 5.60649V3.93051C1.83578 3.49801 1.46042 3.1461 0.999054 3.1461C0.537474 3.1461 0.162109 3.49801 0.162109 3.93051V7.5C0.162109 7.93274 0.537474 8.28464 0.999054 8.28464H4.80652C5.26785 8.28464 5.64322 7.93274 5.64322 7.5C5.64322 7.0675 5.26785 6.7156 4.80652 6.7156H3.0188L8.25277 1.80849C8.41223 1.66146 8.50015 1.46447 8.50015 1.25327C8.50015 1.0423 8.41223 0.845321 8.2535 0.698949C7.92688 0.392766 7.39639 0.393221 7.07074 0.698949Z" fill="white"/>
+                        </svg> -->
+                        <img src="../../../../../assets/shoppingCart/minimize.svg" class="pointer" />
+                    </button>
+                    <img src="../../../../../assets/shoppingCart/close.svg" class="pointer ml-4  mr-5"
+                        (click)="hide()" />
+                </div>
+            </div>
+            <div class="row  ml-1 mr-1 topsubheader border-bottom">
+                <div class="ml-1 previousArrow">
+                    <button *ngIf="showCarousel" (click)="goPrevious_Next_Transaction(transactionPosition.Previous)"
+                        [disabled]="appTransactionsForViewDto?.firstRecord" class="previousBtn"
+                        [ngClass]="{ disabled:appTransactionsForViewDto?.firstRecord}"> <i
+                            class="fa fa-chevron-left"></i> </button>
+                </div>
+                <div class="p-4 row col-4">
+                    <label class="pt-2 font-weight-bold purpleColor"> {{l("Status")}} </label>
+                    <div class="status ml-3 pl-4 pt-2">
+                        {{shoppingCartDetails?.entityStatusCode}}
+                    </div>
+
+                </div>
+                <div class="p-4" style="line-height: 10px;">
+                    <label class="pt-2 font-weight-bold purpleColor"> {{l("Created")}} </label>
+                    <div class="purpleColor">
+                        {{shoppingCartDetails?.createDate?.toString() | date: 'MMM d y, h:mm a'}}
+                    </div>
+                </div>
+
+                <div class="p-4 text-right border-left row">
+                    <button type="button" class="btn btn-primary bgPurple border-0 mr-4 pl-4 pr-4 shareBtn disabled"
+                        style="height: 37px;">
+                        <img src="../../../../../assets/shoppingCart/share.svg" /> {{l("Share")}}
+                    </button>
+
+
+
+                    <div class="dropdown" dropdown
+                        *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='DRAFT'">
+                        <button class="btn btn-secondary dropdown-toggle p-0" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" dropdownToggle>
+                            <div class="three-dots"></div>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" *dropdownMenu>
+                            <a class="link purpleColor p-3" (click)="cancelOrder()"
+                                *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'">{{l('Cancel')}}</a>
+                            <a class="link purpleColor p-3" (click)="unCancelOrder()"
+                                *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='CANCELLED'">{{l('UnCancel')}}</a>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="p-4 text-right border-left">
+                    <button type="button" class="btn btn-primary bgPurple border-0  ml-5 pl-4 pr-4"
+                        style="height: 37px;" (click)="onContinueShopping()"
+                        [disabled]="!shoppingCartDetails?.detailsView"
+                        [ngClass]="{ disabled:!shoppingCartDetails?.detailsView}">
+                        {{l("ContinueShopping")}}
+                    </button>
+
+                    <button type="button" class="btn btn-primary bgPurple border-0 mr-4 pl-4 pr-4 discartBtn"
+                        style="height: 37px;" (click)="onDiscardShopping()">
+                        {{l("DiscardShopping")}}
+                    </button>
+                </div>
+            </div>
+            <div class="row h-100 m-3">
+                <div class="col-8 p-0">
+                    <h1 class="mb-4 purpleColor"> {{shoppingCartDetails?.name}} </h1>
+                    <p-accordion class="shoppingCartAccordionTabBG mt-4" [(activeIndex)]="activeIndex">
+                        <!-- order information tab -->
+                        
+                        <!-- [ngClass]="{'shoppingCartAccordionNotValidTab':!orderInfoValid}" -->
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header d-flex">
+                                    <img src="../../../../../assets/shoppingCart/checked.svg" *ngIf="orderInfoValid" />
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Information</h6>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <app-sales-order [activeTab]="activeIndex ?  activeIndex :0"
+                                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                    (orderInfoValid)="ontabInfoValid($event)"
+                                    [createOrEditorderInfo]="createOrEditorderInfo"
+                                    (ontabChange)="ontabChange($event)"></app-sales-order>
+                            </ng-template>
+                        </p-accordionTab>
+                        <!-- order information tab -->
+
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header d-flex">
+                                    <img src="../../../../../assets/shoppingCart/checked.svg"
+                                        *ngIf="buyerContactInfoValid" />
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <div>
+                                    <app-create-or-edit-buyer-seller-contact-info [activeTab]="activeIndex ?  activeIndex :1"
+                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                        (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
+                                        (ontabChange)="ontabChange($event)"
+                                        [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"></app-create-or-edit-buyer-seller-contact-info>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header d-flex">
+                                    <img src="../../../../../assets/shoppingCart/checked.svg"
+                                        *ngIf="SellerContactInfoValid" />
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Sellercontactinfo")}}</h6>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <div>
+                                    <app-create-or-edit-buyer-seller-contact-info [activeTab]="activeIndex ?  activeIndex :2"
+                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                        (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
+                                        (ontabChange)="ontabChange($event)"
+                                        [showSaveBtn]="showSaveBtn"
+                                        [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"></app-create-or-edit-buyer-seller-contact-info>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header d-flex">
+                                    <img src="../../../../../assets/shoppingCart/checked.svg"
+                                        *ngIf="SalesRepInfoValid" />
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("SalesRepInformation")}}
+                                    </h6>
+                                </div>
+                            </ng-template>
+
+                            <ng-template pTemplate="content">
+                                <div>
+                                    <app-create-or-edit-sales-rep-info [activeTab]="activeIndex ?  activeIndex :3"
+                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                        (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
+                                        [showSaveBtn]="showSaveBtn"
+                                        [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"></app-create-or-edit-sales-rep-info>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header d-flex">
+                                    <img src="../../../../../assets/shoppingCart/checked.svg"
+                                        *ngIf="shippingInfOValid" />
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
+                                    </h6>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <div>
+                                    <app-create-or-add-shipping-information
+                                        [activeTab]="activeIndex ?  activeIndex :4"
+                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                        (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
+                                        [createOrEditshippingInfO]="createOrEditshippingInfO">
+                                    </app-create-or-add-shipping-information>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header d-flex">
+                                    <img src="../../../../../assets/shoppingCart/checked.svg"
+                                        *ngIf="BillingInfoValid" />
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <div>
+                                    <app-create-or-edit-billing-info
+                                    [activeTab]="activeIndex ?  activeIndex :5"
+                                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                    (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
+                                    [createOrEditBillingInfo]="createOrEditBillingInfo"
+                                    >
+                                    </app-create-or-edit-billing-info>
+                                </div>
+                            </ng-template>
+                        </p-accordionTab>
+                        <p-accordionTab class="shoppingCartAccordionTabBG">
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header d-flex">
+                                    <h6 class="mb-1 mt-1 purpleColor">{{l("OrderDetails")}}</h6>
+                                </div>
+                            </ng-template>
+                            <div class="summarySection">
+                                <div class="row p-3  summarySection ml-0 mr-0">
+                                    <div class="row col-4">
+                                        <h6 class=" mt-2 purpleColor font-weight-bold pr-2">
+                                            {{l("ProductCode")}}
+                                        </h6>
+                                        <input type="text" class="col-6 pl-1 form-control ml-0 inputs" id="ProductCode"
+                                            [(ngModel)]="productCode" (keyup)="getShoppingCartData()">
+                                    </div>
+                                    <div class="row pl-2 col-4">
+                                        <h6 class="mt-2 purpleColor font-weight-bold">{{l("Color")}}</h6>
+                                        <div class="col-9">
+                                            <p-dropdown #colorsInput="ngModel"
+                                                placeholder="{{ 'select color' | localize }}" [options]="colors"
+                                                styleClass="ticket-dropdown form-control aria-select text-left"
+                                                [filter]="false" name="colors" (onChange)="getShoppingCartData()"
+                                                [(ngModel)]="colorFilter" [showClear]="true">
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                    <div class="row pl-2 col-4">
+                                        <h6 class="mt-2 purpleColor font-weight-bold">{{l("Size")}}</h6>
+                                        <div class="col-9">
+                                            <p-dropdown #sizesInput="ngModel"
+                                                placeholder="{{ 'select size' | localize }}" [options]="sizes"
+                                                styleClass="ticket-dropdown form-control aria-select text-left"
+                                                [filter]="false" name="sizes" (onChange)="getShoppingCartData()"
+                                                [(ngModel)]="sizeFilter" [showClear]="true">
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                    <div class="row pt-1 pl-4">
+                                        <label for="ShowVariations" class="row">
+                                            <input #ShowVariations="ngModel" id="ShowVariations" type="checkbox"
+                                                name="ShowVariations" [(ngModel)]="showVariations"
+                                                (change)="onShowVariations($event)" class="mr-2 checkbox"
+                                                style="z-index: 999" />
+                                            <h6 class="purpleColor mt-2 pt-1  font-weight-bold">
+                                                {{l("ShowVariations")}}
+                                            </h6>
+                                        </label>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="ml-3 mr-4">
+                                        <p-treeTable [value]="shoppingCartTreeNodes" [scrollable]="true"
+                                            [tableStyle]="{'min-width':'50rem'}">
+                                            <ng-template pTemplate="header">
+                                                <tr>
+                                                    <th *ngFor="let col of cols" class="purpleColor"
+                                                        [ngClass]="{'col-2':col.field=='manufacturerCode'}">
+                                                        {{ col.header }}
+                                                    </th>
+                                                    <!--  <th> <img
+                                                    src="../../../../../assets/shoppingCart/Order-Details-Table-Action_Btn.svg" />
+                                            </th> -->
+                                                    <th class="purpleColor">
+                                                        {{l("Action")}}
+                                                    </th>
+                                                </tr>
+                                                <br />
+                                            </ng-template>
+                                            <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+                                                <tr [ttRow]="rowNode">
+                                                    <!--  <td style="width:150px" class="td-tree">
+                                                <p-treeTableToggler [rowNode]="rowNode" class="branch-name"></p-treeTableToggler>
+                                                {{rowData.code}}
+                                            </td>
+                                            <td>{{ rowData.name }}</td>
+                                            <td>{{ rowData.quantity }}</td>
+                                            <td>{{ rowData.price }}</td>
+                                            <td>{{ rowData.amount }}</td>
+                                            <td>{{ rowData.image }}</td> -->
+                                                    <!-- style="white-space: nowrap;  overflow: hidden;" -->
+                                                    <td *ngFor="let col of cols; let i = index" class="p-treeTable"
+                                                        [ngClass]="{'col-2':col.field=='manufacturerCode'}">
+                                                        <p-treeTableToggler [rowNode]="rowNode"
+                                                            *ngIf="i === 0"></p-treeTableToggler>
+                                                        <label *ngIf="(col.field!='image') &&  (col.field!='qty')">
+                                                            {{ rowData[col.field] }}</label>
+                                                        <label
+                                                            *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
+                                                            {{ rowData[col.field] }}</label>
+
+                                                        <label *ngIf="col.field=='image'">
+                                                            <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                                class="imgIcon" />
+                                                        </label>
+
+                                                        <label
+                                                            *ngIf="col.field=='qty' && rowNode?.node?.data?.editQty && rowNode?.node?.data?.showEditQty">
+                                                            <div class="editQtyContainer">
+                                                                <div class="fieldset">
+                                                                    <input type="number" min="0"
+                                                                        class="form-control inputs form-text"
+                                                                        id="editQty"
+                                                                        [(ngModel)]="rowNode.node.data.updatedQty">
+                                                                    <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                                        (click)="rowNode.node.data.showEditQty=false"></a>
+                                                                    <button
+                                                                        class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                                        (click)="onEditQty(rowNode)"
+                                                                        [ngClass]="{ disabled:!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0 || rowNode.node.data.updatedQty==rowNode.node.data.qty}"
+                                                                        [disabled]="!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0  || rowNode.node.data.updatedQty==rowNode.node.data.qty"></button>
+                                                                </div>
+                                                                <label class="text-danger"
+                                                                    *ngIf="rowNode?.node?.data?.invalidUpdatedQty">{{
+                                                                    rowNode.node.data.invalidUpdatedQty}}
+                                                                </label>
+
+                                                            </div>
+
+                                                        </label>
+                                                    </td>
+
+                                                    <td class="p-treeTable">
+                                                        <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
+                                                    class="imgIcon" (click)="onDelete(rowNode)" />
+                                                <img *ngIf="rowNode?.node?.data?.editQty" src=""
+                                                    class="editIcon fa fa-edit ml-3 fa-1x"
+                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty" /> -->
+
+                                                        <div class="dropdown" dropdown>
+                                                            <button class="btn btn-secondary dropdown-toggle p-0"
+                                                                type="button" id="dropdownMenuButton"
+                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false" dropdownToggle>
+                                                                <div class="three-dots"></div>
+                                                            </button>
+                                                            <div class="dropdown-menu"
+                                                                aria-labelledby="dropdownMenuButton" *dropdownMenu>
+                                                                <div *ngIf="rowNode?.node?.data?.editQty"
+                                                                    class="pointer"
+                                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty">
+                                                                    <a class="link purpleColor p-3">
+                                                                        <img src=""
+                                                                            class="editIcon fa fa-edit ml-3 fa-1x" />
+                                                                        {{l('Edit')}} </a>
+                                                                </div>
+
+                                                                <div class="pointer ml-3 mt-3"
+                                                                    (click)="onDelete(rowNode)">
+                                                                    <a class="link purpleColor p-3">
+                                                                        <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
+                                                                            class="imgIcon" />
+                                                                        {{l('Delete')}}</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+                                            </ng-template>
+
+                                        </p-treeTable>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-accordionTab>
+                    </p-accordion>
+
+
+
+                </div>
+                <div class="col-4  p-4">
+                    <div class="row">
+                        <h4 class="purpleColor font-weight-bold col-12"> {{l("Order Summary")}} </h4>
+                        <div class="row summarySection p-4 ml-2 mt-3 purpleColor">
+                            <div class="row w-100">
+                                <div class="col-6 font-weight-bold">{{l("TotalAmount")}}</div>
+                                <div class="font-weight-bold">${{shoppingCartDetails?.totalAmount ?
+                                    shoppingCartDetails?.totalAmount : 0 }}</div>
+                            </div>
+                            <div class="row w-100 mt-4 mb-4">
+                                <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
+                                <div class="font-weight-bold">{{shoppingCartDetails?.totalQty ?
+                                    shoppingCartDetails?.totalQty : 0 }}</div>
+                            </div>
+                            <div class=" row w-100 mt-4 ml-1">
+                                <button type="button"
+                                    class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
+                                    style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
+                                    {{l("Proceedtocheckout")}}
+                                </button>
+                                <!-- <button type="button" class="btn btn-primary bgPurple border-0 w-100 pointer"
+                                    style="height: 37px;" *ngIf="showTabs" (click)="PlaceOrder()"
+                                    [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
+                                    [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}">
+                                    {{l("Placeyourorder")}}
+                                </button> -->
+                                <button type="button" class="btn btn-primary bgPurple border-0 w-100 pointer"
+                                    style="height: 37px;" *ngIf="showTabs" (click)="PlaceOrder()">
+                                    {{l("Placeyourorder")}}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ng-container *ngIf="loadNotesComp;">
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+
+                                <!-- app Notes shared component-->
+                                <app-notes [entityId]="orderId"></app-notes>
+                            </div>
+
+                        </div>
+
+                    </ng-container>
+                    <div class="row mt-4">
+                        <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
+                        <div class="w-100 comment-warper summarySection p-4 ml-2 mt-3 purpleColor">
+                            <app-comment-parent [cartStyle]="true" #commentParentComponent>
+                            </app-comment-parent>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="mr-1 nextArrow">
+                    <button *ngIf="showCarousel" (click)="goPrevious_Next_Transaction(transactionPosition.Next)"
+                        [disabled]="appTransactionsForViewDto?.lastRecord" class="nextBtn"
+                        [ngClass]="{ disabled:appTransactionsForViewDto?.lastRecord}"> <i
+                            class="fa fa-chevron-right"></i> </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div [ngClass]="minimize ? 'minimizedScreen px-3 py-2' : 'maximizedScreen'">
+        <div *ngFor="let item of minimizedOrders" class="d-flex align-items-center justify-content-center p-2">
+            <button (click)="maximizeScreen()" class="btn mini-order">
+                <h6 class="m-0 p-0">{{item.name}}</h6>
+                <img src="../../../../../assets/shoppingCart/minimize.svg" class="pointer" />
+            </button>
+        </div>
+    </div>
+
+</ng-template>

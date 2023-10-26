@@ -216,7 +216,7 @@ export class CreateEditAppItemVariationsComponent
                 this.sizes = res;
             });
 
-          this.selectedAttrID = this.appItem.sycIdentifierId.toString()
+          this.selectedAttrID = this.appItem?.sycIdentifierId?.toString()
     }
 
     async getSiwiiMarketPlaceColor() {
@@ -463,7 +463,7 @@ export class CreateEditAppItemVariationsComponent
         )[0];
         if (
             sizeIsSelected &&
-            (!this.sizeScaleFormIsValid || !this.sizeRatioFormIsValid)
+            ((!this.sizeScaleFormIsValid && !this.appSizeScales )|| (!this.sizeRatioFormIsValid && !this.appSizeScales) )
         )
             return this.notify.error(
                 this.l("PleaseCompleteAllSizeScaleAndSizeRatioRequired(*)Data")
@@ -488,7 +488,7 @@ export class CreateEditAppItemVariationsComponent
 
         this._appItemsServiceProxy
             .getVariationsCodes(
-                this.attributeID,
+                this.attributeID  ?     this.attributeID  : this.appItem?.sycIdentifierId,
                 this.productCode,
                 this.productTypeId,
                 this.variationMatrices
@@ -507,11 +507,11 @@ export class CreateEditAppItemVariationsComponent
             return this.setDefaultExtraAttributeForVariationAttachment(
                 this.selectedExtraAttributes[0]
             );
-        const oldVariationsExtraAttrs = oldVariations[0].entityExtraData.map(
+        const oldVariationsExtraAttrs = oldVariations[0]?.entityExtraData.map(
             (item) => item.attributeId
         );
         const newVariationsExtraAttrs =
-            this.variationMatrices[0].entityExtraData.map(
+            this.variationMatrices[0]?.entityExtraData.map(
                 (item) => item.attributeId
             );
         const compareVariationRow = (
@@ -535,9 +535,9 @@ export class CreateEditAppItemVariationsComponent
         };
         // check if the extra attributes are the same
         if (
-            oldVariationsExtraAttrs.length == newVariationsExtraAttrs.length ||
+            oldVariationsExtraAttrs.length == newVariationsExtraAttrs?.length ||
             oldVariationsExtraAttrs.every((item) =>
-                newVariationsExtraAttrs.includes(item)
+                newVariationsExtraAttrs?.includes(item)
             )
         ) {
             this.variationMatrices = this.variationMatrices.map((varRow) => {
@@ -561,7 +561,7 @@ export class CreateEditAppItemVariationsComponent
             });
         }
         if (
-            newVariationsExtraAttrs.includes(
+            newVariationsExtraAttrs?.includes(
                 this.defaultExtraAttrForAttachments.attributeId
             )
         ) {
@@ -909,59 +909,61 @@ export class CreateEditAppItemVariationsComponent
                 this.variationMatrices.push(newVariation);
             }
         };
-        if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
-            currentExtraAttr.selectedValues.forEach((attrId) => {
-                let attrOptionData: any = currentExtraAttr.lookupData.filter(
-                    (item) => item.value == attrId
-                )[0];
-                createNewVariation(
-                    attrOptionData.label,
-                    attrOptionData.code,
-                    attrId
-                );
-            });
-        } else {
-            // size condition
-            console.log(">>", this.appSizeRatios.appSizeScalesDetails);
-
-            // if (this.appSizeRatios.appSizeScalesDetails.length < 2) {
-            // let sizeData = this.appSizeRatios.appSizeScalesDetails[0];
-            // this.siwiSizes.forEach((size) => {
-            this.appSizeRatios.appSizeScalesDetails.forEach(
-                (sizeScale: any) => {
-                    let arr = this.siwiSizes.filter(
-                        (size) => size.code === sizeScale.sizeCode
+            if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
+                currentExtraAttr.selectedValues.forEach((attrId) => {
+                    // if(attrId || attrId>=0){
+                    let attrOptionData: any = currentExtraAttr.lookupData.filter(
+                        (item) => item.value == attrId
+                    )[0];
+                    createNewVariation(
+                        attrOptionData?.label,
+                        attrOptionData?.code,
+                        attrId
                     );
-                    console.log(">>", arr);
-
-                    if (arr.length !== 0) {
-                        createNewVariation(
-                            sizeScale.sizeCode,
-                            sizeScale.sizeCode,
-                            arr[0].value
+                  //  }
+                });
+            } else {
+                // size condition
+                console.log(">>", this.appSizeRatios.appSizeScalesDetails);
+    
+                // if (this.appSizeRatios.appSizeScalesDetails.length < 2) {
+                // let sizeData = this.appSizeRatios.appSizeScalesDetails[0];
+                // this.siwiSizes.forEach((size) => {
+                this.appSizeRatios.appSizeScalesDetails.forEach(
+                    (sizeScale: any) => {
+                        let arr = this.siwiSizes.filter(
+                            (size) => size.code === sizeScale.sizeCode
                         );
-                    } else {
-                        createNewVariation(
-                            sizeScale.sizeCode,
-                            sizeScale.sizeCode
-                        );
-                        // }
+                        console.log(">>", arr);
+    
+                        if (arr.length !== 0) {
+                            createNewVariation(
+                                sizeScale.sizeCode,
+                                sizeScale.sizeCode,
+                                arr[0].value
+                            );
+                        } else {
+                            createNewVariation(
+                                sizeScale.sizeCode,
+                                sizeScale.sizeCode
+                            );
+                            // }
+                        }
                     }
-                }
-            );
-
-            // });
-            // } else {
-            //     this.appSizeRatios.appSizeScalesDetails.forEach(
-            //         (sizeDetailDto) => {
-            //             createNewVariation(
-            //                 sizeDetailDto.sizeCode,
-            //                 sizeDetailDto.sizeCode
-            //             );
-            //         }
-            //     );
-            // }
-        }
+                );
+    
+                // });
+                // } else {
+                //     this.appSizeRatios.appSizeScalesDetails.forEach(
+                //         (sizeDetailDto) => {
+                //             createNewVariation(
+                //                 sizeDetailDto.sizeCode,
+                //                 sizeDetailDto.sizeCode
+                //             );
+                //         }
+                //     );
+                // }
+            }
     }
 
     setPrice(price: any, dropdown: BsDropdownDirective) {

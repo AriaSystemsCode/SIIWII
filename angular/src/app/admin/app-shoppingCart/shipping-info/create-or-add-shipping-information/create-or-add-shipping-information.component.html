@@ -1,0 +1,91 @@
+<div class="tab-cont">
+    <div *ngIf="createOrEditshippingInfO">
+    <div class="container-fluid pt-1 mb-3">
+        <div class="header my-2 d-flex align-items-center justify-content-between">
+            <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
+            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
+                 {{l("Continue")}}
+            </button>
+        </div>
+        <hr class="my-2" />
+        <div class="InfoForm pr-3 thin-scroll">
+            <div class="row ml-1"> 
+                <app-contact  
+                class="w-100"
+                [shipInfoIndex]="1"
+                (loadAddressComponent)="reloadAddresscomponentShipFrom($event)"
+                [isCreateOrEdit]="createOrEditshippingInfO"
+                [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                (formValidityChanged)="isContactFormValid($event)"
+                [showDepartment]="activeTab ==shoppingCartoccordionTabs.ShippingInfo"
+            ></app-contact>
+            </div>
+        </div>
+        <hr class="my-2" />
+        <app-address 
+        [isCreateOredit]="createOrEditshippingInfO"
+        [contactId]="contactIdShipFrom"
+        ></app-address>
+        
+    </div>
+    <div class="container-fluid pt-1">
+        <div class="header my-2 d-flex align-items-center justify-content-between">
+            <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
+            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()"
+             class="continuebtn text-center btn float-right">
+                 {{l("Continue")}}
+            </button>
+        </div>
+        <hr class="my-2" />
+        <div class="InfoForm pr-3 thin-scroll">
+            <div class="row ml-1"> 
+                <app-contact  
+                class="w-100"
+                [shipInfoIndex]="2"
+                (loadAddressComponent)="reloadAddresscomponentShipTo($event)"
+                [isCreateOrEdit]="createOrEditshippingInfO"
+                [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                (formValidityChanged)="isContactFormValid($event)"
+                [showDepartment]="activeTab ==shoppingCartoccordionTabs.ShippingInfo"
+            ></app-contact>
+            </div>
+        </div>
+        <hr class="my-2" />
+        <app-address 
+        [isCreateOredit]="createOrEditshippingInfO"
+        [contactId]="contactIdShipTo"
+        ></app-address>
+<div class="row edit-mode ">
+    <div class="col-6 mb-4">
+        <label class="label mt-1 mb-1">{{l("Store")}}</label>
+<input type="text" class="form-control w-100" #store/>
+    </div>
+    <div class="col-6 mb-4">
+        <label class="label mt-1 mb-1">{{l("ShipVia")}}</label>
+        <p-dropdown
+        id="shipVia"
+        [options]="shipViaList"
+        name="shipVia"
+        styleClass="form-control aria-select"
+        [required]="true"
+        [placeholder]="'PleaseSelect' | localize"
+    >
+    </p-dropdown>
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<div *ngIf="!createOrEditshippingInfO">
+    <app-view-shipping-information
+    [activeTab]="activeTab"
+    [appTransactionsForViewDto]="appTransactionsForViewDto">
+</app-view-shipping-information>
+</div>
+</div>

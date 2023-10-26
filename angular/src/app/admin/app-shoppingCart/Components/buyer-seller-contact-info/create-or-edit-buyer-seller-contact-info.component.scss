@@ -1,0 +1,46 @@
+.InfoForm{
+    max-height: 550px;
+    overflow: hidden scroll;
+}
+ 
+
+.savebtn{
+    background-color: #700066;
+    color: #fff;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 9999;
+}
+
+.headertxt{
+    color: #F88011 !important;
+}
+
+
+.continuebtn{
+    background-color: #700066;
+    color: #fff;
+   position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 9999;
+}
+
+.previewbtn{
+    background-color: #f88011;
+    color: #fff;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 9999;
+}
+.cancelbtn{
+    background-color: #fff;
+    color: #700066;
+    border:2px solid #700066;
+    position: absolute;
+    top: 5px;
+    right: 110px;
+    z-index: 9999;
+}

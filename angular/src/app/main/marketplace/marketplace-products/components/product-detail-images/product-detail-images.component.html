@@ -1,0 +1,72 @@
+<div class="wrapper">
+    <div
+        class="d-flex align-items-start justify-content-center"
+        style="gap: 10px"
+    >
+        <!-- hide images and show slider -->
+        <div
+            *ngIf="productImages.length <= 7"
+            class="slides d-flex align-items-lg-start justify-content-around flex-column"
+        >
+            <div
+                *ngFor="let image of productImages; let i = index"
+                class="mb-1"
+            >
+                <img
+                    (click)="setMainImage(i)"
+                    [src]="attachmentBaseUrl + '/' + image.url"
+                    alt="images slides"
+                    class="imageSlides"
+                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                    [ngClass]="
+                        i === currentIndex ? 'border border-primary ' : ''
+                    "
+                />
+            </div>
+        </div>
+
+        <div *ngIf="productImages.length > 7">
+            <div class="slider-container">
+                <div
+                    class="slider"
+                    [style.transform]="'translateY(' + translateY + 'px)'"
+                >
+                    <img
+                        class="imageSlides mb-2"
+                        *ngFor="let image of productImages; let i = index"
+                        [src]="attachmentBaseUrl + '/' + image.url"
+                        alt="Image {{ i }}"
+                        (click)="setMainImage(i)"
+                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                        [ngClass]="
+                            i === currentIndex ? 'border border-primary ' : ''
+                        "
+                    />
+                </div>
+            </div>
+            <!-- <button (click)="slideToPreviousImage()">&#8593; Previous</button> -->
+            <button (click)="slideToNextImage()" class="indicator-btns">
+                <i class="fa fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <div class="main-image">
+            <img
+                *ngIf="!colorView"
+                [src]="
+                    attachmentBaseUrl + '/' + productImages[currentIndex].url
+                "
+                alt="images slides"
+                class="main"
+                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+            />
+            <img
+                *ngIf="colorView"
+                [src]="attachmentBaseUrl + '/' + colorAttachmentForMainIamge"
+                alt="images slides"
+                class="main"
+                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+            />
+        </div>
+    </div>
+</div>

@@ -1,0 +1,343 @@
+<div class="orderForm  position-relative">
+    <div class="container-fluid orderInfoForm thin-scroll">
+        <div
+            class="header p-2 my-2 d-flex align-items-center  "
+        >
+            <!-- <h6><span class="headertxt"> Entered By : </span> {{ fullName }}</h6> -->
+            <h6><span class="headertxt"> Entered By : </span></h6>
+
+            <button
+                [disabled]="!(isContactsValid && isSalesOrderValidForm())"
+                *ngIf="createOrEditorderInfo && !showSaveBtn"
+                (click)="createOrEditTransaction()"
+                class="continuebtn text-center btn float-right"
+            >
+                Continue
+            </button>
+            <button
+                *ngIf="!createOrEditorderInfo"
+                (click)="showEditMode()"
+                class="previewbtn text-center btn float-right"
+            >
+                Change
+                <i class="pi pi-pencil"></i>
+            </button>
+            <button
+            *ngIf="showSaveBtn"
+            (click)="save()"
+            class="previewbtn text-center btn float-right"
+        >
+            Save
+            <i class="pi pi-check"></i>
+        </button>
+        <button
+        *ngIf="showSaveBtn"
+        (click)="cancel()"
+        class="cancelbtn text-center btn float-right"
+    >
+        Cancel
+        <i class="pi pi-times"></i>
+    </button>
+        </div>
+        <hr class="my-2" />
+        <div class="pr-3">
+            <app-contact
+            class="w-100"
+            [isCreateOrEdit]="createOrEditorderInfo"
+                [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (formValidityChanged)="isContactFormValid($event)"
+                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                [showDepartment]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo"
+            ></app-contact>
+
+            <div class="row">
+                <!-- classification -->
+                <div class="col-md-12 mt-3">
+                    <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
+                        <label class="label">Classifications</label>
+                        <div
+                            class="align-items-center big-scroll categoriesClassificationsContainer px-3 py-2 d-flex h-100 row   w-100 border"
+                        >
+                            <p
+                                class="previewValue classificationsValues mr-2 p-0 my-0"
+                                *ngFor="
+                                    let item of appTransactionsForViewDto?.entityClassifications
+                                "
+                            >
+                                {{ item?.entityObjectClassificationName }}
+                            </p>
+                            <p
+                                *ngIf="
+                                !appTransactionsForViewDto?.entityClassifications  ||   appTransactionsForViewDto?.entityClassifications
+                                        ?.length === 0
+                                "
+                                class="p-0 m-0 customPlaceHolder"
+                            >
+                                Please select Classification From Tree below
+                            </p>
+                        </div>
+                        <div class="border">
+                            <p-tree
+                                class="w-full md:w-30rem"
+                                [value]="classificationsFiles"
+                                (onNodeExpand)="
+                                    classificationNodeExpand($event)
+                                "
+                                [loading]="loading"
+                                selectionMode="checkbox"
+                                (onNodeSelect)="
+                                    classififcationNodeSelect($event)
+                                "
+                                (onNodeUnselect)="classififcationNodeUnSelect($event)"
+                            ></p-tree>
+                        </div>
+                    </div>
+                    <div *ngIf="!createOrEditorderInfo">
+                        <div
+                            class="align-items-center big-scroll categoriesClassificationsContainer px-3  d-flex h-100 row   w-100 "
+                        >
+                            <h6 class="previewTitle  m-0 p-0 pr-2 my-2">
+                                Classifications :
+                            </h6>
+                            <p
+                                class="previewValue classificationsValues  m-0 p-0  my-2"
+                                *ngFor="
+                                    let item of appTransactionsForViewDto?.entityClassifications
+                                "
+                            >
+                                {{ item?.entityObjectClassificationName}}
+                            </p>
+                            <p
+                                class="previewValue m-0 p-0 col-4 my-2"
+                                *ngIf="
+                             !appTransactionsForViewDto?.entityClassifications  ||  appTransactionsForViewDto?.entityClassifications
+                                    ?.length === 0
+                            "
+                            >
+                                -
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- classification -->
+
+                <!-- categories -->
+                <div class="col-md-12 mt-3">
+                    <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
+                        <label class="label">Categories</label>
+                        <div
+                            class="categoriesClassificationsContainer  big-scroll  h-100 row align-tems-center border flex-row px-3 py-2 rounded row thin-scroll w-100 border"
+                        >
+                            <p
+                                class="previewValue categoriesValues mr-2 p-0"
+                                *ngFor="
+                                    let item of appTransactionsForViewDto?.entityCategories
+                                "
+                            >
+                                {{ item?.entityObjectCategoryName }}
+                            </p>
+                            <p
+                                *ngIf="
+                                !appTransactionsForViewDto?.entityCategories  ||  appTransactionsForViewDto?.entityCategories
+                                        ?.length === 0
+                                "
+                                class="p-0 m-0 customPlaceHolder"
+                            >
+                                Please select Categories From Tree below
+                            </p>
+                        </div>
+                        <div class="border">
+                            <p-tree
+                                class="w-full md:w-30rem"
+                                [value]="categoriesFiles"
+                                (onNodeExpand)="categoriesNodeExpand($event)"
+                                [loading]="loading"
+                                selectionMode="checkbox"
+                                (onNodeSelect)="categoriesNodeSelect($event)"
+                                (onNodeUnselect)="categoriesNodeUnSelect($event)"
+
+                            ></p-tree>
+                        </div>
+                        
+                        <!-- [(selection)]="selectedCategories"  -->
+                        <!-- <p-treeSelect
+                            class="md:w-20rem w-full"
+                            containerStyleClass="w-full"
+                            [(ngModel)]="selectedCategories"
+                            selectionMode="checkbox"
+                            [options]="categoriesFiles"
+                            placeholder="Select Item..."
+                            (onNodeExpand)="categoriesNodeExpand($event)"
+                            (onNodeSelect)="categoriesNodeSelect($event)"
+                        ></p-treeSelect> -->
+                    </div>
+                    <div *ngIf="!createOrEditorderInfo">
+                        <div
+                            class="categoriesClassificationsContainer d-flex align-items-center big-scroll px-3    h-100 row   w-100"
+                        >
+                            <h6 class="previewTitle  m-0 p-0 pr-2 my-2">Categories :</h6>
+                            <p
+                                class="previewValue classificationsValues  m-0 p-0  my-2"
+                                *ngFor="
+                                    let item of appTransactionsForViewDto?.entityCategories
+                                "
+                            >
+                                {{ item?.entityObjectCategoryName}}
+                            </p>
+                            <p
+                                class="previewValue   m-0 p-0 col-4 my-2"
+                                *ngIf="
+                                !appTransactionsForViewDto?.entityCategories  || appTransactionsForViewDto?.entityCategories
+                                    ?.length === 0
+                            "
+                            >
+                                -
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- categories -->
+
+                <!-- dates -->
+                <div class="col-md-6 my-3">
+                    <div *ngIf="createOrEditorderInfo">
+                        <label class="label">Entered Date</label>
+                        <p-calendar
+                            [(ngModel)]="enteredDate"
+                            [showIcon]="true"
+                            (ngModelChange)="onChangeDate()"
+                        ></p-calendar>
+                    </div>
+                    <div *ngIf="!createOrEditorderInfo">
+                        <div
+                            class="d-flex align-items-center   w-75"
+                        >
+                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">Entered Date :</h6>
+                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "dd/MM/yy " }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 my-3">
+                    <div *ngIf="createOrEditorderInfo">
+                        <label class="label">Start Date</label>
+                        <p-calendar
+                            [(ngModel)]="startDate"
+                            [showIcon]="true"
+                            (ngModelChange)="onChangeDate()"
+                        ></p-calendar>
+                    </div>
+                    <div *ngIf="!createOrEditorderInfo">
+                        <div
+                            class="d-flex align-items-center   w-75"
+                        >
+                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">Start Date :</h6>
+                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "dd/MM/yy "}}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div *ngIf="createOrEditorderInfo">
+                        <label class="label">Avaialable Date</label>
+                        <p-calendar
+                            [(ngModel)]="availableDate"
+                            [showIcon]="true"
+                            (ngModelChange)="onChangeDate()"
+                        ></p-calendar>
+                    </div>
+                    <div *ngIf="!createOrEditorderInfo">
+                        <div
+                            class="d-flex align-items-center   w-75"
+                        >
+                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                                Avaialable Date :
+                            </h6>
+                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "dd/MM/yy " }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div *ngIf="createOrEditorderInfo">
+                        <label class="label">Complete Date</label>
+                        <p-calendar
+                            [(ngModel)]="completeDate"
+                            [showIcon]="true"
+                            (ngModelChange)="onChangeDate()"
+                        ></p-calendar>
+                    </div>
+                    <div *ngIf="!createOrEditorderInfo">
+                        <div
+                            class="d-flex align-items-center   w-75"
+                        >
+                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                                Complete Date :
+                            </h6>
+                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "dd/MM/yy " }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- dates -->
+                <!-- currency -->
+                <div class="col-md-6 mt-3">
+                    <div *ngIf="createOrEditorderInfo">
+                        <label class="label">Currency</label>
+                        <p-dropdown
+                            [options]="currencies"
+                            [(ngModel)]="selectedCurrency"
+                            optionLabel="code"
+                            optionValue="value"
+                            class="w-100"
+                            (onChange)="onchangeCurrency()"
+                        ></p-dropdown>
+                    </div>
+                    <div *ngIf="!createOrEditorderInfo">
+                        <div
+                            class="d-flex align-items-center  "
+                        >
+                            <h6 class="previewTitle  m-0 p-0 col-3 my-2">Currency :</h6>
+                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                                {{ appTransactionsForViewDto?.currencyCode }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- currency -->
+
+                <!-- exchange rate -->
+                <div class="col-md-6 mt-3">
+                    <div *ngIf="createOrEditorderInfo" class="formGroup">
+                        <label class="label">Exchange Rate</label>
+                        <input
+                            type="text"
+                            placeholder="Exchange Rate..."
+                            class="form-control w-100"
+                            [(ngModel)]="appTransactionsForViewDto.currencyExchangeRate"
+                        />
+                    </div>
+                    <div *ngIf="!createOrEditorderInfo">
+                        <div
+                            class="d-flex align-items-center   w-75"
+                        >
+                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                                Exchange Rate :
+                            </h6>
+                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                                {{ appTransactionsForViewDto?.currencyExchangeRate }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- exchange rate -->
+            </div>
+        </div>
+        <hr class="my-2" />
+    </div>
+</div>

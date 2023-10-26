@@ -1,0 +1,23 @@
+<div class="container-fluid InfoForm thin-scroll">
+    <div class="header p-3 my-2 d-flex align-items-center justify-content-between p-2">
+        <h6><span class="headertxt"> Company & Contact Information : </span></h6>
+        <button
+        (click)="showEditMode()"
+        class="previewbtn text-center btn float-right"
+    >
+        Change
+        <i class="pi pi-pencil"></i>
+    </button>
+    </div>
+    <hr class="my-2" />
+    <div class="pr-3">
+        <div class="row ml-1">
+            <app-contact 
+                class="w-100" [isCreateOrEdit]="isCreateOrEdit" [activeTab]="activeTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                    (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                    [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"></app-contact>
+        </div>
+    </div>
+    <hr class="my-2" />
+</div>

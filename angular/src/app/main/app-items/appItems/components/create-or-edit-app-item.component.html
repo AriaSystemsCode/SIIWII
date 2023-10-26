@@ -79,6 +79,7 @@
                             </app-codes>
                                 <app-codes *ngIf="appItem?.id>0"
                                  [objectType]="entityObjectType"
+                                 [readonly]="true"
                                  [editMode]=true
                                  classes="bg-white"
                                  [code]="appItem?.code"
@@ -664,7 +665,7 @@
     <app-create-edit-app-item-variations
         [appItem]="appItem"
         [selectedItemTypeData]="selectedItemTypeData"
-        (cancel)="hideVariations()"
+        (cancel)="hideVariations($event)"
         [defaultAppItemImage]="this.attachmentsSrcs[this.defaultImageIndex]"
         (applyVariations)="applyVariations($event)"
         [isListing]="listingMode !== undefined"

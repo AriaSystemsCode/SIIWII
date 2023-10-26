@@ -1156,6 +1156,8 @@ export class CreateOrEditAppItemComponent
         this.seperateNewAndRemovedDepartments();
         this.seperateNewAndRemovedClassifications();
         this.extraSelectedValuesExtraData();
+        if(this.appItem.sycIdentifierId==0)
+        this.appItem.sycIdentifierId=null;
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
@@ -1289,7 +1291,7 @@ export class CreateOrEditAppItemComponent
         this.appItem.variationItems = $event.variation;
         this.appItem.appItemSizesScaleInfo = $event.appItemSizesScaleInfo;
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
-        this.hideVariations();
+        this.hideVariations(true);
         this.updateProductAvailableQuantity();
 
         if (
@@ -1328,9 +1330,13 @@ export class CreateOrEditAppItemComponent
             this.appItem?.variationItems[0]?.appItemPriceInfos;
     }
 
-    hideVariations() {
+  
+    hideVariations($event) {
+        if($event?.target?.files.length==0)
+        return;
         this.displayVariations = false;
     }
+    
     allCurrencies: CurrencyInfoDto[] = [];
     getCurrencies() {
         return this._appEntitiesServiceProxy
@@ -1579,9 +1585,20 @@ export class CreateOrEditAppItemComponent
     productAdvancedPriceChangesHandler($event: AppItemPriceInfo[]) {
         this.showAdvancedPricing = false;
         this.appItem.appItemPriceInfos = $event;
+        if(this.updateVariation){
+            this.appItem.variationItems.forEach((variation) => {
+                if (this.updateVariation) {
+                    variation.appItemPriceInfos = this.getParentProductPrices();
+                }
+            });
+        }
         this.checkAndAddDefaultPriceObject();
     }
-
+    getParentProductPrices() {
+        return this.appItem.appItemPriceInfos.map((item) =>
+            AppItemPriceInfo.fromJS({ ...item, id: 0 } as IAppItemPriceInfo)
+        );
+    }
     onUpdateVariation($event) {
         this.updateVariation = $event;
     }

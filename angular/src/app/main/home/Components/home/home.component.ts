@@ -34,7 +34,10 @@ export class HomeComponent implements OnInit {
             if (res.items.length > 0) {
               if (res.items[0].type == PostType.TEXT)
               {
-                window.open(this.GetLinkUrl(res.items[0].appPost.description), "_blank");
+                if(this.GetLinkUrl(res.items[0].appPost.description))
+                window.open(this.GetLinkUrl(res.items[0].appPost.description), "_blank"); 
+                else
+                this.viewPostModal.show(res.items[0]);
               }
               else
               {

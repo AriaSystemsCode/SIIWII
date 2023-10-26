@@ -101,6 +101,26 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PostsModule } from './main/posts/posts.module';
 import { eventsModule } from './main/AppEvent/events.module';
 import { CreateTransactionModal } from "./admin/appTransactions/appTransactions/createTransactionModal.component";
+import { AppTransactionsBrowseComponent } from "./admin/appTransactions/appTransactions/appTransBrowse.component";
+import { ShoppingCartViewComponentComponent } from "./admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
+import { AccordionModule } from "primeng/accordion";
+import { TreeTableModule } from 'primeng/treetable';
+import { SalesOrderComponent } from "./admin/app-shoppingCart/Components/sales-order/sales-order.component";
+import { ContactComponent } from "./admin/app-shoppingCart/Components/contact/contact.component";
+import { TreeSelectModule } from "primeng/treeselect";
+import { CalendarModule } from 'primeng/calendar';
+import { AddressComponent } from "./admin/app-shoppingCart/Components/address/address.component";
+import { CreateOrEditBuyerSellerContactInfoComponent } from "./admin/app-shoppingCart/Components/buyer-seller-contact-info/create-or-edit-buyer-seller-contact-info.component";
+import { ViewBuyerSellerContactInfoComponent } from "./admin/app-shoppingCart/Components/buyer-seller-contact-info/view-buyer-seller-contact-info.component";
+import { NotesComponent } from "./admin/shared/notes/notes.component";
+import { InteractionsModule } from "./main/interactions/interactions.module";
+import { ViewSalesRepInfoComponent } from "./admin/app-shoppingCart/Components/salesRep-info/view-sales-rep-info.component";
+import { CreateOrEditSalesRepInfoComponent } from "./admin/app-shoppingCart/Components/salesRep-info/create-or-edit-sales-rep-info.component";
+import { ViewShippingInformationComponent } from "./admin/app-shoppingCart/shipping-info/view-shipping-information/view-shipping-information.component";
+import { CreateOrAddShippingInformationComponent } from "./admin/app-shoppingCart/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
+import { CreateOrEditBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/create-or-edit-billing-info/create-or-edit-billing-info.component";
+import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/view-billing-info/view-billing-info.component";
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -155,6 +175,20 @@ import { CreateTransactionModal } from "./admin/appTransactions/appTransactions/
         MenuSearchBarComponent,
         ActiveDelegatedUsersComboComponent,
         CreateTransactionModal,
+        AppTransactionsBrowseComponent,
+        ShoppingCartViewComponentComponent,
+        SalesOrderComponent,
+        CreateOrEditBuyerSellerContactInfoComponent,
+        ViewBuyerSellerContactInfoComponent,
+        ContactComponent,
+        AddressComponent,
+        NotesComponent,
+        CreateOrEditSalesRepInfoComponent,
+        ViewSalesRepInfoComponent,
+        ViewShippingInformationComponent,
+        CreateOrAddShippingInformationComponent,
+        CreateOrEditBillingInfoComponent,
+        ViewBillingInfoComponent
     ],
     imports: [
         BrowserAnimationsModule,
@@ -186,13 +220,17 @@ import { CreateTransactionModal } from "./admin/appTransactions/appTransactions/
         NgxSpinnerModule,
         AppBsModalModule,
         CdkStepperModule,
-        ToastModule, PostsModule, eventsModule,
+        ToastModule, PostsModule, eventsModule,InteractionsModule,
         MenuModule,
         DialogModule,
         DropdownModule,
         ReactiveFormsModule,
         CheckboxModule,
         NgSelectModule,
+        AccordionModule,
+        TreeTableModule,
+        TreeSelectModule,
+        CalendarModule, TooltipModule
     ],
     providers: [
         ImpersonationService,

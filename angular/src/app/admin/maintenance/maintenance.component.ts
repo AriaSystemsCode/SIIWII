@@ -1,7 +1,7 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { CachingServiceProxy, EntityDtoOfString, WebLogServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppUpdateItemSSINServiceProxy, CachingServiceProxy, EntityDtoOfString, WebLogServiceProxy } from '@shared/service-proxies/service-proxies';
 import { FileDownloadService } from '@shared/utils/file-download.service';
 import * as _ from 'lodash';
 import { finalize } from 'rxjs/operators';
@@ -9,7 +9,8 @@ import { finalize } from 'rxjs/operators';
 @Component({
     templateUrl: './maintenance.component.html',
     styleUrls: ['./maintenance.component.scss'],
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()],
+    providers:[AppUpdateItemSSINServiceProxy]
 })
 export class MaintenanceComponent extends AppComponentBase implements OnInit {
 
@@ -21,6 +22,7 @@ export class MaintenanceComponent extends AppComponentBase implements OnInit {
         injector: Injector,
         private _cacheService: CachingServiceProxy,
         private _webLogService: WebLogServiceProxy,
+        private _appUpdateItemSSINAppService: AppUpdateItemSSINServiceProxy,
         private _fileDownloadService: FileDownloadService) {
         super(injector);
     }
@@ -59,7 +61,12 @@ export class MaintenanceComponent extends AppComponentBase implements OnInit {
             self.fixWebLogsPanelHeight();
         });
     }
-
+    fixItemsSSIN() {
+        this.showMainSpinner();
+         this._appUpdateItemSSINAppService.updateSSIN().pipe(finalize(() => { this.hideMainSpinner() }))
+         .subscribe((result) => {
+         });
+    }
     downloadWebLogs = function () {
         const self = this;
         self._webLogService.downloadWebLogs().subscribe((result) => {

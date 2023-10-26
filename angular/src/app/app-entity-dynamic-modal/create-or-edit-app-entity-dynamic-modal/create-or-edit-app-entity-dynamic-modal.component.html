@@ -58,7 +58,7 @@
                                 </div> -->
 
                                 <div class="form-group">
-                                    <label for="AppEntity_Name">{{l("Name")}} <span class="required">*</span></label>ee
+                                    <label for="AppEntity_Name">{{l("Name")}} <span class="required">*</span></label>
                                     <input type="text" id="AppEntity_Name" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.name" name="Name"     required/>
                                 </div>
 
@@ -172,7 +172,15 @@
                                             </h6>
                                         </div>
                                         <div>
-                                            <input type="text" id="AspectRatio" [placeholder]="l('AspectRatio')" class="form-control form-control-sm" [(ngModel)]="aspectRatio" name="aspectRatio" />
+                                        
+                                            <input type="text" (change)="changeFn($event)" id="AspectRatio" [placeholder]="l('AspectRatio')" class="form-control form-control-sm" [(ngModel)]="aspectRatio" name="aspectRatio" />
+                                            <br/>
+                                            
+                                            <select *ngIf="attCategoriesShow==true" class="form-control col-12" #ref (change)="getSelectedValue(ref.value)" >
+                                            
+                                                <option *ngFor="let attCat of attCategories let i=index" value={{i}}    [selected]="attCat.sycAttachmentCategory.code===productImageCategory.sycAttachmentCategory.code" >{{ attCat?.sycAttachmentCategory?.name }}</option>
+
+                                            </select>
                                         </div>
                                         <div>
                                             <button (click)="removeAllAttachments()" type="button" class="bg-white btn btn-hover-primary p-1 text-center" [disabled]="attachmentsSrcs.length == 1">

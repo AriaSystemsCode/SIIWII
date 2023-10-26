@@ -1,0 +1,53 @@
+
+    <div class="container-fluid pt-1 mb-3">
+        <div class="header my-2 d-flex align-items-center justify-content-between">
+            <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>   
+        </div>
+        <hr class="my-2" />
+        <div class="InfoForm pr-3 thin-scroll">
+            <div class="row ml-1"> 
+                <!-- <app-contact 
+            class="w-100"
+            [shoppingCartMode]="shoppingCartMode"
+                [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (formValidityChanged)="isContactFormValid($event)"
+                [showDepartment]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo"
+            ></app-contact>-->
+            </div>
+        </div>
+        <hr class="my-2" />
+        <app-address></app-address>
+    </div>
+    <div class="container-fluid pt-1">
+        <div class="header my-2 d-flex align-items-center justify-content-between">
+            <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
+        </div>
+        <hr class="my-2" />
+        <div class="InfoForm pr-3 thin-scroll">
+            <div class="row ml-1"> 
+                <!-- <app-contact
+            class="w-100"
+            [shoppingCartMode]="shoppingCartMode"
+                [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (formValidityChanged)="isContactFormValid($event)"
+                [showDepartment]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo"
+            ></app-contact>-->
+            </div>
+        </div>
+        <hr class="my-2" />
+        <app-address></app-address>
+        <div class="row view-mode mt-2 mb-2">
+            <div class="col-6">
+                <label class="label mt-1 mb-1  w-50">{{l("Store")}}</label>
+                <label class="label mt-1 mb-1 w-50">{{l("Store")}}</label>
+        
+            </div>
+            <div class="col-6">
+                <label class="label mt-1 mb-1 w-50">{{l("ShipVia")}}</label>
+                <label class="label mt-1 mb-1 w-50">{{l("Store")}}</label>
+        
+            </div>
+        </div>
+    </div>

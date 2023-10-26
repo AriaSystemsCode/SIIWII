@@ -12,6 +12,7 @@ import { TicketsComponent } from './autoTaskTickets/tickets/tickets.component';
 import { AppTenantsActivitiesLogsComponent } from './appTenantsActivitiesLogs/appTenantsActivitiesLogs/appTenantsActivitiesLogs.component';
 import { AppTenantPlansComponent } from './appTenantPlans/appTenantPlans/appTenantPlans.component';
 import { AppTransactionsComponent } from './appTransactions/appTransactions/appTransactions.component';
+import { AppTransactionsBrowseComponent } from './appTransactions/appTransactions/appTransBrowse.component';
 import { SycPlanServicesComponent } from './sycPlanServices/sycPlanServices/sycPlanServices.component';
 import { SycPlansComponent } from './sycPlans/sycPlans/sycPlans.component';
 import { SycServicesComponent } from './sycServices/sycServices/sycServices.component';
@@ -58,6 +59,8 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
                     { path: 'appTenantsActivitiesLogs/appTenantsActivitiesLogs', component: AppTenantsActivitiesLogsComponent, data: { permission: 'Pages.Administration.AppTenantsActivitiesLogs' }  },
                     { path: 'appTenantPlans/appTenantPlans', component: AppTenantPlansComponent, data: { permission: 'Pages.Administration.AppTenantPlans' }  },
                     { path: 'appTransactions/appTransactions', component: AppTransactionsComponent, data: { permission: 'Pages.Administration.AppTransactions' }  },
+                    { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent , data: { permission: 'Pages.AppSiiwiiTransactions' } } ,
+                  //  { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent } ,
                     { path: 'sycPlanServices/sycPlanServices', component: SycPlanServicesComponent, data: { permission: 'Pages.Administration.SycPlanServices' }  },
                     { path: 'sycPlans/sycPlans', component: SycPlansComponent, data: { permission: 'Pages.Administration.SycPlans' }  },
                     { path: 'sycServices/sycServices', component: SycServicesComponent, data: { permission: 'Pages.Administration.SycServices' }  },

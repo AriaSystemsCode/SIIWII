@@ -210,9 +210,11 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
 
     getPublishOptionsList(componentRef:{ onListLoadCallback : Function }){
         const items =  [
-            { label:this.l('Both'), value: 0 },
-            { label:this.l('Published'), value:1 },
-            { label:this.l('UnPublished'), value:2 },
+            { label:'all', value: 0 },
+            { label:'Shared Public', value:1 },
+            { label:'Shared Restricted', value:2 },
+            { label:'Private', value:3 },
+            { label:'Hidden', value:4 },
         ]
         const result: { items : any[], totalCount?:number } = {
             items,

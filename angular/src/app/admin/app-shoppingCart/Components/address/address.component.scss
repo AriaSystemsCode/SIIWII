@@ -1,0 +1,104 @@
+.address-wrapper {
+    .address-form {
+        border-radius: 4px;
+        border: 1px dashed #a584a3;
+        .form {
+            padding: 10px 15px;
+        }
+        .adrress-title {
+            padding: 10px 15px;
+            h3 {
+                color: #f88011;
+                font-family: Poppins;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: normal;
+            }
+            p {
+                color: #000;
+                font-family: Poppins;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 300;
+                line-height: normal;
+            }
+        }
+        .btns {
+            gap: 10px;
+            .cancel {
+                border-radius: 4px;
+                border: 1px solid #4a0d4a;
+                color: #4a0d4a;
+                font-family: Poppins;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: normal;
+            }
+            .save {
+                border-radius: 4px;
+                background: #f88011;
+                color: #fff;
+                font-family: Poppins;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: normal;
+            }
+        }
+    }
+    .search-input-icon{
+    color: #868995;
+    float: right;
+    margin-top: -25px;
+    margin-right: 10px;
+    }
+    .address-warper-cont{
+        padding-left: 10px;
+        padding-right: 10px;
+        .address-warper{
+            list-style: none;
+            border-bottom: 1px dashed #a584a3;
+     input[type="radio"]{
+    width: fit-content;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right:10px;
+           }
+           button{
+            background-color: transparent;
+            border: none;
+            outline: none;
+            color: #4a0d4a;
+           }
+        }
+
+    }
+.add-new-add-btn{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: #f88011;
+    font-weight: 600;
+}
+
+}
+.noAddressMsg{
+    display: block;
+    padding: 15px;
+    text-align: center;
+    color: #700066;
+}
+.savebtn{
+    background-color: #700066;
+    color: #fff;
+}
+textarea{
+    vertical-align: text-top;
+
+}
+ul.address-warper-cont {
+    max-height: 18em;
+    overflow-y: auto;
+}

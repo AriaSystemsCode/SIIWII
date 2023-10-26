@@ -1,0 +1,6 @@
+<svg id="Order_Details-Table-Delete_Btn" data-name="Order Details-Table-Delete_Btn" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="Group_247" data-name="Group 247" transform="translate(-990 -1514)">
+    <rect id="Rectangle_257" data-name="Rectangle 257" width="40" height="40" rx="4" transform="translate(990 1514)" fill="#700066"/>
+    <path id="Icon_material-delete" data-name="Icon material-delete" d="M9,28.5a3.009,3.009,0,0,0,3,3H24a3.009,3.009,0,0,0,3-3v-18H9ZM28.5,6H23.25l-1.5-1.5h-7.5L12.75,6H7.5V9h21Z" transform="translate(991.5 1516)" fill="#fff"/>
+  </g>
+</svg>

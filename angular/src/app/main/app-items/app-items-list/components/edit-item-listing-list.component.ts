@@ -418,14 +418,31 @@ export class EditItemListingListComponent
     }
     openMultiSelector() {
         this.sessionKey = this.guid();
-        const defaultMainFilter: ItemsFilterTypesEnum =
+     /*    const defaultMainFilter: ItemsFilterTypesEnum =
             ItemsFilterTypesEnum.MyListing;
         const pageMainFilters: SelectItem[] = [
             {
                 label: this.l("MyListings"),
                 value: ItemsFilterTypesEnum.MyListing,
             },
+        ]; */
+        const defaultMainFilter: ItemsFilterTypesEnum =
+        ItemsFilterTypesEnum.MyItems;
+        const pageMainFilters: SelectItem[] = [
+            {
+                label: this.l("MyProducts"),
+                value: ItemsFilterTypesEnum.MyItems,
+            },
+            {
+                label: 'My Own Products',
+                value: ItemsFilterTypesEnum.MyOwnedItems ,
+            },
+            {
+                label: 'My Partners Products',
+                value: ItemsFilterTypesEnum.MyPatrnersItems ,
+            },
         ];
+
         let options: Partial<AppItemsBrowseInputs> = {
             pageMainFilters,
             defaultMainFilter,
@@ -637,8 +654,8 @@ export class EditItemListingListComponent
     btnLoader: boolean = false;
     syncProduct() {
         this.btnLoader = true;
-        this._appItemsServiceProxy
-            .syncProduct(this.listId)
+        this._appItemsListsServiceProxy
+            .syncItemList(this.listId)
             .pipe(finalize(() => (this.btnLoader = false)))
             .subscribe((res: any) => {
                 console.log(">>", res);

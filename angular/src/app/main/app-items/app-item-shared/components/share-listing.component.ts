@@ -147,6 +147,7 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
+                    this.notify.success(this.l("shared Successfully"));
                 })
             )
             .subscribe((res: any) => {
@@ -159,6 +160,7 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
+                    this.notify.success(this.l("shared Successfully"));
                 })
             )
             .subscribe((res: any) => {

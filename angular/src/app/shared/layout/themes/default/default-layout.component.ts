@@ -32,6 +32,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     remoteServiceBaseUrl: string = AppConsts.remoteServiceBaseUrl;
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
     accountSummary:any;
+    openSideBar:boolean;
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
@@ -51,6 +52,9 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
             this.accountSummary = result;
         })
     }
+    onupdateAccountSummary($event){
+        this.accountSummary=$event;
+    }
     marketPlaceUrl : string = "marketplace"
     subscribeToMarketPlace(){
         const url = this._router.url
@@ -68,5 +72,8 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     }
     checkIsCurrentUrlMarketPlace(url:string){
         this.displayMarketPlace = url.includes(this.marketPlaceUrl)
+    }
+    onOpenSideBar($event:boolean){
+        this.openSideBar=$event
     }
 }
