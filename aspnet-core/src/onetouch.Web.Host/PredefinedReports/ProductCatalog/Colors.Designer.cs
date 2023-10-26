@@ -117,7 +117,7 @@
             // 
             // BottomMargin
             // 
-            this.BottomMargin.HeightF = 0F;
+            this.BottomMargin.HeightF = 0.3151576F;
             this.BottomMargin.Name = "BottomMargin";
             // 
             // sqlDataSource1
@@ -216,8 +216,9 @@
             this.label9,
             this.pictureBox3,
             this.xrLabel2});
-            this.PageHeader.HeightF = 97.43398F;
+            this.PageHeader.HeightF = 64.10067F;
             this.PageHeader.Name = "PageHeader";
+            this.PageHeader.PrintOn = DevExpress.XtraReports.UI.PrintOnPages.NotWithReportFooter;
             // 
             // pageInfo3
             // 
@@ -303,7 +304,7 @@
             this.GroupHeader1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrLabel3});
             this.GroupHeader1.Font = new DevExpress.Drawing.DXFont("Arial", 12F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.GroupHeader1.HeightF = 31.8903F;
+            this.GroupHeader1.HeightF = 127F;
             this.GroupHeader1.KeepTogether = true;
             this.GroupHeader1.Name = "GroupHeader1";
             this.GroupHeader1.RepeatEveryPage = true;
@@ -318,11 +319,11 @@
             this.xrLabel3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "?ColorPageShowCategory==TRUE AND Upper(?ColorPageSort)==\'MATERIALCONTENT\'"),
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(IsNullOrEmpty([MeterialContent]),\'None\' ,[MeterialContent] )")});
-            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(408.6209F, 0F);
+            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(49.24586F, 38.54167F);
             this.xrLabel3.Multiline = true;
             this.xrLabel3.Name = "xrLabel3";
             this.xrLabel3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrLabel3.SizeF = new System.Drawing.SizeF(306.4232F, 26.19932F);
+            this.xrLabel3.SizeF = new System.Drawing.SizeF(993.9233F, 26.19932F);
             this.xrLabel3.StylePriority.UseBackColor = false;
             this.xrLabel3.StylePriority.UseTextAlignment = false;
             this.xrLabel3.Text = "xrLabel3";
@@ -332,8 +333,9 @@
             // 
             this.Detail.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrPanel1});
-            this.Detail.HeightF = 137.5F;
-            this.Detail.MultiColumn.ColumnCount = 9;
+            this.Detail.HeightF = 130.4619F;
+            this.Detail.KeepTogether = true;
+            this.Detail.MultiColumn.ColumnCount = 8;
             this.Detail.MultiColumn.Layout = DevExpress.XtraPrinting.ColumnLayout.AcrossThenDown;
             this.Detail.MultiColumn.Mode = DevExpress.XtraReports.UI.MultiColumnMode.UseColumnCount;
             this.Detail.Name = "Detail";
@@ -344,9 +346,9 @@
             this.xrPanel1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.pictureBox1,
             this.label3});
-            this.xrPanel1.LocationFloat = new DevExpress.Utils.PointFloat(7.371025F, 0F);
+            this.xrPanel1.LocationFloat = new DevExpress.Utils.PointFloat(2.369995F, 0F);
             this.xrPanel1.Name = "xrPanel1";
-            this.xrPanel1.SizeF = new System.Drawing.SizeF(104.8512F, 127.5F);
+            this.xrPanel1.SizeF = new System.Drawing.SizeF(132F, 130F);
             // 
             // pictureBox1
             // 
@@ -355,9 +357,9 @@
             this.pictureBox1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "ImageUrl", "[Attachment]")});
             this.pictureBox1.KeepTogether = false;
-            this.pictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(10F, 7.992325F);
+            this.pictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(11.91817F, 5.538086F);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.SizeF = new System.Drawing.SizeF(87.79526F, 87.8F);
+            this.pictureBox1.SizeF = new System.Drawing.SizeF(90.21F, 87.8F);
             this.pictureBox1.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
             this.pictureBox1.StylePriority.UseBackColor = false;
             this.pictureBox1.StylePriority.UseBorders = false;
@@ -367,16 +369,15 @@
             this.label3.BorderColor = System.Drawing.Color.Transparent;
             this.label3.Borders = DevExpress.XtraPrinting.BorderSide.Left;
             this.label3.BorderWidth = 2F;
-            this.label3.CanGrow = false;
             this.label3.CanShrink = true;
             this.label3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Name]")});
-            this.label3.Font = new DevExpress.Drawing.DXFont("Arial", 10.2F, DevExpress.Drawing.DXFontStyle.Bold);
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Code]+\'-\'+[Name]")});
+            this.label3.Font = new DevExpress.Drawing.DXFont("Arial", 9F);
             this.label3.ForeColor = System.Drawing.Color.Black;
-            this.label3.LocationFloat = new DevExpress.Utils.PointFloat(4.28817F, 95.79233F);
+            this.label3.LocationFloat = new DevExpress.Utils.PointFloat(0.9999998F, 93.33809F);
             this.label3.Name = "label3";
             this.label3.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 6, 0, 0, 100F);
-            this.label3.SizeF = new System.Drawing.SizeF(96.145F, 23.62203F);
+            this.label3.SizeF = new System.Drawing.SizeF(130F, 36.66191F);
             this.label3.StylePriority.UseBorderColor = false;
             this.label3.StylePriority.UseBorders = false;
             this.label3.StylePriority.UseBorderWidth = false;
@@ -388,12 +389,12 @@
             // 
             // PageFooter
             // 
-            this.PageFooter.HeightF = 30.05072F;
+            this.PageFooter.HeightF = 0F;
             this.PageFooter.Name = "PageFooter";
             // 
             // GroupFooter1
             // 
-            this.GroupFooter1.HeightF = 22.75906F;
+            this.GroupFooter1.HeightF = 1.768112F;
             this.GroupFooter1.KeepTogether = true;
             this.GroupFooter1.Level = 1;
             this.GroupFooter1.Name = "GroupFooter1";
@@ -414,7 +415,7 @@
             this.DataSource = this.sqlDataSource1;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Landscape = true;
-            this.Margins = new DevExpress.Drawing.DXMargins(0F, 0F, 0F, 0F);
+            this.Margins = new DevExpress.Drawing.DXMargins(0F, 0F, 0F, 0.3151576F);
             this.PageHeight = 850;
             this.PageWidth = 1100;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
