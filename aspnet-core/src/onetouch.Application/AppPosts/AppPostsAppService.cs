@@ -257,10 +257,12 @@ namespace onetouch.AppPosts
                 var filteredAppPosts = _appPostRepository.GetAll()
                         .Include(e => e.AppContactFk)
                         .Include(e => e.AppEntityFk)
-                        .Where(x => x.AppEntityFk.EntityObjectTypeId == entityType &&
-                         (x.CreationTime.Date  >= DateTime.Now.Date.AddDays(-1 * noOfDays)
-                         && x.CreationTime.Date <= DateTime.Now.Date)).OrderByDescending  (a=>a.CreationTime).Take(noOfPosts);
-
+                        //T-SII-20230917.0001,1 MMT 09/19/2023 Display Top new disgest without filtering on date[T-SII-20230917.0001][Start]
+                        //.Where(x => x.AppEntityFk.EntityObjectTypeId == entityType &&
+                        // (x.CreationTime.Date  >= DateTime.Now.Date.AddDays(-1 * noOfDays)
+                        // && x.CreationTime.Date <= DateTime.Now.Date)).OrderByDescending  (a=>a.CreationTime).Take(noOfPosts);
+                        .Where(x => x.AppEntityFk.EntityObjectTypeId == entityType).OrderByDescending(a => a.CreationTime).Take(noOfPosts);
+                //T-SII-20230917.0001,1 MMT 09/19/2023 Display Top new disgest without filtering on date[T-SII-20230917.0001][End]
                 var appPosts = from o in filteredAppPosts
                                join o1 in _lookup_appContactRepository.GetAll() on o.AppContactId equals o1.Id into j1
                                from s1 in j1.DefaultIfEmpty()

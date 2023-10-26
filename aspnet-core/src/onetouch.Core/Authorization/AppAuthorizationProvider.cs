@@ -72,6 +72,8 @@ namespace onetouch.Authorization
             autotaskQueues.CreateChildPermission(AppPermissions.Pages_AutotaskQueues_Edit, L("EditAutotaskQueue"), multiTenancySides: MultiTenancySides.Host);
             autotaskQueues.CreateChildPermission(AppPermissions.Pages_AutotaskQueues_Delete, L("DeleteAutotaskQueue"), multiTenancySides: MultiTenancySides.Host);
 
+            var appSiiwiiTransactions = pages.CreateChildPermission(AppPermissions.Pages_AppSiiwiiTransactions, L("AppSiiwiiTransactions"), multiTenancySides: MultiTenancySides.Tenant);
+
             var appItems = pages.CreateChildPermission(AppPermissions.Pages_AppItems, L("AppItems"), multiTenancySides: MultiTenancySides.Tenant);
             appItems.CreateChildPermission(AppPermissions.Pages_AppItems_Create, L("CreateNewAppItem"), multiTenancySides: MultiTenancySides.Tenant);
             appItems.CreateChildPermission(AppPermissions.Pages_AppItems_Edit, L("EditAppItem"), multiTenancySides: MultiTenancySides.Tenant);

@@ -76,7 +76,7 @@ namespace onetouch.AppItems.Dtos
         public List<AppItemPriceInfo> AppItemPriceInfos { get; set; }
         public List<AppItemSizesScaleInfo> AppItemSizesScaleInfo { get; set;}
         public string OriginalCode { get; set; }
-        public long SycIdentifierId { get; set; }
+        public long? SycIdentifierId { get; set; }
         //MMT
     }
     //MMT
@@ -88,6 +88,7 @@ namespace onetouch.AppItems.Dtos
         public virtual string CurrencyCode { get; set; }
         public virtual string CurrencySymbol { get; set; }
         public virtual string CurrencyName { get; set; }
+        public virtual bool IsDefault { set; get; }
     }
     public class AppItemSizesScaleInfo : AppSizeScaleDto
     {

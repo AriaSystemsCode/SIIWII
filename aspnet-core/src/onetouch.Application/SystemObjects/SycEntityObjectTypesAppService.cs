@@ -660,6 +660,25 @@ namespace onetouch.SystemObjects
                 }).ToListAsync();
         }
 
+        //[AbpAuthorize(AppPermissions.Pages_SycEntityObjectTypes)]
+        [AbpAllowAnonymous]
+        public async Task<List<SycEntityObjectTypeSycEntityObjectTypeLookupTableDto>> GetSycEntityObjectTypeForObjectAsTableDropdown(string objectCode)
+        {
+            try
+            {
+                var objectId = _lookup_sydObjectRepository.GetAll().Where(e => e.Code == objectCode).FirstOrDefault();
+                return await _lookup_sycEntityObjectTypeRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId || x.TenantId == null && x.ObjectId == objectId.Id)
+                    .Select(sycEntityObjectType => new SycEntityObjectTypeSycEntityObjectTypeLookupTableDto
+                    {
+                        Id = sycEntityObjectType.Id,
+                        DisplayName = sycEntityObjectType.Name.ToString()
+                    }).ToListAsync();
+            }
+            catch (Exception ex) {
+                return new List<SycEntityObjectTypeSycEntityObjectTypeLookupTableDto>();
+            }
+        }
+
         [AbpAuthorize(AppPermissions.Pages_SycEntityObjectTypes)]
         public async Task<PagedResultDto<SycEntityObjectTypeSycIdentifierDefinitionLookupTableDto>> GetAllSycIdentifierDefinitionForLookupTable(onetouch.SystemObjects.Dtos.GetAllForLookupTableInput input)
         {

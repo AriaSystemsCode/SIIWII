@@ -32,7 +32,9 @@ namespace onetouch.SystemObjects
 		Task<List<SycEntityObjectTypeSydObjectLookupTableDto>> GetAllSydObjectForTableDropdown();
 		
 		Task<List<SycEntityObjectTypeSycEntityObjectTypeLookupTableDto>> GetAllSycEntityObjectTypeForTableDropdown();
-		Task<PagedResultDto<SycEntityObjectTypeSycIdentifierDefinitionLookupTableDto>> GetAllSycIdentifierDefinitionForLookupTable(onetouch.SystemObjects.Dtos.GetAllForLookupTableInput input);
+		Task<List<SycEntityObjectTypeSycEntityObjectTypeLookupTableDto>> GetSycEntityObjectTypeForObjectAsTableDropdown(string objectCode);
+
+        Task<PagedResultDto<SycEntityObjectTypeSycIdentifierDefinitionLookupTableDto>> GetAllSycIdentifierDefinitionForLookupTable(onetouch.SystemObjects.Dtos.GetAllForLookupTableInput input);
 		Task<SelectItemDto[]> GetAllParentsIds();
 
 	}

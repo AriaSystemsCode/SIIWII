@@ -29,6 +29,7 @@ namespace onetouch.AppMarketplaceItems
         [ForeignKey("CurrencyId")]
         public virtual AppEntity CurrencyFk { get; set; }
         [ForeignKey("AppMarketplaceItemId")]
-        public virtual AppMarketplaceItem AppItemFk { get; set; }
+        public virtual AppMarketplaceItems AppItemFk { get; set; }
+        public virtual bool IsDefault { set; get; }
     }
 }

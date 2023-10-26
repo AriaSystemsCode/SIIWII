@@ -31,5 +31,6 @@ namespace onetouch.AppItems
         public virtual AppEntity CurrencyFk { get; set; }
         [ForeignKey("AppItemId")]
         public virtual AppItem AppItemFk { get; set; }
+        public virtual bool IsDefault { set; get; }
     }
 }
