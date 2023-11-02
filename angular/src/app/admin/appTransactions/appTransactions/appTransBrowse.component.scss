@@ -1,0 +1,23 @@
+@import "../../../../assets/styles/base/variables";
+
+.list-toolbar-divider {
+    width: 2px;
+    height: 38px;
+    border-left: 1px dashed $grey-2 !important;
+}
+
+.searchBtn {
+    padding: 5px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    right: 0px;
+    background-color: #f88011;
+}
+
+.searchBtn:hover {
+    border: none;
+    background-color: #f88011;
+}
+
+

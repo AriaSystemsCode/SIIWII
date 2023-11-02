@@ -1,5 +1,5 @@
 ﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, AfterViewInit, } from '@angular/core';
-import { AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ActivatedRoute } from '@angular/router';
@@ -68,6 +68,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     allPhoneTypes: LookupLabelDto[];
     allCurrencies: LookupLabelDto[];
+    allCurrenciesDto: CurrencyInfoDto[];
     allLanguages: LookupLabelDto[];
     allPriceLevel: SelectItem[] = [];
     accountTypes: SelectItem[] = [];
@@ -313,6 +314,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         });
     }
 
+    getCurrenciesDto(){
+        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
+            this.allCurrenciesDto = result;
+        });
+    }
+
     getAccountType(){
         this._AccountsServiceProxy.getMyAccountForEdit().subscribe((result) => {
             this.accountInfoTemp.accountType=result.accountInfo.accountType;
@@ -355,10 +362,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     loadInitData(){
-        this.defineAccountTypes()
-        this.getLanguages()
-        this.getCurrencies()
-        this.getPhoneTypes()
+        this.defineAccountTypes();
+        this.getLanguages();
+        this.getCurrencies();
+        this.getCurrenciesDto();
+        this.getPhoneTypes();
        this.allPriceLevel= this.getPriceLevel();
        this.getAccountTypes();
     }
@@ -399,6 +407,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             this.loadInitData()
         }
         const result = await this._AccountsServiceProxy.getMyAccountForEdit().toPromise()
+        
         if(result){
             this.getForEditResult = result
             this.accountInfoOldCurrencyId= this.getForEditResult.accountInfo.currencyId;
@@ -674,7 +683,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 this.touched = false
                 this.notify.success(this.l('SavedSuccessfully'));
                 // call get account of edit and on the subscribe call the 3 following lines
-                if(!this.accountInfoTemp.id || this.changeCurrency) return location.reload();
+                //if(!this.accountInfoTemp.id || this.changeCurrency) return location.reload();
+                this.appSession.tenant.currencyInfoDto = this.allCurrenciesDto.filter(e=> e.value = this.accountInfoTemp.currencyId)[0];
+                this.tenantDefaultCurrency =  this.allCurrenciesDto.filter(e=> e.value = this.accountInfoTemp.currencyId)[0];       
                 this.displaySaveAccount = true;
                 this.canPublish=true;
                 this.getForEditResult.lastChangesIsPublished = false

@@ -1,0 +1,48 @@
+.card {
+    border-radius: 0% !important;
+    width: 15rem;
+    cursor: pointer;
+    .img {
+        height: 225px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        padding: 10px !important;
+
+        .ssin {
+            color: #B8B8B8;
+            font-size: 13px;
+        }
+
+        .desc {
+            color: #707070
+        }
+
+        .name-price {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .seller {
+                font-size: 11px;
+                text-decoration: underline;
+                color: #B8B8B8;
+            }
+
+            .price {
+                color: #707070;
+                font-weight: bold;
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+
+@media only screen and (max-width: 600px) {
+    .card {
+        border-radius: 0% !important;
+        width: 100%;
+    }
+}

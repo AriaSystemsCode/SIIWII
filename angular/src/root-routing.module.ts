@@ -82,7 +82,7 @@ export class RootRoutingModule {
             classesToRemember += ' swal2-toast-shown';
         }
 
-        document.body.className = this._uiCustomizationService.getAccountModuleBodyClass() + ' ' + classesToRemember;
+      //  document.body.className = this._uiCustomizationService.getAccountModuleBodyClass() + ' ' + classesToRemember;
     }
 
     getSetting(key: string): string {

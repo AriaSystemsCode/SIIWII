@@ -127,7 +127,7 @@ function initializeAppCssClasses(injector: Injector, theme: UiCustomizationSetti
     if (abp.session.userId) {
         document.body.className = appUiCustomizationService.getAppModuleBodyClass();
     } else {
-        document.body.className = appUiCustomizationService.getAccountModuleBodyClass();
+     //   document.body.className = appUiCustomizationService.getAccountModuleBodyClass();
     }
 }
 

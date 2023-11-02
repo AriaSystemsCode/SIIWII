@@ -318,7 +318,7 @@
                             ></button>
                         </div>
                         <div class="last-updated  my-3 d-flex align-items-center gap-3 justify-content-end w-100">
-                         <p >  Last Updated  {{lastUpdatedDate}} </p>
+                         <p >  Last Edit  {{lastUpdatedDate | date: 'MMM d, y, h:mm a':"+timezoneOffset"}} </p>
                         </div>
                         <div class="header">
                             [{{ appItemForViewDto?.code }}]

@@ -16,3 +16,18 @@ textarea{
 .wrapper {
     gap: 20px;
 }
+button.send-comment-icon {
+    color: #F88011;
+    font-size: 20px;
+    border: none;
+    outline: none;
+    float: right;
+    margin-top: -41px;
+    z-index: 100;
+    position: relative;
+    background-color: transparent;
+    margin-right: 6px;
+}
+button.send-comment-icon[disabled]{
+    color:#f8ab64;
+}

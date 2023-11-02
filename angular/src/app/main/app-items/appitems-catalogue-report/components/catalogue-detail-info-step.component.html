@@ -1,5 +1,5 @@
 <div class="h-100">
-    <app-catalogue-report-cover-page-step (searchAccount)="searchAccounts($event)" [accounts]="accounts"
+    <app-catalogue-report-cover-page-step (searchAccount)="searchAccounts($event)" [accounts]="accounts"  (linesheetName)="setLinesheetName($event)"
         [printInfoParam]="printInfoParam" class="h-75">
     </app-catalogue-report-cover-page-step>
 </div>
@@ -209,7 +209,7 @@
         <i class="fa-arrow-left fas ml-3"></i>
         {{ "Previous" | localize }}
     </button>
-    <button class="btn btn-primary" (click)="continueToNextStep()">
+    <button class="btn btn-primary" (click)="continueToNextStep()" [disabled]="!linesheetName && !printInfoParam?.reportTitle">
         {{ "Continue" | localize }}
         <i class="fa-arrow-right fas ml-3"></i>
     </button>

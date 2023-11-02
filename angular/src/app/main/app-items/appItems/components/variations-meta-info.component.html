@@ -4,10 +4,10 @@
     <div class="col text-left font-weight-bold">{{variations?.length}}</div>
 </div>
 <div class="row mb-2" *ngFor="let extraAttr of selectedVariations | keyvalue">
-    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right">
+    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE'">
         {{extraAttr?.key}}:
     </div>
-    <div class="col text-left font-weight-bold">{{extraAttr?.value | arrayToString}}</div>
+    <div class="col text-left font-weight-bold"  *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE'">{{extraAttr?.value | arrayToString}}</div>
 </div>
 <div class="row mb-2" *ngIf="showPriceRange && minPrice != maxPrice">
     <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" >

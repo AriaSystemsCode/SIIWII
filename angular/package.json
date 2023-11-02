@@ -1,7 +1,7 @@
 {
   "name": "siwii",
   "uniqueName": "SIWII",
-  "version": "8.7.42",
+  "version": "8.7.46",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {

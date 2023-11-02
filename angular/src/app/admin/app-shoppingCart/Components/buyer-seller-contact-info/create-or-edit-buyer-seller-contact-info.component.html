@@ -1,0 +1,52 @@
+<div class="position-relative">
+    <div *ngIf="activeTab == shoppingCartoccordionTabs.BuyerContactInfo ? createOrEditbuyerContactInfo : createOrEditSellerContactInfo">
+        <div class="container-fluid InfoForm thin-scroll">
+            <div class="header p-2 my-2 d-flex align-items-center justify-content-between">
+                <h6><span class="headertxt"> Company & Contact Information : </span></h6>
+                <div>
+                    <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
+                        *ngIf="!showSaveBtn " class="continuebtn text-center btn float-right">
+                        Continue
+                    </button>
+                    <button *ngIf="showSaveBtn" (click)="save()"
+                        class="previewbtn text-center btn float-right">
+                        Save
+                        <i class="pi pi-check"></i>
+                    </button>
+                    <button
+                    *ngIf="showSaveBtn"
+                    (click)="cancel()"
+                    class="cancelbtn text-center btn float-right"
+                >
+                    Cancel
+                    <i class="pi pi-times"></i>
+                </button>
+                </div>
+            </div>
+            <hr class="my-2" />
+            <div class="pr-3">
+                <div class="row ml-1">
+                    <app-contact class="w-100"
+                        [isCreateOrEdit]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo ? createOrEditbuyerContactInfo : createOrEditSellerContactInfo"
+                        [activeTab]="activeTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
+                        (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                        (formValidityChanged)="isContactFormValid($event)"
+                        [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"></app-contact>
+                </div>
+            </div>
+            <hr class="my-2" />
+        </div>
+    </div>
+    
+    
+    <div *ngIf="activeTab == shoppingCartoccordionTabs.BuyerContactInfo ? !createOrEditbuyerContactInfo : !createOrEditSellerContactInfo">
+    <app-view-buyer-seller-contact-info
+    [activeTab]="activeTab"
+    [isCreateOrEdit]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo ? createOrEditbuyerContactInfo : createOrEditSellerContactInfo"
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    (showBuyer_sellerEditMode)="onshowBuyer_sellerEditMode($event)"
+    (onshowSaveBtn)="onshowSaveBtn($event)"></app-view-buyer-seller-contact-info>
+    </div>
+    </div>
+    
+    

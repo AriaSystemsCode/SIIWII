@@ -1,0 +1,50 @@
+.InfoForm{
+    max-height: 550px;
+    overflow: hidden scroll;
+}
+.previewbtn{
+    background-color: #f88011;
+    color: #fff;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 9999;
+}
+ 
+.savebtn{
+    background-color: #700066;
+    color: #fff;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 9999;
+}
+.headertxt{
+    color: #F88011 !important;
+}
+
+.label{
+    font-size: 12px;
+    color: #700066;
+    font-weight: 600;
+}
+
+
+.groupForm{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.previewTitle{
+    color: #700066;
+    font-weight: 600;
+}
+
+.previewValue{
+    color: #700066;
+}
+.customPlaceHolder{
+    color:#666666 ;
+    font-size: 13px;
+}

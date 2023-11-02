@@ -547,3 +547,76 @@ div.cropper span.resize-bar {
 .iti__flag-container {
     direction: ltr;
 }
+
+
+
+.orderForm{
+    .header{
+        span{
+            color: #f6851d
+        }
+    }
+}
+
+.savebtn{
+    background-color: #700066;
+    color: #fff;
+}
+
+.previewbtn{
+    background-color: #f88011;
+    color: #fff;
+}
+
+.label{
+    font-size: 12px;
+    color: #700066;
+    font-weight: 600;
+}
+
+.groupForm{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.previewTitle{
+    color: #700066;
+    font-weight: 600;
+}
+
+.previewValue{
+    color: #700066;
+}
+
+
+::ng-deep{
+    .p-treeselect{
+        width: 100% !important;
+    }
+    .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label {
+        background-color: #3699FF !important;
+        color: #FFFFFF !important;
+    }
+    .p-calendar {
+        position: relative;
+        display: inline-flex;
+        /* max-width: 100%; */
+        width: 100% !important;
+    }
+    .p-calendar-w-btn .p-datepicker-trigger {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        background: #700066;
+        border-color: #700066;
+    }
+}
+
+.classificationsValues{
+    background-color: #ffe2c7;
+    color: #f89c28;
+    border-radius: 2px;
+    padding: 5px 10px !important;
+    margin-right: 5px !important;
+    font-size: 8px;
+}

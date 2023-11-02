@@ -1,7 +1,305 @@
-<div class="mt-5">
-    <app-app-items
-        #AppItemsBrowseComponent
-        (eventTriggered)="viewProductHandler($event)"
-        >
-    </app-app-items>
+<div
+    [@routerTransition]
+    style="margin-top: -50px"
+    class="wrapper kt-container web"
+>
+    <div
+        class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
+    >
+        <div class="marketplace-products">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
+                </div>
+                <div class="col-md-12">
+                    <div
+                        class="d-flex align-items-center justify-content-between"
+                    >
+                        <div class="share">
+                            <p-dropdown
+                                [options]="sharingOptions"
+                                [(ngModel)]="seletedOption"
+                                optionLabel="label"
+                                class="shares"
+                                (onChange)="handleSharingLevelsOptions($event)"
+                            ></p-dropdown>
+                        </div>
+                        <div
+                            class="sarch d-flex align-items-center justify-content-center"
+                            style="gap: 5px"
+                        >
+                            <p-dropdown
+                                [options]="currencies"
+                                [(ngModel)]="selectedCurrrency"
+                                optionLabel="code"
+                                class="w-50"
+                                (onChange)="handleCurrencyChange($event)"
+                            ></p-dropdown>
+                            <span class="p-input-icon-right w-100">
+                                <i class="pi pi-search"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Search"
+                                    pInputText
+                                    class="w-100"
+                                    [(ngModel)]="searchInput"
+                                    style="width: 380px !important"
+                                    (keyup)="handleProductSearchText()"
+                                />
+                            </span>
+                        </div>
+                        <div
+                            class="sort d-flex align-items-center justify-content-end"
+                            style="gap: 5px"
+                        >
+                            <p-button
+                                icon="pi pi-sliders-h"
+                                [label]="
+                                    isFilterHidden
+                                        ? 'Show Filters '
+                                        : 'Hide Filters'
+                                "
+                                (click)="toggleFilters()"
+                                styleClass="p-button-outlined p-button-secondary"
+                            ></p-button>
+
+                            <p-dropdown
+                                [options]="sortingData"
+                                [(ngModel)]="selectedSort"
+                                placeholder="Sort by"
+                                optionLabel="label"
+                                (onChange)="handleSortingChange($event)"
+                            ></p-dropdown>
+                            <p-button
+                                icon="pi pi-refresh"
+                                (click)="resetProducts($event)"
+                                styleClass="p-button-outlined p-button-secondary"
+                            ></p-button>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!isFilterHidden" class="col-md-3 my-3 text-dark">
+                    <app-product-filters
+                        [isSellerIdExists]="isSellerIdExists"
+                        (handleCatalogSelections)="selectCatalog($event)"
+                        (handledeDratmentsTreeSelections)="
+                            selectDepartment($event)
+                        "
+                        (handleStartPrice)="setPriceFrom($event)"
+                        (handleEndPrice)="setPriceTo($event)"
+                        (handleStockSiwtch)="swtichStock($event)"
+                        (handleStartShipDate)="setStartShipDate($event)"
+                        (handleEndShipDate)="setEndtShipDate($event)"
+                        (handleSatrtsoldOutDate)="setStartSoldOutDate($event)"
+                        (handleEndSoldOutDate)="setEndSoldOutDate($event)"
+                        (handleBrandsSelection)="selectBrands($event)"
+                        #filters
+                    ></app-product-filters>
+                </div>
+
+                <div
+                    [ngClass]="!isFilterHidden ? 'col-md-9' : 'col-md-12'"
+                    class="my-3"
+                >
+                    <div class="row">
+                        <div
+                            class="my-2"
+                            [ngClass]="
+                                !isFilterHidden ? 'col-md-3' : 'col-md-2'
+                            "
+                            *ngFor="let product of items"
+                        >
+                            <app-prodcut-card
+                                [currency]="currency"
+                                [product]="product.appItem"
+                                [sellerSSIN]="sellerSSIN"
+                                [buyerSSIN]="buyerSSIN"
+                                [isSellerIdExists]="isSellerIdExists"
+                            ></app-prodcut-card>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="">
+                        <p-paginator
+                            (onPageChange)="onPageChange($event)"
+                            [first]="skipCount"
+                            [rows]="maxResultCount"
+                            [totalRecords]="pagesNumber"
+                            [rowsPerPageOptions]="[10, 20, 30]"
+                            #p
+                        ></p-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- mobile ui design -->
+<div class="mobile">
+    <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
+    <div class="container-fluid">
+        <div class="quickFilters">
+            <button
+                (click)="openFiltersDialog('Shared With Me and Public')"
+                class="filter-btn"
+            >
+                Shared With Me and Public
+            </button>
+            <span class="p-input-icon-right w-100">
+                <i class="pi pi-search"></i>
+                <input
+                    type="text"
+                    placeholder="Search"
+                    pInputText
+                    class="w-100"
+                    [(ngModel)]="searchInput"
+                    (keyup)="handleProductSearchText()"
+                />
+            </span>
+        </div>
+        <div class="btn-filters">
+            <button
+                (click)="openFiltersDialog('Select Currency')"
+                class="filter-btn w-25"
+            >
+                {{ selectedCurrrency.code }}
+            </button>
+            <button
+                class="filter-btn w-50"
+                (click)="openFiltersDialog('Filter By')"
+            >
+                Filter By
+            </button>
+            <button
+                class="filter-btn w-25"
+                (click)="openFiltersDialog('Sort By')"
+            >
+                Sort By
+            </button>
+            <p-button
+                icon="pi pi-refresh"
+                (click)="resetProducts($event)"
+                styleClass="p-button-outlined p-button-secondary"
+            ></p-button>
+        </div>
+        <!-- list All products -->
+        <div class="row">
+            <div class="col-6 col-md-4 my-2" *ngFor="let product of items">
+                <app-prodcut-card
+                    [currency]="currency"
+                    [product]="product.appItem"
+                    [sellerSSIN]="sellerSSIN"
+                    [buyerSSIN]="buyerSSIN"
+                ></app-prodcut-card>
+            </div>
+            <div class="col-md-12">
+                <div class="">
+                    <p-paginator
+                        (onPageChange)="onPageChange($event)"
+                        [first]="skipCount"
+                        [rows]="maxResultCount"
+                        [totalRecords]="pagesNumber"
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                    ></p-paginator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- mobile filters dialog -->
+<p-dialog
+    [style]="{ width: '40vw' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
+    [baseZIndex]="10000"
+    [modal]="true"
+    [header]="filterType"
+    [(visible)]="displayFitlers"
+    [draggable]="false"
+    [closable]="true"
+    position="bottom"
+    (onHide)="cancel()"
+>
+    <!-- sharing option filters -->
+    <div
+        class="flex flex-column gap-3"
+        *ngIf="filterType === 'Shared With Me and Public'"
+    >
+        <div
+            *ngFor="let option of sharingOptions"
+            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3"
+        >
+            <label [for]="option.value" class="ml-2">{{ option.label }}</label>
+            <p-radioButton
+                [inputId]="option.value"
+                name="label"
+                class="px-3"
+                [value]="option"
+                [(ngModel)]="seletedOption"
+            ></p-radioButton>
+        </div>
+    </div>
+
+    <!-- currency Filters -->
+    <div
+        class="flex flex-column gap-3"
+        style="overflow-y: scroll; height: 200px"
+        *ngIf="filterType === 'Select Currency'"
+    >
+        <div
+            *ngFor="let currency of currencies"
+            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3"
+        >
+            <label [for]="currency.code" class="ml-2">{{
+                currency.code
+            }}</label>
+            <p-radioButton
+                [inputId]="currency.code"
+                name="code"
+                class="px-3"
+                [value]="currency"
+                [(ngModel)]="selectedCurrrency"
+            ></p-radioButton>
+        </div>
+    </div>
+
+    <!-- sort by -->
+    <div class="flex flex-column gap-3" *ngIf="filterType === 'Sort By'">
+        <div
+            *ngFor="let sort of sortingData"
+            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3"
+        >
+            <label [for]="sort.value" class="ml-2">{{ sort.label }}</label>
+            <p-radioButton
+                [inputId]="sort.value"
+                name="label"
+                class="px-3"
+                [value]="sort"
+                [(ngModel)]="selectedSort"
+            ></p-radioButton>
+        </div>
+    </div>
+
+    <div *ngIf="filterType === 'Filter By'">
+        <app-product-filters
+            [isSellerIdExists]="isSellerIdExists"
+            (handleCatalogSelections)="selectCatalog($event)"
+            (handledeDratmentsTreeSelections)="selectDepartment($event)"
+            (handleStartPrice)="setPriceFrom($event)"
+            (handleEndPrice)="setPriceTo($event)"
+            (handleStockSiwtch)="swtichStock($event)"
+            (handleStartShipDate)="setStartShipDate($event)"
+            (handleEndShipDate)="setEndtShipDate($event)"
+            (handleSatrtsoldOutDate)="setStartSoldOutDate($event)"
+            (handleEndSoldOutDate)="setEndSoldOutDate($event)"
+            (handleBrandsSelection)="selectBrands($event)"
+            #filters
+        ></app-product-filters>
+    </div>
+
+    <div class="w-100 text-center">
+        <button class="apply" (click)="applyFilters()">Apply filters</button>
+    </div>
+</p-dialog>
