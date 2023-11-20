@@ -1,0 +1,39 @@
+<div [ngClass]="{'kt-grid kt-grid--ver kt-grid--root': !useFullWidthLayout(), 'kt-content': useFullWidthLayout() }" [style.text-align]="useFullWidthLayout() ? 'center' : 'left'">
+    <div [ngClass]="{'kt-grid kt-grid--hor kt-grid--root  kt-login kt-login--v1': !useFullWidthLayout(), 'row':useFullWidthLayout()}" id="kt_login">
+        <div [ngClass]="{'kt-grid__item kt-grid__item--fluid kt-grid kt-grid--desktop kt-grid--ver-desktop kt-grid--hor-tablet-and-mobile': !useFullWidthLayout(), 'col-md-12': useFullWidthLayout()}">
+            <div class="account-logo-lg  kt-grid__item kt-grid__item--order-tablet-and-mobile-2 kt-grid kt-grid--hor kt-login__aside" *ngIf="!useFullWidthLayout()" style="background-image: url('/assets/metronic/common/images/bg/Login_BGimage.svg');">
+                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
+                    <div class="kt-grid__item kt-grid__item--middle">
+                        <div class="align-items-center d-flex logos">
+                            <a (click)="goToHome()" >
+                                <img class="main-logo-image" *ngIf="!appSession.tenant || !appSession.tenant.logoId" [src]="appRootUrl() + 'assets/common/images/app-logo-on-dark.svg'" alt="logo" height="38" />
+                                <img class="main-logo-image" *ngIf="appSession.tenant && appSession.tenant.logoId" [src]="remoteServiceBaseUrl + '/TenantCustomization/GetTenantLogo?skin=light&tenantId=' + appSession.tenant.id + '&id=' + appSession.tenant.logoId" alt="logo" height="38" />
+                            </a>
+                            <img class="main-logo-image-text" [src]="appRootUrl() + 'assets/common/images/app-logo-text-on-light.svg'" alt="logo" height="38" />
+                        </div>
+                        <h4 class="kt-login__subtitle">{{ "TheGlobalApparelB2BNetwork." | localize }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="account-logo-sm"  
+            > 
+                <img class="w-100"
+                 src="../../assets/accounts/SignUp_TopBanner_Purple.png"  >
+                </div>
+
+            <div class="kt-grid__item kt-grid__item--fluid  kt-grid__item--order-tablet-and-mobile-1  kt-login__wrapper d-block pl-5 pr-5 pl-sm-0 pr-sm-0">
+                <div class="kt-login__head  mt-3 mr-auto ml-auto text-right  d-flex flex-row-reverse">
+                    <language-switch></language-switch>
+                </div>
+
+                <div class="kt-login__body d-block mt-3 mr-auto ml-auto">
+                    <div *ngIf="showTenantChange()" class="kt-login__signup-label tenant-change-box text-center">
+                        <tenant-change class="d-none"></tenant-change>
+                    </div>
+                    <router-outlet ></router-outlet>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

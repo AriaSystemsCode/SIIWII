@@ -1,0 +1,124 @@
+
+<div  [@routerTransition]>
+    <div>
+        <div>
+            <div class="kt-portlet m-0">
+                <div>
+                    <div>
+                        
+                        <div class="kt-pricing-1__items row FreeEdition_Container">
+                        <div class=" FreeEdition_Purple_Logo-sm"   
+                        > 
+                            <img class="w-100"
+                            src="../../assets/accounts/SignUp_TopBanner_White.png"  >
+                            </div>
+                           <!--  <div class="FreeEdition_child border-0  order-1 order-sm-0 col col-sm-6 kt-pricing-1__item  p-5"
+                                *ngFor="let editionWithFeatures of editionsSelectOutput.editionsWithFeatures;  let i = index" *ngIf="i==0">
+                                 -->
+                                 <div class="FreeEdition_child border-0  order-1 order-sm-0 col col-sm-6 kt-pricing-1__item  p-5">
+                                
+                                <div class=" FreeEdition_Purple_Logo-lg w-100"   
+                        > 
+                            <img class="w-100"
+                            src="../../assets/accounts/SignUp_TopBanner_White.png"  >
+                            </div>
+
+                                <div class="kt-pricing-1__visual d-none">
+                                    <div class="kt-pricing-1__hexagon1"></div>
+                                    <div class="kt-pricing-1__hexagon2"></div>
+                                    <span class="kt-pricing-1__icon kt-font-brand">
+                                        <i class="fa {{editionIcons[0]}}"></i>
+                                    </span>
+                                </div>
+
+                                <!-- <h2 class="kt-pricing-1__subtitle editionName">
+                                   {{editionWithFeatures.edition.displayName}}
+                                </h2> -->
+
+                                <h2 class="kt-pricing-1__subtitle pl-4 editionName" *ngIf="isFree(editionWithFeatures.edition)">
+                                    {{"FREE EDITION" | localize}}
+                                </h2>
+
+                                <h2 class="kt-pricing-1__subtitle pl-4" *ngIf="!isFree(editionWithFeatures.edition)">
+                                    <span *ngIf="editionWithFeatures.edition.dailyPrice > 0" class="kt-pricing-1__label">{{appSession.application.currencySign}} {{editionWithFeatures.edition.dailyPrice}}
+                                    {{"PerDay" | localize}}<br /></span>
+                                    <span *ngIf="editionWithFeatures.edition.weeklyPrice > 0" class="kt-pricing-1__label">{{appSession.application.currencySign}} {{editionWithFeatures.edition.weeklyPrice}}
+                                    {{"PerWeek" | localize}}<br /></span>
+                                    <span *ngIf="editionWithFeatures.edition.monthlyPrice > 0" class="kt-pricing-1__label">{{appSession.application.currencySign}} {{editionWithFeatures.edition.monthlyPrice}}
+                                    {{"PerMonth" | localize}} <br /></span>
+                                    <span *ngIf="editionWithFeatures.edition.annualPrice > 0" class="kt-pricing-1__label">{{appSession.application.currencySign}} {{editionWithFeatures.edition.annualPrice}}
+                                    {{"PerYear" | localize}}</span>
+                                </h2>
+
+                                <span class="lineHeight" >
+
+                                    <ng-container *ngFor="let feature of editionsSelectOutput.allFeatures">
+                                        <!--Checbox Feature-->
+                                        <div class="ngContainer">
+                                        <ng-container *ngIf="isTrueFalseFeature(feature)">
+                                            <i class="la la-check kt-font-success pr-3 pt-3"
+                                                *ngIf="featureEnabledForEdition(feature,editionWithFeatures)"></i>
+                                            <i class="la la-times kt-font-dark pr-3 pt-3"
+                                                *ngIf="!featureEnabledForEdition(feature,editionWithFeatures)"></i>
+                                        </ng-container>
+                                        <ng-container *ngIf="isTrueFalseFeature(feature)">{{feature.displayName}}
+                                        </ng-container>
+                                        <!--Checbox Feature-->
+                                        <!--Not Checbox Feature-->
+                                        <ng-container *ngIf="!isTrueFalseFeature(feature)">
+                                            <i class="la la-check kt-font-success"></i>
+                                        </ng-container>
+                                        <ng-container *ngIf="!isTrueFalseFeature(feature)">
+                                            {{feature.displayName}}:{{getFeatureValueForEdition(feature,editionWithFeatures)}}
+                                        </ng-container>
+                                        <!--Not Checbox Feature-->
+                                        <br />
+                                    </div>
+                                    </ng-container>
+
+                                </span>
+
+                                <div class="kt-pricing-1__btn" class="floatDiv">
+                                    <button
+                                        class="_btn btn btn-warning btn-brand btn-wide btn-uppercase btn-bolder  btn  mt-4"
+                                        (click)="upgrade(editionWithFeatures.edition, editionPaymentType.Upgrade)"
+                                        *ngIf="isUserLoggedIn">
+                                        {{"Upgrade" | localize}}
+                                    </button>
+
+                                    <button
+                                        class="_btn btn mt-4 startBtn"
+                                        [routerLink]="['/account/register-tenant']"
+                                        [queryParams]="{editionId: editionWithFeatures.edition.id, subscriptionStartType: subscriptionStartType.Free,tenantid:tenantid}"
+                                        href="#" *ngIf="!isUserLoggedIn && isFree(editionWithFeatures.edition)">
+                                        {{"Start" | localize}}
+                                    </button>
+
+                                    <button
+                                        class="_btn btn btn-warning   btn-brand btn-wide btn-uppercase btn-bolder  mt-4"
+                                        [routerLink]="['/account/register-tenant']"
+                                        [queryParams]="{editionId: editionWithFeatures.edition.id, subscriptionStartType: subscriptionStartType.Trial}"
+                                        href="#"
+                                        *ngIf="!isUserLoggedIn && !isFree(editionWithFeatures.edition) && editionWithFeatures.edition.trialDayCount">
+                                        {{"FreeTrial" | localize}}
+                                    </button>
+
+                                    <button
+                                        class="_btn btn btn-primary btn-pill  btn-brand btn-wide btn-uppercase btn-bolder  mt-4"
+                                        [routerLink]="['/account/register-tenant']"
+                                        [queryParams]="{editionId: editionWithFeatures.edition.id, subscriptionStartType: subscriptionStartType.Paid, editionPaymentType: editionPaymentType.NewRegistration}"
+                                        href="#" *ngIf="!isUserLoggedIn && !isFree(editionWithFeatures.edition)">
+                                        {{"BuyNow" | localize}}
+                                    </button>
+
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-6 FreeEdition_Desktop_Photo">  <img class="h-100  p-5 w-100" src="../../assets/accounts/SignUp_FreeEdition_Desktop_Photo.png"  >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
