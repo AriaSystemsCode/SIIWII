@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="sqlDataSource1.ResultSchemaSerializable" xml:space="preserve">
-    <value>PERhdGFTZXQgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxWaWV3IE5hbWU9IkNvbG9yX1NpemVzIj48RmllbGQgTmFtZT0ibnVtX3JvdyIgVHlwZT0iSW50NjQiIC8+PEZpZWxkIE5hbWU9Ikl0ZW1JZCIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9IkF0dGFjaG1lbnQiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iQXR0cmlidXRlVmFsdWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iY291bnRlciIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9IkF0dHJpYnV0ZVZhbHVlMyIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJTaXplMSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJTaXplMiIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJUb3RhbCIgVHlwZT0iU3RyaW5nIiAvPjwvVmlldz48L0RhdGFTZXQ+</value>
-  </data>
   <data name="$this.ScriptsSource" xml:space="preserve">
     <value>
 private void tableCell24_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
