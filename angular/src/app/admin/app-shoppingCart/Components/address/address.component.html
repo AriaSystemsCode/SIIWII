@@ -1,0 +1,218 @@
+<div class="selected-addr-comp mb-3"  *ngIf="selectedAddress&&isCreateOredit">
+    <div class="selected-add-edit row">
+        <div class="col-md-12 mb-3">
+            <label class="label mt-2 mb-2">{{l("AddressType")}}</label>
+            <div class="w-50 d-inline-block ml-2 ">
+             <p-dropdown
+             [(ngModel)]="addType"
+            id="AddCountry"
+            [options]="AddressTypesList"
+            name="Addresstype"
+            styleClass="form-control aria-select  "
+            [required]="true"
+            [placeholder]="'PleaseSelect' | localize"
+            (onChange)="selectAddressType()"
+        >
+        </p-dropdown> 
+            </div>
+
+
+        </div>
+        <div class="col-md-12 mb-3" >
+            <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
+            <textarea class="form-control w-50  d-inline-block ml-4" readonly>{{selectedAddress.addressLine1+' ,'}}{{selectedAddress.addressLine2+' ,'}}{{selectedAddress.city+' ,'}}{{selectedAddress.state+' ,'}}{{selectedAddress.countryName}}</textarea>
+            <div class="pull-right">
+            <button   class="savebtn text-center btn float-right" (click)="showAddressList()">
+                {{l("Change")}}
+                <i class="fas fa-edit ml-1 mr-1"></i>
+           </button>      
+            </div>
+
+            </div>
+
+    </div>
+</div>
+<div class="selected-addr-comp view-mode mb-3"  *ngIf="!isCreateOredit">
+    <div class="selected-add-view row">
+        <div class="col-md-12">
+            <label class="label mt-2 mb-2">{{l("AddressType")}} :</label>
+            <label class="label mt-2 mb-2 add-type ml-3" *ngIf="selectedAddressDetails"></label>
+            <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
+        </div>
+        <div class="col-md-12">
+            <label class="label mt-2 mb-2 mr-4">{{l("Address")}} :</label>
+            <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="selectedAddressDetails">
+                {{selectedAddressDetails.addressLine1+' ,'}}{{selectedAddressDetails.addressLine2+' ,'}}{{selectedAddressDetails.city+' ,'}}{{selectedAddressDetails.state+' ,'}}{{selectedAddressDetails.countryName}}
+            </label>
+            <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
+            </div>
+
+            </div>
+
+    </div>
+<div class="address-wrapper p-2 view-mode" *ngIf="showAddList">
+    <div class="address-form">
+        <div class="adrress-title">
+            <h3>{{l("SelectAddresses")}}</h3>
+            <p class="mb-0">{{l("PleaseSelectFromTheSavedAddressesBelow")}}</p>
+        </div>
+        <hr>
+        <div class="filter-add-comp col-12 mb-1">
+            <input class="filter-adress-list form-control w-100" 
+            placeholder="Lookin in company addresses ...."
+            #filterVal
+            (keyup)="filterAddressList(filterVal.value)"
+            type="text"/> 
+            <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
+        </div>
+        <ul class="address-warper-cont">
+            <li *ngFor="let address of savedAddressesList" class="address-warper mt-3 mb-3 pt-1 pb-1">
+                <input  *ngIf="selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
+                 [checked]="address.id==selectedAddress.id" name="selectedAdd"  [id]="address.id"/> 
+                    <input *ngIf="!selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
+                      name="selectedAdd"  [id]="address.id"/> 
+                 <label>{{address.name}}</label>
+                 <div class="pull-right">
+                    <button (click)="editAddress(address.id)">
+                        {{l("Edit")}}
+                        <i class="fas fa-edit ml-1 mr-1"></i>
+                    </button>
+                    <button (click)="deleteAddress(address.id)">
+                        {{l("Delete")}}
+                        <i class="fas fa-trash ml-1 mr-1" aria-hidden="true"></i>
+                    </button>
+
+                 </div>
+            </li>
+        </ul>
+        <label class="noAddressMsg" *ngIf="savedAddressesList.length==0"> No Addresses found</label>
+        <button class=" mb-3 ml-2 add-new-add-btn" (click)="openAddAddressForm()">
+            <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
+        </button>
+        </div>
+</div>
+
+<div class="address-wrapper p-2 add-edit-mode" *ngIf="openAddNewAddForm">
+    <div class="address-form">
+        <div class="adrress-title">
+            <h3 *ngIf="!addressIdForEdit">{{l("AddNewAddressDetails")}}</h3>
+            <h3 *ngIf="addressIdForEdit">{{l("EditAddress")}}</h3>
+            <p class="mb-0">{{l("PleaseEnterThenewAddressInformation")}}</p>
+        </div>
+        <hr>
+        <form class="form" #addressForm="ngForm"  method="post" novalidate (ngSubmit)="saveAddress(addressForm)">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="label mt-2 mb-2">{{l("Code")}}</label>
+                    <input
+                        type="text"
+                        placeholder="Adress Code..."
+                        class="form-control w-100"
+                        name="addressCode"
+                        [(ngModel)]="addressCode"
+                        #Code="ngModel"
+                        required
+                    />
+                </div>
+                <div class="col-md-6">
+                    <label class="label mt-2 mb-2">{{l("Name")}}</label>
+                    <input
+                        type="text"
+                        placeholder="Adress Name..."
+                        class="form-control w-100"
+                        name="addressName"
+                        [(ngModel)]="addressName"
+                        #Name="ngModel"
+                        required
+                    />
+                </div>
+                <div class="col-md-6">
+                    <label class="label mt-2 mb-2">{{l("AddressLineOne")}}</label>
+                    <input
+                        type="text"
+                        placeholder="Adress Line 1..."
+                        class="form-control w-100"
+                        name="address1"
+                        [(ngModel)]="address1"
+                        #addressOne="ngModel"
+                        required
+                    />
+                </div>
+                <div class="col-md-6">
+                    <label class="label mt-2 mb-2">{{l("AddressLineTow")}}</label>
+                    <input
+                        type="text"
+                        placeholder="Adress Line 2..."
+                        class="form-control w-100"
+                        name="address2"
+                        [(ngModel)]="address2"
+                        #addressTwo="ngModel"
+                    />
+                </div>
+                <div class="col-md-6">
+                    <label class="label mt-2 mb-2">{{l("City")}}</label>
+                    <input
+                        type="text"
+                        placeholder="City..."
+                        class="form-control w-100"
+                        name="cityAddress"
+                        [(ngModel)]="city"
+                        #cityAddress="ngModel"
+                        required
+                    />
+                </div>
+                <div class="col-md-6">
+                    <label class="label mt-2 mb-2">{{l("State")}}</label>
+                    <input
+                        type="text"
+                        placeholder="State..."
+                        class="form-control w-100"
+                        name="State"
+                        [(ngModel)]="state"
+                        #AddState="ngModel"
+                        required
+                    />
+                </div>
+                <div class="col-md-6">
+                    <label class="label mt-2 mb-2">{{l("PostalCode")}} </label>
+                    <input
+                        type="number"
+                        placeholder="Postal Code 1..."
+                        class="form-control w-100"
+                        name="postalCode"
+                        [(ngModel)]="postalCode"
+                        #postal_Code="ngModel"
+                        required
+                    />
+                </div>
+                <div class="col-md-6" *ngIf="countries.length>0">
+                    <label class="label mt-2 mb-2">{{l("Country")}} </label>
+                    <p-dropdown
+                    id="AddCountry"
+                    [options]="countries"
+                    [(ngModel)]="selectedCountry"
+                    name="AddressCountry"
+                    styleClass="form-control aria-select"
+                    [required]="true"
+                    [placeholder]="'PleaseSelect' | localize"
+                >
+                </p-dropdown>
+
+                </div> 
+            </div>
+        <hr>
+        <div class="btns mx-3 d-flex align-items-center justify-content-sm-end py-3">
+            <button class="btn cancel" (click)="discardAddressForm()" [disabled]="savedAddressesList.length==0">{{l("Cancel")}}</button>
+         <button class="btn save"         
+          [buttonBusy]="saving"
+         [busyText]="'emptyText'"
+         [disabled]="!addressForm.form.valid"
+         type="submit">
+         {{l("Save")}}
+        </button>
+        </div>
+    </form>
+
+    </div>
+</div>

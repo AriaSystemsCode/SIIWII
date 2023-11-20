@@ -1,0 +1,54 @@
+<div class="position-relative">
+    <div *ngIf="createOrEditSalesRepInfo">
+        <div class="container-fluid InfoForm thin-scroll">
+            <div *ngFor="let salesRep of salesReps ;let salesRepIndex = index">
+                <div class="header p-3 my-2 d-flex align-items-center justify-content-between p-2">
+                    <h6 *ngIf="salesRepIndex>0"><span class="headertxt"> Sales Rep {{salesRepIndex}} : </span></h6>
+                    <div>
+                        <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
+                            *ngIf="salesRepIndex==0 &&!showSaveBtn " class="continuebtn text-center btn float-right">
+                            Continue
+                        </button>
+                        <button *ngIf="salesRepIndex==0 &&showSaveBtn" (click)="save()"
+                            class="previewbtn text-center btn float-right">
+                            Save
+                            <i class="pi pi-check"></i>
+                        </button>
+                        <button
+                        *ngIf="showSaveBtn"
+                        (click)="cancel()"
+                        class="cancelbtn text-center btn float-right"
+                    >
+                        Cancel
+                        <i class="pi pi-times"></i>
+                    </button>
+                    </div>
+                </div>
+                <hr class="my-2" *ngIf="salesRepIndex>0" />
+
+                <div class="pr-3" *ngIf="salesRepIndex>0">
+                    <div class="row ml-1">
+                        <app-contact class="w-100" [isCreateOrEdit]="createOrEditSalesRepInfo" [activeTab]="activeTab"
+                            [salesRepIndex]="salesRepIndex" [appTransactionsForViewDto]="appTransactionsForViewDto"
+                            (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                            (formValidityChanged)="isContactFormValid($event)"
+                            [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"></app-contact>
+                    </div>
+                </div>
+
+                <hr class="my-2" *ngIf="salesRepIndex>0" />
+            </div>
+        </div>
+        <br/>
+        <button  class="addbtn mr-3" (click)="addNewSalesRep()" *ngIf="salesReps?.length <= 2">
+            Add <i class="fa fa-plus" style="color:#F88011"></i>
+        </button>
+        <br/><br/>
+    </div>
+
+    <div *ngIf="!createOrEditSalesRepInfo">
+        <app-view-sales-rep-info [activeTab]="activeTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
+            (showSalesRepEditMode)="onShowSalesRepEditMode($event)" (onshowSaveBtn)="onshowSaveBtn($event)"
+            [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"></app-view-sales-rep-info>
+    </div>
+</div>

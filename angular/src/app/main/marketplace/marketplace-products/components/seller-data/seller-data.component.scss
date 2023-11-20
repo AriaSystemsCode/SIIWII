@@ -1,0 +1,70 @@
+.seller-data {
+    height: 300px !important;
+    overflow: hidden;
+
+    .logo-name {
+        background-color: #87878a;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        height: 300px;
+
+        img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    }
+
+    .banner {
+        // background-position: top top;
+        // background-repeat: no-repeat;
+        // background-size: cover;
+        // height: 300px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        margin-top: -180px;
+    }
+}
+
+.web {
+    display: block;
+}
+
+.mobile {
+    display: none;
+}
+
+@media only screen and (max-width: 900px) {
+    .web {
+        display: none !important;
+    }
+    .mobile {
+        display: block !important;
+        // overflow: hidden;
+        position: relative;
+        margin-bottom: 4rem;
+        .seller-bannner {
+            background-position: top center !important;
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            height: 100px;
+            background-color: #b1b1b1 !important;
+        }
+        .mobile-logo {
+            position: absolute;
+            top: 55%;
+            left: 10px;
+            img {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+        }
+    }
+}

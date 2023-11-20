@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Injector, Output, ViewChild ,Input} from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
@@ -11,6 +11,8 @@ import { AddCommentComponent } from '../../../comments/components/add-comment/ad
 export class CommentParentComponent extends AppComponentBase {
     @ViewChild("AddCommentComponent") addCommentComponent: AddCommentComponent
     @Output() newCommentAdded : EventEmitter<any> = new EventEmitter<any>()
+    @Input() cartStyle: boolean;
+
     active : boolean = true
     comments : GetMessagesForViewDto[] = []
     skipCount : number = 0
@@ -45,7 +47,7 @@ export class CommentParentComponent extends AppComponentBase {
             comment.parentId = this.parentId
             comment.threadId = this.threadId
         }
-        comment.to = this.creatorUserId.toString()
+        comment.to = this.creatorUserId?.toString()
         comment.senderId = this.appSession?.user?.id
         comment.mesasgeObjectType = MesasgeObjectType.Comment
         this.addCommentComponent.show(comment)

@@ -128,6 +128,13 @@ export class AppItemsComponent extends AppComponentBase {
             const control = this._fb.control(undefined)
             this.filterForm.addControl("appItemType",control)
         }
+           // Fix Issue T-SII-20230618.0001 
+       /*  if(flags.appItemSizeScale){
+            const control = this._fb.control(undefined)
+            this.filterForm.addControl("appItemSizeScale",control)
+        } */
+           // Fix Issue T-SII-20230618.0001 
+
         if(flags.categories){
             const control = this._fb.control([])
             this.filterForm.addControl("categories",control)
@@ -182,6 +189,7 @@ export class AppItemsComponent extends AppComponentBase {
         this.isModal  =  inputs.isModal
         this.canAdd  =  inputs.canAdd
         this.pageMainFilters  =  inputs.pageMainFilters
+        console.log(">>", this.pageMainFilters)
         this.filtersFlags  =  inputs.filtersFlags
         this.statusesFlags  =  inputs.statusesFlags
         this.actionsMenuFlags  =  inputs.actionsMenuFlags
@@ -254,6 +262,7 @@ export class AppItemsComponent extends AppComponentBase {
         ];
     }
     filterBody = new GetAllAppItemsInput();
+    @Output() itemEmited :EventEmitter<any> = new EventEmitter<any>()
     getAppItems(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.totalRecords = 10;
@@ -269,6 +278,11 @@ export class AppItemsComponent extends AppComponentBase {
         filterBody.arrtibuteFilters = []
         filterBody.filterType = filters.filterType.value
         filterBody.priceListId = this.priceListId
+
+           // Fix Issue T-SII-20230618.0001 
+        // Mariam & Esraa Change value to be sizescale id 
+        // filterBody.filterSizeScale= filters?.appItemSizeScale?.map(sizeScale=>sizeScale.data?.sycEntityObjectCategory?.id)
+
 
         const extraAttributesKeys  = Object.keys(filters?.extraAttributes)
         if(extraAttributesKeys?.length) {
@@ -305,6 +319,8 @@ export class AppItemsComponent extends AppComponentBase {
         this.loading = true;
         this._appItemsServiceProxy
             .getAll(
+                   // Fix Issue T-SII-20230618.0001 
+                //Mariam add  filterBody.filterSizeScale to  get all   
                 filterBody.tenantId,
                 filterBody.appItemListId,
                 filterBody.selectorOnly,
@@ -339,6 +355,7 @@ export class AppItemsComponent extends AppComponentBase {
             )
             .subscribe((result) => {
                 this.items = result.items;
+                this.itemEmited.emit(result.items)
                 this.primengTableHelper.totalRecordsCount = result.totalCount;
                 this.primengTableHelper.records = result.items;
             });

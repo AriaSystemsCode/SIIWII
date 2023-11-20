@@ -30,7 +30,7 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
   localattachmentBaseUrl: string = "http://localhost" ;
   colorPageSort;
   detailPageSort;
-
+  linesheetName;
   constructor(private _appEntitiesServiceProxy: AppEntitiesServiceProxy, private injector: Injector) {
     super(injector);
   }
@@ -88,6 +88,8 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
       {
        //this.printInfoParam.DetailPageSort = this.lineSheetDetailPageSort[index].label;
        this.printInfoParam.DetailPageSort = this.lineSheetDetailPageSortLookup[index].code;
+       this.printInfoParam.DetailPageGroupByName = this.lineSheetDetailPageSort[index].label;
+       console.log("DetailPageGroupByName:"+this.printInfoParam.DetailPageGroupByName)
        this.printInfoParam.orderBy = this.lineSheetDetailPageSortLookup[index].code}
     else
       this.printInfoParam.DetailPageSort = "";
@@ -143,7 +145,12 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
       this.setBgImageSrc();
     }
 
+    //this.printInfoParam.BKGround = this.attachmentBaseUrl + "/" + this.backgroundsItems[indx].attachmentName;
     this.printInfoParam.BKGround = this.localattachmentBaseUrl + "/" + this.backgroundsItems[indx].attachmentName;
+    console.log(this.printInfoParam.BKGround) 
+  }
 
+  setLinesheetName($event){
+    this.linesheetName=$event;
   }
 }

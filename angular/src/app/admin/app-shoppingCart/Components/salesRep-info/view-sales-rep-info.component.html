@@ -1,0 +1,30 @@
+
+    <div class="container-fluid InfoForm thin-scroll">
+        <div  *ngFor="let salesRep of salesReps ;let salesRepIndex = index">
+        <div class="header p-3 my-2 d-flex align-items-center justify-content-between p-2">
+            <h6 *ngIf="salesRepIndex>0"><span class="headertxt"> Sales Rep {{salesRepIndex}} : </span></h6>
+            <div *ngIf="salesRepIndex==0">
+                <button
+                (click)="showEditMode()"
+                class="previewbtn text-center btn float-right"
+            >
+                Change
+                <i class="pi pi-pencil"></i>
+            </button>
+            </div>
+        </div>
+        <hr class="my-2"  *ngIf="salesRepIndex>0"/>
+
+        <div class="pr-3" *ngIf="salesRepIndex>0">
+            <div class="row ml-1">
+                <app-contact 
+                class="w-100" [isCreateOrEdit]="createOrEditSalesRepInfo" [activeTab]="activeTab" [salesRepIndex]="salesRepIndex"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                    (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                    [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"></app-contact>
+            </div>
+        </div>
+
+        <hr class="my-2" *ngIf="salesRepIndex>0"/>
+    </div>
+    </div>

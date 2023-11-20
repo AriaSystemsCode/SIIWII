@@ -1,0 +1,28 @@
+.notes-cont{
+    background-color:#F2F3F8;
+    .note-sub-cont{
+        background-color:#fff;
+    textarea.note-control {
+        resize: none;
+        border:none;
+        background-color: #fff !important;
+
+      }
+      .notes-info{
+        .date{
+            color: #999999 !important;
+            font-size:12px;
+        }
+    }
+    .btn.bgPurple:hover{
+        background-color: #700066 !important;
+    }
+      &.has-saved-note{
+        textarea.note-control{
+            pointer-events: none;
+            color: #868995;
+        }
+      }
+    }
+
+}

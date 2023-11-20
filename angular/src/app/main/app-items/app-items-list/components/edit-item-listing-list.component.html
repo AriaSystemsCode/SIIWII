@@ -38,12 +38,20 @@
                         <span
                             class="kt-subheader__separator kt-subheader__separator--v"
                         ></span>
-                        <span class="ml-1 mr-3">
+                        <span>
+                            <div class="share-level px-2"  >
+                                <span *ngIf="list?.appItemsList?.sharingLevel === 1 || list?.appItemsList?.sharingLevel === 2 " > Shared  <div class="shared-dot"></div> </span>
+                                <span *ngIf="list?.appItemsList?.sharingLevel === 3 " > Private  <div class="private-dot"></div> </span>
+                                <span *ngIf="list?.appItemsList?.sharingLevel === 4 " > Hidden <div class="hidden-dot"></div> </span>
+                                <span  *ngIf="list?.appItemsList?.sharingLevel === null || list?.appItemsList?.sharingLevel === 0 "   > Not Shared </span>
+                            </div>
+                        </span>
+                        <!-- <span class="ml-1 mr-3">
                             {{
                                 !loading && list?.appItemsList?.published
                                     ? l("Published")
                                     : l("NotPublished")
-                            }}
+                            }} tes
                             <span class="ml-2">
                                 <i
                                     class="d-inline-flex flaticon2-information rounded-circle text-white"
@@ -54,7 +62,7 @@
                                     "
                                 ></i>
                             </span>
-                        </span>
+                        </span> -->
                         <span
                             class="kt-subheader__separator kt-subheader__separator--v"
                             *ngIf="
@@ -102,7 +110,7 @@
                         <div
                             class="last-updated my-3 d-flex align-items-center gap-3 justify-content-end w-100"
                         >
-                            <p>Last Updated {{ lastUpdatedDate }}</p>
+                            <p>Last Edit {{ lastUpdatedDate }}</p>
                         </div>
                     </div>
                     <div class="kt-subheader__toolbar" *ngIf="!viewMode">

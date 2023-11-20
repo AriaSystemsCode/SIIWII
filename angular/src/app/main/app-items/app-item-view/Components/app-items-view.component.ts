@@ -165,6 +165,8 @@ export class AppItemsViewComponent
     showAdvancedPricing: boolean = false;
 
     display: boolean = false;
+    timezoneOffset: number;
+
     public constructor(
         private _router: Router,
         private _appItemsServiceProxy: AppItemsServiceProxy,
@@ -181,6 +183,7 @@ export class AppItemsViewComponent
     ngOnChanges(changes: SimpleChanges) {
         if (this.appItemViewInput) {
             this.appItemForViewDto = this.appItemViewInput.appItemForViewDto;
+            this.getTimezoneOffset();
         this.lastUpdatedDate = this.datePipe.transform(
             this.appItemViewInput.appItemForViewDto.lastModifiedDate.toISOString(),
             "MMM d, y, h:m a"
@@ -219,6 +222,7 @@ export class AppItemsViewComponent
 
     getDetails(){
         this.appItemForViewDto = this.appItemViewInput.appItemForViewDto;
+        this.getTimezoneOffset();
         this.lastUpdatedDate = this.datePipe.transform(
             this.appItemViewInput.appItemForViewDto.lastModifiedDate.toISOString(),
             "MMM d, y, h:m a"
@@ -885,6 +889,7 @@ export class AppItemsViewComponent
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
+                    this.notify.success(this.l("Product sync Successfully"));
                 })
             )
             .subscribe((result) => {
@@ -892,5 +897,9 @@ export class AppItemsViewComponent
                 this.appItemForViewDto.showSync = result.appItem.showSync
             })
             });
+    }
+
+    getTimezoneOffset() {
+        this.timezoneOffset = new Date().getTimezoneOffset();
     }
 }

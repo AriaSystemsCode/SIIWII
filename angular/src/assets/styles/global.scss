@@ -398,3 +398,56 @@ color: #700066 !important;
     background-color: #e8ebf1;
     border: 1px solid #700066 !important;
  }
+
+ .notshowdropdown-toggle .nav-link.dropdown-toggle:after, .btn.dropdown-toggle:after{
+    display: none;
+ }
+
+ .purpleSortableIcon i.p-sortable-column-icon.pi.pi-fw.pi-sort-alt {
+    color: #700066 !important;
+}
+
+.shoppingCartAccordionTabBG  .p-accordion .p-accordion-header .p-accordion-header-link  {
+    background: #f1f2f3 !important;
+    padding: 15px;
+}
+.shoppingCartAccordionTabBG   .p-accordion .p-accordion-content{
+    background:white !important;
+    padding: 0px !important;
+}
+
+.ticket-dropdown.form-control.aria-select.text-left.p-dropdown.p-component{
+    background:white !important;
+    border-color: #700066 !important;
+}
+
+.p-treetable .p-treetable-thead > tr {
+    border: none !important;
+   // background: white !important;
+}
+
+.p-treetable .p-treetable-thead > tr >  th
+{
+    border: 1px solid white !important;
+    background: white !important;
+}
+
+.p-treetable .p-treetable-scrollable-body{
+    overflow: hidden scroll;
+    min-height: 400px;
+    max-height: 500px;
+}
+
+
+.shoppingCartAccordionTabBG path {
+    color: #700066;
+}
+  .shoppingCartAccordionTabBG.shoppingCartAccordionNotValidTab .p-accordion .p-accordion-header .p-accordion-header-link  {
+    background: red !important;
+}
+
+
+.tempAccount .p-dropdown.p-component{
+    background-color: red;
+    border: none;
+}

@@ -21,6 +21,8 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
     lastSelectedAppItemType : TreeNodeOfGetSycEntityObjectTypeForViewDto
 
     categoriesFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
+       // Fix Issue T-SII-20230618.0001 
+     //  sizeScaleFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
     departmentsFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
     classificationsFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectClassificationForViewDto[]>
 
@@ -51,6 +53,8 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
     ngOnInit(): void {
 
         this.categoriesFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>({list : []})
+         // Fix Issue T-SII-20230618.0001 
+         //  this.sizeScaleFilterMetaData= new FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>({list : []})
         this.departmentsFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>({list : []})
         this.classificationsFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectClassificationForViewDto[]>({list : []})
         this.appItemTypeFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectTypeForViewDto[]>({list : []})
@@ -210,9 +214,11 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
 
     getPublishOptionsList(componentRef:{ onListLoadCallback : Function }){
         const items =  [
-            { label:this.l('Both'), value: 0 },
-            { label:this.l('Published'), value:1 },
-            { label:this.l('UnPublished'), value:2 },
+            { label:'All', value: 0 },
+            { label:'Public', value:1 },
+            { label:'Restricted', value:2 },
+            { label:'Hidden', value:4 },
+            { label:' Not shared', value:3 },
         ]
         const result: { items : any[], totalCount?:number } = {
             items,
@@ -260,6 +266,38 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
         })
         this.subscriptions.push(subs)
     }
+
+    // Fix Issue T-SII-20230618.0001 
+   /*  getSizeScaleList(componentRef:{ onListLoadCallback : Function }){
+        //////// Mariam getSizeScaleList
+        this.loading = true
+        const subs = this._sycEntityObjectCategoriesServiceProxy.getAllWithChildsForProductWithPaging(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            false,
+            undefined,
+            undefined,
+            this.sortBy,
+            this.sizeScaleFilterMetaData.listSkipCount,
+            this.sizeScaleFilterMetaData.listMaxResultCount,
+        )
+        .pipe(
+            finalize(()=>this.loading = false)
+        )
+        .subscribe((res)=>{
+            componentRef.onListLoadCallback(res);
+        })
+        this.subscriptions.push(subs)
+    } */
+   // Fix Issue T-SII-20230618.0001 
+
+    
     getDepartmentsList(componentRef:{ onListLoadCallback : Function }){
         this.loading = true
         const subs = this._sycEntityObjectCategoriesServiceProxy.getAllWithChildsForProductWithPaging(
@@ -318,6 +356,41 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             this.subscriptions.push(subs)
         }
     }
+
+   // Fix Issue T-SII-20230618.0001 
+  /*   loadSizeScaleNode(node : TreeNodeOfGetSycEntityObjectCategoryForViewDto){
+        ////// Mariam loadSizeScaleNode
+        if (node) {
+            const loadedCompletely : boolean =  !isNaN(node?.totalChildrenCount) && !isNaN(node?.children?.length) && node.totalChildrenCount === node.children.length
+            if( loadedCompletely ) return
+            const parentId = node.data.sycEntityObjectCategory.id
+            const subs = this._sycEntityObjectCategoriesServiceProxy.getAllChildsWithPaging(
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                parentId,
+                true,
+                undefined,
+                undefined,
+                this.sortBy,
+                0,
+                node.totalChildrenCount,
+            )
+            .pipe(
+                finalize(()=>this.loading = false)
+            )
+            .subscribe((res)=>{
+                if(!node.children) node.children = []
+                node.children.push(...res.items)
+            })
+            this.subscriptions.push(subs)
+        }
+    } */
+   // Fix Issue T-SII-20230618.0001 
 
     getAppItemTypesList(componentRef:{ onListLoadCallback : Function }){
         this.loading = true

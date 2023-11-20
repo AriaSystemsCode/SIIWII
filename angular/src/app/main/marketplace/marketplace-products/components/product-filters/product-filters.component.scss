@@ -1,0 +1,78 @@
+:host ::ng-deep {
+    .p-accordion .p-accordion-header .p-accordion-header-link {
+        padding: 0.857rem 1rem !important;
+        border: 1px solid #d1d1d1 !important;
+        color: #333333 !important;
+        background: #ffff !important;
+        font-weight: 700 !important;
+        border-radius: 3px;
+        transition: background-color 0.2s, box-shadow 0.2s;
+    }
+    .p-accordion .p-accordion-content {
+        padding: 0.571rem 0rem;
+        border: none !important;
+        background: #ffffff;
+        color: #333333;
+        border-top: 0;
+        border-top-right-radius: 0;
+        border-top-left-radius: 0;
+        border-bottom-right-radius: 3px;
+        border-bottom-left-radius: 3px;
+    }
+    .p-accordion .p-accordion-content {
+        margin-bottom: 0px !important ;
+        border: none;
+    }
+    .p-calendar {
+        width: 100% !important;
+    }
+    // .p-tree .p-tree-container .p-treenode .p-treenode-content.p-treenode-selectable:not(.p-highlight) {
+    //     background: #d1d1d1 !important;
+    //     color: #333333;
+    // }
+}
+
+.filter-selection {
+    height: 600px;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f5f5f5;
+}
+
+.filter-selection::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-selection::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+}
+
+.filter-selection::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+}
+
+.filter-selection::-webkit-scrollbar-thumb:hover {
+    background-color: #999;
+}
+
+.btn-list {
+    background-color: #ffff;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-list:hover {
+    background-color: #d1d1d1;
+}
+
+.selectedCatalog {
+    background-color: #d1d1d1;
+}
+
+.price{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    padding: 0px 15px;
+}

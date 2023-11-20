@@ -20,11 +20,13 @@ import {
     GetSycAttachmentCategoryForViewDto,
     SycAttachmentCategoryDto,
     SycEntityObjectTypesServiceProxy,
+    
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, ModalDirective, ModalOptions } from "ngx-bootstrap/modal";
 import { Observable, Subscription } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { AppEntityListDynamicModalComponent } from "../app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component";
+import { throws } from "assert";
 
 @Component({
     selector: "app-create-or-edit-app-entity-dynamic-modal",
@@ -56,6 +58,9 @@ export class CreateOrEditAppEntityDynamicModalComponent
     codeIsRequired: boolean;
     showCodeErrMsg: boolean = false;
     isHost: boolean;
+    SelectedVal: any;
+    attCategoriesShow:boolean=false;
+    attCategories: GetSycAttachmentCategoryForViewDto [];
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -81,12 +86,55 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 .getAppEntityForEdit(this.appEntity.id)
                 .subscribe((res) => {
                     this.appEntity = AppEntityDto.fromJS(res.appEntity);
+                   if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
                     console.log(">>", this.appEntity);
                     this.adjustImageSrcsUrls();
                     this.loading = true;
                 });
         }
+            console.log("this.entityObjectType.code"+this.entityObjectType.code);
+        this._sycAttachmentCategoriesServiceProxy.getAllByEntityObjectType(
+            0,
+            this.entityObjectType.code,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            0,
+            "",
+            undefined,
+            undefined,
+            undefined,
+            undefined
+        ).subscribe(result => {
+            //this.primengTableHelper.totalRecordsCount = result.totalCount;
+            //this.primengTableHelper.records = result.items;
+            //this.primengTableHelper.hideLoadingIndicator();
+            this.attCategories = result.items;
+            if(this.attCategories.length>0)
+            {
+                this.aspectRatio =  Number(this.attCategories[0].sycAttachmentCategory.aspectRatio);
+                this.productImageCategory =  this.attCategories[0];
+                this.attCategoriesShow = true
+            }
+            if(this.attCategories.length>0 && this.editMode == true && this.appEntity.entityAttachments?.length > 0)
+            {
+                 
+                 let found = this.attCategories.filter(e=> e.sycAttachmentCategory.id == this.appEntity.entityAttachments[0].attachmentCategoryId);
+                 if(found && found.length>0)
+                 {  this.aspectRatio =  Number(found[0].sycAttachmentCategory.aspectRatio);
+                    this.productImageCategory =  found[0];
+                    this.attCategoriesShow = true
+                     
+                 }
+            }
+            
+        });
         this.getExtrAttributes();
+
         this.active = true;
         this.modal.show();
     }
@@ -116,6 +164,35 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.hide();
         this.show(this.entityObjectType);
     }
+
+    changeFn(event: any)
+    {
+        if (this.aspectRatio != Number(this.productImageCategory.sycAttachmentCategory.aspectRatio))
+        {
+            this.productImageCategory =
+        new GetSycAttachmentCategoryForViewDto({
+            imgURL: null,
+            sycAttachmentCategory: new SycAttachmentCategoryDto({
+                code: "IMAGE",
+                name: "Image",
+                attributes: null,
+                parentCode: null,
+                parentId: null,
+                aspectRatio: this.aspectRatio,
+                id: 3,
+            } as any),
+            sycAttachmentCategoryName: "",
+        });  
+        }
+    }
+    getSelectedValue(value:any){
+  
+        // Prints selected value
+        console.log(value);
+        this.aspectRatio = Number(this.attCategories[value].sycAttachmentCategory.aspectRatio);
+        this.productImageCategory =  this.attCategories[value];
+        
+      }
 
     close() {
         this.cancel.emit(true);
@@ -173,6 +250,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
                         new GetAllEntityObjectTypeOutput();
                 }
             });
+
+
     }
 
     resetExtraData() {
