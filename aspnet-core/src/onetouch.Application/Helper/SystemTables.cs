@@ -10,6 +10,7 @@ using System.Linq;
 using onetouch.SycCounters;
 using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.AppEntities.Dtos;
+using onetouch.SycCurrencyExchangeRates;
 
 namespace onetouch.Helpers
 {
@@ -23,14 +24,15 @@ namespace onetouch.Helpers
         //MMT30[Start]
         private readonly IRepository<SycSegmentIdentifierDefinition, long> _sycSegmentIdentifierDefinition;
         private readonly IRepository<SycCounter, long> _sycCounter;
+        private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRate;
         //MMT30[End]
-        
-      public SystemTables(IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
+
+        public SystemTables(IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             
             IRepository<SycAttachmentCategory, long> sycAttachmentCategory, IRepository<SycEntityObjectClassification, long> SycEntityObjectClassifications,
            
             IRepository<SycEntityObjectStatus, long> sycEntityObjectStatus, IRepository<SycCounter, long> sycCounter,
-            IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition)
+            IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate)
         {
             _sydObjectRepository = sydObjectRepository;
             _sycEntityObjectType = sycEntityObjectType;
@@ -40,6 +42,7 @@ namespace onetouch.Helpers
             //MMT30[Start]
             _sycSegmentIdentifierDefinition = sycSegmentIdentifierDefinition;
             _sycCounter = sycCounter;
+            _sycCurrencyExchangeRate = sycCurrencyExchangeRate;
             //MMT30[End]
         }
 
@@ -444,9 +447,29 @@ namespace onetouch.Helpers
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "SCALE");
             return obj.Id;
         }
-        //MMT
-
-        //MMT
+        //MMT33-3[Start]
+        public decimal GetExchangeRate(string fromCurrencyCode,string toCurrencyCode)
+        { 
+            decimal returnVal = 0;
+            onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates sourceCurrency = null;
+            if (fromCurrencyCode != "USD")
+            {
+                sourceCurrency = _sycCurrencyExchangeRate.GetAll().FirstOrDefault(x => x.CurrencyCode == fromCurrencyCode);
+                returnVal = 1 / sourceCurrency.ExchangeRate;
+            }
+            var toCurrency = _sycCurrencyExchangeRate.GetAll().FirstOrDefault(x => x.CurrencyCode == toCurrencyCode);
+            if (toCurrency != null)
+            {
+                if (fromCurrencyCode == "USD")
+                    return toCurrency.ExchangeRate;
+                else
+                {
+                    returnVal *= toCurrency.ExchangeRate;
+                }
+            }
+            return returnVal;
+        }
+        //MMT33-3[End]
         //MMT30[Start]
         public async Task<string> GenerateSSIN(long objectTypeId, AppEntityDto appEntity = null)
         {
@@ -552,6 +575,30 @@ namespace onetouch.Helpers
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "DRAFT" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        public async Task<long> GetEntityObjectStatusActiveTransaction()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "ACTIVE" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        public async Task<long> GetEntityObjectStatusOpenTransaction()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "OPEN" && x.ObjectCode == "TRANSACTION");
+                return obj.Id;
+            }
+        }
+        public async Task<long> GetEntityObjectStatusCancelledTransaction()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "CANCELLED" && x.ObjectCode == "TRANSACTION");
                 return obj.Id;
             }
         }

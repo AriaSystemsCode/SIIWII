@@ -621,6 +621,9 @@ namespace onetouch.AppEntities
                 (x.TenantId == AbpSession.TenantId || x.TenantId == null));
 
                 //var output = new GetAppEntityForEditOutput { AppEntity = ObjectMapper.Map<CreateOrEditAppEntityDto>(appEntity) };
+                // as per Sam needs and requirments
+                if(input.MaxResultCount ==null || input.MaxResultCount==0 || input.MaxResultCount == 10)
+                { input.MaxResultCount = 1000; }
 
                 var pagedAndFilteredAppEntities = filteredAppEntities
                  .OrderBy(input.Sorting ?? "Name asc")
@@ -633,7 +636,7 @@ namespace onetouch.AppEntities
                                       Label = o.Name.ToString(),
                                       Code = o.Code,
                                       IsHostRecord = o.TenantId == null,
-                                      AttachmentName = o.EntityAttachments != null && o.EntityAttachments.Count > 0 ? @"attachments/" + o.EntityAttachments[0].AttachmentFk.TenantId.ToString() + @"/" + o.EntityAttachments[0].AttachmentFk.Attachment : ""
+                                      AttachmentName = o.EntityAttachments != null && o.EntityAttachments.Count > 0 ? @"attachments/" + (o.EntityAttachments[0].AttachmentFk.TenantId!=null? o.EntityAttachments[0].AttachmentFk.TenantId.ToString():"-1") + @"/" + o.EntityAttachments[0].AttachmentFk.Attachment : ""
                                   };
 
 
@@ -747,8 +750,22 @@ namespace onetouch.AppEntities
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
                     Symbol = appEntity.EntityExtraData != null & appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ? appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
-                })
+                }).OrderBy(a=>a.Code)
                 .ToListAsync();
+        }
+        public async Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode)
+        {
+            CurrencyInfoDto rertunObj = new CurrencyInfoDto();
+            var currencyId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();
+            var currencyObject = await _appEntityRepository.GetAll().Include(a => a.EntityExtraData).Where(x => x.EntityObjectTypeId == currencyId && x.Code == currencyCode).FirstOrDefaultAsync();
+            if (currencyObject != null)
+            {
+                rertunObj.Value = currencyObject.Id;
+                rertunObj.Label = currencyObject.Name.ToString();
+                rertunObj.Code = currencyObject.Code;
+                rertunObj.Symbol = currencyObject.EntityExtraData != null & currencyObject.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ? currencyObject.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : "";
+            }
+            return rertunObj;
         }
 
         public async Task<List<LookupLabelDto>> GetAllTitlesForTableDropdown()
@@ -1991,5 +2008,26 @@ namespace onetouch.AppEntities
             }
         }
         #endregion Ranking functions
+        [AbpAuthorize(AppPermissions.Pages_AppEntities_Edit)]
+        public async Task UpdateAppEntityNotes(long entityId, string notes)
+        {
+            var entityObj = await _appEntityRepository.GetAll().Where(x => x.Id == entityId).FirstOrDefaultAsync();
+            if (entityObj != null)
+            {
+                entityObj.Notes = notes;
+                await _appEntityRepository.UpdateAsync(entityObj);
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
+        }
+        public async Task<string> GetAppEntityNotes(long entityId)
+        {
+            var entityObj = await _appEntityRepository.GetAll().Where(x => x.Id == entityId).FirstOrDefaultAsync();
+            if (entityObj != null)
+            {
+                return entityObj.Notes;
+                
+            }
+            return "";
+        }
     }
 }

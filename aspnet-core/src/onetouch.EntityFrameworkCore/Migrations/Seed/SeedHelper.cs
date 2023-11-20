@@ -5,6 +5,7 @@ using Abp.Domain.Uow;
 using Abp.EntityFrameworkCore.Uow;
 using Abp.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
+using onetouch.AppItems;
 using onetouch.EntityFrameworkCore;
 using onetouch.Migrations.Seed.Host;
 using onetouch.Migrations.Seed.Tenants;

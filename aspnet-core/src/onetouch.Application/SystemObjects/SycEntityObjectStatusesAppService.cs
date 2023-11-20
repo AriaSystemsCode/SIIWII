@@ -74,8 +74,29 @@ namespace onetouch.SystemObjects
                 await sycEntityObjectStatuses.ToListAsync()
             );
          }
-		 
-		 public async Task<GetSycEntityObjectStatusForViewDto> GetSycEntityObjectStatusForView(int id)
+
+        // [AbpAuthorize(AppPermissions.Pages_SycEntityObjectStatuses)]
+        [AbpAllowAnonymous]
+        public async Task<List<SycEntityObjectStatusLookupTableDto>> GetAllSycEntityStatusForTableDropdown(string objectCode)
+        {
+            try
+            {
+                var objectId = _lookup_sydObjectRepository.GetAll().Where(e => e.Code == objectCode).FirstOrDefault();
+                return await _sycEntityObjectStatusRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId || x.TenantId == null && x.ObjectId == objectId.Id)
+                    .Select(sycEntityObjectType => new SycEntityObjectStatusLookupTableDto
+                    {
+                        Id = sycEntityObjectType.Id,
+                        DisplayName = sycEntityObjectType.Name.ToString()
+                    }).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return new List<SycEntityObjectStatusLookupTableDto>();
+            }
+        }
+
+
+        public async Task<GetSycEntityObjectStatusForViewDto> GetSycEntityObjectStatusForView(int id)
          {
             var sycEntityObjectStatus = await _sycEntityObjectStatusRepository.FirstOrDefaultAsync(x=>x.Id==id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
 

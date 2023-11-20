@@ -18,5 +18,12 @@ namespace onetouch.AppItems.Dtos
         public bool Listed { get; set; }
 
         public virtual string ImageUrl { get; set; }
+        //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
+        public virtual string SSIN { get; set; }
+        public virtual string SharingLevel { get; set; }
+        //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
+        public bool ShowItem { set; get; }
+        public virtual string SellerName { get; set; }
+        public virtual string ManufacturerCode { get; set; }
     }
 }

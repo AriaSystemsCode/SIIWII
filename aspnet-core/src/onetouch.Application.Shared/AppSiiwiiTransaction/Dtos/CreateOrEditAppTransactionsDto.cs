@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Abp.Application.Services.Dto;
 using onetouch.AppEntities.Dtos;
+using onetouch.Sessions.Dto;
 
 namespace onetouch.AppSiiwiiTransaction.Dtos
 {
@@ -15,15 +16,15 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         [StringLength(AppTransactionConst.MaxEnteredByUserRoleLength, MinimumLength = AppTransactionConst.MinEnteredByUserRoleLength)]
         public virtual string EnteredByUserRole { set; get; }
-        public virtual long? BuyerId { set; get; }
+        public virtual string? BuyerCompanySSIN { set; get; }
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinBuyerNameLength)]
-        public virtual string? BuyerName { set; get; }
+        public virtual string? BuyerCompanyName { set; get; }
         public long? SellerId { set; get; }
         [StringLength(AppTransactionConst.MaxSellerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string? SellerName { set; get; }
+        public virtual string? SellerCompanyName { set; get; }
 
         [StringLength(AppTransactionConst.MaxEMailLength, MinimumLength = AppTransactionConst.MinEMailLength)]
-        public virtual string? BuyerEMailAddress { get; set; }
+        public virtual string? BuyerContactEMailAddress { get; set; }
 
         public virtual long? LanguageId { get; set; }
 
@@ -35,27 +36,49 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
         public virtual string CurrencyCode { get; set; }
         [StringLength(AppTransactionConst.MaxEMailLength, MinimumLength = AppTransactionConst.MinEMailLength)]
-        public virtual string? SellerEMailAddress { get; set; }
+        public virtual string? SellerContactEMailAddress { get; set; }
         [StringLength(AppTransactionConst.MaxPhoneNumberLength, MinimumLength = AppTransactionConst.MinPhoneNumberLength)]
-        public virtual string? BuyerPhoneNumber { get; set; }
+        public virtual string? BuyerContactPhoneNumber { get; set; }
 
         
         [StringLength(AppTransactionConst.MaxPhoneNumberLength, MinimumLength = AppTransactionConst.MinPhoneNumberLength)]
-        public virtual string? SellerPhoneNumber { get; set; }
+        public virtual string? SellerContactPhoneNumber { get; set; }
 
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string BuyerCompanyName { get; set; }
+        public virtual string BuyerContactName { get; set; }
 
         [StringLength(AppTransactionConst.MaxSellerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string SellerCompanyName { get; set; }
+        public virtual string SellerContactName { get; set; }
         public virtual string PriceLevel { get; set; }
-        public virtual long? BuyerContactId { set; get; }
+        public virtual string? BuyerContactSSIN { set; get; }
         
-        public virtual string? BuyerContactName { set; get; }
-        public virtual long? SellerContactId { set; get; }
+        //public virtual string? BuyerContactSSIN { set; get; }
+        public virtual string? SellerContactSSIN { set; get; }
+        public virtual TransactionType TransactionType { set; get; }
+        public string EntityStatusCode { set; get; }
+        // virtual string? SellerContactName { set; get; }
+        public DateTime CompleteDate { get; set; }
+        public virtual string? SellerCompanySSIN { set; get; }
+        public virtual DateTime StartDate { set; get; }
+        public virtual DateTime AvailableDate { set; get; }
+        public virtual long? ShipViaId { get; set; }
 
-        public virtual string? SellerContactName { set; get; }
+        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
+        public virtual string ShipViaCode { get; set; }
+       
+        public virtual long? PaymentTermsId { get; set; }
+
+        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
+        public virtual string PaymentTermsCode { get; set; }
+        [StringLength(AppTransactionConst.MaxBuyerDeptLength, MinimumLength = AppTransactionConst.MinBuyerDeptLength)]
+        public virtual string BuyerDepartment { set; get; }
         public virtual ICollection<AppTransactionsDetailDto> AppTransactionsDetails { get; set; }
+        public virtual ICollection<AppTransactionContactDto> AppTransactionContacts { get; set; }
+        public virtual string BuyerStore { set; get; }
+        public virtual long TotalQuantity { set; get; }
+        public virtual double TotalAmount { set; get; }
+        public virtual bool lFromPlaceOrder { set; get; } = false;
+        public virtual decimal CurrencyExchangeRate { get; set; }
     }
     public enum OrderCreatorRole
     { 
@@ -63,10 +86,17 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         IndependentSalesRep,
         Buyer
     }
+    public enum TransactionType
+    {
+        SalesOrder,
+        PurchaseOrder
+    }
     public class GetAccountInformationOutputDto
     {
         public long Id { set; get; }
         public string Name { set; get; }
+        public string AccountSSIN { set; get; }
+        public CurrencyInfoDto CurrencyCode { set; get; }
     }
     public class GetContactInformationDto
     {
@@ -74,5 +104,15 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string Name{set;get;}
         public string Email { set; get; }
         public string Phone { set; get; }
+        public string SSIN { set; get; }
+        public long? PhoneTypeId { get; set; }
+        public string PhoneTypeName { set; get; }
+        public List<PhoneNumberAndtype> PhoneList { get; set; }
+    }
+    public class PhoneNumberAndtype 
+    { 
+        public string PhoneNumber { set; get; }
+        public long? PhoneTypeId { get; set; }
+        public string PhoneTypeName { set; get; }
     }
 }

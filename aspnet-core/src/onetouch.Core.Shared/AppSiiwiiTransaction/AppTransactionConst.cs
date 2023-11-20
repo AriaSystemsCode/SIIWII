@@ -22,5 +22,9 @@ namespace onetouch.AppSiiwiiTransaction
         public const int MaxPhoneNumberLength = 20;
         public const int MinItemCodeLength = 1;
         public const int MaxItemCodeLength = 50;
+        public const int MaxSSINLength = 50;
+        public const int MinSSINLength = 0;
+        public const int MaxBuyerDeptLength = 50;
+        public const int MinBuyerDeptLength = 0;
     }
 }
