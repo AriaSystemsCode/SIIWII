@@ -58,8 +58,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Features;
 using DevExpress.AspNetCore.Reporting.QueryBuilder;
-using Microsoft.AspNetCore.SignalR;
-using onetouch.Build;
 
 namespace onetouch.Web.Startup
 {
@@ -327,13 +325,7 @@ namespace onetouch.Web.Startup
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<AbpCommonHub>("/signalr");
-                endpoints.MapHub<Hub>("/signalr-chat");
-                //Hassan ticket [Begin]
-                endpoints.MapHub<BuildHub>("/signalr-build");
-                //Hassan ticket [End]
-
-                // maintanance
-                //endpoints.MapHub<MaintainanceHub>("/signalr-maintainance");
+                endpoints.MapHub<ChatHub>("/signalr-chat");
 
                 endpoints.MapControllerRoute("defaultWithArea", "{area}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");

@@ -39,6 +39,7 @@
             this.pageInfo3 = new DevExpress.XtraReports.UI.XRPageInfo();
             this.Detail = new DevExpress.XtraReports.UI.DetailBand();
             this.pictureBox3 = new DevExpress.XtraReports.UI.XRPictureBox();
+            this.xrPictureBox1 = new DevExpress.XtraReports.UI.XRPictureBox();
             this.xrLabel1 = new DevExpress.XtraReports.UI.XRLabel();
             this.label9 = new DevExpress.XtraReports.UI.XRLabel();
             this.label13 = new DevExpress.XtraReports.UI.XRLabel();
@@ -49,7 +50,6 @@
             this.telephone = new DevExpress.XtraReports.Parameters.Parameter();
             this.email = new DevExpress.XtraReports.Parameters.Parameter();
             this.logo = new DevExpress.XtraReports.Parameters.Parameter();
-            this.BKGround = new DevExpress.XtraReports.Parameters.Parameter();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // TopMargin
@@ -176,6 +176,7 @@
             this.Detail.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.pageInfo3,
             this.pictureBox3,
+            this.xrPictureBox1,
             this.xrLabel1,
             this.label9,
             this.label13});
@@ -196,6 +197,15 @@
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.SizeF = new System.Drawing.SizeF(250F, 250F);
             this.pictureBox3.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
+            // 
+            // xrPictureBox1
+            // 
+            this.xrPictureBox1.Dpi = 254F;
+            this.xrPictureBox1.ImageSource = new DevExpress.XtraPrinting.Drawing.ImageSource("img", resources.GetString("xrPictureBox1.ImageSource"));
+            this.xrPictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(2458.862F, 25F);
+            this.xrPictureBox1.Name = "xrPictureBox1";
+            this.xrPictureBox1.SizeF = new System.Drawing.SizeF(254F, 254F);
+            this.xrPictureBox1.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
             // 
             // xrLabel1
             // 
@@ -291,11 +301,6 @@
             this.logo.Name = "logo";
             this.logo.Visible = false;
             // 
-            // BKGround
-            // 
-            this.BKGround.Description = "BKGround";
-            this.BKGround.Name = "BKGround";
-            // 
             // CoverPage
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -310,7 +315,6 @@
             this.PageWidth = 2794;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.address, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
-            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.BKGround, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.logo, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.telephone, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.email, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
@@ -319,7 +323,6 @@
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.reportTitle, DevExpress.XtraReports.Parameters.Orientation.Horizontal)});
             this.Parameters.AddRange(new DevExpress.XtraReports.Parameters.Parameter[] {
             this.address,
-            this.BKGround,
             this.logo,
             this.telephone,
             this.email,
@@ -327,10 +330,6 @@
             this.accountName,
             this.reportTitle});
             this.ReportUnit = DevExpress.XtraReports.UI.ReportUnit.TenthsOfAMillimeter;
-            this.Scripts.OnBeforePrint = "CoverPage_BeforePrint";
-            this.ScriptsSource = "\r\nprivate void CoverPage_BeforePrint(object sender, System.ComponentModel.CancelE" +
-    "ventArgs e) {\r\n        string str1 = this.BKGround.Value.ToString();\r\n         \r" +
-    "\n }\r\n";
             this.SnapGridSize = 25F;
             this.Version = "22.2";
             this.Watermark.ImageSource = new DevExpress.XtraPrinting.Drawing.ImageSource("img", resources.GetString("CoverPage.Watermark.ImageSource"));
@@ -355,12 +354,12 @@
         private DevExpress.XtraReports.Parameters.Parameter address;
         private DevExpress.XtraReports.Parameters.Parameter telephone;
         private DevExpress.XtraReports.Parameters.Parameter email;
+        private DevExpress.XtraReports.UI.XRPictureBox xrPictureBox1;
         private DevExpress.XtraReports.UI.XRLabel xrLabel1;
         private DevExpress.XtraReports.UI.XRLabel label9;
         private DevExpress.XtraReports.UI.XRLabel label13;
         private DevExpress.XtraReports.UI.XRPictureBox pictureBox3;
         private DevExpress.XtraReports.Parameters.Parameter logo;
         private DevExpress.XtraReports.UI.XRShape xrShape1;
-        private DevExpress.XtraReports.Parameters.Parameter BKGround;
     }
 }

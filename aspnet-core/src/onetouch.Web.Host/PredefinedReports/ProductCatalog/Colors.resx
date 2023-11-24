@@ -118,24 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="sqlDataSource1.ResultSchemaSerializable" xml:space="preserve">
-    <value>PERhdGFTZXQgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxEYXRhU2V0IE5hbWU9IkxpbmVTaGVldF9Db2xvcnNEYXRhIj48VmlldyBOYW1lPSJSZXN1bHQxIj48RmllbGQgTmFtZT0iQXR0cmlidXRlSWQiIFR5cGU9IkludDY0IiAvPjxGaWVsZCBOYW1lPSJBdHRyaWJ1dGVWYWx1ZUlkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iTmFtZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJDb2RlIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IkF0dGFjaG1lbnQiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iTWV0ZXJpYWxDb250ZW50IiBUeXBlPSJTdHJpbmciIC8+PC9WaWV3PjxWaWV3IE5hbWU9IlJlc3VsdDIiPjxGaWVsZCBOYW1lPSJBdHRyaWJ1dGVJZCIgVHlwZT0iSW50NjQiIC8+PEZpZWxkIE5hbWU9IkF0dHJpYnV0ZVZhbHVlSWQiIFR5cGU9IkludDY0IiAvPjxGaWVsZCBOYW1lPSJOYW1lIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IkNvZGUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iQXR0YWNobWVudCIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJNZXRlcmlhbENvbnRlbnQiIFR5cGU9IlN0cmluZyIgLz48L1ZpZXc+PC9EYXRhU2V0PjwvRGF0YVNldD4=</value>
-  </data>
-  <data name="$this.ScriptsSource" xml:space="preserve">
-    <value>
-private void GroupHeader1_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-}
-
-private void Colors_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-  
-
-}
-
-private void Colors_DataSourceDemanded(object sender, System.EventArgs e) {
-        if(this.ColorPageSort.Value.ToString().ToUpper() == "MATERIALCONTENT")
-   {GroupField groupField = new GroupField("MeterialContent");
-    GroupHeader1.GroupFields.Add(groupField);}
-
-}
-</value>
+    <value>PERhdGFTZXQgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxWaWV3IE5hbWU9IkxpbmVTaGVldF9Db2xvcnNEYXRhIj48RmllbGQgTmFtZT0iQXR0cmlidXRlSWQiIFR5cGU9IkludDY0IiAvPjxGaWVsZCBOYW1lPSJBdHRyaWJ1dGVWYWx1ZUlkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iTmFtZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJDb2RlIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IkF0dGFjaG1lbnQiIFR5cGU9IlN0cmluZyIgLz48L1ZpZXc+PC9EYXRhU2V0Pg==</value>
   </data>
 </root>

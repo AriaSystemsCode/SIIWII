@@ -42,7 +42,6 @@
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate3.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate4.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate5.vsrepx" />
-    <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate7.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate7.vsrepx" />
     <None Remove="Reports\1\ItemsReport2.repx" />
     <None Remove="Reports\1\TicketsRport4.repx" />
@@ -98,7 +97,9 @@
     <Folder Include="wwwroot\Plugins\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="PredefinedReports\ProductCatalog\Color_Size1.cs" />
+    <Compile Update="PredefinedReports\ProductCatalog\Color_Size1.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.cs">
       <DependentUpon>ProductsCatalogTemplate1.vsrepx</DependentUpon>
     </Compile>
