@@ -97,7 +97,7 @@
                         <div class="col primeng-datatable-container" [busyIf]="primengTableHelper.isLoading">
                             <p-table #dataTable (onLazyLoad)="getTenants($event)" [value]="primengTableHelper.records"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
-                                [lazy]="true" responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                [lazy]="true" [responsive]="primengTableHelper.isResponsive">
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th style="width:130px">{{'Actions' | localize}}</th>
@@ -127,7 +127,7 @@
                                 <ng-template pTemplate="body" let-record="$implicit">
                                     <tr>
                                         <td style="width: 130px">
-                                            <div class="btn-group dropdown position-absolute" dropdown>
+                                            <div class="btn-group dropdown" dropdown>
                                                 <button dropdownToggle class="dropdown-toggle btn btn-sm btn-primary">
                                                     <i class="fa fa-cog"></i><span class="caret"></span>
                                                     {{"Actions" | localize}}
@@ -165,32 +165,32 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'TenancyCodeName' | localize}}</span>
+                                            <span class="ui-column-title">{{'TenancyCodeName' | localize}}</span>
                                             <i *ngIf="record.connectionString" class="fa fa-database"
                                                 title="{{'HasOwnDatabase' | localize}}"></i>
                                             {{record.tenancyName}}
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'Name' | localize}}</span>
+                                            <span class="ui-column-title">{{'Name' | localize}}</span>
                                             {{record.name}}
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'Edition' | localize}}</span>
+                                            <span class="ui-column-title">{{'Edition' | localize}}</span>
                                             {{record.editionDisplayName}}
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'SubscriptionEndDateUtc' | localize}}</span>
+                                            <span class="ui-column-title">{{'SubscriptionEndDateUtc' | localize}}</span>
                                             {{ record.subscriptionEndDateUtc ? (record.subscriptionEndDateUtc | momentFormat:'L') : '-'}}
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'Active' | localize}}</span>
+                                            <span class="ui-column-title">{{'Active' | localize}}</span>
                                             <span *ngIf="record.isActive"
                                                 class="kt-badge kt-badge--success kt-badge--inline">{{'Yes' | localize}}</span>
                                             <span *ngIf="!record.isActive"
                                                 class="kt-badge kt-badge--dark kt-badge--inline">{{'No' | localize}}</span>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'CreationTime' | localize}}</span>
+                                            <span class="ui-column-title">{{'CreationTime' | localize}}</span>
                                             {{record.creationTime | momentFormat:'L'}}
                                         </td>
                                     </tr>

@@ -1,4 +1,4 @@
-<div *ngIf="isSiiwii==false"  class="bg-white container mb-3  mt-lg-5 p-4 pl-5">
+<div class="bg-white container mb-3  mt-lg-5 p-4 pl-5">
     <div class="p-2 row" style="gap:15px;">
         <img
             [src]="
@@ -50,77 +50,6 @@
                 }}
             </div>
         </button>
-    </div>
-    </div>
-</div>
-
-<div *ngIf="isSiiwii==true" class="bg-white container mb-3  mt-lg-5 pt-4">
-    <div class="p-2 row" style="gap:15px;">
-        <img
-            [src]="
-                profilePicture
-                    ? profilePicture
-                    : 'assets/common/images/default-profile-picture.png'
-            "
-            class="rounded-circle logo"
-        />
-        
-        <button
-            class="btn btn-secondary btn-createPost flex-grow-0 col-6 col-lg-5"
-            (click)="showCreateOrEdit()"
-        >
-            <h6 class="_text">{{ "Whatdoyouwanttotalkabout" | localize }}</h6>
-        </button>
-        
-
-        <div class=" ml-lg-n3 ml-3 row uploadfile" >
-        <button
-            class="uploadfilecontainer pt-2  border-0"
-            (click)="showCreateOrEdit(PostType.SINGLEIMAGE)"
-            [disabled]="!uploadImage"
-        >
-            <div [ngClass]="{ disabled: !uploadImage }">
-                <img src="assets/posts/image.png" class="mr-1 PostEntryImage" />{{
-                    "Photos" | localize
-                }}
-            </div>
-        </button>
-
-        <button
-            class="border-0 ml-2 pl-2 pt-2 uploadfilecontainer"
-            (click)="showCreateOrEdit(PostType.SINGLEVIDEO)"
-            [disabled]="!uploadVideo"
-        >
-            <div [ngClass]="{ disabled: !uploadVideo }">
-                <img src="assets/posts/youtube.png" class="mr-1 PostEntryImage" />{{
-                    "Video" | localize
-                }}
-            </div>
-        </button>
-
-        <button
-            class="border-0 ml-2 pl-2 pt-2 uploadfilecontainer"
-            (click)="showCreateOrEditEvent()"
-        >
-            <div>
-                <img src="assets/posts/event.png" class="mr-1 PostEntryImage" />{{
-                    "Event" | localize
-                }}
-            </div>
-        </button>
-        
-      <button 
-            class="border-0 ml-2 pl-2 pt-2 uploadfilecontainer"
-            (click)="showCreateOrEdit(PostType.NEWSDIGEST)"
-            [disabled]="!uploadVideo"
-        >
-            <div [ngClass]="{ disabled: !uploadVideo }">
-                <img src="assets/posts/news.png" class="mr-2 PostEntryImage" />{{
-                    "News" | localize
-                }}
-            </div>
-        </button> 
-
     </div>
     </div>
 </div>

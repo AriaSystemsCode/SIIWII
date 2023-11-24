@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AppItemsMultiSelectionDemoComponent } from './app-items-multi-selection-demo.component';
 
@@ -6,7 +6,7 @@ describe('AppItemsMultiSelectionDemoComponent', () => {
   let component: AppItemsMultiSelectionDemoComponent;
   let fixture: ComponentFixture<AppItemsMultiSelectionDemoComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ AppItemsMultiSelectionDemoComponent ]
     })

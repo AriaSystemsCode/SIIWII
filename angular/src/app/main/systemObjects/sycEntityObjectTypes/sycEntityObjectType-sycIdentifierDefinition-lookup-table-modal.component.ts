@@ -4,10 +4,10 @@ import {SycEntityObjectTypesServiceProxy, SycEntityObjectTypeSycIdentifierDefini
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Table } from 'primeng/table';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 @Component({
     selector: 'sycEntityObjectTypeSycIdentifierDefinitionLookupTableModal',
-    styleUrls: ['./sycEntityObjectType-sycIdentifierDefinition-lookup-table-modal.component.scss'],
+    styleUrls: ['./sycEntityObjectType-sycIdentifierDefinition-lookup-table-modal.component.less'],
     encapsulation: ViewEncapsulation.None,
     templateUrl: './sycEntityObjectType-sycIdentifierDefinition-lookup-table-modal.component.html'
 })
@@ -45,7 +45,6 @@ export class SycEntityObjectTypeSycIdentifierDefinitionLookupTableModalComponent
         }
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

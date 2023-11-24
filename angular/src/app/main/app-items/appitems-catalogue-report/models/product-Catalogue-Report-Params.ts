@@ -25,7 +25,6 @@ export class ProductCatalogueReportParamsI {
     bccUsers: NameValueOfString[] ;
     subject: string = "";
     body: string = "";
-    orderBy: string="";
 }
 
 export class ProductCatalogueReportParams implements ProductCatalogueReportParamsI {
@@ -37,8 +36,8 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     tenantId:number 
     showPrice:boolean = true
     showCode:boolean = true
-    showCover:boolean= false
-    showColors:boolean= false
+    showCover:boolean= true
+    showColors:boolean= true
     showQty:boolean= true
     showNo:boolean= true
     showFooter:boolean= false
@@ -52,13 +51,6 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     bccUsers: NameValueOfString[] =[];
     subject: string = "";
     body: string = "";
-    BKGround: string = "";
-    orderBy: string = "";
-    ColorPageSort: string = "";
-    DetailPageSort: string = "";
-    DetailPageGroupByName: string="";
-    DetailPageShowCategory:boolean= false
-    ColorPageShowCategory:boolean= false
 
 
     private attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
@@ -120,13 +112,6 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += '&subject=' + this.subject
        url += '&body=' + this.body
        url += "&attachmentBaseUrl=" + this.attachmentBaseUrl
-       url += "&BKGround=" + this.BKGround
-       url += "&ColorPageSort=" + this.ColorPageSort
-       url += "&DetailPageSort=" + this.DetailPageSort
-       url += "&DetailPageGroupByName=" + this.DetailPageGroupByName
-       url += "&DetailPageShowCategory=" + this.DetailPageShowCategory
-       url += "&ColorPageShowCategory=" + this.ColorPageShowCategory
-       url += "&orderBy=" + this.orderBy
-              return url
+       return url
     }
 }

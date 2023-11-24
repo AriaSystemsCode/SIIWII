@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AccountMainFilterEnum } from '@app/main/accounts/account-shared/models/accounts-main-filter.enum';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 
 @Component({
     selector: 'app-marketplace-accounts',

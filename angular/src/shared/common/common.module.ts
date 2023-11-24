@@ -5,7 +5,7 @@ import { AppUiCustomizationService } from './ui/app-ui-customization.service';
 import { AppSessionService } from './session/app-session.service';
 import { CookieConsentService } from './session/cookie-consent.service';
 import { ToastService } from './toast/toast.service';
-import { MessageService } from 'primeng/api';
+import { MessageService } from 'primeng';
 
 @NgModule({
     imports: [

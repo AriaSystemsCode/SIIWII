@@ -15,7 +15,7 @@
         [styleClass]="'w-100'"
         [name]="title"
         [(ngModel)]="selectedValue"
-        [placeholder]="l('Select') + ' ' + title"
+        [defaultLabel]="l('Select') + ' ' + title"
         (onChange)="onMultiSelectChange($event)">
     </p-multiSelect>
 </div>

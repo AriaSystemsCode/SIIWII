@@ -88,7 +88,7 @@
                                        [lazy]="true"
                                        [scrollable]="true"
                                        ScrollWidth="100%"
-                                       responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                       [responsive]="primengTableHelper.isResponsive"
                                        [resizableColumns]="primengTableHelper.resizableColumns">
                               <ng-template pTemplate="header">
                                   <tr>
@@ -148,28 +148,28 @@
                                           </div>
                                       </td>
                                       <td style="width:150px">
-                                                  <span class="p-column-title"> {{l('TicketNumber')}}</span>
+                                                  <span class="ui-column-title"> {{l('TicketNumber')}}</span>
                                                   {{record.ticketTicketNumber}}
                                               </td>
                                       <td style="width:150px">
-                                              <span class="p-column-title"> {{l('Title')}}</span>
+                                              <span class="ui-column-title"> {{l('Title')}}</span>
                                               {{record.ticketNote.title}}
                                           </td>
                                       <td style="width:150px">
-                                              <span class="p-column-title"> {{l('Description')}}</span>
+                                              <span class="ui-column-title"> {{l('Description')}}</span>
                                               {{record.ticketNote.description}}
                                           </td>
                                         
                                           <td style="width:150px">
-                                              <span class="p-column-title"> {{l('Creator')}}</span>
+                                              <span class="ui-column-title"> {{l('Creator')}}</span>
                                               {{record.createUserName}}
                                           </td> 
                                           <td style="width:150px">
-                                               <span class="p-column-title"> {{l('Date')}}</span>
-                                              {{record.ticketNote.createDateTime?.toString() | date:"MM/dd/yyyy" }}
+                                               <span class="ui-column-title"> {{l('Date')}}</span>
+                                              {{record.ticketNote.createDateTime | date:"MM/dd/yyyy" }}
                                           </td> 
                                           <td style="width:150px">
-                                            <span class="p-column-title"> {{l('Attachments')}}</span>
+                                            <span class="ui-column-title"> {{l('Attachments')}}</span>
                                             {{record.attachments.length }}
                                         </td> 
   

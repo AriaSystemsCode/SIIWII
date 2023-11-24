@@ -30,7 +30,6 @@ export class CreateorEditPostComponent
     @ViewChild("createOrEditModal", { static: true }) modal: ModalDirective;
     @ViewChild("imageInput") imageInput: ElementRef;
     @ViewChild("videoInput") videoInput: ElementRef;
-    @ViewChild("newsInput") newsInput: ElementRef;
     @ViewChild("image1") image1: ElementRef;
     @ViewChild("image2") image2: ElementRef;
     @ViewChild("image3") image3: ElementRef;
@@ -61,7 +60,6 @@ export class CreateorEditPostComponent
     attachmetsSrc: string[] = [];
     PostType = PostType;
     typeFile: PostType;
-    typeFilePassed: PostType;
     uploadImage: boolean;
     uploadVideo: boolean;
     videoUrl;
@@ -90,8 +88,6 @@ export class CreateorEditPostComponent
         typeFile?: PostType,
         relatedEntityId?: number
     ) {
-
-        this.typeFilePassed = typeFile;
         if(!relatedEntityId)
       this.relatedEntityId =0;
       else
@@ -112,7 +108,7 @@ export class CreateorEditPostComponent
                 ? this.post.attachmentsURLs
                 : [];
             this.typeFile = this.post.type;
-            if (this.typeFile == this.PostType.SINGLEVIDEO || this.typeFile == PostType.NEWSDIGEST)
+            if (this.typeFile == this.PostType.SINGLEVIDEO)
                 this.videoUrl = this.attachmets[0];
             this.showAttachmentsIcons = false;
 
@@ -179,9 +175,7 @@ export class CreateorEditPostComponent
                 });
             } else this.imageInput.nativeElement.click();
         } else if (typeFile == PostType.SINGLEVIDEO)
-            {this.videoInput.nativeElement.click();}
-            else if ( typeFile == PostType.NEWSDIGEST)
-            {this.newsInput.nativeElement.click();}
+            this.videoInput.nativeElement.click();
     }
 
     fileChangeEvent($event, typeFile: PostType) {
@@ -233,7 +227,7 @@ export class CreateorEditPostComponent
     }
 
     validateAttachmets(files: any) {
-        if (this.typeFile == PostType.SINGLEVIDEO || this.typeFile == PostType.NEWSDIGEST) {
+        if (this.typeFile == PostType.SINGLEVIDEO) {
             this.videoUrl = null;
             this.attachmets = [];
             this.uploadVideo = true;

@@ -114,7 +114,7 @@
                                      [lazy]="true"
                                      [scrollable]="true"
                                      ScrollWidth="100%"
-                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [responsive]="primengTableHelper.isResponsive"
                                      [resizableColumns]="primengTableHelper.resizableColumns">
                             <ng-template pTemplate="header">
                                 <tr>
@@ -183,35 +183,35 @@
                                         </div>
                                     </td>
                                     <td style="width:100px">
-                                        <span class="p-column-title"> {{l('Code')}}</span>
+                                        <span class="ui-column-title"> {{l('Code')}}</span>
                                         {{record.sycAttachmentCategory.code}}
                                     </td>
                                     <td style="width:100px">
-                                        <span class="p-column-title"> {{l('Name')}}</span>
+                                        <span class="ui-column-title"> {{l('Name')}}</span>
                                         {{record.sycAttachmentCategory.name}}
                                     </td>
                                     <td style="width:50px">
-                                        <span class="p-column-title"> {{l('Type')}}</span>
+                                        <span class="ui-column-title"> {{l('Type')}}</span>
                                         {{AttachmentTypesEnum[record.sycAttachmentCategory.type] || ''}}
                                     </td>
                                     <td style="width:50px">
-                                        <span class="p-column-title"> {{l('AspectRatio')}}</span>
+                                        <span class="ui-column-title"> {{l('AspectRatio')}}</span>
                                         {{record.sycAttachmentCategory.aspectRatio}}
                                     </td>
                                     <td style="width:50px">
-                                        <span class="p-column-title"> {{l('MaxFileSize')}}</span>
+                                        <span class="ui-column-title"> {{l('MaxFileSize')}}</span>
                                         {{record.sycAttachmentCategory.maxFileSize}}
                                     </td>
                                     <td style="width:50px">
-                                        <span class="p-column-title"> {{l('Parent')}}</span>
+                                        <span class="ui-column-title"> {{l('Parent')}}</span>
                                         {{record.sycAttachmentCategoryName}}
                                     </td>
                                     <td style="width:100px">
-                                        <span class="p-column-title"> {{l('Message')}}</span>
+                                        <span class="ui-column-title"> {{l('Message')}}</span>
                                         {{record.sycAttachmentCategory.message}}
                                     </td>
                                     <td style="width:50px">
-                                        <span class="p-column-title"> {{l('Attributes')}}</span>
+                                        <span class="ui-column-title"> {{l('Attributes')}}</span>
                                         {{record.sycAttachmentCategory.attributes}}
                                     </td>
                                 </tr>

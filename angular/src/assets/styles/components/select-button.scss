@@ -1,6 +1,6 @@
 @import '../base/variables';
 
-body .p-selectbutton .p-button {
+body .ui-selectbutton .ui-button {
     background-color: $white-color;
     border: 1px solid $grey-2;
     color: $grey-2;
@@ -8,24 +8,18 @@ body .p-selectbutton .p-button {
     margin: .1rem .1rem;
     box-shadow: 0px 3px 16px #E1E1EF41;
     margin-right: 1rem;
-    margin-bottom:10px;
     @extend %transition-all-3ms;
-    &:not(.p-disabled):hover,
-    &.p-highlight {
+    &:not(.ui-state-disabled):not(.ui-state-active):hover,
+    &.ui-state-active:not(.ui-state-disabled) {
         background-color: $green-1!important;
         border-color: $green-1!important;
         color:$white!important;
         @extend %transition-all-3ms;
     }
-    &:not(.p-disabled).p-focus {
+    &:not(.ui-state-disabled):not(.ui-state-active).ui-state-focus {
         -webkit-box-shadow: none;
         -moz-box-shadow: none;
         box-shadow: none;
         z-index: 1;
     }
-}
-.p-selectbutton .p-button.p-highlight {
-    background: #007ad9;
-    border-color: #007ad9;
-    color: #ffffff;
 }

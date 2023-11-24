@@ -7,12 +7,12 @@ export class AppConsts {
     static remoteServiceBaseUrl: string;
     static attachmentBaseUrl: string;
     static remoteServiceBaseUrlFormat: string;
+    static urlRenderServiceBaseUrl: string;
     static appBaseUrl: string;
     static appBaseHref: string; // returns angular's base-href parameter value if used during the publish
     static appBaseUrlFormat: string;
     static recaptchaSiteKey: string;
     static subscriptionExpireNootifyDayCount: number;
-    static siiwiiName: string;
 
     static localeMappings: any = [];
 

@@ -4,7 +4,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { LanguageServiceProxy } from '@shared/service-proxies/service-proxies';
 import * as _ from 'lodash';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import { EditTextModalComponent } from './edit-text-modal.component';
@@ -102,7 +102,6 @@ export class LanguageTextsComponent extends AppComponentBase implements AfterVie
         }]);
 
         if (this.paginator.getPage() !== 0) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
 
             return;

@@ -16,9 +16,6 @@ export interface IFormattedUserNotification {
     data: any;
     url: string;
     isUnread: boolean;
-    entityId: number;
-    entityType :  string;
-    entityTypeName :  string;
 }
 
 @Injectable()
@@ -78,10 +75,7 @@ export class UserNotificationHelper extends AppComponentBase {
             state: abp.notifications.getUserNotificationStateAsString(userNotification.state),
             data: userNotification.notification.data,
             url: this.getUrl(userNotification),
-            isUnread: userNotification.state === abp.notifications.userNotificationState.UNREAD,
-            entityId: userNotification?.notification?.entityId,
-            entityType :userNotification?.notification?.entityType,
-            entityTypeName :userNotification?.notification?.entityTypeName
+            isUnread: userNotification.state === abp.notifications.userNotificationState.UNREAD
         };
 
         if (truncateText || truncateText === undefined) {

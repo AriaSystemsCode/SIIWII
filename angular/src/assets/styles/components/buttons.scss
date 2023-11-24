@@ -22,7 +22,7 @@
 .btn-action
 {
     background-color: $blue-light !important;
-    background: url('../../profile/ActionMenu.svg') no-repeat center!important;
+    background: url('assets/profile/ActionMenu.svg') no-repeat center!important;
     border: none!important;
     width: 30px!important;
     &:hover{
@@ -34,7 +34,7 @@
         background-color: $blue !important;
         width: 30px!important;
         border: none!important;
-        background: url('../../profile/ActionMenu.svg') no-repeat center!important;
+        background: url('assets/profile/Actionmenu-hover.png') no-repeat center!important;
      }
 }
 

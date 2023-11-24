@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
+import { InputSwitchModule, TreeModule } from "primeng";
 import { ModalModule } from "ngx-bootstrap/modal";
 import { BsDropdownModule } from "ngx-bootstrap/dropdown";
 import { DropdownModule } from "primeng/dropdown";
@@ -19,7 +20,6 @@ import {
     TimeZoneInfoServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { CarouselModule} from "primeng/carousel";
-import { InputSwitchModule } from "primeng/inputswitch";
 
 @NgModule({
     declarations: [

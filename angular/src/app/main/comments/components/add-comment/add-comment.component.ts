@@ -14,7 +14,6 @@ export class AddCommentComponent extends AppComponentBase {
     @Output() saveDone : EventEmitter<GetMessagesForViewDto>  = new EventEmitter<GetMessagesForViewDto>();
     commentObject : CreateMessageInput
     active : boolean
-    @Input() cartStyle: boolean;
 
     constructor(
         private injector: Injector,
@@ -28,7 +27,6 @@ export class AddCommentComponent extends AppComponentBase {
     saving:boolean = false
     maxAcceptedChars:number = 1300
     writtenChars:number = 0
-    emptyText:string='emptyText';
     extendTextAreaHandler($event){
         var textarea = $event.target
         const text:string = textarea.value

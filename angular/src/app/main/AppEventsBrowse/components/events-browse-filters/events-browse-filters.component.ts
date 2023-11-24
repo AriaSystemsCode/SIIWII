@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { FilterMetaData } from '@app/shared/filters-shared/models/FilterMetaData.model';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { DisplayNameValueDto, EventsFilterTypesEnum, TimeZoneInfoServiceProxy } from '@shared/service-proxies/service-proxies';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { finalize } from 'rxjs/operators';
 import { EventsBrowseComponentFiltersDisplayFlags } from '../../models/EventsBrowseComponentFiltersDisplayFlags';
 

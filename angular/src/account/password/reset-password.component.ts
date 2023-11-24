@@ -92,5 +92,13 @@ export class ResetPasswordComponent extends AppComponentBase implements OnInit {
                 }
             });
     }
-    
+
+    parseTenantId(tenantIdAsStr?: string): number {
+        let tenantId = !tenantIdAsStr ? undefined : parseInt(tenantIdAsStr);
+        if (tenantId === NaN) {
+            tenantId = undefined;
+        }
+
+        return tenantId;
+    }
 }

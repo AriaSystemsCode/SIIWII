@@ -18,7 +18,7 @@
                              rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
                              [paginator]="false"
                              [lazy]="true"
-                             responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                             [responsive]="primengTableHelper.isResponsive">
                         <ng-template pTemplate="header">
                             <tr>
                                 <th style="width:20%">
@@ -41,7 +41,7 @@
                                     </button>
                                 </td>
                                 <td style="width: 65%">
-                                    <span class="p-column-title"> {{'UserName' | localize}}</span>
+                                    <span class="ui-column-title"> {{'UserName' | localize}}</span>
                                     {{getShownLinkedUserName(record)}}
                                 </td>
                                 <td style="width:15%">

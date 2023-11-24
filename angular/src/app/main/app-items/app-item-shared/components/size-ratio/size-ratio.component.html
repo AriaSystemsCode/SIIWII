@@ -3,7 +3,7 @@
         <div class="align-items-end justify-content-between col-9 d-flex pl-0">
             <div class="row pl-0 w-100">
                 <div class="col d-flex pl-0 align-items-end">
-                    <div class="sizescale-name mr-2 pl-3">
+                    <div class="sizescale-name mr-2">
                         <div *ngIf="appSizeScales?.name">
                             <input type="text" disabled [value]="appSizeScales.name" class="dimension-input form-control"/>
                         </div>
@@ -63,8 +63,7 @@
         <div  class="align-items-center buttons-list d-flex flex-column mt-4 sizescale-name" style="gap:20px" *ngIf="!readOnly">
             <button class="btn btn-primary w-100" (click)="openSelectSizeRatioModal()" [disabled]="!appSizeScales?.sizeScaleId">{{'SelectSizeRatio'| localize}}</button>
             <button class="btn btn-primary w-100" (click)="createOrEdit(false)" [disabled]=" !appSizeScales?.sizeScaleId || (appSizeScales?.sizeScaleId && !appSizeRatios?.sizeScaleId) || sizeRatioForm.form.invalid">{{'SaveSizeRatio' | localize}}</button>
-            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" [disabled]="!appSizeScales?.sizeScaleId || sizeRatioForm.form.invalid" style="background-color: #eba461 !important;
-            border: none !important;">{{'SaveAsNewSizeRatio'| localize}}</button>
+            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" [disabled]="!appSizeScales?.sizeScaleId || sizeRatioForm.form.invalid">{{'SaveNewSizeRatio'| localize}}</button>
         </div>
         
     </div>

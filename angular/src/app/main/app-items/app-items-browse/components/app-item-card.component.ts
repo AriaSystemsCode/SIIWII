@@ -34,7 +34,7 @@ export class AppItemCardComponent extends AppComponentBase {
     @Input() statusesFlags:AppItemsBrowseComponentStatusesFlags
     @Input() browseMode:BrowseMode
     @Output() eventTriggered: EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>> = new EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>>();
-
+    
     AppItemBrowseEvents = AppItemBrowseEvents
     selectedList: AppItemsListDto;
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
@@ -48,7 +48,6 @@ export class AppItemCardComponent extends AppComponentBase {
     }
 
     eventHandler($event:ActionsMenuEventEmitter<AppItemBrowseEvents>){
-        console.log(">>", 'publish')
         switch ($event.event) {
             case AppItemBrowseEvents.PublishListing:
                 this.item.appItem.published = true;

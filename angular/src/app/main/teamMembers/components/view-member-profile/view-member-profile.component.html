@@ -94,7 +94,7 @@
                         <hr class="header"  *ngIf="memberData?.contact?.joinDateIsPublic">
                         <div class="col-md-12 d-flex align-items-baseline" *ngIf="memberData?.contact?.joinDateIsPublic">
                             <h6 class="text-right col-2">{{ ( "JoinDate" | localize ) + ":" }}</h6>
-                            <p class="text-left col">{{memberData?.contact?.joinDate?.toString()| date: 'short'}}</p>
+                            <p class="text-left col">{{memberData?.contact?.joinDate| date: 'short'}}</p>
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.emailAddressIsPublic">
                         <div class="col-md-12 d-flex align-items-baseline" *ngIf="memberData?.contact?.emailAddressIsPublic">

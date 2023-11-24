@@ -8,14 +8,14 @@
     right: 0px;
 }
 
-:host ::ng-deep .p-inputtext {
+:host ::ng-deep .ui-inputtext {
     border: none !important;
 }
 
 :host
     ::ng-deep
-    .p-autocomplete.p-autocomplete-multiple
-    .p-autocomplete-multiple-container:not(.p-disabled).p-focus {
+    .ui-autocomplete.ui-autocomplete-multiple
+    .ui-autocomplete-multiple-container:not(.ui-state-disabled).ui-state-focus {
     box-shadow: none !important;
     //width: 300px !important;
 }

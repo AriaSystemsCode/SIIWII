@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { waitForAsync } from "@angular/core/testing";
+import { async } from "@angular/core/testing";
 import { ProfileServiceProxy } from "@shared/service-proxies/service-proxies";
 
 @Injectable({

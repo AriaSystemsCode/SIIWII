@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EventsBrowseActionsMenuComponent } from './events-browse-actions-menu.component';
 
@@ -6,7 +6,7 @@ describe('EventsBrowseActionsMenuComponent', () => {
   let component: EventsBrowseActionsMenuComponent;
   let fixture: ComponentFixture<EventsBrowseActionsMenuComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ EventsBrowseActionsMenuComponent ]
     })

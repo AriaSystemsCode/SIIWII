@@ -23,7 +23,6 @@ import { EditionHelperService } from '@account/payment/edition-helper.service';
 export class SelectEditionComponent extends AppComponentBase implements OnInit {
 
     editionsSelectOutput: EditionsSelectOutput = new EditionsSelectOutput();
-    editionWithFeatures :EditionWithFeaturesDto;
     isUserLoggedIn = false;
     isSetted = false;
     editionPaymentType: typeof EditionPaymentType = EditionPaymentType;
@@ -51,7 +50,6 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
         this._tenantRegistrationService.getEditionsForSelect()
             .subscribe((result) => {
                 this.editionsSelectOutput = result;
-                this.editionWithFeatures= this.editionsSelectOutput.editionsWithFeatures[0];
 
                 if (!this.editionsSelectOutput.editionsWithFeatures || this.editionsSelectOutput.editionsWithFeatures.length <= 0) {
                     this._router.navigate(['/account/register-tenant']);

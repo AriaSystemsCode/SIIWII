@@ -31,6 +31,7 @@ export class CreateOrEditTicketNoteModalComponent extends AppComponentBase imple
     TicketNoteattachments=[];
 
     public uploader: FileUploader;
+    private _uploaderOptions: FileUploaderOptions = {};
 
     ngOnInit(): void {
         this.initUploaders();

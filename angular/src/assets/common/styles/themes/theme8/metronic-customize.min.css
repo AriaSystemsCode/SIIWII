@@ -54,7 +54,7 @@ body.kt-header--minimize .kt-header__topbar .subscription-warning span {
     margin-right: 14px;
   }
 }
-.menuSearchBarContainer .p-autocomplete-panel {
+.menuSearchBarContainer .ui-autocomplete-panel {
   margin-left: 14px;
 }
 @media (max-width: 1024px) {

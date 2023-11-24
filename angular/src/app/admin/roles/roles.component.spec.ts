@@ -23,7 +23,7 @@ describe('RolesComponent', () => {
                 AppModule,
                 UtilsModule,
                 AppRoutingModule,
-                RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
+                RouterModule.forRoot([]),
                 RootModule,
                 ServiceProxyModule,
                 ModalModule,

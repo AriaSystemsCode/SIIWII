@@ -1,13 +1,4 @@
-import {
-    AfterViewInit,
-    ElementRef,
-    Input,
-    OnDestroy,
-    Output,
-    QueryList,
-    ViewChild,
-    ViewChildren,
-} from "@angular/core";
+import { Input, OnDestroy, Output, ViewChild } from "@angular/core";
 import { Injector } from "@angular/core";
 import { OnChanges } from "@angular/core";
 import { SimpleChanges } from "@angular/core";
@@ -32,26 +23,23 @@ import { PostListService } from "../Services/post-list.service";
 })
 export class PostCardComponent
     extends AppComponentBase
-    implements OnChanges, OnDestroy, AfterViewInit
+    implements OnChanges, OnDestroy
 {
-    @Input() isCurrentVideo: boolean;
+
     @Input() post: GetAppPostForViewDto = null;
     @Output() showViewPost = new EventEmitter<GetAppPostForViewDto>();
     @Output() _deletePost = new EventEmitter<GetAppPostForViewDto>();
     @Output() _editPost = new EventEmitter<GetAppPostForViewDto>();
     @Output() _viewEvent = new EventEmitter<number>();
-    @Output() videoClicked: EventEmitter<any> = new EventEmitter<any>();
-
     linkUrl: string = null;
     PostType = PostType;
     profilePicture: string;
     isHost: boolean = false;
-    urlPreviewImage: string;
-    @ViewChild("InteractionsComponent")
-    InteractionsComponent: InteractionsComponent;
+    urlPreviewImage : string
+    @ViewChild('InteractionsComponent') InteractionsComponent : InteractionsComponent
     getAppEntityForViewDto: AppEntitiesRelationshipDto = null;
-    appEntityTypes = AppEntityTypes;
-
+    appEntityTypes=AppEntityTypes;
+    
     constructor(
         private _postService: AppPostsServiceProxy,
         private _entitiesService: AppEntitiesServiceProxy,
@@ -62,12 +50,8 @@ export class PostCardComponent
         super(injector);
         this.isHost = !this.appSession.tenantId;
     }
-    ngAfterViewInit(): void {
-        throw new Error("Method not implemented.");
-    }
 
     ngOnChanges(changes: SimpleChanges) {
-       
         if (this.post) {
             //Get ProfilePicture
             this.getProfilePictureById(this.post.appPost.profilePictureId);
@@ -76,16 +60,13 @@ export class PostCardComponent
                 this.post.appPost.description
             );
             this.post.appPost.embeddedLink = this.linkUrl;
-            if (this.linkUrl && this.post.type === PostType.TEXT) {
-                this.urlPreviewImage = this.post.attachmentsURLs[0];
+            if( this.linkUrl && this.post.type === PostType.TEXT  ){
+                this.urlPreviewImage = this.post.attachmentsURLs[0]
             }
         }
         const post = GetAppPostForViewDto.fromJS(this.post.toJSON());
         this.post = post;
         this.getRelatedEntity();
-        this.scrollableDiv.nativeElement.addEventListener("scroll", () => {
-            this.detectHiddenSections();
-        });
     }
 
     ngOnDestroy() {
@@ -126,8 +107,8 @@ export class PostCardComponent
     }
 
     onshowViewPost() {
-        this.InteractionsComponent.createView();
-        if (this.post.type == PostType.TEXT) return;
+        this.InteractionsComponent.createView()
+        if(this.post.type == PostType.TEXT) return
         this.showViewPost.emit(this.post);
     }
 
@@ -145,60 +126,6 @@ export class PostCardComponent
             AppEntityTypes[AppEntityTypes.EVENT].toString().toUpperCase()
         )
             this._viewEvent.emit(this.getAppEntityForViewDto.relatedEntityId);
-        this.InteractionsComponent.createView();
-    }
-
-    currentPlayingVideo: HTMLVideoElement;
-    onPlayingVideo(event) {
-        console.log(event.target, this.currentPlayingVideo);
-        event.preventDefault();
-        // play the first video that is chosen by the user
-        if (this.currentPlayingVideo === undefined) {
-            this.currentPlayingVideo = event.target;
-            this.currentPlayingVideo.play();
-        } else {
-            // if the user plays a new video, pause the last
-            // one and play the new one
-            if (event.target !== this.currentPlayingVideo) {
-                this.currentPlayingVideo.pause();
-                this.currentPlayingVideo = event.target;
-                this.currentPlayingVideo.play();
-            }
-        }
-    }
-
-    playVideo(videoUrl: string, event) {
-        let videoPrams={
-            value:event.target,
-            url :videoUrl
-        }
-        this.videoClicked.emit(videoPrams);
-    }
-
-    @ViewChild("scrollableDiv") scrollableDiv!: ElementRef;
-    @ViewChildren("itemElement") itemElements!: QueryList<ElementRef>;
-    detectHiddenSections() {
-        const scrollableDivTop =
-            this.scrollableDiv.nativeElement.getBoundingClientRect().top;
-        const scrollableDivBottom =
-            this.scrollableDiv.nativeElement.getBoundingClientRect().bottom;
-
-        this.itemElements.forEach((itemElement) => {
-            const itemElementTop =
-                itemElement.nativeElement.getBoundingClientRect().top;
-            const itemElementBottom =
-                itemElement.nativeElement.getBoundingClientRect().bottom;
-
-            if (
-                itemElementTop > scrollableDivBottom ||
-                itemElementBottom < scrollableDivTop
-            ) {
-                itemElement.nativeElement.classList.add("hidden");
-                console.log("hide");
-            } else {
-                itemElement.nativeElement.classList.remove("hidden");
-                console.log("visible");
-            }
-        });
+            this.InteractionsComponent.createView()
     }
 }

@@ -40,7 +40,6 @@ import { PaymentCompletedComponent } from './payment/payment-completed.component
 import { SessionLockScreenComponent } from './login/session-lock-screen.component';
 import { AppBsModalModule } from '@shared/common/appBsModal/app-bs-modal.module';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { DropdownModule } from 'primeng/dropdown';
 import { AppCommonModule } from '@app/shared/common/app-common.module';
 
 export function getRecaptchaLanguage(): string {
@@ -64,7 +63,6 @@ export function getRecaptchaLanguage(): string {
         PasswordModule,
         AppBsModalModule, 
         BsDropdownModule.forRoot(),
-        DropdownModule
     ],
     declarations: [
         AccountComponent,

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, Output, ViewChild } from '@angular/c
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { UserDelegationServiceProxy, UserDelegationDto } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import { CreateNewUserDelegationModalComponent } from './create-new-user-delegation-modal.component';

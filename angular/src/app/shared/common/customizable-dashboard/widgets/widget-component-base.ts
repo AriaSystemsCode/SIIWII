@@ -1,10 +1,7 @@
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { OnDestroy, Injector } from '@angular/core';
 import { timer, Subscription } from 'rxjs';
-import { Directive } from '@angular/core';
 
-@Directive()
-// TODO: Add Angular decorator.
 export abstract class WidgetComponentBase extends AppComponentBase implements OnDestroy {
     delay = 300;
     timer: Subscription;

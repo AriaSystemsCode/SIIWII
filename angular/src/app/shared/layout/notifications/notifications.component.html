@@ -57,7 +57,7 @@
                             <p-table #dataTable (onLazyLoad)="getNotifications($event)"
                                 [value]="primengTableHelper.records"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
-                                [lazy]="true" responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                [lazy]="true" [responsive]="primengTableHelper.isResponsive">
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th style="width:130px">
@@ -88,7 +88,7 @@
                                             </button>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'Notification' | localize}}</span>
+                                            <span class="ui-column-title">{{'Notification' | localize}}</span>
                                             <a *ngIf="record.formattedNotification.url"
                                                 href="{{record.formattedNotification.url}}"
                                                 class="{{getRowClass(record)}}">{{truncateString(record.formattedNotification.text, 120)}}</a>

@@ -38,11 +38,8 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, A
   cols: MatrixGridColumns = new MatrixGridColumns({ rowHeaderColumn:new MatrixGridSelectItem({label:'',value:''}), columns:[]})
   rows: MatrixGridRows[] = []
   canAddCols: boolean = false
-  canAddRows: boolean
+  canAddRows: boolean = false
   cellSelectionFormInput:FormInputs<string,LookupLabelDto[]> // any to be changed
-  appSizeScalesDetails;
-  sizeScaleName:string="";
-
   constructor(
     private _extraAttributeDataService:ExtraAttributeDataService,
     private _appSizeScaleServiceProxy:AppSizeScaleServiceProxy,
@@ -80,10 +77,9 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, A
         sizeScaleId:res.id,
         id:this.appSizeScaleDto.id || 0
       })
-      this.appSizeScalesDetails=this.appSizeScaleDto.appSizeScalesDetails;
       this.mapAppSizeScaleDtoToMatrixGrid()
       this.canAddCols = true
-   //   this.canAddRows = true
+      this.canAddRows = true
     })
   }
   sizeScaleSelectionCancelHandler(){
@@ -152,7 +148,7 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, A
     this.canAddCols = Boolean($event)
   }
   dimension2NameOnChange($event:string){
-   // this.canAddRows = Boolean($event)
+    this.canAddRows = Boolean($event)
   }
   openAppEntityListModal(dimension:1|2|3) {
     let config : ModalOptions = new ModalOptions()
@@ -185,20 +181,10 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, A
         if(modalRefData.selectionDone) {
           if(dimension == 2) {
             this.adjustRows(modalRefData)
-            if(!this.appSizeScaleDto.dimesion2Name)
-               this.appSizeScaleDto.dimesion2Name="Second dimension"
-              
           } else if(dimension == 1) {
             this.adjustCols(modalRefData)
-            if(!this.appSizeScaleDto.dimesion1Name)
-               this.appSizeScaleDto.dimesion1Name="First dimension"
           }
         }
-      
-        
-       
-       
-       
         if(!modalRef.content.isHiddenToCreateOrEdit)  subs.unsubscribe()
     })
   }
@@ -255,12 +241,7 @@ selectedRecords=modalRefData.selectedRecords;
     const newCols :MatrixGridSelectItem[] = []
     selectedRecords.forEach(record=>{
     //  let recordSelectItem : MatrixGridSelectItem = this.extraAttr.lookupData.filter(item=>item.value == record)[0]
-    let recordSelectItem : MatrixGridSelectItem;
-    recordSelectItem = modalRefData.allRecords.filter(item=>item.value == record)[0];
-    if(!recordSelectItem)
-     recordSelectItem =  this.extraAttr.lookupData.filter(item=>item.value == record)[0];
-    
-
+    let recordSelectItem : MatrixGridSelectItem = modalRefData.allRecords.filter(item=>item.value == record)[0];
       const existIndex = this.cols.columns.findIndex(col=>col.value == record)
       if(existIndex > -1) return 
       const col = new MatrixGridSelectItem(recordSelectItem)
@@ -280,13 +261,6 @@ selectedRecords=modalRefData.selectedRecords;
       })
     })
     // this.matrixGrid.addNewColumns(newCols)
-
-    if(this.cols?.columns?.length>0)
-      this.canAddRows=true;
-    else
-      this.canAddRows=false;
-
-      this.matrixGrid.canAddRows= this.canAddRows;
   }
   getAllSizeScales(getAllInputs: GetAllInputs) {
     return this._appSizeScaleServiceProxy.getAll(
@@ -322,6 +296,10 @@ selectedRecords=modalRefData.selectedRecords;
   openCreateOrEditSizeScale(isNew:boolean) {
   }
   createOrEdit(isNew:boolean) {
+    if(!this.appSizeScaleDto.name ) {
+      this.sizeScaleForm.form.markAllAsTouched();
+      return this.notify.error(this.l('PleaseEnterSizeScaleName'))
+    }
     if(!this.appSizeScaleDto.dimesion1Name || (this.rows?.length && !this.appSizeScaleDto.dimesion2Name)) {
       this.sizeScaleForm.form.markAllAsTouched();
       return this.notify.error(this.l('CompleteAllTheRequired*fields'))
@@ -347,56 +325,6 @@ selectedRecords=modalRefData.selectedRecords;
     body.dimesion3Name = this.appSizeScaleDto.dimesion3Name 
     body.noOfDimensions = this.appSizeScaleDto.noOfDimensions
     body.name = this.appSizeScaleDto.name
-    if( this.appSizeScalesDetails && this.appSizeScalesDetails?.length == body.appSizeScalesDetails.length && 
-      JSON.stringify(this.appSizeScalesDetails) == JSON.stringify(body.appSizeScalesDetails)){
-   return   this.notify.error(this.l('No change to Saved!'))
-    }
-  
-
-   /*  if(!this.appSizeScaleDto.name ) {
-      this.sizeScaleForm.form.markAllAsTouched();
-      return this.notify.error(this.l('PleaseEnterSizeScaleName'))
-    } */
-
-    if (!this.appSizeScaleDto.name) {
-      this.sizeScaleForm.form.markAllAsTouched();
-             this.sizeScaleName= "";
-             if (this.rows.length > 0) {
-               this.sizeScaleName = this.rows[0]?.rowValues[0]?.code;
-               if (this.rows.length - 1 != 0)
-               this.sizeScaleName += '-' + this.rows[this.rows.length - 1]?.rowValues[this.rows[this.rows.length - 1]?.rowValues.length - 1]?.code;
-             }
-             else if (this.cols.columns.length > 0) {
-               this.sizeScaleName = this.cols?.columns[0]?.code;
-               if (this.cols.columns.length - 1 != 0)
-               this.sizeScaleName += '-' + this.cols?.columns[this.cols.columns.length - 1]?.code;
-             }
-             //              this.l('The size scale name will be "'+ this.sizeScaleName +'" Do you need to proceed with this change?'),
-
-             this.message.confirm(
-              '',
-              this.l('The name '+ this.sizeScaleName+' will be used to save the size scale. Do you have to move on?'),
-              (isConfirmed) => {
-                  if (isConfirmed) 
-                 {
-                  this.appSizeScaleDto.name =  this.sizeScaleName;
-                  body.name = this.appSizeScaleDto.name
-                  this._createOrEdit(body);
-                 }
-                  else{
-                  this.appSizeScaleDto.name="";
-                  return;
-                  }
-              }
-          );
-             
-           }
-
-           else
-           this._createOrEdit(body);
-  }
-
-  _createOrEdit(body){
     this._appSizeScaleServiceProxy.createOrEditAppSizeScale(body).subscribe(result=>{
       this.notify.success(this.l('SavedSuccessfully'))
       this.appSizeScaleDto.sizeScaleId = result.id
@@ -459,12 +387,5 @@ selectedRecords=modalRefData.selectedRecords;
     }
     this.rows = rows
     this.cols = cols
-
-    if(this.cols?.columns?.length>0)
-    this.canAddRows=true;
-  else
-    this.canAddRows=false;
-
-    this.matrixGrid.canAddRows= this.canAddRows;
   }
 }

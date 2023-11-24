@@ -42,7 +42,7 @@
                         <div class="col primeng-datatable-container" [busyIf]="primengTableHelper.isLoading">
                             <p-table #dataTable (onLazyLoad)="getRoles()" [value]="primengTableHelper.records"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
-                                [lazy]="true" responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                [lazy]="true" [responsive]="primengTableHelper.isResponsive">
 
                                 <ng-template pTemplate="header">
                                     <tr>
@@ -83,7 +83,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'RoleName' | localize}}</span>
+                                            <span class="ui-column-title">{{'RoleName' | localize}}</span>
                                             <span>
                                                 {{record.displayName}}
                                                 <span *ngIf="record.isStatic"
@@ -102,7 +102,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'CreationTime' | localize}}</span>
+                                            <span class="ui-column-title">{{'CreationTime' | localize}}</span>
                                             {{record.creationTime | momentFormat:'L'}}
                                         </td>
                                     </tr>
@@ -111,7 +111,7 @@
                             <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
                                 {{'NoData' | localize}}
                             </div>
-                            <div class="p-table-footer">
+                            <div class="ui-table-footer">
                             </div>
                         </div>
                         <!--<Primeng-TurboTable-End>-->

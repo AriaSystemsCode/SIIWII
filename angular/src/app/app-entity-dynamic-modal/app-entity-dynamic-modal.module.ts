@@ -8,11 +8,8 @@ import { onetouchCommonModule } from '@shared/common/common.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AppEntityListDynamicModalComponent } from './app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { DropdownModule } from 'primeng/dropdown';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { CheckboxModule } from 'primeng/checkbox';
-import { ColorPickerModule } from 'ngx-color-picker';
+import { CheckboxModule, DropdownModule, MultiSelectModule, RadioButtonModule } from 'primeng';
+
 
 
 @NgModule({
@@ -29,8 +26,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
     CheckboxModule,
     MultiSelectModule,
     DropdownModule,
-    RadioButtonModule,
-    ColorPickerModule
+    RadioButtonModule
   ],
   exports : [CreateOrEditAppEntityDynamicModalComponent, AppEntityListDynamicModalComponent]
 })

@@ -16,7 +16,6 @@ import { eventsModule } from "../AppEvent/events.module";
 import { LinkPreviewComponent } from './Components/link-preview.component';
 import { InteractionsModule } from "../interactions/interactions.module";
 import { RouterModule } from "@angular/router";
-import { NewsDigestComponent } from '../../../shared/components/news-digest/news-digest.component';
 import { TrendingPostsComponent } from '../../../shared/components/trending-posts/trending-posts.component';
 import { TopPeopleComponent } from '../../../shared/components/top-people/top-people.component';
 import { TopCompanyComponent } from '../../../shared/components/top-company/top-company.component';
@@ -31,7 +30,6 @@ import { AdsSidebarComponent } from '../../../shared/components/ads-sidebar/ads-
         CreatePostEntryComponent,
         SanitizeurlPipe,
         LinkPreviewComponent,
-        NewsDigestComponent,
         TrendingPostsComponent,
         TopPeopleComponent,
         TopCompanyComponent,
@@ -56,7 +54,6 @@ import { AdsSidebarComponent } from '../../../shared/components/ads-sidebar/ads-
         CreateorEditPostComponent,
         PostListComponent,
         CreatePostEntryComponent,
-        NewsDigestComponent,
         TrendingPostsComponent,
         TopPeopleComponent,
         TopCompanyComponent,

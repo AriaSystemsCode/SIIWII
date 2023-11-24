@@ -42,4 +42,13 @@ export class ConfirmEmailComponent extends AppComponentBase implements OnInit {
                 });
         });
     }
+
+    parseTenantId(tenantIdAsStr?: string): number {
+        let tenantId = !tenantIdAsStr ? undefined : parseInt(tenantIdAsStr, 10);
+        if (tenantId === NaN) {
+            tenantId = undefined;
+        }
+
+        return tenantId;
+    }
 }

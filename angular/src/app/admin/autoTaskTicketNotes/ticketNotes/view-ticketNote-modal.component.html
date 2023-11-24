@@ -31,7 +31,7 @@
                     </div>
                     <div class="col-6 mb-3">
                         <h6> {{l("Date")}} :</h6>
-                        {{item.ticketNote.createDateTime?.toString() | date:"MM/dd/yyyy" }}
+                        {{item.ticketNote.createDateTime | date:"MM/dd/yyyy" }}
                     </div>
                     <div class="col-6 mb-3" *ngIf="item?.attachments?.length > 0" >
                         <h6> {{l("Attachments")}} :  {{item.attachments.length}}</h6>

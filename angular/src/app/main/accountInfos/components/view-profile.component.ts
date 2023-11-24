@@ -1,12 +1,11 @@
 import { Component, ViewChild, Injector, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, CreateOrEditAccountInfoDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountLevelEnum, AppEntitiesServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { ImageObject } from '../../accounts/account-shared/models/imageobject';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
-import { finalize } from 'rxjs';
 
 @Component({
     selector: 'app-view-profile',
@@ -21,9 +20,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Input('isPublished') isPublished: boolean;
     @Input() viewMode: boolean;
     @Input() accountLevel: AccountLevelEnum;
-    showEditConnected:boolean=false;
-    priceLevel:string;
-    allPriceLevel: SelectItem[] = [];
 
     @Output("edit") edit: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("delete") delete: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -68,8 +64,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     
     constructor(
         injector: Injector,
-        private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private _AccountsServiceProxy: AccountsServiceProxy,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
         super(injector)
     }
@@ -83,8 +78,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
     ngOnInit(){
         this.getAllForAccountInfo()
-        this.allPriceLevel=this.getPriceLevel();
-        this.allPriceLevel.push({ label :'MSRP' ,value: 'MSRP'});
     }
     handleInvalidImages(event) {
     }
@@ -97,13 +90,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     handleAccountData() {
-        this.accountData.isConnected=  this.accountData.status;
-        if(this.accountData.isConnected)
-        this.showEditConnected=true;
-        else
-        this.showEditConnected=false;
-
-        this.priceLevel=this.accountData.priceLevel;
         if (this.accountData.coverUrl) this.coverPhoto = `${this?.attachmentBaseUrl}/${this?.accountData?.coverUrl}`;
         if (this.accountData.logoUrl) this.logoPhoto = `${this?.attachmentBaseUrl}/${this?.accountData?.logoUrl}`;
 
@@ -116,7 +102,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             }
             this.imageObject.push(object);
         }
-   this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
+        this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
         this.edit.emit()
@@ -253,56 +239,5 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.unPublish.emit(true);
     }
 
-
-    editConnnectedAccount(){
-        this.showMainSpinner();
-
-          /*  let createOrEditAccountInfoDto:CreateOrEditAccountInfoDto=new CreateOrEditAccountInfoDto();
-           createOrEditAccountInfoDto.accountType=this.accountData.accountType;
-           createOrEditAccountInfoDto.accountTypeId=this.accountData.accountTypeId;
-           createOrEditAccountInfoDto.attachmentSourceTenantId=this.accountData.attachmentSourceTenantId;
-           createOrEditAccountInfoDto.branches=this.accountData.branches;
-           createOrEditAccountInfoDto.code=this.accountData.code;
-           createOrEditAccountInfoDto.contactAddresses=this.accountData.contactAddresses;
-           createOrEditAccountInfoDto.contactPaymentMethods=this.accountData.contactPaymentMethods;
-           createOrEditAccountInfoDto.currencyId=this.accountData.currencyId;
-           createOrEditAccountInfoDto.eMailAddress=this.accountData.eMailAddress;
-           createOrEditAccountInfoDto.entityAttachments=this.accountData.entityAttachments;
-           createOrEditAccountInfoDto.entityClassifications=this.accountData.entityClassifications;
-           createOrEditAccountInfoDto.entityId=this.accountData.entityId;
-           createOrEditAccountInfoDto.id=this.accountData.id;
-           createOrEditAccountInfoDto.languageId=this.accountData.languageId;
-           createOrEditAccountInfoDto.name=this.accountData.name ?this.accountData.name : this.appSession.tenant.name ;
-           createOrEditAccountInfoDto.notes=this.accountData.notes;
-           createOrEditAccountInfoDto.phone1Ex=this.accountData.phone1Ex;
-           createOrEditAccountInfoDto.phone1Number=this.accountData.phone1Number;
-           createOrEditAccountInfoDto.phone1TypeId=this.accountData.phone1TypeId;
-           createOrEditAccountInfoDto.phone2Ex=this.accountData.phone2Ex;
-           createOrEditAccountInfoDto.phone2Number=this.accountData.phone2Number;
-           createOrEditAccountInfoDto.phone2TypeId=this.accountData.phone2TypeId;
-           createOrEditAccountInfoDto.phone3Ex=this.accountData.phone3Ex;
-           createOrEditAccountInfoDto.phone3Number=this.accountData.phone3Number;
-           createOrEditAccountInfoDto.phone3TypeId=this.accountData.phone3TypeId;
-           createOrEditAccountInfoDto.priceLevel=this.priceLevel;
-           createOrEditAccountInfoDto.ssin=this.accountData.ssin;
-           createOrEditAccountInfoDto.tenantId=this.accountData.tenantId ;
-           createOrEditAccountInfoDto.tradeName=this.accountData.tradeName ?  this.accountData.tradeName : this.appSession.tenant.name;
-           createOrEditAccountInfoDto.website=this.accountData.website;
-           createOrEditAccountInfoDto.UseDTOTenant=true; */
-
-           this._AccountsServiceProxy.updateConnectedAccountPriceLevel(this.accountData.id,this.priceLevel)
-           .pipe(
-            finalize(
-                ()=>this.hideMainSpinner()
-            )
-        )
-            .subscribe(result => {
-             this.notify.info(this.l('SavedSuccessfully'));
-             this.showEditConnected =true;
-           this.accountData.priceLevel=this.priceLevel;
-            });
-
-        
-    }
 
 }

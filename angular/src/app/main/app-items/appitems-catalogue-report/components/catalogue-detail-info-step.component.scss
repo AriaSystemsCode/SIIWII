@@ -1,36 +1,4 @@
-@import '../../../../../assets/styles/base/variables';
 input:focus
 {
     border: 1px solid black !important;
-}
-
-.bgImg {
-    border: 1px solid #ddd; /* Gray border */
-    border-radius: 4px;  /* Rounded border */
-    padding: 5px; /* Some padding */
-    width: 200px;
-    height: 200px;
-  }
-  
-
-  .disableSection{
-    opacity: 0.5;
-  }
-  .enableSection{
-    opacity: 1;
-  }
-
-  .image-wrapper {
-    border: 1px solid $grey-1;
-    width: 200px;
-    height: 276px;
-    background-color: white;
-    margin-right: 2rem;
-    border-radius: 6px;
-    img {
-        max-height: 100%;
-        max-width: 100%;
-    }
-
-
 }

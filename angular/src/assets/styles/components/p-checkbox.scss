@@ -1,36 +1,16 @@
 @import '../base/variables';
+body .ui-chkbox .ui-chkbox-box.ui-state-active,
+body .ui-chkbox .ui-chkbox-box.ui-state-active:not(.ui-state-disabled):hover
+  {
+    border-color: #a6a6a6!important;
+    background-color: $white-color!important;
+    color: $checkbox-color!important;
+}
+body .ui-chkbox .ui-chkbox-box.ui-state-focus {
+    box-shadow:none
+}
+
 
 .kt-checkbox-list p-checkbox {
     display: flex;
-}
-
-.p-checkbox {
-    .p-checkbox-box {
-        background: $white!important;
-        width: 16px;
-        height: 16px;
-        color: #333333!important;
-        &.p-highlight {
-            border-color: $checkbox-border-color!important;
-            background: $white;
-        }
-    }
-    &:not(.p-checkbox-disabled) .p-checkbox-box {
-        &:hover,
-        &.p-focus,
-        &.p-highlight:hover {
-            outline: 0 none;
-            outline-offset: 0;
-            box-shadow: none!important;
-            border-color: $checkbox-border-color!important;
-        }
-    }
-    
-    .p-checkbox-icon {
-        color: $black!important;
-    }
-    .pi-check:before {
-        font-weight: 600;
-        font-size: 10px;
-    }
 }

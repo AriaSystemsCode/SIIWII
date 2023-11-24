@@ -6,15 +6,13 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppItemsListDto, AppItemsListsServiceProxy, GetAppItemsListForViewDto, ItemsListFilterTypesEnum } from '@shared/service-proxies/service-proxies';
 import { FileDownloadService } from '@shared/utils/file-download.service';
+import { LazyLoadEvent, Paginator, SelectItem, Table } from 'primeng';
 import { debounceTime, finalize } from 'rxjs/operators';
 import { CreateOrEditAppitemListComponent } from '../../app-item-shared/components/create-or-edit-appitem-list.component';
 import { filter } from 'lodash';
 import { Router } from '@angular/router';
 import { AppitemListPublishService } from '../services/appitem-list-publish.service';
 import { Observable } from 'rxjs';
-import { SelectItem, LazyLoadEvent } from 'primeng/api';
-import { Paginator } from 'primeng/paginator';
-import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-app-item-list-list',
@@ -107,7 +105,6 @@ export class AppItemListListComponent extends AppComponentBase implements OnInit
 
     getAppItemsLists(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

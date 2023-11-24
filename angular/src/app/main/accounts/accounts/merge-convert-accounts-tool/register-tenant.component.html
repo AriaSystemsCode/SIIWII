@@ -51,24 +51,6 @@
                     </div>
 
                     <div class="form-group col-9 col-lg-12 col-md-10 col-sm-7 m-0">
-                        <p-dropdown
-                        #accountTypeInput="ngModel"
-                      placeholder="{{ 'Account Type' | localize }} *"
-                      [options]="accountTypes"
-                       styleClass="ticket-dropdown form-control aria-select text-left"
-                        [filter]="false"
-                       name="accountType"
-                       [(ngModel)]="accountType"
-                       (onChange)="changeAccountType($event)"
-                      required>
-                       </p-dropdown>
-        
-                        <validation-messages
-                            [formCtrl]="accountTypeInput"
-                        ></validation-messages>
-                    </div>
-
-                    <div class="form-group col-9 col-lg-12 col-md-10 col-sm-7 m-0">
                         <input #nameInput="ngModel" class="form-control" type="text"
                             placeholder="{{ 'AccountName' | localize }} *" [(ngModel)]="model.name" name="Name" required
                             maxlength="128" />
@@ -118,8 +100,7 @@
                     </div>
                     <div class="form-group">
                         <input #adminEmailAddressInput="ngModel" class="form-control" type="email"
-                            [placeholder]="!accountTypeLabel.includes('PERSONAL')?  'admin email*'    :  'personal email*'"
-                            [(ngModel)]="model.adminEmailAddress"
+                            placeholder="{{ 'AdminEmailAddress' | localize }} *" [(ngModel)]="model.adminEmailAddress"
                             name="adminEmailAddress" required maxlength="256" email />
                         <span class="form-text text-danger">
                             <validation-messages [formCtrl]="adminEmailAddressInput"></validation-messages>
@@ -128,9 +109,7 @@
 
                     <div class="form-group">
                         <input type="password" name="Password" class="form-control" [(ngModel)]="model.adminPassword"
-                            #Password="ngModel" 
-                            [placeholder]=" !accountTypeLabel.includes('PERSONAL') ? 'Admin Password'  :  'Password'  "
-
+                            #Password="ngModel" placeholder="{{ 'AdminPassword' | localize }}"
                             validateEqual="PasswordRepeat" reverse="true"
                             [requireDigit]="passwordComplexitySetting.requireDigit" [requireLowercase]="
                                 passwordComplexitySetting.requireLowercase

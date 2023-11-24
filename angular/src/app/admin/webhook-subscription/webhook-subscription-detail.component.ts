@@ -46,7 +46,6 @@ export class WebhookSubscriptionDetailComponent extends AppComponentBase impleme
 
     getSendAttempts(event?: LazyLoadEvent): void {
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

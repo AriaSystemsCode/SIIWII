@@ -38,7 +38,8 @@ import {
     Subscription,
 } from "rxjs";
 import { ImageCropperComponent } from "@app/shared/common/image-cropper/image-cropper.component";
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
+import { ScrollTopOptions } from "@metronic/app/core/_base/layout/directives/scroll-top.directive";
 import {
     Router,
     NavigationStart,
@@ -90,8 +91,6 @@ export abstract class AppComponentBase {
 
     tenantDefaultCurrency : CurrencyInfoDto 
     _sycAttachmentCategoriesServiceProxy : SycAttachmentCategoriesServiceProxy
-    
-    
     constructor(injector: Injector, private _location?: Location) {
         this.localization = injector.get(LocalizationService);
         this.permission = injector.get(PermissionCheckerService);
@@ -270,10 +269,10 @@ export abstract class AppComponentBase {
             }
         };
 
-        const uploaderOptions: Partial<FileUploaderOptions> = {};
+        const uploaderOptions: FileUploaderOptions = {};
         uploaderOptions.authToken = "Bearer " + this.tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
-        uploader.setOptions(uploaderOptions as FileUploaderOptions);
+        uploader.setOptions(uploaderOptions);
         return uploader;
     }
     createCustomUploader(
@@ -301,10 +300,10 @@ export abstract class AppComponentBase {
             }
         };
 
-        const uploaderOptions: Partial<FileUploaderOptions> = {};
+        const uploaderOptions: FileUploaderOptions = {};
         uploaderOptions.authToken = "Bearer " + this.tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
-        uploader.setOptions(uploaderOptions as FileUploaderOptions);
+        uploader.setOptions(uploaderOptions);
         return uploader;
     }
     uploadBlobAttachment(
@@ -480,7 +479,7 @@ export abstract class AppComponentBase {
     }
 
     emitDestroy() {
-        this.destroy$.next(undefined);
+        this.destroy$.next();
     }
 
     confirmDiscardChanges(): boolean {
@@ -565,25 +564,5 @@ export abstract class AppComponentBase {
 
             fr.readAsDataURL(file);
         })
-    }
-    parseTenantId(tenantIdAsStr?: string): number | undefined {
-        let tenantId : number | undefined
-        if(tenantIdAsStr){
-            tenantId = parseInt(tenantIdAsStr, 10);
-            if ( isNaN(tenantId) ) {
-                tenantId = undefined;
-            }
-        }
-        return tenantId;
-    }
-
-    getPriceLevel():SelectItem[] {
-           let allPriceLevel: SelectItem[] = [];
-            allPriceLevel.push({ label :'A' ,value: 'A'});
-            allPriceLevel.push({ label :'B' ,value: 'B'});
-            allPriceLevel.push({ label :'C' ,value: 'C'});
-            allPriceLevel.push({ label :'D' ,value: 'D'});
-
-            return allPriceLevel;
     }
 }

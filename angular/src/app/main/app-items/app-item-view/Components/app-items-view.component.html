@@ -1,6 +1,11 @@
 <div [@routerTransition] #parentDiv>
     <div
-        class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal"
+        class="
+            kt-content
+            kt-grid__item kt-grid__item--fluid
+            kt-grid kt-grid--hor
+            font-weight-normal
+        "
     >
         <div
             class="kt-subheader kt-grid__item"
@@ -43,14 +48,18 @@
             }"
         >
             <div
-                class="kt-portlet kt-portlet--mobile seconedContainer extraDatacontainer p-4"
+                class="
+                    kt-portlet kt-portlet--mobile
+                    seconedContainer
+                    extraDatacontainer
+                    p-4
+                "
             >
                 <div class="row details">
                     <div class="col-6">
                         <div class="row">
                             <div
-                                *ngIf="
-                                    appItemForViewDto?.variations.length == 0
+                                *ngIf="appItemForViewDto?.variations.length==0 
                                 "
                                 class="p-2 leftContainer thin-scroll mr-5"
                                 [ngStyle]="{
@@ -86,7 +95,7 @@
                             </div>
                             <div
                                 *ngIf="
-                                    appItemForViewDto?.variations[0]
+                                appItemForViewDto?.variations[0]
                                         ?.selectedValues[varitaionSelectedIndex]
                                         ?.entityAttachments?.length > 0
                                 "
@@ -144,16 +153,17 @@
                             <div
                                 class="pt-4 pl-3 mb-5 text-center"
                                 *ngIf="
-                                    appItemForViewDto?.variations[0]
-                                        ?.selectedValues?.length > 0
+                                    appItemForViewDto?.variations[0]?.selectedValues
+                                        ?.length > 0
                                 "
                             >
+                                
+
                                 <div
                                     class="row"
                                     *ngIf="
                                         appItemForViewDto?.variations[0]
-                                            ?.selectedValues.length >
-                                            numVisible;
+                                            ?.selectedValues.length > numVisible;
                                         else nocarousel
                                     "
                                 >
@@ -166,15 +176,12 @@
                                         </h6>
                                     </div>
                                     <div class="col-12">
-                                        <div
-                                            class="attachImage thin-scroll d-flex justify-content-center"
-                                        >
+                                        <div class="attachImage thin-scroll d-flex justify-content-center">
                                             <p-carousel
                                                 [style]="{ width: '430px' }"
                                                 itemstyle="width:77px"
                                                 [value]="
-                                                    appItemForViewDto
-                                                        ?.variations[0]
+                                                    appItemForViewDto?.variations[0]
                                                         ?.selectedValues
                                                 "
                                                 [numVisible]="numVisible"
@@ -186,12 +193,15 @@
                                                     )
                                                 "
                                             >
-                                                <ng-template
-                                                    let-img
-                                                    pTemplate="item"
-                                                >
+                                                <ng-template let-img pTemplate="item">
                                                     <div
-                                                        class="p-d-flex p-jc-center p-ai-center mr-2 ml-2"
+                                                        class="
+                                                            p-d-flex
+                                                            p-jc-center
+                                                            p-ai-center
+                                                            mr-2
+                                                            ml-2
+                                                        "
                                                     >
                                                         <img
                                                             [src]="
@@ -234,26 +244,29 @@
                                         <div class="col-12">
                                             <h6 class="header">
                                                 {{
-                                                    appItemForViewDto
-                                                        ?.variations[0]
+                                                    appItemForViewDto?.variations[0]
                                                         .extraAttrName
                                                 }}: {{ selectedValuesName }}
                                             </h6>
                                         </div>
                                         <div class="col-12">
-                                            <div
-                                                class="attachImage thin-scroll d-flex justify-content-center"
-                                            >
+                                            <div class="attachImage thin-scroll d-flex justify-content-center">
+                                            
                                                 <div
                                                     *ngFor="
                                                         let img of appItemForViewDto
                                                             ?.variations[0]
-                                                            ?.selectedValues;
-                                                        let index = index
+                                                            ?.selectedValues;let index = index
                                                     "
                                                 >
                                                     <div
-                                                        class="p-d-flex p-jc-center p-ai-center mr-2 ml-2"
+                                                        class="
+                                                            p-d-flex
+                                                            p-jc-center
+                                                            p-ai-center
+                                                            mr-2
+                                                            ml-2
+                                                        "
                                                     >
                                                         <img
                                                             [src]="
@@ -288,6 +301,7 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </ng-template>
                             </div>
@@ -295,38 +309,11 @@
                     </div>
 
                     <div class="col-6 pl-5">
-                        <div
-                            class="share-sync my-3 d-flex align-items-center gap-3 justify-content-end w-100"
-                        >
-                            <button
-                                pButton
-                                pRipple
-                                label="Share"
-                                class="share mr-2"
-                                icon="pi pi-share-alt"
-                                (click)="openShareProductListingModal()"
-                            ></button>
-                            <button
-                                pButton
-                                pRipple
-                                label="Sync"
-                                class="sync"
-                                icon="pi pi-sync"
-                                (click)="syncProduct()"
-                                [loading]="btnLoader"
-                                [disabled]="!appItemForViewDto?.showSync"
-                            ></button>
-                        </div>
-                        <div class="last-updated  my-3 d-flex align-items-center gap-3 justify-content-end w-100">
-                         <p >  Last Edit  {{lastUpdatedDate | date: 'MMM d, y, h:mm a':"+timezoneOffset"}} </p>
-                        </div>
                         <div class="header">
                             [{{ appItemForViewDto?.code }}]
                             {{ appItemForViewDto?.name }}
                         </div>
-                        <div
-                            class="d-flex align-items-baseline justify-content-between"
-                        >
+                        <div class="d-flex align-items-baseline justify-content-between">
                             <div
                                 class="price pt-2"
                                 *ngIf="
@@ -334,11 +321,10 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{ "MSRP" | localize }}:
-                                {{ tenantDefaultCurrency.symbol
-                                }}{{ appItemForViewDto?.minPrice }} -
-                                {{ tenantDefaultCurrency.symbol
-                                }}{{ appItemForViewDto?.maxPrice }}
+                                {{ "MSRP" | localize }}: {{tenantDefaultCurrency.symbol}}{{
+                                    appItemForViewDto?.minPrice
+                                }}
+                                - {{tenantDefaultCurrency.symbol}}{{ appItemForViewDto?.maxPrice }}
                             </div>
                             <div
                                 class="price pt-2"
@@ -347,46 +333,28 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{ "MSRP" | localize }}:
-                                {{ tenantDefaultCurrency.symbol
-                                }}{{ appItemForViewDto?.minPrice }}
+                                {{ "MSRP" | localize }}: {{tenantDefaultCurrency.symbol}}{{
+                                    appItemForViewDto?.minPrice
+                                }}
                             </div>
                             <div class="d-flex">
-                                <button
-                                    class="btn btn-primary"
-                                    type="button"
-                                    (click)="showAdvancedPricingModal()"
-                                >
-                                    {{ "AdvancedPricing" | localize }}
+                                <button class="btn btn-primary" type="button" (click)="showAdvancedPricingModal()">
+                                    {{'AdvancedPricing' | localize}}
                                 </button>
                             </div>
                         </div>
                         <div
                             class="price pt-2 d-flex align-items-center justify-content-between"
                             *ngIf="
-                                appItemForViewDto?.stockAvailability &&
-                                appItemForViewDto?.variations[0]
+                                appItemForViewDto?.stockAvailability && appItemForViewDto?.variations[0]
                             "
                         >
                             <div>
                                 {{ "ProductAvailableQuantity" | localize }}
                             </div>
                             <div>
-                                <input
-                                    class="bg-secondary disabled font-weight-bold text-center text-primary readonly-text-input"
-                                    type="text"
-                                    name="Product_StockAvailability"
-                                    readonly
-                                    [value]="
-                                        appItemForViewDto?.stockAvailability
-                                    "
-                                />
+                                <input class="bg-secondary disabled font-weight-bold text-center text-primary readonly-text-input" type="text" name="Product_StockAvailability" readonly [value]="appItemForViewDto?.stockAvailability">
                             </div>
-                        </div>
-                        <div class="share-level"  >
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 1 || _publishAppItemListingService.sharingStatus === 2 " > Shared  <div class="shared-dot"></div> </span>
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 3 " > Private  <div class="private-dot"></div> </span>
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 4 " > Hidden <div class="hidden-dot"></div> </span>
                         </div>
                         <div
                             *ngIf="productDescription"
@@ -396,7 +364,7 @@
                                 {{ "ProductDescription" | localize }}
                             </div>
                             <div
-                                class="big-scroll"
+                            class="big-scroll"
                                 [ngStyle]="{
                                     'overflow-y': scrollDesc
                                         ? 'scroll'
@@ -404,14 +372,14 @@
                                     height: scrollDesc ? '200px' : 'auto'
                                 }"
                             >
-                                <p
-                                    class="m-0"
-                                    [innerHTML]="productDescription"
-                                ></p>
+                                <p class="m-0" [innerHTML]="
+                                    productDescription
+                                ">
+                                    
+                                </p>
                             </div>
                         </div>
-                        <div
-                            *ngIf="false"
+                        <div *ngIf="false"
                             class="pt-4 pl-2 pt-4 thin-scroll dropDownVariation"
                         >
                             <div
@@ -451,147 +419,72 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="tab-wrapper size-attr-tabset">
+                        
+                        <div class="tab-wrapper size-attr-tabset" >
                             <tabset>
                                 <tab>
                                     <ng-template tabHeading>
-                                        <span class="tab-item pl-4 pr-4">{{
-                                            "AvailableQty" | localize
-                                        }}</span>
+                                        <span class="tab-item pl-4 pr-4">{{ 'AvailableQty' | localize }}</span>
                                     </ng-template>
                                     <ng-template #parentProductAvailQty>
-                                        <div>
-                                            <input
-                                                class="bg-secondary disabled font-weight-bold text-center text-primary readonly-text-input"
-                                                type="text"
-                                                name="Product_StockAvailability"
-                                                readonly
-                                                [value]="
-                                                    appItemForViewDto?.stockAvailability
-                                                "
-                                            />
-                                        </div>
+                                        <div  >
+                                            <input class="bg-secondary disabled font-weight-bold text-center text-primary readonly-text-input" type="text" name="Product_StockAvailability" readonly [value]="appItemForViewDto?.stockAvailability">
+                                        </div> 
                                     </ng-template>
-                                    <div
-                                        *ngIf="
-                                            appItemForViewDto?.variations[0]
-                                                ?.selectedValues[
-                                                this.varitaionSelectedIndex
-                                            ]?.edRestAttributes[0]?.values;
-                                            else parentProductAvailQty
-                                        "
-                                    >
-                                        <div
-                                            class="col ratio-container thin-scroll"
-                                        >
-                                            <div class="d-flex flex-wrap">
-                                                <div
-                                                    class="ratio-item"
-                                                    *ngFor="
-                                                        let lookuplabel of appItemForViewDto
-                                                            .variations[0]
-                                                            .selectedValues[
-                                                            this
-                                                                .varitaionSelectedIndex
-                                                        ].edRestAttributes[0]
-                                                            .values;
-                                                        index as i
-                                                    "
-                                                >
-                                                    <div class="ratio-lable">
-                                                        {{ lookuplabel.label }}
-                                                    </div>
+                                    <div  *ngIf="appItemForViewDto?.variations[0]?.selectedValues[this.varitaionSelectedIndex]?.edRestAttributes[0]?.values;else parentProductAvailQty">
+                                        
+                                        <div class="col ratio-container thin-scroll " > 
+                                            <div class="d-flex flex-wrap" >
+                                                <div class="ratio-item" *ngFor="let lookuplabel of appItemForViewDto.variations[0].selectedValues[this.varitaionSelectedIndex].edRestAttributes[0].values;index as i">
+                                                    <div class="ratio-lable">{{lookuplabel.label}}</div>
                                                     <div class="ratio-qty">
-                                                        <input
-                                                            type="number"
-                                                            [value]="
-                                                                lookuplabel.stockAvailability
-                                                            "
-                                                            [name]="
-                                                                lookuplabel.label +
-                                                                '-' +
-                                                                i
-                                                            "
+                                                        <input 
+                                                            type="number" 
+                                                            [value]='lookuplabel.stockAvailability' 
+                                                            [name]="lookuplabel.label + '-' + i" 
                                                             readOnly
                                                         />
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> 
                                 </tab>
-                                <tab
-                                    *ngIf="
-                                        appItemForViewDto?.variations[0]
-                                            ?.selectedValues[
-                                            this.varitaionSelectedIndex
-                                        ]?.edRestAttributes[0]?.extraAttrName ==
-                                        'SIZE'
-                                    "
-                                >
+                                <tab *ngIf="appItemForViewDto?.variations[0]?.selectedValues[this.varitaionSelectedIndex]?.edRestAttributes[0]?.extraAttrName == 'SIZE'" >
                                     <ng-template tabHeading>
-                                        <span class="tab-item pl-4 pr-4">{{
-                                            "SizeRatio" | localize
-                                        }}</span>
+                                        <span class="tab-item pl-4 pr-4">{{'SizeRatio' | localize }}</span>
                                     </ng-template>
-                                    <div
-                                        *ngIf="
-                                            appItemForViewDto
-                                                ?.appItemSizesScaleInfo
-                                                ?.length == 2
-                                        "
-                                    >
+                                    <div *ngIf='appItemForViewDto?.appItemSizesScaleInfo?.length == 2'>
                                         <app-size-ratio
                                             #sizeRatioComponent
-                                            [oldAppSizeRatios]="
-                                                appItemForViewDto
-                                                    .appItemSizesScaleInfo[1]
-                                            "
-                                            [appSizeScales]="
-                                                appItemForViewDto
-                                                    .appItemSizesScaleInfo[0]
-                                            "
+                                            [oldAppSizeRatios]="appItemForViewDto.appItemSizesScaleInfo[1]"
+                                            [appSizeScales]="appItemForViewDto.appItemSizesScaleInfo[0]"
                                             [readOnly]="true"
                                         >
                                         </app-size-ratio>
                                     </div>
                                 </tab>
-                                <tab>
+                                <tab >
                                     <ng-template tabHeading>
-                                        <span class="tab-item pl-4 pr-4">{{
-                                            "Pricing" | localize
-                                        }}</span>
+                                        <span class="tab-item pl-4 pr-4">{{'Pricing' | localize }}</span>
                                     </ng-template>
-                                    <div
-                                        class="d-flex justify-content-center align-items-baseline"
-                                    >
-                                        <div class="col-5">
-                                            <p-dropdown
-                                                [options]="currencies"
-                                                [styleClass]="
-                                                    'w-100 aria-select-primeng'
-                                                "
-                                                [filter]="false"
-                                                [name]="'variation-currencies'"
-                                                [(ngModel)]="currencyId"
-                                                [placeholder]="
-                                                    'Select' | localize
-                                                "
-                                                [appendTo]="'body'"
-                                                (ngModelChange)="
-                                                    filterPricing()
-                                                "
-                                            >
-                                            </p-dropdown>
-                                        </div>
+                                    <div class="d-flex justify-content-center align-items-baseline">
+                                        <p-dropdown
+                                            [options]="currencies"
+                                            [styleClass]="'aria-select-primeng-small'"
+                                            [filter]="false" 
+                                            [name]="'variation-currencies'" 
+                                            [(ngModel)]="currencyId"
+                                            [placeholder]="'Select' | localize"
+                                            [appendTo]="'body'"
+                                            (ngModelChange)="filterPricing()"
+                                        >
+                                        </p-dropdown>
                                         <p-dropdown
                                             [options]="levels"
-                                            [styleClass]="
-                                                'w-100 aria-select-primeng'
-                                            "
-                                            [filter]="false"
-                                            [name]="'variation-levels'"
+                                            [styleClass]="'aria-select-primeng-small'"
+                                            [filter]="false" 
+                                            [name]="'variation-levels'" 
                                             [(ngModel)]="level"
                                             [placeholder]="'Select' | localize"
                                             [appendTo]="'body'"
@@ -600,80 +493,45 @@
                                         </p-dropdown>
                                     </div>
                                     <ng-template #priceElseTemp>
-                                        <div>
-                                            <div
-                                                class="col ratio-container thin-scroll"
-                                            >
-                                                <div class="d-flex flex-wrap">
-                                                    <div class="ratio-item">
+                                        <div  >
+                                            <div class="col ratio-container thin-scroll " >
+                                                <div class="d-flex flex-wrap" >
+                                                    <div class="ratio-item" >
                                                         <div class="ratio-qty">
-                                                            <input
-                                                                type="number"
-                                                                [value]="
-                                                                    appItemForViewDto
-                                                                        ?.appItemPriceInfos[
-                                                                        parentProductPriceIndex
-                                                                    ]?.price
-                                                                "
-                                                                [name]="
-                                                                    'priceDto.price' +
-                                                                    '-' +
-                                                                    parentProductPriceIndex
-                                                                "
+                                                            <input 
+                                                                type="number" 
+                                                                [value]='appItemForViewDto?.appItemPriceInfos[parentProductPriceIndex]?.price' 
+                                                                [name]="'priceDto.price' + '-' + parentProductPriceIndex" 
                                                                 readOnly
                                                             />
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> 
                                     </ng-template>
                                     <div
-                                        *ngIf="
-                                            this.appItemForViewDto
-                                                ?.variations[0]
-                                                ?.extraAttributeId;
-                                            else priceElseTemp
-                                        "
+                                        *ngIf="this.appItemForViewDto?.variations[0]?.extraAttributeId;else priceElseTemp"
                                     >
-                                        <div *ngIf="prices">
-                                            <div
-                                                class="col ratio-container thin-scroll"
-                                            >
-                                                <div class="d-flex flex-wrap">
-                                                    <div
-                                                        class="ratio-item"
-                                                        *ngFor="
-                                                            let priceDto of prices;
-                                                            let index = index
-                                                        "
-                                                    >
-                                                        <div
-                                                            class="ratio-lable"
-                                                        >
-                                                            {{
-                                                                priceDto.attibuteCode
-                                                            }}
-                                                        </div>
+                                        <div  *ngIf="prices">
+                                            <div class="col ratio-container thin-scroll " >
+                                                <div class="d-flex flex-wrap" >
+                                                    <div class="ratio-item" *ngFor="let priceDto of prices;let index = index">
+                                                        <div class="ratio-lable">{{priceDto.attibuteCode}}</div>
                                                         <div class="ratio-qty">
-                                                            <input
-                                                                type="number"
-                                                                [value]="
-                                                                    priceDto.price
-                                                                "
-                                                                [name]="
-                                                                    'priceDto.price' +
-                                                                    '-' +
-                                                                    index
-                                                                "
+                                                            <input 
+                                                                type="number" 
+                                                                [value]='priceDto.price' 
+                                                                [name]="'priceDto.price' + '-' + index" 
                                                                 readOnly
                                                             />
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> 
                                     </div>
+                                    
                                 </tab>
                             </tabset>
                         </div>
@@ -685,7 +543,7 @@
             [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
             "
-            [ngClass]="{ 'pt-5': appItemViewInput?.marketPlace }"
+            [ngClass]="{ 'pt-5': appItemViewInput?.marketPlace  }"
         >
             <div class="productDetailContainer p-4">
                 <h6 class="header">{{ "ProductDetails" | localize }}</h6>
@@ -1162,34 +1020,3 @@
     (_cancel)="hideAdvancedPricingModal()"
 >
 </app-advanced-pricing>
-
-<!-- <p-dialog
-    [style]="{ width: '30vw' }"
-    [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
-    [baseZIndex]="10000"
-    [modal]="true"
-    [(visible)]="display"
-    [draggable]="false"
-    [closable]="true"
->
-    <p-header>
-       <h5 class="text-dark"> Product Sharing Option </h5>
-    </p-header>
-
-    <p>The stor.</p>
-
-    <p-footer>
-        <button
-            type="button"
-            pButton
-            icon="fa-check"
-            (click)="display = false"
-            label="Yes"
-        >
-            hghk
-        </button>
-    </p-footer>
-</p-dialog> -->
-
-<app-variations-selection-modal #variationSelectionModal>
-</app-variations-selection-modal>

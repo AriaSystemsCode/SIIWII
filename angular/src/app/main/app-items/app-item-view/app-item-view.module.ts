@@ -5,15 +5,14 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AppCommonModule } from "@app/shared/common/app-common.module";
 import { AppItemsViewComponent } from "./Components/app-items-view.component";
 import { AppItemSharedModule } from "../app-item-shared/app-item-shared.module";
-import { DropdownModule } from "primeng/dropdown";
+import { DropdownModule } from "primeng";
 import { RouterModule } from "@angular/router";
 import { BsDropdownModule } from "ngx-bootstrap/dropdown";
 import { ModalModule } from "ngx-bootstrap/modal";
 import { CarouselModule} from "primeng/carousel";
 import { InteractionsModule } from "@app/main/interactions/interactions.module";
 import { TabsModule } from "ngx-bootstrap/tabs";
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
+
 @NgModule({
     declarations: [AppItemsViewComponent],
     imports: [
@@ -30,8 +29,6 @@ import { DialogModule } from 'primeng/dialog';
         CarouselModule,
         InteractionsModule,
         TabsModule.forRoot(),
-        ButtonModule,
-        DialogModule
     ],
     exports: [AppItemsViewComponent],
 })

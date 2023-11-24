@@ -9,6 +9,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { TreeviewModule } from 'ngx-treeview';
+import { PaginatorModule, MultiSelectModule, DropdownModule, TableModule, TreeTableModule, TabMenuModule, TreeModule, CheckboxModule } from 'primeng';
 import {  BulkImportModule } from '../../../../shared/components/import-steps/bulk-import.module';
 import { AccountCardComponent } from './components/account-card.component';
 import { AccountsListFiltersComponent } from './components/accounts-list-filters.component';
@@ -16,14 +17,6 @@ import { AccountsComponent } from './components/accounts.component';
 import { NgxBootstrapDatePickerConfigService } from 'assets/ngx-bootstrap/ngx-bootstrap-datepicker-config.service';
 import { FiltersSharedModule } from '@app/shared/filters-shared/filters-shared.module';
 import { EmailingTemplateServiceProxy } from '@shared/service-proxies/service-proxies';
-import { CheckboxModule } from 'primeng/checkbox';
-import { DropdownModule } from 'primeng/dropdown';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { PaginatorModule } from 'primeng/paginator';
-import { TableModule } from 'primeng/table';
-import { TabMenuModule } from 'primeng/tabmenu';
-import { TreeModule } from 'primeng/tree';
-import { TreeTableModule } from 'primeng/treetable';
 
 
 @NgModule({

@@ -14,7 +14,7 @@
                          rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
                          [paginator]="false"
                          [lazy]="true"
-                         responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                         [responsive]="primengTableHelper.isResponsive">
                     <ng-template pTemplate="header">
                         <tr>
                             <th style="width: 15%"
@@ -39,11 +39,11 @@
                                 </button>
                             </td>
                             <td>
-                                <span class="p-column-title">{{'Role' | localize}}</span>
+                                <span class="ui-column-title">{{'Role' | localize}}</span>
                                 {{record.displayName}}
                             </td>
                             <td>
-                                <span class="p-column-title">{{'AddedTime' | localize}}</span>
+                                <span class="ui-column-title">{{'AddedTime' | localize}}</span>
                                 {{record.addedTime | momentFormat:'L'}}
                             </td>
                         </tr>

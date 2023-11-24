@@ -67,7 +67,7 @@ export class AccountComponent extends AppComponentBase implements OnInit {
 
     ngOnInit(): void {
         this._loginService.init();
-       // document.body.className = this._uiCustomizationService.getAccountModuleBodyClass();
+        document.body.className = this._uiCustomizationService.getAccountModuleBodyClass();
     }
 
     goToHome(): void {

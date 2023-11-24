@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, OnInit, Output, ViewChild } from '@a
 import { AddMemberModalComponent } from '@app/admin/organization-units/add-member-modal.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { OrganizationUnitServiceProxy, OrganizationUnitUserListDto } from '@shared/service-proxies/service-proxies';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import { IBasicOrganizationUnitInfo } from './basic-organization-unit-info';
@@ -59,7 +59,6 @@ export class OrganizationUnitMembersComponent extends AppComponentBase implement
         }
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
 
             return;

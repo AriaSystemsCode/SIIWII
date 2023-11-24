@@ -44,7 +44,7 @@ import { AddWidgetModalComponent } from "./customizable-dashboard/add-widget-mod
 import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { NgxBootstrapDatePickerConfigService } from "assets/ngx-bootstrap/ngx-bootstrap-datepicker-config.service";
 import { PerfectScrollbarModule } from "ngx-perfect-scrollbar";
-import CountoModule  from "angular2-counto";
+import { CountoModule } from "angular2-counto";
 import { AppBsModalModule } from "@shared/common/appBsModal/app-bs-modal.module";
 import { SingleLineStringInputTypeComponent } from "./input-types/single-line-string-input-type/single-line-string-input-type.component";
 import { ComboboxInputTypeComponent } from "./input-types/combobox-input-type/combobox-input-type.component";
@@ -65,7 +65,7 @@ import {SendMailModalComponent} from '@app/shared/common/Mail/sendMail-modal.com
 import { ImageUploadComponent } from './image-upload/image-upload.component';
 import { ImageDisplayComponent } from './image-display/image-display.component';
 import { ProgressComponent } from './progress/progress.component'
-import { CheckboxModule } from "primeng/checkbox";
+import { CheckboxModule } from "primeng";
 import { GenericFormModalComponent } from "./generic-forms/generic-form-modal.component";
 import { MatrixGridComponent } from "./matrix-grid/matrix-grid.component";
 import { SelectionModalComponent } from "./selection-modals/selection-modal.component";
@@ -167,9 +167,31 @@ import { SelectionModalComponent } from "./selection-modals/selection-modal.comp
         },
         {
             provide: BsDaterangepickerConfig,
-            useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig,
+            useFactory:
+                NgxBootstrapDatePickerConfigService.getDaterangepickerConfig,
         },
-    ]
+    ],
+
+    entryComponents: [
+        WidgetGeneralStatsComponent,
+        WidgetDailySalesComponent,
+        WidgetEditionStatisticsComponent,
+        WidgetHostTopStatsComponent,
+        WidgetIncomeStatisticsComponent,
+        WidgetMemberActivityComponent,
+        WidgetProfitShareComponent,
+        WidgetRecentTenantsComponent,
+        WidgetRegionalStatsComponent,
+        WidgetSalesSummaryComponent,
+        WidgetSubscriptionExpiringTenantsComponent,
+        WidgetTopStatsComponent,
+        FilterDateRangePickerComponent,
+        SingleLineStringInputTypeComponent,
+        ComboboxInputTypeComponent,
+        CheckboxInputTypeComponent,
+        MultipleSelectComboboxInputTypeComponent,
+        ImageViewerComponent,
+    ],
 })
 export class AppCommonModule {
     static forRoot(): ModuleWithProviders<AppCommonModule> {

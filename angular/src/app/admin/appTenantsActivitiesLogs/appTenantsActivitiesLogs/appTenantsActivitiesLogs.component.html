@@ -165,7 +165,7 @@
                                      [lazy]="true"
                                      [scrollable]="true"
                                      ScrollWidth="100%"
-                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [responsive]="primengTableHelper.isResponsive"
                                      [resizableColumns]="primengTableHelper.resizableColumns">
                             <ng-template pTemplate="header">
                                 <tr>
@@ -256,15 +256,15 @@
                                         </div>
                                     </td>
                                     <td style="width:150px">
-                                        <span class="p-column-title"> {{l('TenantName')}}</span>
+                                        <span class="ui-column-title"> {{l('TenantName')}}</span>
                                         {{record.tenancyName}}
                                     </td>                                    
                                     <td style="width:150px">
-												<span class="p-column-title"> {{l('SycServiceCode')}}</span>
+												<span class="ui-column-title"> {{l('SycServiceCode')}}</span>
 												{{record.sycServiceCode}}
 											</td>
                                             <td style="width:150px">
-                                                <span class="p-column-title"> {{l('ActivityDate')}}</span>
+                                                <span class="ui-column-title"> {{l('ActivityDate')}}</span>
                                                 <span *ngIf="record.appTenantsActivitiesLog.activityDate">
                                                     {{record.appTenantsActivitiesLog.activityDate |  momentFormat:'L' }}
                                                 </span>
@@ -272,49 +272,49 @@
                                             </td>                                            
                                    
                                     <td style="width:150px">
-												<span class="p-column-title"> {{l('AppTransactionCode')}}</span>
+												<span class="ui-column-title"> {{l('AppTransactionCode')}}</span>
 												{{record.appTransactionCode}}
 											</td>
                                    
                              
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('Units')}}</span>
+											<span class="ui-column-title"> {{l('Units')}}</span>
 											{{record.appTenantsActivitiesLog.units}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('UnitPrice')}}</span>
+											<span class="ui-column-title"> {{l('UnitPrice')}}</span>
 											{{record.appTenantsActivitiesLog.unitPrice}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('Amount')}}</span>
+											<span class="ui-column-title"> {{l('Amount')}}</span>
 											{{record.appTenantsActivitiesLog.amount}}
 										</td>
                                    
                                         
                             <td style="width:150px">
-                                        <span class="p-column-title"> {{l('SycPlanName')}}</span>
+                                        <span class="ui-column-title"> {{l('SycPlanName')}}</span>
                                         {{record.sycPlanName}}
                                     </td> 
                                     <td style="width:150px">
-                                        <span class="p-column-title"> {{l('SycApplicationName')}}</span>
+                                        <span class="ui-column-title"> {{l('SycApplicationName')}}</span>
                                         {{record.sycApplicationName}}
                                     </td>               
                                     <td style="width:150px">
-										<span class="p-column-title"> {{l('Billed')}}</span>
+										<span class="ui-column-title"> {{l('Billed')}}</span>
                                         <div *ngIf="record.appTenantsActivitiesLog.billed" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
 										<div *ngIf="!record.appTenantsActivitiesLog.billed" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
                                     </td>                        
                                     <td style="width:150px">
-										<span class="p-column-title"> {{l('IsManual')}}</span>
+										<span class="ui-column-title"> {{l('IsManual')}}</span>
                                         <div *ngIf="record.appTenantsActivitiesLog.isManual" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
 										<div *ngIf="!record.appTenantsActivitiesLog.isManual" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
                                     </td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('InvoiceNumber')}}</span>
+											<span class="ui-column-title"> {{l('InvoiceNumber')}}</span>
 											{{record.appTenantsActivitiesLog.invoiceNumber}}
 										</td>
                                     <td style="width:150px">
-										<span class="p-column-title"> {{l('InvoiceDate')}}</span>
+										<span class="ui-column-title"> {{l('InvoiceDate')}}</span>
                                         <span *ngIf="record.appTenantsActivitiesLog.invoiceDate">
 											{{record.appTenantsActivitiesLog.invoiceDate |  momentFormat:'L' }}
                                         </span>

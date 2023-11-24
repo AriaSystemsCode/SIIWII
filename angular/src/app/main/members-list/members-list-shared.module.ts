@@ -12,7 +12,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { TreeviewModule } from 'ngx-treeview';
-import { PaginatorModule } from 'primeng/paginator';
+import { PaginatorModule } from 'primeng';
 
 
 @NgModule({

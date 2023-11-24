@@ -16,11 +16,8 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     @Input() entityId: number
     @Input() relatedEntityId: number
     @Input() postCreatorUserId: number
-    @Input() showFirstBarOnly: boolean=false
     @Input() parentId: number
     @Input() threadId: number
-    @Input() cartStyle: boolean;
-
     showReactionsPopup: boolean = false
     defaultReactionType: Reactions = this._reactionService.defaultReactionType
     currentUserReaction: AppEntityUserReactionDto = new AppEntityUserReactionDto()

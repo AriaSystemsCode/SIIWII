@@ -1,14 +1,12 @@
-@import '../base/variables';
-
-body .wide-drop-down .p-dropdown {
+body .wide-drop-down .ui-dropdown {
     border: 1px solid #dee2e6;
     padding: 0.2rem 1rem;
 }
-body .wide-drop-down .p-dropdown:hover {
-    border: 1px solid $grey-2 !important;
+body .wide-drop-down .ui-dropdown:hover {
+    border: 1px solid #b5b5c3 !important;
 }
 
-body .wide-drop-down .p-dropdown .p-dropdown-trigger {
+body .wide-drop-down .ui-dropdown .ui-dropdown-trigger {
     padding-right: 4rem;
 }
 
@@ -27,9 +25,7 @@ body bs-dropdown-container {
     }
 }
 
-.p-dropdown:not(.p-disabled).p-focus {
-    box-shadow: none!important;
-}
+
 
 
 // fix ticket style issue 
@@ -37,19 +33,17 @@ body bs-dropdown-container {
     padding: 0.2rem 0.1rem;
  }
 
+ span.ui-dropdown-label.ui-inputtext.ui-corner-all{
+    font-size: 0.875rem !important; 
+ }
+
+
  .linesheet-price {
-    .p-dropdown-label {
+    .ui-dropdown-label {
         font-size: 11px!important;
         font-family: Arial, Helvetica, sans-serif !important;
     }
  }
- p-dropdown .p-dropdown-label-container {
+ p-dropdown .ui-dropdown-label-container {
     overflow: hidden;
-}
-
-.dropdown-menu>.dropdown-item, .dropdown-menu>li>a {
-    color: $grey-6;
-}
-.p-dropdown {
-    align-items: center;
 }

@@ -68,7 +68,7 @@
             <div class="col-md-3 col-12">
                 <div *ngIf="singleItemPerRowMode" class="text-right" >
                     <div *ngIf="member.joinDate !== null">
-                        {{ "JoinedAt" | localize }} {{ member.joinDate?.toString() | date : 'M-d-yyyy' }}
+                        {{ "JoinedAt" | localize }} {{ member.joinDate | date : 'M-d-yyyy' }}
                     </div>
                     <div *ngIf="showActiveStatus && member?.userId">
                         <span class="connected text-success" *ngIf="member.isActive == true">

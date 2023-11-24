@@ -21,7 +21,7 @@
                             [value]="primengTableHelper.records"
                             rows="{{primengTableHelper.records.length}}"
                             [paginator]="false"
-                            responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                            [responsive]="primengTableHelper.isResponsive">
                             <ng-template pTemplate="header">
                                 <tr>
                                     <th>

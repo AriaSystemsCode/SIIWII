@@ -1,4 +1,4 @@
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
 import { MemberFilterTypeEnum } from '@shared/service-proxies/service-proxies';
 
 export interface MembersListComponentInputsI {

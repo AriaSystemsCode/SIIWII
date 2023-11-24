@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AppItemsBrowseModalComponent } from './app-items-browse-modal.component';
 
@@ -6,7 +6,7 @@ describe('AppItemsBrowseModalComponent', () => {
   let component: AppItemsBrowseModalComponent;
   let fixture: ComponentFixture<AppItemsBrowseModalComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ AppItemsBrowseModalComponent ]
     })

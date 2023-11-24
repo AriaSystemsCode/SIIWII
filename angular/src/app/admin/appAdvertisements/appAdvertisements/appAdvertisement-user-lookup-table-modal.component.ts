@@ -4,10 +4,10 @@ import {AppAdvertisementsServiceProxy, AppAdvertisementUserLookupTableDto } from
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Table } from 'primeng/table';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 @Component({
     selector: 'appAdvertisementUserLookupTableModal',
-    styleUrls: ['./appAdvertisement-user-lookup-table-modal.component.scss'],
+    styleUrls: ['./appAdvertisement-user-lookup-table-modal.component.less'],
     encapsulation: ViewEncapsulation.None,
     templateUrl: './appAdvertisement-user-lookup-table-modal.component.html'
 })
@@ -45,7 +45,6 @@ export class AppAdvertisementUserLookupTableModalComponent extends AppComponentB
         }
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

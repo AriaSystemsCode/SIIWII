@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UtilsModule } from '../../shared/utils/utils.module';
-import { TreeModule } from 'primeng/tree';
+import { TreeModule } from 'primeng';
 import { onetouchCommonModule } from '../../shared/common/common.module';
 import { AppCommonModule } from '../shared/common/app-common.module';
 import { ModalModule } from 'ngx-bootstrap/modal';

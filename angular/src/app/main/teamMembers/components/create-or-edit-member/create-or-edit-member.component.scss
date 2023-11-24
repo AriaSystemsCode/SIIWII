@@ -18,7 +18,7 @@
 }
 /*Start Address model */
  /*custom*/
- .p-chkbox-box :before {
+ .ui-chkbox-box :before {
     content: "";
     width: 20px;
     height: 20px;
@@ -194,7 +194,7 @@
     position: absolute;
     left: 18px;
     top: 36px; */
-    background: url('../../../../../assets/profile/Add-Address.svg') no-repeat;
+    background: url('assets/profile/Add-Address.svg') no-repeat;
     position: absolute;
     left: 14px;
     width: 100% inherit;

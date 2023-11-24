@@ -1,5 +1,5 @@
 import { ItemsFilterTypesEnum } from "@shared/service-proxies/service-proxies";
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
 import { BrowseMode } from "./BrowseModeEnum";
 import { MultiSelectionInfo } from "./multi-selection-info.model";
 
@@ -33,8 +33,6 @@ export class AppItemsBrowseComponentFiltersDisplayFlags {
     listingStatus:  boolean
     publishStatus: boolean
     visibilityStatus: boolean
-       // Fix Issue T-SII-20230618.0001 
-       //appItemSizeScale:boolean
     showAll(){
         this.filterType = true
         this.search =  true
@@ -47,8 +45,6 @@ export class AppItemsBrowseComponentFiltersDisplayFlags {
         this.listingStatus = true
         this.publishStatus = true
         this.visibilityStatus = true
-          // Fix Issue T-SII-20230618.0001 
-          // this.appItemSizeScale=true;
     }
     allIsHidden : boolean
 }

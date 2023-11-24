@@ -1,5 +1,5 @@
 import { TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, TreeNodeOfGetSycEntityObjectTypeForViewDto, ArrtibuteFilter } from "@shared/service-proxies/service-proxies";
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
 import { Subject, Observable } from "rxjs";
 import { FilteredExtraAttribute } from "../../app-item-shared/models/filtered-extra-attribute";
 

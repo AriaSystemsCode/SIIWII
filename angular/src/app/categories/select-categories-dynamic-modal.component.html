@@ -1,41 +1,23 @@
-<div class="modal-content-wrapper" *ngIf="active">
+
+<div class="modal-content-wrapper" *ngIf="active"  >
     <div class="modal-header">
-        <h4 class="modal-title">
+        <h4 class="modal-title" >
             <span>{{ entityObjectDisplayName | localize }} </span>
-            <p class="desc-menu-item">
-                {{ l("SelectFromTheBelow") }} {{ " " }}
-                {{ l(entityObjectDisplayName) }}
-            </p>
+            <p class="desc-menu-item">{{l("SelectFromTheBelow")}} {{" "}} {{l(entityObjectDisplayName)}}</p>
         </h4>
-        <button
-            style="position: absolute; right: 0; top: 8px"
-            type="button"
-            class="close"
-            (click)="close()"
-            aria-label="Close"
-        >
+        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()" aria-label="Close" >
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="modal-body p-0 mr-2">
+    <div class="modal-body p-0  mr-2">
         <p class="title-tree ml-3">
             {{ entityObjectDisplayName | localize }}
         </p>
-        <div
-            class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded"
-        >
+        <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded">
             <span class="mr-3">
                 <i class="fas fa-search"></i>
             </span>
-            <input
-                type="text"
-                name="search"
-                id="search"
-                placeholder="Search"
-                (input)="onFilter()"
-                [(ngModel)]="searchQuery"
-                class="form-control bg-white border-0"
-            />
+            <input type="text" name="search" id="search" placeholder="Search" (input)="onFilter()" [(ngModel)]="searchQuery" class="form-control bg-white border-0">
         </div>
         <p-tree
             styleClass="p-tree-with-actions"
@@ -45,49 +27,24 @@
             [(selection)]="selectedRecords"
             [loading]="loading"
             (onNodeExpand)="loadCategoriesNode($event)"
-            (onNodeSelect)="nodeSelect($event)"
         >
             <ng-template let-node let-i="index" pTemplate="default">
-                <div
-                    class="d-flex flex-wrap justify-content-between align-items-center"
-                >
-                    <div class="treenode-label-text">{{ node.label }}</div>
-                    <div
-                        class="treenode-action"
-                        (click)="stopPropagation($event)"
-                    >
-                        <div
-                            class="btn-group dropdown"
-                            dropdown
-                            container="body"
-                            placement="bottom right"
-                            *ngIf="showActions"
-                        >
-                            <button
-                                title="actions"
-                                class="dropdown-toggle btn btn-sm btn-action"
-                                aria-controls="dropdown-alignment"
-                                dropdownToggle
-                            ></button>
-                            <ul
-                                id="dropdown-alignment"
-                                class="dropdown-menu dropdown-action-btn dropdown-menu-right"
-                                *dropdownMenu
-                            >
+                <div class="d-flex flex-wrap justify-content-between align-items-center">
+                    <div> {{node.label}}</div>
+                    <div (click)="stopPropagation($event)">
+                        <div class="btn-group dropdown" dropdown container="body" placement='bottom right' *ngIf="showActions">
+                            <button title="actions" class="dropdown-toggle btn btn-sm btn-action" aria-controls="dropdown-alignment"
+                                dropdownToggle >
+                            </button>
+                            <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"  *dropdownMenu>
                                 <li>
-                                    <a (click)="addAsNewChild(node)">{{
-                                        "AddSubcategory" | localize
-                                    }}</a>
+                                    <a (click)="addAsNewChild(node)">{{'AddSubcategory' | localize}}</a>
                                 </li>
                                 <li>
-                                    <a (click)="editCategory(node)">{{
-                                        "Edit" | localize
-                                    }}</a>
+                                    <a (click)="editCategory(node)">{{'Edit' | localize}}</a>
                                 </li>
                                 <li>
-                                    <a (click)="deleteSycEntityObject(node)">{{
-                                        "Delete" | localize
-                                    }}</a>
+                                    <a  (click)="deleteSycEntityObject(node)" >{{'Delete' | localize}}</a>
                                 </li>
                             </ul>
                         </div>
@@ -101,37 +58,15 @@
                 (click)="showMoreListData()"
                 *ngIf="showMoreListDataButton"
             >
-                {{ "showmore" | localize }} ...
+                {{ 'showmore' | localize }} ...
             </button>
         </div>
-    </div>
-    <div class="modal-footer d-fex align-items-center justify-content-between">
-        <button
-            *ngIf="showAddAction"
-            title="{{ 'AddNewCategory' | localize }}"
-            type="button"
-            class="btn btn-icon btn-primary btn-circle create-edit-btn"
-            (click)="openCreateOrEditModal()"
-        >
+        <button *ngIf="showAddAction"   title="{{ 'AddNewCategory' | localize }}" type="button" class="btn btn-icon btn-primary btn-circle create-edit-btn" (click)="openCreateOrEditModal()">
             <i class="flaticon2-plus"></i>
         </button>
-
-        <div>
-            <button
-                type="button"
-                class="btn btn-default btn-gray"
-                (click)="close()"
-            >
-                {{ l("Cancel") }}
-            </button>
-            <button
-                type="submit"
-                [disabled]="!selectedRecords?.length"
-                (click)="submitSelection()"
-                class="btn btn-primary blue btn-blue"
-            >
-                <span>{{ l("Add") }}</span>
-            </button>
-        </div>
+    </div>
+    <div class="modal-footer">
+        <button  type="button"  class="btn btn-default btn-gray" (click)="close()">{{l("Cancel")}}</button>
+        <button type="submit" [disabled]="!selectedRecords?.length" (click)="submitSelection()" class="btn btn-primary blue btn-blue"  > <span>{{l("Add")}}</span></button>
     </div>
 </div>

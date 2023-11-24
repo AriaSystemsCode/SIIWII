@@ -2,11 +2,10 @@ import { Component, EventEmitter, Injector, Output, ViewChild } from '@angular/c
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
+import { LazyLoadEvent, Paginator, SelectItem } from 'primeng';
 import { debounceTime, finalize } from 'rxjs/operators';
 import { AccountsServiceProxy, GetMemberForViewDto, MemberFilterTypeEnum } from '@shared/service-proxies/service-proxies';
 import { MembersListComponentInputsI } from '../models/member-list-component-interface';
-import { SelectItem, LazyLoadEvent } from 'primeng/api';
-import { Paginator } from 'primeng/paginator';
 @Component({
     selector: 'app-members-list',
     templateUrl: './members-list.component.html',
@@ -134,7 +133,6 @@ export class MembersListComponent extends AppComponentBase {
     getMembers(event?: LazyLoadEvent) {
         if ( isNaN(this.defaultMainFilter) ) return
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

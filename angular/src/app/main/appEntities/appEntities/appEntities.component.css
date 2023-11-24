@@ -1,11 +1,11 @@
-.p-accordion-header a{
+.ui-accordion-header a{
 background-color: white !important;
 border: none !important;
 color: #464E5F !important;
     font-size: 14px !important;
     font-weight: 400 !important;
 }
-.p-accordion-toggle-icon{
+.ui-state-active a,.ui-accordion-toggle-icon{
     color:#464E5F !important;
     border: none !important;
 }
@@ -36,14 +36,14 @@ color: #464E5F !important;
 }
 
 
-.p-table-scrollable-header-box th{
+.ui-table-scrollable-header-box th{
     background-color: white !important;
     color: #B5B5C3 !important;
 }
-.p-table-scrollable-header-box td{
+.ui-table-scrollable-header-box td{
     color: #464E5F !important;
 }
-body .p-accordion .p-accordion-header a:focus {
+body .ui-accordion .ui-accordion-header a:focus {
     outline: 0 none;
     outline-offset: 0;
      box-shadow: none !important;
@@ -96,7 +96,7 @@ body .p-accordion .p-accordion-header a:focus {
             border: none;
             border-radius: 5px;
          }
-      .p-accordion-header-text{
+      .ui-accordion-header-text{
           position: relative;
       }
 
@@ -107,13 +107,13 @@ body .p-accordion .p-accordion-header a:focus {
     margin-top: 31px !important;
 }
 
-body .p-component {
+body .ui-widget {
     /* font-family: "Open Sans", "Helvetica Neue", sans-serif; */
     font-size: 14px;
     font-weight: normal !important;
     font-family: "Poppins" !important;
 }
-/* body .p-accordion .p-accordion-content{
+/* body .ui-accordion .ui-accordion-content{
     padding-left: 0;
     margin-left: 0;
 }
@@ -151,10 +151,10 @@ tr:after{
     margin-bottom: 0;
     padding-top: 10px;
 }
-body .p-accordion .p-accordion-header {
+body .ui-accordion .ui-accordion-header {
      margin-bottom: 0px !important;
 }
-body .p-accordion{
+body .ui-accordion{
     margin-bottom: 20px;
     padding: 20px;
 }
@@ -162,17 +162,16 @@ body .p-accordion{
     margin-bottom: 20px !important;
     padding: 20px;
 }
-body #lookups .p-accordion .p-accordion-header a {
-    padding: 25px 25px 30px 20px;
+body #lookups .ui-accordion .ui-accordion-header a {
+    margin-bottom: 20px !important;
+    padding-top: 30px;
+    padding: 20px;
 }
-.p-accordion-content{
+.ui-accordion-content{
     /* margin-top: -20px; */
     margin-bottom: 20px;
 }
-.p-accordion-content-wrapper{
+.ui-accordion-content-wrapper{
     margin-top: -20px;
-    margin-bottom: 20px;
-}
-.p-accordion p-accordiontab .p-accordion-tab {
     margin-bottom: 20px;
 }

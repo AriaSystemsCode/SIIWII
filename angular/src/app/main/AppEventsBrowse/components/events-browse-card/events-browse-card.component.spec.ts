@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EventsBrowseCardComponent } from './events-browse-card.component';
 
@@ -6,7 +6,7 @@ describe('EventsBrowseCardComponent', () => {
   let component: EventsBrowseCardComponent;
   let fixture: ComponentFixture<EventsBrowseCardComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ EventsBrowseCardComponent ]
     })

@@ -45,7 +45,7 @@
   min-width: 150px !important;
   margin-right: 14px;
 }
-.menuSearchBarContainer .p-autocomplete-panel {
+.menuSearchBarContainer .ui-autocomplete-panel {
   margin-left: 14px;
 }
 @media (max-width: 1024px) {

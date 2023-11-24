@@ -24,7 +24,7 @@
             <div class="col primeng-datatable-container" [busyIf]="primengTableHelper.isLoading">
                 <p-table #dataTable (onLazyLoad)="getDynamicParameters()" [value]="primengTableHelper.records"
                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false" [lazy]="true"
-                    responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                    [responsive]="primengTableHelper.isResponsive">
                     <ng-template pTemplate="header">
                         <tr>
                             <th style="width: 100px;">{{ 'Actions' | localize}}</th>

@@ -507,7 +507,7 @@
                     <div class="row align-items-center">
                         <!--<Primeng-Datatable-Start>-->
                         <div
-                            class="primeng-datatable-container table-transparent-header table-transparent-rows col-12"
+                            class="primeng-datatable-container col-12"
                             [busyIf]="primengTableHelper.isLoading"
                         >
                             <p-table
@@ -521,7 +521,7 @@
                                 [lazy]="true"
                                 [scrollable]="true"
                                 ScrollWidth="100%"
-                                responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                [responsive]="primengTableHelper.isResponsive"
                                 [resizableColumns]="
                                     primengTableHelper.resizableColumns
                                 "
@@ -766,7 +766,7 @@
                                             </div>
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("PublishOnHomePage") }}</span
                                             >
                                             <div
@@ -795,7 +795,7 @@
                                             </div>
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("PublishOnMarketLandingPage") }}</span
                                             >
                                             <div
@@ -824,7 +824,7 @@
                                             </div>
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{
                                                     l("PublishDateTime")
                                                 }}</span
@@ -851,13 +851,13 @@
                                         </td>
 
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("TenantName") }}</span
                                             >
                                             {{ record.tenantName }}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("TimeZone") }}</span
                                             >
                                             {{
@@ -865,7 +865,7 @@
                                             }}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("StartDate") }}</span
                                             >
                                             <span
@@ -890,7 +890,7 @@
                                         </td>
 
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("StartTime") }}</span
                                             >
                                             {{
@@ -899,7 +899,7 @@
                                             }}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("EndDate") }}</span
                                             >
                                             <span
@@ -923,7 +923,7 @@
                                             >
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("EndTime") }}</span
                                             >
                                             {{
@@ -934,7 +934,7 @@
 
 
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{
                                                     l("Occurence")
                                                 }}</span
@@ -945,7 +945,7 @@
                                             }}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("For") }}</span
                                             >
                                             {{
@@ -954,7 +954,7 @@
                                             }}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("Every") }}</span
                                             >
                                             {{
@@ -963,7 +963,7 @@
                                             }}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title">
+                                            <span class="ui-column-title">
                                                 {{ l("CreatedBy") }}</span
                                             >
                                             {{ record.userName }}

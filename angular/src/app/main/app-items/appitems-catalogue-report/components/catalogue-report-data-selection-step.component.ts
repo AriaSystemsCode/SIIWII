@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppItemSelectorsServiceProxy, AppItemsListDto, AppItemsListsServiceProxy, AppItemsServiceProxy, CreateOrEditAppItemsListItemDto, GetAllAppItemsInput, GetAppItemForViewDto, GetAppItemsListForViewDto, ItemsFilterTypesEnum, ItemsListFilterTypesEnum, LookupLabelDto } from '@shared/service-proxies/service-proxies';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { finalize } from 'rxjs/operators';
 import { AppItemsBrowseModalComponent } from '../../app-items-browse/components/app-items-browse-modal.component';
 import { AppItemsBrowseInputs } from '../../app-items-browse/models/app-item-browse-inputs.model';

@@ -22,7 +22,7 @@ export class ChangeProfilePictureModalComponent extends AppComponentBase {
     public saving = false;
     public  maxProfilPictureBytesUserFriendlyValue = 5;
 
-    private _uploaderOptions: Partial<FileUploaderOptions> = {};
+    private _uploaderOptions: FileUploaderOptions = {};
 
     imageChangedEvent: any = '';
 
@@ -90,7 +90,7 @@ export class ChangeProfilePictureModalComponent extends AppComponentBase {
             }
         };
 
-        this.uploader.setOptions(this._uploaderOptions as FileUploaderOptions);
+        this.uploader.setOptions(this._uploaderOptions);
     }
 
     updateProfilePicture(fileToken: string): void {

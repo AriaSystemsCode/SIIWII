@@ -6,6 +6,7 @@ import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.com
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEventsServiceProxy, AppPostDto, AppPostsServiceProxy, AttachmentsCategories, CreateOrEditAppPostDto, EventsFilterTypesEnum, GetAppEventForViewDto, GetAppPostForViewDto, PostType, ProfileServiceProxy } from '@shared/service-proxies/service-proxies';
 import { FileDownloadService } from '@shared/utils/file-download.service';
+import { LazyLoadEvent, Paginator, SelectItem, Table } from 'primeng';
 import { debounceTime, finalize, tap } from 'rxjs/operators';
 import { EventsBrowseActionsEvents, EventsBrowseInputs } from '../../models/Events-browse-inputs';
 import { EventsBrowseComponentFiltersDisplayFlags } from "../../models/EventsBrowseComponentFiltersDisplayFlags";
@@ -14,10 +15,11 @@ import { EventsBrowseComponentStatusesFlags } from "../../models/EventsBrowseCom
 import * as moment from 'moment';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { CreateorEditPostComponent } from '@app/main/posts/Components/createor-edit-post.component';
+import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
+import { AppConsts } from '@shared/AppConsts';
+import { FileUploaderOptions } from 'ng2-file-upload';
 import { Observable } from 'rxjs';
-import { SelectItem, LazyLoadEvent } from 'primeng/api';
-import { Paginator } from 'primeng/paginator';
-import { Table } from 'primeng/table';
+import { DateFormValidations } from '@shared/utils/validation/date-form-validation.directive';
 
 @Component({
   selector: 'app-events-browse',
@@ -295,7 +297,6 @@ export class EventsBrowseComponent extends AppComponentBase {
     getEvents(event?: LazyLoadEvent) {
         if ( isNaN(this.defaultMainFilter) ) return
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

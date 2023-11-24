@@ -102,7 +102,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         this._AppEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
             const lookupLabelDto : LookupLabelDto = new LookupLabelDto()
             lookupLabelDto.label = "None"
-            lookupLabelDto.value = null
+            lookupLabelDto.value = undefined
             this.allLanguages = [];
             this.allLanguages.push(lookupLabelDto,...result)
         });
@@ -111,7 +111,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
             const lookupLabelDto : LookupLabelDto = new LookupLabelDto()
             lookupLabelDto.label = "None"
-            lookupLabelDto.value = null
+            lookupLabelDto.value = undefined
             this.allPhoneTypes = [];
             this.allPhoneTypes.push(lookupLabelDto,...result)
             this.phonesLoaded = true

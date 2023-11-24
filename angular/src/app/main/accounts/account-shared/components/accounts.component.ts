@@ -20,7 +20,7 @@ import { AppComponentBase } from "@shared/common/app-component-base";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { Table } from "primeng/table";
 import { Paginator } from "primeng/paginator";
-import { LazyLoadEvent, SelectItem } from "primeng/api";
+import { LazyLoadEvent, SelectItem } from "primeng/public_api";
 import * as _ from "lodash";
 import { SendMailModalComponent } from "@app/shared/common/Mail/sendMail-modal.component";
 import { debounceTime, finalize } from "rxjs/operators";
@@ -171,7 +171,6 @@ export class AccountsComponent
 
     getAccounts(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
@@ -207,9 +206,6 @@ export class AccountsComponent
                 filters.city || undefined,
                 filters.state || undefined,
                 filters.postalCode || undefined,
-                filters?.ssin || undefined,
-                filters?.accountTypeId || undefined,
-                filters?.accountType || undefined,
                 filters.accountTypes || undefined,
                 filters.statuses || undefined,
                 filters.languages || undefined,

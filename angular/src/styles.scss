@@ -1,6 +1,4 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~@ng-select/ng-select/themes/default.theme.css";
-
 .margin-left-5 {
     margin-left: 5px !important;
 }
@@ -155,14 +153,14 @@ ngx-spinner .loading-text{
 
 /*Custom*/
 
-// body .selectClassificationsModal .p-corner-all,
-// body .selectCategoriesModal .p-corner-all{
-//     margin-left: 0;
-//     padding-left: 0;
-//     padding-top: 0;
-// }
-body .selectClassificationsModal .p-chkbox .p-chkbox-box,
-body .selectCategoriesModal .p-chkbox .p-chkbox-box {
+body .selectClassificationsModal .ui-corner-all,
+body .selectCategoriesModal .ui-corner-all{
+    margin-left: 0;
+    padding-left: 0;
+    padding-top: 0;
+}
+body .selectClassificationsModal .ui-chkbox .ui-chkbox-box,
+body .selectCategoriesModal .ui-chkbox .ui-chkbox-box {
 
     background: #E5EAEE 0% 0% no-repeat padding-box !important;
     border-radius: 3px !important;
@@ -170,36 +168,36 @@ body .selectCategoriesModal .p-chkbox .p-chkbox-box {
     opacity: 1;
     /* margin-left: 14px; */
   }
-  body .selectClassificationsModal .p-tree .p-tree-container .p-treenode .p-treenode-content:focus,
-body .selectCategoriesModal .p-tree .p-tree-container .p-treenode .p-treenode-content:focus {
+  body .selectClassificationsModal .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content:focus,
+body .selectCategoriesModal .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content:focus {
       box-shadow: none;
   }
-  body .selectClassificationsModal .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler,
-  body .selectCategoriesModal .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler{
+  body .selectClassificationsModal .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-tree-toggler,
+  body .selectCategoriesModal .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-tree-toggler{
     color:black;
   }
-  body .selectClassificationsModal .p-treenode-content-selected .p-chkbox .p-chkbox-box,
-  body .selectCategoriesModal .p-treenode-content-selected .p-chkbox .p-chkbox-box{
+  body .selectClassificationsModal .ui-treenode-content-selected .ui-chkbox .ui-chkbox-box,
+  body .selectCategoriesModal .ui-treenode-content-selected .ui-chkbox .ui-chkbox-box{
       background-color: #2786FB !important;
       color: #FFFFFF !important;
       /* margin-left: 14px; */
   }
-  body .selectClassificationsModal .p-state-highligh,.p-treenode-label,
-  body .selectCategoriesModal .p-state-highligh,.p-treenode-label{
+  body .selectClassificationsModal .ui-state-highligh,.ui-treenode-label,
+  body .selectCategoriesModal .ui-state-highligh,.ui-treenode-label{
       position: relative;
   }
 
-  body .selectClassificationsModal div.p-treenode-content,
-  body .selectCategoriesModal div.p-treenode-content{
+  body .selectClassificationsModal div.ui-treenode-content,
+  body .selectCategoriesModal div.ui-treenode-content{
     border: 1px solid black;
     border-style: none none dashed none;
     width: 100%;
 }
 
-body .selectClassificationsModal .p-treenode-label :before,
-body .selectCategoriesModal .p-treenode-label :before{
+body .selectClassificationsModal .ui-treenode-label :before,
+body .selectCategoriesModal .ui-treenode-label :before{
     /* content: ""; */
-    content:url('./assets/profile/Close-Sub-Folder.svg'); /* with class ModalCarrot ??*/
+    content:url('assets/profile/Close-Sub-Folder.svg'); /* with class ModalCarrot ??*/
 
     display: block;
     position: absolute;
@@ -211,10 +209,10 @@ body .selectCategoriesModal .p-treenode-label :before{
     background-size: cover; */
 
   }
-  body .selectClassificationsModal .p-highlight :before,
-  body .selectCategoriesModal .p-highlight :before{
+  body .selectClassificationsModal .ui-state-highlight :before,
+  body .selectCategoriesModal .ui-state-highlight :before{
     /* content: ""; */
-    content:url('./assets/profile/Open-Sub-Folder.svg'); /* with class ModalCarrot ??*/
+    content:url('assets/profile/Open-Sub-Folder.svg'); /* with class ModalCarrot ??*/
 
     display: block;
     position: absolute;
@@ -226,8 +224,8 @@ body .selectCategoriesModal .p-treenode-label :before{
     background-size: cover; */
 
   }
-  body .selectClassificationsModal .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler,
-  body .selectCategoriesModal .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler{
+  body .selectClassificationsModal .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-tree-toggler,
+  body .selectCategoriesModal .ui-tree .ui-tree-container .ui-treenode .ui-treenode-content .ui-tree-toggler{
     vertical-align: middle;
     display: inline-block;
     float: none;
@@ -253,7 +251,7 @@ body .selectCategoriesModal .p-treenode-label :before{
  select.form-control:focus {
     box-shadow: none!important;
   }
-  /* body .model-tree-item .p-tree-container .p-treenode:after{
+  /* body .model-tree-item .ui-tree-container .ui-treenode:after{
       content: "";
     border-style: none none dotted none !important;
 } */
@@ -288,16 +286,16 @@ body.kt-demo-panel--left .header-block-buttons {
 body.kt-demo-panel--left .btn-1bc5bd{
     margin-right: 10px;
 }
-body.kt-demo-panel--left .p-multiselect .p-multiselect-trigger {
+body.kt-demo-panel--left .ui-multiselect .ui-multiselect-trigger {
     width: 98%;
 }
-body.kt-demo-panel--left .p-dropdown .p-dropdown-trigger{
+body.kt-demo-panel--left .ui-dropdown .ui-dropdown-trigger{
     width: 98%;
 }
-body.kt-demo-panel--left .p-dropdown-panel .p-dropdown-item{
+body.kt-demo-panel--left .ui-dropdown-panel .ui-dropdown-item{
     text-align: right;
 }
-body.kt-demo-panel--left .p-multiselect-panel .p-multiselect-item{
+body.kt-demo-panel--left .ui-multiselect-panel .ui-multiselect-item{
     text-align: right;
 }
 body.kt-demo-panel--left .kt-portlet__head-title{
@@ -308,14 +306,15 @@ body.kt-demo-panel--left .aria-sub-header{
 }
 /*modal dialog*/
 body .confirm-modal{position: relative;z-index: 9999999 !important;}
-body .p-dialog .p-dialog-titlebar { background-color:#FFFFFF !important;display: none; }
-body .p-dialog-footer{text-align: center !important;padding: 21px 0 25px 0 !important;}
-body  p.content1{color: #1BC5BD;font-size: 16px;text-align: center;}
-body  p.content1-del{color: #E83E8C;}
-body  p.content2{color: #464E5F;font-size: 14px;text-align: center;}
-body .p-dialog .p-dialog-content{text-align: center;padding: 25px 0 0 0 !important;}
+body .ui-dialog .ui-dialog-titlebar { background-color:#FFFFFF !important;display: none; }
+body .ui-dialog-footer{text-align: center !important;padding: 21px 0 25px 0 !important;}
+body .ui-widget-content p.content1{color: #1BC5BD;font-size: 16px;text-align: center;}
+body .ui-widget-content p.content1-del{color: #E83E8C;}
+body .ui-widget-content p.content2{color: #464E5F;font-size: 14px;text-align: center;}
+body .ui-dialog .ui-dialog-content{text-align: center;padding: 25px 0 0 0 !important;}
 body .btn-buttonNo{background-color: #EBEBEB; border: none; color: #464E5F; padding: 10px 25px; border-radius: 5px;}
 body .btn-buttonYes{background-color: #2786FB; border: none; color: #FFFFFF; padding: 10px 25px; border-radius: 5px;}
+body .ui-widget-content{   border: 5px solid #ECF0F3;border-radius: 5px;}
 .aria-select-modal{
     height: 37px !important;
     /* background-color: #F3F6F9 !important; */
@@ -373,7 +372,7 @@ background-color: #1BC5BD !important;
         position: relative;
         width: 130px;
         /* height: 136px; */
-        background-image: url("./assets/profile/company-logo.svg");
+        background-image: url("assets/profile/company-logo.svg");
         background-repeat: no-repeat;
         background-size: cover;
      }
@@ -396,23 +395,23 @@ background-color: #1BC5BD !important;
         height: 86px !important;
     }
 
-    body .aria-select-modal-account,body .aria-select-modal-account .p-dropdown .p-dropdown-trigger,body .aria-select-modal-account  .p-placeholder{
+    body .aria-select-modal-account,body .aria-select-modal-account .ui-dropdown .ui-dropdown-trigger,body .aria-select-modal-account  .ui-placeholder{
         background-color: #F3F6F9 !important;
         border:none;
         outline: none;
      }
-     .aria-select-modal-account .p-dropdown-trigger{
+     .aria-select-modal-account .ui-dropdown-trigger.ui-state-default.ui-corner-right{
         background-color: #F3F6F9 !important;
 
      }
-     body .aria-select-modal-account label.p-dropdown-label.p-inputtext{
+     body .aria-select-modal-account label.ui-dropdown-label.ui-inputtext.ui-corner-all{
         background-color: #F3F6F9 !important;
      }
      /*PRIMARYNG*/
-     /* .form-control.aria-select.aria-select-primeng.p-dropdown.p-widget.p-corner-all{
+     /* .form-control.aria-select.aria-select-primeng.ui-dropdown.ui-widget.ui-state-default.ui-corner-all{
         min-width: 6.2em !important;
      } */
-     .form-control.aria-select.aria-select-modal-account.aria-select-modal.p-dropdown.p-component{
+     .form-control.aria-select.aria-select-modal-account.aria-select-modal.ui-dropdown.ui-widget.ui-state-default.ui-corner-all{
         height: 37px !important;
         /* background-color: #F3F6F9 !important; */
         border: none;
@@ -422,7 +421,7 @@ background-color: #1BC5BD !important;
         height: 36px !important;
         padding: 5px !important;
      }
-.aria-select-primeng.p-dropdown {
+.aria-select-primeng.ui-dropdown {
     min-width: 6.2em !important;
 }
  .aria-select-primeng-medium {
@@ -435,13 +434,13 @@ background-color: #1BC5BD !important;
 .kt-slider{
     margin-top:0 !important;
 }
-body .p-component {
+body .ui-widget {
     /* font-family: "Open Sans", "Helvetica Neue", sans-serif; */
     font-size: 14px;
     /* font-weight: normal !important; */
     font-family: "Poppins" !important;
 }
-body .p-autocomplete.p-autocomplete-multiple .p-autocomplete-multiple-container .p-autocomplete-token{
+body .ui-autocomplete.ui-autocomplete-multiple .ui-autocomplete-multiple-container .ui-autocomplete-token{
     background-color: #F5F5F5 !important;
     color: #5F6368;
 }
@@ -465,7 +464,7 @@ body .p-autocomplete.p-autocomplete-multiple .p-autocomplete-multiple-container 
   }
 
 /* override the autocomplete input width of p-auto complete  */
-.email-autocomplete .p-autocomplete-input-token input {
+.email-autocomplete .ui-autocomplete-input-token input {
     width: 20px;
 }
 
@@ -546,77 +545,4 @@ div.cropper span.resize-bar {
 
 .iti__flag-container {
     direction: ltr;
-}
-
-
-
-.orderForm{
-    .header{
-        span{
-            color: #f6851d
-        }
-    }
-}
-
-.savebtn{
-    background-color: #700066;
-    color: #fff;
-}
-
-.previewbtn{
-    background-color: #f88011;
-    color: #fff;
-}
-
-.label{
-    font-size: 12px;
-    color: #700066;
-    font-weight: 600;
-}
-
-.groupForm{
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.previewTitle{
-    color: #700066;
-    font-weight: 600;
-}
-
-.previewValue{
-    color: #700066;
-}
-
-
-::ng-deep{
-    .p-treeselect{
-        width: 100% !important;
-    }
-    .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label {
-        background-color: #3699FF !important;
-        color: #FFFFFF !important;
-    }
-    .p-calendar {
-        position: relative;
-        display: inline-flex;
-        /* max-width: 100%; */
-        width: 100% !important;
-    }
-    .p-calendar-w-btn .p-datepicker-trigger {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        background: #700066;
-        border-color: #700066;
-    }
-}
-
-.classificationsValues{
-    background-color: #ffe2c7;
-    color: #f89c28;
-    border-radius: 2px;
-    padding: 5px 10px !important;
-    margin-right: 5px !important;
-    font-size: 8px;
 }

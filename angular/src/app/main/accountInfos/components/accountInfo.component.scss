@@ -454,7 +454,7 @@ select:focus{
    border-color: gray;
    outline:none;
 }
-body .p-multiselect{
+body .ui-multiselect{
    border: none;
 }
 .form-control:focus {
@@ -469,15 +469,15 @@ button:focus {
 select.form-control:focus {
    box-shadow: none!important;
  }
-body .p-multiselect .p-multiselect-trigger,body .p-dropdown .p-dropdown-trigger{
+body .ui-multiselect .ui-multiselect-trigger,body .ui-dropdown .ui-dropdown-trigger{
    background-color: transparent;
-    background: url('../../../../assets/profile/Down_Arrow.svg') no-repeat right;
+    background: url("assets/profile/Down_Arrow.svg") no-repeat right;
     background-position-x: 6px;
 }
-.p-multiselect .p-multiselect-trigger .p-multiselect-trigger-icon,.p-dropdown .p-dropdown-trigger .p-dropdown-trigger-icon{
+.ui-multiselect .ui-multiselect-trigger .ui-multiselect-trigger-icon,.ui-dropdown .ui-dropdown-trigger .ui-dropdown-trigger-icon{
    display: none;
 }
-body .p-dropdown-label,body .p-dropdown,.p-dropdown .p-dropdown-trigger .p-dropdown-trigger-icon{
+body .ui-dropdown-label,body .ui-dropdown,.ui-dropdown .ui-dropdown-trigger .ui-dropdown-trigger-icon{
    background:transparent;
    border: none;
 }
@@ -500,7 +500,7 @@ select{
    border-radius: 5px;
    height: 34px;
    /* background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #ddd; */
-   background: url("../../../../assets/profile/Down_Arrow.svg") no-repeat right #ddd;
+   background: url("assets/profile/Down_Arrow.svg") no-repeat right #ddd;
    background-position-x: 98% !important;
 
 
@@ -684,20 +684,16 @@ color: #B5B5C3;
 }
 
 /*tab2*/
-body .tab2 .p-treetable .p-treetable-thead > tr > th,
-body .tab2 .td-tree {
+body .tab2 .ui-treetable .ui-treetable-thead > tr > th,body .tab2 .td-tree{
    border: none !important;
    font-size: 16px;
-   color: #464E5F;
-}
-body .tab2 .td-tree {
-   font-size: 14px;
+    color: #464E5F;
 }
 body .tab2 .pi-chevron-right:before{
-   content: url('../../../../assets/profile/orientation-right.svg');
+   content: url('assets/profile/orientation-right.svg');
 }
 body .tab2 .pi-chevron-down:before{
-   content: url('../../../../assets/profile/Arrow-Expanded-Open-Sub.svg');
+   content: url('assets/profile/Arrow-Expanded-Open-Sub.svg');
    vertical-align: middle;
 }
 body .tab2 .nav-link.dropdown-toggle:after, body .tab2 .btn.dropdown-toggle:after{
@@ -716,42 +712,42 @@ body .tab2 .btn.dropdown-toggle:active,body .tab2 .btn.dropdown-toggle:hover{
 
 .btn-action{
    background-color: #E1F0FF;
-   background: url('../../../../assets/profile/ActionMenu.svg') no-repeat center;
+   background: url('assets/profile/ActionMenu.svg') no-repeat center;
 }
 .btn-action:hover{
    background-color: #E1F0FF !important;
-   /* background: url('../../../../assets/profile/Actionmenu-hover.svg') no-repeat center; */
+   /* background: url('assets/profile/Actionmenu-hover.svg') no-repeat center; */
 }
 .btn-action:focus{
    background-color: #2786FB !important;
-   background: url('../../../../assets/profile/Actionmenu-hover.png') no-repeat center;
+   background: url('assets/profile/Actionmenu-hover.png') no-repeat center;
 }
 .dropdownActionmenuhover{
    display: block !important;
 }
 span.icon-table:after{
-   content: url('../../../../assets/profile/sort.svg');
+   content: url('assets/profile/sort.svg');
    padding: 8px;
 }
-/* a.p-treetable-toggler.p-unselectable-text:after {
-   content: url('../../../../assets/profile/Close-Sub-Folder.svg');
+/* a.ui-treetable-toggler.ui-unselectable-text:after {
+   content: url('assets/profile/Close-Sub-Folder.svg');
 } */
 p-treetabletoggler.branch-name:after {
-   content: url('../../../../assets/profile/Close-Sub-Folder.svg');
+   content: url('assets/profile/Close-Sub-Folder.svg');
    vertical-align: middle;
 }
-body .p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler {
+body .ui-treetable .ui-treetable-tbody > tr > td .ui-treetable-toggler {
    color: #848484;
    vertical-align: unset;
 }
-body .p-treetable .p-treetable-tbody > tr:focus > td,
-body .p-treetable .p-treetable-tbody > tr:focus > td:first-child,
-body .p-treetable .p-treetable-tbody > tr:focus > td,
-body .p-treetable .p-treetable-tbody > tr:focus,
-body .p-treetable .p-treetable-tbody > tr:focus + tr > td {
+body .ui-treetable .ui-treetable-tbody > tr:focus > td
+,body .ui-treetable .ui-treetable-tbody > tr:focus > td:first-child,
+body .ui-treetable .ui-treetable-tbody > tr:focus > td,
+body .ui-treetable .ui-treetable-tbody > tr:focus,
+body .ui-treetable .ui-treetable-tbody > tr:focus + tr > td {
    box-shadow:none !important;
 }
-body .p-treetable .p-sortable-column.p-highlight{
+body .ui-treetable .ui-sortable-column.ui-state-highlight{
    background-color: #f4f4f4;
    outline: none;
    box-shadow: none;
@@ -793,10 +789,4 @@ a:hover {
 }
 .kt-portlet {
     margin-top: 0px !important;
-}
-body .p-dropdown .p-dropdown-trigger {
-   height: 5px;
-}
-.depts-table thead {
-   height: 40px!important;
 }

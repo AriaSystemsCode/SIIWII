@@ -1,5 +1,5 @@
 <form #coverPageForm="ngForm" >
-    <div class="d-flex flex-column h-100" >
+    <div class="d-flex flex-column h-100 justify-content-between wizard-wrapper" >
         <h5 class="col-12">{{ "Please fill the required linesheet information" | localize }}</h5>
         <div class="row">
             <div class="col-12">
@@ -26,7 +26,6 @@
                             #reportTitleInput="ngModel"
                             [ngClass]="{ 'border-danger': false }"
                             [placeholder]="'Enterlinesheetname' | localize"
-                            (keyup)="onChangLinesheetName()"
                         />
                     </div>
 
@@ -71,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="d-flex flex-row justify-content-between pr-5 w-100" >
+        <div class="d-flex flex-row justify-content-between pr-5 w-100" >
             <button class="btn btn-primary" type="button" (click)="previousStep()">
                 <i class="fa-arrow-left fas ml-3"></i>
                 {{ "Previous" | localize }}
@@ -80,6 +79,6 @@
                 {{ "Continue" | localize }}
                 <i class="fa-arrow-right fas ml-3"></i>
             </button>
-        </div> -->
+        </div>
     </div>
 </form>

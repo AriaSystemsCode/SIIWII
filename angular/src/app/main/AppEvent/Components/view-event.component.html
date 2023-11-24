@@ -1,5 +1,5 @@
-<div bsModal #viewEventModal="bs-modal" class="modal fade text-left" tabindex="-1" role="dialog" aria-labelledby="viewEventModal"
-    aria-hidden="true" [config]="{ backdrop: false , ignoreBackdropClick: true }"  style="overflow-y: scroll;">
+<div bsModal #viewEventModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="viewEventModal"
+    aria-hidden="true" [config]="{ backdrop: 'static' }" style="overflow-y: scroll;">
     <div class="modal-dialog modal-lg ">
         <div class="modal-content h-100">
             <div class="row  ml-3 mr-3 d-md-block d-none">
@@ -159,22 +159,15 @@
                             <br />
                         </h6>
                         <h6>
-                            <!-- {{
-                            event?.currentFromDateTime?.toString()
+                            {{
+                            event?.appEvent?.utcFromDateTime
                             | date: "short":"+timezoneOffset"
                             }}
                             -
                             {{
-                            event?.currentToDateTime?.toString()
+                            event?.appEvent?.utcToDateTime
                             | date: "short":"+timezoneOffset"
-                            }} -->
-                            {{event?.appEvent?.fromDate?.toString() | date : 'fullDate' }},
-                            {{event?.appEvent?.fromTime?.toString() | date : 'shortTime' }}
-                            -
-                            {{event?.appEvent?.toDate?.toString() | date : 'fullDate' }},
-                            {{event?.appEvent?.toTime?.toString() | date : 'shortTime' }}
-                            {{ event?.appEvent?.timeZone }} 
-                             
+                            }}
                         </h6>
                     </div>
                 </div>

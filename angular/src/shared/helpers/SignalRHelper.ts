@@ -16,7 +16,7 @@ export class SignalRHelper {
             attachmentBaseUrl: AppConsts.attachmentBaseUrl,
             startConnection: undefined,
             url: '/signalr'
-        } as any;
+        };
 
         let script = document.createElement('script');
         script.onload = () => {

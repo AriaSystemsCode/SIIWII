@@ -37,13 +37,9 @@
 
                 <div class="mb-1 text-dark " >
                     <b>{{"AccountType" | localize}}: </b>
-                    <!-- <span *ngFor="let accountType of account.account.accountType;let last = last">
+                    <span *ngFor="let accountType of account.account.accountType;let last = last">
                         {{ accountType }}{{ last ? '' : ', ' }}
-                    </span> -->
-                    <span>
-                        {{ account.account.accountType }}
                     </span>
-                    
                     <span *ngIf="account.account.accountType.length === 0">
                         {{ "NotSpecified" | localize }}
                     </span>

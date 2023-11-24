@@ -4,10 +4,10 @@ import {TicketNotesServiceProxy, TicketNoteTicketLookupTableDto } from '@shared/
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Table } from 'primeng/table';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 @Component({
     selector: 'ticketNoteTicketLookupTableModal',
-    styleUrls: ['./ticketNote-ticket-lookup-table-modal.component.scss'],
+    styleUrls: ['./ticketNote-ticket-lookup-table-modal.component.less'],
     encapsulation: ViewEncapsulation.None,
     templateUrl: './ticketNote-ticket-lookup-table-modal.component.html'
 })
@@ -45,7 +45,6 @@ export class TicketNoteTicketLookupTableModalComponent extends AppComponentBase 
         }
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

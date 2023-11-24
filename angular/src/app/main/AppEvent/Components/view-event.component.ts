@@ -73,7 +73,7 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
         this.showMainSpinner();
 
         const subs = this._appEventsServiceProxy
-            .getAppEventForView(this.idFilter,this.entityIdFilter, moment.tz.guess() )
+            .getAppEventForView(this.idFilter,this.entityIdFilter )
             .pipe(finalize(() => this.hideMainSpinner()))
             .subscribe((result) => {
 
@@ -172,7 +172,7 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
             .subscribe((result) => {
 
                 const _subs = this._appEventsServiceProxy
-                    .getAppEventForView(this.idFilter,this.entityIdFilter,moment.tz.guess())
+                    .getAppEventForView(this.idFilter,this.entityIdFilter)
                     .pipe(finalize(() => this.hideMainSpinner()))
                     .subscribe((result) => {
                         this.event.appEvent.guestsCount =

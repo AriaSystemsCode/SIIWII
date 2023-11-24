@@ -12,13 +12,13 @@ import {
     PaymentPeriodType,
     SubscriptionPaymentGatewayType,
     SubscriptionStartType,
-    EditionPaymentType,} from '@shared/service-proxies/service-proxies';
+    EditionPaymentType
+} from '@shared/service-proxies/service-proxies';
 import { RegisterTenantModel } from './register-tenant.model';
 import { TenantRegistrationHelperService } from './tenant-registration-helper.service';
 import { finalize, catchError } from 'rxjs/operators';
 import { ReCaptchaV3Service } from 'ngx-captcha';
 import { Patterns } from '../../shared/utils/patterns/pattern';
-import { SelectItem } from 'primeng/api';
 
 @Component({
     templateUrl: './register-tenant.component.html',
@@ -38,9 +38,6 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
 
     saving = false;
     domainPattern = Patterns.domainName
-   accountType;
-   accountTypeLabel:string="";
-   accountTypes:SelectItem[] = [];
     constructor(
         injector: Injector,
         private _tenantRegistrationService: TenantRegistrationServiceProxy,
@@ -88,24 +85,8 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
                     this.model.edition = result;
                 });
         }
-
-     this.getAccountTypes();
     }
 
-    getAccountTypes(){
-       /* this.accountTypes.push({ label :'Personal' ,value:1});
-        this.accountTypes.push({ label :'Business' ,value:2});
-        this.accountTypes.push({ label :'Group' ,value: 3});*/
-
-        this._tenantRegistrationService.getEditionsForSelect()
-    .subscribe((result) => {
-        for (let i = 0; i < result.editionsWithFeatures.length; i++) {
-            const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
-            const accountTypeValue = result.editionsWithFeatures[i].edition.id;
-            this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
-    }
-    }); 
-    } 
     get useCaptcha(): boolean {
         return this.setting.getBoolean('App.TenantManagement.UseCaptchaOnRegistration');
     }
@@ -115,18 +96,12 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
         let recaptchaCallback = (token: string) => {
             this.saving = true;
             this.model.captchaResponse = token;
-       this.model.editionId =Number(this.accountType);
-       this.model.accountTypeId=this.accountType;
-       this.model.accountType = this.accountTypeLabel;
-
-
-         
             this._tenantRegistrationService.registerTenant(this.model)
                 .pipe(finalize(() => { this.saving = false; }))
                 .subscribe((result: RegisterTenantOutput) => {
                     this.notify.success(this.l('SuccessfullyRegistered'));
                     this._tenantRegistrationHelper.registrationResult = result;
-                    if (this.model?.subscriptionStartType && parseInt(this.model.subscriptionStartType.toString()) === SubscriptionStartType.Paid) {
+                    if (parseInt(this.model.subscriptionStartType.toString()) === SubscriptionStartType.Paid) {
                         this._router.navigate(['account/buy'],
                             {
                                 queryParams: {
@@ -149,16 +124,5 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
         } else {
             recaptchaCallback(null);
         }
-    }
-
-    changeAccountType($event){
-        debugger ;
-         let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
-
-         if(indx>=0)
-         this.accountTypeLabel= this.accountTypes[indx].label.toString().toUpperCase();
-         else
-         this.accountTypeLabel='';
-
     }
 }

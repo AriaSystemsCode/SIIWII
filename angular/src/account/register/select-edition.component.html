@@ -12,11 +12,8 @@
                             <img class="w-100"
                             src="../../assets/accounts/SignUp_TopBanner_White.png"  >
                             </div>
-                           <!--  <div class="FreeEdition_child border-0  order-1 order-sm-0 col col-sm-6 kt-pricing-1__item  p-5"
-                                *ngFor="let editionWithFeatures of editionsSelectOutput.editionsWithFeatures;  let i = index" *ngIf="i==0">
-                                 -->
-                                 <div class="FreeEdition_child border-0  order-1 order-sm-0 col col-sm-6 kt-pricing-1__item  p-5">
-                                
+                            <div class="FreeEdition_child border-0  order-1 order-sm-0 col col-sm-6 kt-pricing-1__item  p-5"
+                                *ngFor="let editionWithFeatures of editionsSelectOutput.editionsWithFeatures;  let i = index">
                                 <div class=" FreeEdition_Purple_Logo-lg w-100"   
                         > 
                             <img class="w-100"
@@ -27,13 +24,13 @@
                                     <div class="kt-pricing-1__hexagon1"></div>
                                     <div class="kt-pricing-1__hexagon2"></div>
                                     <span class="kt-pricing-1__icon kt-font-brand">
-                                        <i class="fa {{editionIcons[0]}}"></i>
+                                        <i class="fa {{editionIcons[i]}}"></i>
                                     </span>
                                 </div>
 
-                                <!-- <h2 class="kt-pricing-1__subtitle editionName">
+                                <h2 class="kt-pricing-1__subtitle editionName">
                                    {{editionWithFeatures.edition.displayName}}
-                                </h2> -->
+                                </h2>
 
                                 <h2 class="kt-pricing-1__subtitle pl-4 editionName" *ngIf="isFree(editionWithFeatures.edition)">
                                     {{"FREE EDITION" | localize}}
@@ -112,6 +109,7 @@
                                     </button>
 
                                 </div>
+
                             </div>
                             <div class="col-6 col-sm-6 FreeEdition_Desktop_Photo">  <img class="h-100  p-5 w-100" src="../../assets/accounts/SignUp_FreeEdition_Desktop_Photo.png"  >
                             </div>

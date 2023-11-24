@@ -62,16 +62,14 @@
               <input type="text" id="address_PostalCode" class="form-control form-control-sm aria-input-text" [(ngModel)]="address.postalCode" name="PostalCode"   minlength="2"  maxlength="150"  required/>
             </div>
 
-            <div class="form-group">
+            <div class="form-group m-form__group">
               <label class="mr-3" for="country">{{l("Country")}}</label>
               <p-dropdown
                   id="country"
                   [options]="allCountries"
                   [(ngModel)]="address.countryId"
                   name="address.countryId"
-                  styleClass="form-control aria-select"
                   [required]="true"
-                  [placeholder]="'PleaseSelect' | localize"
               >
               </p-dropdown>
               <!-- <select [(ngModel)]="address.countryId" name="address.countryId"  class="form-control form-control-sm aria-input-text" required>

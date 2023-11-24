@@ -127,7 +127,7 @@ function initializeAppCssClasses(injector: Injector, theme: UiCustomizationSetti
     if (abp.session.userId) {
         document.body.className = appUiCustomizationService.getAppModuleBodyClass();
     } else {
-     //   document.body.className = appUiCustomizationService.getAccountModuleBodyClass();
+        document.body.className = appUiCustomizationService.getAccountModuleBodyClass();
     }
 }
 
@@ -180,10 +180,7 @@ function getDocumentOrigin() {
 function registerLocales(resolve: (value?: boolean | Promise<boolean>) => void, reject: any, spinnerService: NgxSpinnerService) {
     if (shouldLoadLocale()) {
         let angularLocale = convertAbpLocaleToAngularLocale(abp.localization.currentLanguage.name);
-        // const moduleName = `/node_modules/@angular/common/locales/${angularLocale}.js`
-        
-        import(/* webpackInclude: /(en|es|id)\.mjs$/ */
-        `/node_modules/@angular/common/locales/${angularLocale}.mjs`)
+        import(`@angular/common/locales/${angularLocale}.js`)
             .then(module => {
                 registerLocaleData(module.default);
                 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales().then(_ => {

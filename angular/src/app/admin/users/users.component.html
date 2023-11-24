@@ -124,7 +124,7 @@
                             <p-table #dataTable (onLazyLoad)="getUsers($event)" [value]="primengTableHelper.records"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
                                 [lazy]="true" [scrollable]="true" ScrollWidth="100%"
-                                responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                [responsive]="primengTableHelper.isResponsive"
                                 [resizableColumns]="primengTableHelper.resizableColumns">
                                 <ng-template pTemplate="header">
                                     <tr>
@@ -212,41 +212,41 @@
                                             </div>
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title"> {{'UserName' | localize}}</span>
+                                            <span class="ui-column-title"> {{'UserName' | localize}}</span>
                                             {{record.userName}}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title"> {{'Name' | localize}}</span>
+                                            <span class="ui-column-title"> {{'Name' | localize}}</span>
                                             {{record.name}}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title"> {{'Surname' | localize}}</span>
+                                            <span class="ui-column-title"> {{'Surname' | localize}}</span>
                                             {{record.surname}}
                                         </td>
                                         <td style="width: 150px">
-                                            <span class="p-column-title"> {{'Roles' | localize}}</span>
+                                            <span class="ui-column-title"> {{'Roles' | localize}}</span>
                                             {{getRolesAsString(record.roles)}}
                                         </td>
                                         <td style="width: 250px">
-                                            <span class="p-column-title"> {{'EmailAddress' | localize}}</span>
+                                            <span class="ui-column-title"> {{'EmailAddress' | localize}}</span>
                                             {{record.emailAddress}}
                                         </td>
                                         <td style="width: 200px">
-                                            <span class="p-column-title"> {{'EmailConfirm' | localize}}</span>
+                                            <span class="ui-column-title"> {{'EmailConfirm' | localize}}</span>
                                             <span class="kt-badge kt-badge--success kt-badge--inline"
                                                 *ngIf="record.isEmailConfirmed">{{'Yes' | localize}}</span>
                                             <span class="kt-badge kt-badge--dark kt-badge--inline"
                                                 *ngIf="!record.isEmailConfirmed">{{'No' | localize}}</span>
                                         </td>
                                         <td style="width: 100px">
-                                            <span class="p-column-title"> {{'Active' | localize}}</span>
+                                            <span class="ui-column-title"> {{'Active' | localize}}</span>
                                             <span class="kt-badge kt-badge--success kt-badge--inline"
                                                 *ngIf="record.isActive">{{'Yes' | localize}}</span>
                                             <span class="kt-badge kt-badge--dark kt-badge--inline"
                                                 *ngIf="!record.isActive">{{'No' | localize}}</span>
                                         </td>
                                         <td style="width: 200px">
-                                            <span class="p-column-title"> {{'CreationTime' | localize}}</span>
+                                            <span class="ui-column-title"> {{'CreationTime' | localize}}</span>
                                             {{record.creationTime | momentFormat:'L'}}
                                         </td>
                                     </tr>

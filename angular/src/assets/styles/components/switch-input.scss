@@ -1,15 +1,12 @@
 @import "../base/variables";
 
 body {
-    .purple-selection.p-inputswitch {
-        &.p-inputswitch-checked .p-inputswitch-slider {
+    .purple-selection.ui-inputswitch {
+        &.ui-inputswitch-checked .ui-inputswitch-slider {
             background-color: $purple;
         }
-        &.p-inputswitch-checked.p-inputswitch-focus .p-inputswitch-slider {
+        &.ui-inputswitch-checked.ui-inputswitch-focus .ui-inputswitch-slider {
             background-color: $purple;
         }
     }
-}
-.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before {
-    background: $white!important;
 }

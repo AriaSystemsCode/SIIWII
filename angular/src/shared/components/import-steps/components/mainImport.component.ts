@@ -376,7 +376,7 @@ export class MainImportComponent
         var toValue = this.uploadingResult.toList[iterationNo];
         if (toValue > 1) { toValue = toValue - 1; }
         //   this.progress = (toValue * 100 / this.uploadingResult.totalRecords);
-        this.progress = Math.ceil((toValue / this.uploadingResult.totalRecords) * 100);
+        this.progress = Math.round((toValue / this.uploadingResult.totalRecords) * 100);
 
 
         this.ProgressDetail = this.uploadingResult.codesFromList[iterationNo] + "[" + this.uploadingResult.fromList[iterationNo] + "-" + this.uploadingResult.toList[iterationNo] + "]";
@@ -435,10 +435,10 @@ export class MainImportComponent
             file.withCredentials = false;
         };
 
-        const uploaderOptions: Partial<FileUploaderOptions> = {};
+        const uploaderOptions: FileUploaderOptions = {};
         uploaderOptions.authToken = "Bearer " + this.tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
-        uploader.setOptions(uploaderOptions as FileUploaderOptions);
+        uploader.setOptions(uploaderOptions);
         return uploader;
     }
 
@@ -548,7 +548,7 @@ export class MainImportComponent
                     this.ProgressDetail = this.l("Importdocumentsyouwanttoshare");
         
                     this.imagesUploader.onProgressAll = (progress) => {
-                        this.progress = Math.ceil((progress.loaded / progress.total) * 100);
+                        this.progress = Math.round((progress.loaded / progress.total) * 100);
                     };
         
                     this.imagesUploader.onErrorItem = (item, response, status) => {

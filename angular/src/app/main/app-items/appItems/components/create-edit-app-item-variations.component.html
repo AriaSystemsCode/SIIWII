@@ -44,34 +44,23 @@
                             <h6>{{ "Attributes" | localize }} </h6>
                             <div class="align-items-baseline d-flex flex-row justify-content-start">
                                 <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
-                                    <!-- attributes -->
                                     <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
                                         *ngFor="let selectedExtraAttribute of selectedExtraAttributes;index  as i"
                                         [ngClass]="{'active':i == activeExtraAttributeIndex}"
                                         (click)="setActiveExtraAttribute(i)"
-                                     [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE'"   >
-                                       {{selectedExtraAttribute.name | localize}}
+                                        >
+                                        {{selectedExtraAttribute.name | localize}}
                                         <span (click)="removeExtraAttribute(selectedExtraAttribute,i)" class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle">
                                             <i class="flaticon2-delete"></i>
                                         </span>
                                     </a>
                                 </div>
                                 <div class="dropdown" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
-                                    <!-- <button class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2"
+                                    <button class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2"
                                         dropdownToggle>
                                         <span class="mr-1">+</span> {{ "AddAttribute" | localize }}
-                                    </button> -->
-                                    <!-- attribute DropDown -->
-                                    <select class="form-select form-control"   (change)="handleAttrChange($event)" aria-label="Default select example">
-                                        <option selected>{{ "AddVariationAttribute" | localize }}</option>
-                                        <option *ngFor="let extraAttribute of extraVariations"
-                                               [selected]="extraAttribute.id == selectedAttrID"
-                                               [value]="extraAttribute.id">
-                                            {{extraAttribute.name|localize}}
-                                        </option>
-                                    </select>
-
-                                    <!-- <div class="dropdown-menu pl-3 pr-3"  *dropdownMenu>
+                                    </button>
+                                    <div class="dropdown-menu pl-3 pr-3"  *dropdownMenu>
                                         <div class="form-group mb-4 pt-2">
                                             <label>
                                                 <small>
@@ -80,8 +69,7 @@
                                             </label>
                                             <div class="d-flex flex-column">
                                                 <label for="extraAttribute_{{extraAttribute.name}}" class="align-items-center checkbox d-flex mb-1 " *ngFor="let extraAttribute of extraAttributes">
-                                                    <input type="checkbox" [attr.selected]="extraAttribute.selected" [(ngModel)]="extraAttribute.selected" [value]="true"  class=" mr-2"
-                                                     name="extraAttributes" id="extraAttribute_{{extraAttribute.name}}"/>
+                                                    <input type="checkbox" [attr.selected]="extraAttribute.selected" [(ngModel)]="extraAttribute.selected" [value]="true"  class=" mr-2" name="extraAttributes" id="extraAttribute_{{extraAttribute.name}}"/>
                                                     <span>{{extraAttribute.name|localize}}</span>
                                                 </label>
                                             </div>
@@ -94,8 +82,7 @@
                                                 {{ "Cancel" | localize }}
                                             </button>
                                         </div>
-                                    </div> -->
-                                    <!-- attribute DropDown -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -106,7 +93,7 @@
                                         <ng-template tabHeading >
                                             <span class="tab-item pl-4 pr-4">{{'SelectSizes' | localize}}</span>
                                         </ng-template>
-                                        <app-size-scale
+                                        <app-size-scale 
                                             #sizeScaleComponent
                                             [oldAppSizeScaleDto]="appSizeScales"
                                             [extraAttr]="selectedExtraAttributes[activeExtraAttributeIndex]"
@@ -153,6 +140,7 @@
                                         multiple="multiple"
                                         [name]="selectedExtraAttributes[activeExtraAttributeIndex].name"
                                         [(ngModel)]="selectedExtraAttributes[activeExtraAttributeIndex].selectedValues"
+                                        [dataKey]="'code'"
                                     >
                                     </p-selectButton>
                                     <button class="btn btn-outline-primary font-weight-normal p-2" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
@@ -162,8 +150,7 @@
                             </ng-template>
                         </div>
                         <div class="mt-4 pl-4 pr-4">
-                            <button [disabled]="!variationPossibilities  || selectedExtraAttributes?.length  < 2   || !(selectedExtraAttributes?.length  >= 2  && selectedExtraAttributes[0]?.selectedValues?.length >0  && selectedExtraAttributes[1]?.selectedValues?.length >0 ) "
-                                 class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()">
+                            <button [disabled]="!variationPossibilities" class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()">
                                 {{ "Create" | localize }}
                                 {{ variationPossibilities > 0 ? variationPossibilities : ' '  }}
                                 {{ "Variations" | localize }}
@@ -205,13 +192,13 @@
                     <div class="kt-portlet__body">
                         <p-accordion>
                             <p-accordionTab [selected]="showVariationPhotos" >
-                                <ng-template pTemplate="header">
+                                <p-header>
                                     <div  class="d-inline-block custom-header ml-3 pb-5">
                                         <h6 class="mb-1">
                                             {{ "AddVariationPhotos" | localize }}
                                         </h6>
                                     </div>
-                                </ng-template>
+                                </p-header>
                                 <div *ngIf="showVariationPhotos" class="row align-items-baseline mb-3 item-photos" >
                                     <div class="col-12 item-photos-header pt-4 pb-2 pl-4">
                                         <div class="d-flex flex-wrap justify-content-between">
@@ -221,7 +208,7 @@
                                                         dropdownToggle> {{defaultExtraAttrForAttachments.name | localize}}
                                                     </button>
                                                     <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
-                                                        <li *ngFor="let extraAttr of selectedExtraAttributes;let i = index"  [hidden]=" extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE'">
+                                                        <li *ngFor="let extraAttr of selectedExtraAttributes;let i = index">
                                                             <a (click)="setDefaultExtraAttributeForVariationAttachment(extraAttr)" >
                                                                 <span>
                                                                     <i *ngIf="extraAttr == defaultExtraAttrForAttachments" class="flaticon2-check-mark text-success mr-2 icon-sm"></i>
@@ -251,7 +238,7 @@
                                             </a>
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
-                                            <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i">
+                                            <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption.attachmentSrcs; index as i">
                                                 <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" for="variation_file_{{i}}">
                                                     <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons">
                                                         <div class="left-icon">
@@ -310,7 +297,7 @@
                     <div class="kt-portlet__body">
                         <p-accordion >
                             <p-accordionTab #variationCombinationTap [selected]="showVariations"  >
-                                <ng-template pTemplate="header">
+                                <p-header>
                                     <div class="d-inline-block custom-header ml-3 ">
                                         <h6 class="mb-1">
                                             {{ "VariationCombinations" | localize }}
@@ -319,9 +306,9 @@
                                             {{ "AGeneratedMatricesOfVariationCombinationWhereYouCanEditThemAsYouWant" | localize }}
                                         </p>
                                     </div>
-                                </ng-template>
+                                </p-header>
                                 <form #varitationsForm="ngForm" *ngIf="showVariations">
-                                    <div class="mt-5 primeng-datatable-container table-transparent-header table-transparent-rows variation-table thin-scroll pt-5 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
+                                    <div class="mt-5 primeng-datatable-container variation-table thin-scroll pt-5 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
                                         <div class="mb-3 d-flex flex-row" *ngIf="selectedVaritaions.length > 0">
                                             <a class="text-primary mr-4">{{ "SelectionActions" | localize }}:</a>
                                             <div class="dropdown mr-4" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
@@ -412,60 +399,46 @@
                                             [value]="primengTableHelper.records"
                                             rows="{{primengTableHelper.records.length}}"
                                             [paginator]="false"
-                                            responsiveLayout="scroll"
-                                            [breakpoint]="'960px'"
-                                            [rowHover]="true" [resizableColumns]="true"
-                                            [tableStyle]="{'min-width': '50rem'}">
+                                            [responsive]="primengTableHelper.isResponsive">
                                             <ng-template pTemplate="header">
                                                 <tr>
-                                                    <th style="width: 4rem">
+                                                    <th>
                                                         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                                                     </th>
                                                     <th>
                                                         {{ "ItemMajor" | localize }}
                                                     </th>
-                                                    <th *ngFor="let extraAttr of selectedExtraAttributes" [hidden]="extraAttr.entityObjectTypeCode !== 'COLOR' && extraAttr.entityObjectTypeCode !== 'SIZE'">
+                                                    <th *ngFor="let extraAttr of selectedExtraAttributes">
                                                         {{extraAttr.name | localize}} {{"Code" | localize}}
-                                                    </th>
-                                                    <th>
-                                                        SIWII Marketplace Color
-                                                    </th>
-                                                    <th>
-                                                        SIWII Marketplace Size
                                                     </th>
                                                     <th>
                                                         {{ "VariationCode" | localize }}
                                                     </th>
                                                     <th>
-                                                        SSIN Number
-                                                    </th>
-                                                    <th>
                                                         {{ "Photos" | localize }}
                                                     </th>
-                                                    <th class="row mr-5">
+                                                    <th >
                                                         <div>
                                                             <div class="text-center">
                                                                 {{ "Price" | localize }}
                                                             </div>
                                                             <div class="d-flex justify-content-between align-items-baseline">
-                                                                <div class="col-9">
                                                                 <p-dropdown
                                                                     [options]="currencies"
-                                                                    [styleClass]="'w-100 aria-select-primeng'"
-                                                                    [filter]="false"
-                                                                    [name]="'variation-currencies'"
+                                                                    [styleClass]="'aria-select-primeng-small'"
+                                                                    [filter]="false" 
+                                                                    [name]="'variation-currencies'" 
                                                                     [(ngModel)]="pricingFilter.currencyId"
                                                                     [placeholder]="'Select' | localize"
                                                                     [appendTo]="'body'"
                                                                     (ngModelChange)="checkAndAddDefaultPriceObjects()"
                                                                 >
                                                                 </p-dropdown>
-                                                            </div>
                                                                 <p-dropdown
                                                                     [options]="levels"
-                                                                    [styleClass]="'w-100 aria-select-primeng'"
-                                                                    [filter]="false"
-                                                                    [name]="'variation-levels'"
+                                                                    [styleClass]="'aria-select-primeng-small'"
+                                                                    [filter]="false" 
+                                                                    [name]="'variation-levels'" 
                                                                     [(ngModel)]="pricingFilter.level"
                                                                     [placeholder]="'Select' | localize"
                                                                     [appendTo]="'body'"
@@ -475,7 +448,6 @@
                                                             </div>
                                                         </div>
                                                     </th>
-
                                                     <th >
                                                         {{ "AvailableQuantity" | localize }}
                                                     </th>
@@ -483,51 +455,14 @@
                                             </ng-template>
                                             <ng-template  pTemplate="body" let-record="$implicit" let-index ="rowIndex">
                                                 <tr [pSelectableRow]="record">
-                                                    <td style="width: 4rem">
-                                                        <label class="h-100 w-100" [for]="'var_'+index">
-                                                            <p-tableCheckbox [inputId]="'var_'+index" [value]="record" [index]="index"></p-tableCheckbox>
-                                                        </label>
+                                                    <td >
+                                                        <p-tableCheckbox [value]="record"></p-tableCheckbox>
                                                     </td>
                                                     <td>
                                                         <input type="text" readonly [value]="appItem?.code || ''" class="form-control rounded-lg pt-3 pb-3 row-item">
                                                     </td>
-                                                    <td *ngFor="let entityExtraData of record.entityExtraData" [hidden]="entityExtraData.entityObjectTypeCode !== 'COLOR' && entityExtraData.entityObjectTypeCode !== 'SIZE'">
+                                                    <td *ngFor="let entityExtraData of record.entityExtraData">
                                                         <input type="text" readonly [value]="entityExtraData?.attributeCode || entityExtraData?.attributeValueFkCode" class="form-control rounded-lg pt-3 pb-3 row-item">
-                                                    </td>
-                                                    <td>
-                                                        <div *ngFor="let entityExtraData of record.entityExtraData, let i = index" >
-                                                            <div *ngIf="entityExtraData.entityObjectTypeCode === 'COLOR-SCHEME'">
-                                                                <select
-                                                                 class="form-select form-control"
-                                                                 aria-label="Default select example"
-                                                                 (change)="handleColorChange($event.target.value,record.entityExtraData, i, index)"
-                                                                 >
-                                                                    <!-- <option selected>Color</option> -->
-                                                                    <option
-                                                                    *ngFor="let extraAttribute of siwiMarketPlaceColor[0]"
-                                                                     [value]="extraAttribute.value"
-                                                                     [disabled]="entityExtraData.attributeValueId === extraAttribute.value"
-                                                                     [selected]="entityExtraData.attributeValueId === extraAttribute.value" >
-                                                                        {{extraAttribute.code|localize}}
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div *ngFor="let entityExtraData of record.entityExtraData, let i = index" >
-                                                                <div *ngIf="entityExtraData.entityObjectTypeCode === 'SIZEMARKETPLACECODE'">
-                                                                    <select (change)="handleSizeChange($event.target.value,record.entityExtraData, i, index)"  class="form-select form-control" aria-label="Default select example">
-                                                                        <option selected>Size</option>
-                                                                        <option *ngFor="let extraAttribute of sizes"
-                                                                         [value]="extraAttribute.value"
-                                                                         [disabled]="entityExtraData.attributeValueId === extraAttribute.value"
-                                                                         [selected]="entityExtraData.attributeValueId === extraAttribute.value">
-                                                                            {{extraAttribute.label|localize}}
-                                                                        </option>
-                                                                    </select>
-                                                            </div>
-                                                        </div>
                                                     </td>
                                                     <td>
                                                         <app-codes
@@ -538,15 +473,6 @@
                                                            classes="bg-white border-color"
                                                            [readonly]=true>
                                                         </app-codes>
-                                                    </td>
-                                                    <td>
-                                                        <input type="text"
-                                                        step="any"
-                                                        placeholder="SSIN Number"
-                                                        [name]="record.ssin"
-                                                        readonly
-                                                        class="form-control rounded-lg pt-3 pb-3 row-item"
-                                                        [(ngModel)]="record.ssin">
                                                     </td>
 
                                                     <td>
@@ -577,7 +503,6 @@
                                                             [(ngModel)]="record.appItemPriceInfos[pricingFilter.variationCorrespondingIndex[index]].price">
                                                         </div>
                                                     </td>
-
                                                     <td >
                                                         <!-- <p-inputNumber
                                                             [ariaRequired]="true"

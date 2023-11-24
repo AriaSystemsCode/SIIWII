@@ -1,4 +1,4 @@
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import * as rtlDetect from 'rtl-detect';
@@ -82,8 +82,8 @@ export class PrimengTableHelper {
             return;
         }
 
-        const body: HTMLElement = table.el.nativeElement.querySelector('.p-table-scrollable-body');
-        const header: HTMLElement = table.el.nativeElement.querySelector('.p-table-scrollable-header');
+        const body: HTMLElement = table.el.nativeElement.querySelector('.ui-table-scrollable-body');
+        const header: HTMLElement = table.el.nativeElement.querySelector('.ui-table-scrollable-header');
         body.addEventListener('scroll', () => {
           header.scrollLeft = body.scrollLeft;
         });

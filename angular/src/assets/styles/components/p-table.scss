@@ -1,16 +1,16 @@
 @import '../base/variables';
 
 
-body .transparent-p-table p-table .p-table-thead > tr > th,
-body .transparent-p-table p-table .p-table-tbody > tr:nth-child(even),
-.transparent-p-table.primeng-datatable-container p-table tr:nth-child(odd).p-highlight,
-body .transparent-p-table.primeng-datatable-container p-table.p-table-hoverable-rows .p-table-tbody > tr.p-selectable-row:not(.p-highlight):hover  {
+body .transparent-p-table .ui-table .ui-table-thead > tr > th,
+body .transparent-p-table .ui-table .ui-table-tbody > tr:nth-child(even),
+.transparent-p-table.primeng-datatable-container .ui-table tr:nth-child(odd).ui-state-highlight,
+body .transparent-p-table.primeng-datatable-container .ui-table.ui-table-hoverable-rows .ui-table-tbody > tr.ui-selectable-row:not(.ui-state-highlight):hover  {
     background-color: $white!important;
 }
 
 
 // varition table
-.primeng-datatable-container.variation-table p-table table {
+.primeng-datatable-container.variation-table .ui-table table {
     table-layout: fixed;
     min-width: 700px;
     width: auto;
@@ -24,23 +24,4 @@ body .transparent-p-table.primeng-datatable-container p-table.p-table-hoverable-
     font-weight: 700;
     color: #333333;
     background-color: #f4f4f4!important;
-}
-
-.table-transparent-rows .p-datatable .p-datatable-tbody > tr > td, 
-.table-transparent-header .p-datatable .p-datatable-thead > tr > th {
-    border-color: transparent!important;
-}
-
-.variation-table .p-datatable .p-datatable-thead > tr > th, 
-.variation-table .p-datatable.p-datatable-hoverable-rows .p-datatable-tbody > tr:not(.p-highlight):hover,
-.variation-table .p-datatable .p-datatable-tbody > tr.p-highlight  {
-    background-color: transparent!important;
-}
-.variation-table .p-datatable .p-datatable-tbody > tr:focus {
-    outline: none!important;
-}
-.p-datatable .p-datatable-thead > tr > th {
-    background-color: #f4f4f4;
-    font-weight: 600;
-    padding: 0.771rem 0.857rem;
 }

@@ -52,9 +52,9 @@
                     [rows]="rows" 
         
                     [canAddCols]="!readOnly"
-                    [canAddRows]="!readOnly&&canAddRows"
-                    [disableAddCols]="false"
-                    [disableAddRows]="false"
+                    [canAddRows]="!readOnly"
+                    [disableAddCols]="!canAddCols"
+                    [disableAddRows]="!canAddRows"
         
                     [canRemoveRows]="!readOnly"
                     [canRemoveCols]="!readOnly"
@@ -83,8 +83,7 @@
         <div class="align-items-center buttons-list col-2 d-flex flex-column" *ngIf="!readOnly">
             <button class="btn btn-primary w-100" (click)="openSelectSizeScaleModal()">{{'SelectSizeScale' | localize}}</button>
             <button class="btn btn-primary w-100" (click)="createOrEdit(false)" [disabled]="!appSizeScaleDto?.sizeScaleId">{{'SaveSizeScale' | localize}}</button>
-            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" style="background-color: #eba461 !important;
-            border: none !important;">{{'SaveAsNewSizeScale' | localize}}</button>
+            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" >{{'SaveNewSizeScale' | localize}}</button>
         </div>
     </div>
 </form>

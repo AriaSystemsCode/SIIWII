@@ -1,5 +1,5 @@
 import { LookupLabelDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto } from "@shared/service-proxies/service-proxies"
-import { SelectItem } from "primeng/api"
+import { SelectItem } from "primeng"
 import { Observable, Subject } from "rxjs"
 
 export class AccountFilters {

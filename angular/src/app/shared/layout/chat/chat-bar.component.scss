@@ -226,7 +226,7 @@ a.page-quick-sidebar-pinner:hover {
 
 /*Stlye for Chat Buttons */
 .kt_chat__tools {
-    .p-button {
+    .ui-button {
         display: block;
         margin: 0;
         text-align: left;
@@ -234,7 +234,7 @@ a.page-quick-sidebar-pinner:hover {
         transition: none !important;
     }
 
-    button.p-fileupload-choose {
+    button.ui-fileupload-choose {
         padding: 0.571em 1em;
     }
 
@@ -248,33 +248,34 @@ a.page-quick-sidebar-pinner:hover {
     }
 }
 
-.p-fileupload-choose.p-button,
-.p-fileupload-choose.p-button .p-component {
+.ui-fileupload-choose.ui-button,
+.ui-fileupload-choose.ui-button .ui-widget,
+.ui-fileupload-choose.ui-button .ui-state-default {
     background-color: #fff;
     color: #6f6f6f;
 }
 
-.p-fileupload-choose.p-button.p-state-hover,
-.p-fileupload-choose.p-button.p-focus,
-.p-fileupload-choose.p-button {
+.ui-fileupload-choose.ui-button.ui-state-hover,
+.ui-fileupload-choose.ui-button.ui-state-focus,
+.ui-fileupload-choose.ui-button.ui-state-active {
     background-color: #eee;
 }
 
 .kt_chat__tools {
     a:hover {
-        span.p-button {
+        span.ui-button {
             background-color: #f4f5f8 !important;
         }
     }
 }
 
-.kt_chat__tools .p-fileupload-choose:not(.p-disabled) {
+.kt_chat__tools .ui-fileupload-choose:not(.ui-state-disabled) {
     border: none;
 }
 
-.kt_chat__tools .p-fileupload-choose:not(.p-disabled):hover,
-.kt_chat__tools .p-fileupload-choose:not(.p-disabled):focus,
-.kt_chat__tools .p-fileupload-choose:not(.p-disabled):active {
+.kt_chat__tools .ui-fileupload-choose:not(.ui-state-disabled):hover,
+.kt_chat__tools .ui-fileupload-choose:not(.ui-state-disabled):focus,
+.kt_chat__tools .ui-fileupload-choose:not(.ui-state-disabled):active {
     background-color: #f4f5f8 !important;
     color: black;
     box-shadow: none !important;
@@ -322,7 +323,7 @@ a.page-quick-sidebar-pinner:hover {
         a {
             &:hover {
                 button.chat-link-button,
-                div.p-fileupload-buttonbar {
+                div.ui-fileupload-buttonbar.ui-widget-header.ui-corner-top {
                     background-color: #f4f5f8 !important;
                 }
             }
@@ -339,16 +340,16 @@ a.page-quick-sidebar-pinner:hover {
 }
 
 .kt_chat__tools {
-    div.p-fileupload-buttonbar {
+    div.ui-fileupload-buttonbar.ui-widget-header.ui-corner-top {
         border: none;
         background: #fff;
     }
 
-    div.p-fileupload-content {
+    div.ui-fileupload-content.ui-widget-content.ui-corner-bottom {
         display: none;
     }
 
-    div.p-fileupload-buttonbar:hover {
+    div.ui-fileupload-buttonbar.ui-widget-header.ui-corner-top:hover {
         background-color: #f4f5f8 !important;
     }
 }

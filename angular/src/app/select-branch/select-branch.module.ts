@@ -7,7 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { UtilsModule } from '@shared/utils/utils.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { TreeModule } from 'primeng/tree';
+import { TreeModule } from 'primeng';
 
 
 @NgModule({

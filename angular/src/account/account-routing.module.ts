@@ -31,7 +31,7 @@ import { SessionLockScreenComponent } from './login/session-lock-screen.componen
                 path: '',
                 component: AccountComponent,
                 children: [
-                    { path: '', redirectTo: 'login', pathMatch:'full' },
+                    { path: '', redirectTo: 'login' },
                     { path: 'login', component: LoginComponent, canActivate: [AccountRouteGuard] },
                     { path: 'register', component: RegisterComponent, canActivate: [AccountRouteGuard] },
                     { path: 'register-tenant', component: RegisterTenantComponent, canActivate: [AccountRouteGuard] },
@@ -97,6 +97,6 @@ export class AccountRoutingModule {
             classesToRemember += ' swal2-toast-shown';
         }
 
-       // document.body.className = this._uiCustomizationService.getAccountModuleBodyClass() + ' ' + classesToRemember;
+        document.body.className = this._uiCustomizationService.getAccountModuleBodyClass() + ' ' + classesToRemember;
     }
 }

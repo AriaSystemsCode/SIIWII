@@ -1,6 +1,6 @@
 /*Start Address model */
  /*custom*/
- .p-chkbox-box :before {
+ .ui-chkbox-box :before {
     content: "";
     width: 20px;
     height: 20px;

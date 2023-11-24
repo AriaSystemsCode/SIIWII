@@ -1,6 +1,5 @@
 ﻿import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { MaintainancesComponent } from './maintainances/maintainances/maintainances.component';
 import { SycIdentifierDefinitionsComponent } from './sycIdentifierDefinitions/sycIdentifierDefinitions/sycIdentifierDefinitions.component';
 import { SycSegmentIdentifierDefinitionsComponent } from './sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions.component';
 import { SycCountersComponent } from './sycCounters/sycCounters/sycCounters.component';
@@ -12,7 +11,6 @@ import { TicketsComponent } from './autoTaskTickets/tickets/tickets.component';
 import { AppTenantsActivitiesLogsComponent } from './appTenantsActivitiesLogs/appTenantsActivitiesLogs/appTenantsActivitiesLogs.component';
 import { AppTenantPlansComponent } from './appTenantPlans/appTenantPlans/appTenantPlans.component';
 import { AppTransactionsComponent } from './appTransactions/appTransactions/appTransactions.component';
-import { AppTransactionsBrowseComponent } from './appTransactions/appTransactions/appTransBrowse.component';
 import { SycPlanServicesComponent } from './sycPlanServices/sycPlanServices/sycPlanServices.component';
 import { SycPlansComponent } from './sycPlans/sycPlans/sycPlans.component';
 import { SycServicesComponent } from './sycServices/sycServices/sycServices.component';
@@ -49,7 +47,6 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
             {
                 path: '',
                 children: [
-                    { path: 'maintainances/maintainances', component: MaintainancesComponent, data: { permission: 'Pages.Administration.Maintainances' }  },
                     { path: 'sycIdentifierDefinitions/sycIdentifierDefinitions', component: SycIdentifierDefinitionsComponent, data: { permission: 'Pages.Administration.SycIdentifierDefinitions' }  },
                     { path: 'sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions', component: SycSegmentIdentifierDefinitionsComponent, data: { permission: 'Pages.Administration.SycSegmentIdentifierDefinitions' }  },
                     { path: 'sycCounters/sycCounters', component: SycCountersComponent, data: { permission: 'Pages.Administration.SycCounters' }  },
@@ -59,8 +56,6 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
                     { path: 'appTenantsActivitiesLogs/appTenantsActivitiesLogs', component: AppTenantsActivitiesLogsComponent, data: { permission: 'Pages.Administration.AppTenantsActivitiesLogs' }  },
                     { path: 'appTenantPlans/appTenantPlans', component: AppTenantPlansComponent, data: { permission: 'Pages.Administration.AppTenantPlans' }  },
                     { path: 'appTransactions/appTransactions', component: AppTransactionsComponent, data: { permission: 'Pages.Administration.AppTransactions' }  },
-                    { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent , data: { permission: 'Pages.AppSiiwiiTransactions' } } ,
-                  //  { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent } ,
                     { path: 'sycPlanServices/sycPlanServices', component: SycPlanServicesComponent, data: { permission: 'Pages.Administration.SycPlanServices' }  },
                     { path: 'sycPlans/sycPlans', component: SycPlansComponent, data: { permission: 'Pages.Administration.SycPlans' }  },
                     { path: 'sycServices/sycServices', component: SycServicesComponent, data: { permission: 'Pages.Administration.SycServices' }  },

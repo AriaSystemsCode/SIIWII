@@ -49,7 +49,7 @@ nav.m-menu__submenu--right span.m-menu__arrow {
     bottom: auto;
 }
 
-.p-tree .p-treenode-children {
+.ui-tree .ui-treenode-children {
     padding-right: 20px !important;
 }
 

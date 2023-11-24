@@ -8,7 +8,7 @@ import { AppItemsBrowseModule } from '@app/main/app-items/app-items-browse/app-i
 import { FormsModule } from '@angular/forms';
 import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { TableModule } from 'primeng/table';
+import { TableModule } from 'primeng';
 
 
 @NgModule({

@@ -44,10 +44,10 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
     defineSteps() {
         const step1 = new PrintCatalogueStep({ title: this.l("DataSelection"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.DataSelection, icon: "" });
         const step2 = new PrintCatalogueStep({ title: this.l("ChooseTemplate"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.ChooseTemplate, icon: "" });
-       // const step3 = new PrintCatalogueStep({ title: this.l("CoverPageinfo"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.CoverPage, icon: "" });
-        const step3 = new PrintCatalogueStep({ title: this.l("Detailsinfo"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.DetailInfo, icon: "" });
-        const step4 = new PrintCatalogueStep({ title: this.l("Deliveryoptions"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.PrintInfo, icon: "" });
-        this.steps.push(step1, step2, step3, step4);
+        const step3 = new PrintCatalogueStep({ title: this.l("CoverPageinfo"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.CoverPage, icon: "" });
+        const step4 = new PrintCatalogueStep({ title: this.l("Detailsinfo"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.DetailInfo, icon: "" });
+        const step5 = new PrintCatalogueStep({ title: this.l("Deliveryoptions"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.PrintInfo, icon: "" });
+        this.steps.push(step1, step2, step3, step4, step5);
     }
     title:string
     active:boolean = false
@@ -128,7 +128,7 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
 
     chooseTemplateDone(selectedTemplate: GetSycReportForViewDto) {
         this.printInfoParam.productsCatalogTemplate = selectedTemplate.sycReport.name
-        this.changeStep(PrintCatalogueStepsEnum.DetailInfo)
+        this.changeStep(PrintCatalogueStepsEnum.CoverPage)
     }
 
     dataSelectionDone() {
@@ -157,8 +157,7 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
     }
 
     DetailInfoPrevious() {
-        //this.changeStep(PrintCatalogueStepsEnum.CoverPage)
-        this.changeStep(PrintCatalogueStepsEnum.ChooseTemplate)
+        this.changeStep(PrintCatalogueStepsEnum.CoverPage)
     }
     sendReportEmail : boolean
     printInfoDone() {

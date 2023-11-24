@@ -4,7 +4,7 @@ import { AppItemsBrowseComponentActionsMenuFlags, AppItemsBrowseComponentFilters
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppItemDto, AppItemSelectorsServiceProxy, CreateOrEditAppItemSelectorDto, GetAllAppItemsInput, GetAppItemForViewDto, ItemsFilterTypesEnum } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { tap } from 'rxjs/operators';
 import { ActionsMenuEventEmitter } from '../models/ActionsMenuEventEmitter';
 import { AppItemBrowseEvents } from '../models/appItems-browse-events';

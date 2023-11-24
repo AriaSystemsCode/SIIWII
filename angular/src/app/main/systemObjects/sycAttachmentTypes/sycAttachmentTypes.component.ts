@@ -8,7 +8,7 @@ import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistor
 import * as _ from 'lodash';
 import { Table } from 'primeng/table';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 
 @Component({
     templateUrl: './sycAttachmentTypes.component.html',
@@ -52,7 +52,6 @@ export class SycAttachmentTypesComponent extends AppComponentBase {
 
     getSycAttachmentTypes(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

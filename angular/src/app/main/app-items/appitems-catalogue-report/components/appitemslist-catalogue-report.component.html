@@ -128,7 +128,7 @@
                                 </app-catalogue-report-choose-template-step>
                             </ng-container>
 
-                           <!--  <ng-container
+                            <ng-container
                                 *ngIf="active"
                             >
                                 <div [ngClass]="{'d-block':currentStep == printCatalogueStepsEnum.CoverPage}" 
@@ -143,7 +143,7 @@
                                     >
                                     </app-catalogue-report-cover-page-step>
                                 </div>
-                            </ng-container> -->
+                            </ng-container>
 
                         
                             <ng-container
@@ -156,9 +156,7 @@
                                 <app-catalogue-detail-info-step
                                     (continue)="DetailInfoDone()"
                                     (previous)="DetailInfoPrevious()"
-                                     (searchAccount)="searchAccounts($event)"
                                     [printInfoParam]="printInfoParam"
-                                    [accounts]="accounts"
                                     class="h-75"
                                 >
                                 </app-catalogue-detail-info-step>

@@ -36,7 +36,7 @@ export class NgxBootstrapDatePickerConfigService {
         let moduleLocaleName = new NgxBootstrapLocaleMappingService().getModuleName(abp.localization.currentLanguage.name);
 
         return new Promise<boolean>((resolve, reject) => {
-            import(`ngx-bootstrap/chronos/${supportedLocale}.js`)
+            import(`ngx-bootstrap/chronos/esm5/i18n/${supportedLocale}.js`)
                 .then(module => {
                     defineLocale(abp.localization.currentLanguage.name.toLowerCase(), module[`${moduleLocaleName}Locale`]);
                     resolve(true);

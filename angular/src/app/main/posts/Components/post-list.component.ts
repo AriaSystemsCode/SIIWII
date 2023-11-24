@@ -69,7 +69,7 @@ export class PostListComponent
     noOfItemsToShowInitially: number = 5;
     totalCount: number = 0;
     itemsToLoad: number = 5;
-    postsToShow: GetAppPostForViewDto[];
+    postsToShow:GetAppPostForViewDto[];
     isFullListDisplayed: boolean = false;
     posts: GetAppPostForViewDto[] = [];
     bodyElement;
@@ -77,10 +77,12 @@ export class PostListComponent
         new CreateOrEditAppPostDto();
     AttachmentInfoDto: AppEntityAttachmentDto[] = [];
     relatedEntityId: number = 0;
-    fromViewEvent: boolean = false;
-    progress: number = 0;
+    fromViewEvent:boolean=false;
+    progress: number=0;
     @ViewChild("ProgressModal", { static: true })
     ProgressModal: ProgressComponent;
+
+    
 
     public constructor(
         private _profileService: ProfileServiceProxy,
@@ -92,6 +94,7 @@ export class PostListComponent
         super(injector);
     }
 
+    
     ngOnInit(): void {
         this.getProfilePicture();
         this.userName =
@@ -159,9 +162,11 @@ export class PostListComponent
     }
 
     onCreateOrEditPost($event: GetAppPostForViewDto) {
+      
         this.attachmets = $event.attachments;
-        if (this.attachmets && this.attachmets.length == 0)
-            this.spinnerService.show();
+        if(this.attachmets &&
+            this.attachmets.length == 0)
+           this.spinnerService.show();
 
         this.AttachmentInfoDto = [];
         if (
@@ -229,22 +234,24 @@ export class PostListComponent
         this.attachmentsUploader.onSuccessItem = (item, response, status) => {
             this.createOrEditPost($event);
         };
-
+      
         this.attachmentsUploader.uploadAllFiles();
+       
+            if(this.attachmets.length > 0){
+               this.ProgressModal.show();
 
-        if (this.attachmets.length > 0) {
-            this.ProgressModal.show();
+            this.attachmentsUploader.onProgressAll = (progress:any) => {
+               this.progress =Math.round((progress.loaded / progress.total) * 100);
+           };
 
-            this.attachmentsUploader.onProgressAll = (progress: any) => {
-                this.progress = Math.ceil(
-                    (progress.loaded / progress.total) * 100
-                );
-            };
+           this.attachmentsUploader.onCompleteItem = () => {
+            this.progress = 100;
+        };
+          }
+       
 
-            this.attachmentsUploader.onCompleteItem = () => {
-                this.progress = 100;
-            };
-        }
+       
+
     }
 
     createUploader(
@@ -259,10 +266,10 @@ export class PostListComponent
             file.withCredentials = false;
         };
 
-        const uploaderOptions: Partial<FileUploaderOptions> = {};
+        const uploaderOptions: FileUploaderOptions = {};
         uploaderOptions.authToken = "Bearer " + this.tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
-        uploader.setOptions(uploaderOptions as FileUploaderOptions);
+        uploader.setOptions(uploaderOptions);
         return uploader;
     }
 
@@ -281,8 +288,10 @@ export class PostListComponent
             .createOrEdit(this.createOrEditAppPostDto)
             .pipe(
                 finalize(() => {
-                    if (this.attachmets?.length) this.ProgressModal.hide();
-                    else this.spinnerService.hide();
+                  if(this.attachmets?.length)
+                    this.ProgressModal.hide();
+                  else
+                    this.spinnerService.hide();
 
                     this.createOrEditModal.hideModal();
                     this.relatedEntityId = 0;
@@ -310,9 +319,7 @@ export class PostListComponent
                 this.filter,
                 this.codeFilter,
                 this.descriptionFilter,
-                undefined,
-                undefined,
-                undefined,
+                this.typeFilter,
                 this.contactNameFilter,
                 this.entityNameFilter,
                 0,
@@ -409,8 +416,8 @@ export class PostListComponent
         if ($event) this.createOrEditEventModal.show(0, true);
     }
 
-    oncreatePostEvent($event: any, fromViewEvent: boolean) {
-        this.fromViewEvent = fromViewEvent;
+    oncreatePostEvent($event: any,fromViewEvent:boolean) {
+        this.fromViewEvent=fromViewEvent;
         var getAppPostForViewDto: GetAppPostForViewDto =
             new GetAppPostForViewDto();
         getAppPostForViewDto.type = PostType.SINGLEIMAGE;
@@ -465,47 +472,32 @@ export class PostListComponent
 
     showEventModal($event: boolean) {
         if (this.fromViewEvent) this.viewEventModal.showModal();
-        this.fromViewEvent = false;
-        this.relatedEntityId = 0;
+        this.fromViewEvent=false;
+        this.relatedEntityId=0;
     }
 
     /* /////////////////////////////////////////////////////// */
 
     showPost(postid: number) {
+
         // reterive the post by postId
         this._postService
-            .getAll(
-                "",
-                "",
-                "",
-                undefined,
-                undefined,
-                undefined,
-                "",
-                "",
-                postid,
-                "",
-                0,
-                1
-            )
-            .subscribe((res) => {
-                if (res.items.length > 0) {
-                    if (res.items[0].type == PostType.TEXT) {
-                        if(this.GetLinkUrl(res.items[0].appPost.description))
-                        window.open(
-                            this.GetLinkUrl(res.items[0].appPost.description),
-                            "_blank"
-                        );
-                        else
-                        this.viewPostModal.show(res.items[0]);
-                    } else {
-                        this.viewPostModal.show(res.items[0]);
-                    }
-                }
-            });
-    }
+          .getAll("", "", "", "", "", "", postid, "", 0, 1)
+          .subscribe((res) => {
+            if (res.items.length > 0) {
+              if (res.items[0].type == PostType.TEXT)
+              {
+                window.open(this.GetLinkUrl(res.items[0].appPost.description), "_blank");
+              }
+              else
+              {
+              this.viewPostModal.show(res.items[0]);
+              }
+            }
+          });
+      }
 
-    GetLinkUrl(textToCheck: string): string {
+      GetLinkUrl(textToCheck: string): string {
         let linkUrl = null;
         let hasLink = false;
 
@@ -551,44 +543,10 @@ export class PostListComponent
             //         : splitText[indx].text;
             //     hasLink = true;
             // }
-            const matchedUrls = textToCheck.match(regex);
-            if (matchedUrls != null && matchedUrls?.length > 0)
-                linkUrl = matchedUrls[matchedUrls.length - 1];
+            const matchedUrls  = textToCheck.match(regex);
+            if(matchedUrls !=null && matchedUrls?.length > 0)  linkUrl = matchedUrls[matchedUrls.length-1]
         }
 
         return linkUrl;
-    }
-
-    currentPlayingVideo: HTMLVideoElement;
-
-    playOrpauseVideo(video, post) {
-        console.log(">>", video.url, video.value);
-
-        // play the first video that is chosen by the user
-        if (this.currentPlayingVideo === undefined) {
-            this.currentPlayingVideo = video.value;
-            this.currentPlayingVideo.play();
-            console.log("play first");
-        } else {
-            // if the user plays a new video, pause the last
-            // one and play the new one
-            if (video.value !== this.currentPlayingVideo) {
-                this.currentPlayingVideo.pause();
-                this.currentPlayingVideo = video.value;
-                this.currentPlayingVideo.play();
-                console.log("pause the other");
-            }
-        }
-
-        // // Set the current video URL
-        // this.currentVideo = videoUrl;
-
-        // // Stop the other videos by resetting the current video in the child components
-        // for (let video of this.postsToShow) {
-        //     console.log(">>", video.attachmentsURLs[0] , videoUrl);
-        //     if (video.attachmentsURLs[0] !== videoUrl) {
-        //         video.isCurrentVideo = false;
-        //     }
-        // }
     }
 }

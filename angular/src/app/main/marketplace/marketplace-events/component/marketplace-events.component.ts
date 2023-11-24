@@ -5,7 +5,7 @@ import { EventsBrowseInputs } from '@app/main/AppEventsBrowse/models/Events-brow
 import { EventsBrowseComponentFiltersDisplayFlags } from "@app/main/AppEventsBrowse/models/EventsBrowseComponentFiltersDisplayFlags";
 import { EventsBrowseComponentActionsMenuFlags } from "@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags";
 import { EventsBrowseComponentStatusesFlags } from "@app/main/AppEventsBrowse/models/EventsBrowseComponentStatusesFlags";
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { EventsFilterTypesEnum } from '@shared/service-proxies/service-proxies';
 
 @Component({

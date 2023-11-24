@@ -91,7 +91,6 @@ export class AppitemsActionsMenuComponent extends AppComponentBase  {
     }
 
     openShareProductListingModal() {
-        console.log(">> listing" )
         const listingId: number = this.item.id;
         const alreadyPublished: boolean = this.item.published;
         const successCallBack = () => {
@@ -176,13 +175,12 @@ export class AppitemsActionsMenuComponent extends AppComponentBase  {
         forkJoin(requests).subscribe((res) => {
             this.successRightModal.show(this.selectedList.name); // list name is missing
             this.itemListSelectionModal.hide();
-
+            
         });
     }
 
     // add to list modal
     openAddtoListModal() {
-        console.log(">>", 'pupblish')
         this.itemListSelectionModal.show(this.item.id);
     }
 
@@ -214,7 +212,7 @@ export class AppitemsActionsMenuComponent extends AppComponentBase  {
     }
 
     appItemListProductListing : CreateOrEditAppItemsListItemDto
-    allVariations: AppItemVariationDto[]
+    allVariations: AppItemVariationDto[] 
     openVariationSelectionModal(list: AppItemsListDto) {
         this.selectedList = list;
         forkJoin([
@@ -252,7 +250,7 @@ export class AppitemsActionsMenuComponent extends AppComponentBase  {
     }
 
     onVariationSelectionDone(output: VariationSelectionOutput) {
-        let selectedVariationsIds = output.selectedVariationsIds
+        let selectedVariationsIds = output.selectedVariationsIds 
         let toBeDeletedDirectly : AppItemsListItemVariationDto[]=[]
         let toBeChanged : AppItemsListItemVariationDto[]=[]
         let toBeAdded : AppItemsListItemVariationDto[]=[]

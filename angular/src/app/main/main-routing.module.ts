@@ -140,17 +140,6 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                                     permission: "Pages.Marketplace.Events",
                                 },
                             },
-                            {
-                                path: "news",
-                                loadChildren: () =>
-                                    import(
-                                        "./marketplace/marketplace-news/marketplace-news.module"
-                                    ).then((m) => m.MarketplaceNewsModule),
-                                data: {
-                                    preload: true,
-                                    permission: "Pages.Marketplace.Events",
-                                },
-                            },
                         ],
                         data: {
                             permission: "Pages.Marketplace",

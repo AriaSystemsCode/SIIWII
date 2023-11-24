@@ -6,9 +6,9 @@ import { MatrixGridColumns } from '@app/shared/common/matrix-grid/models/MatrixG
 import { MatrixGridRows } from '@app/shared/common/matrix-grid/models/MatrixGridRows';
 import { MatrixGridSelectItem } from '@app/shared/common/matrix-grid/models/MatrixGridSelectItem';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppItemPriceInfo, CreateOrEditAppItemDto, CurrencyInfoDto } from '@shared/service-proxies/service-proxies';
+import { AppItemPriceInfo, CurrencyInfoDto } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { PricingHelpersService } from '../services/pricing-helpers.service';
 
 @Component({
@@ -23,13 +23,8 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   @Input() prices:AppItemPriceInfo[] = []
   @Input() readOnly:boolean 
   @Input() allCurrencies:CurrencyInfoDto[] = []
-  @Input()  appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
-
-  
   @Output() _submit : EventEmitter<AppItemPriceInfo[]> = new EventEmitter()
   @Output() _cancel : EventEmitter<any> = new EventEmitter()
-  @Output() updateVariation : EventEmitter<boolean> = new EventEmitter()
-
   
   cols: MatrixGridColumns
   rows: MatrixGridRows[]
@@ -37,7 +32,6 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   canAddRows: boolean = true
   rowHeaderFormInput:FormInputs<string,CurrencyInfoDto[]>
   cellSelectionFormInput:FormInputs<string,CurrencyInfoDto[]>
-  
   constructor(
     private pricingHelpersService: PricingHelpersService,
     private injector: Injector
@@ -115,25 +109,8 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
     const hasDuplicates = new Set(this.rows.map(item=>item.rowHeader.value)).size !== this.rows.length;
     if(hasDuplicates) return this.notify.error(this.l("CurrenciesCannotBeDublicated"))
     const newPrices : AppItemPriceInfo[] = this.mapRowsToAppItemPricesDto()
-
-   if(this.appItem?.variationItems  && this.appItem?.variationItems.length >0  &&  !this.matrixGrid.matrixGridForm.pristine){
-    this.message.confirm(
-      '',
-      this.l('Do you want to update variations with the new price?'),
-      (isConfirmed) => {
-          if (isConfirmed) 
-          this.updateVariation.emit(true);
-        else
-        this.updateVariation.emit(false);
-
-          this._submit.emit(newPrices)
-      }
-       );
-    }
-    else
-    this._submit.emit(newPrices);
+    this._submit.emit(newPrices)
   }
-
   mapRowsToAppItemPricesDto(){
     const getPriceInfoIndex = ( currencyCode:string, level:string ) :number=>{
       return this.prices.findIndex(item=>item.currencyCode == currencyCode && item.code == level)
@@ -144,8 +121,8 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
       const currencyName : string = row.rowHeader.label
       const currencyId : number = row.rowHeader.value
       row.rowValues.forEach(cell=>{
-       // if(!cell.value) return
-        const level = cell?.label
+        if(!cell.value) return
+        const level = cell.label
         const oldItemIndex :number = getPriceInfoIndex( currencyCode, level ) 
         const item = new AppItemPriceInfo()
         if(oldItemIndex > -1) item.init(this.prices[oldItemIndex])
@@ -153,7 +130,7 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
         item.currencyId = currencyId
         item.currencyName = currencyName
         item.code = level
-        item.price = cell?.value
+        item.price = cell.value
         newPrices.push(item)
       })
     })

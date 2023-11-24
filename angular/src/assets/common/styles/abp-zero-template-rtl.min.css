@@ -40,7 +40,7 @@ nav.m-menu__submenu--right span.m-menu__arrow {
   right: auto;
   bottom: auto;
 }
-.p-tree .p-treenode-children {
+.ui-tree .ui-treenode-children {
   padding-right: 20px !important;
 }
 .kt-header__topbar div.dropdown-menu {

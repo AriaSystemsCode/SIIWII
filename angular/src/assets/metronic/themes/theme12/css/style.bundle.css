@@ -18954,7 +18954,7 @@ strong {
     visibility: hidden;
     height: 45px;
     min-height: 125px; }
-  .kt-portlet.p-sortable-helper {
+  .kt-portlet.ui-sortable-helper {
     border: 1px dashed #ebedf2; }
   .kt-portlet .kt-portlet__head {
     -webkit-transition: left 0.3s, right 0.3s, height 0.3s;
@@ -19228,7 +19228,7 @@ strong {
     visibility: hidden;
     height: 45px;
     min-height: 125px; }
-  .kt-portlet.p-sortable-helper {
+  .kt-portlet.ui-sortable-helper {
     border: 1px dashed #ebedf2; }
   .kt-portlet .kt-portlet__head {
     -webkit-transition: height 0.3s;
@@ -22202,7 +22202,7 @@ strong {
 .fc-unthemed .fc-axis > span {
   font-size: 0.9rem; }
 
-.p-draggable-handle {
+.ui-draggable-handle {
   cursor: move;
   /* fallback if grab cursor is unsupported */
   cursor: grab;

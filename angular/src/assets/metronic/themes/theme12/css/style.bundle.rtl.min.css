@@ -23982,7 +23982,7 @@ strong {
   height: 45px;
   min-height: 125px;
 }
-.kt-portlet.p-sortable-helper {
+.kt-portlet.ui-sortable-helper {
   border: 1px dashed #ebedf2;
 }
 .kt-portlet .kt-portlet__head {
@@ -24367,7 +24367,7 @@ strong {
   height: 45px;
   min-height: 125px;
 }
-.kt-portlet.p-sortable-helper {
+.kt-portlet.ui-sortable-helper {
   border: 1px dashed #ebedf2;
 }
 .kt-portlet .kt-portlet__head {
@@ -27842,7 +27842,7 @@ td > .kt-radio.kt-radio--single {
 .fc-unthemed .fc-axis > span {
   font-size: 0.9rem;
 }
-.p-draggable-handle {
+.ui-draggable-handle {
   cursor: move;
   /* fallback if grab cursor is unsupported */
   cursor: grab;

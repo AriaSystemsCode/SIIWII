@@ -1,37 +1,22 @@
 @import '../base/variables';
 
-p-toast {
-    .p-toast {
-        opacity: 1!important;
+.ui-toast {
+    .ui-toast-message-error {
+        background-color: $red!important;
     }
-    .p-toast-message {
-        .p-toast-icon-close	,
-        .p-toast-message-icon,
-        .p-toast-icon,
-        .p-toast-detail,
-        .p-toast-summary {
-            color:$white2!important;
-        }
-        color:$white2!important;
-        &.p-toast-message-error {
-            background-color: $red!important;
-            border-color: $red!important;
-        }
-        &.p-toast-message-success {
-            background-color: $green-1!important;
-            border-color: $green-1!important;
-        }
-        &.p-toast-message-info {
-            background-color: $blue!important;
-            border-color: $blue!important;
-        }
-        &.p-toast-message-warn {
-            background-color: $orange-1!important;
-            border-color: $orange-1!important;
-        }
+    .ui-toast-message-success {
+        background-color: #43a047!important;
     }
-    
-    .p-toast-message-text-content {
+    .ui-toast-message-info {
+        background-color: $blue!important;
+    }
+    .ui-toast-message-warn {
+        background-color: $orange-1!important;
+    }
+    // .ui-toast-message {
+
+    // }
+    .ui-toast-close-icon ,.ui-toast-message,.ui-toast-message-text-content {
         color: $white2!important;
     }
 }

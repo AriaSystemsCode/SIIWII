@@ -58,6 +58,7 @@ import { TreeModule } from 'primeng/tree';
         BsDatepickerModule.forRoot(),
         BsDropdownModule.forRoot(),
         PopoverModule.forRoot(),
+
     ],
     declarations: [
         SelectAddressModalComponent,
@@ -67,7 +68,12 @@ import { TreeModule } from 'primeng/tree';
         SelectAddressModalComponent,
         CreateOrEditAddressModalComponent
     ],
-    providers: []
+    providers: [
+    ],
+
+    entryComponents: [
+
+    ]
 })
 export class SelectAddressModule {
     static forRoot(): ModuleWithProviders<SelectAddressModule> {

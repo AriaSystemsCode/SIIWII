@@ -37,7 +37,7 @@ export class SessionTimeoutComponent extends AppComponentBase implements AfterVi
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next(undefined);
+    this.destroy$.next();
   }
 
   private bindActions(): void {

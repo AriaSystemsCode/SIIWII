@@ -1,11 +1,11 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TrendingPostsComponent } from './trending-posts.component';
 
 describe('TrendingPostsComponent', () => {
   let component: TrendingPostsComponent;
   let fixture: ComponentFixture<TrendingPostsComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [TrendingPostsComponent]
     })

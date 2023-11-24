@@ -127,7 +127,7 @@
                                      [lazy]="true"
                                      [scrollable]="true"
                                      ScrollWidth="100%"
-                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [responsive]="primengTableHelper.isResponsive"
                                      [resizableColumns]="primengTableHelper.resizableColumns">
                             <ng-template pTemplate="header">
                                 <tr>
@@ -192,35 +192,35 @@
                                         </div>
                                     </td>
                                     <td style="width:150px">
-												<span class="p-column-title"> {{l('Name')}}</span>
+												<span class="ui-column-title"> {{l('Name')}}</span>
 												{{record.sycApplicationName}}
 											</td>
                                     <td style="width:150px">
-												<span class="p-column-title"> {{l('Name')}}</span>
+												<span class="ui-column-title"> {{l('Name')}}</span>
 												{{record.sycPlanName}}
 											</td>
                                     <td style="width:150px">
-												<span class="p-column-title"> {{l('Code')}}</span>
+												<span class="ui-column-title"> {{l('Code')}}</span>
 												{{record.sycServiceCode}}
 											</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('UnitOfMeasure')}}</span>
+											<span class="ui-column-title"> {{l('UnitOfMeasure')}}</span>
 											{{record.sycPlanService.unitOfMeasure}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('UnitPrice')}}</span>
+											<span class="ui-column-title"> {{l('UnitPrice')}}</span>
 											{{record.sycPlanService.unitPrice}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('Units')}}</span>
+											<span class="ui-column-title"> {{l('Units')}}</span>
 											{{record.sycPlanService.units}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('BillingFrequency')}}</span>
+											<span class="ui-column-title"> {{l('BillingFrequency')}}</span>
 											{{record.sycPlanService.billingFrequency}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('MinimumUnits')}}</span>
+											<span class="ui-column-title"> {{l('MinimumUnits')}}</span>
 											{{record.sycPlanService.minimumUnits}}
 										</td>
 

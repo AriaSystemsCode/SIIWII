@@ -10,7 +10,7 @@ import { ViewAppTenantPlanModalComponent } from './view-appTenantPlan-modal.comp
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Table } from 'primeng/table';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 import { FileDownloadService } from '@shared/utils/file-download.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -59,7 +59,6 @@ export class AppTenantPlansComponent extends AppComponentBase {
 
     getAppTenantPlans(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

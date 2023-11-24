@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { UtilsModule } from '@shared/utils/utils.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { FileUploadModule, PaginatorModule, EditorModule, MultiSelectModule,  TableModule, TreeModule, AccordionModule, SelectButtonModule, InputNumberModule } from 'primeng';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CategoriesModule } from '@app/categories/categories.module';
@@ -27,16 +28,6 @@ import { SharedFormsComponentsModule } from '@shared/components/shared-forms-com
 import { MyAppItemsComponent } from './components/my-app-items.component';
 import {  BulkImportModule } from '../../../../shared/components/import-steps/bulk-import.module';
 import { AppitemsCatalogueReportModule } from '../appitems-catalogue-report/appitems-catalogue-report.module';
-import { FileUploadModule } from 'ng2-file-upload';
-import { AccordionModule } from 'primeng/accordion';
-import { EditorModule } from 'primeng/editor';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { PaginatorModule } from 'primeng/paginator';
-import { TableModule } from 'primeng/table';
-import { TreeModule } from 'primeng/tree';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { InputNumberModule } from 'primeng/inputnumber';
-
 
 @NgModule({
   declarations: [

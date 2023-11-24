@@ -15,9 +15,6 @@ export class CatalogueReportCoverPageStepComponent extends AppComponentBase  {
   @Output() previous: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input('accounts') accounts: GetAccountForDropdownDto[] = []
   @Output("searchAccount") searchAccountEvent: EventEmitter<string> = new EventEmitter<string>()
-  @Output("linesheetName") linesheetName: EventEmitter<string> = new EventEmitter<string>()
-
-  
   selectedAccount: GetAccountForDropdownDto
   // accounts : string[] = []
   constructor(
@@ -34,10 +31,6 @@ export class CatalogueReportCoverPageStepComponent extends AppComponentBase  {
   }
   searchAccounts(str: string) {
     this.searchAccountEvent.emit(str)
-  }
-
-  onChangLinesheetName(){
-    this.linesheetName.emit(this.printInfoParam.reportTitle);
   }
   selectAccount(account: GetAccountForDropdownDto) {
     if (!account) return

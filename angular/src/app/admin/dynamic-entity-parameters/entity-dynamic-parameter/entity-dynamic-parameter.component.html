@@ -25,7 +25,7 @@
                             <p-table #dataTable (onLazyLoad)="getEntityDynamicParameters()"
                                 [value]="primengTableHelper.records"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
-                                [lazy]="true" responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                [lazy]="true" [responsive]="primengTableHelper.isResponsive">
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th>{{ 'EntityFullName' | localize}}</th>

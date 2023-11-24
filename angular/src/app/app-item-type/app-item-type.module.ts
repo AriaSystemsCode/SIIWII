@@ -7,7 +7,7 @@ import { onetouchCommonModule } from '@shared/common/common.module';
 import { UtilsModule } from '@shared/utils/utils.module';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { TreeModule } from 'primeng/tree';
+import { TreeModule } from 'primeng';
 
 
 

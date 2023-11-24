@@ -3,7 +3,7 @@ import { Component, ElementRef, Injector, OnInit, ViewChild } from '@angular/cor
 import { Router } from '@angular/router';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountDto, AccountsServiceProxy, ComboboxItemDto, CreateAccountsInputDto, LookupAccountOrTenantDto, NameValueOfString, SelectItemDto, SourceAccountEnum, SubscriptionStartType, TargetAccountEnum, TenantRegistrationServiceProxy } from '@shared/service-proxies/service-proxies';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { finalize } from 'rxjs/operators';
 import { RegisterTenantComponent } from './register-tenant.component';
 

@@ -30,7 +30,7 @@
                         <div class="col-12 primeng-datatable-container" [busyIf]="primengTableHelper.isLoading">
                             <p-table #dataTable (onLazyLoad)="getLanguages()" [value]="primengTableHelper.records"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
-                                [lazy]="true" responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                [lazy]="true" [responsive]="primengTableHelper.isResponsive">
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th style="width: 130px"
@@ -87,7 +87,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'Name' | localize}}</span>
+                                            <span class="ui-column-title">{{'Name' | localize}}</span>
                                             <span [ngClass]="{'text-bold' : defaultLanguageName === record.name}">
                                                 <i [ngClass]="record.icon" class="margin-right-5 d-inline-block"></i>
                                                 {{record.displayName}} <span
@@ -95,11 +95,11 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'Code' | localize}}</span>
+                                            <span class="ui-column-title">{{'Code' | localize}}</span>
                                             {{record.name}}
                                         </td>
                                         <td *ngIf="appSession.tenantId ? true : false">
-                                            <span class="p-column-title">{{'Default' | localize}}</span>
+                                            <span class="ui-column-title">{{'Default' | localize}}</span>
                                             <span class="kt-badge kt-badge--success kt-badge--inline"
                                                 *ngIf="record.name === defaultLanguageName">
                                                 {{'Yes' | localize}}
@@ -110,7 +110,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'IsEnabled' | localize}}</span>
+                                            <span class="ui-column-title">{{'IsEnabled' | localize}}</span>
                                             <span class="kt-badge kt-badge--success kt-badge--inline"
                                                 *ngIf="!record.isDisabled">
                                                 {{'Yes' | localize}}
@@ -121,7 +121,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'CreationTime' | localize}}</span>
+                                            <span class="ui-column-title">{{'CreationTime' | localize}}</span>
                                             {{record.creationTime | momentFormat:'L'}}
                                         </td>
                                     </tr>
@@ -130,7 +130,7 @@
                             <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
                                 {{'NoData' | localize}}
                             </div>
-                            <div class="p-table-footer">
+                            <div class="ui-table-footer">
                                 {{'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount}}
                             </div>
                         </div>

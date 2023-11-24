@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { TreeNode } from 'primeng/api';
+import { TreeNode } from 'primeng';
 import { FilterMetaData } from '../models/FilterMetaData.model';
 
 @Component({

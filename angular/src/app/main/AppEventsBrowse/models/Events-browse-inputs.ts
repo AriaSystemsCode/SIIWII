@@ -1,5 +1,5 @@
 import { EventsFilterTypesEnum } from "@shared/service-proxies/service-proxies";
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
 import { EventsBrowseComponentActionsMenuFlags } from "./EventsBrowseComponentActionsMenuFlags";
 import { EventsBrowseComponentFiltersDisplayFlags } from "./EventsBrowseComponentFiltersDisplayFlags";
 import { EventsBrowseComponentStatusesFlags } from "./EventsBrowseComponentStatusesFlags";

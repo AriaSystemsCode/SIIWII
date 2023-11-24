@@ -116,7 +116,7 @@ export class SelectionModalComponent<T = any> extends AppComponentBase implement
   }
   reset(){
     this.selectedRecords = []
-//    this.selectionMode = undefined
+    this.selectionMode = undefined
     this.showAdd = undefined
     this.showEdit = undefined
     this.showDelete = undefined

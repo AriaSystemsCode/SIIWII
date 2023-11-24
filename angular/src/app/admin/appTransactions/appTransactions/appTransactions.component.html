@@ -106,7 +106,7 @@
                                      [lazy]="true"
                                      [scrollable]="true"
                                      ScrollWidth="100%"
-                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [responsive]="primengTableHelper.isResponsive"
                                      [resizableColumns]="primengTableHelper.resizableColumns">
                             <ng-template pTemplate="header">
                                 <tr>
@@ -155,25 +155,25 @@
                                         </div>
                                     </td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('Code')}}</span>
+											<span class="ui-column-title"> {{l('Code')}}</span>
 											{{record.appTransaction.code}}
 										</td>
                                     <td style="width:150px">
-										<span class="p-column-title"> {{l('Date')}}</span>
+										<span class="ui-column-title"> {{l('Date')}}</span>
                                         <span *ngIf="record.appTransaction.date">
 											{{record.appTransaction.date |  momentFormat:'L' }}
                                         </span>
                                         <span *ngIf="!record.appTransaction.date">-</span>
                                     </td>
                                     <td style="width:150px">
-										<span class="p-column-title"> {{l('AddDate')}}</span>
+										<span class="ui-column-title"> {{l('AddDate')}}</span>
                                         <span *ngIf="record.appTransaction.addDate">
 											{{record.appTransaction.addDate |  momentFormat:'L' }}
                                         </span>
                                         <span *ngIf="!record.appTransaction.addDate">-</span>
                                     </td>
                                     <td style="width:150px">
-										<span class="p-column-title"> {{l('EndDate')}}</span>
+										<span class="ui-column-title"> {{l('EndDate')}}</span>
                                         <span *ngIf="record.appTransaction.endDate">
 											{{record.appTransaction.endDate |  momentFormat:'L' }}
                                         </span>

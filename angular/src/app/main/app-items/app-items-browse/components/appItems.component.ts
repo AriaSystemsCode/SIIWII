@@ -49,7 +49,7 @@ import { MainImportService } from "@shared/components/import-steps/services/main
 export class AppItemsComponent extends AppComponentBase {
     appItemListId:number;
     @Output() eventTriggered :EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>> = new EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>>()
-
+ 
     singleItemPerRowMode: boolean = false;
     @ViewChild("entityTypeHistoryModal", { static: true })  entityTypeHistoryModal: EntityTypeHistoryModalComponent;
 
@@ -101,7 +101,6 @@ export class AppItemsComponent extends AppComponentBase {
     BrowseModeEnum = BrowseMode
     multiSelectionInfo : MultiSelectionInfo
     applySelectionTitle:string = 'Apply'
-    oldValue;
     constructor(
         injector: Injector,
         private _importService: MainImportService,
@@ -128,13 +127,6 @@ export class AppItemsComponent extends AppComponentBase {
             const control = this._fb.control(undefined)
             this.filterForm.addControl("appItemType",control)
         }
-           // Fix Issue T-SII-20230618.0001 
-       /*  if(flags.appItemSizeScale){
-            const control = this._fb.control(undefined)
-            this.filterForm.addControl("appItemSizeScale",control)
-        } */
-           // Fix Issue T-SII-20230618.0001 
-
         if(flags.categories){
             const control = this._fb.control([])
             this.filterForm.addControl("categories",control)
@@ -189,7 +181,6 @@ export class AppItemsComponent extends AppComponentBase {
         this.isModal  =  inputs.isModal
         this.canAdd  =  inputs.canAdd
         this.pageMainFilters  =  inputs.pageMainFilters
-        console.log(">>", this.pageMainFilters)
         this.filtersFlags  =  inputs.filtersFlags
         this.statusesFlags  =  inputs.statusesFlags
         this.actionsMenuFlags  =  inputs.actionsMenuFlags
@@ -238,8 +229,7 @@ export class AppItemsComponent extends AppComponentBase {
                 debounceTime(1500)
             )
             .subscribe((value) => {
-                if (value && value !=this.oldValue)  {
-                    this.oldValue=value;
+                if (value) {
                     this.eventTriggered.emit({event:AppItemBrowseEvents.FilterChange})
                     this.getFreshData();
                 }
@@ -262,14 +252,12 @@ export class AppItemsComponent extends AppComponentBase {
         ];
     }
     filterBody = new GetAllAppItemsInput();
-    @Output() itemEmited :EventEmitter<any> = new EventEmitter<any>()
     getAppItems(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
-        const filters = this.filterForm.value;
+        const filters = this.deepClone(this.filterForm.value);
         const filterBody = this.filterBody
         filterBody.categoryFilters = filters?.categories?.map(dept=>dept.data?.sycEntityObjectCategory?.id)
         filterBody.classificationFilters = filters?.classifications?.map(_class=>_class?.data?.sycEntityObjectClassification?.id)
@@ -278,12 +266,7 @@ export class AppItemsComponent extends AppComponentBase {
         filterBody.arrtibuteFilters = []
         filterBody.filterType = filters.filterType.value
         filterBody.priceListId = this.priceListId
-
-           // Fix Issue T-SII-20230618.0001 
-        // Mariam & Esraa Change value to be sizescale id 
-        // filterBody.filterSizeScale= filters?.appItemSizeScale?.map(sizeScale=>sizeScale.data?.sycEntityObjectCategory?.id)
-
-
+        
         const extraAttributesKeys  = Object.keys(filters?.extraAttributes)
         if(extraAttributesKeys?.length) {
             extraAttributesKeys.forEach((key)=>{
@@ -304,7 +287,7 @@ export class AppItemsComponent extends AppComponentBase {
         filterBody.minimumPrice = 0
         filterBody.maximumPrice = 0
         filterBody.selectorKey = this.multiSelectionInfo?.sessionSelectionKey
-
+        
         filterBody.sorting = filters.sorting.value
         filterBody.skipCount = this.primengTableHelper.getSkipCount(this.paginator, event),
         filterBody.maxResultCount = this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -313,14 +296,13 @@ export class AppItemsComponent extends AppComponentBase {
 
         filterBody.tenantId = 0
         filterBody.selectorOnly =false
-
+        
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner();
         this.loading = true;
+        debugger;
         this._appItemsServiceProxy
             .getAll(
-                   // Fix Issue T-SII-20230618.0001 
-                //Mariam add  filterBody.filterSizeScale to  get all   
                 filterBody.tenantId,
                 filterBody.appItemListId,
                 filterBody.selectorOnly,
@@ -355,7 +337,6 @@ export class AppItemsComponent extends AppComponentBase {
             )
             .subscribe((result) => {
                 this.items = result.items;
-                this.itemEmited.emit(result.items)
                 this.primengTableHelper.totalRecordsCount = result.totalCount;
                 this.primengTableHelper.records = result.items;
             });
@@ -407,7 +388,7 @@ export class AppItemsComponent extends AppComponentBase {
         if(event.event == AppItemBrowseEvents.Delete) this.deleteItemHandler(index)
         this.eventTriggered.emit(event)
     }
-
+    
 
     saveUserPreferenceForListView() {
         const key = "appitem-list-view-mode";

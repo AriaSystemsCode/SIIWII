@@ -7,7 +7,7 @@
     role="dialog"
     aria-labelledby="createOrEditModal"
     aria-hidden="true"
-    [config]="{ backdrop: false , ignoreBackdropClick: true }"
+    [config]="{ backdrop: 'static' }"
 >
     <div class="h-100 m-0 ml-md-auto modal-dialog modal-lg mr-md-auto mt-md-5 createOrEditpost posts-sm">
         <div 
@@ -265,9 +265,8 @@
 
                 <div
                     *ngIf="
-                       (typeFile == PostType.SINGLEVIDEO ||
-                        typeFile == PostType.NEWSDIGEST )
-                        && attachmets.length > 0
+                        typeFile == PostType.SINGLEVIDEO &&
+                        attachmets.length > 0
                     "
                     class="img-wrap w-100 h-100"
                 >
@@ -328,7 +327,6 @@
                     class="_attachmentsIcons pt-3 pr-3"
                 >
                     <button
-                    *ngIf="typeFilePassed != PostType.NEWSDIGEST"
                         class="border-0 _btn btn-secondary"
                         (click)="show(null, PostType.SINGLEIMAGE)"
                         [disabled]="!uploadImage"
@@ -338,7 +336,6 @@
                         </div>
                     </button>
                     <input
-                    *ngIf="typeFilePassed != PostType.NEWSDIGEST"
                         type="file"
                         class="d-none"
                         #imageInput
@@ -348,8 +345,7 @@
                         multiple
                     />
 
-                    <button 
-                    *ngIf="typeFilePassed == PostType.SINGLEVIDEO"
+                    <button
                         class="border-0 _btn btn-secondary"
                         (click)="show(null, PostType.SINGLEVIDEO)"
                         [disabled]="!uploadVideo"
@@ -358,9 +354,7 @@
                             <img src="../../../../assets/posts/youtube.png" class="mr-2 attachIcons" />
                         </div>
                     </button>
-                    
-                    <input 
-                    *ngIf="typeFilePassed == PostType.SINGLEVIDEO"
+                    <input
                         type="file"
                         class="d-none"
                         #videoInput
@@ -368,23 +362,6 @@
                         accept="video/mp4"
                         (change)="fileChangeEvent($event, PostType.SINGLEVIDEO)"
                     />
-
-                <button *ngIf="typeFilePassed == PostType.NEWSDIGEST"
-                    class="border-0 _btn btn-secondary"
-                    (click)="show(null, PostType.NEWSDIGEST)"
-                    [disabled]="!uploadVideo" >
-                    <div [ngClass]="{ disabled: !uploadVideo }">
-                        <img src="../../../../assets/posts/youtube.png" class="mr-2 attachIcons" />
-                    </div>
-                </button>
-                <input *ngIf="typeFilePassed == PostType.NEWSDIGEST"
-                    type="file"
-                    class="d-none"
-                    #newsInput
-                    id="_newsInput"
-                    accept="video/mp4"
-                    (change)="fileChangeEvent($event, PostType.NEWSDIGEST)"
-                />
                 </div>
             </div>
         </div>

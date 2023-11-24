@@ -1,11 +1,11 @@
-﻿.p-fileupload {
+﻿.ui-fileupload .ui-corner-top {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
-.p-fileupload {
+.ui-fileupload .ui-corner-bottom {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
-.p-fileupload .p-button {
+.ui-fileupload .ui-button {
   border-radius: 2px;
 }

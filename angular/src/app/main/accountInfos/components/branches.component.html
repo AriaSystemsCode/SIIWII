@@ -20,7 +20,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="accountId" class="table-transparent-header table-transparent-rows">
+            <div *ngIf="accountId">
                 <p-treeTable #dataTable [value]="branches" rows="5" [paginator]="false"
                 [lazy]="true" [scrollable]="true" ScrollWidth="100%" [resizableColumns]="true"
                 (onNodeExpand)="getBranches($event)">

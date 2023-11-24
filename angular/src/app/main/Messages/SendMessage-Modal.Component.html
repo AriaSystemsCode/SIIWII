@@ -213,6 +213,7 @@
                             <div class="form-group editor-text">
                                 <p-editor
                                     [(ngModel)]="htmlEditorInput"
+                                    name="HtmlEditorInput"
                                     [style]="{ height: '200px' }"
                                 >
                                 </p-editor>
@@ -296,7 +297,6 @@
                             id="file-input"
                             type="file"
                             (change)="handleInputChangeAttachment($event)"
-                            multiple
                         />
                     </div>
                 </div>
@@ -507,6 +507,7 @@
                                 <div class="form-group editor-text h-100">
                                     <p-editor
                                         [(ngModel)]="htmlEditorInput"
+                                        name="HtmlEditorInput"
                                         class="HtmlEditorInput-sm h-100"
                                         [style]="{ height: '70%' }"
                                     >
@@ -589,7 +590,6 @@
                                 id="file-input"
                                 type="file"
                                 (change)="handleInputChangeAttachment($event)"
-                                multiple
                             />
                         </div>
                     </div>

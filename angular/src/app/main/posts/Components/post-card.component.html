@@ -36,7 +36,7 @@
                 </a>
                 <h6 class="userName">
                     {{'PostBy' | localize}},<b>{{ post.appPost.userName }} </b> ,
-                    {{ post.appPost.creationDatetime?.toString() | date: "mediumDate" }}
+                    {{ post.appPost.creationDatetime | date: "mediumDate" }}
                 </h6>
             </div>
 
@@ -133,7 +133,7 @@
                         }}"
                             class="evetCover w-100"
                         />
-
+    
                         <img
                         src="{{ attachmentBaseUrl }}/{{
                             post.attachmentsURLs[0]
@@ -265,10 +265,8 @@
                         </div>
                     </div>
                 </div>
-                <div *ngIf="post.type == PostType.SINGLEVIDEO || post.type == PostType.NEWSDIGEST" class="_video w-100">
+                <div *ngIf="post.type == PostType.SINGLEVIDEO" class="_video w-100">
                     <video
-                        (playing)="playVideo(post.attachmentsURLs[0], $event)"
-                        (click)="playVideo(post.attachmentsURLs[0], $event)"
                         controls
                         [attr.src]="attachmentBaseUrl + '/' + post.attachmentsURLs[0] | sanitizeurl"
                         class="w-100 h-100"

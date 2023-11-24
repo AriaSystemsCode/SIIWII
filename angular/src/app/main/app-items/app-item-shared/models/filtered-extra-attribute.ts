@@ -1,6 +1,6 @@
 import { PaginationSettings } from "@shared/components/shared-forms-components/dropdown-with-pagination/dropdown-with-pagination.component";
 import { ExtraAttribute, IExtraAttribute, LookupLabelDto } from "@shared/service-proxies/service-proxies"
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
 
 export interface IFilteredExtraAttribute extends IExtraAttribute {
     lookupData ?: LookupLabelDto[]

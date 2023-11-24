@@ -8,7 +8,7 @@ import { CreateOrEditSuiIconModalComponent } from './create-or-edit-suiIcon-moda
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Table } from 'primeng/table';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 import { FileDownloadService } from '@shared/utils/file-download.service';
 import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistory/entity-type-history-modal.component';
 import * as _ from 'lodash';
@@ -57,7 +57,6 @@ export class SuiIconsComponent extends AppComponentBase {
 
     getSuiIcons(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

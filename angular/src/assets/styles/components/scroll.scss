@@ -2,7 +2,7 @@
 
 // custom thin scrollbar
 .thin-scroll,
-.p-table-scrollable-body {
+.ui-table-scrollable-body {
     @include thin-scroll();
 }
 

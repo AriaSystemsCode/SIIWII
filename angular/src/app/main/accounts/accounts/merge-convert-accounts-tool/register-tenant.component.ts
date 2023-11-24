@@ -1,13 +1,12 @@
 import { RegisterTenantModel } from '@account/register/register-tenant.model';
 import { Component, EventEmitter, Injector, OnInit, Output, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import {   PasswordComplexitySetting, RegisterTenantOutput, SubscriptionStartType, TenantRegistrationServiceProxy } from '@shared/service-proxies/service-proxies';
+import { PasswordComplexitySetting, RegisterTenantOutput, SubscriptionStartType, TenantRegistrationServiceProxy } from '@shared/service-proxies/service-proxies';
 import { Patterns } from '@shared/utils/patterns/pattern';
 import { ModalDirective } from "ngx-bootstrap/modal";
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
 import { accountModuleAnimation } from '@shared/animations/routerTransition';
-import { SelectItem } from 'primeng/api';
 
 
 @Component({
@@ -18,7 +17,7 @@ import { SelectItem } from 'primeng/api';
 export class RegisterTenantComponent extends AppComponentBase implements OnInit {
 
   constructor(injector: Injector,
-    private _tenantRegistrationService: TenantRegistrationServiceProxy
+    private _tenantRegistrationService: TenantRegistrationServiceProxy,
   ) {
     super(injector);
   }
@@ -32,10 +31,6 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit 
   recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
   @Output() register = new EventEmitter<number>();
 
-  accountType;
-  accountTypes:SelectItem[] = [];
-
-  accountTypeLabel:string="";
   ngOnInit(): void {
   }
 
@@ -54,25 +49,9 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit 
             this.model.subscriptionStartType = SubscriptionStartType.Free;
           }
         }
-     this.getAccountTypes();
         this.modal.show();
       });
   }
-
-   getAccountTypes(){
-      /*this.accountTypes.push({ label :'Personal' ,value: 'Personal'});
-    this.accountTypes.push({ label :'Business' ,value: 'Business'});
-    this.accountTypes.push({ label :'Group' ,value: 'Group'}); */
-   
-    this._tenantRegistrationService.getEditionsForSelect()
-    .subscribe((result) => {
-        for (let i = 0; i < result.editionsWithFeatures.length; i++) {
-            const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
-            const accountTypeValue = result.editionsWithFeatures[i].edition.id;
-            this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
-    }
-    }); 
-} 
 
   hide() {
     this.register.emit(this.registerTenantId);
@@ -81,8 +60,6 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit 
 
   save() {
     this.saving = true;
-    this.model.editionId =Number(this.accountType);
-       this.model.accountType =this.accountType;
     this._tenantRegistrationService.registerTenant(this.model)
       .pipe(finalize(() => { this.saving = false; }))
       .subscribe((result: RegisterTenantOutput) => {
@@ -92,15 +69,6 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit 
       });
   }
 
-  changeAccountType($event){
-    debugger ;
-     let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
 
-     if(indx>0)
-     this.accountTypeLabel= this.accountTypes[indx].label.toString().toUpperCase();
-     else
-     this.accountTypeLabel='';
-
-}
 
 }

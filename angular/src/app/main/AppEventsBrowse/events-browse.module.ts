@@ -8,15 +8,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { AccordionModule, PaginatorModule, TableModule } from 'primeng';
 import { EventsBrowseActionsMenuComponent } from './components/events-browse-actions-menu/events-browse-actions-menu.component';
 import { FiltersSharedModule } from '@app/shared/filters-shared/filters-shared.module';
 import { eventsModule } from '../AppEvent/events.module';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PostsModule } from '../posts/posts.module';
-import { AccordionModule } from 'primeng/accordion';
-import { PaginatorModule } from 'primeng/paginator';
-import { TableModule } from 'primeng/table';
 
 
 

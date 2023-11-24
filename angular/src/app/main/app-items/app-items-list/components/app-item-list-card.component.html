@@ -32,11 +32,11 @@
                         {{ "Owner" | localize }} :
                         <b>{{item?.appItemsList?.creatorUserName}}</b>
                     </p>
-                    <!-- <p
+                    <p
                         class="text-dark mb-2"
                         *ngIf="
                             mainFilterType == ItemsListFilterTypesEnum.MyItemsList &&
-                            !item?.appItemsList?.published
+                            !item?.appItemsList?.published 
                         "
                     >
                         {{ "NotPublished" | localize }}
@@ -50,7 +50,7 @@
                         class="text-dark mb-2"
                         *ngIf="
                             mainFilterType == ItemsListFilterTypesEnum.MyItemsList &&
-                            item?.appItemsList?.published
+                            item?.appItemsList?.published 
                         "
                     >
                         {{ "Published" | localize }}
@@ -59,18 +59,12 @@
                                 class="bg-success d-inline-flex flaticon2-information rounded-circle text-white"
                             ></i>
                         </span>
-                    </p> -->
-                    <div class="share-level"  >
-                        <span *ngIf="item?.appItemsList?.sharingLevel === 1 || item?.appItemsList?.sharingLevel === 2 " > Shared  <div class="shared-dot"></div> </span>
-                        <span *ngIf="item?.appItemsList?.sharingLevel === 3 " > Private  <div class="private-dot"></div> </span>
-                        <span *ngIf="item?.appItemsList?.sharingLevel === 4 " > Hidden <div class="hidden-dot"></div> </span>
-                        <span *ngIf="item?.appItemsList?.sharingLevel === null || item?.appItemsList?.sharingLevel ==0 " > Not Shared <div class="hidden-dot"></div> </span>
-                    </div>                  
-                      <p
+                    </p>
+                    <p
                         class="mb-2 font-weight-bold"
                         *ngIf="
                             mainFilterType == ItemsListFilterTypesEnum.MyItemsList &&
-                            item?.appItemsList?.statusCode
+                            item?.appItemsList?.statusCode 
                         "
                         [ngClass]="{'text-success' : item?.appItemsList?.statusCode }"
                     >
@@ -84,8 +78,8 @@
                 [ngClass]="singleItemPerRowMode ? 'col-md-4' : 'col-md-5'"
             >
                 <div class="align-items-center d-flex justify-content-end" >
-                    <p class="m-0 p-0 mr-2">{{ ("ItemAdded" | localize) + " " + (item?.appItemsList?.creationTime?.toString() | date : 'longDate') }}</p>
-
+                    <p class="m-0 p-0 mr-2">{{ ("ItemAdded" | localize) + " " + (item?.appItemsList?.creationTime | date : 'longDate') }}</p>
+                    
                     <div
                         class="btn-group dropdown"
                         dropdown
@@ -110,7 +104,7 @@
                                     >{{ "View" | localize }}</a
                                 >
                             </li>
-                           <!--  <li *ngIf="mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
+                            <li *ngIf="mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
                                 <a
                                     href="javascript:;"
                                     [ngClass]="{
@@ -129,7 +123,7 @@
                                     (click)="unPublish()"
                                     >{{ "UnpublishList" | localize }}
                                 </a>
-                            </li> -->
+                            </li>
                             <li *ngIf="canEdit && mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
                                 <a
                                     href="javascript:;"
@@ -140,7 +134,7 @@
                                     >{{ "EditProductsList" | localize }}</a
                                 >
                             </li>
-                            <li >
+                            <li *ngIf="mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
                                 <a href="javascript:;" [ngClass]="{ 'dimmed' : !canPrint }" (click)="printList()">{{
                                     "PrintProductsList" | localize
                                 }}</a>

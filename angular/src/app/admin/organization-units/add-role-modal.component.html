@@ -30,7 +30,7 @@
                                  rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
                                  [paginator]="false"
                                  [lazy]="true"
-                                 responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                 [responsive]="primengTableHelper.isResponsive"
                                  [(selection)]="selectedRoles"
                                  selectionMode="multiple">
                             <ng-template pTemplate="header">
@@ -49,7 +49,7 @@
                                         <p-tableCheckbox [value]="record"></p-tableCheckbox>
                                     </td>
                                     <td>
-                                        <span class="p-column-title">{{'Name' | localize}}</span>
+                                        <span class="ui-column-title">{{'Name' | localize}}</span>
                                         {{record.name}}
                                     </td>
                                 </tr>

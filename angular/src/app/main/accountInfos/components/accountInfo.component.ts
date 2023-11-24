@@ -1,5 +1,5 @@
 ﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, AfterViewInit, } from '@angular/core';
-import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ActivatedRoute } from '@angular/router';
@@ -15,7 +15,7 @@ import { SelectCategoriesDynamicModalComponent } from '@app/categories/select-ca
 import { SelectClassificationDynamicModalComponent } from '@app/classification/select-classification-dynamic-modal.component';
 import { Router } from '@angular/router';
 import { UpdateLogoService } from '@shared/utils/update-logo.service';
-import { LazyLoadEvent, SelectItem } from 'primeng/api';
+import { LazyLoadEvent, Paginator, SelectItem } from 'primeng';
 import { AccountInfoPageTabs } from '../models/Account-info-page-tabs.enum';
 import { MembersListComponentInputsI } from '@app/main/members-list/models/member-list-component-interface';
 import { ViewMemberProfileComponent } from '@app/main/teamMembers/components/view-member-profile/view-member-profile.component';
@@ -24,7 +24,6 @@ import { CreateOrEditMemberComponent } from '@app/main/teamMembers/components/cr
 import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/view-member-profile-model';
 import { MembersListComponent } from '@app/main/members-list/components/members-list.component';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
-import { Paginator } from 'primeng/paginator';
 
 @Component({
     selector:'app-account-info',
@@ -68,10 +67,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     allPhoneTypes: LookupLabelDto[];
     allCurrencies: LookupLabelDto[];
-    allCurrenciesDto: CurrencyInfoDto[];
     allLanguages: LookupLabelDto[];
-    allPriceLevel: SelectItem[] = [];
-    accountTypes: SelectItem[] = [];
 
     logoId:number;
     bannerId:number;
@@ -119,9 +115,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     firstLoad:boolean = true
 
     entityObjectType:string ="TENANTCONTACT";
-    accountInfoOldCurrencyId=0;
-    changeCurrency:boolean=false;
-
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -139,6 +132,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         super(injector);
 
         this.accountInfoTemp = new CreateOrEditAccountInfoDto();
+        this.accountInfoTemp.accountType = []
         this.accountInfoTemp.entityClassifications = [];
         this.accountInfoTemp.entityCategories = [];
 
@@ -277,10 +271,10 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             }
         };
 
-        const uploaderOptions: Partial<FileUploaderOptions> = {};
+        const uploaderOptions: FileUploaderOptions = {};
         uploaderOptions.authToken = 'Bearer ' + this._tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
-        uploader.setOptions(uploaderOptions as FileUploaderOptions);
+        uploader.setOptions(uploaderOptions);
         return uploader;
     }
 
@@ -314,18 +308,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         });
     }
 
-    getCurrenciesDto(){
-        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
-            this.allCurrenciesDto = result;
-        });
-    }
-
-    getAccountType(){
-        this._AccountsServiceProxy.getMyAccountForEdit().subscribe((result) => {
-            this.accountInfoTemp.accountType=result.accountInfo.accountType;
-        });
-    }
-
     async handleComponentMode() {
 
         if( this.isExternalAccount || this.isManualAccount   ) { // EditManualOrExternal Account
@@ -336,7 +318,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             else { // create ManualOrExternal Account
                 this.loadInitData()
                 this.setProfileData()
-               
             }
         }
 
@@ -348,7 +329,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             } else { // create
                 this.loadInitData()
                 this.setProfileData()
-                this.getAccountType();
             }
         }
 
@@ -362,25 +342,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     loadInitData(){
-        this.defineAccountTypes();
-        this.getLanguages();
-        this.getCurrencies();
-        this.getCurrenciesDto();
-        this.getPhoneTypes();
-       this.allPriceLevel= this.getPriceLevel();
-       this.getAccountTypes();
+        this.defineAccountTypes()
+        this.getLanguages()
+        this.getCurrencies()
+        this.getPhoneTypes()
     }
-
-    getAccountTypes(){ 
-       this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-      .subscribe((result) => {
-        this.accountTypes=result;
-      }); 
-      /*  this.accountTypes.push({ label :'Personal' ,value: 'Personal'});
-    this.accountTypes.push({ label :'Business' ,value: 'Business'});
-    this.accountTypes.push({ label :'Group' ,value: 'Group'});*/
-  } 
-
 
     getAccountDataForEdit() :void {
         if(!this.initDataLoaded)  {
@@ -407,14 +373,10 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             this.loadInitData()
         }
         const result = await this._AccountsServiceProxy.getMyAccountForEdit().toPromise()
-        
         if(result){
             this.getForEditResult = result
-            this.accountInfoOldCurrencyId= this.getForEditResult.accountInfo.currencyId;
             this.setProfileData(result)
             if(!result.accountInfo.id) {
-               this.accountInfoTemp.accountType=result.accountInfo.accountType;
-               this.accountInfoTemp.accountTypeId=result.accountInfo.accountTypeId;
                 this.accountInfoTemp.name = this.appSession.tenant.name
                 this.accountInfoTemp.tradeName = this.appSession.tenant.name
             }
@@ -475,9 +437,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         if(!this.accountInfoTemp.entityAttachments) this.accountInfoTemp.entityAttachments = []
         if(!this.accountInfoTemp.entityCategories) this.accountInfoTemp.entityCategories = []
         if(!this.accountInfoTemp.entityClassifications) this.accountInfoTemp.entityClassifications = []
-        if(!this.accountInfoTemp.accountType) this.accountInfoTemp.accountType = ""
-        if(!this.accountInfoTemp.accountTypeId) this.accountInfoTemp.accountTypeId = 0
-
+        if(!this.accountInfoTemp.accountType) this.accountInfoTemp.accountType = []
         if(!this.accountInfoTemp.contactAddresses) this.accountInfoTemp.contactAddresses = []
         if(!this.accountInfoTemp.contactPaymentMethods) this.accountInfoTemp.contactPaymentMethods = []
         if(!this.accountInfoTemp.branches) this.accountInfoTemp.branches = []
@@ -674,26 +634,20 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
     }
 
-
     saveMyAccount(){
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => { this.saving = false;}))
             .subscribe(result => {
-               
                 this.touched = false
                 this.notify.success(this.l('SavedSuccessfully'));
                 // call get account of edit and on the subscribe call the 3 following lines
-                //if(!this.accountInfoTemp.id || this.changeCurrency) return location.reload();
-                this.appSession.tenant.currencyInfoDto = this.allCurrenciesDto.filter(e=> e.value = this.accountInfoTemp.currencyId)[0];
-                this.tenantDefaultCurrency =  this.allCurrenciesDto.filter(e=> e.value = this.accountInfoTemp.currencyId)[0];       
+                if(!this.accountInfoTemp.id) return location.reload();
                 this.displaySaveAccount = true;
                 this.canPublish=true;
                 this.getForEditResult.lastChangesIsPublished = false
                 this.updateLogoService.updateLogo()
                 this.handleComponentMode();
                 
-               
-
             },err=>this.touched = true);
     }
     touched : boolean = false
@@ -735,28 +689,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
         this.saving = true;
         if(this.accountLevel === AccountLevelEnum.Profile) {
-            
-        if( this.accountInfoOldCurrencyId   && this.accountInfoTemp.currencyId !=this.accountInfoOldCurrencyId ){
-                        //    this.l('The default currency of all prices that you assign to all products will be affected by this change. Do you need to proceed with this change?'),
-            this.message.confirm(
-                '',
-            this.l('Are you sure you want to change the default currency? , The pricing you assign to all of the products may change as a result of the change in your default currency. Do you have to make this change now?'),
-                (isConfirmed) => {
-                    if (!isConfirmed) {
-                       this.accountInfoTemp.currencyId =this.accountInfoOldCurrencyId ;
-                       this.changeCurrency=false;
-                       this.saving = false;
-                    }
-                    else{
-                    this.changeCurrency=true;
-                    this.saveMyAccount()
-                    }
-                }
-            );
-        }
-        else
-        this.saveMyAccount()
-            
+            this.saveMyAccount()
         } else {
             this.accountInfoTemp.accountLevel = this.accountLevel
             this.saveExternalOrManualAccount()
@@ -1041,7 +974,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     connect(): void {
-        this._AccountsServiceProxy.connect(this.accountDataForView.partnerId)
+        this._AccountsServiceProxy.connect(this.accountDataForView.id)
         .subscribe(() => {
             this.notify.success(this.l('SuccessfullyConnected'));
             this.accountDataForView.status = true
@@ -1212,9 +1145,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     getClassifications(event: LazyLoadEvent) {
         if (this.primengTableHelperClass.shouldResetPaging(event)) {
-            setTimeout(() => {
-                this.paginatorClass.changePage(0);
-            }, 500);
+            this.paginatorClass.changePage(0);
             return;
         }
         const skipCount = this.primengTableHelperClass.getSkipCount(this.paginatorClass, event)
@@ -1223,12 +1154,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             skipCount,
             maxResultCount + skipCount
         )
+        this.primengTableHelperClass.totalRecordsCount = this.accountInfoTemp.entityClassifications.length;
     }
     getCategories(event: LazyLoadEvent) {
         if (this.primengTableHelperCateg.shouldResetPaging(event)) {
-            setTimeout(() => {
-                this.paginatorCateg.changePage(0);
-            }, 500);
+            this.paginatorCateg.changePage(0);
             return;
         }
         const skipCount = this.primengTableHelperCateg.getSkipCount(this.paginatorCateg, event)
@@ -1237,5 +1167,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             skipCount,
             maxResultCount + skipCount
         )
+        this.primengTableHelperCateg.totalRecordsCount = this.accountInfoTemp.entityCategories.length;
     }
 }

@@ -2,7 +2,7 @@ import { Injectable, Injector } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { PaginationSettings } from '@shared/components/shared-forms-components/dropdown-with-pagination/dropdown-with-pagination.component';
 import { AppEntitiesServiceProxy, AppItemVariationDto, AppItemVariationsDto, ExtraAttribute, LookupLabelDto, VariationItemDto } from '@shared/service-proxies/service-proxies';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { forkJoin, Observable } from 'rxjs';
 import { EExtraAttributeUsage } from '../../appItems/models/extra-attribute-usage.enum';
 import { FilteredExtraAttribute } from '../models/filtered-extra-attribute';
@@ -110,7 +110,6 @@ export class ExtraAttributeDataService extends AppComponentBase {
 
 
     getExtraAttributesLookupDataAsync(codes:string[]) : Promise<LookupLabelDto[][]> {
-        console.log(">>", codes)
         let requests : Observable<LookupLabelDto[]>[] = []
         codes.forEach((code)=>{
             let req = this._appEntitiesServiceProxy.getAllEntitiesByTypeCode(code)

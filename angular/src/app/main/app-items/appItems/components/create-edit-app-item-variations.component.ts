@@ -1,81 +1,41 @@
-import {
-    Component,
-    EventEmitter,
-    Injector,
-    Input,
-    OnChanges,
-    Output,
-    SimpleChanges,
-    ViewChild,
-} from "@angular/core";
-import { AppComponentBase } from "@shared/common/app-component-base";
-import {
-    AppEntityAttachmentDto,
-    GetAllEntityObjectTypeOutput,
-    VariationItemDto,
-    AppEntityExtraDataDto,
-    GetSycAttachmentCategoryForViewDto,
-    SycAttachmentCategoryDto,
-    LookupLabelDto,
-    AppEntitiesServiceProxy,
-    CreateOrEditAppItemDto,
-    AppItemsServiceProxy,
-    AppItemVariationDto,
-    AppItemPriceInfo,
-    CurrencyInfoDto,
-    IAppItemPriceInfo,
-    AppSizeScalesDetailDto,
-    AppItemSizesScaleInfo,
-    IAppItemSizesScaleInfo,
-} from "@shared/service-proxies/service-proxies";
-import { BsDropdownDirective } from "ngx-bootstrap/dropdown";
-import { cloneDeep } from "lodash";
-import { ImageCropperComponent } from "@app/shared/common/image-cropper/image-cropper.component";
-import { appModuleAnimation } from "@shared/animations/routerTransition";
-import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
-import { AppEntityListDynamicModalComponent } from "@app/app-entity-dynamic-modal/app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component";
-import { Observable, Subscription } from "rxjs";
-import { IsVariationExtraAttribute } from "../../app-item-shared/models/IsVariationExtraAttribute";
-import { IVaritaionAttachment } from "../../app-item-shared/models/IVaritaionAttachment";
-import { ExtraAttributeDataService } from "../../app-item-shared/services/extra-attribute-data.service";
-import { ListingModeEnum } from "../models/app-item-listing-enum";
-import { PricingHelpersService } from "../../app-item-shared/services/pricing-helpers.service";
-import { AccordionTab } from "primeng/accordion";
-import { SelectItem } from "primeng/api";
-import { SelectAppItemTypeComponent } from "@app/app-item-type/select-app-item-type/select-app-item-type.component";
-import { table } from "console";
+import { Component, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AppComponentBase } from '@shared/common/app-component-base';
+import { AppEntityAttachmentDto, GetAllEntityObjectTypeOutput, VariationItemDto, AppEntityExtraDataDto, GetSycAttachmentCategoryForViewDto, SycAttachmentCategoryDto, LookupLabelDto, AppEntitiesServiceProxy, CreateOrEditAppItemDto, AppItemsServiceProxy, AppItemVariationDto, AppItemPriceInfo, CurrencyInfoDto, IAppItemPriceInfo, AppSizeScalesDetailDto, AppItemSizesScaleInfo, IAppItemSizesScaleInfo } from '@shared/service-proxies/service-proxies';
+import { AccordionTab, SelectItem } from 'primeng';
+import { BsDropdownDirective } from 'ngx-bootstrap/dropdown';
+import { cloneDeep } from 'lodash';
+import { ImageCropperComponent } from '@app/shared/common/image-cropper/image-cropper.component';
+import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
+import { AppEntityListDynamicModalComponent } from '@app/app-entity-dynamic-modal/app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component';
+import { Observable, Subscription } from 'rxjs';
+import { IsVariationExtraAttribute } from '../../app-item-shared/models/IsVariationExtraAttribute';
+import { IVaritaionAttachment } from '../../app-item-shared/models/IVaritaionAttachment';
+import { ExtraAttributeDataService } from '../../app-item-shared/services/extra-attribute-data.service';
+import { ListingModeEnum } from '../models/app-item-listing-enum';
+import { PricingHelpersService } from '../../app-item-shared/services/pricing-helpers.service';
 
 @Component({
-    selector: "app-create-edit-app-item-variations",
-    templateUrl: "./create-edit-app-item-variations.component.html",
-    styleUrls: ["./create-edit-app-item-variations.component.scss"],
-    animations: [appModuleAnimation()],
+  selector: 'app-create-edit-app-item-variations',
+  templateUrl: './create-edit-app-item-variations.component.html',
+  styleUrls: ['./create-edit-app-item-variations.component.scss'],
+  animations: [appModuleAnimation()]
 })
-export class CreateEditAppItemVariationsComponent
-    extends AppComponentBase
-    implements OnChanges
-{
-    @Input("isListing") isListing: boolean = false;
-    @Input("listingMode") listingMode: ListingModeEnum;
-    @Input() currencies: CurrencyInfoDto[];
-    @Input() updateVariation: boolean = true;
-    @Input() productTypeId: number;
-    @Input() productCode: any;
-    @ViewChild("variationCombinationTap") variationCombinationTap: AccordionTab;
-    extraVariations: any[];
-    siwiMarketPlaceColor: any[];
-    sizes: any[];
-    siwiSizes: any[];
+export class CreateEditAppItemVariationsComponent extends AppComponentBase implements OnChanges {
+    @Input('isListing') isListing: boolean = false
+    @Input('listingMode') listingMode: ListingModeEnum
+    @Input() currencies: CurrencyInfoDto[]
+    @ViewChild('variationCombinationTap') variationCombinationTap: AccordionTab
     // @ViewChild('appSelectionModal', { static: true }) appSelectionModal: SelectionModalComponent<LookupLabelDto>
     // @ViewChild('appFormModal', { static: true }) appFormModal: GenericFormModalComponent
 
-    selectedVaritaions: VariationItemDto[] = [];
-    stokeAvailability: number;
+    selectedVaritaions: VariationItemDto[] = []
+    stokeAvailability: number
     get selectedExtraAttributesNames(): string[] {
         return this.selectedExtraAttributes.reduce((accum: string[], elem) => {
-            accum.push(elem.name);
-            return accum;
-        }, []);
+            accum.push(elem.name)
+            return accum
+        }, [])
     }
 
     private _showVariations: boolean = false;
@@ -83,222 +43,142 @@ export class CreateEditAppItemVariationsComponent
         return this._showVariations;
     }
     public set showVariations(value: boolean) {
-        if (this.isListing) this.selectedVaritaions = this.variationMatrices;
+        if(this.isListing) this.selectedVaritaions = this.variationMatrices
         this._showVariations = value;
     }
-    showVariationValues = false;
-    showVariationSelectionMetaData = false;
-    showVariationPhotos: boolean = false;
-    editVariation: boolean = true;
+    showVariationValues = false
+    showVariationSelectionMetaData = false
+    showVariationPhotos :boolean = false
+    editVariation : boolean = true
 
-    extraAttributes: IsVariationExtraAttribute[];
-    extraAttributesOptions: { [key: string]: SelectItem[] };
-    activeExtraAttributeIndex: number = -1;
+    extraAttributes : IsVariationExtraAttribute []
+    extraAttributesOptions : { [key:string] : SelectItem[] }
+    activeExtraAttributeIndex : number = -1
 
-    oldExtraAttributesData: IsVariationExtraAttribute[] = [];
 
-    selectedExtraAttr: { [key: string]: number[] } = {};
-    defaultExtraAttrForAttachments: IsVariationExtraAttribute;
-    activeAttachmentOption: IVaritaionAttachment = undefined;
+    oldExtraAttributesData :IsVariationExtraAttribute[] = []
 
-    variationAttachmentsSrcs: string[] = [];
-    oldDefaultExtraAttrForAttachments = undefined;
-    oldActiveAttachmentOption = undefined;
+    selectedExtraAttr :{[key:string]:number[]} = {}
+    defaultExtraAttrForAttachments : IsVariationExtraAttribute
+    activeAttachmentOption : IVaritaionAttachment = undefined
 
-    variationMatrices: VariationItemDto[] = [];
-    attributeID: any;
-    sizeId: any;
-    selectedAttrID:string
+    variationAttachmentsSrcs :string[] = []
+    oldDefaultExtraAttrForAttachments = undefined
+    oldActiveAttachmentOption = undefined
 
-    @Input("selectedItemTypeData")
-    selectedItemTypeData: GetAllEntityObjectTypeOutput;
-    @Input("appItem") appItem: CreateOrEditAppItemDto;
-    @Input("defaultAppItemImage") defaultAppItemImage: string;
-    @Output("applyVariations")
-    applyVariations: EventEmitter<ApplyVariationOutput> =
-        new EventEmitter<ApplyVariationOutput>();
-    @Output("cancel") cancel: EventEmitter<boolean> =
-        new EventEmitter<boolean>();
+    variationMatrices : VariationItemDto[] = []
 
-    appItemDefaultImage: string;
-    hideUnselectedVariations: boolean = false;
-    entityObjectType: string = "PRODUCTVARIATION";
+    @Input("selectedItemTypeData") selectedItemTypeData : GetAllEntityObjectTypeOutput
+    @Input("appItem") appItem : CreateOrEditAppItemDto
+    @Input("defaultAppItemImage") defaultAppItemImage:string
+    @Output("applyVariations") applyVariations :EventEmitter<ApplyVariationOutput> = new EventEmitter<ApplyVariationOutput>()
+    @Output("cancel") cancel :EventEmitter<boolean>  = new EventEmitter<boolean>()
+
+    appItemDefaultImage:string
+    hideUnselectedVariations : boolean = false;
+    entityObjectType:string ="PRODUCTVARIATION";
     stylesObj = {
-        width: "195px",
-        height: "60px",
-    };
-    sizeExtraAttrCode: string = "SIZE".toUpperCase();
-    pricingFilter: {
-        currencyId: number;
-        level: string;
-        variationCorrespondingIndex: number[];
-    };
-    appSizeRatios: AppItemSizesScaleInfo = new AppItemSizesScaleInfo({
-        appSizeScalesDetails: [],
-    } as IAppItemSizesScaleInfo);
-    showViewSelectedSizes: boolean = false;
-    appSizeScales: AppItemSizesScaleInfo = new AppItemSizesScaleInfo({
-        appSizeScalesDetails: [],
-    } as IAppItemSizesScaleInfo);
-    parentProductUnselectedVariations: VariationItemDto[];
-    levels: SelectItem[];
-
-    get selectedExtraAttributes() {
-        return this.extraAttributes.filter((attr) => attr.selected);
+        'width': '195px',
+        'height': '60px'
     }
+    sizeExtraAttrCode:string = 'SIZE'.toUpperCase();
+    pricingFilter:{ 
+        currencyId:number, 
+        level:string, 
+        variationCorrespondingIndex :number[]
+    } 
+    appSizeRatios:AppItemSizesScaleInfo = new AppItemSizesScaleInfo({appSizeScalesDetails:[]} as IAppItemSizesScaleInfo)
+    showViewSelectedSizes : boolean = false
+    appSizeScales : AppItemSizesScaleInfo = new AppItemSizesScaleInfo({appSizeScalesDetails:[]} as IAppItemSizesScaleInfo)
+    parentProductUnselectedVariations : VariationItemDto []
+    levels: SelectItem []
 
-    getallAtrributes() {
-        this._appItemsServiceProxy
-            .getProductVariationsTypes(this.productTypeId)
-            .subscribe((res: any) => {
-                this.extraVariations = res;
-            });
+    get selectedExtraAttributes(){
+        return this.extraAttributes.filter(attr=>attr.selected)
     }
-
-    handleAttrChange(event: any) {
-        let varaitionsValue = this.extraVariations.map((variation: any) => {
-            if (Number(event.target.value) === variation.id) {
-                return variation.variationAttributes;
-            }
-        });
-        this.appItem.sycIdentifierId = Number(event.target.value);
-        this.attributeID = event.target.value;
-        varaitionsValue[0].map((variation: any) => {
-            this.extraAttributes.map((attr: IsVariationExtraAttribute) => {
-                if (attr.attributeId === variation.attributeId) {
-                    attr.selected = true;
-                }
-            });
-        });
-    }
-    get variationPossibilities() {
-        var count = 0;
-        this.selectedExtraAttributes?.forEach((extraAttr) => {
-            let extraAttrSelectedValues: number;
-            if (
-                this.sizeExtraAttrCode ==
-                extraAttr.entityObjectTypeCode?.toUpperCase()
-            ) {
-                extraAttrSelectedValues =
-                    this.appSizeRatios?.appSizeScalesDetails?.length;
+    get variationPossibilities () {
+        var count = 0
+        this.selectedExtraAttributes?.forEach((extraAttr)=>{
+            let extraAttrSelectedValues:number 
+            if(this.sizeExtraAttrCode == extraAttr.entityObjectTypeCode?.toUpperCase()){
+                extraAttrSelectedValues = this.appSizeRatios?.appSizeScalesDetails?.length
             } else {
-                extraAttrSelectedValues = extraAttr.selectedValues?.length;
+                extraAttrSelectedValues = extraAttr.selectedValues?.length
             }
-            if (count == 0 && extraAttrSelectedValues > 0) count = 1;
-            if (extraAttrSelectedValues) count *= extraAttrSelectedValues;
-        });
-        return count;
+            if(count == 0 && extraAttrSelectedValues > 0)  count  = 1
+            if(extraAttrSelectedValues) count *= extraAttrSelectedValues
+        })
+        return count
     }
-    get selectedCurrency() {
-        return this.currencies.filter(
-            (curr) => curr.value == this.pricingFilter.currencyId
-        )[0];
-    }
+    get selectedCurrency () { return this.currencies.filter(curr=>curr.value == this.pricingFilter.currencyId)[0] } 
 
     constructor(
-        injector: Injector,
-        private _extraAttributeDataService: ExtraAttributeDataService,
+        injector:Injector,
+        private _extraAttributeDataService : ExtraAttributeDataService,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _appItemsServiceProxy: AppItemsServiceProxy,
-        private _BsModalService: BsModalService,
-        private _pricingHelpersService: PricingHelpersService
-    ) {
-        super(injector);
+        private _BsModalService:BsModalService,
+        private _pricingHelpersService: PricingHelpersService,
+
+        ){
+        super(injector)
     }
 
-    ngOnInit(): void {
-        this.initUploaders();
-        this.initPricingNeededData();
-        this.getSiwiiMarketPlaceColor();
-        this._appEntitiesServiceProxy
-            .getMarketPlaceSizes()
-            .subscribe((res: any) => {
-                this.sizes = res;
-            });
-
-          this.selectedAttrID = this.appItem?.sycIdentifierId?.toString()
+    ngOnInit() :void {
+        this.initUploaders()
+        this.initPricingNeededData()
     }
-
-    async getSiwiiMarketPlaceColor() {
-        const response =
-            await this._extraAttributeDataService.getExtraAttributesLookupDataAsync(
-                ["COLOR-SCHEME"]
-            );
-        this.siwiMarketPlaceColor = response;
-        console.log(">>", response);
-    }
-    selectedValue: any = "";
-    test: boolean = true;
-
-    initPricingNeededData() {
+    initPricingNeededData(){
         this.levels = [
             {
-                label: this._pricingHelpersService.defaultLevel,
-                value: this._pricingHelpersService.defaultLevel,
+                label:this._pricingHelpersService.defaultLevel,
+                value:this._pricingHelpersService.defaultLevel
             },
-            ...this._pricingHelpersService.levels.map((item) => {
+            ...this._pricingHelpersService.levels.map(item=>{
                 return {
-                    label: item,
-                    value: item,
-                };
-            }),
-        ];
+                    label:item,
+                    value:item,
+                }
+            })
+        ]
         this.pricingFilter = {
-            currencyId: this.tenantDefaultCurrency.value,
-            level: this._pricingHelpersService.defaultLevel,
-            variationCorrespondingIndex: [],
-        };
+            currencyId:this.tenantDefaultCurrency.value,
+            level:this._pricingHelpersService.defaultLevel,
+            variationCorrespondingIndex:[]
+        }
     }
-    ngOnChanges(changes: SimpleChanges) {
-        this.getallAtrributes();
-
-        if (this.appItem && this.selectedItemTypeData) {
+    ngOnChanges(changes:SimpleChanges){
+        if( this.appItem && this.selectedItemTypeData ){
             // get sizescale and size ratios data if exists
-            if (
-                this.appItem?.appItemSizesScaleInfo?.length > 0 &&
-                this.appItem?.appItemSizesScaleInfo[0]
-            )
-                this.appSizeScales = new AppItemSizesScaleInfo(
-                    this.appItem?.appItemSizesScaleInfo[0]
-                );
-            if (
-                this.appItem?.appItemSizesScaleInfo?.length > 0 &&
-                this.appItem?.appItemSizesScaleInfo[1]
-            )
-                this.appSizeRatios = new AppItemSizesScaleInfo(
-                    this.appItem?.appItemSizesScaleInfo[1]
-                );
+            if(this.appItem?.appItemSizesScaleInfo?.length > 0 && this.appItem?.appItemSizesScaleInfo[0]) this.appSizeScales = new AppItemSizesScaleInfo(this.appItem?.appItemSizesScaleInfo[0])
+            if(this.appItem?.appItemSizesScaleInfo?.length > 0 && this.appItem?.appItemSizesScaleInfo[1]) this.appSizeRatios = new AppItemSizesScaleInfo(this.appItem?.appItemSizesScaleInfo[1])
             // get lookup data attributes
-            this.getNeededDataForEditMode();
+            this.getNeededDataForEditMode()
 
             //deep clone extra attributes
-            this.selectedItemTypeData = GetAllEntityObjectTypeOutput.fromJS(
-                this.selectedItemTypeData
-            );
+            this.selectedItemTypeData = GetAllEntityObjectTypeOutput.fromJS(this.selectedItemTypeData)
         }
     }
 
-    detectAppItemDefaultImage() {
-        this.appItemDefaultImage = this.appItem.entityAttachments.filter(
-            (item) => item.isDefault
-        )[0].url;
+    detectAppItemDefaultImage(){
+        this.appItemDefaultImage = this.appItem.entityAttachments.filter(item=>item.isDefault)[0].url
     }
 
-    async getNeededDataForEditMode() {
+
+    async getNeededDataForEditMode(){
         // get extraatributes data by product type id
-        await this.getItemTypeDataAndExtraAttributes();
-        this.deepCloneVariations();
+        await this.getItemTypeDataAndExtraAttributes()
+        this.deepCloneVariations()
         // get item type extra data and group them and their options
-        if (this.variationMatrices && this.variationMatrices.length) {
-            this.variationMatrices.map((item, index) => {
-                item.position = index + 1;
-                return item;
-            });
-            this.reverseEngineerVariations();
-            if (this.listingMode === ListingModeEnum.Edit)
-                this.getUnselectedProductVariations(this.appItem.listingItemId);
-            this.initializePricesObjects();
-            this.checkAndAddDefaultPriceObjects();
+        if(this.variationMatrices && this.variationMatrices.length) {
+            this.variationMatrices.map((item,index)=>{
+                item.position = index +1
+                return item
+            })
+            this.reverseEngineerVariations()
+            if( this.listingMode === ListingModeEnum.Edit ) this.getUnselectedProductVariations(this.appItem.listingItemId)
+            this.initializePricesObjects()
+            this.checkAndAddDefaultPriceObjects()
         }
         // images
         // define the default attribute for images
@@ -308,24 +188,18 @@ export class CreateEditAppItemVariationsComponent
         // this.extraAttributesOptions = ExtraAttributesOptionsData
     }
 
-    deepCloneVariations() {
+    deepCloneVariations(){
         //deep clone variations
-        let appItemVariations = this.appItem.variationItems;
-        if (Array.isArray(appItemVariations) && appItemVariations.length) {
-            this.variationMatrices = [];
-            appItemVariations.forEach((elem) =>
-                this.variationMatrices.push(VariationItemDto.fromJS(elem))
-            );
-            console.log(">>", this.variationMatrices);
-            this._appEntitiesServiceProxy
-                .getMarketPlaceSizes()
-                .subscribe((res: any) => {
-                    this.sizes = res;
-                });
-            this.primengTableHelper.records = this.variationMatrices;
-            this.showVariationSelectionMetaData = true;
-            this.showVariationValues = false;
-            this.showVariations = true;
+
+        let appItemVariations = this.appItem.variationItems
+        if( Array.isArray(appItemVariations) && appItemVariations.length ){
+            this.variationMatrices = []
+            appItemVariations.forEach((elem)=>this.variationMatrices.push( VariationItemDto.fromJS(elem) ))
+            this.primengTableHelper.records = this.variationMatrices
+
+            this.showVariationSelectionMetaData = true
+            this.showVariationValues = false
+            this.showVariations = true
         }
     }
 
@@ -369,704 +243,475 @@ export class CreateEditAppItemVariationsComponent
     //     )
     // }
 
-    cancelExtraAttributeSelection() {
-        if (this.variationMatrices.length === 0) {
-            this.extraAttributes.map((item) => {
-                item.selected = false;
-                item.selectedValues = [];
-            });
-            this.activeExtraAttributeIndex = -1;
-            return;
+    cancelExtraAttributeSelection(){
+        if(this.variationMatrices.length === 0) {
+            this.extraAttributes.map((item)=>{
+                item.selected = false
+                item.selectedValues = []
+            })
+            this.activeExtraAttributeIndex = -1
+            return
         }
-        this.extraAttributes = [];
-        this.oldExtraAttributesData.forEach((elem) => {
-            this.extraAttributes.push(cloneDeep(elem));
-        });
-        this.oldExtraAttributesData = [];
-        this.defaultExtraAttrForAttachments =
-            this.oldDefaultExtraAttrForAttachments;
-        this.oldDefaultExtraAttrForAttachments = undefined;
-        this.activeAttachmentOption = this.oldActiveAttachmentOption;
-        this.oldActiveAttachmentOption = undefined;
+        this.extraAttributes = []
+        this.oldExtraAttributesData.forEach((elem)=>{
+            this.extraAttributes.push(
+                cloneDeep(elem)
+            )
+        })
+        this.oldExtraAttributesData =  []
+        this.defaultExtraAttrForAttachments = this.oldDefaultExtraAttrForAttachments
+        this.oldDefaultExtraAttrForAttachments = undefined
+        this.activeAttachmentOption = this.oldActiveAttachmentOption
+        this.oldActiveAttachmentOption = undefined
 
-        this.showVariationSelectionMetaData = true;
-        this.showVariationPhotos = true;
-        this.showVariations = true;
+           
+
+        this.showVariationSelectionMetaData = true
+        this.showVariationPhotos = true
+        this.showVariations = true
+
     }
     async getItemTypeDataAndExtraAttributes() {
-        return new Promise(async (resolve, reject) => {
-            this.extraAttributes =
-                this._extraAttributeDataService.getIsVariationFilteredAttributes(
-                    this.selectedItemTypeData.extraAttributes.extraAttributes,
-                    false
-                );
-            let extraAttributesCodes: string[] = this.extraAttributes.map(
-                (item) => item.entityObjectTypeCode
-            );
+        return new Promise(async (resolve,reject)=>{
+            this.extraAttributes =  this._extraAttributeDataService.getIsVariationFilteredAttributes(this.selectedItemTypeData.extraAttributes.extraAttributes,false)
+            let extraAttributesCodes : string[] = this.extraAttributes.map(item=>item.entityObjectTypeCode)
             // let responses = this._extraAttributeDataService.getExtraAttributesLookupDataAsync(extraAttributesCodes)
-            let requests: Promise<LookupLabelDto[]>[] = [];
-            extraAttributesCodes.forEach((code) => {
-                let req = this._appEntitiesServiceProxy
-                    .getAllEntitiesByTypeCode(code)
-                    .toPromise();
-                requests.push(req);
-            });
-            let responses = await Promise.all(requests);
-            console.log(">> size", responses);
-            this.siwiSizes = responses[1];
-            if (responses) {
-                this.extraAttributes.forEach((extraAttr, index) => {
-                    let lookupData = responses[index];
-                    extraAttr.lookupData = lookupData;
-                    extraAttr.displayedLookupData = extraAttr.lookupData;
-                });
-                resolve(true);
-            } else {
-                reject(false);
-                this.notify.error(this.l("FailedToGetAttibutesValues"));
+            let requests : Promise<LookupLabelDto[]>[] = []
+            extraAttributesCodes.forEach((code)=>{
+                let req = this._appEntitiesServiceProxy.getAllEntitiesByTypeCode(code).toPromise()
+                requests.push(req)
+            })
+            let responses = await Promise.all(requests)
+            if(responses){
+                this.extraAttributes.forEach((extraAttr,index)=>{
+                    let lookupData = responses[index]
+                    extraAttr.lookupData = lookupData
+                    extraAttr.displayedLookupData = extraAttr.lookupData
+                })
+                resolve(true)
             }
-        });
+            else {
+                reject(false)
+                this.notify.error(this.l("FailedToGetAttibutesValues"))
+            }
+        })
+
     }
 
-    removeExtraAttribute(extraAttr: IsVariationExtraAttribute, index: number) {
+    removeExtraAttribute(extraAttr:IsVariationExtraAttribute,index:number){
         // this.selectedExtaAttrCtrl.removeControl(name)
-        if (extraAttr.entityObjectTypeCode == this.sizeExtraAttrCode) {
-            this.appSizeRatios = new AppItemSizesScaleInfo({
-                appSizeScalesDetails: [],
-            } as IAppItemSizesScaleInfo);
-            this.appSizeScales = new AppItemSizesScaleInfo({
-                appSizeScalesDetails: [],
-            } as IAppItemSizesScaleInfo);
+        if(extraAttr.entityObjectTypeCode == this.sizeExtraAttrCode) {
+            this.appSizeRatios = new AppItemSizesScaleInfo({appSizeScalesDetails:[]} as IAppItemSizesScaleInfo)
+            this.appSizeScales = new AppItemSizesScaleInfo({appSizeScalesDetails:[]} as IAppItemSizesScaleInfo)
         }
-        extraAttr.selected = false;
-        extraAttr.selectedValues = [];
-        if (this.selectedExtraAttributes.length === 0)
-            this.activeExtraAttributeIndex = -1;
-        if (this.activeExtraAttributeIndex == index && index > 0)
-            this.activeExtraAttributeIndex = index - 1;
+        extraAttr.selected = false
+        extraAttr.selectedValues = []
+        if (this.selectedExtraAttributes.length ===0) this.activeExtraAttributeIndex = -1
+        if( this.activeExtraAttributeIndex == index && index > 0 ) this.activeExtraAttributeIndex = index-1
     }
 
-    setActiveExtraAttribute(index: number) {
-        this.activeExtraAttributeIndex = -1;
+    setActiveExtraAttribute(index:number){
+        this.activeExtraAttributeIndex = -1
         setTimeout(() => {
-            this.activeExtraAttributeIndex = index;
+            this.activeExtraAttributeIndex = index
         }, 1);
     }
-
+    
     saveExtraAtrributeSelection() {
-        const oldVariations = this.variationMatrices;
-        this.variationMatrices = [];
-        if (this.selectedExtraAttributes.length === 0)
-            return this.notify.error(this.l("PleaseSelectVariationsFirst"));
-        const sizeIsSelected = this.selectedExtraAttributes.filter(
-            (item) => item.entityObjectTypeCode == this.sizeExtraAttrCode
-        )[0];
-        if (
-            sizeIsSelected &&
-            ((!this.sizeScaleFormIsValid && !this.appSizeScales )|| (!this.sizeRatioFormIsValid && !this.appSizeScales) )
-        )
-            return this.notify.error(
-                this.l("PleaseCompleteAllSizeScaleAndSizeRatioRequired(*)Data")
-            );
-        if (!sizeIsSelected) {
-            this.appSizeRatios = new AppItemSizesScaleInfo({
-                appSizeScalesDetails: [],
-            } as IAppItemSizesScaleInfo);
-            this.appSizeScales = new AppItemSizesScaleInfo({
-                appSizeScalesDetails: [],
-            } as IAppItemSizesScaleInfo);
+        const oldVariations = this.variationMatrices
+        this.variationMatrices = []
+        if (this.selectedExtraAttributes.length === 0) return this.notify.error(this.l('PleaseSelectVariationsFirst'))
+        const sizeIsSelected = this.selectedExtraAttributes.filter(item=> item.entityObjectTypeCode == this.sizeExtraAttrCode )[0]
+        if( sizeIsSelected && ( !this.sizeScaleFormIsValid || !this.sizeRatioFormIsValid ) ) return this.notify.error(this.l('PleaseCompleteAllSizeScaleAndSizeRatioRequired(*)Data'))
+        if(!sizeIsSelected) {
+            this.appSizeRatios = new AppItemSizesScaleInfo({appSizeScalesDetails:[]} as IAppItemSizesScaleInfo)
+            this.appSizeScales = new AppItemSizesScaleInfo({appSizeScalesDetails:[]} as IAppItemSizesScaleInfo)
         }
-
-        this.createAllPossibleVariationsCombination();
-        this.initializePricesObjects();
-        this.checkAndAddDefaultPriceObjects();
-        this.checkIfVariationsAlreadyExists(oldVariations);
-        this.mapExtraAttrSelectionDataFromVariationMatrices();
-        // this.primengTableHelper.records = this.variationMatrices;
-
-        console.log(">> list variation", this.variationMatrices);
-
-        this._appItemsServiceProxy
-            .getVariationsCodes(
-                this.attributeID  ?     this.attributeID  : this.appItem?.sycIdentifierId,
-                this.productCode,
-                this.productTypeId,
-                this.variationMatrices
-            )
-            .subscribe((response: any) => {
-                console.log(">>", response, this.variationMatrices);
-                this.primengTableHelper.records = response;
-                this.variationMatrices = response;
-            });
-        this.showVariationSelectionMetaData = true;
-        this.showVariationPhotos = true;
-        this.showVariations = true;
+        this.createAllPossibleVariationsCombination()
+        this.initializePricesObjects()
+        this.checkAndAddDefaultPriceObjects()
+        this.checkIfVariationsAlreadyExists(oldVariations)
+        this.mapExtraAttrSelectionDataFromVariationMatrices()
+        this.primengTableHelper.records = this.variationMatrices
+        this.showVariationSelectionMetaData = true
+        this.showVariationPhotos = true
+        this.showVariations = true
     }
-    checkIfVariationsAlreadyExists(oldVariations: VariationItemDto[]) {
-        if (!oldVariations.length)
-            return this.setDefaultExtraAttributeForVariationAttachment(
-                this.selectedExtraAttributes[0]
-            );
-        const oldVariationsExtraAttrs = oldVariations[0]?.entityExtraData.map(
-            (item) => item.attributeId
-        );
-        const newVariationsExtraAttrs =
-            this.variationMatrices[0]?.entityExtraData.map(
-                (item) => item.attributeId
-            );
-        const compareVariationRow = (
-            variationRow: VariationItemDto,
-            variationsRows: VariationItemDto[]
-        ): VariationItemDto => {
-            const selectedExtraAttrValuesIds = variationRow.entityExtraData.map(
-                (item) => item.attributeCode
-            );
-            const oldExtraAttrCount: number =
-                variationsRows[0]?.entityExtraData?.length || -1;
-            const newExtraAttrCount: number =
-                selectedExtraAttrValuesIds.length || -1;
-            if (newExtraAttrCount != oldExtraAttrCount) return undefined;
-            const existIndex = variationsRows.findIndex((row) =>
-                row.entityExtraData.every((item) =>
-                    selectedExtraAttrValuesIds.includes(item.attributeCode)
-                )
-            );
-            return variationsRows[existIndex];
-        };
-        // check if the extra attributes are the same
-        if (
-            oldVariationsExtraAttrs.length == newVariationsExtraAttrs?.length ||
-            oldVariationsExtraAttrs.every((item) =>
-                newVariationsExtraAttrs?.includes(item)
-            )
-        ) {
-            this.variationMatrices = this.variationMatrices.map((varRow) => {
-                const existsRow = compareVariationRow(varRow, oldVariations);
-                if (existsRow) varRow = existsRow;
-                const currentRowDefaultAttachmentEntityExtraData =
-                    varRow.entityExtraData.filter(
-                        (extrData) =>
-                            extrData.attributeId ==
-                            this.defaultExtraAttrForAttachments.attributeId
-                    )[0];
-                if (currentRowDefaultAttachmentEntityExtraData) {
-                    varRow.entityAttachments =
-                        this.defaultExtraAttrForAttachments
-                            .selectedValuesAttachments[
-                            currentRowDefaultAttachmentEntityExtraData
-                                .attributeCode
-                        ]?.entityAttachments || [];
-                }
-                return varRow;
-            });
+    checkIfVariationsAlreadyExists(oldVariations:VariationItemDto[]){
+        if(!oldVariations.length) return this.setDefaultExtraAttributeForVariationAttachment(this.selectedExtraAttributes[0])
+        const oldVariationsExtraAttrs = oldVariations[0].entityExtraData.map(item=>item.attributeId)
+        const newVariationsExtraAttrs = this.variationMatrices[0].entityExtraData.map(item=>item.attributeId)
+        const compareVariationRow =(variationRow:VariationItemDto,variationsRows:VariationItemDto[]) : VariationItemDto =>{
+            const selectedExtraAttrValuesIds = variationRow.entityExtraData.map(item=>item.attributeCode)
+            const oldExtraAttrCount:number = variationsRows[0]?.entityExtraData?.length || -1
+            const newExtraAttrCount:number = selectedExtraAttrValuesIds.length || -1
+            if(newExtraAttrCount != oldExtraAttrCount) return undefined
+            const existIndex =  variationsRows.findIndex(row=>row.entityExtraData.every(item=>selectedExtraAttrValuesIds.includes(item.attributeCode)))
+            return variationsRows[existIndex]
         }
-        if (
-            newVariationsExtraAttrs?.includes(
-                this.defaultExtraAttrForAttachments.attributeId
-            )
+        // check if the extra attributes are the same
+        if(
+            oldVariationsExtraAttrs.length == newVariationsExtraAttrs.length || 
+            oldVariationsExtraAttrs.every( item=> newVariationsExtraAttrs.includes(item) )
         ) {
-            const oldAttachmentObject =
-                this.defaultExtraAttrForAttachments.selectedValuesAttachments;
+            this.variationMatrices = this.variationMatrices.map(varRow=>{
+                const existsRow = compareVariationRow(varRow,oldVariations)
+                if(existsRow) varRow = existsRow
+                const currentRowDefaultAttachmentEntityExtraData = varRow.entityExtraData.filter(extrData=>extrData.attributeId == this.defaultExtraAttrForAttachments.attributeId)[0]
+                if(currentRowDefaultAttachmentEntityExtraData){
+                    varRow.entityAttachments = this.defaultExtraAttrForAttachments.selectedValuesAttachments[currentRowDefaultAttachmentEntityExtraData.attributeCode]?.entityAttachments || []
+                }
+                return varRow
+            })
+        }
+        if( newVariationsExtraAttrs.includes(this.defaultExtraAttrForAttachments.attributeId) ){
+            const oldAttachmentObject = this.defaultExtraAttrForAttachments.selectedValuesAttachments;
             this.defaultExtraAttrForAttachments.selectedValuesAttachments = {};
-            let attachmentObj: { [key: number]: IVaritaionAttachment } =
-                this.defaultExtraAttrForAttachments.selectedValuesAttachments;
-            (
-                this.defaultExtraAttrForAttachments.selectedValues as number[]
-            ).forEach((elem) => {
+            let attachmentObj: { [key: number]: IVaritaionAttachment } = this.defaultExtraAttrForAttachments.selectedValuesAttachments;
+            (this.defaultExtraAttrForAttachments.selectedValues as number[]).forEach(elem => {
                 // this.defaultExtraAttrForAttachments = selectedExtraAttr[currentExtraDataIndex]
                 if (oldAttachmentObject[elem]) {
-                    attachmentObj[elem] = oldAttachmentObject[elem];
+                    attachmentObj[elem] = oldAttachmentObject[elem]
                 } else {
-                    let selectedValue: SelectItem =
-                        this.defaultExtraAttrForAttachments.lookupData.filter(
-                            (item) => item.value == elem
-                        )[0];
-                    attachmentObj[elem] = {
+                    let selectedValue: SelectItem = this.defaultExtraAttrForAttachments.lookupData.filter(item => item.value == elem)[0]
+                    attachmentObj[elem]= {
                         attachmentSrcs: [""],
                         entityAttachments: [],
                         defaultImageIndex: -1,
-                        lookupData: selectedValue,
-                    };
+                        lookupData: selectedValue
+                    }
                 }
             });
-            this.updateVaritaionAttachments();
+            this.updateVaritaionAttachments()
+
         }
     }
 
-    setDefaultExtraAttributeForVariationAttachment(
-        extraAttr: IsVariationExtraAttribute,
-        generatePhotos: boolean = true
-    ) {
-        const sameSelection: boolean =
-            this.defaultExtraAttrForAttachments == extraAttr;
 
-        if (sameSelection) return;
-        else this.defaultExtraAttrForAttachments = extraAttr;
+    setDefaultExtraAttributeForVariationAttachment(extraAttr:IsVariationExtraAttribute,generatePhotos:boolean= true){
+        const sameSelection:boolean = this.defaultExtraAttrForAttachments == extraAttr
+
+        if( sameSelection ) return
+        else this.defaultExtraAttrForAttachments = extraAttr
         // reset selected values if one exists
-        this.selectedExtraAttributes.map((elem, index) => {
-            elem.defaultForAttachment = extraAttr == elem;
-            if (extraAttr != elem) elem.selectedValuesAttachments = undefined;
-            else elem.selectedValuesAttachments = {};
-            return elem;
-        });
+        this.selectedExtraAttributes.map((elem,index)=>{
+            elem.defaultForAttachment = extraAttr == elem
+            if( extraAttr != elem ) elem.selectedValuesAttachments = undefined
+            else elem.selectedValuesAttachments = {}
+            return elem
+        })
 
-        if (generatePhotos)
-            this.generatePhotosObjectForDefaultExtraAttributeOfVariationAttachment();
-        this.updateVaritaionAttachments();
-    }
+        if(generatePhotos) this.generatePhotosObjectForDefaultExtraAttributeOfVariationAttachment()
+        this.updateVaritaionAttachments()
 
-    getParentProductPrices() {
-        return this.appItem.appItemPriceInfos.map((item) =>
-            AppItemPriceInfo.fromJS({ ...item, id: 0 } as IAppItemPriceInfo)
-        );
     }
-    initializePricesObjects() {
-        this.variationMatrices.forEach((variation) => {
-            //  if(!variation.appItemPriceInfos || variation.appItemPriceInfos.length == 0)
-            if (this.updateVariation) {
-                variation.appItemPriceInfos = this.getParentProductPrices();
+    
+    getParentProductPrices(){
+        return this.appItem.appItemPriceInfos.map(item=> AppItemPriceInfo.fromJS({...item,id:0} as IAppItemPriceInfo) )
+    }
+    initializePricesObjects(){
+        this.variationMatrices.forEach(variation=>{
+            if(!variation.appItemPriceInfos || variation.appItemPriceInfos.length == 0) {
+                variation.appItemPriceInfos = this.getParentProductPrices()
             }
-        });
+        })
     }
-    checkAndAddDefaultPriceObjects() {
-        if (!this.pricingFilter.level)
-            this.pricingFilter.level = this._pricingHelpersService.defaultLevel;
-        if (!this.pricingFilter.currencyId)
-            this.pricingFilter.currencyId = this.tenantDefaultCurrency.value;
-        const level = this.pricingFilter.level;
-        this.pricingFilter.variationCorrespondingIndex = [];
-        const currencyId = this.pricingFilter.currencyId;
+    checkAndAddDefaultPriceObjects(){
+        if(!this.pricingFilter.level) this.pricingFilter.level = this._pricingHelpersService.defaultLevel
+        if(!this.pricingFilter.currencyId) this.pricingFilter.currencyId = this.tenantDefaultCurrency.value
+        const level = this.pricingFilter.level
+        this.pricingFilter.variationCorrespondingIndex = []
+        const currencyId = this.pricingFilter.currencyId
 
-        this.variationMatrices.forEach((item) => {
-            let index = this._pricingHelpersService.getPricingIndex(
-                item.appItemPriceInfos,
-                level,
-                currencyId
-            );
-            if (index == -1) {
-                const newPriceDto =
-                    this._pricingHelpersService.getPricingInstance(
-                        level,
-                        this.selectedCurrency
-                    );
-                item.appItemPriceInfos.push(newPriceDto);
-                index = item.appItemPriceInfos.length - 1;
+        this.variationMatrices.forEach(item=>{
+            let index = this._pricingHelpersService.getPricingIndex(item.appItemPriceInfos, level, currencyId)
+            if(index == -1) {
+                const newPriceDto = this._pricingHelpersService.getPricingInstance(level, this.selectedCurrency)
+                item.appItemPriceInfos.push(newPriceDto)
+                index = item.appItemPriceInfos.length - 1
             }
-            this.pricingFilter.variationCorrespondingIndex.push(index);
-        });
+            this.pricingFilter.variationCorrespondingIndex.push(index)
+        })
     }
-
-    filterPricing() {
-        this.checkAndAddDefaultPriceObjects();
+    
+    filterPricing(){
+        this.checkAndAddDefaultPriceObjects()
     }
-    generatePhotosObjectForDefaultExtraAttributeOfVariationAttachment() {
-        let defaultImageExtraAttr = this.defaultExtraAttrForAttachments;
+    generatePhotosObjectForDefaultExtraAttributeOfVariationAttachment(){
+        let defaultImageExtraAttr = this.defaultExtraAttrForAttachments
 
-        const valuesAttachmentObject =
-            defaultImageExtraAttr.selectedValuesAttachments;
+        const valuesAttachmentObject = defaultImageExtraAttr.selectedValuesAttachments
 
-        const selectedValues: number[] = defaultImageExtraAttr.selectedValues;
+        const selectedValues : number[] = defaultImageExtraAttr.selectedValues
 
         // build attachment data for each value of the default selected attibute
-        defaultImageExtraAttr.lookupData.forEach((elem: SelectItem) => {
-            let optionId = elem.value;
-            let isSelected = selectedValues.includes(optionId);
-            if (isSelected) {
-                valuesAttachmentObject[optionId] = {
-                    entityAttachments: [],
-                    attachmentSrcs: [""],
-                    lookupData: elem,
-                    defaultImageIndex: -1,
-                };
+        defaultImageExtraAttr.lookupData.forEach((elem:SelectItem) => {
+            let optionId = elem.value
+            let isSelected = selectedValues.includes(optionId)
+            if(isSelected){
+                valuesAttachmentObject[optionId]= {
+                    entityAttachments : [],
+                    attachmentSrcs : [""],
+                    lookupData : elem,
+                    defaultImageIndex: -1
+                }
             }
         });
 
         // set first option value as active
-        if (defaultImageExtraAttr.selectedValues.length) {
-            let key = defaultImageExtraAttr.selectedValues[0];
-            this.activeAttachmentOption =
-                defaultImageExtraAttr.selectedValuesAttachments[key];
+        if(defaultImageExtraAttr.selectedValues.length) {
+            let key  = defaultImageExtraAttr.selectedValues[0]
+            this.activeAttachmentOption = defaultImageExtraAttr.selectedValuesAttachments[key]
         }
     }
-    setDefaultImage(index) {
-        if (
-            this.activeAttachmentOption.entityAttachments == null ||
-            this.activeAttachmentOption.entityAttachments == undefined
-        ) {
+    setDefaultImage(index){
+        if (this.activeAttachmentOption.entityAttachments == null || this.activeAttachmentOption.entityAttachments == undefined) {
             this.activeAttachmentOption.entityAttachments = [];
         }
-        this.activeAttachmentOption.defaultImageIndex = index;
-        this.activeAttachmentOption.entityAttachments.map((item, i) => {
-            item.isDefault = index == i ? true : false;
-            return item;
-        });
-        this.updateVaritaionAttachments();
+        this.activeAttachmentOption.defaultImageIndex = index
+        this.activeAttachmentOption.entityAttachments.map((item,i)=>{
+            item.isDefault = index == i  ? true  : false
+            return item
+        })
+        this.updateVaritaionAttachments()
     }
 
-    removePhoto(i: number) {
-        if (
-            this.activeAttachmentOption.defaultImageIndex === i &&
-            this.activeAttachmentOption.entityAttachments.length > 1
-        )
-            return this.notify.info(
-                "Please set another image as default first"
-            );
-        this.activeAttachmentOption.entityAttachments.splice(i, 1);
-        this.activeAttachmentOption.attachmentSrcs.splice(i, 1);
-        let imagesCount = this.activeAttachmentOption.entityAttachments.length;
-        if (
-            (imagesCount === 9 &&
-                this.activeAttachmentOption.attachmentSrcs.every(
-                    (item) => item
-                )) ||
-            imagesCount === 0
-        )
-            this.activeAttachmentOption.attachmentSrcs.push("");
-        else if (this.activeAttachmentOption.defaultImageIndex > i)
-            this.activeAttachmentOption.defaultImageIndex--;
-        this.updateVaritaionAttachments();
+    removePhoto(i :number){
+        if( this.activeAttachmentOption.defaultImageIndex === i && this.activeAttachmentOption.entityAttachments.length > 1 )  return this.notify.info("Please set another image as default first")
+        this.activeAttachmentOption.entityAttachments.splice(i,1)
+        this.activeAttachmentOption.attachmentSrcs.splice(i,1)
+        let imagesCount = this.activeAttachmentOption.entityAttachments.length
+        if( (imagesCount === 9 && this.activeAttachmentOption.attachmentSrcs.every(item=>item)) || imagesCount ===0 ) this.activeAttachmentOption.attachmentSrcs.push("")
+        else if ( this.activeAttachmentOption.defaultImageIndex > i )  this.activeAttachmentOption.defaultImageIndex--
+        this.updateVaritaionAttachments()
     }
 
-    removeAllAttachments() {
+    removeAllAttachments(){
         var isConfirmed: Observable<boolean>;
-        isConfirmed = this.askToConfirm(
-            "AreYouSureYouWanToDeleteAllTheAttachments",
-            "Warning"
-        );
+        isConfirmed   = this.askToConfirm("AreYouSureYouWanToDeleteAllTheAttachments","Warning");
 
-        isConfirmed.subscribe((res) => {
-            if (res) {
-                let attachmentValues =
-                    this.defaultExtraAttrForAttachments
-                        .selectedValuesAttachments;
-                Object.keys(attachmentValues).forEach((key) => {
-                    attachmentValues[Number(key)].entityAttachments = [];
-                    attachmentValues[Number(key)].attachmentSrcs = [""];
-                    attachmentValues[Number(key)].defaultImageIndex = -1;
-                });
-                this.updateVaritaionAttachments();
+       isConfirmed.subscribe((res)=>{
+          if(res){
+                    let attachmentValues = this.defaultExtraAttrForAttachments.selectedValuesAttachments
+                    Object.keys(attachmentValues).forEach((key)=>{
+                        attachmentValues[Number(key)].entityAttachments = []
+                        attachmentValues[Number(key)].attachmentSrcs = [""]
+                        attachmentValues[Number(key)].defaultImageIndex = -1
+                    })
+                    this.updateVaritaionAttachments()
+                }
             }
-        });
+        )
+
     }
 
-    fileChange(event, index: number) {
-        if (event.target.value) {
-            // there is a file
+
+    fileChange(event,index:number){
+        if(event.target.value) { // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
-            let { onCropDone, data } = this.openImageCropper(
-                event,
-                undefined,
-                true
-            );
-            let subs = onCropDone.subscribe((res) => {
-                if (data.isCropDone) {
-                    this.tempUploadImage(event, data, index);
+            let { onCropDone, data } = this.openImageCropper(event,undefined,true);
+            let subs = onCropDone.subscribe((res)=>{
+                if(data.isCropDone) {
+                    this.tempUploadImage(event, data, index)
                 }
                 // reset input
-                event.target.value = null;
-                subs.unsubscribe();
-            });
+                event.target.value = null
+                subs.unsubscribe()
+            })
         }
     }
 
-    attachmentCategory: GetSycAttachmentCategoryForViewDto =
-        new GetSycAttachmentCategoryForViewDto({
-            imgURL: null,
-            sycAttachmentCategory: new SycAttachmentCategoryDto({
-                code: "IMAGE",
-                name: "Image",
-                attributes: null,
-                parentCode: null,
-                parentId: null,
-                id: 1,
-            } as any),
-            sycAttachmentCategoryName: "",
-        });
+    attachmentCategory :GetSycAttachmentCategoryForViewDto = new GetSycAttachmentCategoryForViewDto({
+        imgURL: null,
+        sycAttachmentCategory: new SycAttachmentCategoryDto({
+            code: "IMAGE",
+            name: "Image",
+            attributes: null,
+            parentCode: null,
+            parentId: null,
+            id: 1
+        } as any),
+        sycAttachmentCategoryName: ""
+    })
 
-    tempUploadImage(
-        event: Event,
-        croppedImageContent: ImageCropperComponent,
-        index: number
-    ) {
-        const file = (event.target as HTMLInputElement).files[0];
+
+    tempUploadImage(event:Event,croppedImageContent:ImageCropperComponent,index:number){
+
+        const file = (event.target as HTMLInputElement).files[0]
         // this.attachmentCategory.imgURL = croppedImageContent.croppedImageAsBase64 as string
 
-        if (
-            this.activeAttachmentOption.entityAttachments == null ||
-            this.activeAttachmentOption.entityAttachments == undefined
-        ) {
+        if (this.activeAttachmentOption.entityAttachments == null || this.activeAttachmentOption.entityAttachments == undefined) {
             this.activeAttachmentOption.entityAttachments = [];
         }
         // create GuId
         let guid = this.guid();
         // create app attachment entity
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-        att.index = index;
+        att.index=index
         att.fileName = file.name;
-        let extraAttrId = this.defaultExtraAttrForAttachments.attributeId;
-        let optionValue = this.activeAttachmentOption.lookupData.value;
-        att.attributes = `${extraAttrId}=${optionValue}`;
-        att.attachmentCategoryId =
-            this.attachmentCategory.sycAttachmentCategory.id;
+        let extraAttrId = this.defaultExtraAttrForAttachments.attributeId
+        let optionValue = this.activeAttachmentOption.lookupData.value
+        att.attributes = `${extraAttrId}=${optionValue}`
+        att.attachmentCategoryId =  this.attachmentCategory.sycAttachmentCategory.id
         att.guid = guid;
-        att.url = croppedImageContent.croppedImageAsBase64 as string;
+        att.url = croppedImageContent.croppedImageAsBase64 as string
+
 
         // save image as a base64
-        this.activeAttachmentOption.attachmentSrcs[index] =
-            croppedImageContent.croppedImageAsBase64 as string;
-        this.activeAttachmentOption.entityAttachments[index] = att;
-        if (this.activeAttachmentOption.entityAttachments.length == 1) {
-            this.setDefaultImage(0);
+        this.activeAttachmentOption.attachmentSrcs[index] = croppedImageContent.croppedImageAsBase64 as string
+        this.activeAttachmentOption.entityAttachments[index] = att
+        if( this.activeAttachmentOption.entityAttachments.length == 1 ) {
+            this.setDefaultImage(0)
         }
 
-        if (
-            this.activeAttachmentOption.attachmentSrcs.every((elem) => elem) &&
-            this.activeAttachmentOption.attachmentSrcs.length < 10
-        )
-            this.activeAttachmentOption.attachmentSrcs.push("");
-        this.updateVaritaionAttachments();
+        if( this.activeAttachmentOption.attachmentSrcs.every(elem=>elem) && this.activeAttachmentOption.attachmentSrcs.length < 10 ) this.activeAttachmentOption.attachmentSrcs.push("")
+        this.updateVaritaionAttachments()
 
-        this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+        this.uploadBlobAttachment(croppedImageContent.croppedImage,att)
+
     }
 
-    triggerActiveOptionAttachments(optionObject: IVaritaionAttachment) {
-        this.activeAttachmentOption = optionObject;
+    triggerActiveOptionAttachments(optionObject : IVaritaionAttachment){
+        this.activeAttachmentOption = optionObject
     }
 
-    createAllPossibleVariationsCombination() {
+
+
+    createAllPossibleVariationsCombination(){
         // needs validation on the data before generate combintaion
 
-        this.combine(0, new VariationItemDto());
+        this.combine(0,new VariationItemDto())
 
         // this.setDefaultExtraAttributeForVariationAttachment(this.selectedExtraAttributes[0])
     }
 
-    combine(index: number, _variation: VariationItemDto) {
-        let currentExtraAttr = this.selectedExtraAttributes[index];
-        let totalSelectedExtraAttributes = this.selectedExtraAttributes.length;
-        const createNewVariation = (
-            attrLabel: string,
-            attrCode: string,
-            attrId?: number
-        ) => {
-            let ___varitation = VariationItemDto.fromJS(_variation);
 
-            if (!___varitation.entityExtraData)
-                ___varitation.entityExtraData = [];
-            if (!___varitation.appItemPriceInfos)
-                ___varitation.appItemPriceInfos = this.getParentProductPrices();
-            if (
-                ___varitation.entityExtraData.length ==
-                totalSelectedExtraAttributes
-            ) {
-                ___varitation = new VariationItemDto();
-                ___varitation.entityExtraData = [];
+
+    combine(index:number,_variation:VariationItemDto)  {
+        let currentExtraAttr = this.selectedExtraAttributes[index]
+        let totalSelectedExtraAttributes = this.selectedExtraAttributes.length
+        const createNewVariation = (attrLabel:string,attrCode:string,attrId?:number)=>{
+            let ___varitation = VariationItemDto.fromJS(_variation)
+
+            if(!___varitation.entityExtraData) ___varitation.entityExtraData = []
+            if (!___varitation.appItemPriceInfos) ___varitation.appItemPriceInfos = this.getParentProductPrices()
+            if(___varitation.entityExtraData.length == totalSelectedExtraAttributes) {
+                ___varitation = new VariationItemDto()
+                ___varitation.entityExtraData = []
             }
 
             let entityExtraData = new AppEntityExtraDataDto({
-                attributeId: currentExtraAttr.attributeId,
-                attributeValue: attrLabel,
-                attributeValueId: attrId,
-                id: 0,
-                entityId: 0,
-                entityObjectTypeCode: currentExtraAttr.entityObjectTypeCode,
-                attributeValueFkName: undefined,
-                entityObjectTypeName: undefined,
-                entityObjectTypeId: undefined,
-                attributeValueFkCode: attrCode,
-                attributeCode: attrCode,
-            });
-            ___varitation.entityExtraData.push(entityExtraData);
-            if (index < totalSelectedExtraAttributes - 1) {
-                this.combine(index + 1, ___varitation); //complete comibinig
-            } else {
-                //comibining done, now lets create a new variation row
-                ___varitation.price = this.appItem.price;
-                ___varitation.stockAvailability = 0;
-                ___varitation.id = 0;
-                ___varitation.entityAttachments = [];
-                ___varitation.position = this.variationMatrices.length;
+                attributeId : currentExtraAttr.attributeId,
+                attributeValue : attrLabel,
+                attributeValueId : attrId,
+                id : 0,
+                entityId : 0,
+                entityObjectTypeCode:currentExtraAttr.entityObjectTypeCode,
+                attributeValueFkName:undefined,
+                entityObjectTypeName:undefined,
+                entityObjectTypeId:undefined,
+                attributeValueFkCode:attrCode,
+                attributeCode:attrCode
+            })
+            ___varitation.entityExtraData.push(entityExtraData)
+            if( index < totalSelectedExtraAttributes - 1  ) {
+                this.combine(index + 1,___varitation)//complete comibinig
+            } else {//comibining done, now lets create a new variation row
+                ___varitation.price = this.appItem.price
+                ___varitation.stockAvailability = 0
+                ___varitation.id = 0
+                ___varitation.entityAttachments = []
+                ___varitation.position = this.variationMatrices.length
 
-                for (
-                    var i = 0;
-                    i < ___varitation?.entityExtraData?.length;
-                    i++
-                ) {
+                for (var i = 0; i < ___varitation?.entityExtraData?.length; i++) {
                     if (i == 0) {
                         if (this.appItem.code)
                             ___varitation.code = this.appItem?.code;
-                        else ___varitation.code = "";
+                        else
+                            ___varitation.code = "";
                     }
 
-                    ___varitation.code +=
-                        "-" +
-                        (___varitation?.entityExtraData[i]?.attributeCode ||
-                            ___varitation?.entityExtraData[i]
-                                ?.attributeValueFkCode);
+                    ___varitation.code += "-" + (___varitation?.entityExtraData[i]?.attributeCode || ___varitation?.entityExtraData[i]?.attributeValueFkCode);
                 }
-                let newVariation: VariationItemDto =
-                    VariationItemDto.fromJS(___varitation);
-                this.variationMatrices.push(newVariation);
+                let newVariation: VariationItemDto = VariationItemDto.fromJS(___varitation)
+                this.variationMatrices.push(newVariation)
             }
-        };
-            if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
-                currentExtraAttr.selectedValues.forEach((attrId) => {
-                    // if(attrId || attrId>=0){
-                    let attrOptionData: any = currentExtraAttr.lookupData.filter(
-                        (item) => item.value == attrId
-                    )[0];
-                    createNewVariation(
-                        attrOptionData?.label,
-                        attrOptionData?.code,
-                        attrId
-                    );
-                  //  }
-                });
-            } else {
-                // size condition
-                console.log(">>", this.appSizeRatios.appSizeScalesDetails);
-    
-                // if (this.appSizeRatios.appSizeScalesDetails.length < 2) {
-                // let sizeData = this.appSizeRatios.appSizeScalesDetails[0];
-                // this.siwiSizes.forEach((size) => {
-                this.appSizeRatios.appSizeScalesDetails.forEach(
-                    (sizeScale: any) => {
-                        let arr = this.siwiSizes.filter(
-                            (size) => size.code === sizeScale.sizeCode
-                        );
-                        console.log(">>", arr);
-    
-                        if (arr.length !== 0) {
-                            createNewVariation(
-                                sizeScale.sizeCode,
-                                sizeScale.sizeCode,
-                                arr[0].value
-                            );
-                        } else {
-                            createNewVariation(
-                                sizeScale.sizeCode,
-                                sizeScale.sizeCode
-                            );
-                            // }
-                        }
-                    }
-                );
-    
-                // });
-                // } else {
-                //     this.appSizeRatios.appSizeScalesDetails.forEach(
-                //         (sizeDetailDto) => {
-                //             createNewVariation(
-                //                 sizeDetailDto.sizeCode,
-                //                 sizeDetailDto.sizeCode
-                //             );
-                //         }
-                //     );
-                // }
-            }
+        }
+        if(currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
+            currentExtraAttr.selectedValues.forEach((attrId)=>{
+                let attrOptionData : any = currentExtraAttr.lookupData.filter(item=>item.value == attrId)[0]
+                createNewVariation(attrOptionData.label,attrOptionData.code,attrId)
+            })
+        } else {
+            this.appSizeRatios.appSizeScalesDetails.forEach((sizeDetailDto)=>{
+                createNewVariation(sizeDetailDto.sizeCode,sizeDetailDto.sizeCode)
+            })
+        }
     }
 
-    setPrice(price: any, dropdown: BsDropdownDirective) {
-        this.selectedVaritaions.map((varitaion) => {
-            let index = this._pricingHelpersService.getPricingIndex(
-                varitaion.appItemPriceInfos,
-                this.pricingFilter.level,
-                this.pricingFilter.currencyId
-            );
-            if (index > -1) {
-                varitaion.appItemPriceInfos[index].price = price;
+    setPrice(price:any,dropdown:BsDropdownDirective){
+        this.selectedVaritaions.map((varitaion)=>{
+            let index = this._pricingHelpersService.getPricingIndex(varitaion.appItemPriceInfos, this.pricingFilter.level, this.pricingFilter.currencyId)
+            if(index > -1) {
+                varitaion.appItemPriceInfos[index].price = price
             }
-            return varitaion;
-        });
-        dropdown.hide();
+            return varitaion
+        })
+        dropdown.hide()
     }
 
-    handleSizeChange(value, extraDara, extraDaraIndex, tableRecordIndex){
-    console.log(">>", value, extraDara, extraDaraIndex, tableRecordIndex)
-    console.log(">>", this.primengTableHelper.records[tableRecordIndex].entityExtraData[extraDaraIndex].attributeValueId);
-    this.primengTableHelper.records[tableRecordIndex].entityExtraData[extraDaraIndex].attributeValueId = Number(value)
-    }
-    handleColorChange(value, extraDara, extraDaraIndex, tableRecordIndex){
-        this.primengTableHelper.records[tableRecordIndex].entityExtraData[extraDaraIndex].attributeValueId = Number(value)
-    }
-
-    deleteSelectedVariations(dropdown: BsDropdownDirective) {
-        let sectedRecordsPositions: number[] = this.selectedVaritaions.reduce(
-            (accum, variation) => {
-                accum.push(variation.position);
-                return accum;
-            },
-            []
-        );
-        this.variationMatrices = this.variationMatrices.filter((variation) => {
-            return !sectedRecordsPositions.includes(variation.position);
-        });
-        this.selectedVaritaions = [];
-        this.primengTableHelper.records = this.variationMatrices;
-        dropdown.hide();
-        this.updateVaritaionAttachments();
+    deleteSelectedVariations(dropdown:BsDropdownDirective){
+        let sectedRecordsPositions :number[] = this.selectedVaritaions.reduce((accum,variation)=>{
+            accum.push( variation.position )
+            return accum
+        },[])
+        this.variationMatrices = this.variationMatrices.filter((variation)=>{
+            return !sectedRecordsPositions.includes(variation.position)
+        })
+        this.selectedVaritaions = []
+        this.primengTableHelper.records = this.variationMatrices
+        dropdown.hide()
+        this.updateVaritaionAttachments()
     }
 
     saveVariations() {
         let invalidPrice = this.variationMatrices.some((variation) => {
-            let defaultPriceindex =
-                this._pricingHelpersService.getDefaultPricingIndex(
-                    variation.appItemPriceInfos
-                );
-            const item = variation.appItemPriceInfos[defaultPriceindex];
-            return (
-                defaultPriceindex == -1 || isNaN(item.price) || item.price < 0
-            );
-        });
+            let defaultPriceindex = this._pricingHelpersService.getDefaultPricingIndex(variation.appItemPriceInfos)
+            const item = variation.appItemPriceInfos[defaultPriceindex]
+            return defaultPriceindex == -1 || isNaN(item.price) || item.price < 0
+        })
         if (invalidPrice) {
-            return this.notify.error(
-                this.l("PleaseCompletePricingAllVariationsFirst")
-            );
+            return this.notify.error(this.l('PleaseCompletePricingAllVariationsFirst'))
         }
-        this.variationMatrices.forEach((variation) => {
-            variation.appItemPriceInfos = variation.appItemPriceInfos.filter(
-                (priceDto) => priceDto.code == "MSRP" || priceDto?.price > 0
-            );
-        });
-        this.isListing ? this.selectedVaritaions : this.variationMatrices;
-        let appItemSizesScaleInfo: AppItemSizesScaleInfo[] = undefined;
-        const sizeIsSelected = this.selectedExtraAttributes.filter(
-            (item) => item.entityObjectTypeCode == this.sizeExtraAttrCode
-        )[0];
+        this.variationMatrices.forEach(variation=>{
+            variation.appItemPriceInfos = variation.appItemPriceInfos.filter(priceDto=> (priceDto.code == 'MSRP' || priceDto?.price > 0) )
+        })
+        this.isListing ? this.selectedVaritaions : this.variationMatrices
+        let appItemSizesScaleInfo : AppItemSizesScaleInfo[] = undefined
+        const sizeIsSelected = this.selectedExtraAttributes.filter(item=> item.entityObjectTypeCode == this.sizeExtraAttrCode )[0]
 
-        if (sizeIsSelected)
-            appItemSizesScaleInfo = [this.appSizeScales, this.appSizeRatios];
-        const body: ApplyVariationOutput = {
-            variation: this.isListing
-                ? this.selectedVaritaions
-                : this.variationMatrices,
-            appItemSizesScaleInfo,
-        };
-        this.applyVariations.emit(body);
+        if(sizeIsSelected) appItemSizesScaleInfo = [ this.appSizeScales, this.appSizeRatios ]
+        const body : ApplyVariationOutput = {
+            variation:this.isListing ? this.selectedVaritaions : this.variationMatrices,
+            appItemSizesScaleInfo
+        }
+        this.applyVariations.emit(body)
     }
 
-    updateVaritaionAttachments() {
-        let defaultExtraAttrId =
-            this.defaultExtraAttrForAttachments.attributeId;
+    updateVaritaionAttachments(){
+        let defaultExtraAttrId = this.defaultExtraAttrForAttachments.attributeId
 
-        this.variationAttachmentsSrcs = [];
+        this.variationAttachmentsSrcs = []
 
-        this.variationMatrices.map((variation, i) => {
-            let filteredExtraAttrValue = variation.entityExtraData.filter(
-                (item) => item.attributeId == defaultExtraAttrId
-            );
+        this.variationMatrices.map((variation,i)=>{
 
-            let extraAttrValue = filteredExtraAttrValue[0];
+            let filteredExtraAttrValue = variation.entityExtraData.filter( (item)=>item.attributeId == defaultExtraAttrId )
 
-            let optionValue =
-                extraAttrValue.entityObjectTypeCode == this.sizeExtraAttrCode
-                    ? extraAttrValue.attributeCode
-                    : extraAttrValue.attributeValueId;
+            let extraAttrValue = filteredExtraAttrValue[0]
 
-            let currentOptionAttachments =
-                this.defaultExtraAttrForAttachments.selectedValuesAttachments[
-                    optionValue
-                ];
+            let optionValue = extraAttrValue.entityObjectTypeCode == this.sizeExtraAttrCode ? extraAttrValue.attributeCode : extraAttrValue.attributeValueId
+
+            let currentOptionAttachments = this.defaultExtraAttrForAttachments.selectedValuesAttachments[optionValue]
             // if(!currentOptionAttachments) {
             //     this.defaultExtraAttrForAttachments.selectedValuesAttachments[optionValue] = {
             //         attachmentSrcs : [""],
@@ -1078,265 +723,169 @@ export class CreateEditAppItemVariationsComponent
             // variation.entityAttachments = currentOptionAttachments.entityAttachments
 
             // handle add new and set default
-            if (currentOptionAttachments) {
-                currentOptionAttachments.entityAttachments.forEach((item) => {
-                    let index = variation.entityAttachments.findIndex(
-                        (varItem) => {
-                            if (item.id)
-                                return varItem.fileName === item.fileName;
-                            else return varItem.guid === item.guid;
-                        }
-                    );
-                    if (index > -1)
-                        variation.entityAttachments[index].isDefault =
-                            item.isDefault;
-                    else variation.entityAttachments.push(item);
-                });
+            if(currentOptionAttachments){
+                currentOptionAttachments.entityAttachments.forEach((item)=>{
+                    let index =  variation.entityAttachments.findIndex( varItem=>{
+                        if(item.id) return varItem.fileName === item.fileName
+                        else return varItem.guid === item.guid
+                    })
+                    if(index > -1) variation.entityAttachments[index].isDefault = item.isDefault
+                    else variation.entityAttachments.push(item)
+                })
 
                 // handle delete
-                variation.entityAttachments =
-                    variation.entityAttachments.filter((varItem) => {
-                        let isStillExist;
-                        if (varItem.id)
-                            isStillExist =
-                                currentOptionAttachments.entityAttachments.some(
-                                    (item) => item.fileName === varItem.fileName
-                                );
-                        else
-                            isStillExist =
-                                currentOptionAttachments.entityAttachments.some(
-                                    (item) => item.guid === varItem.guid
-                                );
-                        return isStillExist;
-                    });
+                variation.entityAttachments = variation.entityAttachments.filter((varItem=>{
+                    let isStillExist
+                    if(varItem.id) isStillExist = currentOptionAttachments.entityAttachments.some(item => item.fileName === varItem.fileName)
+                    else isStillExist = currentOptionAttachments.entityAttachments.some(item => item.guid === varItem.guid)
+                    return isStillExist
+                }))
 
-                const defaultImageIndex = variation.entityAttachments.findIndex(
-                    (item) => item.isDefault
-                );
+                const defaultImageIndex = variation.entityAttachments.findIndex(item=>item.isDefault)
 
-                const defaultImage: string =
-                    currentOptionAttachments.attachmentSrcs[defaultImageIndex];
+                const defaultImage :string = currentOptionAttachments.attachmentSrcs[defaultImageIndex]
 
-                this.variationAttachmentsSrcs.push(defaultImage);
-            } else {
-                this.variationAttachmentsSrcs.push(undefined);
+                this.variationAttachmentsSrcs.push(defaultImage)
+            }
+            else {
+                this.variationAttachmentsSrcs.push(undefined)
             }
 
-            return variation;
-        });
+            return variation
+        })
     }
 
-    reverseEngineerVariations() {
-        // selectedExtraATtributes
-        // selectedValues
-        // attachemnts
-        // parse image srcs
-        let extraAttrIds = this.extraAttributes.map((row) => row.attributeId);
+     reverseEngineerVariations(){
+         // selectedExtraATtributes
+         // selectedValues
+         // attachemnts
+         // parse image srcs
+         let extraAttrIds = this.extraAttributes.map((row)=>row.attributeId)
 
-        let firstVariationRow = this.variationMatrices[0];
+         let  firstVariationRow = this.variationMatrices[0]
         // reverse engineer extra attributes selected extra attributes
         firstVariationRow.entityExtraData.forEach((elem) => {
-            const currentExtraDataIndex = extraAttrIds.indexOf(
-                elem.attributeId
-            );
-            this.extraAttributes[currentExtraDataIndex].selected = true;
-            this.extraAttributes[currentExtraDataIndex].selectedValues = [];
-        });
+            const currentExtraDataIndex = extraAttrIds.indexOf(elem.attributeId)
+            this.extraAttributes[currentExtraDataIndex].selected = true
+            this.extraAttributes[currentExtraDataIndex].selectedValues = []
+        })
 
-        let selectedExtraAttrIds = this.selectedExtraAttributes.map(
-            (row) => row.attributeId
-        );
+        let selectedExtraAttrIds = this.selectedExtraAttributes.map((row)=>row.attributeId)
 
         // reverse engineer extra attributes default attachment extra attribute
         for (let index = 0; index < this.variationMatrices.length; index++) {
             this.variationMatrices[index].entityAttachments.forEach((elem) => {
-                let [extraAttrId, optionvalueId] = elem.attributes.split("=");
-                const currentExtraDataIndex = selectedExtraAttrIds.indexOf(
-                    Number(extraAttrId)
-                );
-                this.selectedExtraAttributes[
-                    currentExtraDataIndex
-                ].defaultForAttachment = true;
-                this.selectedExtraAttributes[
-                    currentExtraDataIndex
-                ].selectedValuesAttachments = {};
-            });
-            if (this.variationMatrices[index].entityAttachments.length) break;
+                let [extraAttrId,optionvalueId] = elem.attributes.split('=')
+                const currentExtraDataIndex = selectedExtraAttrIds.indexOf(Number(extraAttrId))
+                this.selectedExtraAttributes[currentExtraDataIndex].defaultForAttachment = true
+                this.selectedExtraAttributes[currentExtraDataIndex].selectedValuesAttachments = {}
+            })
+            if(this.variationMatrices[index].entityAttachments.length) break;
         }
 
-        let selectedExtraAttr = this.selectedExtraAttributes;
-        let defaultExtraAttrForAttachmentsId = this.variationMatrices.filter(
-            (item) => item.entityAttachments.length === 0
-        )[0]?.entityAttachments[0]?.attributes[0];
-        let defaultExtraAttrForAttachmentsIndex;
-        if (defaultExtraAttrForAttachmentsId)
-            defaultExtraAttrForAttachmentsIndex =
-                this.selectedExtraAttributes.filter(
-                    (item) =>
-                        String(item.attributeId) ==
-                        defaultExtraAttrForAttachmentsId
-                )[0];
-        if (defaultExtraAttrForAttachmentsIndex)
-            this.defaultExtraAttrForAttachments =
-                selectedExtraAttr[defaultExtraAttrForAttachmentsIndex];
-        this.variationMatrices.forEach((variation) => {
-            variation.entityExtraData.forEach((item) => {
-                let extraAttrId = item.attributeId;
-                let currentExtraDataIndex =
-                    selectedExtraAttrIds.indexOf(extraAttrId);
-                let isSizeExtraAttr: boolean =
-                    item.entityObjectTypeCode == this.sizeExtraAttrCode;
-                let optionValueId = item.attributeValueId;
-                let optionValueCode = item.attributeCode;
-                if (!isSizeExtraAttr && !optionValueId) {
-                    optionValueId = selectedExtraAttr[
-                        currentExtraDataIndex
-                    ].lookupData.filter(
-                        (item) => item.code == optionValueCode
-                    )[0]?.value;
+        let selectedExtraAttr = this.selectedExtraAttributes
+        let defaultExtraAttrForAttachmentsId = this.variationMatrices.filter((item)=>item.entityAttachments.length === 0)[0]?.entityAttachments[0]?.attributes[0]
+        let defaultExtraAttrForAttachmentsIndex
+        if (defaultExtraAttrForAttachmentsId) defaultExtraAttrForAttachmentsIndex = this.selectedExtraAttributes.filter(item=>String(item.attributeId) == defaultExtraAttrForAttachmentsId)[0]
+        if (defaultExtraAttrForAttachmentsIndex) this.defaultExtraAttrForAttachments = selectedExtraAttr[defaultExtraAttrForAttachmentsIndex]
+        this.variationMatrices.forEach((variation=>{
+
+            variation.entityExtraData.forEach((item)=>{
+                let extraAttrId = item.attributeId
+                let currentExtraDataIndex = selectedExtraAttrIds.indexOf(extraAttrId)
+                let isSizeExtraAttr:boolean = item.entityObjectTypeCode == this.sizeExtraAttrCode
+                let optionValueId = item.attributeValueId
+                let optionValueCode = item.attributeCode
+                if(!isSizeExtraAttr && !optionValueId) {
+                    optionValueId = selectedExtraAttr[currentExtraDataIndex].lookupData.filter(item=>item.code == optionValueCode)[0]?.value
                 }
-                let attOptionValue = isSizeExtraAttr
-                    ? optionValueCode
-                    : optionValueId;
-                let alreadySelectedValues: any[] =
-                    selectedExtraAttr[currentExtraDataIndex].selectedValues;
-                if (!alreadySelectedValues.includes(attOptionValue as unknown))
-                    alreadySelectedValues.push(attOptionValue);
-                let attachmentObj: { [key: number]: IVaritaionAttachment } =
-                    selectedExtraAttr[currentExtraDataIndex]
-                        .selectedValuesAttachments
-                        ? selectedExtraAttr[currentExtraDataIndex]
-                              .selectedValuesAttachments
-                        : (selectedExtraAttr[
-                              currentExtraDataIndex
-                          ].selectedValuesAttachments = {});
+                let attOptionValue = isSizeExtraAttr ? optionValueCode : optionValueId
+                let alreadySelectedValues:any[] = selectedExtraAttr[currentExtraDataIndex].selectedValues
+                if(!alreadySelectedValues.includes(attOptionValue as unknown)) alreadySelectedValues.push(attOptionValue)
+                let attachmentObj : { [key:number]: IVaritaionAttachment } = selectedExtraAttr[currentExtraDataIndex].selectedValuesAttachments ? selectedExtraAttr[currentExtraDataIndex].selectedValuesAttachments : selectedExtraAttr[currentExtraDataIndex].selectedValuesAttachments = {}
                 // this.defaultExtraAttrForAttachments = selectedExtraAttr[currentExtraDataIndex]
-                if (!attachmentObj[attOptionValue]) {
-                    let selectedValue: SelectItem;
-                    if (!isSizeExtraAttr)
-                        selectedValue = selectedExtraAttr[
-                            currentExtraDataIndex
-                        ].lookupData.filter(
-                            (item) => item.value == attOptionValue
-                        )[0];
+                if( !attachmentObj[attOptionValue] ) {
+                    let selectedValue : SelectItem
+                    if(!isSizeExtraAttr) selectedValue = selectedExtraAttr[currentExtraDataIndex].lookupData.filter(item=>item.value == attOptionValue )[0]
                     attachmentObj[attOptionValue] = {
-                        attachmentSrcs: [""],
-                        entityAttachments: [],
-                        defaultImageIndex: -1,
-                        lookupData: selectedValue,
-                    };
-                }
-            });
-
-            variation.entityAttachments.forEach((entityAttachment) => {
-                let attributes = entityAttachment.attributes.split("=");
-                let extraAttrId: string = attributes[0];
-                let currentExtraDataIndex = selectedExtraAttrIds.indexOf(
-                    Number(extraAttrId)
-                );
-                let isSizeExtraAttr: boolean =
-                    selectedExtraAttr[currentExtraDataIndex]
-                        .entityObjectTypeCode == this.sizeExtraAttrCode;
-                let optionvalue = isSizeExtraAttr
-                    ? attributes[1]
-                    : Number(attributes[1]);
-                let attachmentObj: { [key: number]: IVaritaionAttachment } =
-                    selectedExtraAttr[currentExtraDataIndex]
-                        .selectedValuesAttachments
-                        ? selectedExtraAttr[currentExtraDataIndex]
-                              .selectedValuesAttachments
-                        : (selectedExtraAttr[
-                              currentExtraDataIndex
-                          ].selectedValuesAttachments = {});
-                // this.defaultExtraAttrForAttachments = selectedExtraAttr[currentExtraDataIndex]
-                if (!attachmentObj[optionvalue]) {
-                    let selectedValue: SelectItem;
-                    if (!isSizeExtraAttr)
-                        selectedValue = selectedExtraAttr[
-                            currentExtraDataIndex
-                        ].lookupData.filter(
-                            (item) => item.value == optionvalue
-                        )[0];
-                    attachmentObj[optionvalue] = {
-                        attachmentSrcs: [""],
-                        entityAttachments: [],
-                        defaultImageIndex: -1,
-                        lookupData: selectedValue,
-                    };
-                }
-                let imgUrl = this.adjustImageSrcUrl(entityAttachment);
-                let optionAttachmentSrcs =
-                    attachmentObj[optionvalue].attachmentSrcs;
-                let optionEntityAttachments =
-                    attachmentObj[optionvalue].entityAttachments;
-                if (
-                    !optionAttachmentSrcs.includes(imgUrl) ||
-                    optionEntityAttachments.length <
-                        variation.entityAttachments.length
-                ) {
-                    optionEntityAttachments.push(entityAttachment);
-                    let index = 0;
-
-                    optionAttachmentSrcs.unshift(imgUrl);
-                    if (entityAttachment.isDefault) {
-                        attachmentObj[optionvalue].defaultImageIndex = index;
-                        const defaultImg = optionAttachmentSrcs[index];
-                        this.variationAttachmentsSrcs.push(defaultImg);
-                    } else {
-                        attachmentObj[optionvalue].defaultImageIndex++;
+                        attachmentSrcs : [""],
+                        entityAttachments : [],
+                        defaultImageIndex : -1,
+                        lookupData : selectedValue
                     }
                 }
-            });
-        });
-        let attachmentExist = this.variationMatrices.some(
-            (item) => item.entityAttachments.length > 0
-        );
-        if (!attachmentExist) {
-            this.setDefaultExtraAttributeForVariationAttachment(
-                this.selectedExtraAttributes[0]
-            );
+            })
+
+            variation.entityAttachments.forEach((entityAttachment)=>{
+                let attributes = entityAttachment.attributes.split('=')
+                let extraAttrId:string = attributes[0]
+                let currentExtraDataIndex = selectedExtraAttrIds.indexOf(Number(extraAttrId))
+                let isSizeExtraAttr:boolean = selectedExtraAttr[currentExtraDataIndex].entityObjectTypeCode == this.sizeExtraAttrCode
+                let optionvalue = isSizeExtraAttr ? attributes[1] :  Number(attributes[1])
+                let attachmentObj : { [key:number]: IVaritaionAttachment } = selectedExtraAttr[currentExtraDataIndex].selectedValuesAttachments ? selectedExtraAttr[currentExtraDataIndex].selectedValuesAttachments : selectedExtraAttr[currentExtraDataIndex].selectedValuesAttachments = {}
+                // this.defaultExtraAttrForAttachments = selectedExtraAttr[currentExtraDataIndex]
+                if( !attachmentObj[optionvalue] ) {
+                    let selectedValue : SelectItem
+                    if(!isSizeExtraAttr) selectedValue = selectedExtraAttr[currentExtraDataIndex].lookupData.filter(item=>item.value == optionvalue )[0]
+                    attachmentObj[optionvalue] = {
+                        attachmentSrcs : [""],
+                        entityAttachments : [],
+                        defaultImageIndex : -1,
+                        lookupData : selectedValue
+                    }
+                }
+                let imgUrl = this.adjustImageSrcUrl(entityAttachment)
+                let optionAttachmentSrcs = attachmentObj[optionvalue].attachmentSrcs
+                let optionEntityAttachments = attachmentObj[optionvalue].entityAttachments
+                if( !optionAttachmentSrcs.includes(imgUrl) || optionEntityAttachments.length < variation.entityAttachments.length ){
+                    optionEntityAttachments.push(entityAttachment)
+                    let index = 0
+
+                    optionAttachmentSrcs.unshift(imgUrl)
+                    if(entityAttachment.isDefault) {
+                        attachmentObj[optionvalue].defaultImageIndex = index
+                        const defaultImg =  optionAttachmentSrcs[index]
+                        this.variationAttachmentsSrcs.push(defaultImg)
+                    } else {
+                        attachmentObj[optionvalue].defaultImageIndex++
+                    }
+                }
+
+            })
+
+
+
+        }))
+        let attachmentExist = this.variationMatrices.some( item=> item.entityAttachments.length > 0 )
+        if ( !attachmentExist ) {
+            this.setDefaultExtraAttributeForVariationAttachment(this.selectedExtraAttributes[0])
         }
 
-        this.defaultExtraAttrForAttachments =
-            this.selectedExtraAttributes.filter(
-                (elem) => elem.defaultForAttachment
-            )[0];
-        let firstValueSelected =
-            this.defaultExtraAttrForAttachments.selectedValues[0];
-        this.activeAttachmentOption =
-            this.defaultExtraAttrForAttachments.selectedValuesAttachments[
-                firstValueSelected
-            ];
-        this.updateVaritaionAttachments();
-        this.showVariationPhotos = true;
-        this.sortVaritaionCombination();
+        this.defaultExtraAttrForAttachments = this.selectedExtraAttributes.filter((elem)=>elem.defaultForAttachment)[0]
+        let firstValueSelected = this.defaultExtraAttrForAttachments.selectedValues[0]
+        this.activeAttachmentOption = this.defaultExtraAttrForAttachments.selectedValuesAttachments[firstValueSelected]
+        this.updateVaritaionAttachments()
+        this.showVariationPhotos = true
+        this.sortVaritaionCombination()
     }
-    sortVaritaionCombination() {
-        let selectedExtraAttributesOrder: number[] =
-            this.selectedExtraAttributes.map((item) => item.attributeId);
-        this.variationMatrices.forEach((variation) => {
-            variation.entityExtraData.sort((item, nextItem) => {
-                let currentExtraDataIndex =
-                    selectedExtraAttributesOrder.findIndex(
-                        (extrAttr) => extrAttr === item.attributeId
-                    );
-                let nextExtraDataIndex = selectedExtraAttributesOrder.findIndex(
-                    (extrAttr) => extrAttr === nextItem.attributeId
-                );
-                return currentExtraDataIndex - nextExtraDataIndex;
-            });
-        });
+    sortVaritaionCombination(){
+        let selectedExtraAttributesOrder:number[] = this.selectedExtraAttributes.map((item)=>item.attributeId)
+        this.variationMatrices.forEach((variation)=>{
+            variation.entityExtraData.sort((item,nextItem)=>{
+                let currentExtraDataIndex = selectedExtraAttributesOrder.findIndex(extrAttr=>extrAttr === item.attributeId )
+                let nextExtraDataIndex = selectedExtraAttributesOrder.findIndex(extrAttr=>extrAttr === nextItem.attributeId )
+                return currentExtraDataIndex - nextExtraDataIndex
+            })
+        })
     }
 
-    adjustImageSrcUrl(entityAttachment: AppEntityAttachmentDto) {
-        const isBase64 = entityAttachment?.url?.match(/data:image/);
-        let imgUrlSrc = isBase64
-            ? `${entityAttachment.url}`
-            : `${this.attachmentBaseUrl}/${entityAttachment.url}`;
-        return imgUrlSrc;
+    adjustImageSrcUrl(entityAttachment:AppEntityAttachmentDto){
+        const isBase64 = entityAttachment?.url?.match(/data:image/)
+        let imgUrlSrc = isBase64 ? `${entityAttachment.url}` :`${this.attachmentBaseUrl}/${entityAttachment.url}`
+        return imgUrlSrc
     }
-    cancelVariations() {
-        this.cancel.emit(true);
+    cancelVariations(){
+        this.cancel.emit(true)
     }
     // currentEntityObjectTypeCode: string
     // getAllEntityValuesList(getAllInputs: GetAllInputs) {
@@ -1381,6 +930,7 @@ export class CreateEditAppItemVariationsComponent
     //     }
     //     this.appSelectionModal.show(SelectionModalInputs)
 
+
     //     return
     //     // let extraAttr = this.selectedExtraAttributes[this.activeExtraAttributeIndex]
     //     // let config : ModalOptions = new ModalOptions()
@@ -1409,31 +959,31 @@ export class CreateEditAppItemVariationsComponent
     //     const entityObjectType:string =extraAttr.entityObjectTypeCode;
 
     //     formInputs.push(
-    //         new FormInputs({
+    //         new FormInputs({ 
     //             type: FormInputType.Text,
-    //             name: 'Name',
-    //             id: this.guid(),
-    //             label: 'Name',
-    //             required: true,
-    //             placeholder: this.l('EnterName')
+    //             name: 'Name', 
+    //             id: this.guid(), 
+    //             label: 'Name', 
+    //             required: true, 
+    //             placeholder: this.l('EnterName') 
     //         }),
-    //         new FormInputs<string,CodeInputConfig>({
+    //         new FormInputs<string,CodeInputConfig>({ 
     //             type: FormInputType.Code,
     //             name: 'Code', id: this.guid(),
     //             label: 'Code',
     //             customStyle: codeStyleObject,
     //             customClass: 'bg-white border-color',
-    //             extraData: {
-    //                 editMode:false,
+    //             extraData: { 
+    //                 editMode:false, 
     //                 entityObjectType
-    //             }
+    //             } 
     //         }),
-    //         new FormInputs({
+    //         new FormInputs({ 
     //             type: FormInputType.Text,
-    //             name: 'Description',
-    //             id: this.guid(),
-    //             label: 'Description',
-    //             placeholder: this.l('EnterDescription')
+    //             name: 'Description', 
+    //             id: this.guid(), 
+    //             label: 'Description', 
+    //             placeholder: this.l('EnterDescription') 
     //         }),
     //     )
     //     this.appFormModal.show(formInputs)
@@ -1446,172 +996,119 @@ export class CreateEditAppItemVariationsComponent
     // }
 
     openCreateNewAppEntityModal() {
-        let extraAttr =
-            this.selectedExtraAttributes[this.activeExtraAttributeIndex];
-        let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
-        let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
-            entityObjectType: {
-                name: extraAttr.name,
-                code: extraAttr.entityObjectTypeCode, //to be discussed with Farag
+        let extraAttr = this.selectedExtraAttributes[this.activeExtraAttributeIndex]
+        let config : ModalOptions = new ModalOptions()
+        config.class = 'right-modal slide-right-in'
+        let modalDefaultData :Partial<AppEntityListDynamicModalComponent> = {
+            entityObjectType : {
+                name : extraAttr.name,
+                code : extraAttr.entityObjectTypeCode,//to be discussed with Farag
             },
-            selectedRecords: extraAttr.selectedValues,
-            acceptMultiValues: extraAttr.acceptMultipleValues,
-        };
-        config.initialState = modalDefaultData;
-        let modalRef: BsModalRef = this._BsModalService.show(
-            AppEntityListDynamicModalComponent,
-            config
-        );
-        let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
-            this._extraAttributeDataService.getExtraAttributeLookupData(
-                extraAttr.entityObjectTypeCode,
-                extraAttr.lookupData,
-                extraAttr
-            );
-            let modalRefData: AppEntityListDynamicModalComponent =
-                modalRef.content;
-            if (modalRefData.selectionDone)
-                extraAttr.selectedValues = modalRefData.selectedRecords;
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
-        });
+            selectedRecords : extraAttr.selectedValues,
+            acceptMultiValues : extraAttr.acceptMultipleValues
+        }
+        config.initialState = modalDefaultData
+        let modalRef:BsModalRef = this._BsModalService.show(AppEntityListDynamicModalComponent,config)
+        let subs : Subscription = this._BsModalService.onHidden.subscribe(()=>{
+            this._extraAttributeDataService.getExtraAttributeLookupData(extraAttr.entityObjectTypeCode,extraAttr.lookupData,extraAttr)
+            let modalRefData :AppEntityListDynamicModalComponent = modalRef.content
+            if(modalRefData.selectionDone) extraAttr.selectedValues = modalRefData.selectedRecords
+            if(!modalRef.content.isHiddenToCreateOrEdit)  subs.unsubscribe()
+        })
     }
-    filterLookup($event) {
-        const search = $event.target.value;
-        const extraAttr =
-            this.selectedExtraAttributes[this.activeExtraAttributeIndex];
-        extraAttr.displayedLookupData = extraAttr.lookupData.filter((item) =>
-            (item.label as string)
-                .trim()
-                .toLowerCase()
-                .includes(search.trim().toLowerCase())
-        );
+    filterLookup($event){
+        const search = $event.target.value
+        const extraAttr = this.selectedExtraAttributes[this.activeExtraAttributeIndex]
+        extraAttr.displayedLookupData = extraAttr.lookupData.filter(item=> (item.label as string).trim().toLowerCase().includes(search.trim().toLowerCase()) )
     }
-
-    getUnselectedProductVariations(productId: number) {
-        this._appItemsServiceProxy.getVariations(productId).subscribe((res) => {
-            const selectedVariationsParentIds: number[] =
-                this.variationMatrices.map((item) => item.listingItemId);
-            const alreadySelected = (id) =>
-                selectedVariationsParentIds.includes(id);
+    
+    getUnselectedProductVariations(productId:number){
+        this._appItemsServiceProxy.getVariations(productId)
+        .subscribe(res=>{
+            const selectedVariationsParentIds : number[] = this.variationMatrices.map(item=>item.listingItemId)
+            const alreadySelected = (id)=> selectedVariationsParentIds.includes(id)
             // filter unselected
-            const parentProductUnselectedVariations: AppItemVariationDto[] =
-                res.filter((parentVar) => !alreadySelected(parentVar.id));
+            const parentProductUnselectedVariations : AppItemVariationDto[] = res.filter(parentVar=> !alreadySelected(parentVar.id))
             // remove ids from them or create new objects for them
-            this.parentProductUnselectedVariations = [];
-            let largestPosition = this.variationMatrices.reduce(
-                (accum, item) => {
-                    accum = item.position;
-                    return accum;
-                },
-                0
-            );
-            parentProductUnselectedVariations.forEach((item) => {
-                const variation = new VariationItemDto();
-                variation.entityExtraData = [];
-                item.entityExtraData.forEach((item) => {
-                    variation.entityExtraData.push(
-                        Object.assign(new AppEntityExtraDataDto(), item)
-                    );
-                });
-                variation.parentId = item.id;
-                variation.entityAttachments = [];
-                variation.position = largestPosition + 1;
-                largestPosition++;
+            this.parentProductUnselectedVariations = []
+            let largestPosition = this.variationMatrices.reduce((accum,item)=>{
+                accum = item.position
+                return accum
+            },0)
+            parentProductUnselectedVariations.forEach(item=>{
+                const variation = new VariationItemDto()
+                variation.entityExtraData = []
+                item.entityExtraData.forEach(item=>{
+                    variation.entityExtraData.push( Object.assign( new AppEntityExtraDataDto(), item ) )
+                })
+                variation.parentId = item.id
+                variation.entityAttachments = []
+                variation.position = largestPosition + 1
+                largestPosition ++;
                 // variation.price = item.price
-                this.parentProductUnselectedVariations.push(variation);
-            });
-        });
+                this.parentProductUnselectedVariations.push(variation)
+            })
+        })
     }
 
-    showUnselectedProductVariations() {
-        this.hideUnselectedVariations = true;
-        this.variationMatrices.push(...this.parentProductUnselectedVariations);
+    showUnselectedProductVariations(){
+        this.hideUnselectedVariations = true
+        this.variationMatrices.push(...this.parentProductUnselectedVariations)
     }
     editExtraAtrributeSelection() {
-        this.oldExtraAttributesData = [];
+        this.oldExtraAttributesData = []
         this.extraAttributes.forEach((elem) => {
-            this.oldExtraAttributesData.push(cloneDeep(elem));
-        });
-        this.mapExtraAttrSelectionDataFromVariationMatrices();
-        this.showVariationSelectionMetaData = false;
-        this.showVariationPhotos = false;
-        this.showVariations = false;
-        this.activeExtraAttributeIndex = 0;
-        this.oldDefaultExtraAttrForAttachments =
-            this.defaultExtraAttrForAttachments;
-        this.oldActiveAttachmentOption = this.activeAttachmentOption;
+            this.oldExtraAttributesData.push(
+                cloneDeep(elem)
+            )
+        })
+        this.mapExtraAttrSelectionDataFromVariationMatrices()
+        this.showVariationSelectionMetaData = false
+        this.showVariationPhotos = false
+        this.showVariations = false
+        this.activeExtraAttributeIndex = 0
+        this.oldDefaultExtraAttrForAttachments = this.defaultExtraAttrForAttachments
+        this.oldActiveAttachmentOption = this.activeAttachmentOption
     }
-    mapExtraAttrSelectionDataFromVariationMatrices() {
+    mapExtraAttrSelectionDataFromVariationMatrices(){
         // this.variationMatrices
-        this.activeExtraAttributeIndex = this.selectedExtraAttributes.findIndex(
-            (item) => item.selected
-        );
+        this.activeExtraAttributeIndex = this.selectedExtraAttributes.findIndex(item=>item.selected)
     }
-    sizeScaleFormIsValid: boolean = false;
-    sizeRatioFormIsValid: boolean = false;
-    sizeScalesChanged($event: AppItemSizesScaleInfo, formIsValid: boolean) {
-        this.appSizeScales = $event;
-        this.sizeScaleFormIsValid = formIsValid;
-        this.showSizeRatio();
+    sizeScaleFormIsValid : boolean = false
+    sizeRatioFormIsValid : boolean = false
+    sizeScalesChanged($event:AppItemSizesScaleInfo,formIsValid:boolean){
+        this.appSizeScales = $event
+        this.sizeScaleFormIsValid = formIsValid
+        this.showSizeRatio()
     }
-    showSizeRatio() {
-        const colValues: AppSizeScalesDetailDto[] = [];
-        const cellValues: AppSizeScalesDetailDto[] = [];
-        let result: AppSizeScalesDetailDto[] = [];
-        this.appSizeScales.appSizeScalesDetails.forEach((sizeScaleItem) => {
-            const isColValue: boolean =
-                Boolean(sizeScaleItem.sizeCode) &&
-                Boolean(sizeScaleItem.sizeId) &&
-                Boolean(sizeScaleItem.dimensionName) &&
-                Boolean(sizeScaleItem.d1Position);
-            const isCellValue: boolean =
-                Boolean(sizeScaleItem.sizeCode) &&
-                !Boolean(sizeScaleItem.sizeId) &&
-                !Boolean(sizeScaleItem.dimensionName);
-            let isAlreadyExistAsRatio: AppSizeScalesDetailDto =
-                this.appSizeRatios.appSizeScalesDetails.filter(
-                    (sizeRaioItem) =>
-                        sizeRaioItem.sizeCode == sizeScaleItem.sizeCode
-                )[0];
-            if (isColValue)
-                colValues.push(
-                    new AppSizeScalesDetailDto({
-                        ...sizeScaleItem,
-                        id: isAlreadyExistAsRatio?.id || 0,
-                        sizeRatio: isAlreadyExistAsRatio?.sizeRatio || 0,
-                    })
-                );
-            else if (isCellValue)
-                cellValues.push(
-                    new AppSizeScalesDetailDto({
-                        ...sizeScaleItem,
-                        id: isAlreadyExistAsRatio?.id || 0,
-                        sizeRatio: isAlreadyExistAsRatio?.sizeRatio || 0,
-                    })
-                );
+    showSizeRatio(){
+        const colValues : AppSizeScalesDetailDto[] = []
+        const cellValues : AppSizeScalesDetailDto[] = []
+        let result : AppSizeScalesDetailDto[] = []
+        this.appSizeScales.appSizeScalesDetails.forEach(sizeScaleItem => {
+            const isColValue : boolean = Boolean(sizeScaleItem.sizeCode) && Boolean(sizeScaleItem.sizeId) && Boolean(sizeScaleItem.dimensionName) && Boolean(sizeScaleItem.d1Position) 
+            const isCellValue : boolean = Boolean(sizeScaleItem.sizeCode) && !Boolean(sizeScaleItem.sizeId) && !Boolean(sizeScaleItem.dimensionName)
+            let isAlreadyExistAsRatio : AppSizeScalesDetailDto  = this.appSizeRatios.appSizeScalesDetails.filter(sizeRaioItem=>sizeRaioItem.sizeCode == sizeScaleItem.sizeCode )[0]
+            if(isColValue) colValues.push( new AppSizeScalesDetailDto({...sizeScaleItem, id:isAlreadyExistAsRatio?.id || 0, sizeRatio: isAlreadyExistAsRatio?.sizeRatio || 0}) )
+            else if(isCellValue) cellValues.push( new AppSizeScalesDetailDto({...sizeScaleItem, id:isAlreadyExistAsRatio?.id || 0, sizeRatio: isAlreadyExistAsRatio?.sizeRatio || 0}))
         });
-        if (cellValues.length) result = cellValues;
-        else result = colValues;
+        if(cellValues.length) result = cellValues
+        else result = colValues
         this.appSizeRatios = new AppItemSizesScaleInfo({
             ...this.appSizeScales,
-            id: this.appSizeRatios.id || 0,
-            sizeScaleId: this.appSizeRatios.sizeScaleId || 0,
-            parentId: this.appSizeScales.sizeScaleId || 0,
-            name: this.appSizeRatios.name,
-            appSizeScalesDetails: result,
-            code: this.appSizeRatios.code,
-        });
+            id:this.appSizeRatios.id||0, 
+            sizeScaleId:this.appSizeRatios.sizeScaleId||0, 
+            parentId:this.appSizeScales.sizeScaleId||0,
+            name:this.appSizeRatios.name,
+            appSizeScalesDetails:result,
+            code:this.appSizeRatios.code
+        })
     }
     // sizeRatioisValid :boolean = false
-    sizeRatioChanged($event: AppItemSizesScaleInfo, formIsValid: boolean) {
-        this.sizeRatioFormIsValid = formIsValid;
-        this.appSizeRatios = $event;
-        this.selectedExtraAttributes[
-            this.activeExtraAttributeIndex
-        ].selectedValues = this.appSizeRatios.appSizeScalesDetails.map(
-            (item) => item.sizeCode
-        );
+    sizeRatioChanged( $event:AppItemSizesScaleInfo,formIsValid:boolean){
+        this.sizeRatioFormIsValid = formIsValid
+        this.appSizeRatios = $event
+        this.selectedExtraAttributes[this.activeExtraAttributeIndex].selectedValues = this.appSizeRatios.appSizeScalesDetails.map(item=>item.sizeCode)
     }
     // extraAttributeOnChange($event:Event,extraAttr:IsVariationExtraAttribute){
 
@@ -1629,6 +1126,6 @@ export class CreateEditAppItemVariationsComponent
     // }
 }
 export interface ApplyVariationOutput {
-    variation: VariationItemDto[];
-    appItemSizesScaleInfo: AppItemSizesScaleInfo[];
+    variation:VariationItemDto[]
+    appItemSizesScaleInfo:AppItemSizesScaleInfo[]
 }

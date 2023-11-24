@@ -97,7 +97,7 @@ export class OrganizationTreeComponent extends AppComponentBase implements OnIni
                     this._organizationUnitService.moveOrganizationUnit(input)
                         .pipe(catchError(error => {
                             this.revertDragDrop();
-                            return new Observable(subsc=>subsc.error(error));
+                            return Observable.throw(error);
                         }))
                         .subscribe(() => {
                             this.notify.success(this.l('SuccessfullyMoved'));

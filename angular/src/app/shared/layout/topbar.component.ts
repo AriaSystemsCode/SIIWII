@@ -6,7 +6,6 @@ import {
     Output,
     EventEmitter,
     Input,
-    ViewChild,
 } from "@angular/core";
 import { AbpMultiTenancyService, AbpSessionService } from "abp-ng2-module";
 import { ImpersonationService } from "@app/admin/users/impersonation.service";
@@ -19,41 +18,18 @@ import {
     MessageServiceProxy,
     ProfileServiceProxy,
     UserLinkServiceProxy,
-    GetMaintainanceForViewDto,
-    MaintainancesServiceProxy,
-    AppTransactionServiceProxy,
-    ICreateOrEditAppTransactionsDto,
-    ShoppingCartSummary,
-    TransactionType,
 } from "@shared/service-proxies/service-proxies";
-
 import { UrlHelper } from "@shared/helpers/UrlHelper";
 import { Router } from "@angular/router";
 import * as _ from "lodash";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
-import * as signalR from "@microsoft/signalr";
-import { ClientAuthError } from "msal";
-import { MenuItem } from "primeng/api";
-import {
-    FormBuilder,
-    FormGroup,
-    FormGroupName,
-    Validators,
-} from "@angular/forms";
-import { DatePipe } from "@angular/common";
-import { finalize } from "rxjs";
-import { Dropdown } from "primeng/dropdown";
-import { ShoppingCartViewComponentComponent } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
-import { ShoppingCartMode } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/ShoppingCartMode";
-
 export enum MarketPlace {
     Accounts,
     Products,
     Persons,
 }
-
 @Component({
     templateUrl: "./topbar.component.html",
     selector: "topbar",
@@ -92,12 +68,8 @@ export enum MarketPlace {
 })
 export class TopBarComponent
     extends ThemesLayoutBaseComponent
-    implements OnInit {
-    attachmentBaseUrl = AppConsts.attachmentBaseUrl;
-    hubConnection: signalR.HubConnection;
-    _belowBar = false;
-    _belowBarMessage = "";
-
+    implements OnInit
+{
     @Input() displayMarketPlace: boolean = false;
     isHost = false;
     isImpersonatedLogin = false;
@@ -125,46 +97,12 @@ export class TopBarComponent
     );
     installationMode = true;
     topbardropDown: TopbardropDown[] = [];
-    display: boolean = false;
-    items: MenuItem[];
-    dt: string;
-    roles: any[];
-    public orderForm: FormGroup;
-    submitted: boolean = false;
-    salesOrderControls: ICreateOrEditAppTransactionsDto;
-    selectedCar: number;
-    buyerCompanies: any[];
-    sellerCompanies: any[];
-    buyerContacts: any[];
-    sellerContacts: any[];
-    searchTimeout: any;
-    buyerComapnyId: number = 0;
-    sellerCompanyId: number = 0;
-    sellerContactId: number;
-    buyerContactId: number;
-    isCompantIdExist: boolean = false;
-    isSellerCompanyIdExist: boolean = false;
-    role: string;
-    formType: string;
-    isRoleExist: boolean = false;
-    btnLoader: boolean = false;
-    modalheaderName: string;
-    showSearch:boolean =false;
-    shoppingCartSummary: ShoppingCartSummary;
-    defaultSellerLogo: string = "";
-    defaultBuyerLogo: string = "";
-    _TransactionType = TransactionType;
-    transactionType: string = "";
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
-
-
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
         private _abpMultiTenancyService: AbpMultiTenancyService,
         private _profileServiceProxy: ProfileServiceProxy,
         private _userLinkServiceProxy: UserLinkServiceProxy,
-        private _maintainancesServiceProxy: MaintainancesServiceProxy,
         private _authService: AppAuthService,
         private _impersonationService: ImpersonationService,
         private _linkedAccountService: LinkedAccountService,
@@ -172,92 +110,12 @@ export class TopBarComponent
         private userClickService: UserClickService,
         private messageReadService: MessageReadService,
         private _MessageServiceProxy: MessageServiceProxy,
-        private updateLogoService: UpdateLogoService,
-        private fb: FormBuilder,
-        private datePipe: DatePipe,
-        private _AppTransactionServiceProxy: AppTransactionServiceProxy
+        private updateLogoService:UpdateLogoService
     ) {
         super(injector);
-
-        this.items = [
-            {
-                items: [
-                    {
-                        label: "Sales Order",
-                        command: () => {
-                            this.getOderNumber("SO", "Sales Order");
-                            this.roles = [
-                                { name: "I'm a Seller", code: 1 },
-                                {
-                                    name: "I'm an Independent Sales Rep.",
-                                    code: 3,
-                                },
-                            ];
-                        },
-                    },
-                    {
-                        label: "Purchase Order",
-                        command: () => {
-                            this.getOderNumber("PO", "Purchase Order");
-                            this.roles = [
-                                { name: "I'm a Buyer", code: 2 },
-                                {
-                                    name: "I'm an Independent buying office.",
-                                    code: 3,
-                                },
-                            ];
-                        },
-                    },
-                ],
-            },
-        ];
-    }
-
-    orderNo: any;
-    getOderNumber(tranType: string, tranName: string) {
-        this._AppTransactionServiceProxy
-            .getNextOrderNumber(tranType)
-            .subscribe((res: any) => {
-                console.log(">>", res);
-                this.orderNo = res;
-                this.display = true;
-                this.formType = tranType;
-                let str = new Date().setSeconds(0, 0);
-                this.dt = this.datePipe.transform(
-                    new Date(str).toISOString(),
-                    "MMM d, y, h a"
-                );
-                this.modalheaderName = tranName;
-            });
     }
 
     ngOnInit() {
-        // this._AppTransactionServiceProxy
-        // .getRelatedAccounts()
-        // .subscribe((res: any) => {
-        //     console.log(res);
-        // });
-        const subs = this.userClickService.clickSubject$.subscribe((res) => {
-            if (res == "refreshShoppingInfoInTopbar") {
-                this.getShoppingCartInfo();
-            }
-        });
-
-        this.hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl(this.attachmentBaseUrl + "/signalr-build")
-            .build();
-        this.hubConnection
-            .start()
-            .then(() => console.log("Connection started"))
-            .catch((err) =>
-                console.log("Error while starting connection: " + err)
-            );
-
-        this.hubConnection.on("SendBuildMessage", (data) => {
-            this.belowBar(data);
-            console.log(data);
-        });
-
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.isHost = !this._abpSessionService.tenantId;
         this.isMultiTenancyEnabled = this._abpMultiTenancyService.isEnabled;
@@ -270,15 +128,13 @@ export class TopBarComponent
         this.appSession.user.id;
         this.registerToEvents();
         this.getUnreadMessageCount();
-        if(!this.isHost)
-          this.getShoppingCartInfo();
 
         this.messageReadService.readMessageSubject$.subscribe((res) => {
             if (res) {
+
                 this.getUnreadMessageCount();
             }
         });
-        this.getBelowBar();
     }
 
     registerToEvents() {
@@ -303,18 +159,11 @@ export class TopBarComponent
         });
     }
 
-    fullName: string = "";
     setCurrentLoginInformations(): void {
         this.shownLoginName = this.appSession.getShownLoginName();
         this.tenancyName = this.appSession.tenancyName;
         this.userName = this.appSession.user.userName;
         this.name = this.appSession.user.name;
-        this.fullName =
-            this.appSession.user.name + this.appSession.user.surname;
-        console.log(">>", this.appSession.user);
-    }
-    closeModal(value: boolean) {
-        this.display = false;
     }
 
     getShownUserName(linkedUser: LinkedUserDto): string {
@@ -330,9 +179,9 @@ export class TopBarComponent
     }
 
     getProfilePicture(): void {
-        this.updateLogoService.profilePictureUpdated$.subscribe((res) => {
-            this.profilePicture = res;
-        });
+        this.updateLogoService.profilePictureUpdated$.subscribe(res=>{
+            this.profilePicture = res
+        })
         // this._profileServiceProxy.getProfilePicture().subscribe((result) => {
         //     if (result && result.profilePicture) {
         //         this.profilePicture =
@@ -400,47 +249,6 @@ export class TopBarComponent
             this.message.success(this.l("GdprDataPrepareStartedNotification"));
         });
     }
-
-    updateBuildWithUserId(): void {
-        this._maintainancesServiceProxy
-            .updateOpenBuildWithUserId(this.appSession.user.id)
-            .subscribe(() => {
-                this.notify.success(this.l("SuccessfullySaved"));
-            });
-        this._belowBar = false;
-        this._belowBarMessage = "";
-    }
-    getBelowBar(): void {
-        this._maintainancesServiceProxy.getOpenBuild().subscribe((data) => {
-            this.belowBar(data);
-        });
-    }
-
-    belowBar(data: GetMaintainanceForViewDto): void {
-        if (data?.maintainance?.id > 0) {
-            this._belowBar = !data.maintainance.dismissIds?.includes(
-                this.appSession.user.id.toString() + "|"
-            );
-            this._belowBarMessage = this.l(
-                "MaintainanceAlarm",
-                new Date(
-                    data.maintainance.from.toString()
-                ).toLocaleDateString() +
-                " " +
-                new Date(
-                    data.maintainance.from.toString()
-                ).toLocaleTimeString(),
-                new Date(data.maintainance.to.toString()).toLocaleDateString() +
-                " " +
-                new Date(
-                    data.maintainance.to.toString()
-                ).toLocaleTimeString()
-            );
-        } else {
-            this._belowBar = false;
-            this._belowBarMessage = "";
-        }
-    }
     defineDropDown() {
         this.topbardropDown = [
             {
@@ -489,28 +297,6 @@ export class TopBarComponent
             this.unreadMessageCount = result;
         });
     }
-
-    getShoppingCartInfo(openShoppingCart: boolean = false) {
-        this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
-            .subscribe((res: ShoppingCartSummary) => {
-                this.shoppingCartSummary = res;
-                if (this.shoppingCartSummary.orderType == this._TransactionType.SalesOrder)
-                    this.transactionType = "SO";
-                if (this.shoppingCartSummary.orderType == this._TransactionType.PurchaseOrder)
-                    this.transactionType = "PO";
-
-                if (!this.shoppingCartSummary.sellerLogo)
-                    this.defaultSellerLogo = "../../../assets/shoppingCart/Order-Details-Seller-logo.svg";
-                if (!this.shoppingCartSummary.buyerLogo)
-                    this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
-
-
-                if (openShoppingCart)
-                    this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
-
-            });
-    }
-
 }
 
 export interface TopbardropDown {

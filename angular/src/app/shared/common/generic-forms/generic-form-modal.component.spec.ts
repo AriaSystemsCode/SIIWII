@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GenericFormModalComponent } from './generic-form-modal.component';
 
@@ -6,7 +6,7 @@ describe('GenericFormModalComponent', () => {
   let component: GenericFormModalComponent;
   let fixture: ComponentFixture<GenericFormModalComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ GenericFormModalComponent ]
     })

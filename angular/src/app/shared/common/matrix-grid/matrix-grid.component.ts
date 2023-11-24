@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, Input, OnChanges, Output, SimpleChan
 import { NgForm } from '@angular/forms';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { LookupLabelDto } from '@shared/service-proxies/service-proxies';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { FormInputs } from '../generic-forms/modals/FormInputs';
 import { FormInputType } from '../generic-forms/modals/FormInputType';
 import { MatrixGridColumns } from './models/MatrixGridColumns';
@@ -26,7 +26,7 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
   @Input() reorderableColumns?: boolean = false;
   @Input() reorderableRows?: boolean = false;
   @Input() canAddCols?: boolean = false;
-  @Input() canAddRows?: boolean ;
+  @Input() canAddRows?: boolean = false;
   @Input() canRemoveCols?: boolean = false;
   @Input() canRemoveRows?: boolean = false;
   @Input() rowHeaderIsUnique:boolean = true
@@ -67,11 +67,6 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
     if(this.rowHeaderFormInput?.extraData?.length){
       // this.dropDownLists.push()
     }
-
-    if(this.cols?.columns?.length>0)
-      this.canAddRows=true;
-      else
-      this.canAddRows=false;
   }
   addNewRows(rows:MatrixGridRows[]){
     rows.forEach(row=>{
@@ -115,12 +110,6 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
         element.rowValues.splice(index,1)
       }
     })
-
-    if(this.cols?.columns?.length>0)
-      this.canAddRows=true;
-      else
-      this.canAddRows=false;
-    
   }
   hide(){
     this.active = true

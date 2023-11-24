@@ -98,7 +98,7 @@
                                     [value]="primengTableHelper.records"
                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
                                     [lazy]="true" [scrollable]="true" ScrollWidth="100%"
-                                    responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                    [responsive]="primengTableHelper.isResponsive">
                                     <ng-template pTemplate="header">
                                         <tr>
                                             <th style="width: 130px">{{'Invoice' | localize}}</th>
@@ -141,42 +141,42 @@
                                                     (click)="createOrShowInvoice(record.id, record.invoiceNo)">{{'ShowInvoice' | localize}}</button>
                                             </td>
                                             <td style="width: 150px">
-                                                <span class="p-column-title">{{'ProcessTime' | localize}}</span>
+                                                <span class="ui-column-title">{{'ProcessTime' | localize}}</span>
                                                 <span
                                                     *ngIf="record.creationTime">{{record.creationTime | momentFormat:'L'}}</span>
                                                 <span *ngIf="!record.creationTime">-</span>
                                             </td>
                                             <td style="width: 150px">
-                                                <span class="p-column-title">{{'Edition' | localize}}</span>
+                                                <span class="ui-column-title">{{'Edition' | localize}}</span>
                                                 {{record.editionDisplayName}}
                                             </td>
                                             <td style="width: 150px">
-                                                <span class="p-column-title">{{'Gateway' | localize}}</span>
+                                                <span class="ui-column-title">{{'Gateway' | localize}}</span>
                                                 {{'SubscriptionPaymentGatewayType_' + record.gateway | localize}}
                                             </td>
                                             <td style="width: 100px">
-                                                <span class="p-column-title">{{'Amount' | localize}}</span>
+                                                <span class="ui-column-title">{{'Amount' | localize}}</span>
                                                 {{appSession.application.currencySign}}
                                                 {{record.amount | number : '1.2-2'}}
                                             </td>
                                             <td style="width: 150px">
-                                                <span class="p-column-title">{{'Status' | localize}}</span>
+                                                <span class="ui-column-title">{{'Status' | localize}}</span>
                                                 {{'SubscriptionPaymentStatus_' + record.status | localize}}
                                             </td>
                                             <td style="width: 150px">
-                                                <span class="p-column-title">{{'Period' | localize}}</span>
+                                                <span class="ui-column-title">{{'Period' | localize}}</span>
                                                 {{'PaymentPeriodType_' + record.paymentPeriodType | localize}}
                                             </td>
                                             <td style="width: 100px">
-                                                <span class="p-column-title">{{'DayCount' | localize}}</span>
+                                                <span class="ui-column-title">{{'DayCount' | localize}}</span>
                                                 {{record.dayCount}}
                                             </td>
                                             <td style="width: 250px;">
-                                                <span class="p-column-title">{{'PaymentId' | localize}}</span>
+                                                <span class="ui-column-title">{{'PaymentId' | localize}}</span>
                                                 {{record.paymentId}}
                                             </td>
                                             <td style="width: 150px">
-                                                <span class="p-column-title">{{'InvoiceNo' | localize}}</span>
+                                                <span class="ui-column-title">{{'InvoiceNo' | localize}}</span>
                                                 {{record.invoiceNo}}
                                             </td>
                                         </tr>

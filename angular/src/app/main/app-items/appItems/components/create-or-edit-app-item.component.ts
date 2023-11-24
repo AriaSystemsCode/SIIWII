@@ -33,7 +33,7 @@ import {
     IAppItemPriceInfo,
     CurrencyInfoDto,
     LookupLabelDto,
-    AppEntitiesServiceProxy,
+    AppEntitiesServiceProxy
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { TabDirective, TabsetComponent } from "ngx-bootstrap/tabs";
@@ -46,7 +46,7 @@ import { PublishService } from "../../a../../app-item-shared/services/publish.se
 import { ListingModeEnum } from "../models/app-item-listing-enum";
 import { EExtraAttributeUsage } from "../models/extra-attribute-usage.enum";
 import { PublishAppItemListingService } from "../../app-item-shared/services/publish-app-item-listing.service";
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
 import { Location } from "@angular/common";
 import { DropdownSelection } from "@shared/components/shared-forms-components/dropdown-with-pagination/dropdown-with-pagination.component";
 import { AppEntityDtoWithActions } from "../models/app-entity-dto-with-actions";
@@ -62,14 +62,14 @@ import { ApplyVariationOutput } from "./create-edit-app-item-variations.componen
 })
 export class CreateOrEditAppItemComponent
     extends AppComponentBase
-    implements OnInit, AfterViewInit {
+    implements OnInit, AfterViewInit
+{
     @ViewChild("staticTabs", { static: false }) staticTabs: TabsetComponent;
     @ViewChild("productForm", { static: true }) productForm: NgForm;
     modalRef: BsModalRef;
     defaultImageIndex: number = -1;
     appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
     submitted: boolean = false;
-    updateVariation: boolean = true;
 
     descriptionEditor: string;
     descriptionExportedHtml: string;
@@ -107,9 +107,9 @@ export class CreateOrEditAppItemComponent
             sycAttachmentCategoryName: "",
         });
 
-    categoriesSkipCount: number = 0;
-    departmentsSkipCount: number = 0;
-    classificationsSkipCount: number = 0;
+    categoriesSkipCount: number=0
+    departmentsSkipCount: number=0;
+    classificationsSkipCount: number=0;
     categoriesTotalCount: number;
     departmentsTotalCount: number;
     classificationsTotalCount: number;
@@ -118,10 +118,9 @@ export class CreateOrEditAppItemComponent
     categories: AppEntityDtoWithActions<AppEntityCategoryDto>[] = [];
     departments: AppEntityDtoWithActions<AppEntityCategoryDto>[] = [];
     classifications: AppEntityDtoWithActions<AppEntityClassificationDto>[] = [];
-    entityObjectType: string = "PRODUCT";
-    defaultCurrencyMSRPPriceIndex = -1;
-    showAdvancedPricing: boolean = false;
-    PriceValidMsg: string = "";
+    entityObjectType:string ="PRODUCT";
+    defaultCurrencyMSRPPriceIndex = -1
+    showAdvancedPricing:boolean = false
 
     constructor(
         injector: Injector,
@@ -143,9 +142,8 @@ export class CreateOrEditAppItemComponent
         let selectedIds: number[] = [];
         if (this.classifications) {
             selectedIds = this.classifications.reduce((accum, elem) => {
-                const addedAndNotSavedYet: boolean = !elem.entityDto.id;
-                if (addedAndNotSavedYet)
-                    accum.push(elem.entityDto.entityObjectClassificationId);
+                const addedAndNotSavedYet: boolean =  !elem.entityDto.id
+                if(addedAndNotSavedYet) accum.push(elem.entityDto.entityObjectClassificationId);
                 return accum;
             }, []);
         }
@@ -156,9 +154,8 @@ export class CreateOrEditAppItemComponent
         let selectedIds: number[] = [];
         if (this.categories) {
             selectedIds = this.categories.reduce((accum, elem) => {
-                const addedAndNotSavedYet: boolean = !elem.entityDto.id;
-                if (addedAndNotSavedYet)
-                    accum.push(elem.entityDto.entityObjectCategoryId);
+                const addedAndNotSavedYet: boolean =  !elem.entityDto.id
+                if(addedAndNotSavedYet) accum.push(elem.entityDto.entityObjectCategoryId);
                 return accum;
             }, []);
         }
@@ -169,17 +166,17 @@ export class CreateOrEditAppItemComponent
         let selectedIds: number[] = [];
         if (this.departments) {
             selectedIds = this.departments.reduce((accum, elem) => {
-                const addedAndNotSavedYet: boolean = !elem.entityDto.id;
-                if (addedAndNotSavedYet)
-                    accum.push(elem.entityDto.entityObjectCategoryId);
+                const addedAndNotSavedYet: boolean =  !elem.entityDto.id
+                if(addedAndNotSavedYet) accum.push(elem.entityDto.entityObjectCategoryId);
                 return accum;
             }, []);
         }
         return selectedIds;
     }
-    id: number;
+    id : number
     // interfaces implementations
-
+   
+   
     ngOnInit(): void {
         this.defineExtraAttributes();
         this.initUploaders();
@@ -192,19 +189,18 @@ export class CreateOrEditAppItemComponent
                     this.adjustImageSrcsUrls();
                     this.detectDefaultImageIndex();
                     this.onItemTypeChange(this.appItem.entityObjectTypeId);
-                    this.productTypeId = this.appItem.entityObjectTypeId;
                     this.editMode = true;
-                    this.checkAndAddDefaultPriceObject();
+                    this.checkAndAddDefaultPriceObject()
                 })
                 .catch((err) => {
                     this.notify.error(err);
                 });
         } else {
-            this.checkAndAddDefaultPriceObject();
+            this.checkAndAddDefaultPriceObject()
         }
-        this.getCurrencies();
+        this.getCurrencies()
     }
-
+    
     ngAfterViewInit() {
         setTimeout(() => (this.readonlyDesc = false), 100);
         this.productForm.valueChanges.subscribe((value) => {
@@ -222,19 +218,19 @@ export class CreateOrEditAppItemComponent
             appItemId = id;
             this.headerTitle = this.l("EditProduct");
             this.headerDesc = this.l("YouCanEditTheProductDetails");
-            this.entityObjectType = "PRODUCT";
+            this.entityObjectType ="PRODUCT";
         } else if (productId) {
             this.listingMode = ListingModeEnum.Create;
             appItemId = productId;
             this.headerTitle = this.l("CreateListing");
             this.headerDesc = this.l("YouCanNowEditTheListingDetails");
-            this.entityObjectType = "LISTING";
+            this.entityObjectType ="LISTING";
         } else if (listingId) {
             this.listingMode = ListingModeEnum.Edit;
             appItemId = listingId;
             this.headerTitle = this.l("EditListing");
             this.headerDesc = this.l("YouCanNowEditTheListingDetails");
-            this.entityObjectType = "LISTING";
+            this.entityObjectType ="LISTING";
         }
         return appItemId;
     }
@@ -274,12 +270,10 @@ export class CreateOrEditAppItemComponent
             }
             if (key === "appItemSizesScaleInfo") {
                 // skip variation as we need their ids to be set on the parent id field per every variation
-                object.appItemSizesScaleInfo.map(
-                    (appItemSizesScaleInfo, index) => {
-                        appItemSizesScaleInfo.parentId = index == 0 ? null : 0; // index =0 =>sizescale, index=1 => sizeratio
-                        return appItemSizesScaleInfo;
-                    }
-                );
+                object.appItemSizesScaleInfo.map((appItemSizesScaleInfo,index) => {
+                    appItemSizesScaleInfo.parentId = index == 0 ? null : 0 // index =0 =>sizescale, index=1 => sizeratio
+                    return appItemSizesScaleInfo;
+                });
             }
             if (Array.isArray(value)) {
                 value.map((item) => {
@@ -314,27 +308,16 @@ export class CreateOrEditAppItemComponent
             )
             .toPromise()
             .then((res) => {
-                this.appItem = CreateOrEditAppItemDto.fromJS({
-                    ...res.appItem,
-                    entityCategories: res.appItem.entityCategories.items,
-                    entityDepartments: res.appItem.entityDepartments.items,
-                    entityClassifications:
-                        res.appItem.entityClassifications.items,
-                });
-                this.categoriesTotalCount =
-                    res.appItem.entityCategories.totalCount;
-                this.departmentsTotalCount =
-                    res.appItem.entityDepartments.totalCount;
-                this.classificationsTotalCount =
-                    res.appItem.entityClassifications.totalCount;
+                this.appItem = CreateOrEditAppItemDto.fromJS(res.appItem)
+                this.categoriesTotalCount = res.appItem.entityCategories.totalCount;
+                this.departmentsTotalCount = res.appItem.entityDepartments.totalCount;
+                this.classificationsTotalCount = res.appItem.entityClassifications.totalCount;
                 this.handleCategories(res.appItem.entityCategories.items);
                 this.handleDepartments(res.appItem.entityDepartments.items);
                 this.handleClassifications(
                     res.appItem.entityClassifications.items
                 );
-                this.sellVariationChecked = Boolean(
-                    this.appItem.variationItems.length
-                );
+                this.sellVariationChecked = Boolean(this.appItem.variationItems.length)
                 return true;
             })
             .catch((err) => {
@@ -348,7 +331,9 @@ export class CreateOrEditAppItemComponent
             [EExtraAttributeUsage.Recommended]:
                 new CreateEditAppItemExtraAttribute({
                     header: this.l("Recommended"),
-                    title: this.l("BuyersMayAlsoBeInterestedInTheseItemSpecifics"),
+                    title: this.l(
+                        "Buyersmayalsobeinterestedintheseitemspecifics"
+                    ),
                     usageEnum: EExtraAttributeUsage.Recommended,
                     orderOfDisplay: 1,
                 }),
@@ -436,18 +421,14 @@ export class CreateOrEditAppItemComponent
             )
             .subscribe((result) => {
                 extraAttr.paginationSetting.totalCount = result.totalCount;
-                if (extraAttr.paginationSetting.skipCount == 0)
-                    extraAttr.paginationSetting.list = [];
+                if (extraAttr.paginationSetting.skipCount == 0) extraAttr.paginationSetting.list = [];
                 else
                     extraAttr.paginationSetting.list.splice(
                         extraAttr.paginationSetting.list.length - 1,
                         1
                     );
                 extraAttr.paginationSetting.list.push(...result.items);
-                if (
-                    extraAttr.paginationSetting.list.length <
-                    extraAttr.paginationSetting.totalCount
-                ) {
+                if (extraAttr.paginationSetting.list.length < extraAttr.paginationSetting.totalCount) {
                     const showMoreSelectItem: SelectItem = {
                         value: -1,
                         label: this.l("showMore"),
@@ -457,25 +438,20 @@ export class CreateOrEditAppItemComponent
                     };
                     extraAttr.paginationSetting.list.push(showMoreSelectItem);
                 }
-                extraAttr.paginationSetting.skipCount +=
-                    extraAttr.paginationSetting.maxResultCount;
+                extraAttr.paginationSetting.skipCount += extraAttr.paginationSetting.maxResultCount;
             });
     }
-    DropdownSelection = DropdownSelection;
-    sellVariationChecked: boolean;
-    askToRemoveAllVariations($event) {
-        if (this.sellVariationChecked || !this.appItem?.variationItems?.length)
-            return;
+    DropdownSelection = DropdownSelection
+    sellVariationChecked:boolean
+    askToRemoveAllVariations($event){
+        if (this.sellVariationChecked || !this.appItem?.variationItems?.length ) return
         var isConfirmed: Observable<boolean>;
-        isConfirmed = this.askToConfirm(
-            "AreYouSureYouWantToDeleteAllVariations?",
-            "Confirm"
-        );
-        isConfirmed.subscribe((res) => {
-            if (res) {
-                this.removeAllVariations();
+        isConfirmed   = this.askToConfirm("AreYouSureYouWantToDeleteAllVariations?","Confirm");
+        isConfirmed.subscribe((res)=>{
+            if(res){
+                this.removeAllVariations()
             } else {
-                this.sellVariationChecked = true;
+                this.sellVariationChecked = true
             }
         });
     }
@@ -483,7 +459,7 @@ export class CreateOrEditAppItemComponent
         this.formTouched = true;
         this.appItem.variationItems = [];
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
-        this.appItem.appItemSizesScaleInfo = [];
+        this.appItem.appItemSizesScaleInfo = []
     }
     resetExtraData() {
         this.appItem.entityExtraData = [];
@@ -510,15 +486,13 @@ export class CreateOrEditAppItemComponent
     setSelectedAppEntityExtraDataOnEditMode() {
         if (!this.appItem.entityExtraData) return;
         let selectedExtraDataAsObject: { [key: number]: any } = {}; // {[12]:[15,18,19]} = {[colorId]=[15,12,16]}
-        const getFilterDefinition = (itemExtraData: AppEntityExtraDataDto) => {
-            const item = [
-                ...this.extraAttributes.ADDITIONAL.extraAttributes,
-                ...this.extraAttributes.RECOMMENDED.extraAttributes,
-            ].filter((x) => x.attributeId == itemExtraData.attributeId);
-            return item.length ? item[0] : undefined;
-        };
+        const getFilterDefinition = (itemExtraData : AppEntityExtraDataDto)=>{
+            const item = [...this.extraAttributes.ADDITIONAL.extraAttributes, ...this.extraAttributes.RECOMMENDED.extraAttributes]
+            .filter(x=>x.attributeId == itemExtraData.attributeId)
+            return item.length ? item[0] : undefined
+        }
         this.appItem.entityExtraData.forEach((ItemExtraData) => {
-            const extraAttrDef = getFilterDefinition(ItemExtraData);
+            const extraAttrDef = getFilterDefinition(ItemExtraData)
             let key = ItemExtraData.attributeId;
             const isLookup: boolean = !!ItemExtraData.attributeValueId;
             let value = isLookup
@@ -570,25 +544,16 @@ export class CreateOrEditAppItemComponent
         this.onItemTypeChange(undefined);
     }
 
-    productTypeId: number;
     selectAppItemTypeHandler(modalRef: BsModalRef) {
         let data: SelectAppItemTypeComponent = modalRef.content;
         if (data.selectionDone && data.selectedRecord) {
             // add or edit done
-            this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false).subscribe((res: any) => {
-                this.appItem.code = res;
-                this.appItem.OriginalCode = res
-            })
-            this.productTypeId =
-                data.selectedRecord.data.sycEntityObjectType.id;
             this.addSelectedAppItemType(data.selectedRecord);
             this.onItemTypeChange(
                 data.selectedRecord.data.sycEntityObjectType.id
             );
         }
     }
-
-
 
     addSelectedAppItemType(
         selected: TreeNodeOfGetSycEntityObjectTypeForViewDto
@@ -649,7 +614,7 @@ export class CreateOrEditAppItemComponent
                 undefined,
                 undefined,
                 this.categoriesSkipCount,
-                this.maxResultCount
+                this.maxResultCount,
             )
             .subscribe((res) => {
                 this.handleCategories(res.items);
@@ -670,7 +635,6 @@ export class CreateOrEditAppItemComponent
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
-            console.log(element);
             const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
                 new AppEntityDtoWithActions<AppEntityCategoryDto>({
                     entityDto: new AppEntityCategoryDto({
@@ -759,7 +723,7 @@ export class CreateOrEditAppItemComponent
                 undefined,
                 undefined,
                 this.departmentsSkipCount,
-                this.maxResultCount
+                this.maxResultCount,
             )
             .subscribe((res) => {
                 // this.handleCategories(res.items)
@@ -780,8 +744,6 @@ export class CreateOrEditAppItemComponent
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
-            console.log(element);
-
             const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
                 new AppEntityDtoWithActions<AppEntityCategoryDto>({
                     entityDto: new AppEntityCategoryDto({
@@ -790,18 +752,12 @@ export class CreateOrEditAppItemComponent
                             element.data.sycEntityObjectCategory.id,
                         entityObjectCategoryCode:
                             element.data.sycEntityObjectCategory.code,
-                        entityObjectCategoryName: this.getPath(element),
+                        entityObjectCategoryName:
+                            element.data.sycEntityObjectCategory.name,
                     }),
                 });
             this.departments.push(newCategory);
         });
-    }
-
-    getPath(item: any): any {
-        if (!item.parent) {
-            return item.label;
-        }
-        return this.getPath(item.parent) + "-" + item.label;
     }
 
     seperateNewAndRemovedCategories() {
@@ -822,12 +778,12 @@ export class CreateOrEditAppItemComponent
         let config: ModalOptions = new ModalOptions();
         config.class = "right-modal slide-right-in";
         let modalDefaultData: Partial<SelectClassificationDynamicModalComponent> =
-        {
-            savedIds: this.selectedClassificationsIds,
-            showAddAction: true,
-            showActions: true,
-            entityId: this.appItem.entityId,
-        };
+            {
+                savedIds: this.selectedClassificationsIds,
+                showAddAction: true,
+                showActions: true,
+                entityId: this.appItem.entityId,
+            };
         config.initialState = modalDefaultData;
         let modalRef: BsModalRef = this._BsModalService.show(
             SelectClassificationDynamicModalComponent,
@@ -874,7 +830,7 @@ export class CreateOrEditAppItemComponent
                 undefined,
                 undefined,
                 this.classificationsSkipCount,
-                this.maxResultCount
+                this.maxResultCount,
                 // this.appItem.entityId
             )
             .subscribe((res) => {
@@ -958,36 +914,36 @@ export class CreateOrEditAppItemComponent
     // }
     multiValuesExtraAttributeOnChange(
         $event: {
-            itemValue: number;
-            value: number[];
-            originalEvent: MouseEvent;
+            itemValue: number,
+            value: number[],
+            originalEvent: MouseEvent,
         },
         extraAttrDefinition
-    ) {
-        if ($event.itemValue == -1) {
-            extraAttrDefinition.selectedValues = (
-                extraAttrDefinition.selectedValues as number[]
-            ).filter((item) => item > 0);
-            return this.loadMoreLookupData(extraAttrDefinition);
+        ){
+        if($event.itemValue == -1) {
+            extraAttrDefinition.selectedValues = (extraAttrDefinition.selectedValues as number []).filter(item=>item > 0)
+            return this.loadMoreLookupData(extraAttrDefinition)
         }
         this.formTouched = true;
     }
 
     singleValueExtraAttributeOnChange(
         $event: {
-            value: number;
-            originalEvent: MouseEvent;
+            value: number,
+            originalEvent: MouseEvent
         },
         extraAttrDefinition: FilteredExtraAttribute<number>
     ) {
-        if ($event.value == -1) {
-            extraAttrDefinition.selectedValues = undefined;
-            return this.loadMoreLookupData(extraAttrDefinition);
+        if($event.value == -1) {
+            extraAttrDefinition.selectedValues = undefined
+            return this.loadMoreLookupData(extraAttrDefinition)
         }
         this.formTouched = true;
     }
 
-    loadMoreLookupData(extraAttrDefinition: FilteredExtraAttribute<number>) {
+    loadMoreLookupData(
+        extraAttrDefinition: FilteredExtraAttribute<number>
+    ) {
         return this.loadExtraDataLookupList(extraAttrDefinition);
     }
 
@@ -1054,8 +1010,8 @@ export class CreateOrEditAppItemComponent
         att.fileName = file.name;
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
-        const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
-        this.addTempAttachments([tempFile]);
+        const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0]
+        this.addTempAttachments([tempFile])
         // save image as a base64
         this.attachmentsSrcs[index] =
             croppedImageContent.croppedImageAsBase64 as string;
@@ -1111,51 +1067,31 @@ export class CreateOrEditAppItemComponent
     removeAllAttachments() {
         this.formTouched = true;
         if (this.attachmentsSrcs.length) {
-            var isConfirmed: Observable<boolean>;
-            isConfirmed = this.askToConfirm(
-                "AreYouSureYouWantToDeleteAllTheAttachments?",
-                "Confirm"
-            );
+             var isConfirmed: Observable<boolean>;
+        isConfirmed   = this.askToConfirm("AreYouSureYouWantToDeleteAllTheAttachments?","Confirm");
 
-            isConfirmed.subscribe((res) => {
-                if (res) {
-                    this.attachmentsSrcs = [""];
-                    this.appItem.entityAttachments = [];
+       isConfirmed.subscribe((res)=>{
+          if(res){
+                        this.attachmentsSrcs = [""];
+                        this.appItem.entityAttachments = [];
+                    }
                 }
-            });
+            );
         }
     }
 
     // save product
     saveProduct(form: NgForm) {
-        // if (!this.appItem?.appItemPriceInfos[this.defaultCurrencyMSRPPriceIndex]?.price || this.appItem?.appItemPriceInfos[this.defaultCurrencyMSRPPriceIndex]?.price <= 0) {
-        //     this.PriceValidMsg = "Price must be greater than 0";
-        //     return this.notify.error(
-        //         this.l(this.PriceValidMsg)
-        //     );
-        // }
-        // else {
-            this.appItem?.variationItems?.forEach((variation) => {
-                variation.appItemPriceInfos = this.getParentProductPrices();
-            });
-    // }
-
         this.submitted = true;
         if (form.form.invalid) {
             form.form.markAllAsTouched();
-            return this.notify.error(
-                this.l("Please,CompleteAllTheRequiredFields(*)")
-            );
+            return this.notify.error(this.l("Please,CompleteAllTheRequiredFields(*)"));
         }
-        if (!this.appItem?.entityAttachments?.length) {
-            return this.notify.error(
-                this.l("Please,UploadAtLeastOneImageToThisProduct")
-            );
+        if (!this.appItem?.entityAttachments?.length ) {
+            return this.notify.error(this.l("Please,UploadAtLeastOneImageToThisProduct"));
         }
-        if (this.uploader.isUploading) {
-            return this.notify.error(
-                this.l("PleaseWait,SomeAttachmentsAreStillUploading")
-            );
+        if ( this.uploader.isUploading ) {
+            return this.notify.error(this.l("PleaseWait,SomeAttachmentsAreStillUploading"));
         }
         this.removeBase64ImagesFromDataBeforeSend();
         this.saving = true;
@@ -1168,8 +1104,6 @@ export class CreateOrEditAppItemComponent
         this.seperateNewAndRemovedDepartments();
         this.seperateNewAndRemovedClassifications();
         this.extraSelectedValuesExtraData();
-        if (this.appItem.sycIdentifierId == 0)
-            this.appItem.sycIdentifierId = null;
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
@@ -1179,8 +1113,8 @@ export class CreateOrEditAppItemComponent
             )
             .subscribe((res) => {
                 this.appItem.id = res;
-                this.stopFormListening = true;
-                this.emitDestroy();
+                this.stopFormListening = true
+                this.emitDestroy()
                 this.removeAllUnusedTempAttachments();
                 this.notify.info(this.l("SavedSuccessfully"));
                 if (
@@ -1191,76 +1125,58 @@ export class CreateOrEditAppItemComponent
                 this.goBack("app/main/products");
             });
     }
-    extraSelectedValuesExtraData() {
-        const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
-            ...this.extraAttributes.ADDITIONAL.extraAttributes,
-            ...this.extraAttributes.RECOMMENDED.extraAttributes,
-        ];
-        const previousExtraAttributes: AppEntityExtraDataDto[] =
-            this.appItem.entityExtraData || [];
-        this.appItem.entityExtraData = [];
-        recentlyExtraAttributes.forEach((extraAttr) => {
-            if (!extraAttr.selectedValues || extraAttr.isSelectedOnVariation)
-                return;
-            if (extraAttr.isLookup) {
-                // is lookup
-                if (extraAttr.acceptMultipleValues) {
-                    // multi selection
-                    extraAttr?.selectedValues?.forEach((attributeValueId) => {
-                        const alreadySelected: AppEntityExtraDataDto =
-                            previousExtraAttributes.filter((item) => {
-                                item.attributeValueId == attributeValueId;
-                            })[0];
-                        if (alreadySelected)
-                            return this.appItem.entityExtraData.push(
-                                alreadySelected
-                            );
-                        const entityExtraData: AppEntityExtraDataDto =
-                            new AppEntityExtraDataDto();
+    extraSelectedValuesExtraData(){
+        const recentlyExtraAttributes : FilteredExtraAttribute<any>[] = [...this.extraAttributes.ADDITIONAL.extraAttributes, ...this.extraAttributes.RECOMMENDED.extraAttributes]
+        const previousExtraAttributes : AppEntityExtraDataDto[] = this.appItem.entityExtraData || []
+        this.appItem.entityExtraData = []
+        recentlyExtraAttributes.forEach((extraAttr)=>{
+            if(!extraAttr.selectedValues || extraAttr.isSelectedOnVariation) return
+            if(extraAttr.isLookup){ // is lookup
+                if(extraAttr.acceptMultipleValues){ // multi selection
+                    extraAttr?.selectedValues?.forEach(attributeValueId => {
+                        const alreadySelected:AppEntityExtraDataDto = previousExtraAttributes.filter(item=>{
+                            item.attributeValueId == attributeValueId
+                        })[0]
+                        if(alreadySelected) return this.appItem.entityExtraData.push(alreadySelected)
+                        const entityExtraData : AppEntityExtraDataDto = new AppEntityExtraDataDto()
                         entityExtraData.id = 0;
                         entityExtraData.attributeValueId = attributeValueId;
                         entityExtraData.attributeId = extraAttr.attributeId;
-                        this.appItem.entityExtraData.push(entityExtraData);
+                        this.appItem.entityExtraData.push(entityExtraData)
                     });
-                } else {
-                    // single selection
-                    const alreadySelected: AppEntityExtraDataDto =
-                        previousExtraAttributes.filter((item) => {
-                            item.attributeId = extraAttr.attributeId;
-                        })[0];
-                    if (alreadySelected) {
-                        alreadySelected.attributeValueId =
-                            extraAttr?.selectedValues;
-                        this.appItem.entityExtraData.push(alreadySelected);
+                } else { // single selection
+                    const alreadySelected:AppEntityExtraDataDto = previousExtraAttributes.filter(item=>{
+                        item.attributeId = extraAttr.attributeId
+                    })[0]
+                    if(alreadySelected) {
+                        alreadySelected.attributeValueId =  extraAttr?.selectedValues;
+                        this.appItem.entityExtraData.push(alreadySelected)
                     } else {
-                        const entityExtraData: AppEntityExtraDataDto =
-                            new AppEntityExtraDataDto();
+                        const entityExtraData : AppEntityExtraDataDto = new AppEntityExtraDataDto()
                         entityExtraData.id = 0;
-                        entityExtraData.attributeValueId =
-                            extraAttr?.selectedValues;
+                        entityExtraData.attributeValueId = extraAttr?.selectedValues;
                         entityExtraData.attributeId = extraAttr.attributeId;
-                        this.appItem.entityExtraData.push(entityExtraData);
+                        this.appItem.entityExtraData.push(entityExtraData)
                     }
                 }
-            } else {
-                // any other not lookup data
-                const alreadySelected: AppEntityExtraDataDto =
-                    previousExtraAttributes.filter((item) => {
-                        item.attributeId = extraAttr?.attributeId;
-                    })[0];
-                if (alreadySelected) {
-                    alreadySelected.attributeValue = extraAttr?.selectedValues;
-                    this.appItem.entityExtraData.push(alreadySelected);
+            } else { // any other not lookup data
+                const alreadySelected:AppEntityExtraDataDto = previousExtraAttributes.filter(item=>{
+                    item.attributeId = extraAttr?.attributeId
+                })[0]
+                if(alreadySelected) {
+                    alreadySelected.attributeValue =  extraAttr?.selectedValues;
+                    this.appItem.entityExtraData.push(alreadySelected)
                 } else {
-                    const entityExtraData: AppEntityExtraDataDto =
-                        new AppEntityExtraDataDto();
+                    const entityExtraData : AppEntityExtraDataDto = new AppEntityExtraDataDto()
                     entityExtraData.id = 0;
                     entityExtraData.attributeValue = extraAttr?.selectedValues;
                     entityExtraData.attributeId = extraAttr.attributeId;
-                    this.appItem.entityExtraData.push(entityExtraData);
+                    this.appItem.entityExtraData.push(entityExtraData)
                 }
             }
-        });
+        })
+
+
     }
 
     showCreateOrEditVariationPage() {
@@ -1273,12 +1189,14 @@ export class CreateOrEditAppItemComponent
         ) {
             return this.notify.error(
                 this.l("ProductType") +
-                ' " ' +
-                this.selectedItemTypeData.name +
-                ' " ' +
-                this.l("doesnotHaveExtraAttributes.")
+                    ' " ' +
+                    this.selectedItemTypeData.name +
+                    ' " ' +
+                    this.l("doesnotHaveExtraAttributes.")
             );
         }
+
+
 
         this.showVariations();
     }
@@ -1299,82 +1217,43 @@ export class CreateOrEditAppItemComponent
         this.goBack("app/main/products");
     }
 
-    applyVariations($event: ApplyVariationOutput) {
+    applyVariations($event:ApplyVariationOutput) {
         this.appItem.variationItems = $event.variation;
         this.appItem.appItemSizesScaleInfo = $event.appItemSizesScaleInfo;
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
-        this.hideVariations(true);
-        this.updateProductAvailableQuantity();
-
-        if (
-            this.appItem.appItemPriceInfos.length ==
-            this.appItem?.variationItems[0]?.appItemPriceInfos.length &&
-            Object.values(this.appItem.appItemPriceInfos) !=
-            Object.values(
-                this.appItem?.variationItems[0]?.appItemPriceInfos
-            )
-        ) {
-            this.message.confirm(
-                "",
-                this.l("Do you want to save the updated price?"),
-                (isConfirmed) => {
-                    if (isConfirmed) this.updateProductPriceInfos();
-                }
-            );
-        }
-
-        this.sellVariationChecked = Boolean(this.appItem.variationItems.length);
+        this.hideVariations();
+        this.updateProductAvailableQuantity()
+        this.sellVariationChecked = Boolean(this.appItem.variationItems.length)
     }
-    updateProductAvailableQuantity() {
-        if (!this.appItem?.variationItems?.length) return;
-        this.appItem.stockAvailability = this.appItem.variationItems.reduce(
-            (accum, item) => {
-                return (accum += isNaN(item.stockAvailability)
-                    ? 0
-                    : item.stockAvailability);
-            },
-            0
-        );
-    }
-    updateProductPriceInfos() {
-        if (!this.appItem?.appItemPriceInfos?.length) return;
-        this.appItem.appItemPriceInfos =
-            this.appItem?.variationItems[0]?.appItemPriceInfos;
+    updateProductAvailableQuantity(){
+        if(!this.appItem?.variationItems?.length) return
+        this.appItem.stockAvailability = this.appItem.variationItems.reduce((accum,item)=>{
+            return accum += isNaN(item.stockAvailability) ? 0 : item.stockAvailability;
+        },0)
     }
 
-
-    hideVariations($event) {
-        if ($event?.target?.files.length == 0)
-            return;
+    hideVariations() {
         this.displayVariations = false;
     }
-
-    allCurrencies: CurrencyInfoDto[] = [];
-    getCurrencies() {
-        return this._appEntitiesServiceProxy
-            .getAllCurrencyForTableDropdown()
-            .subscribe((result) => {
-                this.allCurrencies = result.map((item) => {
-                    item.label = item.label + " " + (item.symbol || "");
-                    return item;
-                });
-            });
+    allCurrencies : CurrencyInfoDto[] = []
+    getCurrencies(){
+        return this._appEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result=>{
+            this.allCurrencies = result.map((item)=>{
+                item.label = item.label + ' ' + (item.symbol || '')
+                return item
+            })
+        })
     }
-    selectedCurrencies: CurrencyInfoDto[] = [];
+    selectedCurrencies : CurrencyInfoDto[] = []
     showVariations() {
-        this.appItem.appItemPriceInfos.forEach((priceDto) => {
-            const currencyId = priceDto.currencyId;
-            const alreadyAdded: boolean =
-                this.selectedCurrencies.findIndex(
-                    (item) => item.value == currencyId
-                ) > -1;
-            let currency = this.allCurrencies.filter(
-                (curr) => curr.value == currencyId
-            )[0];
-            if (currency && !alreadyAdded) {
-                this.selectedCurrencies.push(currency);
+        this.appItem.appItemPriceInfos.forEach((priceDto)=>{
+            const currencyId = priceDto.currencyId
+            const alreadyAdded : boolean = this.selectedCurrencies.findIndex(item=>item.value == currencyId) > -1
+            let currency = this.allCurrencies.filter(curr=>curr.value == currencyId)[0]
+            if(currency && !alreadyAdded) {
+                this.selectedCurrencies.push(currency)
             }
-        });
+        })
         this.formTouched = true;
         this.displayVariations = true;
     }
@@ -1445,61 +1324,58 @@ export class CreateOrEditAppItemComponent
                 modalRef.content;
             if (modalRefData.selectionDone)
                 extraAttr.selectedValues = modalRefData.selectedRecords;
-            // if(extraAttr.acceptMultipleValues){ // multi selection
-            //     const selectedValues : number[] =  extraAttr.selectedValues
-            //     selectedValues.forEach(selectedValue => {
-            //         const selectedValueIndex = this.appItem.entityExtraData.findIndex(
-            //             (elem) => elem.attributeValueId != selectedValue
-            //         );
+                // if(extraAttr.acceptMultipleValues){ // multi selection
+                //     const selectedValues : number[] =  extraAttr.selectedValues
+                //     selectedValues.forEach(selectedValue => {
+                //         const selectedValueIndex = this.appItem.entityExtraData.findIndex(
+                //             (elem) => elem.attributeValueId != selectedValue
+                //         );
 
-            //         if(selectedValueIndex > -1) return
+                //         if(selectedValueIndex > -1) return
 
-            //         const newExtraData = new AppEntityExtraDataDto();
-            //         // newExtraData.attributeId = extraAttrDefinition.attributeId
-            //         // newExtraData.attributeValueId = selectedAttrValue
-            //         newExtraData.id = 0
+                //         const newExtraData = new AppEntityExtraDataDto();
+                //         // newExtraData.attributeId = extraAttrDefinition.attributeId
+                //         // newExtraData.attributeValueId = selectedAttrValue
+                //         newExtraData.id = 0
 
-            //         this.appItem.entityExtraData.push(newExtraData);
-            //     });
-            // } else { // single selction
-            //     const selectedValue : number =  extraAttr.selectedValues
+                //         this.appItem.entityExtraData.push(newExtraData);
+                //     });
+                // } else { // single selction
+                //     const selectedValue : number =  extraAttr.selectedValues
 
-            //     const selectedValueAsEntityExtraData = this.appItem.entityExtraData.filter(
-            //         (elem) => elem.attributeValueId != extraAttr.attributeId
-            //     );
+                //     const selectedValueAsEntityExtraData = this.appItem.entityExtraData.filter(
+                //         (elem) => elem.attributeValueId != extraAttr.attributeId
+                //     );
 
-            //     if( selectedValueAsEntityExtraData.length > 0) {
-            //         selectedValueAsEntityExtraData[0].attributeValueId = selectedValue
-            //     } else {
-            //         const newExtraData = new AppEntityExtraDataDto();
-            //         newExtraData.attributeId = extraAttr.attributeId
-            //         newExtraData.attributeValueId = selectedValue
-            //         newExtraData.id = 0
-            //         this.appItem.entityExtraData.push(newExtraData);
-            //     }
-            // }
+                //     if( selectedValueAsEntityExtraData.length > 0) {
+                //         selectedValueAsEntityExtraData[0].attributeValueId = selectedValue
+                //     } else {
+                //         const newExtraData = new AppEntityExtraDataDto();
+                //         newExtraData.attributeId = extraAttr.attributeId
+                //         newExtraData.attributeValueId = selectedValue
+                //         newExtraData.id = 0
+                //         this.appItem.entityExtraData.push(newExtraData);
+                //     }
+                // }
 
             if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
     askToPublish() {
         var isConfirmed: Observable<boolean>;
-        isConfirmed = this.askToConfirm(
-            this.l(
-                `Savedsuccessfully,AreYouWantToPublishYourProductListingow?`
-            ),
-            "",
-            {
-                confirmButtonText: this.l("PublishNow"),
-                cancelButtonText: this.l("Later"),
-            }
-        );
+        isConfirmed   = this.askToConfirm( this.l(
+            `Savedsuccessfully,AreYouWantToPublishYourProductListingow?`
+        ),"",
+        {
+            confirmButtonText: this.l("PublishNow"),
+            cancelButtonText: this.l("Later"),
+        });
 
-        isConfirmed.subscribe((res) => {
-            if (res) {
-                this.openShareProductListingModal();
+        isConfirmed.subscribe((res)=>{
+            if(res){
+                    this.openShareProductListingModal();
             }
-            //this._router.navigate(["/app/main/appItem"]);
+                //this._router.navigate(["/app/main/appItem"]);
             else this.goBack("app/main/products");
         });
     }
@@ -1541,78 +1417,48 @@ export class CreateOrEditAppItemComponent
     }
 
     getCodeValue(code: string) {
-        this.appItem.code = code;
+        this.appItem.code= code;
         this.setVariationCode();
-    }
+      }
 
     setVariationCode() {
         if (this.appItem?.variationItems?.length > 0)
             var subCode = this.appItem?.variationItems[0]?.code.split("-");
-        if (subCode && subCode[0] == this.appItem?.code) return;
+        if (subCode && subCode[0] == this.appItem?.code)
+            return;
         for (var i = 0; i < this.appItem?.variationItems?.length; i++) {
-            for (
-                var j = 0;
-                j < this.appItem?.variationItems[i]?.entityExtraData?.length;
-                j++
-            ) {
+            for (var j = 0; j < this.appItem?.variationItems[i]?.entityExtraData?.length; j++) {
                 if (j == 0) {
                     if (this.appItem?.code)
-                        this.appItem.variationItems[i].code = this.appItem.code;
-                    else this.appItem.variationItems[i].code = "";
+                    this.appItem.variationItems[i].code = this.appItem.code;
+                    else
+                    this.appItem.variationItems[i].code = "";
                 }
-                this.appItem.variationItems[i].code +=
-                    "-" +
-                    this.appItem?.variationItems[i]?.entityExtraData[j]
-                        ?.attributeValue;
+                this.appItem.variationItems[i].code += "-" + this.appItem?.variationItems[i]?.entityExtraData[j]?.attributeValue;
             }
         }
     }
-    checkDefaultCurrencyMSRPPriceIndex() {
-        this.defaultCurrencyMSRPPriceIndex =
-            this._pricingHelperService.getDefaultPricingIndex(
-                this.appItem.appItemPriceInfos
-            );
+    checkDefaultCurrencyMSRPPriceIndex(){
+        this.defaultCurrencyMSRPPriceIndex = this._pricingHelperService.getDefaultPricingIndex(this.appItem.appItemPriceInfos)
     }
-    stockAvailabilityChanged($event) {
-        if (this.appItem.stockAvailability < 0)
-            this.notify.error("Available Qty should be >=0");
+    stockAvailabilityChanged($event){
+        if(this.appItem.stockAvailability < 0) this.notify.error('Available Qty should be >=0')
     }
-    checkAndAddDefaultPriceObject() {
-        if (
-            !this.appItem.appItemPriceInfos ||
-            !this.appItem.appItemPriceInfos.length
-        ) {
-            this.appItem.appItemPriceInfos = [
-                this._pricingHelperService.getDefaultPricingInstance(),
-            ];
+    checkAndAddDefaultPriceObject(){
+        if(!this.appItem.appItemPriceInfos || !this.appItem.appItemPriceInfos.length){
+            this.appItem.appItemPriceInfos = [this._pricingHelperService.getDefaultPricingInstance()]
         }
-        this.checkDefaultCurrencyMSRPPriceIndex();
+        this.checkDefaultCurrencyMSRPPriceIndex()
     }
-    showAdvancedPricingModal() {
-        this.showAdvancedPricing = true;
+    showAdvancedPricingModal(){
+        this.showAdvancedPricing = true
     }
-    hideAdvancedPricingModal() {
-        this.showAdvancedPricing = false;
+    hideAdvancedPricingModal(){
+        this.showAdvancedPricing = false
     }
-    productAdvancedPriceChangesHandler($event: AppItemPriceInfo[]) {
-        this.showAdvancedPricing = false;
-        this.appItem.appItemPriceInfos = $event;
-        if (this.updateVariation) {
-            this.appItem.variationItems.forEach((variation) => {
-                if (this.updateVariation) {
-                    variation.appItemPriceInfos = this.getParentProductPrices();
-                }
-            });
-        }
-        this.checkAndAddDefaultPriceObject();
-    }
-
-    getParentProductPrices() {
-        return this.appItem.appItemPriceInfos.map((item) =>
-            AppItemPriceInfo.fromJS({ ...item, id: 0 } as IAppItemPriceInfo)
-        );
-    }
-    onUpdateVariation($event) {
-        this.updateVariation = $event;
+    productAdvancedPriceChangesHandler($event:AppItemPriceInfo[]){
+        this.showAdvancedPricing = false
+        this.appItem.appItemPriceInfos = $event
+        this.checkAndAddDefaultPriceObject()
     }
 }

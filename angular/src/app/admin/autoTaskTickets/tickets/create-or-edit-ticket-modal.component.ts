@@ -7,7 +7,7 @@ import * as moment from 'moment';
 import { AppConsts } from '@shared/AppConsts';
 import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { FileUploader, FileUploaderOptions, FileItem } from 'ng2-file-upload';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 
 @Component({
     selector: 'createOrEditTicketModal',
@@ -28,6 +28,7 @@ export class CreateOrEditTicketModalComponent extends AppComponentBase  implemen
 
     ticketAttachments= [];
     public uploader: FileUploader;
+    private _uploaderOptions: FileUploaderOptions = {};
     ngOnInit(): void {
         this.initUploaders();
 

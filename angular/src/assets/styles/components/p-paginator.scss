@@ -1,43 +1,43 @@
-@import '../base/variables';
+@import './base/variables';
 
 //this is override to p-paginator of the ngprime library
 
-body  p-paginator {
+body .custom-paginator p-paginator {
     // parent element
-    .p-paginator	 {
+    .ui-paginator	 {
         background-color: $paginator-bg!important;
         border: 0!important;
         padding: 1rem;
         // floating all the elements left except dropdown
-        .p-paginator-element,
-        .p-paginator-pages {
+        .ui-paginator-element,
+        .ui-paginator-pages {
             float: left;
         }
         // every element on the paginator except dropdown
-        .p-paginator-element {
+        .ui-paginator-element {
             margin-right: 1rem!important;
             border-radius: .4rem !important;
         }
         //paginator buttons
-        .p-paginator-first,
-        .p-paginator-next,
-        .p-paginator-prev,
-        .p-paginator-last	 {
+        .ui-paginator-first,
+        .ui-paginator-next,
+        .ui-paginator-prev,
+        .ui-paginator-last	 {
             background-color: $pagiantor-paginate-btns-bg!important;
-            &.p-disabled {
+            &.ui-state-disabled {
                 background-color: $pagiantor-paginate-btns-bg-disabled!important;
             }
         }
         //every page number
-        .p-paginator-page	 {
+        .ui-paginator-page	 {
             background-color: $pagiantor-page-bg!important;
             border: 1px solid $pagiantor-page-border-color!important;
             color: $pagiantor-page-color!important;
-            // &.p-state-active {
-            //     background-color: $pagiantor-page-bg-active!important;
-            //     border: 1px solid $pagiantor-page-border-color-active!important;
-            //     color: $pagiantor-page-color-active!important;
-            // }
+            &.ui-state-active {
+                background-color: $pagiantor-page-bg-active!important;
+                border: 1px solid $pagiantor-page-border-color-active!important;
+                color: $pagiantor-page-color-active!important;
+            }
         }
         //paginator icons
         .pi-caret-left:before {
@@ -55,11 +55,11 @@ body  p-paginator {
     }
     p-dropdown {
         float: right;
-        // .p-dropdown-label {
-        //     padding-right: 3rem!important;
-        // }
-        .p-dropdown-label,
-        .p-dropdown-trigger {
+        .ui-dropdown-label {
+            padding-right: 3rem!important;
+        }
+        .ui-dropdown-label,
+        .ui-dropdown-trigger.ui-state-default.ui-corner-right {
             background-color: $pagiantor-paginate-btns-bg-disabled;
         }
         .pi-chevron-down{
@@ -69,17 +69,4 @@ body  p-paginator {
     &::after {
         clear: both;
     }
-}
-button.p-ripple.p-element.p-paginator-page.p-paginator-element.p-link.p-highlight {
-    background-color: #fff!important;
-    border: 1px solid #3699ff!important;
-    color: #3699ff!important;
-    border-radius: 5px;
-}
-.primeng-datatable-container .primeng-paging-container .p-paginator .p-dropdown {
-    height: 2.357rem;
-}
-
-.primeng-datatable-container .primeng-paging-container .p-paginator .p-dropdown {
-    height: 2.357rem!important;
 }

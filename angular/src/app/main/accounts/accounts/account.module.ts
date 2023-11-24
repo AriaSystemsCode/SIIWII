@@ -30,7 +30,7 @@ import { Ng2TelInputModule } from 'ng2-tel-input';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { TreeviewModule } from 'ngx-treeview';
 import { TreeModule } from 'primeng/tree';
-import { CheckboxModule } from 'primeng/checkbox';
+import { CheckboxModule } from 'primeng';
 import { ImageCropperModule } from 'ngx-image-cropper';
 import { BulkImportModule } from '../../../../shared/components/import-steps/bulk-import.module';
 import { MyAccountsComponent } from './components/my-accounts.component';

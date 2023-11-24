@@ -5,7 +5,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, BranchDto, CreateOrEditAccountInfoDto, LookupLabelDto, TreeNodeOfBranchForViewDto, TreeviewItem } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
-import { TreeTable } from 'primeng/treetable';
+import { TreeNode, TreeTable } from 'primeng';
 import { Observable, Subscription } from 'rxjs';
 import { BranchDetailsDynamicModalComponent } from './branch-details-dynamic-modal.component';
 import { CreateOrEditBranchModalComponent } from './create-or-edit-branch-modal.component';

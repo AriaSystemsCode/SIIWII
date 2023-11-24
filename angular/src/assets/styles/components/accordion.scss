@@ -1,7 +1,7 @@
-body .p-accordion {
+body .ui-accordion {
     margin-bottom: 0;
     padding: 0;
-    .p-accordion-header {
+    .ui-accordion-header {
         margin-bottom: 0;
         padding-top: 0;
         a {
@@ -20,15 +20,14 @@ body .p-accordion {
             }
         }
     }
-    .p-accordion-content {
+    .ui-accordion-content {
         margin-bottom: 20px;
-        border: none;
     }
-    .p-accordion-content-wrapper {
+    .ui-accordion-content-wrapper {
         margin-top: -20px;
         margin-bottom: 20px;
     }
-    .p-accordion-toggle-icon {
+    .ui-accordion-toggle-icon {
         color: #464e5f !important;
         border: none !important;
     }

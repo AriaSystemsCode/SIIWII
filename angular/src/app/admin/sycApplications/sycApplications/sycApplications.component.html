@@ -88,7 +88,7 @@
                                      [lazy]="true"
                                      [scrollable]="true"
                                      ScrollWidth="100%"
-                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [responsive]="primengTableHelper.isResponsive"
                                      [resizableColumns]="primengTableHelper.resizableColumns">
                             <ng-template pTemplate="header">
                                 <tr>
@@ -133,15 +133,15 @@
                                         </div>
                                     </td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('Code')}}</span>
+											<span class="ui-column-title"> {{l('Code')}}</span>
 											{{record.sycApplication.code}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('Name')}}</span>
+											<span class="ui-column-title"> {{l('Name')}}</span>
 											{{record.sycApplication.name}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('Notes')}}</span>
+											<span class="ui-column-title"> {{l('Notes')}}</span>
 											{{record.sycApplication.notes}}
 										</td>
 

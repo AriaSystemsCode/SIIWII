@@ -20,7 +20,7 @@
                                 [busyIf]="primengTableHelper.isLoading"  *ngIf="!dataLoading">
                                 <p-table #ExpiringTenantsTable [value]="expiringTenantsData.expiringTenants"
                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false" 
-                                    [lazy]="false" responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                    [lazy]="false" [responsive]="primengTableHelper.isResponsive">
                                     <ng-template pTemplate="header">
                                         <tr>
                                             <th>{{'TenantName' | localize}}</th>
@@ -30,12 +30,12 @@
                                     <ng-template pTemplate="body" let-record="$implicit">
                                         <tr>
                                             <td>
-                                                <span class="p-column-title">{{'TenantName' | localize}}</span>
+                                                <span class="ui-column-title">{{'TenantName' | localize}}</span>
                                                 {{record.tenantName}}
                                             </td>
                                             <td>
                                                 <span
-                                                    class="p-column-title">{{'RemainingDay' | localize}}</span>
+                                                    class="ui-column-title">{{'RemainingDay' | localize}}</span>
                                                 {{record.remainingDayCount}}
                                             </td>
                                         </tr>

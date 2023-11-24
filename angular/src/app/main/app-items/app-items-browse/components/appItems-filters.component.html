@@ -13,21 +13,6 @@
         </app-tree-single-selection-filter>
     </div>
 
-    <!-- Fix Issue T-SII-20230618.0001  -->
-    <!-- <div class="mb-4" *ngIf="filtersFlags?.appItemSizeScale">
-        <app-tree-multi-selection-filter
-            #SizeScaleFilter
-            [filterMetaData]="sizeScaleFilterMetaData"
-            [formContol]="filterForm.controls.appItemSizeScale"
-            [title]="'Size Scale' | localize"
-            (onLoadData)="getSizeScaleList(SizeScaleFilter)"
-            (onLoadNode)="loadSizeScaleNode($event)"
-        >
-        </app-tree-multi-selection-filter>
-    </div> -->
-    <!-- Fix Issue T-SII-20230618.0001  -->
-
-
     <div class="mb-4" *ngIf="filtersFlags?.categories">
         <app-tree-multi-selection-filter
             #CategoryFilter
@@ -78,20 +63,29 @@
     </ng-container>
 
 
+    <div class="mb-4"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyItems && filtersFlags?.listingStatus">
+        <app-single-selection-filter
+            #listingStatusFilter
+            [filterMetaData]="listingStatusFilterMetaData"
+            [formContol]="filterForm.controls.listingStatus"
+            [title]="'Status' | localize"
+            (onLoadData)="getListingStatusOptionsList(listingStatusFilter)"
+        >
+        </app-single-selection-filter>
+    </div>
 
-
-    <div class="mb-4" *ngIf="filtersFlags?.publishStatus" >
+    <div class="mb-4"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyListing  && filtersFlags?.publishStatus">
         <app-single-selection-filter
             #publishStatusFilter
             [filterMetaData]="publishStatusFilterMetaData"
             [formContol]="filterForm.controls.publishStatus"
-            [title]="'Sharing Status'"
+            [title]="'Publicity' | localize"
             (onLoadData)="getPublishOptionsList(publishStatusFilter)"
         >
         </app-single-selection-filter>
     </div>
 
-    <!-- <div class="mb-4"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyListing && filtersFlags?.visibilityStatus">
+    <div class="mb-4"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyListing && filtersFlags?.visibilityStatus">
         <app-single-selection-filter
             #visibilityStatusFilter
             [filterMetaData]="visibilityStatusFilterMetaData"
@@ -100,6 +94,6 @@
             (onLoadData)="getVisibiltyOptionsList(visibilityStatusFilter)"
         >
         </app-single-selection-filter>
-    </div> -->
+    </div>
 
 </form>

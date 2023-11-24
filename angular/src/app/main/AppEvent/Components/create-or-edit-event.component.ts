@@ -22,7 +22,6 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import * as moment from "moment";
 import { MenuItem, SelectItem } from "primeng/api";
-
 import { ModalDirective } from "ngx-bootstrap/modal";
 import { NgForm } from "@angular/forms";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
@@ -80,11 +79,6 @@ export class CreateOrEditEventComponent
     fromDate: Date;
     toDate: Date;
     fromTime: Date;
-    fromHour: number;
-    fromMinute: number;    
-    toHour: number;
-    toMinute: number;
-
     toTime: Date;
     allTimeZone: SelectItem[];
     publishEvent:boolean = true
@@ -177,10 +171,6 @@ export class CreateOrEditEventComponent
             this.fromDate = new Date();
             this.toDate = new Date();
             this.fromTime = new Date();
-            this.fromHour = new Date().getHours();        
-            this.toHour = new Date().getHours();
-            this.fromMinute = new Date().getMinutes();
-            this.toMinute = new Date().getMinutes();
             this.toTime = new Date();
             this.event.fromDate = moment(new Date());
             this.event.toDate = moment(new Date());
@@ -228,12 +218,6 @@ export class CreateOrEditEventComponent
                 this.toDate = this.event.toDate.toDate()
                 this.fromTime = this.event.fromTime.toDate()
                 this.toTime = this.event.toTime.toDate()
-                
-                this.fromHour = this.fromTime.getHours();        
-                this.toHour = this.toTime.getHours();
-                this.fromMinute = this.fromTime.getMinutes();
-                this.toMinute = this.toTime.getMinutes();
-
                 this.minDate = this.fromDate
                 this.ProfileImg = this.attachmentBaseUrl + '/' + res.appEvent.logoURL
                 this.coverPhoto = this.attachmentBaseUrl + '/' + res.appEvent.banarURL
@@ -287,13 +271,6 @@ export class CreateOrEditEventComponent
         this.event.toDate = moment(this.toDate);
         this.event.fromTime = moment(this.fromTime);
         this.event.toTime = moment(this.toTime);
-
-        this.event.fromHour = this.fromTime.getHours();        
-        this.event.toHour = this.toTime.getHours();
-        this.event.fromMinute = this.fromTime.getMinutes();
-        this.event.toMinute = this.toTime.getMinutes();
-
-
         this.event.privacy = false;
         this.onUploadAttachmets( this.event.id || (!this.event.id && !this.publishEvent) ? this.createEvent.bind(this) : this.isPublishedCreatePost.bind(this) );
     }

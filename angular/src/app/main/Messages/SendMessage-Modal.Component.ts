@@ -52,7 +52,6 @@ import { DemoUiEditorComponent } from "@app/admin/demo-ui-components/demo-ui-edi
 import { empty } from "rxjs";
 import { AppConsts } from "@shared/AppConsts";
 import * as moment from "moment";
-import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
 
 @Component({
     selector: "SendMessageModal",
@@ -69,6 +68,7 @@ export class SendMessageModalComponent
     @ViewChild("demoUiEditor", { static: true })
     demoUiEditor: DemoUiEditorComponent;
     public uploader: FileUploader;
+    private _uploaderOptions: FileUploaderOptions = {};
     @Output() modalSave: EventEmitter<any> = new EventEmitter<any>();
     active: boolean;
     displayCC: boolean = false;
@@ -85,7 +85,6 @@ export class SendMessageModalComponent
     data = [];
     replyMessageId: number = 0;
     threadId: number = 0;
-    attachmentsUploader: FileUploaderCustom;
 
     constructor(
         injector: Injector,
@@ -96,7 +95,7 @@ export class SendMessageModalComponent
     }
 
     ngOnInit(): void {
-      //  this.initUploaders();
+        this.initUploaders();
     }
     mesasgeObjectType: MesasgeObjectType = MesasgeObjectType.Message
     show(id?: number, threadId?: number, forward?: boolean,mesasgeObjectType?: MesasgeObjectType) {
@@ -316,7 +315,7 @@ export class SendMessageModalComponent
     //     return expression;
     // }
 
-   /*  initUploaders(): void {
+    initUploaders(): void {
         this.uploader = this.createUploader(
             "/Attachment/UploadFiles",
             (result) => {
@@ -324,8 +323,8 @@ export class SendMessageModalComponent
                 // this.appSession.tenant.logoId = result.id;
             }
         );
-    } */
-  /*   createUploader(url: string, success?: (result: any) => void): FileUploader {
+    }
+    createUploader(url: string, success?: (result: any) => void): FileUploader {
         const uploader = new FileUploader({
             url: AppConsts.remoteServiceBaseUrl + url,
         });
@@ -346,12 +345,12 @@ export class SendMessageModalComponent
             }
         };
 
-        const uploaderOptions: Partial<FileUploaderOptions> = {};
+        const uploaderOptions: FileUploaderOptions = {};
         uploaderOptions.authToken = "Bearer " + this._tokenService.getToken();
         uploaderOptions.removeAfterUpload = true;
-        uploader.setOptions(uploaderOptions as FileUploaderOptions);
+        uploader.setOptions(uploaderOptions);
         return uploader;
-    } */
+    }
 
     close(): void {
         this.SendMessageModal.hide();
@@ -367,114 +366,67 @@ export class SendMessageModalComponent
     showBCC(): void {
         this.displayBCC = true;
     }
-    // guid(): string {
-    //     function s4() {
-    //         return Math.floor((1 + Math.random()) * 0x10000)
-    //             .toString(16)
-    //             .substring(1);
-    //     }
-    //     return (
-    //         s4() +
-    //         s4() +
-    //         "-" +
-    //         s4() +
-    //         "-" +
-    //         s4() +
-    //         "-" +
-    //         s4() +
-    //         "-" +
-    //         s4() +
-    //         s4() +
-    //         s4()
-    //     );
-    // }
-    // handleInputChangeAttachment(e) {
-    //     if (e.target.files.length === 0) return;
-    //     var file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
-    //     this.attachments.push(e.target.files[0]);
-    //     this.uploader.addToQueue(e.target.files);
-
-    //     let guid = this.guid();
-    //     this.uploader.onBuildItemForm = (fileItem: any, form: any) => {
-    //         form.append("guid", guid);
-    //     };
-
-    //     this.uploader.uploadAll();
-
-    //     var pattern = /image-*/;
-    //     var reader = new FileReader();
-    //     // if (!file.type.match(pattern)) {
-    //     //   alert('invalid format');
-    //     //   return;
-    //     // }
-    //     reader.onload = this._handleReaderLoadedAttachment.bind(this);
-    //     reader.readAsDataURL(file);
-    //     let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-    //     att.fileName = e.target.files[0].name;
-    //     att.attachmentCategoryId = 4;
-    //     att.guid = guid;
-    //     if (
-    //         this.messages.entityAttachments == null ||
-    //         this.messages.entityAttachments == undefined
-    //     ) {
-    //         this.messages.entityAttachments = [];
-    //     }
-    //     this.messages.entityAttachments.push(att);
-    // }
+    guid(): string {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        return (
+            s4() +
+            s4() +
+            "-" +
+            s4() +
+            "-" +
+            s4() +
+            "-" +
+            s4() +
+            "-" +
+            s4() +
+            s4() +
+            s4()
+        );
+    }
     handleInputChangeAttachment(e) {
         if (e.target.files.length === 0) return;
-        for (let i = 0; i < e.target.files.length; i++) {
-        var file = e.dataTransfer ? e.dataTransfer.files[i] : e.target.files[i];
-        this.attachments.push(e.target.files[i]);  
+        var file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
+        this.attachments.push(e.target.files[0]);
+        this.uploader.addToQueue(e.target.files);
+
+        let guid = this.guid();
+        this.uploader.onBuildItemForm = (fileItem: any, form: any) => {
+            form.append("guid", guid);
+        };
+
+        this.uploader.uploadAll();
+
+        var pattern = /image-*/;
+        var reader = new FileReader();
+        // if (!file.type.match(pattern)) {
+        //   alert('invalid format');
+        //   return;
+        // }
+        reader.onload = this._handleReaderLoadedAttachment.bind(this);
+        reader.readAsDataURL(file);
+        let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
+        att.fileName = e.target.files[0].name;
+        att.attachmentCategoryId = 4;
+        att.guid = guid;
+        if (
+            this.messages.entityAttachments == null ||
+            this.messages.entityAttachments == undefined
+        ) {
+            this.messages.entityAttachments = [];
+        }
+        this.messages.entityAttachments.push(att);
     }
-}
-
-
 
     _handleReaderLoadedAttachment(e) {
         let reader = e.target;
         // this.imageFeaturedImageSrc = reader.result;
         // this.featuredImageControl.setValue(this.imageFeaturedImageSrc)
     }
-    onUploadAttachmets(){
-            var uploadUrl = "/Attachment/UploadFiles";
-            this.attachmentsUploader = this.createCustomUploader(uploadUrl);
-    
-            this.attachmentsUploader.addToQueue(this.attachments);
-            this.attachmentsUploader.onBuildItemForm = (
-                fileItem: any,
-                form: any
-            ) => {
-             
-                for (let i = 0; i < this.attachments.length; i++) {
-                    var guid = this.guid();
-                    let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-                    att.fileName = this.attachments[i].name;
-                    att.attachmentCategoryId = 4;
-                    att.guid = guid;
-                    if (
-                        this.messages.entityAttachments == null ||
-                        this.messages.entityAttachments == undefined
-                    ) {
-                        this.messages.entityAttachments = [];
-                    }
-                    this.messages.entityAttachments.push(att);
-
-                    if (this.attachments.length > 1) form.append("guid" + i, guid);
-                    else form.append("guid", guid);
-                }
-            };
-    
-            this.attachmentsUploader.onErrorItem = (item, response, status) => {
-                this.notify.error(this.l("UploadFailed"));
-            };
-
-            this.attachmentsUploader.uploadAllFiles();
-    }
-
     sendMessage(): void {
-        this.showMainSpinner();
-        this.onUploadAttachmets();
         let ToList = "";
         let CCList = "";
         let BCCList = "";
@@ -511,7 +463,7 @@ export class SendMessageModalComponent
 
         this._MessageServiceProxy
             .createMessage(this.messages)
-            .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();}))
+            .pipe(finalize(() => (this.saving = false)))
             .subscribe(() => {
                 this.notify.info(this.l("SendSuccessfully"));
                 this.SendMessageModal.hide();

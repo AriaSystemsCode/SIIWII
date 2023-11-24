@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import {BulkImportRoutingModule } from './bulk-import-routing.module';
 import { MainImportComponent } from './components/mainImport.component'
 import { BrowseFolderComponent } from './components/browseFolder.component'
@@ -15,18 +16,15 @@ import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { UtilsModule } from '@shared/utils/utils.module';
 import CountoModule from 'angular2-counto';
 import { NgImageSliderModule } from 'ng-image-slider';
+import { Ng2TelInputModule } from 'ng2-tel-input';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { ImageCropperModule } from 'ngx-image-cropper';
+import {  FileUploadModule, AutoCompleteModule, PaginatorModule, EditorModule, MultiSelectModule, DropdownModule, InputMaskModule, TableModule, TreeTableModule, TabMenuModule, TreeModule, CheckboxModule } from 'primeng';
 import { AccountsImport } from './services/accountsImport.service';
 import { itemsImport } from './services/itemsImport.service';
-import { CheckboxModule } from 'primeng/checkbox';
-import { TreeModule } from 'primeng/tree';
-import { DropdownModule } from 'primeng/dropdown';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { FileUploadModule } from 'ng2-file-upload';
 
 @NgModule({
     declarations: [

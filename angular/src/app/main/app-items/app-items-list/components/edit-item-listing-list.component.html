@@ -1,7 +1,11 @@
 <form #listForm="ngForm" (ngSubmit)="createOrEditAppItemList(listForm)">
     <div [@routerTransition] style="margin-top: -90px" class="wrapper">
         <div
-            class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
+            class="
+                kt-content
+                kt-grid__item kt-grid__item--fluid
+                kt-grid kt-grid--hor
+            "
         >
             <div class="kt-subheader kt-grid__item">
                 <div [class]="containerClass">
@@ -17,7 +21,10 @@
                             </a>
                         </h3>
                         <span
-                            class="kt-subheader__separator kt-subheader__separator--v"
+                            class="
+                                kt-subheader__separator
+                                kt-subheader__separator--v
+                            "
                         ></span>
                         <span class="kt-subheader__desc">
                             {{ "ManageMyLists" | localize }}
@@ -36,22 +43,15 @@
                             {{ list?.appItemsList?.name }}
                         </span>
                         <span
-                            class="kt-subheader__separator kt-subheader__separator--v"
+                            class="
+                                kt-subheader__separator
+                                kt-subheader__separator--v
+                            "
                         ></span>
-                        <span>
-                            <div class="share-level px-2"  >
-                                <span *ngIf="list?.appItemsList?.sharingLevel === 1 || list?.appItemsList?.sharingLevel === 2 " > Shared  <div class="shared-dot"></div> </span>
-                                <span *ngIf="list?.appItemsList?.sharingLevel === 3 " > Private  <div class="private-dot"></div> </span>
-                                <span *ngIf="list?.appItemsList?.sharingLevel === 4 " > Hidden <div class="hidden-dot"></div> </span>
-                                <span  *ngIf="list?.appItemsList?.sharingLevel === null || list?.appItemsList?.sharingLevel === 0 "   > Not Shared </span>
-                            </div>
-                        </span>
-                        <!-- <span class="ml-1 mr-3">
-                            {{
-                                !loading && list?.appItemsList?.published
-                                    ? l("Published")
-                                    : l("NotPublished")
-                            }} tes
+                        <span 
+                            class="ml-1 mr-3"
+                        >
+                            {{ !loading && list?.appItemsList?.published ? l("Published")  : l('NotPublished') }}
                             <span class="ml-2">
                                 <i
                                     class="d-inline-flex flaticon2-information rounded-circle text-white"
@@ -62,56 +62,20 @@
                                     "
                                 ></i>
                             </span>
-                        </span> -->
-                        <span
-                            class="kt-subheader__separator kt-subheader__separator--v"
-                            *ngIf="
-                                !loading &&
-                                list?.appItemsList?.statusCode &&
-                                viewMode
-                            "
-                        ></span>
-                        <span *ngIf="viewMode" class="ml-1 mr-3 text-success">
-                            {{
-                                !loading && list?.appItemsList?.statusCode
-                                    ? l(
-                                          list?.appItemsList?.statusCode
-                                              | titlecase
-                                      )
-                                    : ""
-                            }}
                         </span>
-                    </div>
-                    <div
-                        class="share-sync my-3 d-flex flex-column align-items-center gap-3 justify-content-end w-50"
-                    >
-                        <div class="d-flex align-items-center gap-3 w-100 justify-content-end">
-                            <button
-                                pButton
-                                pRipple
-                                label="Share"
-                                class="share mr-2"
-                                icon="pi pi-share-alt"
-                                type="button"
-                                (click)="openShareProductListingModal()"
-                            ></button>
-                            <button
-                                pButton
-                                pRipple
-                                label="Sync"
-                                class="sync"
-                                type="button"
-                                icon="pi pi-sync"
-                                [loading]="btnLoader"
-                                [disabled]="!list.showSync"
-                                (click)="syncProduct()"
-                            ></button>
-                        </div>
-                        <div
-                            class="last-updated my-3 d-flex align-items-center gap-3 justify-content-end w-100"
+                        <span
+                            class="
+                                kt-subheader__separator
+                                kt-subheader__separator--v
+                            "
+                            *ngIf="!loading && list?.appItemsList?.statusCode && viewMode"
+                        ></span>
+                        <span 
+                            *ngIf="viewMode"
+                            class="ml-1 mr-3 text-success"
                         >
-                            <p>Last Edit {{ lastUpdatedDate }}</p>
-                        </div>
+                            {{ !loading && list?.appItemsList?.statusCode ? l(list?.appItemsList?.statusCode  | titlecase)  : '' }}
+                        </span>
                     </div>
                     <div class="kt-subheader__toolbar" *ngIf="!viewMode">
                         <div class="kt-subheader__wrapper">
@@ -156,10 +120,19 @@
                     <div class="kt-portlet__body">
                         <div class="row">
                             <div
-                                class="col-10 d-flex flex-column justify-content-between"
+                                class="
+                                    col-10
+                                    d-flex
+                                    flex-column
+                                    justify-content-between
+                                "
                             >
                                 <h3
-                                    class="align-items-baseline d-flex kt-subheader__title"
+                                    class="
+                                        align-items-baseline
+                                        d-flex
+                                        kt-subheader__title
+                                    "
                                 >
                                     {{ "View" | localize }}
                                     {{ list?.appItemsList?.name }}
@@ -179,7 +152,7 @@
                                             *ngFor="
                                                 let user of list?.appItemsList
                                                     ?.users;
-                                                index as i
+                                                index as i;
                                             "
                                         >
                                             <img
@@ -188,8 +161,7 @@
                                                     'z-index': i + 1
                                                 }"
                                                 [title]="user.name"
-                                                [src]="
-                                                    user.imageURL ||
+                                                [src]="user.imageURL ||
                                                     'assets/common/images/avatar-icon1.jpg'
                                                 "
                                                 alt=""
@@ -228,12 +200,19 @@
                                     placement="bottom right"
                                 >
                                     <button
-                                        class="dropdown-toggle btn btn-sm btn-action"
+                                        class="
+                                            dropdown-toggle
+                                            btn btn-sm btn-action
+                                        "
                                         dropdownToggle
                                         type="button"
                                     ></button>
                                     <ul
-                                        class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                                        class="
+                                            dropdown-menu
+                                            dropdown-action-btn
+                                            dropdown-menu-right
+                                        "
                                         *dropdownMenu
                                     >
                                         <li>
@@ -242,33 +221,18 @@
                                                 [ngClass]="{
                                                     dimmed: !canPublish
                                                 }"
-                                                *ngIf="
-                                                    !list?.appItemsList
-                                                        ?.published &&
-                                                    list?.appItemsList
-                                                        ?.appItemsListItems
-                                                        ?.totalCount > 0 &&
-                                                    list?.appItemsList
-                                                        ?.statusCode == 'ACTIVE'
-                                                "
-                                                (click)="
-                                                    openShareProductListModal()
-                                                "
-                                                >{{ "PublishList" | localize }}
+                                                *ngIf="!list?.appItemsList?.published && list?.appItemsList?.appItemsListItems?.totalCount > 0 && list?.appItemsList?.statusCode == 'ACTIVE'"
+                                                (click)="openShareProductListModal()"
+                                                >{{  "PublishList"| localize }}
                                             </a>
                                             <a
                                                 href="javascript:;"
                                                 [ngClass]="{
                                                     dimmed: !canPublish
                                                 }"
-                                                *ngIf="
-                                                    list?.appItemsList
-                                                        ?.published
-                                                "
+                                                *ngIf="list?.appItemsList?.published"
                                                 (click)="unPublish()"
-                                                >{{
-                                                    "UnpublishList" | localize
-                                                }}
+                                                >{{ "UnpublishList" | localize }}
                                             </a>
                                         </li>
                                         <li *ngIf="canEdit">
@@ -326,18 +290,15 @@
                         <div class="row">
                             <div
                                 *ngIf="!viewMode"
-                                class="col-12 list-toolbar border-dashed-bottom pb-4"
+                                class="
+                                    col-12
+                                    list-toolbar
+                                    border-dashed-bottom
+                                    pb-4
+                                "
                             >
                                 <div class="h3 text-center text-success">
-                                    {{
-                                        !loading &&
-                                        list?.appItemsList?.statusCode
-                                            ? l(
-                                                  list?.appItemsList?.statusCode
-                                                      | titlecase
-                                              )
-                                            : ""
-                                    }}
+                                    {{ !loading && list?.appItemsList?.statusCode ? l(list?.appItemsList?.statusCode  | titlecase)  : '' }}
                                 </div>
                                 <div class="align-items-baseline mb-5 mt-5 row">
                                     <div
@@ -359,16 +320,18 @@
                                                 [(ngModel)]="
                                                     list.appItemsList.name
                                                 "
-                                                class="form-control bg-white form-control-border-grey"
+                                                class="
+                                                    form-control
+                                                    bg-white
+                                                    form-control-border-grey
+                                                "
                                                 [ngClass]="{
                                                     'border-danger': false
                                                 }"
                                                 placeholder="{{
                                                     'List name' | localize
                                                 }}"
-                                                (blur)="
-                                                    onHeaderInputsBlur($event)
-                                                "
+                                                (blur)="onHeaderInputsBlur($event)"
                                             />
                                         </ng-container>
                                     </div>
@@ -400,16 +363,18 @@
                                                 [(ngModel)]="
                                                     list.appItemsList.code
                                                 "
-                                                class="form-control bg-white form-control-border-grey"
+                                                class="
+                                                    form-control
+                                                    bg-white
+                                                    form-control-border-grey
+                                                "
                                                 [ngClass]="{
                                                     'border-danger': false
                                                 }"
                                                 [placeholder]="
                                                     'ListCode' | localize
                                                 "
-                                                (blur)="
-                                                    onHeaderInputsBlur($event)
-                                                "
+                                                (blur)="onHeaderInputsBlur($event)"
                                             />
                                         </ng-container>
                                     </div>
@@ -438,7 +403,11 @@
                                                 type="text"
                                                 [required]="true"
                                                 name="description"
-                                                class="form-control bg-white form-control-border-grey"
+                                                class="
+                                                    form-control
+                                                    bg-white
+                                                    form-control-border-grey
+                                                "
                                                 [(ngModel)]="
                                                     list.appItemsList
                                                         .description
@@ -449,9 +418,7 @@
                                                 placeholder="{{
                                                     'ListDescription' | localize
                                                 }}"
-                                                (blur)="
-                                                    onHeaderInputsBlur($event)
-                                                "
+                                                (blur)="onHeaderInputsBlur($event)"
                                             />
                                         </ng-container>
                                     </div>
@@ -466,7 +433,13 @@
                             </div>
 
                             <div
-                                class="col-12 d-flex flex-column justify-content-between"
+                                class="
+                                    col-12
+                                    d-flex
+                                    flex-column
+                                    justify-content-between
+                                "
+
                             >
                                 <div class="row pt-5 pl-5 pr-2">
                                     <div
@@ -492,7 +465,11 @@
                                             [item]="item"
                                             [viewMode]="viewMode"
                                             (deleteMe)="
-                                                deleteItem($event, item, i)
+                                            deleteItem(
+                                                    $event,
+                                                    item,
+                                                    i
+                                                )
                                             "
                                             (changeStatus)="
                                                 itemStatusChangeHandler(
@@ -511,7 +488,13 @@
                                         </app-item-list-item-card>
                                     </div>
                                     <div
-                                        class="font-weight-normal mt-5 p-5 text-center w-100"
+                                        class="
+                                            font-weight-normal
+                                            mt-5
+                                            p-5
+                                            text-center
+                                            w-100
+                                        "
                                         *ngIf="
                                             list?.appItemsList
                                                 ?.appItemsListItems?.items
@@ -525,7 +508,10 @@
                                     </div>
                                 </div>
                                 <div
-                                    class="primeng-paging-container custom-paginator"
+                                    class="
+                                        primeng-paging-container
+                                        custom-paginator
+                                    "
                                 >
                                     <p-paginator
                                         [rows]="
@@ -545,7 +531,11 @@
                                     </p-paginator>
 
                                     <div
-                                        class="total-records-count text-right mr-3"
+                                        class="
+                                            total-records-count
+                                            text-right
+                                            mr-3
+                                        "
                                     >
                                         {{
                                             l(
@@ -570,6 +560,7 @@
     (cancelDone)="onVariationSelectionCanceled($event)"
 >
 </app-variations-selection-modal>
+
 
 <app-items-browse-modal
     #appItemsBrowseModal

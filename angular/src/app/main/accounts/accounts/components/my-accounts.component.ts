@@ -1,6 +1,6 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 import { AccountMainFilterEnum } from '../../account-shared/models/accounts-main-filter.enum';
 
 @Component({
@@ -30,13 +30,11 @@ export class MyAccountsComponent extends AppComponentBase implements OnInit {
             this.defaultMainFilter = AccountMainFilterEnum.ExternalAccounts
         } else {
             this.pageMainFilters = [
-                { label: this.l('MyAccounts'), value: AccountMainFilterEnum.ManualAndConnectedAccounts },
+                { label: this.l('MyAccounts'), value: AccountMainFilterEnum.MyAccounts },
                 { label: this.l('ManualAccounts'), value: AccountMainFilterEnum.ManualAccounts },
-                { label: this.l('ConnectedAccounts'), value: AccountMainFilterEnum.ConnectedAccounts },
             ];
-            this.defaultMainFilter = AccountMainFilterEnum.ManualAndConnectedAccounts
+            this.defaultMainFilter = AccountMainFilterEnum.MyAccounts
         }
     }
 
 }
- 

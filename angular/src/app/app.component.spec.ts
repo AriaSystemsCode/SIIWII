@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
 
 import { APP_BASE_HREF } from '@angular/common';
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed, async } from '@angular/core/testing';
 import { API_BASE_URL } from '@shared/service-proxies/service-proxies';
 import { RootModule } from '../root.module';
 import { AppComponent } from './app.component';
@@ -17,7 +17,7 @@ describe('App: onetouch', () => {
     (window as any).FreezeUI = function () { };
     (window as any).UnFreezeUI = function () { };
 
-    beforeEach(waitForAsync(() => {
+    beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [
                 RootModule
@@ -30,7 +30,7 @@ describe('App: onetouch', () => {
         }).compileComponents();
     }));
 
-    it('should create the app', waitForAsync(() => {
+    it('should create the app', async(() => {
         const fixture = TestBed.createComponent(AppComponent);
         const app = fixture.debugElement.componentInstance;
         expect(app).toBeTruthy();

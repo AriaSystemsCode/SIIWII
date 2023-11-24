@@ -120,7 +120,7 @@
                                      [lazy]="true"
                                      [scrollable]="true"
                                      ScrollWidth="100%"
-                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                     [responsive]="primengTableHelper.isResponsive"
                                      [resizableColumns]="primengTableHelper.resizableColumns">
                             <ng-template pTemplate="header">
                                 <tr>
@@ -181,28 +181,28 @@
                                         </div>
                                     </td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('Code')}}</span>
+											<span class="ui-column-title"> {{l('Code')}}</span>
 											{{record.sycIdentifierDefinition.code}}
 										</td>
                                     <td style="width:150px">
-										<span class="p-column-title"> {{l('IsTenantLevel')}}</span>
+										<span class="ui-column-title"> {{l('IsTenantLevel')}}</span>
                                         <div *ngIf="record.sycIdentifierDefinition.isTenantLevel" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
 										<div *ngIf="!record.sycIdentifierDefinition.isTenantLevel" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
                                     </td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('NumberOfSegments')}}</span>
+											<span class="ui-column-title"> {{l('NumberOfSegments')}}</span>
 											{{record.sycIdentifierDefinition.numberOfSegments}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('MaxLength')}}</span>
+											<span class="ui-column-title"> {{l('MaxLength')}}</span>
 											{{record.sycIdentifierDefinition.maxLength}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('MinSegmentLength')}}</span>
+											<span class="ui-column-title"> {{l('MinSegmentLength')}}</span>
 											{{record.sycIdentifierDefinition.minSegmentLength}}
 										</td>
                                     <td style="width:150px">
-											<span class="p-column-title"> {{l('MaxSegmentLength')}}</span>
+											<span class="ui-column-title"> {{l('MaxSegmentLength')}}</span>
 											{{record.sycIdentifierDefinition.maxSegmentLength}}
 										</td>
 

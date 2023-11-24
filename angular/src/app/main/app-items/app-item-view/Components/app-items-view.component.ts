@@ -1,4 +1,4 @@
-import { DatePipe, Location } from "@angular/common";
+import { Location } from "@angular/common";
 import {
     Component,
     ElementRef,
@@ -7,7 +7,6 @@ import {
     OnChanges,
     OnDestroy,
     OnInit,
-    Output,
     SimpleChanges,
     ViewChild,
 } from "@angular/core";
@@ -30,7 +29,7 @@ import {
     LookupLabelDto,
     RecommandedOrAdditional,
 } from "@shared/service-proxies/service-proxies";
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
 import { AppitemListSelectionModalComponent } from "../../app-item-shared/components/appitem-list-selection-modal.component";
 import { AppitemsActionsMenuComponent } from "../../app-item-shared/components/appitems-actions-menu.component";
 import { CreateOrEditAppitemListComponent } from "../../app-item-shared/components/create-or-edit-appitem-list.component";
@@ -44,8 +43,6 @@ import { AppItemsBrowseComponentActionsMenuFlags } from "../../app-items-browse/
 import { AppItemBrowseEvents } from "../../app-items-browse/models/appItems-browse-events";
 import { AppitemListPublishService } from "../../app-items-list/services/appitem-list-publish.service";
 import { AppItemViewInput } from "../models/app-item-view-input";
-import { EventEmitter } from "stream";
-import { finalize } from "rxjs";
 
 @Component({
     selector: "app-app-items-view",
@@ -59,7 +56,6 @@ export class AppItemsViewComponent
 {
     @ViewChild("itemListSelection", { static: true })
     itemListSelectionModal: AppitemListSelectionModalComponent;
-
     @ViewChild("createOrEditListModal", { static: true })
     createOrEditListModal: CreateOrEditAppitemListComponent;
     @ViewChild("variationSelectionModal", { static: true })
@@ -152,109 +148,52 @@ export class AppItemsViewComponent
 
     imageSelectedIndex: number = 0;
     varitaionSelectedIndex: number = 0;
-    lastUpdatedDate: string;
 
     centerImage: AppEntityAttachmentDto = null;
-    /*  showProductAttachment: boolean = true; */
+   /*  showProductAttachment: boolean = true; */
     selectedValuesName: string = "";
 
     defaultLogo =
         AppConsts.appBaseUrl + "/assets/placeholders/appitem-placeholder.png";
 
-    defaultCurrencyMSRPPriceIndex = -1;
-    showAdvancedPricing: boolean = false;
-
-    display: boolean = false;
-    timezoneOffset: number;
-
+    defaultCurrencyMSRPPriceIndex = -1
+    showAdvancedPricing:boolean = false
     public constructor(
         private _router: Router,
         private _appItemsServiceProxy: AppItemsServiceProxy,
-        private appSizeScaleServiceProxy: AppSizeScaleServiceProxy,
+        private appSizeScaleServiceProxy:AppSizeScaleServiceProxy,
         private _pricingHelpersService: PricingHelpersService,
         injector: Injector,
         _location: Location,
-        public _publishAppItemListingService: PublishAppItemListingService,
-        private datePipe: DatePipe
     ) {
         super(injector, _location);
     }
-    appSizeRatio: AppItemSizesScaleInfo;
+    appSizeRatio:AppItemSizesScaleInfo
     ngOnChanges(changes: SimpleChanges) {
         if (this.appItemViewInput) {
             this.appItemForViewDto = this.appItemViewInput.appItemForViewDto;
-            this.getTimezoneOffset();
-        this.lastUpdatedDate = this.datePipe.transform(
-            this.appItemViewInput.appItemForViewDto.lastModifiedDate.toISOString(),
-            "MMM d, y, h:m a"
-        );
-        this.productId = this.appItemForViewDto.id;
-        this._publishAppItemListingService.sharingStatus =
-            this.appItemForViewDto.sharingLevel;
-        this.actionsMenuFlags.showAll();
-        this.appItemForViewDto.recommended[0];
-        //Product 'Description'
-        this.getProductDescription();
+            this.productId = this.appItemForViewDto.id;
+            this.actionsMenuFlags.showAll();
+            this.appItemForViewDto.recommended[0];
+            //Product 'Description'
+            this.getProductDescription();
 
-        //Product Category & Department & Classification
-        this.initCategoryVariables(true);
-        this.initDepartmentVariables(true);
-        this.initClassificationVariables(true);
-        this.initRecommendedVariables(true);
-        this.initAdditionalVariables(true);
-        if (this.appItemForViewDto?.variations.length == 0)
-            this.centerImage = this.appItemForViewDto.entityAttachments[0];
-        else
-            this.showImagesOfVaritaionSelectedValues(
-                this.appItemForViewDto.variations[0].selectedValues[0]
-            );
-        this.initPricingNeededData();
-        this.selectedValuesName =
-            this.appItemForViewDto?.variations[0]?.selectedValues[0]?.value;
-        this.defaultCurrencyMSRPPriceIndex =
-            this._pricingHelpersService.getDefaultPricingIndex(
-                this.appItemForViewDto.appItemPriceInfos
-            );
-        this.filterPricing();
+            //Product Category & Department & Classification
+            this.initCategoryVariables(true);
+            this.initDepartmentVariables(true);
+            this.initClassificationVariables(true);
+            this.initRecommendedVariables(true);
+            this.initAdditionalVariables(true);
+            if(this.appItemForViewDto?.variations.length==0)
+                this.centerImage = this.appItemForViewDto.entityAttachments[0];
+            else
+             this.showImagesOfVaritaionSelectedValues(this.appItemForViewDto.variations[0].selectedValues[0]);
+             this.initPricingNeededData()
+            this.selectedValuesName =
+                this.appItemForViewDto?.variations[0]?.selectedValues[0]?.value;
+            this.defaultCurrencyMSRPPriceIndex = this._pricingHelpersService.getDefaultPricingIndex(this.appItemForViewDto.appItemPriceInfos)
+            this.filterPricing()
         }
-    }
-
-
-    getDetails(){
-        this.appItemForViewDto = this.appItemViewInput.appItemForViewDto;
-        this.getTimezoneOffset();
-        this.lastUpdatedDate = this.datePipe.transform(
-            this.appItemViewInput.appItemForViewDto.lastModifiedDate.toISOString(),
-            "MMM d, y, h:m a"
-        );
-        this.productId = this.appItemForViewDto.id;
-        this._publishAppItemListingService.sharingStatus =
-            this.appItemForViewDto.sharingLevel;
-        this.actionsMenuFlags.showAll();
-        this.appItemForViewDto.recommended[0];
-        //Product 'Description'
-        this.getProductDescription();
-
-        //Product Category & Department & Classification
-        this.initCategoryVariables(true);
-        this.initDepartmentVariables(true);
-        this.initClassificationVariables(true);
-        this.initRecommendedVariables(true);
-        this.initAdditionalVariables(true);
-        if (this.appItemForViewDto?.variations.length == 0)
-            this.centerImage = this.appItemForViewDto.entityAttachments[0];
-        else
-            this.showImagesOfVaritaionSelectedValues(
-                this.appItemForViewDto.variations[0].selectedValues[0]
-            );
-        this.initPricingNeededData();
-        this.selectedValuesName =
-            this.appItemForViewDto?.variations[0]?.selectedValues[0]?.value;
-        this.defaultCurrencyMSRPPriceIndex =
-            this._pricingHelpersService.getDefaultPricingIndex(
-                this.appItemForViewDto.appItemPriceInfos
-            );
-        this.filterPricing();
     }
 
     ngOnDestroy() {
@@ -263,9 +202,10 @@ export class AppItemsViewComponent
 
     getProductDescription() {
         this.productDescription = this.appItemForViewDto.description;
-        if (this.productDescription.length >= this.maxDescCnt)
+        if (this.productDescription.length >=this.maxDescCnt) 
             this.scrollDesc = true;
-        else this.scrollDesc = false;
+        else 
+        this.scrollDesc = false;
     }
 
     setVaraitionExtraDataValues(secondAttributeindex: number) {
@@ -299,6 +239,7 @@ export class AppItemsViewComponent
         }
     }
 
+   
     showImageAtCenter(img) {
         this.centerImage = img;
     }
@@ -343,7 +284,7 @@ export class AppItemsViewComponent
             this.appItemForViewDto.variations[0].selectedValues[
                 this.varitaionSelectedIndex
             ].value;
-        this.filterPricing();
+            this.filterPricing()
     }
     getDefaultEntityAttachmentPerPage($event) {
         this.totalDefaultImages =
@@ -412,7 +353,7 @@ export class AppItemsViewComponent
                     this.appItemForViewDto.entityId,
                     undefined,
                     this.skipCategoryCount,
-                    this.maxCategoryCount
+                    this.maxCategoryCount,
                 )
                 .subscribe((res) => {
                     if (
@@ -472,7 +413,7 @@ export class AppItemsViewComponent
                     this.appItemForViewDto.entityId,
                     undefined,
                     this.skipDepartmentCount,
-                    this.maxDepartmentCount
+                    this.maxDepartmentCount,
                 )
                 .subscribe((res) => {
                     if (
@@ -533,7 +474,7 @@ export class AppItemsViewComponent
                     this.appItemForViewDto.entityId,
                     undefined,
                     this.skipClassificationCount,
-                    this.maxClassificationCount
+                    this.maxClassificationCount,
                 )
                 .subscribe((res) => {
                     if (
@@ -719,187 +660,106 @@ export class AppItemsViewComponent
     handleFailedImage($event) {
         $event.target.src = this.defaultLogo;
     }
-    addingToList: boolean = false;
-    addToListHandler($event) {
-        this.addingToList = true;
+    addingToList:boolean = false
+    addToListHandler($event){
+        this.addingToList = true
     }
-    addToListDoneOrCanceled($event) {
-        this.addingToList = false;
+    addToListDoneOrCanceled($event){
+        this.addingToList = false
     }
-    eventTriggerHandler(
-        $event: ActionsMenuEventEmitter<AppItemBrowseEvents, number>
-    ) {
+    eventTriggerHandler($event:ActionsMenuEventEmitter<AppItemBrowseEvents,number>){
         switch ($event.event) {
             case AppItemBrowseEvents.Edit:
-                this.editItemHandler();
+                this.editItemHandler()            
                 break;
             case AppItemBrowseEvents.EditListing:
-                this.editListingHandler();
+                this.editListingHandler()            
                 break;
             case AppItemBrowseEvents.Delete:
-                this.deleteItemHandler();
+                this.deleteItemHandler()            
                 break;
             case AppItemBrowseEvents.CreateListing:
-                this.createListingHandler();
+                this.createListingHandler()
                 break;
             case AppItemBrowseEvents.PublishProductList:
-                this.publishProductListHandler();
+                this.publishProductListHandler()
                 break;
             case AppItemBrowseEvents.PublishListing:
-                this.publishListingHandler();
+                this.publishListingHandler()
                 break;
             case AppItemBrowseEvents.UnPublishListing:
-                this.unPublishListingHandler();
+                this.unPublishListingHandler()
                 break;
             case AppItemBrowseEvents.AddToList:
-                this.addToListHandler($event.data);
+                this.addToListHandler($event.data)
                 break;
             default:
                 break;
         }
     }
-    showAdvancedPricingModal() {
-        this.showAdvancedPricing = true;
+    showAdvancedPricingModal(){
+        this.showAdvancedPricing = true
     }
-    hideAdvancedPricingModal() {
-        this.showAdvancedPricing = false;
+    hideAdvancedPricingModal(){
+        this.showAdvancedPricing = false
     }
-    level: string;
-    currencyId: number;
-    prices: AppItemAttributePriceDto[];
-    filterPricing() {
-        const currentCurrency = this.currencies.filter(
-            (item) => item.value == this.currencyId
-        )[0];
-        const attributeId =
-            this.appItemForViewDto.variations[0]?.extraAttributeId;
-        if (attributeId && currentCurrency) {
-            this._appItemsServiceProxy
-                .getAppItemPrice(
-                    this.productId,
-                    this.level,
-                    currentCurrency.code,
-                    attributeId,
-                    this.selectedValuesName
-                )
-                .subscribe((result) => {
-                    this.prices = result;
-                });
+    level:string
+    currencyId:number
+    prices:AppItemAttributePriceDto[] 
+    filterPricing(){
+        const currentCurrency = this.currencies.filter(item=>item.value == this.currencyId)[0]
+        const attributeId = this.appItemForViewDto.variations[0]?.extraAttributeId
+        if(attributeId && currentCurrency){
+            this._appItemsServiceProxy.getAppItemPrice(
+                this.productId,
+                this.level,
+                currentCurrency.code,
+                attributeId,
+                this.selectedValuesName
+            ).subscribe(result=>{
+                this.prices = result
+            })
         } else {
-            this.parentProductPriceIndex =
-                this._pricingHelpersService.getPricingIndex(
-                    this.appItemForViewDto.appItemPriceInfos,
-                    this.level,
-                    this.currencyId
-                );
+            this.parentProductPriceIndex = this._pricingHelpersService.getPricingIndex(this.appItemForViewDto.appItemPriceInfos,this.level,this.currencyId)
         }
     }
-    parentProductPriceIndex: number = -1;
-    levels: SelectItem[] = [];
-    currencies: CurrencyInfoDto[] = [];
-    initPricingNeededData() {
-        this.appItemForViewDto.appItemPriceInfos.forEach((priceDto) => {
-            const currencyId = priceDto.currencyId;
-            const alreadyAdded: boolean =
-                this.currencies.findIndex((item) => item.value == currencyId) >
-                -1;
-            let currency = new CurrencyInfoDto({
-                label: `${priceDto.currencyName}`,
-                code: priceDto.currencyCode,
-                symbol: priceDto.currencySymbol,
-                value: priceDto.currencyId,
-                isHostRecord: undefined,
-                stockAvailability: undefined,
-            });
-            if (currency.symbol) currency.label += ` ${currency.symbol}`;
-            if (currency && !alreadyAdded) {
-                this.currencies.push(currency);
+    parentProductPriceIndex : number = -1
+    levels:SelectItem[] = []
+    currencies:CurrencyInfoDto[] = []
+    initPricingNeededData(){
+        this.appItemForViewDto.appItemPriceInfos.forEach((priceDto)=>{
+            const currencyId = priceDto.currencyId
+            const alreadyAdded : boolean = this.currencies.findIndex(item=>item.value == currencyId) > -1
+            let currency =new CurrencyInfoDto({
+                label:`${priceDto.currencyName}`,
+                code:priceDto.currencyCode,
+                symbol:priceDto.currencySymbol,
+                value:priceDto.currencyId,
+                isHostRecord:undefined,
+                stockAvailability:undefined
+            })
+            if(currency.symbol) currency.label += ` ${currency.symbol}` 
+            if(currency && !alreadyAdded) {
+                this.currencies.push(currency)
             }
-        });
-        this.currencyId = this.tenantDefaultCurrency.value;
-        this.level = this._pricingHelpersService.defaultLevel;
+        })
+        this.currencyId = this.tenantDefaultCurrency.value
+        this.level = this._pricingHelpersService.defaultLevel
         // currencies
         this.levels = [
             {
-                label: this._pricingHelpersService.defaultLevel,
-                value: this._pricingHelpersService.defaultLevel,
+                label:this._pricingHelpersService.defaultLevel,
+                value:this._pricingHelpersService.defaultLevel
             },
-            ...this._pricingHelpersService.levels.map((item) => {
+            ...this._pricingHelpersService.levels.map(item=>{
                 return {
-                    label: item,
-                    value: item,
-                };
-            }),
-        ];
-    }
-    showSizeRatio() {}
-
-    openShareProductListingModal() {
-        console.log(">> listing");
-        const listingId: number = this.productId;
-        const alreadyPublished: boolean = false;
-        const successCallBack = () => {
-            this.notify.success(this.l("PublishedSuccessfully"));
-            // this.eventTriggered.emit({
-            //     event: AppItemBrowseEvents.PublishListing,
-            //     data: true,
-            // });
-        };
-        this._publishAppItemListingService.openProductListingSharingModal(
-            alreadyPublished,
-            listingId,
-            successCallBack
-        );
-        this._publishAppItemListingService.subscribersNumber =
-            this.appItemForViewDto.numberOfSubscribers;
-        this._publishAppItemListingService.productId = this.productId;
-        this._publishAppItemListingService.screen = 1
-    }
-    btnLoader: boolean = false;
-    syncProduct() {
-        this.btnLoader = true;
-        this._appItemsServiceProxy
-            .syncProduct(this.productId)
-            .pipe(finalize(() => (this.btnLoader = false)))
-            .subscribe((res: any) => {
-                this._appItemsServiceProxy
-            .getAppItemForView(
-                undefined,
-                0,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                this.productId,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                0,
-                10
-            )
-            .pipe(
-                finalize(() => {
-                    this.hideMainSpinner();
-                    this.notify.success(this.l("Product sync Successfully"));
-                })
-            )
-            .subscribe((result) => {
-                console.log(">>",result.appItem)
-                this.appItemForViewDto.showSync = result.appItem.showSync
+                    label:item,
+                    value:item,
+                }
             })
-            });
+        ]
     }
-
-    getTimezoneOffset() {
-        this.timezoneOffset = new Date().getTimezoneOffset();
+    showSizeRatio(){
+        
     }
 }

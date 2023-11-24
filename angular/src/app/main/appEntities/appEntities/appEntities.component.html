@@ -95,7 +95,7 @@
                                             [value]="primengTableHelper.records"
                                             rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
                                             [lazy]="true" [scrollable]="true" ScrollWidth="100%"
-                                            responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                            [responsive]="primengTableHelper.isResponsive"
                                             [resizableColumns]="primengTableHelper.resizableColumns">
                                             <ng-template pTemplate="header">
                                                 <tr>
@@ -122,17 +122,17 @@
                                             <ng-template pTemplate="body" let-record="$implicit">
                                                 <tr>
                                                     <td style="width:150px">
-                                                        <span class="p-column-title"> {{l('Name')}}</span>
+                                                        <span class="ui-column-title"> {{l('Name')}}</span>
 
                                                         <span>{{record.appEntity.name}}</span>
                                                     </td>
                                                     <td style="width:150px">
-                                                        <span class="p-column-title"> {{l('Code')}}</span>
+                                                        <span class="ui-column-title"> {{l('Code')}}</span>
 
                                                         <span>{{record.appEntity.code}}</span>
                                                     </td>
                                                     <td style="width:150px">
-                                                        <span class="p-column-title"> {{l('Notes')}}</span>
+                                                        <span class="ui-column-title"> {{l('Notes')}}</span>
 
                                                         <span>{{record.appEntity.notes}}</span>
                                                     </td>
@@ -264,13 +264,13 @@
                                     </form>
                                     <div class="row align-items-center">
                                         <!--<Primeng-Datatable-Start>-->
-                                        <div class="primeng-datatable-container col-12 table-transparent-header table-transparent-rows"
+                                        <div class="primeng-datatable-container col-12"
                                             [busyIf]="primengTableHelper.isLoading">
                                             <p-table #dataTable
                                                 [value]="primengTableHelper.records"
                                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
                                                 [paginator]="false" [lazy]="true" [scrollable]="true" ScrollWidth="100%"
-                                                responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                                [responsive]="primengTableHelper.isResponsive"
                                                 [resizableColumns]="primengTableHelper.resizableColumns">
                                                 <ng-template pTemplate="header">
                                                     <tr>
@@ -297,16 +297,16 @@
                                                 <ng-template pTemplate="body" let-record="$implicit" >
                                                     <tr>
                                                         <td style="width:150px">
-                                                            <span class="p-column-title"> {{l('Name')}}</span>
+                                                            <span class="ui-column-title"> {{l('Name')}}</span>
                                                             <span>{{record.appEntity.name}}</span>
                                                         </td>
                                                         <td style="width:150px">
-                                                            <span class="p-column-title"> {{l('Code')}}</span>
+                                                            <span class="ui-column-title"> {{l('Code')}}</span>
 
                                                             <span>{{record.appEntity.code}}</span>
                                                         </td>
                                                         <td style="width:150px">
-                                                            <span class="p-column-title"> {{l('Notes')}}</span>
+                                                            <span class="ui-column-title"> {{l('Notes')}}</span>
 
                                                             <span>{{record.appEntity.notes}}</span>
 

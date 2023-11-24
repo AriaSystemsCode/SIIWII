@@ -4,10 +4,10 @@ import {AppAdvertisementsServiceProxy, AppAdvertisementAppEntityLookupTableDto }
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Table } from 'primeng/table';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 @Component({
     selector: 'appAdvertisementAppEntityLookupTableModal',
-    styleUrls: ['./appAdvertisement-appEntity-lookup-table-modal.component.scss'],
+    styleUrls: ['./appAdvertisement-appEntity-lookup-table-modal.component.less'],
     encapsulation: ViewEncapsulation.None,
     templateUrl: './appAdvertisement-appEntity-lookup-table-modal.component.html'
 })
@@ -45,7 +45,6 @@ export class AppAdvertisementAppEntityLookupTableModalComponent extends AppCompo
         }
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

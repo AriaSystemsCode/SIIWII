@@ -3,7 +3,7 @@ import { EntityChangeDetailModalComponent } from './entity-change-detail-modal.c
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AuditLogServiceProxy, EntityChangeListDto } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent } from 'primeng/public_api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import * as _ from 'lodash';

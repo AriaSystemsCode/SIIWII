@@ -6,12 +6,21 @@ import { CreateEditManualAccountComponent } from './components/create-edit-manua
 import { ViewOthersProfileComponent } from './components/view-others-profile.component';
 
 const routes: Routes = [
-  { path: '', component: AccountInfoComponent, data: { permission: 'Pages.Accounts' } },
-  { path: 'create-manual', component: CreateEditManualAccountComponent, data: { permission: 'Pages.Accounts' } },
-  { path: 'create-external', component: CreateEditExternalAccountComponent, data: { permission: 'Pages.Accounts' } },
-  { path: 'edit-manual/:id', component: CreateEditManualAccountComponent, data: { permission: 'Pages.Accounts' } },
-  { path: 'edit-external/:id', component: CreateEditExternalAccountComponent, data: { permission: 'Pages.Accounts' } },
-  { path: 'view/:id', component: ViewOthersProfileComponent, data: { permission: 'Pages.Accounts' } },
+  {
+    path: '',
+    // component: AccountInfosComponent,
+    children: [
+      { path: '', component: AccountInfoComponent, data: { permission: 'Pages.Accounts' } },
+
+      { path: 'create-manual', component: CreateEditManualAccountComponent, data: { permission: 'Pages.Accounts' } },
+      { path: 'create-external', component: CreateEditExternalAccountComponent, data: { permission: 'Pages.Accounts' } },
+      { path: 'edit-manual/:id', component: CreateEditManualAccountComponent, data: { permission: 'Pages.Accounts' } },
+      { path: 'edit-external/:id', component: CreateEditExternalAccountComponent, data: { permission: 'Pages.Accounts' } },
+      { path: 'view/:id', component: ViewOthersProfileComponent, data: { permission: 'Pages.Accounts' } },
+
+
+    ]
+  }
 ];
 
 @NgModule({

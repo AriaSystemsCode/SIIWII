@@ -84,7 +84,7 @@
                             <p-table #dataTable (onLazyLoad)="getLanguageTexts($event)"
                                 [value]="primengTableHelper.records"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
-                                [lazy]="true" responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                [lazy]="true" [responsive]="primengTableHelper.isResponsive">
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th pSortableColumn="key">
@@ -105,16 +105,16 @@
                                 <ng-template pTemplate="body" let-record="$implicit">
                                     <tr>
                                         <td>
-                                            <span class="p-column-title">{{'Key' | localize}}</span>
+                                            <span class="ui-column-title">{{'Key' | localize}}</span>
                                             <span title="{{record.key}}">{{truncateString(record.key)}}</span>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'BaseValue' | localize}}</span>
+                                            <span class="ui-column-title">{{'BaseValue' | localize}}</span>
                                             <span
                                                 title="{{record.baseValue}}">{{truncateString(record.baseValue)}}</span>
                                         </td>
                                         <td>
-                                            <span class="p-column-title">{{'TargetValue' | localize}}</span>
+                                            <span class="ui-column-title">{{'TargetValue' | localize}}</span>
                                             <span
                                                 title="{{record.targetValue}}">{{truncateString(record.targetValue) }}</span>
                                         </td>

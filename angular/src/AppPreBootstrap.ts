@@ -62,17 +62,19 @@ export class AppPreBootstrap {
 
             AppConsts.appBaseUrlFormat = result.appBaseUrl;
             AppConsts.remoteServiceBaseUrlFormat = result.remoteServiceBaseUrl;
+            AppConsts.urlRenderServiceBaseUrl = result.urlRenderServiceBaseUrl;
             AppConsts.localeMappings = result.localeMappings;
-            AppConsts.siiwiiName = result.siiwiiName;
 
             if (tenancyName == null) {
                 AppConsts.appBaseUrl = result.appBaseUrl.replace(AppConsts.tenancyNamePlaceHolderInUrl + '.', '');
                 AppConsts.remoteServiceBaseUrl = result.remoteServiceBaseUrl.replace(AppConsts.tenancyNamePlaceHolderInUrl + '.', '');
                 AppConsts.attachmentBaseUrl = result.attachmentBaseUrl.replace(AppConsts.tenancyNamePlaceHolderInUrl + '.', '');
+                AppConsts.urlRenderServiceBaseUrl = result.urlRenderServiceBaseUrl.replace(AppConsts.tenancyNamePlaceHolderInUrl + '.', '');;
             } else {
                 AppConsts.appBaseUrl = result.appBaseUrl.replace(AppConsts.tenancyNamePlaceHolderInUrl, tenancyName);
                 AppConsts.remoteServiceBaseUrl = result.remoteServiceBaseUrl.replace(AppConsts.tenancyNamePlaceHolderInUrl, tenancyName);
                 AppConsts.attachmentBaseUrl = result.attachmentBaseUrl.replace(AppConsts.tenancyNamePlaceHolderInUrl, tenancyName);
+                AppConsts.urlRenderServiceBaseUrl = result.urlRenderServiceBaseUrl.replace(AppConsts.tenancyNamePlaceHolderInUrl, tenancyName);
             }
 
             callback();

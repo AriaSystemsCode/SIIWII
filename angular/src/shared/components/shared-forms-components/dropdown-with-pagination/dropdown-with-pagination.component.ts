@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 export enum DropdownSelection {
     Single = 1,
     Multi = 2

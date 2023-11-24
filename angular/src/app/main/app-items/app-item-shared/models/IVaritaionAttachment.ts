@@ -1,5 +1,5 @@
 import { AppEntityAttachmentDto } from '@shared/service-proxies/service-proxies';
-import { SelectItem } from 'primeng/api';
+import { SelectItem } from 'primeng';
 
 
 export interface IVaritaionAttachment {

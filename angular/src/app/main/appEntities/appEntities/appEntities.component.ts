@@ -10,7 +10,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Table } from 'primeng/table';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent, MenuItem } from 'primeng/api';
+import { LazyLoadEvent, MenuItem } from 'primeng/public_api';
 import { MessageService } from 'primeng/api';
 
 import { FileDownloadService } from '@shared/utils/file-download.service';
@@ -117,11 +117,12 @@ export class AppEntitiesComponent extends AppComponentBase {
         event.stopPropagation();
     }
     onTabOpen(e,item) {
+        var index = e.index;
         this.tabChanged(item)
     }
     tabChanged(tab) {
         if(this.currTab === tab) return
-        // this.primengTableHelper.records = null;
+        this.primengTableHelper.records = null;
         this.currTab = tab
         this.filterText = ''
         this.nameFilter = ''
@@ -141,7 +142,6 @@ export class AppEntitiesComponent extends AppComponentBase {
         if (!this.currTab) return
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

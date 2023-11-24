@@ -31,8 +31,6 @@
 @import "./components/carousel.scss";
 @import "./components/switch-input.scss";
 @import "./components/auto-complete.scss";
-@import "./components/p-multi-select.scss";
-@import "./components/p-dialog";
 
 .hint {
     font-size: 0.8rem;
@@ -83,31 +81,31 @@ body {
 }
 
 .sendMessageInputs {
-    .p-autocomplete.p-autocomplete-multiple
-        .p-autocomplete-multiple-container
-        .p-autocomplete-input-token {
+    .ui-autocomplete.ui-autocomplete-multiple
+        .ui-autocomplete-multiple-container
+        .ui-autocomplete-input-token {
         width: 100% !important;
     }
 }
 
-.events p-steps {
-    margin-top: 40px;
+.events .ui-steps .ui-steps-item {
+    margin-right: 113px;
 }
 
-.sm-events .p-steps .p-steps-item {
+.sm-events .ui-steps .ui-steps-item {
     margin-right: 75px;
 }
-.ctaSlider .p-carousel-prev span,
-.ctaSlider .p-carousel-next span,
-.sliderImages .p-carousel-prev span,
-.sliderImages .p-carousel-next span {
+.ctaSlider .ui-carousel-prev span,
+.ctaSlider .ui-carousel-next span,
+.sliderImages .ui-carousel-prev span,
+.sliderImages .ui-carousel-next span {
     display: none !important;
 }
 
-.ctaSlider .p-carousel .p-carousel-content .p-carousel-prev,
-.ctaSlider .p-carousel .p-carousel-content .p-carousel-next,
-.sliderImages .p-carousel .p-carousel-content .p-carousel-prev,
-.sliderImages .p-carousel .p-carousel-content .p-carousel-next {
+.ctaSlider .ui-carousel .ui-carousel-content .ui-carousel-prev,
+.ctaSlider .ui-carousel .ui-carousel-content .ui-carousel-next,
+.sliderImages .ui-carousel .ui-carousel-content .ui-carousel-prev,
+.sliderImages .ui-carousel .ui-carousel-content .ui-carousel-next {
     background-color: transparent;
     border: none;
     border-radius: 50%;
@@ -118,52 +116,52 @@ body {
 }
 
 .ctaSlider
-    .p-carousel
-    .p-carousel-content
-    .p-carousel-prev:not(.p-disabled):hover,
+    .ui-carousel
+    .ui-carousel-content
+    .ui-carousel-prev:not(.ui-state-disabled):hover,
 .ctaSlider
-    .p-carousel
-    .p-carousel-content
-    .p-carousel-next:not(.p-disabled):hover,
+    .ui-carousel
+    .ui-carousel-content
+    .ui-carousel-next:not(.ui-state-disabled):hover,
 .sliderImages
-    .p-carousel
-    .p-carousel-content
-    .p-carousel-prev:not(.p-disabled):hover,
+    .ui-carousel
+    .ui-carousel-content
+    .ui-carousel-prev:not(.ui-state-disabled):hover,
 .sliderImages
-    .p-carousel
-    .p-carousel-content
-    .p-carousel-next:not(.p-disabled):hover {
+    .ui-carousel
+    .ui-carousel-content
+    .ui-carousel-next:not(.ui-state-disabled):hover {
     background-color: transparent;
     color: transparent;
 }
-.sliderImages .p-carousel .p-carousel-content .p-carousel-prev {
-    background-image: url("../landingPage/arrow-right1.svg");
+.sliderImages .ui-carousel .ui-carousel-content .ui-carousel-prev {
+    background-image: url("assets/landingPage/arrow-right1.svg");
     left: 3%;
     z-index: 1;
 }
 
-.hiddenIndicator .p-carousel .p-carousel-content .p-carousel-prev,
-.hiddenIndicator .p-carousel .p-carousel-content .p-carousel-next {
+.hiddenIndicator .ui-carousel .ui-carousel-content .ui-carousel-prev,
+.hiddenIndicator .ui-carousel .ui-carousel-content .ui-carousel-next {
     display: none;
 }
 
-.sliderImages .p-carousel .p-carousel-content .p-carousel-next {
-    background-image: url("../landingPage/arrow-right1.svg");
+.sliderImages .ui-carousel .ui-carousel-content .ui-carousel-next {
+    background-image: url("assets/landingPage/arrow-right1.svg");
     transform: rotate(180deg);
     right: 3%;
     z-index: 1;
 }
 
-.ctaSlider .p-carousel .p-carousel-content .p-carousel-prev {
-    background-image: url("../landingPage/arrow-right2.svg");
+.ctaSlider .ui-carousel .ui-carousel-content .ui-carousel-prev {
+    background-image: url("assets/landingPage/arrow-right2.svg");
 }
 
-.ctaSlider .p-carousel .p-carousel-content .p-carousel-next {
-    background-image: url("../landingPage/arrow-right2.svg");
+.ctaSlider .ui-carousel .ui-carousel-content .ui-carousel-next {
+    background-image: url("assets/landingPage/arrow-right2.svg");
     transform: rotate(180deg);
 }
 
-.hiddenDotsIndicator ul.p-carousel-dots-container.p-reset {
+.hiddenDotsIndicator ul.ui-carousel-dots-container.ui-helper-reset {
     display: none;
 }
 
@@ -212,7 +210,7 @@ body {
 
 /* 
 
-.slidersContainerCarousel .p-carousel.p-component.p-carousel-horizontal , .slidersContainerCarousel .p-carousel-container {
+.slidersContainerCarousel .ui-carousel.ui-widget.ui-carousel-horizontal , .slidersContainerCarousel .ui-carousel-container {
     width: 100% !important;
     height:  100% !important;
 } */
@@ -270,11 +268,11 @@ body {
     padding-right: 0px !important;
 }
 
-.event-sm-steps span.p-steps-title{
+.event-sm-steps span.ui-steps-title{
     display: none !important;
 }
 
-.event-steps  .p-steps .p-steps-item.p-highlight .p-steps-number {
+.event-steps  .ui-steps .ui-steps-item.ui-state-highlight .ui-steps-number {
     background-color: #700066 !important;
 }
 
@@ -284,40 +282,24 @@ body {
         left: 20%;
         position: relative;
     }
-    .p-steps .p-steps-item .p-menuitem-link{
+    .ui-steps .ui-steps-item .ui-menuitem-link{
         width: 100% !important;
     }
-    .p-steps .p-steps-item .p-menuitem-link .p-steps-number {
+    .ui-steps .ui-steps-item .ui-menuitem-link .ui-steps-number {
         border-radius: 5px !important;
         width: 100% !important;
         height: 8pt !important;
         font-size: 0px !important;
     }
 
-    .p-steps:before{
+    .ui-steps:before{
     display: none !important;
     }
-    .sm-events .p-steps .p-steps-item {
+    .sm-events .ui-steps .ui-steps-item {
         margin-right: 0px;
         width: 30% !important;
         padding-left: 5% !important;
     }
-    
-.notification-sm{
-    position: fixed !important;
-    top: 0px !important;
-    left: 0px !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-.notification-settings .modal-dialog  {
-    height: 100% !important;
-    margin: 0px !important;
-}
-.notification-settings .modal-content {
-    height: 100% !important;
-}
 }
 
 
@@ -347,107 +329,18 @@ body {
     font-size: 12pt !important;
     padding-top: 20px !important;
 }
-
-
-
-.confirm-button-class2 {
-    background-color: #f88011  !important;
-}
 .wizard-wrapper {
     min-height: 350px;
 }
 
-.HtmlEditorInput-sm .p-component.p-editor-container{
+.HtmlEditorInput-sm .ui-widget.ui-editor-container.ui-corner-all{
     height: 100%;
 }
 
-.sendUsers ul.p-autocomplete-multiple-container
+.sendUsers ul.ui-autocomplete-multiple-container
 {
     max-height: 80px;
     overflow-y: auto;
     width: 97%;
 }
 
-
-.purpleColor {
-    color: #700066 !important;
-}
-
-.kt-notification .kt-notification__item:after {
-color: #700066 !important;
-}
-
-.kt-notification .kt-notification__item:hover .kt-notification__item-details .kt-notification__item-title {
-    color: #700066 !important;
-}
-
-.unread-notification-count {
-    background-color: #f88011 !important;
-}
-
-
-.radio , .checkbox{
-    accent-color: #700066 !important;
- }
-
- .kt-switch input:checked ~ span:after {
-    background-color: #700066 !important;
- }
-
- .kt-switch input:empty ~ span:before {
-    background-color: #e8ebf1;
-    border: 1px solid #700066 !important;
- }
-
- .notshowdropdown-toggle .nav-link.dropdown-toggle:after, .btn.dropdown-toggle:after{
-    display: none;
- }
-
- .purpleSortableIcon i.p-sortable-column-icon.pi.pi-fw.pi-sort-alt {
-    color: #700066 !important;
-}
-
-.shoppingCartAccordionTabBG  .p-accordion .p-accordion-header .p-accordion-header-link  {
-    background: #f1f2f3 !important;
-    padding: 15px;
-}
-.shoppingCartAccordionTabBG   .p-accordion .p-accordion-content{
-    background:white !important;
-    padding: 0px !important;
-}
-
-.ticket-dropdown.form-control.aria-select.text-left.p-dropdown.p-component{
-    background:white !important;
-    border-color: #700066 !important;
-}
-
-.p-treetable .p-treetable-thead > tr {
-    border: none !important;
-   // background: white !important;
-}
-
-.p-treetable .p-treetable-thead > tr >  th
-{
-    border: 1px solid white !important;
-    background: white !important;
-}
-
-.p-treetable .p-treetable-scrollable-body{
-    overflow: hidden scroll;
-    min-height: 400px;
-    max-height: 500px;
-}
-
-
-.shoppingCartAccordionTabBG path {
-    color: #700066;
-}
-  .shoppingCartAccordionTabBG.shoppingCartAccordionNotValidTab .p-accordion .p-accordion-header .p-accordion-header-link  {
-    background: red !important;
-}
-
-
-.tempAccount .p-dropdown.p-component{
-    background-color: red;
-    border: none;
-}

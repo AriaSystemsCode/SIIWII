@@ -1753,7 +1753,7 @@
 
 			/**
 			 * Hide/show table cell defined by
-			 * options[columns][i]responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"[visible/hidden]
+			 * options[columns][i][responsive][visible/hidden]
 			 */
 			columnHide: function() {
 				var screen = util.getViewPort().width;

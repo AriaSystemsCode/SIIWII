@@ -16,11 +16,9 @@ import { ExtraAttributeDataService } from '../app-item-shared/services/extra-att
 import { PublishService } from '../app-item-shared/services/publish.service';
 import { PublishAppItemListingService } from '../app-item-shared/services/publish-app-item-listing.service';
 import { AppitemListPublishService } from './services/appitem-list-publish.service';
-import { TableModule } from 'primeng/table';
-import { PaginatorModule } from 'primeng/paginator';
+import { PaginatorModule, TableModule } from 'primeng';
 import { AppItemsBrowseModule } from '../app-items-browse/app-items-browse.module';
 import { AppItemSharedModule } from '../app-item-shared/app-item-shared.module';
-import { ButtonModule } from 'primeng/button';
 
 @NgModule({
   declarations:
@@ -44,8 +42,7 @@ import { ButtonModule } from 'primeng/button';
     TableModule,
     ModalModule,
     AppItemSharedModule,
-    AppItemsBrowseModule,
-    ButtonModule
+    AppItemsBrowseModule
   ],
   providers:[
       ExtraAttributeDataService,

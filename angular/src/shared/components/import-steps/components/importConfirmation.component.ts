@@ -8,7 +8,7 @@ import { Component } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { ExcelRecordRepeateHandler } from "@shared/service-proxies/service-proxies";
 import { ModalDirective } from "ngx-bootstrap/modal";
-import { SelectItem } from "primeng/api";
+import { SelectItem } from "primeng";
 import { ImageFile } from "../models/imageFile.model";
 import { MainImportService } from "../services/mainImport.service";
 import {ImportTypes} from "../models/ImportTypes"

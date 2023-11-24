@@ -3,7 +3,8 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Router, RouterStateSnapshot } from '@angular/router';
 import { AppSessionService } from '@shared/common/session/app-session.service';
 import { UrlHelper } from '@shared/helpers/UrlHelper';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable } from '@node_modules/rxjs/internal/Observable';
+import { of, Subject } from 'rxjs';
 
 @Injectable()
 export class AppRouteGuard implements CanActivate, CanActivateChild, CanLoad {

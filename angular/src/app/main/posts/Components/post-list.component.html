@@ -7,7 +7,7 @@
         (_showCreateOrEditEvent)="onshowCreateOrEditEvent($event)"
     >
     </app-create-post-entry>
-
+    
 
 <div *ngIf="postsToShow" class="m-auto">
         <div *ngFor="let post of postsToShow; let i = index">
@@ -17,7 +17,6 @@
                 (_deletePost)="ondeletePost($event, i)"
                 (_editPost)="onshowCreateOrEdit($event)"
                 (_viewEvent)="onshowViewEventFromPost($event)"
-                (videoClicked)="playOrpauseVideo($event, post.attachmentsURLs[0])"
             >
             </app-post-card>
             <div *ngIf="(i%5==0) && (i!=0)" class="d-sm-sidebars d-none">

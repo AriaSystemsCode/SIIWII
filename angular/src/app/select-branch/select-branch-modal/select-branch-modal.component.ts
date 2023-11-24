@@ -3,9 +3,15 @@ import { Component, ViewChild, Injector, Output, EventEmitter,Input} from '@angu
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import {
+    BranchDto,
     AccountsServiceProxy,
+    AppEntitiesServiceProxy
     } from '@shared/service-proxies/service-proxies';
-import { TreeNodeOfBranchForViewDto } from '@shared/service-proxies/service-proxies';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AccountLevelEnum,  CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, TreeviewItem } from '@shared/service-proxies/service-proxies';
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
+import { TreeNode, TreeTable } from 'primeng';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'selectBranchModal',
   templateUrl: './select-branch-modal.component.html',
