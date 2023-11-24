@@ -5,7 +5,6 @@ using Abp.Domain.Uow;
 using Abp.EntityFrameworkCore.Uow;
 using Abp.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
-using onetouch.AppItems;
 using onetouch.EntityFrameworkCore;
 using onetouch.Migrations.Seed.Host;
 using onetouch.Migrations.Seed.Tenants;
@@ -29,9 +28,6 @@ namespace onetouch.Migrations.Seed
             //Default tenant seed (in host database).
             new DefaultTenantBuilder(context).Create();
             new TenantRoleAndUserBuilder(context, 1).Create();
-            //IT33
-            new UpdateItemSSIN(context).UpdateSSIN();
-            //IT33
         }
 
         private static void WithDbContext<TDbContext>(IIocResolver iocResolver, Action<TDbContext> contextAction)

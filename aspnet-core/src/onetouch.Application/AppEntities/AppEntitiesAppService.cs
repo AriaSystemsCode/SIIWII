@@ -28,10 +28,6 @@ using onetouch.Authorization.Users.Profile;
 using Abp.UI;
 using onetouch.Notifications;
 using onetouch.Sessions.Dto;
-using onetouch.AppPosts.Dtos;
-using onetouch.Build;
-using Microsoft.AspNetCore.SignalR;
-using onetouch.AppEvents;
 
 namespace onetouch.AppEntities
 {
@@ -55,7 +51,7 @@ namespace onetouch.AppEntities
         private readonly IProfileAppService _iProfileAppService;
         private readonly IRepository<AppEntityState, long> _appEntityStateRepository;
         private readonly Helper _helper;
-        
+
         //MMT
         private readonly IRepository<AppEntityReactionsCount, long> _appEntityReactionsCount;
         private readonly IRepository<AppEntityUserReactions, long> _appEntityUserReactions;
@@ -63,7 +59,6 @@ namespace onetouch.AppEntities
         //MMT
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
         private readonly IAppNotifier _appNotifier;
-
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
 
         public AppEntitiesAppService(IRepository<AppEntity, long> appEntityRepository
@@ -85,10 +80,8 @@ namespace onetouch.AppEntities
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount,
             IRepository<AppEntityUserReactions, long> appEntityUserReactions,
             IRepository<AppPost, long> appPostRepository, IProfileAppService iProfileAppService, IAppNotifier appNotifier
-            , IRepository<AppEntityState, long> appEntityStateRepository
-            )
+            , IRepository<AppEntityState, long> appEntityStateRepository)
         {
-             
             _iProfileAppService = iProfileAppService;
             _appEntityRepository = appEntityRepository;
             _appEntityAddressRepository = appEntityAddressRepository;
@@ -297,30 +290,30 @@ namespace onetouch.AppEntities
                 .FirstOrDefaultAsync(x => x.Id == input.Id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
 
                 var output = new GetAppEntityForEditOutput { AppEntity = ObjectMapper.Map<CreateOrEditAppEntityDto>(appEntity) };
-               
-                    if (output.AppEntity.EntityObjectTypeId != null)
-                    {
-                        var _lookupSycEntityObjectType = await _lookup_sycEntityObjectTypeRepository.FirstOrDefaultAsync(int.Parse(output.AppEntity.EntityObjectTypeId.ToString()));
-                        output.SycEntityObjectTypeName = _lookupSycEntityObjectType.Name.ToString();
-                    }
 
-                    if (output.AppEntity.EntityObjectStatusId != null)
-                    {
-                        var _lookupSycEntityObjectStatus = await _lookup_sycEntityObjectStatusRepository.FirstOrDefaultAsync(int.Parse(output.AppEntity.EntityObjectStatusId.ToString()));
-                        output.SycEntityObjectStatusName = _lookupSycEntityObjectStatus.Name.ToString();
-                    }
+                if (output.AppEntity.EntityObjectTypeId != null)
+                {
+                    var _lookupSycEntityObjectType = await _lookup_sycEntityObjectTypeRepository.FirstOrDefaultAsync((int)output.AppEntity.EntityObjectTypeId);
+                    output.SycEntityObjectTypeName = _lookupSycEntityObjectType.Name.ToString();
+                }
 
-                    if (output.AppEntity.ObjectId != null)
-                    {
-                        var _lookupSydObject = await _lookup_sydObjectRepository.FirstOrDefaultAsync(int.Parse(output.AppEntity.ObjectId.ToString()));
-                        output.SydObjectName = _lookupSydObject.Name.ToString();
-                    }
-                    output.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(appEntity.EntityAttachments);
-                    foreach (var item in output.AppEntity.EntityAttachments)
-                    {
-                        item.Url = @"attachments/" + -1 + @"/" + item.FileName;
-                    }
-                
+                if (output.AppEntity.EntityObjectStatusId != null)
+                {
+                    var _lookupSycEntityObjectStatus = await _lookup_sycEntityObjectStatusRepository.FirstOrDefaultAsync((int)output.AppEntity.EntityObjectStatusId);
+                    output.SycEntityObjectStatusName = _lookupSycEntityObjectStatus.Name.ToString();
+                }
+
+                if (output.AppEntity.ObjectId != null)
+                {
+                    var _lookupSydObject = await _lookup_sydObjectRepository.FirstOrDefaultAsync((int)output.AppEntity.ObjectId);
+                    output.SydObjectName = _lookupSydObject.Name.ToString();
+                }
+                output.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(appEntity.EntityAttachments);
+                foreach (var item in output.AppEntity.EntityAttachments)
+                {
+                    item.Url = @"attachments/" + -1 + @"/" + item.FileName;
+                }
+
                 return output;
             }
         }
@@ -490,30 +483,16 @@ namespace onetouch.AppEntities
                 .ToListAsync();
         }
 
-        //public async Task<List<LookupLabelDto>> GetAllAccountTypesForTableDropdown()
-        //{
-        //    var accountTypeId = await _helper.SystemTables.GetEntityObjectTypeAccountTypeId();
-        //    return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeId == accountTypeId && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
-        //        .OrderBy("Name asc")
-        //        .Select(appEntity => new LookupLabelDto
-        //        {
-        //            Value = appEntity.Id,
-        //            Label = appEntity.Name.ToString(),
-        //            Code = appEntity.Code,
-        //        })
-        //        .ToListAsync();
-        //}
-
         public async Task<List<LookupLabelDto>> GetAllAccountTypesForTableDropdown()
         {
-            var accountTypeId = await _helper.SystemTables.GetObjectContactId();
-           return  await _lookup_sycEntityObjectTypeRepository.GetAll().Where(e => e.ObjectId == accountTypeId && (e.ParentId < 1 || e.ParentId==null))
-            .OrderBy("Name asc")
-                .Select(sycEntityObjectType => new LookupLabelDto
+            var accountTypeId = await _helper.SystemTables.GetEntityObjectTypeAccountTypeId();
+            return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeId == accountTypeId && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                .OrderBy("Name asc")
+                .Select(appEntity => new LookupLabelDto
                 {
-                    Value = sycEntityObjectType.Id,
-                    Label = sycEntityObjectType.Name.ToString(),
-                    Code = sycEntityObjectType.Code,
+                    Value = appEntity.Id,
+                    Label = appEntity.Name.ToString(),
+                    Code = appEntity.Code,
                 })
                 .ToListAsync();
         }
@@ -532,25 +511,6 @@ namespace onetouch.AppEntities
                 })
                 .ToListAsync();
         }
-        //MMT30
-        public async Task<List<LookupLabelDto>> GetMarketPlaceSizes()
-        {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
-                return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeCode == "SIZE" && x.TenantId == null)
-                .OrderBy("Name asc")
-                .Select(appEntity => new LookupLabelDto
-                {
-                    Value = appEntity.Id,
-                    Label = appEntity.Name.ToString(),
-                    Code = appEntity.Code,
-                    IsHostRecord = appEntity.TenantId == null
-                })
-                .ToListAsync();
-            } 
-        }
-        //MMT30
 
         #region get all with paging
         public async Task<PagedResultDto<LookupLabelDto>> GetAllEntitiesByTypeCodeWithPaging(GetAllAppEntitiesInput input)
@@ -584,73 +544,6 @@ namespace onetouch.AppEntities
             );
         }
 
-        public async Task<List<LookupLabelDto>> GetLineSheetColorSort()
-        {
-            List<LookupLabelDto> ret = new List<LookupLabelDto>();
-
-            ret.Add(new LookupLabelDto() { Code = "ColorName", Label = L("ColorName"), Value = 0 }); 
-            ret.Add(new LookupLabelDto() { Code = "MaterialContent", Label = L("MaterialContent"), Value = 1 });
-
-            return ret;
-
-        }
-
-         
-        public async Task<List<LookupLabelDto>> GetLineSheetDetailPageSort()
-        {
-            List<LookupLabelDto> ret = new List<LookupLabelDto>();
-
-            ret.Add(new LookupLabelDto() { Code = "Brand", Label = L("Brand"), Value = 0 });
-            ret.Add(new LookupLabelDto() { Code = "ItemName", Label = L("ItemName"), Value = 1 });
-            ret.Add(new LookupLabelDto() { Code = "MaterialContent", Label = L("MaterialContent"), Value = 2 });
-            ret.Add(new LookupLabelDto() { Code = "StartShipDate", Label = L("StartShipDate"), Value = 3 });
-            ret.Add(new LookupLabelDto() { Code = "EntityObjectTypeCode", Label = L("ProductType"), Value = 4 });
-            return ret;
-            
-        }
-
-
-        public async Task<PagedResultDto<LookupLabelWithAttachmentDto>> GetAllBackgroundWithPaging(GetAllAppEntitiesInput input)
-        {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                var filteredAppEntities = _appEntityRepository.GetAll()
-               .Include(x => x.EntityAttachments)
-               .ThenInclude(x => x.AttachmentFk)
-               .Where(x => x.EntityObjectTypeCode == input.SycEntityObjectTypeNameFilter &&
-                (x.TenantId == AbpSession.TenantId || x.TenantId == null));
-
-                //var output = new GetAppEntityForEditOutput { AppEntity = ObjectMapper.Map<CreateOrEditAppEntityDto>(appEntity) };
-                // as per Sam needs and requirments
-                if(input.MaxResultCount ==null || input.MaxResultCount==0 || input.MaxResultCount == 10)
-                { input.MaxResultCount = 1000; }
-
-                var pagedAndFilteredAppEntities = filteredAppEntities
-                 .OrderBy(input.Sorting ?? "Name asc")
-                 .PageBy(input);
-
-                var appEntities = from o in pagedAndFilteredAppEntities
-                                  select new LookupLabelWithAttachmentDto()
-                                  {
-                                      Value = o.Id,
-                                      Label = o.Name.ToString(),
-                                      Code = o.Code,
-                                      IsHostRecord = o.TenantId == null,
-                                      AttachmentName = o.EntityAttachments != null && o.EntityAttachments.Count > 0 ? @"attachments/" + (o.EntityAttachments[0].AttachmentFk.TenantId!=null? o.EntityAttachments[0].AttachmentFk.TenantId.ToString():"-1") + @"/" + o.EntityAttachments[0].AttachmentFk.Attachment : ""
-                                  };
-
-
-                var totalCount = await filteredAppEntities.CountAsync();
-
-                return new PagedResultDto<LookupLabelWithAttachmentDto>(
-                    totalCount,
-                    await appEntities.ToListAsync()
-                );
-            }
-        }
-
-
-
         public async Task<PagedResultDto<LookupLabelDto>> GetAllCurrencyForTableDropdownWithPaging(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();
@@ -671,35 +564,19 @@ namespace onetouch.AppEntities
 
         public async Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input)
         {
-            var objectContactId = await _helper.SystemTables.GetObjectContactId();
-
-            var filteredContactTypes =  _lookup_sycEntityObjectTypeRepository.GetAll().Where(e => e.ObjectId == objectContactId && (e.ParentId < 1 || e.ParentId == null))
-                 ;
-
-            var pagedAndFilteredAppEntities = filteredContactTypes
-               .OrderBy(input.Sorting ?? "Name asc")
-               .PageBy(input);
-
-            var appEntities = from o in pagedAndFilteredAppEntities
-                              select new LookupLabelDto()
-                              {
-                                  Value = o.Id,
-                                  Label = o.Name.ToString(),
-                                  Code = o.Code,
-                              };
-
-            var totalCount = await filteredContactTypes.CountAsync();
-
-            return new PagedResultDto<LookupLabelDto>(
-                totalCount,
-                await appEntities.ToListAsync()
-            );
+            input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeAccountTypeId();
+            return await GetAllEntityTypeForTableDropdown(input);
         }
 
         public async Task<List<LookupLabelDto>> GetAllAccountTypeForTableDropdown()
         {
-            return await GetAllAccountTypesForTableDropdown();
-            
+            var currencyId = await _helper.SystemTables.GetEntityObjectTypeAccountTypeId();
+            return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeId == currencyId && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                .Select(appEntity => new LookupLabelDto
+                {
+                    Value = appEntity.Id,
+                    Label = appEntity.Name.ToString()
+                }).ToListAsync();
         }
 
         public async Task<PagedResultDto<LookupLabelDto>> GetAllEntityTypeForTableDropdown(GetAllAppEntitiesInput input)
@@ -750,22 +627,8 @@ namespace onetouch.AppEntities
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
                     Symbol = appEntity.EntityExtraData != null & appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ? appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
-                }).OrderBy(a=>a.Code)
+                })
                 .ToListAsync();
-        }
-        public async Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode)
-        {
-            CurrencyInfoDto rertunObj = new CurrencyInfoDto();
-            var currencyId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();
-            var currencyObject = await _appEntityRepository.GetAll().Include(a => a.EntityExtraData).Where(x => x.EntityObjectTypeId == currencyId && x.Code == currencyCode).FirstOrDefaultAsync();
-            if (currencyObject != null)
-            {
-                rertunObj.Value = currencyObject.Id;
-                rertunObj.Label = currencyObject.Name.ToString();
-                rertunObj.Code = currencyObject.Code;
-                rertunObj.Symbol = currencyObject.EntityExtraData != null & currencyObject.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ? currencyObject.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : "";
-            }
-            return rertunObj;
         }
 
         public async Task<List<LookupLabelDto>> GetAllTitlesForTableDropdown()
@@ -846,10 +709,6 @@ namespace onetouch.AppEntities
                 entity.Name = input.Name;
                 entity.Code = input.Code;
                 entity.Notes = input.Notes;
-                //MMT30[Start]
-                entity.SSIN = input.SSIN;
-                entity.TenantOwner = int.Parse (input.TenantOwner.ToString ());
-                //MMT30[Start]
                 //entity.ExtraData = input.ExtraData;
 
                 // I3-13 [Begin]
@@ -955,9 +814,6 @@ namespace onetouch.AppEntities
                             AppEntityExtraData extraData;
                             extraData = ObjectMapper.Map<AppEntityExtraData>(item);
                             extraData.EntityId = entity.Id;
-                            //mmt30
-                            extraData.EntityCode =entity.Code;
-                            //mmt30
                             if (extraData.AttributeValueId != 0 && extraData.AttributeValueId != null)
                             {
                                 var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == extraData.AttributeValueId);
@@ -1261,7 +1117,6 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<AppEntityCategoryDto>(0, new List<AppEntityCategoryDto>());
             }
         }
-       
 
         public async Task<PagedResultDto<string>> GetAppEntityCategoriesNamesWithPaging(GetAppEntityAttributesInput input)
         {
@@ -1437,7 +1292,6 @@ namespace onetouch.AppEntities
         [AbpAllowAnonymous]
         public async Task CreateOrUpdateReaction(long entitlyId, int reaction)
         {
-
             int oldReaction = 0;
             var userId = long.Parse(AbpSession.UserId.ToString());
 
@@ -1475,20 +1329,9 @@ namespace onetouch.AppEntities
                                     if (notifyUser != null)
                                     {
                                         var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
-                                        //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
-                                        var post = _appPostRepository.GetAll ().Where(x=>x.AppEntityId == entitlyId  ).FirstOrDefault ();
-                                        if (post != null)
-                                        {
-                                            await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                                "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your <a> post </a>" +(post.Description.Length > 30 ? post.Description.Substring (0,30): post.Description), Abp.Notifications.NotificationSeverity.Info,
-                                                new Abp.Domain.Entities.EntityIdentifier(typeof(AppPost), post.Id ));
-                                        }
-                                        else
-                                        {
-                                            //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
-                                            await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                                "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
-                                        }
+
+                                        await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
+                                            "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
                                     }
                                 }
                             }
@@ -1865,17 +1708,6 @@ namespace onetouch.AppEntities
                                select new TopPostDto()
                                {
                                    Id = tp.Id,
-                                   AppPost = new AppPostDto
-                                   {
-                                       Id = tp.Id,
-                                       Code = tp.Code,
-                                       Description = tp.Description,
-                                       CreatorUserId = tp.CreatorUserId,
-                                       CreationDatetime = tp.CreationTime,
-                                       TenantId = tp.TenantId,
-                                       AppEntityId = tp.AppEntityId,
-
-                                   },
                                    UserId = (long)tp.CreatorUserId,
                                    ImageUrl = tp.AppEntityFk.EntityAttachments.Count() == 0 ? "" : $"{imagesUrl}{(tp.TenantId == null ? -1 : tp.TenantId)}/{tp.AppEntityFk?.EntityAttachments.FirstOrDefault()?.AttachmentFk?.Attachment}",
                                    CreatedOn = tp.CreationTime.ToLongDateString(),
@@ -2008,26 +1840,5 @@ namespace onetouch.AppEntities
             }
         }
         #endregion Ranking functions
-        [AbpAuthorize(AppPermissions.Pages_AppEntities_Edit)]
-        public async Task UpdateAppEntityNotes(long entityId, string notes)
-        {
-            var entityObj = await _appEntityRepository.GetAll().Where(x => x.Id == entityId).FirstOrDefaultAsync();
-            if (entityObj != null)
-            {
-                entityObj.Notes = notes;
-                await _appEntityRepository.UpdateAsync(entityObj);
-                await CurrentUnitOfWork.SaveChangesAsync();
-            }
-        }
-        public async Task<string> GetAppEntityNotes(long entityId)
-        {
-            var entityObj = await _appEntityRepository.GetAll().Where(x => x.Id == entityId).FirstOrDefaultAsync();
-            if (entityObj != null)
-            {
-                return entityObj.Notes;
-                
-            }
-            return "";
-        }
     }
 }

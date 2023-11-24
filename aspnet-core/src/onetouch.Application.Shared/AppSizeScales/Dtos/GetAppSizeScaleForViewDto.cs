@@ -49,38 +49,11 @@ namespace onetouch.AppSizeScales.Dtos
         public virtual string Code { get; set; }
         public virtual int NoOfDimensions { get; set; }
         public virtual bool IsDefault { get; set; }
-        //T-SII-20230209.0005,1 MMT 03/26/2023 -Edit Imported product -variations[Start]
-        //[Required]
-        [RequiredIf("NoOfDimensions", "1")]
-        //T-SII-20230209.0005,1 MMT 03/26/2023 -Edit Imported product -variations[End]
+        [Required]
         public virtual string Dimesion1Name { get; set; }
         public virtual string Dimesion2Name { get; set; }
         public virtual string Dimesion3Name { get; set; }
 
         public virtual IList<AppSizeScalesDetailDto> AppSizeScalesDetails { get; set; }
     }
-    //T-SII-20230209.0005,1 MMT 03/26/2023 -Edit Imported product -variations[Start]
-    public class RequiredIfAttribute : RequiredAttribute
-    {
-        private String PropertyName { get; set; }
-        private Object DesiredValue { get; set; }
-        public RequiredIfAttribute(String propertyName, Object desiredvalue)
-        {
-            PropertyName = propertyName;
-            DesiredValue = desiredvalue;
-        }
-        protected override ValidationResult IsValid(object value, ValidationContext context)
-        {
-            Object instance = context.ObjectInstance;
-            Type type = instance.GetType();
-            Object proprtyvalue = type.GetProperty(PropertyName).GetValue(instance, null);
-            if (int.Parse(proprtyvalue.ToString()) >= int.Parse(DesiredValue.ToString()))
-            {
-                ValidationResult result = base.IsValid(value, context);
-                return result;
-            }
-            return ValidationResult.Success;
-        }
-    }
-    //T-SII-20230209.0005,1 MMT 03/26/2023 -Edit Imported product -variations[End]
 }

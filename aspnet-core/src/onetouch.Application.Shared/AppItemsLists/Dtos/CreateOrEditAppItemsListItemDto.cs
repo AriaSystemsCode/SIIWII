@@ -23,9 +23,6 @@ namespace onetouch.AppItemsLists.Dtos
         public virtual string ImageURL { get; set; }
 
         public virtual StateEnum State { get; set; }
-        //MMT30
-        public virtual string ItemSSIN { get; set; }
-        //MMT30
     }
     public class CreateOrEditAppItemsListItemDto : AppItemsListItemDto
     {

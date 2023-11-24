@@ -341,41 +341,24 @@ namespace onetouch.AppItems
                 // Get worksheet by name
                 Worksheet Sheet = document.Workbook.Worksheets[0];
                 // Set current cell
-                //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
-                //Sheet.Cell("AA1").Value = "Processing Status";
-                //Sheet.Cell("AB1").Value = "Processing Error Message";
-                //Sheet.Cell("AC1").Value = "Processing Error Details";
-                Sheet.Cell("F1").Value = "Processing Status";
-                Sheet.Cell("G1").Value = "Processing Error Message";
-                Sheet.Cell("H1").Value = "Processing Error Details";
-                //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
+                Sheet.Cell("AA1").Value = "Processing Status";
+                Sheet.Cell("AB1").Value = "Processing Error Message";
+                Sheet.Cell("AC1").Value = "Processing Error Details";
                 rowNumber = 1;
                 //accountExcelResultsDTO.FromList.Add(1);
                 foreach (AppItemStockAvailabilityExcelRecordDTO logRecord in itemExcelResultsDTO.ExcelRecords)
                 {
                     rowNumber++;
-                    if (rowNumber == 2)
-                    {
+                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
+                   // {
+                        if (rowNumber > 2)
+                        { itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
                         itemExcelResultsDTO.FromList.Add(rowNumber);
                         itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("A" + rowNumber.ToString()).Value.ToString());
-                    }
-                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
-                    // {
-                    if (rowNumber > 2 && (int.DivRem(rowNumber, 100).Remainder == 0))
-                        { itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
-                    else { continue; }
-
-                    itemExcelResultsDTO.FromList.Add(rowNumber);
-                    itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("A" + rowNumber.ToString()).Value.ToString());
                     //}
-                    //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
-                    //Sheet.Cell("AA" + rowNumber.ToString()).Value = logRecord.Status;
-                    //Sheet.Cell("AB" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
-                    //Sheet.Cell("AC" + rowNumber.ToString()).Value = logRecord.FieldsErrors.ToList().JoinAsString(",");
-                    Sheet.Cell("F" + rowNumber.ToString()).Value = logRecord.Status;
-                    Sheet.Cell("G" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
-                    Sheet.Cell("H" + rowNumber.ToString()).Value = logRecord.FieldsErrors.ToList().JoinAsString(",");
-                    //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[End]
+                    Sheet.Cell("AA" + rowNumber.ToString()).Value = logRecord.Status;
+                    Sheet.Cell("AB" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
+                    Sheet.Cell("AC" + rowNumber.ToString()).Value = logRecord.FieldsErrors.ToList().JoinAsString(",");
                 }
                 itemExcelResultsDTO.ToList.Add(rowNumber);
                 //move to attachment folder and save

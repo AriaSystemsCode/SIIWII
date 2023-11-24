@@ -96,13 +96,8 @@ namespace onetouch.Sessions
                 var contactAccount = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId  && x.ParentId==null && x.PartnerId ==null);//&& x.AccountId == null
                 if (contactAccount != null)
                 output.User.AccountId = contactAccount.Id;
-                if (AbpSession.TenantId != null)
-                {
-                   //T-SII-20230501.0001,1 MMT 05/02/2023 error in account profile page if account has no assigned currency[Start]
-                   output.Tenant.CurrencyInfoDto = new CurrencyInfoDto();
-                   //T-SII-20230501.0001,1 MMT 05/02/2023 error in account profile page if account has no assigned currency[End]
-                    output.Tenant.CurrencyInfoDto = await TenantManager.GetTenantCurrency();
-                }
+                if (AbpSession.TenantId!=null)
+                output.Tenant.CurrencyInfoDto = await TenantManager.GetTenantCurrency();
                 //Mariam[End]
             }
 

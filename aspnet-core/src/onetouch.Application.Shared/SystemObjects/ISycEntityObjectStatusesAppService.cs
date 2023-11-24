@@ -14,9 +14,8 @@ namespace onetouch.SystemObjects
         Task<PagedResultDto<GetSycEntityObjectStatusForViewDto>> GetAll(GetAllSycEntityObjectStatusesInput input);
 
         Task<GetSycEntityObjectStatusForViewDto> GetSycEntityObjectStatusForView(int id);
-        Task<List<SycEntityObjectStatusLookupTableDto>> GetAllSycEntityStatusForTableDropdown(string objectCode);
 
-        Task<GetSycEntityObjectStatusForEditOutput> GetSycEntityObjectStatusForEdit(EntityDto input);
+		Task<GetSycEntityObjectStatusForEditOutput> GetSycEntityObjectStatusForEdit(EntityDto input);
 
 		Task CreateOrEdit(CreateOrEditSycEntityObjectStatusDto input);
 

@@ -72,8 +72,6 @@ namespace onetouch.Authorization
             autotaskQueues.CreateChildPermission(AppPermissions.Pages_AutotaskQueues_Edit, L("EditAutotaskQueue"), multiTenancySides: MultiTenancySides.Host);
             autotaskQueues.CreateChildPermission(AppPermissions.Pages_AutotaskQueues_Delete, L("DeleteAutotaskQueue"), multiTenancySides: MultiTenancySides.Host);
 
-            var appSiiwiiTransactions = pages.CreateChildPermission(AppPermissions.Pages_AppSiiwiiTransactions, L("AppSiiwiiTransactions"), multiTenancySides: MultiTenancySides.Tenant);
-
             var appItems = pages.CreateChildPermission(AppPermissions.Pages_AppItems, L("AppItems"), multiTenancySides: MultiTenancySides.Tenant);
             appItems.CreateChildPermission(AppPermissions.Pages_AppItems_Create, L("CreateNewAppItem"), multiTenancySides: MultiTenancySides.Tenant);
             appItems.CreateChildPermission(AppPermissions.Pages_AppItems_Edit, L("EditAppItem"), multiTenancySides: MultiTenancySides.Tenant);
@@ -145,11 +143,6 @@ namespace onetouch.Authorization
             pages.CreateChildPermission(AppPermissions.Pages_DemoUiComponents, L("DemoUiComponents"), multiTenancySides: MultiTenancySides.Host);
 
             var administration = pages.CreateChildPermission(AppPermissions.Pages_Administration, L("Administration"));
-
-            var maintainances = administration.CreateChildPermission(AppPermissions.Pages_Administration_Maintainances, L("Maintainances"), multiTenancySides: MultiTenancySides.Host);
-            maintainances.CreateChildPermission(AppPermissions.Pages_Administration_Maintainances_Create, L("CreateNewMaintainance"), multiTenancySides: MultiTenancySides.Host);
-            maintainances.CreateChildPermission(AppPermissions.Pages_Administration_Maintainances_Edit, L("EditMaintainance"), multiTenancySides: MultiTenancySides.Host);
-            maintainances.CreateChildPermission(AppPermissions.Pages_Administration_Maintainances_Delete, L("DeleteMaintainance"), multiTenancySides: MultiTenancySides.Host);
 
             var sycIdentifierDefinitions = administration.CreateChildPermission(AppPermissions.Pages_Administration_SycIdentifierDefinitions, L("SycIdentifierDefinitions"), multiTenancySides: MultiTenancySides.Host);
             sycIdentifierDefinitions.CreateChildPermission(AppPermissions.Pages_Administration_SycIdentifierDefinitions_Create, L("CreateNewSycIdentifierDefinition"), multiTenancySides: MultiTenancySides.Host);
@@ -318,8 +311,8 @@ namespace onetouch.Authorization
             var marketplaceProducts = marketplace.CreateChildPermission(AppPermissions.Pages_Marketplace_Products, L("MarketplaceProducts"), multiTenancySides: MultiTenancySides.Tenant);
             marketplaceProducts.CreateChildPermission(AppPermissions.Pages_Marketplace_Products_View, L("ViewMarketplaceProducts"), multiTenancySides: MultiTenancySides.Tenant);
 
-            // var homePage = pages.CreateChildPermission(AppPermissions.Pages_HomePage, L("HomePage"));
-            // homePage.CreateChildPermission(AppPermissions.Pages_HomePage_View, L("HomePageView"));
+           // var homePage = pages.CreateChildPermission(AppPermissions.Pages_HomePage, L("HomePage"));
+           // homePage.CreateChildPermission(AppPermissions.Pages_HomePage_View, L("HomePageView"));
 
         }
 

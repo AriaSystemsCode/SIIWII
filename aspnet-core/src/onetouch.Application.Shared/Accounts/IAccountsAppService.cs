@@ -21,9 +21,7 @@ namespace onetouch.Accounts
 
 		Task<GetAccountInfoForEditOutput> CreateOrEditAccount(CreateOrEditAccountInfoDto input);
 
-        Task<bool> UpdateConnectedAccountPriceLevel(long id, string priceLevel);
-
-        Task Delete(EntityDto<long> input);
+		Task Delete(EntityDto<long> input);
 
 		//Task<FileDto> GetAccountsToExcel(GetAllAccountsForExcelInput input);
 

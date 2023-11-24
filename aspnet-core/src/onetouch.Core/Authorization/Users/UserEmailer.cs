@@ -115,21 +115,16 @@ namespace onetouch.Authorization.Users
             //}
 
             mailMessage.AppendLine("<br />");
-            //T-SII-20230308.0002,1 MMT 03/14/2023 -Can the "Email verification" message and also the "invited user" email messages be changed to the text in the document attached?[Start]
-            //mailMessage.AppendLine(L("EmailActivation_ClickTheLinkBelowToVerifyYourEmail") + "<br /><br />");
-            //T-SII-20230308.0002,1 MMT 03/14/2023 -Can the "Email verification" message and also the "invited user" email messages be changed to the text in the document attached?[End]
+            mailMessage.AppendLine(L("EmailActivation_ClickTheLinkBelowToVerifyYourEmail") + "<br /><br />");
             mailMessage.AppendLine("<a style=\"" + _emailButtonStyle + "\" bg-color=\"" + _emailButtonColor + "\" href=\"" + link + "\">" + L("Verify") + "</a>");
             mailMessage.AppendLine("<br />");
             mailMessage.AppendLine("<br />");
             mailMessage.AppendLine("<br />");
-            //T-SII-20230308.0002,1 MMT 03/14/2023 -Can the "Email verification" message and also the "invited user" email messages be changed to the text in the document attached?[Start]
-            //mailMessage.AppendLine("<span style=\"font-size: 9pt;\">" + L("EmailMessage_CopyTheLinkBelowToYourBrowser") + "</span><br />");
-            mailMessage.AppendLine("<span style=\"font-size: 9pt;\">" + "If the button above doesn't work, click the link below" + "</span><br />");
-            //T-SII-20230308.0002,1 MMT 03/14/2023 -Can the "Email verification" message and also the "invited user" email messages be changed to the text in the document attached?[End]
+            mailMessage.AppendLine("<span style=\"font-size: 9pt;\">" + L("EmailMessage_CopyTheLinkBelowToYourBrowser") + "</span><br />");
             mailMessage.AppendLine("<span style=\"font-size: 8pt;\">" + link + "</span>");
 
             // mailMessage.AppendLine("<br>"+"This link will verify your email address, and then you’ll officially be a part of the SIIWII Portal community."+"<br><br>");
-            mailMessage.AppendLine("<br>" + "Here are your account credentials:" + "<br>");
+            mailMessage.AppendLine("<br>" + "Here are your account credentials:" + "<br><br>");
 
             //mailMessage.AppendLine("<b>" + L("NameSurname") + "</b>: " + user.Name + " " + user.Surname + "<br />");
             mailMessage.AppendLine("<b>" + "Name" + "</b>: " + user.Name + " " + user.Surname + "<br />");
@@ -145,7 +140,7 @@ namespace onetouch.Authorization.Users
             {
                 mailMessage.AppendLine("<b>" + L("Password") + "</b>: " + plainPassword + "<br />");
             }
-            mailMessage.AppendLine("<br><br>" + "See you there!" + "<br><br>" + "The SIIWII team");
+            mailMessage.AppendLine("<br><br>" + "See you there!" + "<br><br>" + "SIIWII Team");
 
             //await ReplaceBodyAndSend(user.EmailAddress, L("EmailActivation_Subject"), emailTemplate, mailMessage);
             await ReplaceBodyAndSend(user.EmailAddress, "Please confirm your Email to start using Siiwii", emailTemplate, mailMessage);

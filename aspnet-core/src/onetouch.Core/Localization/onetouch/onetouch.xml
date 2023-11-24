@@ -1,20 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
-	<text name="MaintainanceAlarm">Maintenance will be from {0} to {1}.</text>
-	<text name="OpenMaintainanceAlarm">Another open Maintenance Found, Multiple Open Maintenance, Not Allowed.</text>
-	<text name="DismissIds">Dismiss ids</text>
-    <text name="Maintainances">Maintenances</text>
-    <text name="Maintainance">Maintenance</text>
-    <text name="onetouch.Maintainances.Maintainance">Maintenance</text>
-    <text name="From">From</text>
-    <text name="MaintainancesHeaderInfo">Maintenances header info</text>
-    <text name="CreateNewMaintainance">Create new maintenance</text>
-    <text name="EditMaintainance">Edit maintenances</text>
-    <text name="DeleteMaintainance">Delete maintenance</text>
-    <text name="FromRange">From range</text>
-    <text name="ToRange">To range</text>
-
 		<text name="AppItemSelectors">App item selectors</text>
 		<text name="AppItemSelector">App item selector</text>
 		<text name="CreateNewAppItemSelector">Create new app item selector</text>
@@ -297,7 +283,6 @@
 		<text name="ResolutionPlanDueDateTimeRange">Resolution plan due date time range</text>
 		<text name="ResolutionPlanDateTimeRange">Resolution plan date time range</text>
 		<text name="AppItems">App items</text>
-		<text name="AppSiiwiiTransactions">App Transactions</text>
 		<text name="AppItem">App item</text>
 		<text name="onetouch.AppItems.AppItem">AppItem</text>
 		<text name="TenantId">Tenant id</text>
@@ -798,7 +783,7 @@
 		<text name="LoginAttempts">Login attempts</text>
 		<text name="Failed">Failed</text>
 		<text name="NewTenant">New tenant</text>
-		<text name="ResizedProfilePicture_Warn_SizeLimit">Resized picture size must be smaller than {0}KB. PleassellerNamee resize down and try again.</text>
+		<text name="ResizedProfilePicture_Warn_SizeLimit">Resized picture size must be smaller than {0}KB. Please resize down and try again.</text>
 		<text name="RegisterFormUserNameInvalidMessage">Please do not enter an email address for username.</text>
 		<text name="UseHostDatabase">Use host database</text>
 		<text name="DatabaseConnectionString">Database connection string</text>
@@ -1446,7 +1431,7 @@
 		<text name="DetailingSubscription">See webhook detail page</text>
 		<text name="ListingSendAttempts">Listing webhook send attempt history</text>
 		<text name="ResendingWebhook">Resending a webhook</text>
-		<text name="Add">Select</text>
+		<text name="Add">Add</text>
 		<text name="ShowResponse">Show Response</text>
 		<text name="ShowData">Show Data</text>
 		<text name="GoToLoginPage">Go to login page</text>
@@ -1894,6 +1879,7 @@
 		<text name="CatalogueReport">Catalogue Report</text>
 		<text name="ProductsCatalogInfo/Print">Products Catalog Info / Print</text>
 		<text name="ChooseTemplate">Choose Template</text>
+		<text name="Continue">Continue</text>
 		<text name="PleaseChooseATemplateFirst">Please choose a template first</text>
 		<text name="PleaseFillTheRequiredProductsCatalogInfo">Please fill the required products catalog info</text>
 		<text name="ProductCatalogTitle">Product catalog title</text>
@@ -2099,6 +2085,7 @@
 		<text name="Curious">Curious</text>
 		<text name="YouAnd">You and</text>
 		<text name="Other">Other</text>
+		<text name="Comments">Comments</text>
 		<text name="Comment">Comment</text>
 		<text name="TrendingPosts">Trending Posts</text>
 		<text name="PostBy">Post by</text>
@@ -2106,15 +2093,6 @@
 		<text name="TopCompanyContributors">Top Company Contributors</text>
 		<text name="Seeall">See all</text>
 		<text name="UpcomingEvents">Upcoming Events</text>
-		<text name="NewsDigest">News Digest</text>
-
-		<text name="PostTitle">Post title</text>
-		<text name="DateAscending">Date Ascending</text>
-		<text name="DateDescending ">Date Descending</text>
-		<text name="ViewsAscending">Views Ascending</text>
-		<text name="ViewsDescending">Views Descending</text>
-		
-		
 		<text name="attendees">attendees</text>
 		<text name="InPerson">In Person</text>
 		<text name="Going">Going</text>
@@ -2319,8 +2297,8 @@
 		<text name="SelectSizeScale">Select Size Scale</text>
 		<text name="SaveSizeRatio">Save Size Ratio</text>
 		<text name="SaveSizeScale">Save Size Scale</text>
-		<text name="SaveAsNewSizeRatio">Save As New Size Ratio</text>
-		<text name="SaveAsNewSizeScale">Save As New Size Scale</text>
+		<text name="SaveNewSizeRatio">Save New Size Ratio</text>
+		<text name="SaveNewSizeScale">Save New Size Scale</text>
 		<text name="IndividualSizesWillBeDisplayedAs">Individual sizes will be displayed as</text>
 		<text name="FirstDimension">First Dimension</text>
 		<text name="SecondDimension">Second Dimension</text>
@@ -2347,74 +2325,5 @@
 		<text name="CurrenciesCannotBeDublicated">Currencies can't be dublicated</text>
 		<text name="DefaultCurrencyMustExist">Default currency must exist</text>
 		<text name="EnterProductList">Enter Product List</text>
-		<text name="ConnectedAccounts">Connected Accounts</text>
-	    <text name="PersonalEmailAddress">personal email</text>
-		<text name="PriceLevel">Price Level</text>
-		<text name="AccountSSIN">Account SSIN</text>
-		<text name="SellerID">Seller ID</text>
-		<text name="BuyerID">Buyer ID</text>
-		<text name="TransactionType">Transaction Type</text>
-		<text name="TransactionID">Transaction ID</text>
-	    <text name="DateCreated">Date Created</text>
-	    <text name="MyTransactions">My Transactions</text>
-	    <text name="SalesOrder">Sales Order</text>
-	    <text name="purchaseOrder">purchase Order</text>
-	
-
-		<text name="DetailsPage">Details Page</text>
-		<text name="Customizeyourlinesheet">Customize your linesheet</text>
-		<text name="ShowProductCode">Show Product Code</text>
-		<text name="ShowProductAvailableQuantity">Show Product Available Quantity</text>
-		<text name="ShowMSRPPrice">Show MSRP Price</text>
-	    <text name="ShowSpecialPrice">Show Special Price</text>
-	    <text name="ShowGroupheaderindetailpages">Show Group header in detail pages </text>
-		<text name="ShowGroupheaderinColorpage">Show Group header in Color page </text>
-	    <text name="Background">Background </text>
-		<text name="NoBackground">No Background </text>
-		<text name="ShowColorPage">Show Color Page</text>
-		<text name="ShowCoverPage">Show Cover Page </text>
-
-		<text name="ColorName">Color Name</text>
-		<text name="MaterialContent">Material Content</text>
-
-		<text name="Brand">Brand</text>
-		<text name="ItemName">Item Name</text>
-		<text name="StartShipDate">Start Ship Date</text>
-		<text name="SellerName">Seller Name</text>
-		<text name="BuyerName">Buyer Name</text>
-		<text name="CompleteDate">Complete Date</text>
-		<text name="DateCreateRange">Date Create Range</text>
-		<text name="DateCompleteRange">Date Complete Range</text>
-		<text name="TotalQuantity">Total Quantity</text>
-		<text name="Proceedtocheckout"> Proceed to checkout</text>
-		<text name="Header"> Header</text>
-		<text name="Enteredby"> Entered by</text>
-		<text name="Buyercontactinfo"> Buyer contact info</text>
-		<text name="Sellercontactinfo"> Seller contact info</text>
-		<text name="SalesRepInformation"> Sales Rep Information</text>
-		<text name="Shippinginformation"> Shipping information</text>
-	    <text name="BillingInformation"> Billing Information</text>
-	    <text name="OrderDetails"> Order Details</text>
-		<text name="ShowVariations"> Show Variations</text>
-		<text name="DiscardShopping"> Discard Shopping</text>
-		<text name="ContinueShopping"> Continue Shopping</text>
-		<text name="Placeyourorder"> Place your order</text>
-	    <text name="Comments"> Comments</text>
-	    <text name="ShipFrom"> Ship From</text>
-	    <text name="ShipTo"> Ship To</text>
-		<text name="SelectAddresses">Select Addresses</text>
-		<text name="AddNewAddressDetails">Add New Address Details</text>
-		<text name="PleaseSelectFromTheSavedAddressesBelow">Please select from the saved addresses below</text>
-		<text name="PleaseEnterThenewAddressInformation">Please enter the new address information</text>
-        <text name="AddANewAddress">Add A New Address</text>
-	    <text name="AddressLineOne">Address Line 1</text>
-	    <text name="AddressLineTow">Address Line 2</text>
-	<text name="AddressType">Address Type</text>
-		<text name="Store">Store</text>
-       <text name="ShipVia">Ship Via</text>
-		<text name="APContact">AP Contact</text>
-		<text name="ARContact">AR Contact</text>
-		<text name="PaymentInformation">Payment Information</text>
-		<text name="PaymentTerms">Payment Terms</text>
-	</texts>  
+	</texts>
 </localizationDictionary>

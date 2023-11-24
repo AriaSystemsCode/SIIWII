@@ -23,31 +23,21 @@ using onetouch.Helpers;
 using Abp.Domain.Uow;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
-using Abp.EntityFrameworkCore;
-using onetouch.EntityFrameworkCore;
-using onetouch.AppContacts;
 
 namespace onetouch.SystemObjects
 {
     [AbpAuthorize(AppPermissions.Pages_SycEntityObjectClassifications)]
     public class SycEntityObjectClassificationsAppService : onetouchAppServiceBase, ISycEntityObjectClassificationsAppService
     {
-        private onetouchDbContext _context => _dbContextProvider.GetDbContext();
-        private readonly IDbContextProvider<onetouchDbContext> _dbContextProvider;
-        private IRepository<AppContact, long> _appContactRepository;
         private readonly IRepository<SycEntityObjectClassification, long> _sycEntityObjectClassificationRepository;
         private readonly ISycEntityObjectClassificationsExcelExporter _sycEntityObjectClassificationsExcelExporter;
         private readonly IRepository<SydObject, long> _lookup_sydObjectRepository;
         private readonly IRepository<SycEntityObjectClassification, long> _lookup_sycEntityObjectClassificationRepository;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly Helper _helper;
-        //xx
-        private readonly ISycEntityLocalizationAppService _sycEntityLocalizeAppService;
-        //xx
-        public SycEntityObjectClassificationsAppService(IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository,
-            ISycEntityObjectClassificationsExcelExporter sycEntityObjectClassificationsExcelExporter, IRepository<SydObject, long> lookup_sydObjectRepository,
-            IRepository<SycEntityObjectClassification, long> lookup_sycEntityObjectClassificationRepository, Helper helper, IAppEntitiesAppService appEntitiesAppService,
-            ISycEntityLocalizationAppService sycEntityLocalizationAppService,IDbContextProvider<onetouchDbContext> dbContextProvider, IRepository<AppContact, long> appContactRepository)
+
+
+        public SycEntityObjectClassificationsAppService(IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, ISycEntityObjectClassificationsExcelExporter sycEntityObjectClassificationsExcelExporter, IRepository<SydObject, long> lookup_sydObjectRepository, IRepository<SycEntityObjectClassification, long> lookup_sycEntityObjectClassificationRepository, Helper helper, IAppEntitiesAppService appEntitiesAppService)
         {
 
             _sycEntityObjectClassificationRepository = sycEntityObjectClassificationRepository;
@@ -56,10 +46,7 @@ namespace onetouch.SystemObjects
             _lookup_sycEntityObjectClassificationRepository = lookup_sycEntityObjectClassificationRepository;
             _appEntitiesAppService = appEntitiesAppService;
             _helper = helper;
-           
-            _sycEntityLocalizeAppService = sycEntityLocalizationAppService;
-            _appContactRepository = appContactRepository;
-            _dbContextProvider = dbContextProvider;
+
         }
 
         public async Task<PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>>> GetAll(GetAllSycEntityObjectClassificationsInput input)
@@ -79,27 +66,17 @@ namespace onetouch.SystemObjects
                     .Where(e => e.TenantId == AbpSession.TenantId || e.TenantId == null)
                     .WhereIf(input.ObjectId > 0, e => e.ObjectId == input.ObjectId);
 
-            
+
             var pagedAndFilteredSycEntityObjectClassifications = filteredSycEntityObjectClassifications
                 .OrderBy(input.Sorting ?? "id asc")
                 .PageBy(input);
-            //XX
-            var tenantLanguage = "ENG";
-            var account = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
-            if (account != null && !string.IsNullOrEmpty(account.LanguageCode))
-            {
-                tenantLanguage = account.LanguageCode;
-            }
-            var cat = await _lookup_sydObjectRepository.FirstOrDefaultAsync(a => a.Code == "CLASSIFICATION");
+
             var sycEntityObjectClassifications = from o in pagedAndFilteredSycEntityObjectClassifications
                                                  join o1 in _lookup_sydObjectRepository.GetAll() on o.ObjectId equals o1.Id into j1
                                                  from s1 in j1.DefaultIfEmpty()
 
                                                  join o2 in _lookup_sycEntityObjectClassificationRepository.GetAll() on o.ParentId equals o2.Id into j2
                                                  from s2 in j2.DefaultIfEmpty()
-
-                                                 join s5 in _context.SycEntityLocalizations.Where(z => z.Language.ToUpper() == tenantLanguage.ToUpper() && z.ObjectTypeId == cat.Id) on s2.Id equals s5.ObjectId into j3
-                                                 from s3 in j3.DefaultIfEmpty()
 
                                                  select new TreeNode<GetSycEntityObjectClassificationForViewDto>()
                                                  {
@@ -108,10 +85,10 @@ namespace onetouch.SystemObjects
                                                          SycEntityObjectClassification = new SycEntityObjectClassificationDto
                                                          {
                                                              Code = o.Code,
-                                                             Name = s3.String == null ? o.Name : s3.String ,
+                                                             Name = o.Name,
                                                              Id = o.Id
                                                          },
-                                                         SydObjectName = s3.String == null ? (s1 == null ? "" : s1.Name.ToString()) : s3.String,
+                                                         SydObjectName = s1 == null ? "" : s1.Name.ToString(),
                                                          SycEntityObjectClassificationName = s2 == null ? "" : s2.Name.ToString()
                                                      },
                                                      Leaf = o.SycEntityObjectClassifications.Count() == 0,
@@ -538,11 +515,6 @@ namespace onetouch.SystemObjects
                 throw new UserFriendlyException(L("CodeIsAlreadyExists", input.Code));
 
             }
-            //xx
-            var classification = await _lookup_sydObjectRepository.FirstOrDefaultAsync(a => a.Code == "CLASSIFICATION");
-            if (classification != null)
-                _sycEntityLocalizeAppService.CreateOrUpdateLocalization(classification.Id, sycEntityObjectClassification.Id, "ENG", "Name", input.Name);
-            //xx
         }
 
         [AbpAuthorize(AppPermissions.Pages_SycEntityObjectClassifications_Edit, AppPermissions.Pages_AppItems_Create, AppPermissions.Pages_AppItems_Edit)]
@@ -553,11 +525,6 @@ namespace onetouch.SystemObjects
 
             var sycEntityObjectClassification = await _sycEntityObjectClassificationRepository.FirstOrDefaultAsync((int)input.Id);
             ObjectMapper.Map(input, sycEntityObjectClassification);
-            //xx
-            var classification = await _lookup_sydObjectRepository.FirstOrDefaultAsync(a => a.Code == "CLASSIFICATION");
-            if (classification != null)
-                _sycEntityLocalizeAppService.CreateOrUpdateLocalization(classification.Id, sycEntityObjectClassification.Id, "ENG", "Name", input.Name);
-            //xx
         }
 
         [AbpAuthorize(AppPermissions.Pages_SycEntityObjectClassifications_Delete)]
@@ -649,34 +616,6 @@ namespace onetouch.SystemObjects
 
             return true;
         }
-        //MMT36
-        [AbpAllowAnonymous]
-        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>>> GetAllWithChildsForTransactionWithPaging(GetAllSycEntityObjectClassificationsInput input)
-        {
-            input.ObjectId = await _helper.SystemTables.GetObjectTransactionId();
 
-            if (input.EntityId != 0)
-            {
-                input.ExcludeIds = new List<long>();
-                var EntityRelated = await _appEntitiesAppService.GetAppEntityClassificationsWithPaging(new GetAppEntityAttributesInput { EntityId = input.EntityId });
-                if (EntityRelated != null && EntityRelated.TotalCount > 0)
-                {
-                    input.ExcludeIds.AddRange(EntityRelated.Items.Select(r => r.EntityObjectClassificationId).ToList());
-                }
-            }
-
-            PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> allParents = await GetAll(input);
-            //foreach (var item in allParents.Items)
-            //{
-            //    if (!item.Leaf)
-            //    {
-            //        await LoadChilds(item);
-            //    }
-            //}
-
-            return allParents;
-
-        }
-        //MMT36
     }
 }

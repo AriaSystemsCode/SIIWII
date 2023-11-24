@@ -24,7 +24,6 @@ namespace onetouch.AppEntities.Dtos
         public long? RelatedEntityId { get; set; }
 
         public long EntityObjectTypeId { get; set; }
-        public string EntityObjectTypeCode { get; set; }
 
         public long? EntityObjectStatusId { get; set; }
 
@@ -44,10 +43,6 @@ namespace onetouch.AppEntities.Dtos
         public virtual IList<AppEntitiesRelationshipDto> RelatedEntitiesRelationships { get; set; }
 
         public virtual AppEntityTypes AppEntityTypes { get; set; }
-        //MMT30[Start]
-        public virtual string SSIN { get; set; }
-        public virtual long TenantOwner { get; set; }
-        //MMT30[End]
     }
 
     public class GetAppEntityAttributesInput : PagedAndSortedResultRequestDto

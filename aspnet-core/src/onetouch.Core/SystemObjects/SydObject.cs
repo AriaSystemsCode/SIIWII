@@ -7,7 +7,6 @@ using Abp.Domain.Entities.Auditing;
 using Abp.Domain.Entities;
 using Abp.Auditing;
 using System.Collections.Generic;
-using onetouch.SycIdentifierDefinitions;
 
 namespace onetouch.SystemObjects
 {
@@ -42,14 +41,5 @@ namespace onetouch.SystemObjects
 		public virtual string ParentCode { get; set; }
 
 		public ICollection<SydObject> SydObjects { get; set; }
-        public virtual long? SSINIdentifierId { get; set; }
-        public virtual string SSINIdentifierCode { get; set; }
-        public virtual long? SycDefaultIdentifierId { get; set; }
-        public virtual string SycDefaultIdentifierCode { get; set; }
-        [ForeignKey("SSINIdentifierId")]
-        public SycIdentifierDefinition SSINIdentifierIdFk { get; set; }
-        [ForeignKey("SycDefaultIdentifierId")]
-        public SycIdentifierDefinition SycDefaultIdentifierIdFk { get; set; }
-
-    }
+	}
 }

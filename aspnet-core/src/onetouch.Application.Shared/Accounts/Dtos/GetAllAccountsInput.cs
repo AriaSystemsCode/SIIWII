@@ -19,10 +19,6 @@ namespace onetouch.Accounts.Dtos
 
         public string Postal { get; set; }
 
-        public string SSIN { get; set; }
-        public long AccountTypeId { get; set; }
-        public string AccountType { get; set; }
-
         public long[] AccountTypes { get; set; }
         
         public long[] Status { get; set; }

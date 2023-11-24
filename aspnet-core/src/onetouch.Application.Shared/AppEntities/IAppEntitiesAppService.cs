@@ -19,12 +19,8 @@ namespace onetouch.AppEntities
 		Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input);
 		Task<PagedResultDto<LookupLabelDto>> GetAllEntityTypeForTableDropdown(GetAllAppEntitiesInput input);
 		Task<List<LookupLabelDto>> GetAllAccountTypeForTableDropdown();
-		Task<PagedResultDto<LookupLabelWithAttachmentDto>> GetAllBackgroundWithPaging(GetAllAppEntitiesInput input);
 
-        Task<List<LookupLabelDto>> GetLineSheetDetailPageSort();
-        Task<List<LookupLabelDto>> GetLineSheetColorSort();
-
-        Task<List<LookupLabelDto>> GetAllAddressTypeForTableDropdown();
+		Task<List<LookupLabelDto>> GetAllAddressTypeForTableDropdown();
 
 		Task<List<LookupLabelDto>> GetAllPhoneTypeForTableDropdown();
 		
@@ -52,9 +48,8 @@ namespace onetouch.AppEntities
 
 		Task<FileDto> GetAppEntitiesToExcel(GetAllAppEntitiesForExcelInput input);
 
-		Task<PagedResultDto<LookupLabelDto>> GetAllEntitiesByTypeCodeWithPaging(GetAllAppEntitiesInput input);
-
-        Task<List<AppEntitySycEntityObjectTypeLookupTableDto>> GetAllSycEntityObjectTypeForTableDropdown();
+		
+		Task<List<AppEntitySycEntityObjectTypeLookupTableDto>> GetAllSycEntityObjectTypeForTableDropdown();
 		
 		Task<List<AppEntitySycEntityObjectStatusLookupTableDto>> GetAllSycEntityObjectStatusForTableDropdown();
 		
@@ -81,8 +76,7 @@ namespace onetouch.AppEntities
 		Task<bool> UpdateEntityCommentsCount(long entitlyId, bool RemoveComment);
 		//MMT
 		Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code);
-		Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode);
-        //MMT
+		//MMT
 
-    }
+	}
 }

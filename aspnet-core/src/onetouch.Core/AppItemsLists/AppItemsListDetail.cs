@@ -29,9 +29,5 @@ namespace onetouch.AppItemsLists
 
         [StringLength(AppItemsListConsts.MaxStateLength, MinimumLength = AppItemsListConsts.MinStateLength)]
         public virtual string State { get; set; }
-        //MMT30
-        [StringLength(AppItemConsts.SSINLength, MinimumLength = AppItemConsts.SSINLength)]
-        public virtual string ItemSSIN { get; set; }
-        //MMT30
     }
 }

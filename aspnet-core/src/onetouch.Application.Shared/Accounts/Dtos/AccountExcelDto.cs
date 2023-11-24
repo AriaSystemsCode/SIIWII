@@ -12,7 +12,6 @@ namespace onetouch.Accounts.Dtos
     public class AccountExcelDto
     {
         public Int32 rowNumber { get; set; }
-        public string PriceLevel { get; set; }
         public string RecordType { get; set; }
         public string ParentCode { get; set; }
         public long? ParentId { get; set; }

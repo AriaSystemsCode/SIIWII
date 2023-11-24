@@ -20,32 +20,20 @@ using Abp.Domain.Uow;
 using onetouch.Helpers;
 using onetouch.AppEntities.Dtos;
 using onetouch.AppEntities;
-using onetouch.AppContacts;
-using NPOI.SS.Formula.Functions;
-using Org.BouncyCastle.X509;
-using System.Security.Cryptography;
-using Abp.EntityFrameworkCore;
-using onetouch.EntityFrameworkCore;
 
 namespace onetouch.SystemObjects
 {
     [AbpAuthorize(AppPermissions.Pages_SycEntityObjectCategories)]
     public class SycEntityObjectCategoriesAppService : onetouchAppServiceBase, ISycEntityObjectCategoriesAppService
     {
-        private onetouchDbContext _context => _dbContextProvider.GetDbContext();
-        private readonly IDbContextProvider<onetouchDbContext> _dbContextProvider;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategoryRepository;
         private readonly ISycEntityObjectCategoriesExcelExporter _sycEntityObjectCategoriesExcelExporter;
         private readonly IRepository<SydObject, long> _lookup_sydObjectRepository;
         private readonly IRepository<SycEntityObjectCategory, long> _lookup_sycEntityObjectCategoryRepository;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly Helper _helper;
-        private readonly SycEntityLocalizationAppService _sycEntityLocalizeAppService;
-        private IRepository<AppContact, long> _appContactRepository;
-        public SycEntityObjectCategoriesAppService(IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository,
-            ISycEntityObjectCategoriesExcelExporter sycEntityObjectCategoriesExcelExporter, IRepository<SydObject, long> lookup_sydObjectRepository, 
-            IRepository<SycEntityObjectCategory, long> lookup_sycEntityObjectCategoryRepository, Helper helper, IAppEntitiesAppService appEntitiesAppService,
-            SycEntityLocalizationAppService sycEntityLocalizationAppService, IRepository<AppContact, long> appContactRepository, IDbContextProvider<onetouchDbContext> dbContextProvider)
+
+        public SycEntityObjectCategoriesAppService(IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository, ISycEntityObjectCategoriesExcelExporter sycEntityObjectCategoriesExcelExporter, IRepository<SydObject, long> lookup_sydObjectRepository, IRepository<SycEntityObjectCategory, long> lookup_sycEntityObjectCategoryRepository, Helper helper, IAppEntitiesAppService appEntitiesAppService)
         {
             _sycEntityObjectCategoryRepository = sycEntityObjectCategoryRepository;
             _sycEntityObjectCategoriesExcelExporter = sycEntityObjectCategoriesExcelExporter;
@@ -53,9 +41,7 @@ namespace onetouch.SystemObjects
             _lookup_sycEntityObjectCategoryRepository = lookup_sycEntityObjectCategoryRepository;
             _appEntitiesAppService = appEntitiesAppService;
             _helper = helper;
-            _sycEntityLocalizeAppService= sycEntityLocalizationAppService;
-            _appContactRepository = appContactRepository;
-            _dbContextProvider = dbContextProvider;
+
         }
 
         [AbpAllowAnonymous]
@@ -81,18 +67,10 @@ namespace onetouch.SystemObjects
                         .Where(e => e.TenantId == AbpSession.TenantId || e.TenantId == null)
                          .WhereIf(input.ObjectId > 0, e => e.ObjectId == input.ObjectId);
 
-                //XX
-                var tenantLanguage = "ENG";
-                var account = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
-                if (account != null && !string.IsNullOrEmpty(account.LanguageCode))
-                {
-                    tenantLanguage = account.LanguageCode;
-                }
-                var cat = await _lookup_sydObjectRepository.FirstOrDefaultAsync(a => a.Code == "CATEGORY");
-                //var categories = _sycEntityLocalizeAppService.GetAll(tenantLanguage, cat.Id ).ToList ();
-                //XX
 
-                    var pagedAndFilteredSycEntityObjectCategories = filteredSycEntityObjectCategories
+
+
+                var pagedAndFilteredSycEntityObjectCategories = filteredSycEntityObjectCategories
                     .OrderBy(input.Sorting ?? "id asc")
                     .PageBy(input);
 
@@ -102,9 +80,6 @@ namespace onetouch.SystemObjects
 
                                                 join o2 in _lookup_sycEntityObjectCategoryRepository.GetAll() on o.ParentId equals o2.Id into j2
                                                 from s2 in j2.DefaultIfEmpty()
-
-                                                join s5 in _context.SycEntityLocalizations.Where(z => z.Language.ToUpper() == tenantLanguage.ToUpper() && z.ObjectTypeId == cat.Id) on s2.Id equals s5.ObjectId  into j3
-                                                from s3 in j3.DefaultIfEmpty()
 
                                                 select new TreeNode<GetSycEntityObjectCategoryForViewDto>()
                                                 {
@@ -116,7 +91,7 @@ namespace onetouch.SystemObjects
                                                             Name = o.Name,
                                                             Id = o.Id
                                                         },
-                                                        SydObjectName = s3.String== null ? (s1 == null ? "" : s1.Name.ToString()): s3.String ,
+                                                        SydObjectName = s1 == null ? "" : s1.Name.ToString(),
                                                         SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
                                                     },
                                                     Leaf = o.SycEntityObjectCategories.Count() == 0,
@@ -519,11 +494,6 @@ namespace onetouch.SystemObjects
                 throw new UserFriendlyException(L("CodeIsAlreadyExists", input.Code));
 
             }
-            //xx
-            var cat = await _lookup_sydObjectRepository.FirstOrDefaultAsync(a => a.Code == "CATEGORY");
-            if (cat != null)
-                _sycEntityLocalizeAppService.CreateOrUpdateLocalization(cat.Id, sycEntityObjectCategory.Id, "ENG", "Name", input.Name);
-            //xx
         }
 
         [AbpAuthorize(AppPermissions.Pages_SycEntityObjectCategories_Edit, AppPermissions.Pages_AppItems_Create, AppPermissions.Pages_AppItems_Edit)]
@@ -533,11 +503,6 @@ namespace onetouch.SystemObjects
 
             var sycEntityObjectCategory = await _sycEntityObjectCategoryRepository.FirstOrDefaultAsync(x => x.Id == input.Id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
             ObjectMapper.Map(input, sycEntityObjectCategory);
-            //xx
-            var cat = await _lookup_sydObjectRepository.FirstOrDefaultAsync(a => a.Code == "CATEGORY");
-            if (cat != null)
-                _sycEntityLocalizeAppService.CreateOrUpdateLocalization(cat.Id, sycEntityObjectCategory.Id, "ENG", "Name", input.Name);
-            //xx
         }
 
         public async Task CreateOrEditForObjectProduct(CreateOrEditSycEntityObjectCategoryDto input)
@@ -643,35 +608,6 @@ namespace onetouch.SystemObjects
 
             return true;
         }
-        //MMT36
-        [AbpAllowAnonymous]
-        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsForTransactionWithPaging(GetAllSycEntityObjectCategoriesInput tmpInput)
-        {
-            tmpInput.ObjectId = await _helper.SystemTables.GetObjectTransactionId();
 
-            if (tmpInput.EntityId != 0)
-            {
-                tmpInput.ExcludeIds = new List<long>();
-                if (tmpInput.DepartmentFlag)
-                {
-                    var EntityRelated = await _appEntitiesAppService.GetAppEntityDepartmentsWithPaging(new GetAppEntityAttributesInput { EntityId = tmpInput.EntityId });
-                    if (EntityRelated != null && EntityRelated.TotalCount > 0)
-                    {
-                        tmpInput.ExcludeIds.AddRange(EntityRelated.Items.Select(r => r.EntityObjectCategoryId).ToList());
-                    }
-                }
-                else
-                {
-                    var EntityRelated = await _appEntitiesAppService.GetAppEntityCategoriesWithPaging(new GetAppEntityAttributesInput { EntityId = tmpInput.EntityId });
-                    if (EntityRelated != null && EntityRelated.TotalCount > 0)
-                    {
-                        tmpInput.ExcludeIds.AddRange(EntityRelated.Items.Select(r => r.EntityObjectCategoryId).ToList());
-                    }
-                }
-            }
-            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> allParents = await GetAll(tmpInput);
-            return allParents;
-        }
-        //MMT36
     }
 }

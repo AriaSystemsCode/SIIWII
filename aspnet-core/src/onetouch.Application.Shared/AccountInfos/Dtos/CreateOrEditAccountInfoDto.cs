@@ -38,10 +38,8 @@ namespace onetouch.AccountInfos.Dtos
         public string TradeName { get; set; }
 
 
-        public string AccountType { get; set; }
-        public long AccountTypeId { get; set; }
-        public string SSIN { get; set; }
-        public string PriceLevel { get; set; }
+        public List<long> AccountType { get; set; }
+
 
         public string Notes { get; set; }
 

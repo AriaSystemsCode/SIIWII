@@ -175,7 +175,7 @@ namespace onetouch.AppEvents
             return appEventDto;
         }
 
-        public async Task<GetAppEventForViewDto> GetAppEventForView(long id,long entityId, string timeZone)
+        public async Task<GetAppEventForViewDto> GetAppEventForView(long id,long entityId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             { 
@@ -187,15 +187,6 @@ namespace onetouch.AppEvents
                 {
                     appEvent.CurrentUserResponce = ResponceType.OTHER;
                 }
-                if (appEvent != null && appEvent.AppEvent != null && appEvent.AppEvent.UTCFromDateTime != null)
-                {
-                    appEvent.currentFromDateTime = _helper.GetDatetimeValueFromUTC(appEvent.AppEvent.UTCFromDateTime, timeZone);
-                }
-                if (appEvent != null && appEvent.AppEvent != null && appEvent.AppEvent.UTCToDateTime != null)
-                {
-                    appEvent.currentToDateTime = _helper.GetDatetimeValueFromUTC(appEvent.AppEvent.UTCToDateTime, timeZone);
-                }
-
                 return appEvent;
             }
         }
@@ -216,17 +207,6 @@ namespace onetouch.AppEvents
         protected virtual async Task<long> DoCreateOrEdit(CreateOrEditAppEventDto input)
         {
             AppEvent appEvent;
-
-            if (input.FromHour > 0 && input.FromMinute > 0)
-            { //input.FromDate = new DateTime(input.FromDate.Year, input.FromDate.Month, input.FromDate.Day, input.FromHour, input.FromMinute,0);
-                input.FromTime = new DateTime(input.FromTime.Year, input.FromTime.Month, input.FromTime.Day, input.FromHour, input.FromMinute, 0);
-            
-            }
-
-            if (input.ToHour > 0 && input.ToMinute > 0)
-            { //input.ToDate = new DateTime(input.ToDate.Year, input.ToDate.Month, input.ToDate.Day, input.ToHour, input.ToMinute, 0);
-                input.ToTime = new DateTime(input.ToTime.Year, input.ToTime.Month, input.ToTime.Day, input.ToHour, input.ToMinute, 0);
-            }
 
             if (input.Id == 0)
             {

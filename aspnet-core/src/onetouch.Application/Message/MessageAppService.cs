@@ -699,21 +699,11 @@ namespace onetouch.Message
                 {
                     if (i != 0)
                         output = output + " , ";
-                    //T-SII-20230213.0009,1 MMT 03/14/2023 BE Error in message scrolling[Start]
-                    //var userName = UserManager.Users.Where(x => x.Id == long.Parse(arr[i])).Select(x => x.Name).FirstOrDefault().ToString();
-                    //userName += "." + UserManager.Users.Where(x => x.Id == long.Parse(arr[i])).Select(x => x.Surname).FirstOrDefault().ToString();
-                    //userName += "@" + GetTenantNameByID(long.Parse(arr[i]));
-                    //output = output + userName;
-                    var userObj= UserManager.Users.Where(x => x.Id == long.Parse(arr[i])).FirstOrDefault();
-                    if (userObj != null)
-                    {
-                        var userName = userObj.Name.ToString();
-                        userName += "." + userObj.Surname.ToString();
-                        userName += "@" + GetTenantNameByID(long.Parse(arr[i]));
-                        output = output + userName;
-                    }
-                    //T-SII-20230213.0009,1 MMT 03/14/2023 BE Error in message scrolling[End]
 
+                    var userName = UserManager.Users.Where(x => x.Id == long.Parse(arr[i])).Select(x => x.Name).FirstOrDefault().ToString();
+                    userName += "." + UserManager.Users.Where(x => x.Id == long.Parse(arr[i])).Select(x => x.Surname).FirstOrDefault().ToString();
+                    userName += "@" + GetTenantNameByID(long.Parse(arr[i]));
+                    output = output + userName;
                 }
             }
             return output;
@@ -725,14 +715,7 @@ namespace onetouch.Message
             var tenantId = UserManager.Users.Where(x => x.Id == (long)userId).Select(x => x.TenantId).FirstOrDefault();
             string tenantName = L("Onetouch");
             if (tenantId!= null)
-            {
-                //T-SII-20230304.0001,1 MMT 03/14/2023 - Error while open Message page[Start]
-                //tenantName = TenantManager.Tenants.Where(x => x.Id == tenantId).Select(x => x.TenancyName).FirstOrDefault().ToString();
-                var tenantObj = TenantManager.Tenants.Where(x => x.Id == tenantId).FirstOrDefault();
-                if (tenantObj != null)
-                    tenantName = tenantObj.TenancyName.ToString();
-                //T-SII-20230304.0001,1 MMT 03/14/2023 - Error while open Message page[End]
-            }
+              tenantName = TenantManager.Tenants.Where(x => x.Id == tenantId).Select(x => x.TenancyName).FirstOrDefault().ToString();
 
             return tenantName;
         }

@@ -40,8 +40,5 @@ namespace onetouch.MultiTenancy.Dto
         [Required]
         public string LastName { get; set; }
         //MMT,1 Add Admin user first name and last name in the Tenant regsitration page[End]
-        public string AccountType { get; set; }
-        public string AccountTypeId { get; set; }
-
     }
 }

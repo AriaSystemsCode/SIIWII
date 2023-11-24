@@ -254,10 +254,7 @@ namespace onetouch.MultiTenancy
             //if (string.IsNullOrEmpty(TenantCurrencyCode))
             {
                 var account = await _appContactRepository.GetAll().Include(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData).FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
-                //T-SII-20230501.0001,1 MMT 05/02/2023 error in account profile page if account has no assigned currency[Start]
-                //if (account != null)
-                if (account != null && account.CurrencyFk !=null)
-                //T-SII-20230501.0001,1 MMT 05/02/2023 error in account profile page if account has no assigned currency[End]
+                if (account != null)
                 {
                     tenantCurrencyInfoDto.Code = account.CurrencyFk.Code;
                     tenantCurrencyInfoDto.Value = account.CurrencyFk.Id;

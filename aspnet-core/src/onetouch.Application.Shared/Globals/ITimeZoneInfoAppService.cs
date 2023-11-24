@@ -11,7 +11,6 @@ namespace onetouch.Globals
     {
          Task<List<DisplayNameValueDto>> GetTimeZonesList();
         DateTime GetUTCDatetimeValue(DateTime dateTime, string timeZone);
-        DateTime GetDatetimeValueFromUTC(DateTime dateTime, string timeZone);
-        
+
     }
 }

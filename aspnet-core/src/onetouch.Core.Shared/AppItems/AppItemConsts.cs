@@ -8,9 +8,6 @@
 
         public const int MinNameLength = 1;
         public const int MaxNameLength = 250;
-        //MMT
-        public const int SSINLength = 30;
-        //MMT
 
     }
 }

@@ -21,9 +21,7 @@ namespace onetouch.AppItems.Dtos
         public virtual decimal Price { get; set; }
 
         public virtual string ImgURL { get; set; }
-        //MMT30
-        public virtual string ItemSSIN { get; set; }
-        //MMT30
+
         public virtual StateEnum State { get; set; }
 
         public IList<AppEntityExtraDataDto> EntityExtraData { get; set; }

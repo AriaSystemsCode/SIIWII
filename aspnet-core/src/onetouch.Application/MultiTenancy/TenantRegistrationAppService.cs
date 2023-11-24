@@ -23,11 +23,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using onetouch.MultiTenancy.Payments;
-using onetouch.AppEntities.Dtos;
-using onetouch.SystemObjects;
-using Abp.Domain.Repositories;
-using onetouch.Helpers;
-using Microsoft.EntityFrameworkCore;
 
 namespace onetouch.MultiTenancy
 {
@@ -42,8 +37,6 @@ namespace onetouch.MultiTenancy
         private readonly ILocalizationContext _localizationContext;
         private readonly TenantManager _tenantManager;
         private readonly ISubscriptionPaymentRepository _subscriptionPaymentRepository;
-        private readonly IRepository<SycEntityObjectType, long> _lookup_sycEntityObjectTypeRepository;
-        private readonly Helper _helper;
 
         public TenantRegistrationAppService(
             IMultiTenancyConfig multiTenancyConfig,
@@ -52,12 +45,8 @@ namespace onetouch.MultiTenancy
             IAppNotifier appNotifier,
             ILocalizationContext localizationContext,
             TenantManager tenantManager,
-            ISubscriptionPaymentRepository subscriptionPaymentRepository,
-            IRepository<SycEntityObjectType, long> lookup_sycEntityObjectTypeRepository,
-            Helper helper)
+            ISubscriptionPaymentRepository subscriptionPaymentRepository)
         {
-            _helper = helper;
-            _lookup_sycEntityObjectTypeRepository = lookup_sycEntityObjectTypeRepository;
             _multiTenancyConfig = multiTenancyConfig;
             _recaptchaValidator = recaptchaValidator;
             _editionManager = editionManager;
@@ -67,19 +56,6 @@ namespace onetouch.MultiTenancy
             _subscriptionPaymentRepository = subscriptionPaymentRepository;
 
             AppUrlService = NullAppUrlService.Instance;
-        }
-
-        public async Task<List<LookupLabelDto>> GetAllAccountTypesForTableDropdown()
-        {
-            var accountTypeId = await _helper.SystemTables.GetObjectContactId();
-            return await _lookup_sycEntityObjectTypeRepository.GetAll().Where(e => e.ObjectId == accountTypeId)
-                 .Select(sycEntityObjectType => new LookupLabelDto
-                 {
-                     Value = sycEntityObjectType.Id,
-                     Label = sycEntityObjectType.Name.ToString(),
-                     Code = sycEntityObjectType.Code,
-                 })
-                 .ToListAsync();
         }
 
         public async Task<RegisterTenantOutput> RegisterTenant(RegisterTenantInput input)
@@ -151,9 +127,7 @@ namespace onetouch.MultiTenancy
                     IsEmailConfirmationRequired = isEmailConfirmationRequired,
                     IsTenantActive = tenant.IsActive,
                     FirstName = input.FirstName,
-                    LastName = input.LastName,
-                    AccountType = input.AccountType,
-                    AccountTypeId = input.AccountTypeId
+                    LastName = input.LastName
                 };
             }
         }

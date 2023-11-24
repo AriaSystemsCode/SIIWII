@@ -1,10 +1,8 @@
 ﻿using onetouch.Globals.Dtos;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TimeZoneConverter;
 
 namespace onetouch.Globals
 {
@@ -16,28 +14,7 @@ namespace onetouch.Globals
             var uTCFromDateTime = TimeZoneInfo.ConvertTimeToUtc(dateTime, timeZoneValue);
             return uTCFromDateTime;
         }
-
-        public DateTime GetDatetimeValueFromUTC(DateTime dateTime, string timeZone)
-        {
-             
-            try
-            {
-                var timeZoneValue = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
-                var uTCFromDateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime, timeZoneValue);
-                return uTCFromDateTime;
-
-            }
-            catch(Exception ex)
-            {
-
-                TimeZoneInfo timeZoneValue = TZConvert.GetTimeZoneInfo(timeZone);
-                var uTCFromDateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime, timeZoneValue);
-                return uTCFromDateTime;
-            }
-            return dateTime;
-
-
-        }
+    
 
         public async  Task<List<DisplayNameValueDto>> GetTimeZonesList()
         {

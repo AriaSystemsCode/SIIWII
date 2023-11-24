@@ -12,7 +12,7 @@ namespace onetouch.AppEvents
         Task<PagedResultDto<GetAppEventForViewDto>> GetAll(GetAllAppEventsInput input);
 
         Task<GetAppEventForEditDto> GetAppEventForEdit(long id);
-        Task<GetAppEventForViewDto> GetAppEventForView(long id, long entityId, string timeZone);
+        Task<GetAppEventForViewDto> GetAppEventForView(long id, long entityId);
         Task<long> CreateOrEdit(CreateOrEditAppEventDto input);
 
         Task Delete(EntityDto<long> input);

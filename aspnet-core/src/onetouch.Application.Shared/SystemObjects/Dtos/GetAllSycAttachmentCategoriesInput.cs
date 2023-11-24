@@ -26,10 +26,4 @@ namespace onetouch.SystemObjects.Dtos
 		public AttachmentType? TypeFilter { get; set; }
 
 	}
-
-	public class GetAllSycAttachmentCategoriesByEntityObjectTypeInput : GetAllSycAttachmentCategoriesInput
-	{
-		public long? EntityObjectTypeId { get; set; }
-        public string? EntityObjectTypeCode { get; set; }
-    }
 }

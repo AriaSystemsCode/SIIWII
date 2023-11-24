@@ -6,11 +6,9 @@ using Abp.Domain.Entities;
 using Abp.Auditing;
 using onetouch.AppEntities;
 using System.Collections.Generic;
-using onetouch.SycIdentifierDefinitions;
 
 namespace onetouch.AppItems
 {
-   
     [Table("AppItems")]
     [Audited]
     public class AppItem : FullAuditedEntity<long>, IMayHaveTenant
@@ -69,15 +67,6 @@ namespace onetouch.AppItems
         //MMT
         public ICollection<AppItemPrices> ItemPricesFkList { get; set; }
         public ICollection<AppItemSizeScalesHeader> ItemSizeScaleHeadersFkList { get; set; }
-        public virtual DateTime TimeStamp { get; set; }
-        public virtual int TenantOwner { get; set; }
-
-        [StringLength(AppItemConsts.SSINLength, MinimumLength = AppItemConsts.SSINLength)]
-        public virtual string SSIN { get; set; }
-        public virtual long? SycIdentifierId { get; set; }
-       
-        [ForeignKey("SycIdentifierId")]
-        public SycIdentifierDefinition SycIdentifierIdFk { get; set; }
         //MMT
     }
 }

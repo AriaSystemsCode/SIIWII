@@ -14,10 +14,6 @@ using onetouch.Authorization.Users;
 using onetouch.EntityFrameworkCore;
 using onetouch.Notifications;
 using onetouch.SystemObjects.Dtos;
-using Castle.MicroKernel.Registration;
-using onetouch.SystemObjects;
-using PayPalCheckoutSdk.Orders;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace onetouch.Migrations.Seed.Host
 {
@@ -131,22 +127,6 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Department);
                 _context.SaveChanges();
             }
-            #region iteration 31 add contact/person,Group and Business
-            var sydObjects_Contact = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-           r => r.Code == "CONTACT");
-            if (sydObjects_Contact == null && sydObjects_Contact.Id > 0)
-            {
-                var sycEntityObjectType_Contact = new SystemObjects.SycEntityObjectType
-                {
-                    Code = "PERSONAL",
-                    Name = "Personal",
-                    ObjectCode = sydObjects_Contact.Code,
-                    ObjectId = sydObjects_Contact.Id
-                };
-                _context.SycEntityObjectTypes.Add(sycEntityObjectType_Contact);
-                _context.SaveChanges();
-            }
-            #endregion
 
             var sydObjects_Classification = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
            r => r.Code == "CLASSIFICATION");
@@ -177,75 +157,6 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Listing);
                 _context.SaveChanges();
             }
-            
-
-            //Iteration#29,1 MMT News Digest changes[Start]
-            var sycIdentifierDefinitionsObj = _context.SycIdentifierDefinitions.FirstOrDefault(
-             r => r.Code == "NEWSDIGEST");
-            if (sycIdentifierDefinitionsObj == null)
-            {
-                sycIdentifierDefinitionsObj = new SycIdentifierDefinitions.SycIdentifierDefinition
-                {
-                    Code = "NEWSDIGEST",
-                    IsTenantLevel = false,
-                    TenantId = null,
-                    NumberOfSegments = 1,
-                    MaxLength = 50,
-                    MaxSegmentLength = 50,
-                    MinSegmentLength = 0
-                };
-                _context.SycIdentifierDefinitions.Add(sycIdentifierDefinitionsObj);
-                _context.SaveChanges();
-            }
-            var sycIdentifierDefinitionsObject = _context.SycIdentifierDefinitions.FirstOrDefault(
-            r => r.Code == "NEWSDIGEST");
-            var sydObjects_Post = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-            r => r.Name == "Post");
-            var ObjectTypeCodeData = _context.SysObjectTypes.IgnoreQueryFilters().FirstOrDefault(
-               r => r.Code == "DATA");
-            var sydObjects_NewsDigest = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-             r => r.Code == "NEWSDIGEST");
-            if (sydObjects_NewsDigest == null && ObjectTypeCodeData != null && ObjectTypeCodeData.Id > 0 && sydObjects_Post != null && sydObjects_Post.Id > 0)
-            {
-                sydObjects_NewsDigest = new SystemObjects.SydObject
-                {
-                    Code = "NEWSDIGEST",
-                    Name = "News Digest",
-                    ObjectTypeCode = ObjectTypeCodeData.Code,
-                    ObjectTypeId = ObjectTypeCodeData.Id,
-                    ParentCode = sydObjects_Post.Code,
-                    ParentId = sydObjects_Post.Id
-                };
-                _context.SydObjects.Add(sydObjects_NewsDigest);
-                _context.SaveChanges();
-                var sydObjects_NewDigestObj = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-                  r => r.Code == "NEWSDIGEST");
-
-                var sycEntityObjectTypes_Post = _context.SycEntityObjectTypes.IgnoreQueryFilters().FirstOrDefault(
-              r => r.TenantId == null && r.Code == "POST");
-
-                var sycEntityObjectTypes_News = _context.SycEntityObjectTypes.IgnoreQueryFilters().FirstOrDefault(
-                               r => r.TenantId == null && r.Code == "NEWSDIGEST");
-                if (sycEntityObjectTypes_News == null && sydObjects_NewDigestObj != null && sydObjects_NewDigestObj.Id > 0
-                    && sycEntityObjectTypes_Post != null && sycEntityObjectTypes_Post.Id > 0)
-                {
-                    sycEntityObjectTypes_News = new SystemObjects.SycEntityObjectType()
-                    {
-                        Code = "NEWSDIGEST",
-                        Name = "News Digest",
-                        ObjectId = sydObjects_NewDigestObj.Id,
-                        ObjectCode = sydObjects_NewDigestObj.Code,
-                        ParentId = sycEntityObjectTypes_Post.Id,
-                        ParentCode = sycEntityObjectTypes_Post.Code,
-                        SycIdentifierDefinitionId = sycIdentifierDefinitionsObject == null ? null : sycIdentifierDefinitionsObject.Id
-                    };
-                    _context.SycEntityObjectTypes.Add(sycEntityObjectTypes_News);
-                    _context.SaveChanges();
-
-                }
-            }
-
-            //Iteration#29,1 MMT News Digest changes[End]
             //T-SII-20230222.0003,1 MMT 02/28/2023 Internal Server Error during your request - when saving a new size scale[Start]
             var sydObjects_SizeScale = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
              r => r.Code == "SCALE");
@@ -262,28 +173,12 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SaveChanges();
             }
             //T-SII-20230222.0003,1 MMT 02/28/2023 Internal Server Error during your request - when saving a new size scale[End]
-            //MMT33[Start]
-            var sydObjects_Transaction = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-        r => r.Code == "TRANSACTION");
-            if (sydObjects_Transaction == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
-            {
-                sydObjects_Transaction = new SystemObjects.SydObject
-                {
-                    Code = "TRANSACTION",
-                    Name = "Transaction",
-                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
-                    ObjectTypeId = ObjectTypeCodeEntity.Id
-                };
-                _context.SydObjects.Add(sydObjects_Transaction);
-                _context.SaveChanges();
-            }
-            //MMT33[End]
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via".Split(',');
+            var parents = "ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE".ToUpper().Split(',');
+            var codes = "PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE".ToUpper().Split(',');
+            var names = "Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -309,7 +204,7 @@ namespace onetouch.Migrations.Seed.Host
                 }
             }
             #endregion add missing entity object types
-
+ 
         }
 
         private void CreateHostObjectEntityStatus()
@@ -320,7 +215,7 @@ namespace onetouch.Migrations.Seed.Host
             var ObjectCode = "ITEMS-LIST";
             var codes = "HOLD,ACTIVE,CANCELLED,DRAFT".ToUpper().Split(',');
             var names = "Hold,Active,Cancelled,Draft".Split(',');
-
+            
             for (int i = 0; i < codes.Length; i++)
             {
                 var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
@@ -339,7 +234,7 @@ namespace onetouch.Migrations.Seed.Host
                             Name = names[i],
                             ObjectId = sydObjects.Id,
                             ObjectCode = sydObjects.Code,
-                            IsDefault = codes[i] == "ACTIVE" ? true : false
+                            IsDefault = codes[i]=="ACTIVE"?true:false
 
                         };
                         _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
@@ -348,48 +243,13 @@ namespace onetouch.Migrations.Seed.Host
                 }
             }
             #endregion add missing entity object types
-            //MMT33[Start]
-            #region Add  sycEntityObject status for listing
-            ObjectCode = "TRANSACTION";
-            codes = "HOLD,ACTIVE,CANCELLED,DRAFT,COMPLETE,OPEN".ToUpper().Split(',');
-            names = "Hold,Active,Cancelled,Draft,Complete,Open".Split(',');
-
-            for (int i = 0; i < codes.Length; i++)
-            {
-                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-                    r => r.Code == ObjectCode);
-                if (sydObjects != null && sydObjects.Id > 0)
-                {
-                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
-                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
-
-                    if (sydObjects != null && sydObjects.Id > 0 &&
-                        SycEntityObjectStatuses == null)
-                    {
-                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
-                        {
-                            Code = codes[i],
-                            Name = names[i],
-                            ObjectId = sydObjects.Id,
-                            ObjectCode = sydObjects.Code,
-                            IsDefault = codes[i] == "OPEN" ? true : false
-
-                        };
-                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
-                        _context.SaveChanges();
-                    }
-                }
-            }
-            #endregion add missing entity object types
-            //MMT33[End]
 
         }
-
         private void CreateHostCodeStructures()
         {
 
             #region get all sycEntityObjectTypes
-            var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().Where(e => e.SycIdentifierDefinitionId == null || e.SycIdentifierDefinitionId < 1).ToListAsync().Result;
+            var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().ToListAsync().Result;
             foreach (var sycEntityObjectType in sycEntityObjectTypes)
             {
                 #region add code identifier 
@@ -414,7 +274,7 @@ namespace onetouch.Migrations.Seed.Host
                     //_context.SycEntityObjectTypes.Update(sycEntityObjectType);
                     _context.SaveChanges();
                     bool isAutoGenerated = false;
-                    if ("CATEGORY|DEPARTMENT|CLASSIFICATION|POST|TENANTCONTACT|MANUALACCOUNT|MANUALACCOUNTCONTACT|MANUALACCOUNTBRANCH|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper() + "|"))
+                    if ("CATEGORY|DEPARTMENT|CLASSIFICATION|POST|TENANTCONTACT|MANUALACCOUNT|MANUALACCOUNTCONTACT|MANUALACCOUNTBRANCH|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper()+"|"))
                     { isAutoGenerated = true; }
                     bool isVisible = true;
                     if ("CATEGORY|DEPARTMENT|CLASSIFICATION|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper() + "|"))
@@ -447,25 +307,26 @@ namespace onetouch.Migrations.Seed.Host
 
         }
 
+
         private void CreateHostFileExt()
         {
 
             #region Add missing SycAttachmentCategories
-            var type = "1,1,1,1,1,1,0,0,1,0,0,0,1,1,1".ToUpper().Split(',');
-            var maxLength = "5,5,5,5,5,5,NULL,NULL,5,NULL,NULL,NULL,5,5,5".ToUpper().Split(',');
-            var aspectRatio = "1.29,0.772,1:1,200:49,127:100,127:100,NULL,NULL,200:49,NULL,NULL,NULL,200:49,6:5,3:1".ToUpper().Split(',');
-            var entityObjectType = "BACKGROUND,BACKGROUND,PARTNER,PARTNER,PARTNER,PERSON,PRODUCT,MESSAGE,PERSON,PARTNER,NULL,NULL,NULL,NULL,NULL".ToUpper().Split(',');
-            var parent = "NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,IMAGE".ToUpper().Split(',');
-            var codes = "LETTER-LANDSCAPE,LETTER-PORTRAIT,LOGO,BANNER,IMAGE,PHOTO,IMAGE,FILE,COVER-PHOTO,VIDEO,FILE,DEFAULT-IMAGE,COVER,CTASLIDER,AUTOSLIDERQ".ToUpper().Split(',');
-            var names = "Letter Landscape,Letter Portrait,Logo,Banner,Image,Photo,Image,File,Cover Photo,Video,File,Default-image,Cover,CTASlider, AutoSlider".Split(',');
+            var type = "1,1,1,1,0,0,1,0,0,0,1,1,1".ToUpper().Split(',');
+            var maxLength = "5,5,5,5,NULL,NULL,5,NULL,NULL,NULL,5,5,5".ToUpper().Split(',');
+            var aspectRatio = "1:1,200:49,127:100,127:100,NULL,NULL,200:49,NULL,NULL,NULL,200:49,6:5,3:1".ToUpper().Split(',');
+            var entityObjectType = "PARTNER,PARTNER,PARTNER,PERSON,PRODUCT,MESSAGE,PERSON,PARTNER,NULL,NULL,NULL,NULL,NULL".ToUpper().Split(',');
+            var parent = "NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,IMAGE".ToUpper().Split(',');
+            var codes = "LOGO,BANNER,IMAGE,PHOTO,IMAGE,FILE,COVER-PHOTO,VIDEO,FILE,DEFAULT-IMAGE,COVER,CTASLIDER,AUTOSLIDERQ".ToUpper().Split(',');
+            var names = "Logo,Banner,Image,Photo,Image,File,Cover Photo,Video,File,Default-image,Cover,CTASlider, AutoSlider".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
                 var sycAttachmentCategories = _context.SycAttachmentCategories.IgnoreQueryFilters().FirstOrDefault(
                     r => r.Code == codes[i]);
                 var xx = int.Parse(type[i]);
-                if (sycAttachmentCategories == null || sycAttachmentCategories.Id == 0)
-                {
+                if (sycAttachmentCategories == null || sycAttachmentCategories.Id == 0  )
+                {   
                     sycAttachmentCategories = new SystemObjects.SycAttachmentCategory
                     {
                         Code = codes[i],
@@ -513,13 +374,13 @@ namespace onetouch.Migrations.Seed.Host
                 if (sycAttachmentTypes == null || sycAttachmentTypes.Id == 0)
                 {
                     sycAttachmentTypes = new SystemObjects.SycAttachmentType
-                    {
+                    { 
                         Name = extNames[i],
                         Extension = extension[i],
                         Type = (AttachmentType)int.Parse(type[i])
 
                     };
-
+                     
                     _context.SycAttachmentTypes.Add(sycAttachmentTypes);
                     _context.SaveChanges();
                 }
@@ -532,9 +393,7 @@ namespace onetouch.Migrations.Seed.Host
         private void CreateHostSystemData()
         {
             #region Add missing SycEntityObjectTypes
-            var keyList = _context.LanguageTexts.Select(e => e.Key).ToList();
-
-            var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().Where(e => !keyList.Contains(("SYCENTITYOBJECTTYPES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+            var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().ToList();
             if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count > 0)
             {
                 var languagesList = _context.Languages.IgnoreQueryFilters().ToList();

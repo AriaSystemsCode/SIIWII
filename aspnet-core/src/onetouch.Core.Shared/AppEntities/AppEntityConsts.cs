@@ -15,6 +15,5 @@
 
 		public const int MinAttributeValueLength = 10;
 		public const int MaxAttributeValueLength = 250;
-		public const int SSINLength = 50;
-    }
+	}
 }

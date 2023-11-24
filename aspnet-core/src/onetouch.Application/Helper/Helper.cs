@@ -23,52 +23,13 @@ namespace onetouch.Helpers
 
             TimeZoneInfoAppService timeZoneInfoAppService = new TimeZoneInfoAppService();
             return timeZoneInfoAppService.GetUTCDatetimeValue(fromDateTime,  timeZone);
-
-        }
-
-        public DateTime GetDatetimeValueFromUTC(DateTime fromDateTime, string fromTimeZone)
-        {
-            TimeZoneInfoAppService timeZoneInfoAppService = new TimeZoneInfoAppService();
-            return timeZoneInfoAppService.GetDatetimeValueFromUTC(fromDateTime, fromTimeZone);
-
         }
 
         public SystemTables SystemTables   
         {
             get { return _systemTables; }
         }
-        //MMT30
-        public string StringMask(string mask, string value)
-        {
-            var builder = new System.Text.StringBuilder();
-            var maskIndex = 0;
-            var valueIndex = 0;
-            while (maskIndex < mask.Length)
-            {
-                if (mask[maskIndex] == '-')
-                {
-                    builder.Append('-');
-                    maskIndex++;
-                }
-                else
-                {
-                    if(valueIndex < value.Length)
-                      builder.Append(value[valueIndex]);
-                    else
-                      builder.Append(" ");
 
-                    maskIndex++;
-                    valueIndex++;
-                }
-            }
-            // Add in the remainder of the value
-            if (valueIndex + 1 < value.Length)
-            {
-                builder.Append(value.Substring(valueIndex));
-            }
-            return builder.ToString();
-        }
-        //MMT30
         public string HtmlToPlainText(string html)
         {
             const string tagWhiteSpace = @"(>|$)(\W|\n|\r)+<";//matches one or more (white space or line breaks) between '>' and '<'

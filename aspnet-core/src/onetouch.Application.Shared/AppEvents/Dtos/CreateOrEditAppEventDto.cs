@@ -50,9 +50,5 @@ namespace onetouch.AppEvents.Dtos
 
         public virtual DateTime UTCToDateTime { get; set; }
 
-        public virtual Int32 FromHour { get; set; }
-        public virtual Int32 ToHour { get; set; }
-        public virtual Int32 FromMinute { get; set; }
-        public virtual Int32 ToMinute { get; set; }
     }
 }

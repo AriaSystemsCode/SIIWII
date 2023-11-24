@@ -65,11 +65,8 @@ namespace onetouch.AppContacts
 		public virtual string PartnerCode { get; set; }
 
 		public virtual string AccountType { get; set; }
-        public virtual long AccountTypeId { get; set; }
-        public virtual string SSIN { get; set; }
-        public virtual string PriceLevel { get; set; }
 
-        public virtual bool IsProfileData { get; set; }
+		public virtual bool IsProfileData { get; set; }
 
 		public virtual long? Phone1TypeId { get; set; }
 

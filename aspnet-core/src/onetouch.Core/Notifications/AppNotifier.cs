@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Abp;
-using Abp.Domain.Entities;
 using Abp.Localization;
 using Abp.Notifications;
 using onetouch.Authorization.Users;
@@ -80,17 +79,7 @@ namespace onetouch.Notifications
                 userIds: new[] { user }
                 );
         }
-        //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
-        public async Task SendMessageAsync(UserIdentifier user, string message, NotificationSeverity severity = NotificationSeverity.Info,EntityIdentifier entityIdentifier= null)
-        {
-            await _notificationPublisher.PublishAsync(
-                "App.SimpleMessage",
-                new MessageNotificationData(message), entityIdentifier,
-                severity: severity,
-                userIds: new[] { user }
-                );
-        }
-        //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
+
         public async Task TenantsMovedToEdition(UserIdentifier user, string sourceEditionName, string targetEditionName)
         {
             var notificationData = new LocalizableMessageNotificationData(

@@ -435,36 +435,36 @@ namespace onetouch.SystemObjects
 
         public async Task<GetSycEntityObjectTypeForViewDto> GetSycEntityObjectTypeForView(int id)
         {
-                var sycEntityObjectType = await _sycEntityObjectTypeRepository.FirstOrDefaultAsync(x => x.Id == id  && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
+            var sycEntityObjectType = await _sycEntityObjectTypeRepository.FirstOrDefaultAsync(x => x.Id == id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
 
 
-                var output = new GetSycEntityObjectTypeForViewDto { SycEntityObjectType = ObjectMapper.Map<SycEntityObjectTypeDto>(sycEntityObjectType) };
+            var output = new GetSycEntityObjectTypeForViewDto { SycEntityObjectType = ObjectMapper.Map<SycEntityObjectTypeDto>(sycEntityObjectType) };
 
-                if (output.SycEntityObjectType.SycIdentifierDefinitionId != null && output.SycEntityObjectType.SycIdentifierDefinitionId > 0)
-                {
-                    var idStructure = await _lookup_SycIdentifierDefinitionRepository.FirstOrDefaultAsync((long)output.SycEntityObjectType.SycIdentifierDefinitionId);
-                    output.IdentifierCode = idStructure.Code;
-                }
+            if (output.SycEntityObjectType.SycIdentifierDefinitionId != null && output.SycEntityObjectType.SycIdentifierDefinitionId > 0)
+            {
+                var idStructure = await _lookup_SycIdentifierDefinitionRepository.FirstOrDefaultAsync((long)output.SycEntityObjectType.SycIdentifierDefinitionId);
+                output.IdentifierCode = idStructure.Code;
+            }
 
-                if (output.SycEntityObjectType.ObjectId != null)
-                {
-                    var _lookupSydObject = await _lookup_sydObjectRepository.FirstOrDefaultAsync((int)output.SycEntityObjectType.ObjectId);
-                    output.SydObjectName = _lookupSydObject.Name.ToString();
-                }
+            if (output.SycEntityObjectType.ObjectId != null)
+            {
+                var _lookupSydObject = await _lookup_sydObjectRepository.FirstOrDefaultAsync((int)output.SycEntityObjectType.ObjectId);
+                output.SydObjectName = _lookupSydObject.Name.ToString();
+            }
 
-                if (output.SycEntityObjectType.ParentId != null)
-                {
-                    var _lookupSycEntityObjectType = await _lookup_sycEntityObjectTypeRepository.FirstOrDefaultAsync((int)output.SycEntityObjectType.ParentId);
-                    output.SycEntityObjectTypeName = _lookupSycEntityObjectType.Name.ToString();
-                }
-                if (output.SycEntityObjectType != null)
-                {
+            if (output.SycEntityObjectType.ParentId != null)
+            {
+                var _lookupSycEntityObjectType = await _lookup_sycEntityObjectTypeRepository.FirstOrDefaultAsync((int)output.SycEntityObjectType.ParentId);
+                output.SycEntityObjectTypeName = _lookupSycEntityObjectType.Name.ToString();
+            }
+            if (output.SycEntityObjectType != null)
+            {
 
-                    var Key = ("SYCENTITYOBJECTTYPES-NAME-" + output.SycEntityObjectType.Id.ToString() + "-" + output.SycEntityObjectType.Name).Trim().ToUpper();
-                    output.SycEntityObjectTypeName = L(Key);
-                }
+                var Key = ("SYCENTITYOBJECTTYPES-NAME-" + output.SycEntityObjectType.Id.ToString() + "-" + output.SycEntityObjectType.Name).Trim().ToUpper();
+                output.SycEntityObjectTypeName = L(Key);
+            }
 
-                return output;
+            return output;
         }
 
         [AbpAuthorize(AppPermissions.Pages_SycEntityObjectTypes_Edit)]
@@ -658,25 +658,6 @@ namespace onetouch.SystemObjects
                     Id = sycEntityObjectType.Id,
                     DisplayName = sycEntityObjectType.Name.ToString()
                 }).ToListAsync();
-        }
-
-        //[AbpAuthorize(AppPermissions.Pages_SycEntityObjectTypes)]
-        [AbpAllowAnonymous]
-        public async Task<List<SycEntityObjectTypeSycEntityObjectTypeLookupTableDto>> GetSycEntityObjectTypeForObjectAsTableDropdown(string objectCode)
-        {
-            try
-            {
-                var objectId = _lookup_sydObjectRepository.GetAll().Where(e => e.Code == objectCode).FirstOrDefault();
-                return await _lookup_sycEntityObjectTypeRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId || x.TenantId == null && x.ObjectId == objectId.Id)
-                    .Select(sycEntityObjectType => new SycEntityObjectTypeSycEntityObjectTypeLookupTableDto
-                    {
-                        Id = sycEntityObjectType.Id,
-                        DisplayName = sycEntityObjectType.Name.ToString()
-                    }).ToListAsync();
-            }
-            catch (Exception ex) {
-                return new List<SycEntityObjectTypeSycEntityObjectTypeLookupTableDto>();
-            }
         }
 
         [AbpAuthorize(AppPermissions.Pages_SycEntityObjectTypes)]

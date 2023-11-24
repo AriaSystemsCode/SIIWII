@@ -31,12 +31,8 @@ namespace onetouch.Accounts.Dtos
 
 		public string CountryName { get; set; }
 
-        public string PriceLevel { get; set; }
-        public string SSIN { get; set; }
 
-        public long AccountTypeId { get; set; }
-
-        public string AccountType { get; set; }
+		public List<string> AccountType { get; set; }
 
 		public string AccountTypeString { get; set; }
 		public bool Status { get; set; }
@@ -55,9 +51,7 @@ namespace onetouch.Accounts.Dtos
 
 		public bool IsManual { get; set; }
 
-        public bool IsConnected { get; set; }
-
-        public virtual IList<TreeNode<BranchForViewDto>> Branches { get; set; }
+		public virtual IList<TreeNode<BranchForViewDto>> Branches { get; set; }
 
 		public long? PartnerId { get; set; }
 		

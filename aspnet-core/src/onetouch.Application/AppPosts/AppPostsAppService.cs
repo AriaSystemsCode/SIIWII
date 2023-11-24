@@ -32,12 +32,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Drawing;
 using Abp.UI;
-using System.Management.Automation.Language;
-using NPOI.SS.Formula.Functions;
-using Abp.Collections.Extensions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Humanizer;
 
 namespace onetouch.AppPosts
 {
@@ -84,12 +78,6 @@ namespace onetouch.AppPosts
         [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAppPostForViewDto>> GetAll(GetAllAppPostsInput input)
         {
-            //Iteration#29,1 MMT News Digest changes[Start]
-            long? entityType = null;
-            if (input.TypeFilter!=null)
-               entityType = await _helper.SystemTables.GetEntityObjectTypePostTypeId(input.TypeFilter.ToString());
-
-            //Iteration#29,1 MMT News Digest changes[Start]
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 //"​/api​/services​/app​/Profile​/GetProfilePictureById"
@@ -97,90 +85,22 @@ namespace onetouch.AppPosts
                 var filteredAppPosts = _appPostRepository.GetAll()
                         .Include(e => e.AppContactFk)
                         .Include(e => e.AppEntityFk)
-                        .Include(e => e.AppEntityFk).ThenInclude (e => e.AppEntityReactionsCount)
                         .WhereIf(input.PostId > 0, e=> e.Id== input.PostId)
-                         //Iteration#29,1 MMT News Digest changes[Start]
-                         //.WhereIf(!string.IsNullOrWhiteSpace(input.Filter),e => false || e.Code.Contains(input.Filter) || e.Description.Contains(input.Filter))
-                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
-                        e => false || e.Code.Contains(input.Filter) || e.Description.Contains(input.Filter) || e.AppEntityFk.Name.Contains(input.Filter))
-                        //Iteration#29,1 MMT News Digest changes[Start]
-                        .WhereIf (entityType!=null, x=> x.AppEntityFk.EntityObjectTypeId == entityType)
-                        //.WhereIf(!string.IsNullOrEmpty(input.FromCreationDateFilter.ToString()) && !string.IsNullOrEmpty(input.ToCreationDateFilter.ToString())
-                        //, x => x.CreationTime >= input.FromCreationDateFilter && x.CreationTime <= input.ToCreationDateFilter )
-                        .WhereIf(!string.IsNullOrEmpty(input.FromCreationDateFilter.ToString())
-                        , x => x.CreationTime >= input.FromCreationDateFilter )
-                        .WhereIf(!string.IsNullOrEmpty(input.ToCreationDateFilter.ToString())
-                        , x => x.CreationTime <= input.ToCreationDateFilter )
-                        //Iteration#29,1 MMT News Digest changes[End]
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Code.Contains(input.Filter) || e.Description.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.DescriptionFilter), e => e.Description == input.DescriptionFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppContactNameFilter), e => e.AppContactFk != null && e.AppContactFk.Name == input.AppContactNameFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppEntityNameFilter), e => e.AppEntityFk != null && e.AppEntityFk.Name == input.AppEntityNameFilter);
 
-                var pagedAndFilteredAppPosts = filteredAppPosts;
-
-                //Iteration#29,1 MMT News Digest changes[Start]
-                if (!string.IsNullOrEmpty(input.Sorting))//NewsDigestSortOptions.SORTBYDATEASC 
-                {  
-                    NewsDigestSortOptions result;
-                    var res = Enum.TryParse<NewsDigestSortOptions>(input.Sorting, out result);
-                    if (res)
-                    {
-                        switch (result)
-                        {
-                            case NewsDigestSortOptions.SORTBYDATEASC:
-                                pagedAndFilteredAppPosts = filteredAppPosts
-                                                      .OrderBy("CreationTime asc")
-                                                      .PageBy(input);
-                                break;
-                            case NewsDigestSortOptions.SORTBYDATEDESC :
-                                pagedAndFilteredAppPosts = filteredAppPosts
-                                                      .OrderBy("CreationTime desc")
-                                                      .PageBy(input);
-                                break;
-                            case NewsDigestSortOptions.SORTBYTITLE:
-                                pagedAndFilteredAppPosts = filteredAppPosts
-                                                      .OrderBy("Description asc")
-                                                      .PageBy(input);
-                                break;
-                            case NewsDigestSortOptions.SORTBYVIEWSASC:
-                                pagedAndFilteredAppPosts = filteredAppPosts
-                                                      .OrderBy(a=>a.AppEntityFk.AppEntityReactionsCount.ViewersCount)
-                                                      .PageBy(input);
-                                break;
-                            case NewsDigestSortOptions.SORTBYVIEWSDESC:
-                                pagedAndFilteredAppPosts = filteredAppPosts
-                                                      .OrderByDescending(a => a.AppEntityFk.AppEntityReactionsCount.ViewersCount)
-                                                      .PageBy(input);
-                                break;
-
-                    
-
-                        }
-                    }
-                    else
-                    {
-                        pagedAndFilteredAppPosts = filteredAppPosts
-                        .OrderBy(input.Sorting ?? "id desc")
-                        .PageBy(input);
-                    }
-                }
-                else
-                {
-                    pagedAndFilteredAppPosts = filteredAppPosts
+                var pagedAndFilteredAppPosts = filteredAppPosts
                     .OrderBy(input.Sorting ?? "id desc")
                     .PageBy(input);
-                }
-                //Iteration#29,1 MMT News Digest changes[Start]
+
                 var appPosts = from o in pagedAndFilteredAppPosts
                                join o1 in _lookup_appContactRepository.GetAll() on o.AppContactId equals o1.Id into j1
                                from s1 in j1.DefaultIfEmpty()
                                join o2 in _lookup_appEntityRepository.GetAll() on o.AppEntityId equals o2.Id into j2
                                from s2 in j2.DefaultIfEmpty()
-                               //xx
-                               //join o3 in _appEntityReactionsCount.GetAll () on  o.AppEntityId equals o3.EntityId into j3 
-                               //from s3 in j3.DefaultIfEmpty() orderby s3.ViewersCount  descending 
-                                   //xx
                                select new GetAppPostForViewDto()
                                {
                                    AppPost = new AppPostDto
@@ -243,107 +163,6 @@ namespace onetouch.AppPosts
                     results);
             }
         }
-
-        //xx
-        //Iteration#29,1 MMT News Digest changes[Start]
-        [AbpAllowAnonymous]
-        public async Task<List<GetAppPostForViewDto>> GetTopNewsDigest(int noOfPosts, int noOfDays)
-        {
-            long entityType = await _helper.SystemTables.GetEntityObjectTypePostTypeId(PostType.NEWSDIGEST.ToString ());
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                //"​/api​/services​/app​/Profile​/GetProfilePictureById"
-                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                var filteredAppPosts = _appPostRepository.GetAll()
-                        .Include(e => e.AppContactFk)
-                        .Include(e => e.AppEntityFk)
-                        //T-SII-20230917.0001,1 MMT 09/19/2023 Display Top new disgest without filtering on date[T-SII-20230917.0001][Start]
-                        //.Where(x => x.AppEntityFk.EntityObjectTypeId == entityType &&
-                        // (x.CreationTime.Date  >= DateTime.Now.Date.AddDays(-1 * noOfDays)
-                        // && x.CreationTime.Date <= DateTime.Now.Date)).OrderByDescending  (a=>a.CreationTime).Take(noOfPosts);
-                        .Where(x => x.AppEntityFk.EntityObjectTypeId == entityType).OrderByDescending(a => a.CreationTime).Take(noOfPosts);
-                //T-SII-20230917.0001,1 MMT 09/19/2023 Display Top new disgest without filtering on date[T-SII-20230917.0001][End]
-                var appPosts = from o in filteredAppPosts
-                               join o1 in _lookup_appContactRepository.GetAll() on o.AppContactId equals o1.Id into j1
-                               from s1 in j1.DefaultIfEmpty()
-                               join o2 in _lookup_appEntityRepository.GetAll() on o.AppEntityId equals o2.Id into j2
-                               from s2 in j2.DefaultIfEmpty()
-                               select new GetAppPostForViewDto()
-                               {
-                                   AppPost = new AppPostDto
-                                   {
-                                       Id = o.Id,
-                                       Code = o.Code,
-                                       Description = o.Description,
-                                       CreatorUserId = o.CreatorUserId,
-                                       CreationDatetime = o.CreationTime,
-                                       TenantId = o.TenantId,
-                                       AppEntityId = o.AppEntityId,
-                                      
-                                   },
-                                  // TimePassedFromCreation = DateTime.UtcNow.AddMinutes(-1 * double.Parse((DateTime.UtcNow  - o.CreationTime.ToUniversalTime()).Minutes.ToString()))
-                                  // .Humanize(null,null,System.Globalization.CultureInfo.CurrentCulture),//o.CreationTime.Date != DateTime.Now.Date ?
-                                  // DateTime.UtcNow.AddDays(-1 * double.Parse((DateTime.Now.Date - o.CreationTime.Date).ToString())).Humanize() : "",
-                                  // DateTime.UtcNow.AddMinutes(-1 * double.Parse((DateTime.Now - o.CreationTime).ToString())).Humanize(),
-                                   UrlTitle = o.UrlTitle,
-                                   EntityObjectTypeCode = s2 == null || s2.EntityObjectTypeCode == null ? "" : s2.EntityObjectTypeCode,
-                                   AppContactName = s1 == null || s1.Name == null ? "" : s1.Name.ToString(),
-                                   AppEntityName = s2 == null || s2.Name == null ? "" : s2.Name.ToString(),
-                                   CanEdit = (o.CreatorUserId == AbpSession.UserId),
-                                   AttachmentsURLs = s2.EntityAttachments.Select(r => imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + r.AttachmentFk.Attachment).ToList(),
-                               };
-
-                var dbList = await appPosts.ToListAsync();
-                var results = new List<GetAppPostForViewDto>();
-
-                foreach (var o in dbList)
-                {
-                    if (DateTime.UtcNow.Date == o.AppPost.CreationDatetime.ToUniversalTime().Date)
-                    {
-                        if (DateTime.UtcNow.Hour == o.AppPost.CreationDatetime.ToUniversalTime().Hour)
-                            o.TimePassedFromCreation = DateTime.UtcNow.AddMinutes(-1 * double.Parse((DateTime.UtcNow - o.AppPost.CreationDatetime.ToUniversalTime()).Minutes.ToString()))
-                                     .Humanize(null, null, System.Globalization.CultureInfo.CurrentCulture);
-                        else
-                        {
-                            double hrs  = double.Parse((DateTime.UtcNow - o.AppPost.CreationDatetime.ToUniversalTime()).Hours.ToString());
-                            double mins = double.Parse((DateTime.UtcNow - o.AppPost.CreationDatetime.ToUniversalTime()).Minutes.ToString());
-                            o.TimePassedFromCreation = DateTime.UtcNow.AddMinutes(-1 * ((hrs * 60)+mins)).Humanize(null, null, System.Globalization.CultureInfo.CurrentCulture);
-                        }
-                    }
-                    else
-                        o.TimePassedFromCreation = DateTime.UtcNow.AddDays(-1 * double.Parse((DateTime.UtcNow.Date - o.AppPost.CreationDatetime.ToUniversalTime().Date).Days.ToString()))
-                                     .Humanize(null, null, System.Globalization.CultureInfo.CurrentCulture);
-
-                    var currPublishContact = await _lookup_appContactRepository.GetAll().Include(x => x.PartnerFkList).FirstOrDefaultAsync(x => x.TenantId == null && !x.IsProfileData && x.ParentId == null & (x.PartnerFk != null ? x.PartnerFk.TenantId == o.AppPost.TenantId : false));
-                    if (currPublishContact != null)
-                    {
-                        o.AppPost.AccountId = currPublishContact.Id;
-                        o.AppPost.AccountName = currPublishContact.Name;
-                    }
-                    o.AppPost.UserName = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId).FullName;
-                    if (o.AppPost.AccountName == null)
-                    {
-                        o.AppPost.AccountName = o.AppPost.TenantId == null ? "" : TenantManager.GetById((int)o.AppPost.TenantId).Name;
-                    }
-                    var profilePictureId = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId).ProfilePictureId;
-                    if (profilePictureId != null)
-                    { o.AppPost.ProfilePictureId = (Guid)profilePictureId; }
-                    try
-                    {
-                        o.Type = ((PostType)Enum.Parse(typeof(PostType), o.EntityObjectTypeCode));
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                    results.Add(o);
-
-                }
-
-                return results;
-            }
-        
-        }
-        //Iteration#29,1 MMT News Digest changes[End]
 
         [AbpAllowAnonymous]
         public async Task<GetProfilePictureOutput> GetProfilePictureAllByID(Guid profilePictureId)

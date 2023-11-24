@@ -21,11 +21,6 @@ namespace onetouch.AppEntities.Dtos
         //MMT
         public bool? IsHostRecord { get; set; }
     }
-
-    public class LookupLabelWithAttachmentDto: LookupLabelDto
-    {   public string AttachmentName { get; set; }
-     }
-
     public class SelectItemDto
     {
         public string Value { get; set; }

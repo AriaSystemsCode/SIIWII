@@ -22,9 +22,6 @@ namespace onetouch.AppPosts.Dtos
 
         public PostType Type { get; set; }
         public string EntityObjectTypeCode { get; set; }
-        //MMT
-        public string TimePassedFromCreation { get; set; }
-        //MMT
 
     }
 
@@ -33,16 +30,6 @@ namespace onetouch.AppPosts.Dtos
     TEXT,
     ARTICLES,
     SINGLEIMAGE,
-    SINGLEVIDEO,
-    NEWSDIGEST
+    SINGLEVIDEO
     }
-    public enum NewsDigestSortOptions
-    { 
-        SORTBYTITLE,
-        SORTBYDATEASC,
-        SORTBYDATEDESC,
-        SORTBYVIEWSASC,
-        SORTBYVIEWSDESC
-    }
-
-    }
+}

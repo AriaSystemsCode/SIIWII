@@ -21,7 +21,6 @@ using Abp.Domain.Uow;
 using onetouch.AppEvents;
 using onetouch.Notifications;
 using System.Globalization;
-using Stripe;
 
 namespace onetouch.AppEventGuests
 {
@@ -170,7 +169,6 @@ namespace onetouch.AppEventGuests
 
                 var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
                 appEventGuest.EntityId = savedEntity;
-                appEventGuest.CreatorUserId = AbpSession.UserId;
                 appEventGuest.UserResponce= (int)input.UserResponce;
 
                 #endregion save entity
@@ -202,13 +200,11 @@ namespace onetouch.AppEventGuests
                                 action = "Cannot go";
                             if (input.UserResponce == ResponceType.MAYBE)
                                 action ="May be";
-                            //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
+
                             await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(eventObj.TenantId, long.Parse(eventObj.CreatorUserId.ToString())),
                                 "User " + myUser.FullName +"@"+ myTenantObject .TenancyName+ " responded with "
                                 + textInfo.ToTitleCase(action.ToLower()) + 
-                                " to the Event: <a>" + (eventObj.Name.Length >30? eventObj.Name.Substring(0,30): eventObj.Name) +"</a>", Abp.Notifications.NotificationSeverity.Info, 
-                                new Abp.Domain.Entities.EntityIdentifier(typeof(AppEvent),input.EventId));
-                            //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
+                                " to the Event: " + eventObj.Name, Abp.Notifications.NotificationSeverity.Info);
                         }
                     }
                 }

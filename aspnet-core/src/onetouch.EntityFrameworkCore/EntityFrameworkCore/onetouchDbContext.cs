@@ -1,5 +1,4 @@
-﻿using onetouch.Maintainances;
-using onetouch.AppItemSelectors;
+﻿using onetouch.AppItemSelectors;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.SycCounters;
@@ -44,18 +43,11 @@ using onetouch.Attachments;
 using onetouch.Message;
 using onetouch.TenantInvitations;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using onetouch.AppSiiwiiTransaction;
-using onetouch.AppMarketplaceItems;
-using onetouch.AppMarketplaceItemLists;
-using onetouch.SycCurrencyExchangeRates;
-using onetouch.AppMarketplaceAccountsPriceLevels;
+
 namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
-        public virtual DbSet<Maintainance> Maintainances { get; set; }
-
-        public virtual DbSet<SycEntityLocalization> SycEntityLocalizations { set; get;}
         public virtual DbSet<AppItemPrices> AppItemPrices { get; set; }
         public virtual DbSet<AppItemSizeScalesDetails> AppItemSizeScalesDetails { get; set; }
         public virtual DbSet<AppItemSizeScalesHeader> AppItemSizeScalesHeaders { get; set; }
@@ -118,19 +110,6 @@ namespace onetouch.EntityFrameworkCore
 
         public virtual DbSet<AppItem> AppItems { get; set; }
 
-        //MMT33-2
-        public virtual DbSet<AppMarketplaceItems.AppMarketplaceItems> AppMarketplaceItems { get; set; }
-        public virtual DbSet<AppMarketplaceItemPrices> AppMarketplaceItemPrices { get; set; }
-        public virtual DbSet<AppMarketplaceItemSelectors> AppMarketplaceItemSelectors { get; set; }
-        public virtual DbSet<AppMarketplaceItemSharings> AppMarketplaceItemSharing { get; set; }
-        public virtual DbSet<AppMarketplaceItemSizeScaleHeaders> AppMarketplaceItemSizeScalesHeaders { get; set; }
-        public virtual DbSet<AppMarketplaceItemSizeScaleDetails> AppMarketplaceItemSizeScalesDetails { get; set; }
-        public virtual DbSet<AppMarketplaceItemLists.AppMarketplaceItemLists> AppMarketplaceItemLists { set; get; }
-        public virtual DbSet<AppMarketplaceItemsListDetails> AppMarketplaceItemsListDetails { set; get; }
-        public virtual DbSet<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates> SycCurrencyExchanges { set; get; }
-        public virtual DbSet<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels> AppMarketplaceAccountsPriceLevels { set; get; }
-        
-        //MMT33-2
         //public virtual DbSet<SysPropertyType> SysPropertyTypes { get; set; }
         //public virtual DbSet<SydObjectProperty> SydObjectProperties { get; set; }
         //public virtual DbSet<SydObjectRevision> SydObjectRevisions { get; set; }
@@ -192,12 +171,6 @@ namespace onetouch.EntityFrameworkCore
         //Mariam[Start]
         public virtual DbSet<SycTenantInvitatios> SycTenantInvitatios { set; get; }
         //Mariam[End]
-        //MMt33
-        public virtual DbSet<AppTransactionHeaders> AppTransactionsHeaders { set; get; }
-        public virtual DbSet<AppTransactionDetails> AppTransactionsDetails { set; get; }
-        public virtual DbSet<AppTransactionContacts> AppTransactionContacts { set; get; }
-        //MMT33
-        public virtual DbSet<AppActiveTransaction> AppShoppingCart { set; get; }
         public onetouchDbContext(DbContextOptions<onetouchDbContext> options)
             : base(options)
         {
