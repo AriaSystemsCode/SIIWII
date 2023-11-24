@@ -244,7 +244,7 @@ namespace onetouch.AppItems
                     itemExcelDto.rowNumber = rowNumber;
                     if (!string.IsNullOrEmpty(itemExcelDto.ParentCode))
                     {
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ParentId != null && x.ListingItemId == null);
+                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace (" ",string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId != null && x.ListingItemId == null);
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
@@ -265,7 +265,7 @@ namespace onetouch.AppItems
                     }
                     else
                     {
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ParentId == null && x.ListingItemId == null);
+                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId == null && x.ListingItemId == null);
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
