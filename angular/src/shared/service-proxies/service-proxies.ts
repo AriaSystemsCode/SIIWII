@@ -9875,6 +9875,7 @@ export class AppItemsServiceProxy {
      * @param arrtibuteFilters (optional) 
      * @param classificationFilters (optional) 
      * @param categoryFilters (optional) 
+     * @param scalesFilters (optional) 
      * @param departmentFilters (optional) 
      * @param entityObjectTypeId (optional) 
      * @param minimumPrice (optional) 
@@ -9888,7 +9889,7 @@ export class AppItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, filterType: ItemsFilterTypesEnum, lastKey: string | null | undefined, selectorKey: string | null | undefined, priceListId: number | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, classificationFilters: number[] | null | undefined, categoryFilters: number[] | null | undefined, departmentFilters: number[] | null | undefined, entityObjectTypeId: number | undefined, minimumPrice: number | undefined, maximumPrice: number | undefined, itemType: number | undefined, listingStatus: number | undefined, publishStatus: number | undefined, visibilityStatus: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppItemForViewDto> {
+    getAll(tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, filterType: ItemsFilterTypesEnum, lastKey: string | null | undefined, selectorKey: string | null | undefined, priceListId: number | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, classificationFilters: number[] | null | undefined, categoryFilters: number[] | null | undefined, scalesFilters: string[] | null | undefined, departmentFilters: number[] | null | undefined, entityObjectTypeId: number | undefined, minimumPrice: number | undefined, maximumPrice: number | undefined, itemType: number | undefined, listingStatus: number | undefined, publishStatus: number | undefined, visibilityStatus: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAll?";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
@@ -9921,6 +9922,8 @@ export class AppItemsServiceProxy {
             classificationFilters && classificationFilters.forEach(item => { url_ += "ClassificationFilters=" + encodeURIComponent("" + item) + "&"; });
         if (categoryFilters !== undefined && categoryFilters !== null)
             categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (scalesFilters !== undefined && scalesFilters !== null)
+            scalesFilters && scalesFilters.forEach(item => { url_ += "ScalesFilters=" + encodeURIComponent("" + item) + "&"; });
         if (departmentFilters !== undefined && departmentFilters !== null)
             departmentFilters && departmentFilters.forEach(item => { url_ += "departmentFilters=" + encodeURIComponent("" + item) + "&"; });
         if (entityObjectTypeId === null)
@@ -10388,6 +10391,7 @@ export class AppItemsServiceProxy {
      * @param getAppItemAttributesInputForExtraData_SkipCount (optional) 
      * @param getAppItemAttributesInputForExtraData_MaxResultCount (optional) 
      * @param currencyCode (optional) 
+     * @param timeZoneValue (optional) 
      * @param itemId (optional) 
      * @param getAppItemAttributesInputForCategories_Sorting (optional) 
      * @param getAppItemAttributesInputForCategories_SkipCount (optional) 
@@ -10403,7 +10407,7 @@ export class AppItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemDetailForViewDto> {
+    getAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, timeZoneValue: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -10433,6 +10437,8 @@ export class AppItemsServiceProxy {
             url_ += "GetAppItemAttributesInputForExtraData.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForExtraData_MaxResultCount) + "&";
         if (currencyCode !== undefined && currencyCode !== null)
             url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        if (timeZoneValue !== undefined && timeZoneValue !== null)
+            url_ += "TimeZoneValue=" + encodeURIComponent("" + timeZoneValue) + "&";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
         else if (itemId !== undefined)
@@ -64832,6 +64838,7 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
     arrtibuteFilters!: ArrtibuteFilter[] | undefined;
     classificationFilters!: number[] | undefined;
     categoryFilters!: number[] | undefined;
+    scalesFilters!: string[] | undefined;
     departmentFilters!: number[] | undefined;
     entityObjectTypeId!: number;
     minimumPrice!: number;
@@ -64883,6 +64890,11 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
                 this.categoryFilters = [] as any;
                 for (let item of _data["categoryFilters"])
                     this.categoryFilters!.push(item);
+            }
+            if (Array.isArray(_data["scalesFilters"])) {
+                this.scalesFilters = [] as any;
+                for (let item of _data["scalesFilters"])
+                    this.scalesFilters!.push(item);
             }
             if (Array.isArray(_data["departmentFilters"])) {
                 this.departmentFilters = [] as any;
@@ -64938,6 +64950,11 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
             for (let item of this.categoryFilters)
                 data["categoryFilters"].push(item);
         }
+        if (Array.isArray(this.scalesFilters)) {
+            data["scalesFilters"] = [];
+            for (let item of this.scalesFilters)
+                data["scalesFilters"].push(item);
+        }
         if (Array.isArray(this.departmentFilters)) {
             data["departmentFilters"] = [];
             for (let item of this.departmentFilters)
@@ -64969,6 +64986,7 @@ export interface IGetAllAppItemsInput {
     arrtibuteFilters: ArrtibuteFilter[] | undefined;
     classificationFilters: number[] | undefined;
     categoryFilters: number[] | undefined;
+    scalesFilters: string[] | undefined;
     departmentFilters: number[] | undefined;
     entityObjectTypeId: number;
     minimumPrice: number;
@@ -69281,6 +69299,114 @@ export enum ContactRoleEnum {
     Creator = 8,
 }
 
+export class ContactAppAddressDto implements IContactAppAddressDto {
+    contactEmail!: string | undefined;
+    contactPhone!: string | undefined;
+    code!: string | undefined;
+    tenantId!: number | undefined;
+    accountId!: number;
+    name!: string | undefined;
+    addressLine1!: string | undefined;
+    addressLine2!: string | undefined;
+    city!: string | undefined;
+    state!: string | undefined;
+    postalCode!: string | undefined;
+    countryId!: number;
+    countryCode!: string | undefined;
+    countryIdName!: string | undefined;
+    useDTOTenant!: boolean;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IContactAppAddressDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.contactEmail = _data["contactEmail"];
+            this.contactPhone = _data["contactPhone"];
+            this.code = _data["code"];
+            this.tenantId = _data["tenantId"];
+            this.accountId = _data["accountId"];
+            this.name = _data["name"];
+            this.addressLine1 = _data["addressLine1"];
+            this.addressLine2 = _data["addressLine2"];
+            this.city = _data["city"];
+            this.state = _data["state"];
+            this.postalCode = _data["postalCode"];
+            this.countryId = _data["countryId"];
+            this.countryCode = _data["countryCode"];
+            this.countryIdName = _data["countryIdName"];
+            this.useDTOTenant = _data["useDTOTenant"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): ContactAppAddressDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactAppAddressDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["contactEmail"] = this.contactEmail;
+        data["contactPhone"] = this.contactPhone;
+        data["code"] = this.code;
+        data["tenantId"] = this.tenantId;
+        data["accountId"] = this.accountId;
+        data["name"] = this.name;
+        data["addressLine1"] = this.addressLine1;
+        data["addressLine2"] = this.addressLine2;
+        data["city"] = this.city;
+        data["state"] = this.state;
+        data["postalCode"] = this.postalCode;
+        data["countryId"] = this.countryId;
+        data["countryCode"] = this.countryCode;
+        data["countryIdName"] = this.countryIdName;
+        data["useDTOTenant"] = this.useDTOTenant;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IContactAppAddressDto {
+    contactEmail: string | undefined;
+    contactPhone: string | undefined;
+    code: string | undefined;
+    tenantId: number | undefined;
+    accountId: number;
+    name: string | undefined;
+    addressLine1: string | undefined;
+    addressLine2: string | undefined;
+    city: string | undefined;
+    state: string | undefined;
+    postalCode: string | undefined;
+    countryId: number;
+    countryCode: string | undefined;
+    countryIdName: string | undefined;
+    useDTOTenant: boolean;
+    id: number;
+
+    [key: string]: any;
+}
+
 export class GetAccountInformationOutputDto implements IGetAccountInformationOutputDto {
     id!: number;
     name!: string | undefined;
@@ -69564,7 +69690,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     contactPhoneTypeId!: number | undefined;
     contactAddressId!: number | undefined;
     contactAddressCode!: string | undefined;
-    contactAddressDetail!: AppAddressDto;
+    contactAddressDetail!: ContactAppAddressDto;
     selectedCompany!: GetAccountInformationOutputDto;
     selectedContact!: GetContactInformationDto;
     selectedBranch!: AccountBranchDto;
@@ -69603,7 +69729,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.contactPhoneTypeId = _data["contactPhoneTypeId"];
             this.contactAddressId = _data["contactAddressId"];
             this.contactAddressCode = _data["contactAddressCode"];
-            this.contactAddressDetail = _data["contactAddressDetail"] ? AppAddressDto.fromJS(_data["contactAddressDetail"]) : <any>undefined;
+            this.contactAddressDetail = _data["contactAddressDetail"] ? ContactAppAddressDto.fromJS(_data["contactAddressDetail"]) : <any>undefined;
             this.selectedCompany = _data["selectedCompany"] ? GetAccountInformationOutputDto.fromJS(_data["selectedCompany"]) : <any>undefined;
             this.selectedContact = _data["selectedContact"] ? GetContactInformationDto.fromJS(_data["selectedContact"]) : <any>undefined;
             this.selectedBranch = _data["selectedBranch"] ? AccountBranchDto.fromJS(_data["selectedBranch"]) : <any>undefined;
@@ -69666,7 +69792,7 @@ export interface IAppTransactionContactDto {
     contactPhoneTypeId: number | undefined;
     contactAddressId: number | undefined;
     contactAddressCode: string | undefined;
-    contactAddressDetail: AppAddressDto;
+    contactAddressDetail: ContactAppAddressDto;
     selectedCompany: GetAccountInformationOutputDto;
     selectedContact: GetContactInformationDto;
     selectedBranch: AccountBranchDto;

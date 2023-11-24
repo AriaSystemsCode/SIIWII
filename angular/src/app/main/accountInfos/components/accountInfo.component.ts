@@ -1098,15 +1098,15 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
     openViewMemberProfile(){
         const memberId : number = this.selectedMember?.memberId
-        const userId : number = this.selectedMember?.userId
+        const userId : any = this.selectedMember?.userId
         const isExternalAccount : boolean = this.accountLevel == AccountLevelEnum.External
         const isManualAccount : boolean = this.accountLevel == AccountLevelEnum.Manual
         const isMyAccount : boolean = !this.viewMode && this.accountLevel == AccountLevelEnum.Profile
         const isConnectedWithAccount :boolean = this.viewMode && this.accountDataForView.status
         const isNotConnectedWithAccount :boolean = this.viewMode && !this.accountDataForView.status
 
-        const isManualContact : boolean = !userId && ( isConnectedWithAccount || isManualAccount )
-        const isExternalContact : boolean = !userId && isExternalAccount
+        const isManualContact : boolean =(!userId || userId=="0" ) && ( isConnectedWithAccount || isManualAccount )
+        const isExternalContact : boolean = (!userId || userId=="0" )  && isExternalAccount
         const isMyTeamMember : boolean = isMyAccount
 
         const canDelete : boolean = (isManualContact || isExternalContact ) && !isNotConnectedWithAccount
@@ -1136,13 +1136,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     // Create or edit member component methods
     openCreateOrEditMember( ){
         const memberId : number = this.selectedMember?.memberId
-        const userId : number = this.selectedMember?.userId
+        const userId : any = this.selectedMember?.userId    
         const isExternalAccount : boolean = this.accountLevel == AccountLevelEnum.External
         const isManualAccount : boolean = this.accountLevel == AccountLevelEnum.Manual
         const isConnectedWithAccount :boolean = this.viewMode && this.accountDataForView.status
 
-        const isManualContact : boolean = !userId && ( isConnectedWithAccount || isManualAccount )
-        const isExternalContact : boolean = !userId && isExternalAccount
+        const isManualContact : boolean = (!userId || userId=="0" ) && ( isConnectedWithAccount || isManualAccount )
+        const isExternalContact : boolean =(!userId || userId=="0" ) && isExternalAccount
         const isMyTeamMember : boolean = !this.viewMode && this.accountLevel == AccountLevelEnum.Profile
 
         const canAdd : boolean = isManualContact || isExternalContact
@@ -1170,14 +1170,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     // Member List component methods
     openMembersList(){
         const memberId : number = this.selectedMember?.memberId
-        const userId : number = this.selectedMember?.userId
+        const userId : any = this.selectedMember?.userId
         const isExternalAccount : boolean = this.accountLevel == AccountLevelEnum.External
         const isManualAccount : boolean = this.accountLevel == AccountLevelEnum.Manual
         const isConnectedWithAccount :boolean = this.viewMode && this.accountDataForView.status
         const isNotConnectedWithAccount :boolean = this.viewMode && !this.accountDataForView.status
 
-        const isManualContact : boolean = !userId && ( isConnectedWithAccount || isManualAccount )
-        const isExternalContact : boolean = !userId && isExternalAccount
+        const isManualContact : boolean = (!userId || userId=="0" ) && ( isConnectedWithAccount || isManualAccount )
+        const isExternalContact : boolean= (!userId || userId=="0" ) && isExternalAccount
         const isMyTeamMember : boolean = !this.viewMode && this.accountLevel == AccountLevelEnum.Profile
 
         const canAdd : boolean = isManualContact || isExternalContact

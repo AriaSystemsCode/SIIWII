@@ -109,6 +109,7 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
     this.matrixGrid.addNewRows([{ rowHeader: { label: '', value: '' }, rowValues: this.pricingHelpersService.setRowValues() }])
   }
   submit(){
+    debugger
     if(!this.isValid) return this.notify.error(this.l('FormIsInvalid'))
     const defaultCurrencyExist = this.rows.filter(item=>item.rowHeader.value == this.tenantDefaultCurrency.value).length;
     if(!defaultCurrencyExist) return this.notify.error(this.l("DefaultCurrencyMustExist"))

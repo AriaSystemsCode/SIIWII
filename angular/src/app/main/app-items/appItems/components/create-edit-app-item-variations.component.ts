@@ -1057,16 +1057,29 @@ export class CreateEditAppItemVariationsComponent
             );
 
             let extraAttrValue = filteredExtraAttrValue[0];
+            let optionValue;
+            let currentOptionAttachments;
 
-            let optionValue =
+            if(extraAttrValue.attributeValueId){
+             optionValue =
                 extraAttrValue.entityObjectTypeCode == this.sizeExtraAttrCode
                     ? extraAttrValue.attributeCode
                     : extraAttrValue.attributeValueId;
 
-            let currentOptionAttachments =
+             currentOptionAttachments =
                 this.defaultExtraAttrForAttachments.selectedValuesAttachments[
                     optionValue
                 ];
+            }
+            else{
+                optionValue=this.defaultExtraAttrForAttachments?.lookupData?.find(x=>x.code==extraAttrValue.attributeCode)?.value;
+
+             currentOptionAttachments =
+                this.defaultExtraAttrForAttachments.selectedValuesAttachments
+                [
+                    optionValue
+                ];
+            }
             // if(!currentOptionAttachments) {
             //     this.defaultExtraAttrForAttachments.selectedValuesAttachments[optionValue] = {
             //         attachmentSrcs : [""],

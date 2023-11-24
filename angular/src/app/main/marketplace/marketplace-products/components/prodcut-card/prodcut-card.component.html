@@ -17,7 +17,7 @@
         <div class="d-flex name-price">
             <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
              <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
-            <h5 class="price">{{ currency }} {{ product?.price }}</h5>
+            <h5 class="price">MSRP :{{ product?.price  | currency:currency:true}}</h5>
         </div>
     </div>
 </div>

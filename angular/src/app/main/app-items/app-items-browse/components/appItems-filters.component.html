@@ -13,19 +13,17 @@
         </app-tree-single-selection-filter>
     </div>
 
-    <!-- Fix Issue T-SII-20230618.0001  -->
-    <!-- <div class="mb-4" *ngIf="filtersFlags?.appItemSizeScale">
+    <!--  T-SII-20231103.0007  -->
+    <div class="mb-4" *ngIf="filtersFlags?.appItemSizeScale">
         <app-tree-multi-selection-filter
             #SizeScaleFilter
             [filterMetaData]="sizeScaleFilterMetaData"
             [formContol]="filterForm.controls.appItemSizeScale"
             [title]="'Size Scale' | localize"
             (onLoadData)="getSizeScaleList(SizeScaleFilter)"
-            (onLoadNode)="loadSizeScaleNode($event)"
         >
         </app-tree-multi-selection-filter>
-    </div> -->
-    <!-- Fix Issue T-SII-20230618.0001  -->
+    </div> 
 
 
     <div class="mb-4" *ngIf="filtersFlags?.categories">

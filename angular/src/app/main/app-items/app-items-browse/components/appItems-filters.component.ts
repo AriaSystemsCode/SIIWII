@@ -2,11 +2,12 @@ import { Component, Injector, Input, OnChanges, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { FilterMetaData } from '@app/shared/filters-shared/models/FilterMetaData.model';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import {  AppEntitiesServiceProxy, ExtraAttribute, GetAllEntityObjectTypeOutput,  ItemsFilterTypesEnum,  LookupLabelDto,  PagedResultDtoOfLookupLabelDto,  SycEntityObjectCategoriesServiceProxy, SycEntityObjectClassificationsServiceProxy, SycEntityObjectTypesServiceProxy, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, TreeNodeOfGetSycEntityObjectTypeForViewDto } from '@shared/service-proxies/service-proxies';
+import {  AppEntitiesServiceProxy, AppSizeScaleServiceProxy, ExtraAttribute, GetAllEntityObjectTypeOutput,  GetAppSizeScaleForViewDto,  ItemsFilterTypesEnum,  LookupLabelDto,  PagedResultDtoOfLookupLabelDto,  SycEntityObjectCategoriesServiceProxy, SycEntityObjectClassificationsServiceProxy, SycEntityObjectTypesServiceProxy, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, TreeNodeOfGetSycEntityObjectTypeForViewDto } from '@shared/service-proxies/service-proxies';
 import { SelectItem } from 'primeng/api';
 import { finalize } from 'rxjs/operators';
 import { ExtraAttributeDataService } from '../../app-item-shared/services/extra-attribute-data.service';
 import { AppItemsBrowseComponentFiltersDisplayFlags } from '../models/app-item-browse-inputs.model';
+import { forEach } from 'lodash';
 
 @Component({
   selector: 'app-items-filters',
@@ -21,8 +22,8 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
     lastSelectedAppItemType : TreeNodeOfGetSycEntityObjectTypeForViewDto
 
     categoriesFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
-       // Fix Issue T-SII-20230618.0001 
-     //  sizeScaleFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
+       // T-SII-20231103.0007 
+     sizeScaleFilterMetaData:FilterMetaData<SelectItem[]>
     departmentsFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>
     classificationsFilterMetaData:FilterMetaData<TreeNodeOfGetSycEntityObjectClassificationForViewDto[]>
 
@@ -45,7 +46,8 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
         private _sycEntityObjectClassificationsServiceProxy : SycEntityObjectClassificationsServiceProxy,
         private _sycEntityObjectTypesServiceProxy : SycEntityObjectTypesServiceProxy,
         private _extraAttributeDataService : ExtraAttributeDataService,
-        private _appEntitiesServiceProxy : AppEntitiesServiceProxy
+        private _appEntitiesServiceProxy : AppEntitiesServiceProxy,
+        private _appSizeScaleServiceProxy :AppSizeScaleServiceProxy
     ) {
         super(injector)
     }
@@ -53,8 +55,8 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
     ngOnInit(): void {
 
         this.categoriesFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>({list : []})
-         // Fix Issue T-SII-20230618.0001 
-         //  this.sizeScaleFilterMetaData= new FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>({list : []})
+         //  T-SII-20231103.0007   
+           this.sizeScaleFilterMetaData= new FilterMetaData<SelectItem[]>({list : []})
         this.departmentsFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectCategoryForViewDto[]>({list : []})
         this.classificationsFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectClassificationForViewDto[]>({list : []})
         this.appItemTypeFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectTypeForViewDto[]>({list : []})
@@ -267,20 +269,11 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
         this.subscriptions.push(subs)
     }
 
-    // Fix Issue T-SII-20230618.0001 
-   /*  getSizeScaleList(componentRef:{ onListLoadCallback : Function }){
-        //////// Mariam getSizeScaleList
+ 
+     getSizeScaleList(componentRef:{ onListLoadCallback : Function }){
+        //  T-SII-20231103.0007
         this.loading = true
-        const subs = this._sycEntityObjectCategoriesServiceProxy.getAllWithChildsForProductWithPaging(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            false,
+        const subs = this._appSizeScaleServiceProxy.getAll(
             undefined,
             undefined,
             this.sortBy,
@@ -291,11 +284,18 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             finalize(()=>this.loading = false)
         )
         .subscribe((res)=>{
-            componentRef.onListLoadCallback(res);
+            const items = [];
+            res.items.forEach(item => {
+                items.push({label:item.name,value:item.name});
+            });
+            const result: { items : any[], totalCount?:number } = {
+                items,
+                totalCount:res.totalCount
+            }
+            componentRef.onListLoadCallback(result);
         })
         this.subscriptions.push(subs)
-    } */
-   // Fix Issue T-SII-20230618.0001 
+    }
 
     
     getDepartmentsList(componentRef:{ onListLoadCallback : Function }){
@@ -357,40 +357,6 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
         }
     }
 
-   // Fix Issue T-SII-20230618.0001 
-  /*   loadSizeScaleNode(node : TreeNodeOfGetSycEntityObjectCategoryForViewDto){
-        ////// Mariam loadSizeScaleNode
-        if (node) {
-            const loadedCompletely : boolean =  !isNaN(node?.totalChildrenCount) && !isNaN(node?.children?.length) && node.totalChildrenCount === node.children.length
-            if( loadedCompletely ) return
-            const parentId = node.data.sycEntityObjectCategory.id
-            const subs = this._sycEntityObjectCategoriesServiceProxy.getAllChildsWithPaging(
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                parentId,
-                true,
-                undefined,
-                undefined,
-                this.sortBy,
-                0,
-                node.totalChildrenCount,
-            )
-            .pipe(
-                finalize(()=>this.loading = false)
-            )
-            .subscribe((res)=>{
-                if(!node.children) node.children = []
-                node.children.push(...res.items)
-            })
-            this.subscriptions.push(subs)
-        }
-    } */
-   // Fix Issue T-SII-20230618.0001 
 
     getAppItemTypesList(componentRef:{ onListLoadCallback : Function }){
         this.loading = true

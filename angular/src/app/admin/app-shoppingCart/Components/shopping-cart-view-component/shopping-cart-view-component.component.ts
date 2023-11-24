@@ -173,6 +173,8 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
+            this.shoppingCartDetails?.totalAmount % 1 ==0?this.shoppingCartDetails.totalAmount=parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)):null; 
+
             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
             if (res.transactionType == TransactionType.PurchaseOrder)
               this.transactionType = "Purchase Order";

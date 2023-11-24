@@ -321,7 +321,7 @@
                                     </div>
                                 </ng-template>
                                 <form #varitationsForm="ngForm" *ngIf="showVariations">
-                                    <div class="mt-5 primeng-datatable-container table-transparent-header table-transparent-rows variation-table thin-scroll pt-5 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
+                                    <div class="mt-5 primeng-datatable-container table-transparent-header table-transparent-rows variation-table  pt-5 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
                                         <div class="mb-3 d-flex flex-row" *ngIf="selectedVaritaions.length > 0">
                                             <a class="text-primary mr-4">{{ "SelectionActions" | localize }}:</a>
                                             <div class="dropdown mr-4" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
@@ -412,7 +412,6 @@
                                             [value]="primengTableHelper.records"
                                             rows="{{primengTableHelper.records.length}}"
                                             [paginator]="false"
-                                            responsiveLayout="scroll"
                                             [breakpoint]="'960px'"
                                             [rowHover]="true" [resizableColumns]="true"
                                             [tableStyle]="{'min-width': '50rem'}">

@@ -1,5 +1,5 @@
 import { HttpParams } from "@angular/common/http";
-import { Component, Input } from "@angular/core";
+import { Component, Input,OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { AppConsts } from "@shared/AppConsts";
 
@@ -16,7 +16,9 @@ export class ProdcutCardComponent {
     @Input()  isSellerIdExists:boolean =false
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
     params: any;
-
+    ngOnInit(){
+        this.product?.price % 1 ==0?this.product.price=Math.round(this.product.price * 100 / 100).toFixed(2):null; 
+    }
     constructor(private router: Router) {}
 
     viewProduct(id: number) {
