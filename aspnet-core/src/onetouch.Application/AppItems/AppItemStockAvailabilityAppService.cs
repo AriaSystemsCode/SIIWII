@@ -229,7 +229,6 @@ namespace onetouch.AppItems
                     {
                         continue;
                     }
-
                     AppItemStockAvailabilityExcelRecordDTO itemExcelRecordErrorDTO = new AppItemStockAvailabilityExcelRecordDTO();
                     itemExcelRecordErrorDTO.ParentCode = itemExcelDto.ParentCode;
                     itemExcelRecordErrorDTO.Code = itemExcelDto.Code;
