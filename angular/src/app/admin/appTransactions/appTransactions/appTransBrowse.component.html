@@ -373,5 +373,5 @@
 <createTransactionModal (modalClose)="closeModal($event)" [roles]="roles" [modalheaderName]="modalheaderName"
     [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"></createTransactionModal>
 
-    <app-shopping-cart-view-component #shoppingCartModal  ></app-shopping-cart-view-component>
+    <app-shopping-cart-view-component #shoppingCartModal  (hideShoppingCartModal)="onHideShoppingCartModal($event)"></app-shopping-cart-view-component>
 
