@@ -206,7 +206,7 @@ namespace onetouch.AppEventGuests
                             await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(eventObj.TenantId, long.Parse(eventObj.CreatorUserId.ToString())),
                                 "User " + myUser.FullName +"@"+ myTenantObject .TenancyName+ " responded with "
                                 + textInfo.ToTitleCase(action.ToLower()) + 
-                                " to the Event: <a>" + (eventObj.Name.Length >30? eventObj.Name.Substring(0,30): eventObj.Name) +"</a>", Abp.Notifications.NotificationSeverity.Info, 
+                                " to the Event: <a>" + eventObj.Name.Substring(0,30)+"</a>", Abp.Notifications.NotificationSeverity.Info, 
                                 new Abp.Domain.Entities.EntityIdentifier(typeof(AppEvent),input.EventId));
                             //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
                         }

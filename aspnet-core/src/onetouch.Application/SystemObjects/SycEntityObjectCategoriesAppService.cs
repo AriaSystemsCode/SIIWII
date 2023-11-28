@@ -643,35 +643,6 @@ namespace onetouch.SystemObjects
 
             return true;
         }
-        //MMT36
-        [AbpAllowAnonymous]
-        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsForTransactionWithPaging(GetAllSycEntityObjectCategoriesInput tmpInput)
-        {
-            tmpInput.ObjectId = await _helper.SystemTables.GetObjectTransactionId();
 
-            if (tmpInput.EntityId != 0)
-            {
-                tmpInput.ExcludeIds = new List<long>();
-                if (tmpInput.DepartmentFlag)
-                {
-                    var EntityRelated = await _appEntitiesAppService.GetAppEntityDepartmentsWithPaging(new GetAppEntityAttributesInput { EntityId = tmpInput.EntityId });
-                    if (EntityRelated != null && EntityRelated.TotalCount > 0)
-                    {
-                        tmpInput.ExcludeIds.AddRange(EntityRelated.Items.Select(r => r.EntityObjectCategoryId).ToList());
-                    }
-                }
-                else
-                {
-                    var EntityRelated = await _appEntitiesAppService.GetAppEntityCategoriesWithPaging(new GetAppEntityAttributesInput { EntityId = tmpInput.EntityId });
-                    if (EntityRelated != null && EntityRelated.TotalCount > 0)
-                    {
-                        tmpInput.ExcludeIds.AddRange(EntityRelated.Items.Select(r => r.EntityObjectCategoryId).ToList());
-                    }
-                }
-            }
-            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> allParents = await GetAll(tmpInput);
-            return allParents;
-        }
-        //MMT36
     }
 }

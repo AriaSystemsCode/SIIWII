@@ -39,10 +39,26 @@ namespace onetouch.AppItems.Dtos
         public long? EntityObjectCategoryID { set; get; }
         //MMT
         public string SizeScaleName { set; get; }
-        public string ScaleSizesOrder { set; get; }
+        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+        //public string ScaleSizesOrder { set; get; }
+        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
         public string SizeRatioName { set; get; }
         public string SizeRatioValue { set; get; }
-        //mmt
+       
+        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+        //public string ScaleSizesOrder { set; get; }
+        public string NoOfDim { set; get; }
+        public String D1Name { set; get; }
+        public String D2Name { set; get; }
+        public String D3Name { set; get; }
+        public String D1Sizes { set; get; }
+        public String D2Sizes { set; get; }
+        public String D3Sizes { set; get; }
+        public string D1Pos { set; get; }
+        public string D2Pos { set; get; }
+        public string D3Pos { set; get; }
+        public string SizeCode { get; set; }
+        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
 
     }
     public class AppItemImage

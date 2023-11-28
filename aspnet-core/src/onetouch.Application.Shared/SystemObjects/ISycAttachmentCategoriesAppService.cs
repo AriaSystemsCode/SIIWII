@@ -13,9 +13,8 @@ namespace onetouch.SystemObjects
     public interface ISycAttachmentCategoriesAppService : IApplicationService 
     {
         Task<PagedResultDto<GetSycAttachmentCategoryForViewDto>> GetAll(GetAllSycAttachmentCategoriesInput input);
-		Task<PagedResultDto<GetSycAttachmentCategoryForViewDto>> GetAllByEntityObjectType(GetAllSycAttachmentCategoriesByEntityObjectTypeInput input);
 
-        Task<long> GetSycAttachmentCategoryForViewByCode(string code);
+		Task<long> GetSycAttachmentCategoryForViewByCode(string code);
 
 		Task<GetSycAttachmentCategoryForViewDto> GetSycAttachmentCategoryForView(long id);
 

@@ -55,14 +55,14 @@ namespace onetouch.AppEntities
 		[StringLength(AppEntityConsts.MaxCodeLength, MinimumLength = AppEntityConsts.MinCodeLength)]
 		public virtual string ObjectCode { get; set; }
 
-		public virtual List<AppEntityCategory> EntityCategories { get; set; }
-		public virtual List<AppEntityClassification> EntityClassifications { get; set; }
+		public virtual IList<AppEntityCategory> EntityCategories { get; set; }
+		public virtual IList<AppEntityClassification> EntityClassifications { get; set; }
 
-		public virtual List<AppEntityAttachment> EntityAttachments { get; set; }
+		public virtual IList<AppEntityAttachment> EntityAttachments { get; set; }
 
-		public virtual List<AppEntityAddress> EntityAddresses { get; set; }
+		public virtual IList<AppEntityAddress> EntityAddresses { get; set; }
 
-		public virtual List<AppEntityExtraData> EntityExtraData { get; set; }
+		public virtual IList<AppEntityExtraData> EntityExtraData { get; set; }
 
 		public virtual IList<AppEntitiesRelationship> EntitiesRelationships { get; set; }
 

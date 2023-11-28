@@ -76,7 +76,7 @@ namespace onetouch.AppItems.Dtos
         public List<AppItemPriceInfo> AppItemPriceInfos { get; set; }
         public List<AppItemSizesScaleInfo> AppItemSizesScaleInfo { get; set;}
         public string OriginalCode { get; set; }
-        public long? SycIdentifierId { get; set; }
+        public long SycIdentifierId { get; set; }
         //MMT
     }
     //MMT
@@ -88,7 +88,6 @@ namespace onetouch.AppItems.Dtos
         public virtual string CurrencyCode { get; set; }
         public virtual string CurrencySymbol { get; set; }
         public virtual string CurrencyName { get; set; }
-        public virtual bool IsDefault { set; get; }
     }
     public class AppItemSizesScaleInfo : AppSizeScaleDto
     {
@@ -217,11 +216,6 @@ namespace onetouch.AppItems.Dtos
 
         //look to be removed if could handle performance
         public List<ExtraAttribute> extraAttributesVar { get; set; }
-        //MMT33-2
-        public virtual bool ShowSync { set; get; }
-        public virtual DateTime LastModifiedDate { set; get; }
-        public virtual long NumberOfSubscribers { set; get; }
-        //MMT33-2
 
     }
 
@@ -376,34 +370,5 @@ namespace onetouch.AppItems.Dtos
         public IList<ItemSharingDto> ItemSharing { get; set; }
 
     }
-    //mmt33-2
-    public class SharingItemOptions
-    {
-        public virtual long AppItemId { get; set; }
 
-        public virtual bool SyncProduct { get; set; } = false;
-
-
-        public virtual byte SharingLevel { get; set; }
-
-        public virtual string Message { get; set; }
-
-        public IList<ItemSharingDto> ItemSharing { get; set; }
-
-    }
-    public class ShareItemListOptions
-    {
-        public virtual long? AppMarketplaceItemId { get; set; }
-
-        public virtual long ItemListId { get; set; }
-
-
-        public virtual byte SharingLevel { get; set; }
-
-        public virtual string Message { get; set; }
-
-        public IList<ItemSharingDto> ItemSharing { get; set; }
-        public bool SyncProductList { set; get; } = false;
-    }
-    //mmt33-2
 }

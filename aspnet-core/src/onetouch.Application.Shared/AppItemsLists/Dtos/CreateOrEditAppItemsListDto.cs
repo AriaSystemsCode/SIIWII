@@ -29,7 +29,6 @@ namespace onetouch.AppItemsLists.Dtos
         public int UsersCount { get; set; }
         public string StatusCode { get; set; }
         public long? StatusId { get; set; }
-
     }
 
     public class UserInfoDto

@@ -51,7 +51,7 @@ namespace onetouch.SystemObjects
 			_sycAttachmentTypesAppService = sycAttachmentTypesAppService;
 		}
 
-	    public async Task<PagedResultDto<GetSycAttachmentCategoryForViewDto>> GetAll(GetAllSycAttachmentCategoriesInput input)
+		 public async Task<PagedResultDto<GetSycAttachmentCategoryForViewDto>> GetAll(GetAllSycAttachmentCategoriesInput input)
          {
 			
 			var filteredSycAttachmentCategories = _sycAttachmentCategoryRepository.GetAll()
@@ -99,60 +99,7 @@ namespace onetouch.SystemObjects
             );
          }
 
-
-        public async Task<PagedResultDto<GetSycAttachmentCategoryForViewDto>> GetAllByEntityObjectType(GetAllSycAttachmentCategoriesByEntityObjectTypeInput input)
-        {
-
-            var filteredSycAttachmentCategories = _sycAttachmentCategoryRepository.GetAll()
-                        .Include(e => e.ParentFk)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Code.Contains(input.Filter) || e.Name.Contains(input.Filter) || e.Attributes.Contains(input.Filter) || e.ParentCode.Contains(input.Filter))
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), e => e.Name == input.NameFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.AttributesFilter), e => e.Attributes == input.AttributesFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.ParentCodeFilter), e => e.ParentCode == input.ParentCodeFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.SycAttachmentCategoryNameFilter), e => e.ParentFk != null && e.ParentFk.Name == input.SycAttachmentCategoryNameFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.AspectRatioFilter), e => e.AspectRatio.Contains(input.AspectRatioFilter))
-                        .WhereIf(input.MaxFileSizeFilter.HasValue && input.MaxFileSizeFilter > 0, e => e.MaxFileSize <= input.MaxFileSizeFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.MessageFilter), e => e.Message.Contains(input.MessageFilter))
-                        .WhereIf(input.TypeFilter != null, e => e.Type == input.TypeFilter)
-						.WhereIf(input.EntityObjectTypeId!=null && input.EntityObjectTypeId >0, e=> e.EntityObjectTypeId == input.EntityObjectTypeId)
-						.WhereIf(!string.IsNullOrEmpty(input.EntityObjectTypeCode), e => e.EntityObjectTypeCode == input.EntityObjectTypeCode);
-
-            var pagedAndFilteredSycAttachmentCategories = filteredSycAttachmentCategories
-                .OrderBy(input.Sorting ?? "id asc")
-                .PageBy(input);
-
-            var sycAttachmentCategories = from o in pagedAndFilteredSycAttachmentCategories
-                                          join o1 in _lookup_sycAttachmentCategoryRepository.GetAll() on o.ParentId equals o1.Id into j1
-                                          from s1 in j1.DefaultIfEmpty()
-
-                                          select new GetSycAttachmentCategoryForViewDto()
-                                          {
-                                              SycAttachmentCategory = new SycAttachmentCategoryDto
-                                              {
-                                                  Id = o.Id,
-                                                  Code = o.Code,
-                                                  Name = o.Name,
-                                                  Attributes = o.Attributes,
-                                                  ParentCode = o.ParentCode,
-                                                  AspectRatio = o.AspectRatio,
-                                                  MaxFileSize = o.MaxFileSize,
-                                                  Message = o.Message,
-                                                  Type = o.Type,
-                                              },
-                                              SycAttachmentCategoryName = s1 == null ? "" : s1.Name.ToString()
-                                          };
-
-            var totalCount = await filteredSycAttachmentCategories.CountAsync();
-
-            return new PagedResultDto<GetSycAttachmentCategoryForViewDto>(
-                totalCount,
-                await sycAttachmentCategories.ToListAsync()
-            );
-        }
-
-
-        [AbpAllowAnonymous]
+		[AbpAllowAnonymous]
 		public async Task<IList<GetSycAttachmentCategoryForViewDto>> GetAllForAccountInfo()
 		{
 			//var entityId = await _accountInfoAppService.GetCurrTenantEntityId();

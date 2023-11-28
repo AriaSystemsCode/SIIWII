@@ -39,6 +39,7 @@
             this.pageInfo3 = new DevExpress.XtraReports.UI.XRPageInfo();
             this.Detail = new DevExpress.XtraReports.UI.DetailBand();
             this.pictureBox3 = new DevExpress.XtraReports.UI.XRPictureBox();
+            this.xrPictureBox1 = new DevExpress.XtraReports.UI.XRPictureBox();
             this.xrLabel1 = new DevExpress.XtraReports.UI.XRLabel();
             this.label9 = new DevExpress.XtraReports.UI.XRLabel();
             this.label13 = new DevExpress.XtraReports.UI.XRLabel();
@@ -176,6 +177,7 @@
             this.Detail.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.pageInfo3,
             this.pictureBox3,
+            this.xrPictureBox1,
             this.xrLabel1,
             this.label9,
             this.label13});
@@ -196,6 +198,15 @@
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.SizeF = new System.Drawing.SizeF(250F, 250F);
             this.pictureBox3.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
+            // 
+            // xrPictureBox1
+            // 
+            this.xrPictureBox1.Dpi = 254F;
+            this.xrPictureBox1.ImageSource = new DevExpress.XtraPrinting.Drawing.ImageSource("img", resources.GetString("xrPictureBox1.ImageSource"));
+            this.xrPictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(2458.862F, 25F);
+            this.xrPictureBox1.Name = "xrPictureBox1";
+            this.xrPictureBox1.SizeF = new System.Drawing.SizeF(254F, 254F);
+            this.xrPictureBox1.Sizing = DevExpress.XtraPrinting.ImageSizeMode.ZoomImage;
             // 
             // xrLabel1
             // 
@@ -355,6 +366,7 @@
         private DevExpress.XtraReports.Parameters.Parameter address;
         private DevExpress.XtraReports.Parameters.Parameter telephone;
         private DevExpress.XtraReports.Parameters.Parameter email;
+        private DevExpress.XtraReports.UI.XRPictureBox xrPictureBox1;
         private DevExpress.XtraReports.UI.XRLabel xrLabel1;
         private DevExpress.XtraReports.UI.XRLabel label9;
         private DevExpress.XtraReports.UI.XRLabel label13;

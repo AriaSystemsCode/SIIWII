@@ -125,8 +125,6 @@
         public const string Pages_AppItems_EditListing = "Pages.AppItems.EditListing";
         public const string Pages_AppItems_DeleteListing = "Pages.AppItems.DeleteListing";
         public const string Pages_AppItems_Publish = "Pages.AppItems.Publish";
-        
-        public const string Pages_AppSiiwiiTransactions = "Pages.AppSiiwiiTransactions";
 
         public const string Pages_Accounts = "Pages.Accounts";
         public const string Pages_Accounts_Create = "Pages.Accounts.Create";

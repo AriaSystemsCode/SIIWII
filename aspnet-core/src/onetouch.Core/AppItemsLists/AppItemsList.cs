@@ -34,8 +34,6 @@ namespace onetouch.AppItemsLists
         public ICollection<AppItemsListDetail> AppItemsListDetails { get; set; }
 
         public ICollection<AppItemSharing> ItemSharingFkList { get; set; }
-        public virtual DateTime TimeStamp { get; set; }
-        [StringLength(AppItemConsts.SSINLength, MinimumLength = AppItemConsts.SSINLength)]
-        public virtual string SSIN { get; set; }
+
     }
 }

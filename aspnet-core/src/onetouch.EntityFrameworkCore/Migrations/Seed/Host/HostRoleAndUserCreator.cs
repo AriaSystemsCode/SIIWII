@@ -33,11 +33,11 @@ namespace onetouch.Migrations.Seed.Host
         public void Create()
         {
             CreateHostRoleAndUsers();
-            CreateHostObjectEntityTypes();
-            CreateHostCodeStructures();
-            CreateHostFileExt();
-            CreateHostSystemData();
-            CreateHostObjectEntityStatus();
+            //CreateHostObjectEntityTypes();
+            //CreateHostCodeStructures();
+            //CreateHostFileExt();
+            //CreateHostSystemData();
+            //CreateHostObjectEntityStatus();
         }
 
         private void CreateHostRoleAndUsers()
@@ -177,8 +177,6 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Listing);
                 _context.SaveChanges();
             }
-            
-
             //Iteration#29,1 MMT News Digest changes[Start]
             var sycIdentifierDefinitionsObj = _context.SycIdentifierDefinitions.FirstOrDefault(
              r => r.Code == "NEWSDIGEST");
@@ -262,28 +260,12 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SaveChanges();
             }
             //T-SII-20230222.0003,1 MMT 02/28/2023 Internal Server Error during your request - when saving a new size scale[End]
-            //MMT33[Start]
-            var sydObjects_Transaction = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-        r => r.Code == "TRANSACTION");
-            if (sydObjects_Transaction == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
-            {
-                sydObjects_Transaction = new SystemObjects.SydObject
-                {
-                    Code = "TRANSACTION",
-                    Name = "Transaction",
-                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
-                    ObjectTypeId = ObjectTypeCodeEntity.Id
-                };
-                _context.SydObjects.Add(sydObjects_Transaction);
-                _context.SaveChanges();
-            }
-            //MMT33[End]
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via".Split(',');
+            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE".ToUpper().Split(',');
+            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE".ToUpper().Split(',');
+            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -348,40 +330,6 @@ namespace onetouch.Migrations.Seed.Host
                 }
             }
             #endregion add missing entity object types
-            //MMT33[Start]
-            #region Add  sycEntityObject status for listing
-            ObjectCode = "TRANSACTION";
-            codes = "HOLD,ACTIVE,CANCELLED,DRAFT,COMPLETE,OPEN".ToUpper().Split(',');
-            names = "Hold,Active,Cancelled,Draft,Complete,Open".Split(',');
-
-            for (int i = 0; i < codes.Length; i++)
-            {
-                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-                    r => r.Code == ObjectCode);
-                if (sydObjects != null && sydObjects.Id > 0)
-                {
-                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
-                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
-
-                    if (sydObjects != null && sydObjects.Id > 0 &&
-                        SycEntityObjectStatuses == null)
-                    {
-                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
-                        {
-                            Code = codes[i],
-                            Name = names[i],
-                            ObjectId = sydObjects.Id,
-                            ObjectCode = sydObjects.Code,
-                            IsDefault = codes[i] == "OPEN" ? true : false
-
-                        };
-                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
-                        _context.SaveChanges();
-                    }
-                }
-            }
-            #endregion add missing entity object types
-            //MMT33[End]
 
         }
 
@@ -451,13 +399,13 @@ namespace onetouch.Migrations.Seed.Host
         {
 
             #region Add missing SycAttachmentCategories
-            var type = "1,1,1,1,1,1,0,0,1,0,0,0,1,1,1".ToUpper().Split(',');
-            var maxLength = "5,5,5,5,5,5,NULL,NULL,5,NULL,NULL,NULL,5,5,5".ToUpper().Split(',');
-            var aspectRatio = "1.29,0.772,1:1,200:49,127:100,127:100,NULL,NULL,200:49,NULL,NULL,NULL,200:49,6:5,3:1".ToUpper().Split(',');
-            var entityObjectType = "BACKGROUND,BACKGROUND,PARTNER,PARTNER,PARTNER,PERSON,PRODUCT,MESSAGE,PERSON,PARTNER,NULL,NULL,NULL,NULL,NULL".ToUpper().Split(',');
-            var parent = "NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,IMAGE".ToUpper().Split(',');
-            var codes = "LETTER-LANDSCAPE,LETTER-PORTRAIT,LOGO,BANNER,IMAGE,PHOTO,IMAGE,FILE,COVER-PHOTO,VIDEO,FILE,DEFAULT-IMAGE,COVER,CTASLIDER,AUTOSLIDERQ".ToUpper().Split(',');
-            var names = "Letter Landscape,Letter Portrait,Logo,Banner,Image,Photo,Image,File,Cover Photo,Video,File,Default-image,Cover,CTASlider, AutoSlider".Split(',');
+            var type = "1,1,1,1,0,0,1,0,0,0,1,1,1".ToUpper().Split(',');
+            var maxLength = "5,5,5,5,NULL,NULL,5,NULL,NULL,NULL,5,5,5".ToUpper().Split(',');
+            var aspectRatio = "1:1,200:49,127:100,127:100,NULL,NULL,200:49,NULL,NULL,NULL,200:49,6:5,3:1".ToUpper().Split(',');
+            var entityObjectType = "PARTNER,PARTNER,PARTNER,PERSON,PRODUCT,MESSAGE,PERSON,PARTNER,NULL,NULL,NULL,NULL,NULL".ToUpper().Split(',');
+            var parent = "NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,IMAGE".ToUpper().Split(',');
+            var codes = "LOGO,BANNER,IMAGE,PHOTO,IMAGE,FILE,COVER-PHOTO,VIDEO,FILE,DEFAULT-IMAGE,COVER,CTASLIDER,AUTOSLIDERQ".ToUpper().Split(',');
+            var names = "Logo,Banner,Image,Photo,Image,File,Cover Photo,Video,File,Default-image,Cover,CTASlider, AutoSlider".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
