@@ -640,6 +640,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                             "BuyerSSIN",
                             JSON.stringify(this.buyerCompanySSIN)
                         );
+
+                        
+                        if (this.formType.toUpperCase() == "PO")
+                            this.currencyCode=  this.appSession.tenant.currencyInfoDto;
+                            
                         localStorage.setItem(
                             "currencyCode",
                             JSON.stringify(this.currencyCode)
