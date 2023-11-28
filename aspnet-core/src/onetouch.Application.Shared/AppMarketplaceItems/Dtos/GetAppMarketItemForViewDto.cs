@@ -82,10 +82,6 @@ namespace onetouch.AppMarketplaceItems.Dtos
         public virtual List<AppEntityAttachmentDto> EntityAttachments { get; set; }
         public virtual AppEntityAttachmentDto DefaultEntityAttachment { get; set; }
         public virtual List<MarketplaceEDRestAttributes> EDRestAttributes { get; set; }
-        //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[Start]
-        public virtual string ColorImage { set; get; }
-        public virtual string ColorHexaCode{ set; get; }
-        //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[End]
     }
     public class MarketplaceEDRestAttributes
     {
@@ -175,7 +171,6 @@ namespace onetouch.AppMarketplaceItems.Dtos
         public List<AppItemPriceInfo> AppItemPriceInfos { get; set; }
         public List<AppItemSizesScaleInfo> AppItemSizesScaleInfo { get; set; }
         public long? SycIdentifierId { get; set; }
-        public virtual string ManufacturerCode { get; set; }
         //MMT
     }
 }

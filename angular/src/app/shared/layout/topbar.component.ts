@@ -23,8 +23,6 @@ import {
     MaintainancesServiceProxy,
     AppTransactionServiceProxy,
     ICreateOrEditAppTransactionsDto,
-    ShoppingCartSummary,
-    TransactionType,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -45,8 +43,6 @@ import {
 import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { Dropdown } from "primeng/dropdown";
-import { ShoppingCartViewComponentComponent } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component";
-import { ShoppingCartMode } from "@app/admin/app-shoppingCart/Components/shopping-cart-view-component/ShoppingCartMode";
 
 export enum MarketPlace {
     Accounts,
@@ -92,7 +88,8 @@ export enum MarketPlace {
 })
 export class TopBarComponent
     extends ThemesLayoutBaseComponent
-    implements OnInit {
+    implements OnInit
+{
     attachmentBaseUrl = AppConsts.attachmentBaseUrl;
     hubConnection: signalR.HubConnection;
     _belowBar = false;
@@ -149,15 +146,6 @@ export class TopBarComponent
     isRoleExist: boolean = false;
     btnLoader: boolean = false;
     modalheaderName: string;
-    showSearch:boolean =false;
-    shoppingCartSummary: ShoppingCartSummary;
-    defaultSellerLogo: string = "";
-    defaultBuyerLogo: string = "";
-    _TransactionType = TransactionType;
-    transactionType: string = "";
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
-
-
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -237,12 +225,6 @@ export class TopBarComponent
         // .subscribe((res: any) => {
         //     console.log(res);
         // });
-        const subs = this.userClickService.clickSubject$.subscribe((res) => {
-            if (res == "refreshShoppingInfoInTopbar") {
-                this.getShoppingCartInfo();
-            }
-        });
-
         this.hubConnection = new signalR.HubConnectionBuilder()
             .withUrl(this.attachmentBaseUrl + "/signalr-build")
             .build();
@@ -270,8 +252,6 @@ export class TopBarComponent
         this.appSession.user.id;
         this.registerToEvents();
         this.getUnreadMessageCount();
-        if(!this.isHost)
-          this.getShoppingCartInfo();
 
         this.messageReadService.readMessageSubject$.subscribe((res) => {
             if (res) {
@@ -426,15 +406,15 @@ export class TopBarComponent
                 new Date(
                     data.maintainance.from.toString()
                 ).toLocaleDateString() +
-                " " +
-                new Date(
-                    data.maintainance.from.toString()
-                ).toLocaleTimeString(),
+                    " " +
+                    new Date(
+                        data.maintainance.from.toString()
+                    ).toLocaleTimeString(),
                 new Date(data.maintainance.to.toString()).toLocaleDateString() +
-                " " +
-                new Date(
-                    data.maintainance.to.toString()
-                ).toLocaleTimeString()
+                    " " +
+                    new Date(
+                        data.maintainance.to.toString()
+                    ).toLocaleTimeString()
             );
         } else {
             this._belowBar = false;
@@ -489,28 +469,6 @@ export class TopBarComponent
             this.unreadMessageCount = result;
         });
     }
-
-    getShoppingCartInfo(openShoppingCart: boolean = false) {
-        this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
-            .subscribe((res: ShoppingCartSummary) => {
-                this.shoppingCartSummary = res;
-                if (this.shoppingCartSummary.orderType == this._TransactionType.SalesOrder)
-                    this.transactionType = "SO";
-                if (this.shoppingCartSummary.orderType == this._TransactionType.PurchaseOrder)
-                    this.transactionType = "PO";
-
-                if (!this.shoppingCartSummary.sellerLogo)
-                    this.defaultSellerLogo = "../../../assets/shoppingCart/Order-Details-Seller-logo.svg";
-                if (!this.shoppingCartSummary.buyerLogo)
-                    this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
-
-
-                if (openShoppingCart)
-                    this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
-
-            });
-    }
-
 }
 
 export interface TopbardropDown {

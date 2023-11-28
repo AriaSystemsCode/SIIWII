@@ -86,7 +86,6 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 .getAppEntityForEdit(this.appEntity.id)
                 .subscribe((res) => {
                     this.appEntity = AppEntityDto.fromJS(res.appEntity);
-                   if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
                     console.log(">>", this.appEntity);
                     this.adjustImageSrcsUrls();
                     this.loading = true;

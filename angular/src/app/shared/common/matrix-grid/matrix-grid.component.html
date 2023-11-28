@@ -70,16 +70,14 @@
                     </td>
                     <td *ngFor="let col of columns;index as i">
                         <div *ngIf="!cellSelectionIsEditable || (cellSelectionIsEditable && !cellSelectionFormInput)else elseCellSelectionTemp">
-                            <span *ngIf="rowData?.rowValues[i]">{{rowData?.rowValues[i][cellLabelField]| currency:' '}}</span>
+                            {{ rowData?.rowValues[i] ? rowData?.rowValues[i][cellLabelField] : '' }}
                         </div>
                         <ng-template #elseCellSelectionTemp>
                             <div [ngSwitch]="cellSelectionFormInput.type">
                                 <span *ngSwitchCase="FormInputType.Number">
                                     <input 
                                         type="number" 
-                                        [ngModel]='rowData.rowValues[i].value|currency:" "' 
-                                        [ngModelOptions]="{updateOn:'blur'}"
-                                        (ngModelChange)="rowData.rowValues[i].value=$event" 
+                                        [(ngModel)]='rowData.rowValues[i].value' 
                                         [ngClass]="cellSelectionFormInput.customClass"
                                         [ngStyle]="cellSelectionFormInput.customStyle"
                                         [name]="cellSelectionFormInput.name+'rowData-'+index+'-'+i" 

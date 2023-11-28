@@ -55,30 +55,11 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         //public virtual string? BuyerContactSSIN { set; get; }
         public virtual string? SellerContactSSIN { set; get; }
         public virtual TransactionType TransactionType { set; get; }
-        public string EntityStatusCode { set; get; }
+
         // virtual string? SellerContactName { set; get; }
         public DateTime CompleteDate { get; set; }
         public virtual string? SellerCompanySSIN { set; get; }
-        public virtual DateTime StartDate { set; get; }
-        public virtual DateTime AvailableDate { set; get; }
-        public virtual long? ShipViaId { get; set; }
-
-        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
-        public virtual string ShipViaCode { get; set; }
-       
-        public virtual long? PaymentTermsId { get; set; }
-
-        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
-        public virtual string PaymentTermsCode { get; set; }
-        [StringLength(AppTransactionConst.MaxBuyerDeptLength, MinimumLength = AppTransactionConst.MinBuyerDeptLength)]
-        public virtual string BuyerDepartment { set; get; }
         public virtual ICollection<AppTransactionsDetailDto> AppTransactionsDetails { get; set; }
-        public virtual ICollection<AppTransactionContactDto> AppTransactionContacts { get; set; }
-        public virtual string BuyerStore { set; get; }
-        public virtual long TotalQuantity { set; get; }
-        public virtual double TotalAmount { set; get; }
-        public virtual bool lFromPlaceOrder { set; get; } = false;
-        public virtual decimal CurrencyExchangeRate { get; set; }
     }
     public enum OrderCreatorRole
     { 
@@ -105,14 +86,5 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string Email { set; get; }
         public string Phone { set; get; }
         public string SSIN { set; get; }
-        public long? PhoneTypeId { get; set; }
-        public string PhoneTypeName { set; get; }
-        public List<PhoneNumberAndtype> PhoneList { get; set; }
-    }
-    public class PhoneNumberAndtype 
-    { 
-        public string PhoneNumber { set; get; }
-        public long? PhoneTypeId { get; set; }
-        public string PhoneTypeName { set; get; }
     }
 }

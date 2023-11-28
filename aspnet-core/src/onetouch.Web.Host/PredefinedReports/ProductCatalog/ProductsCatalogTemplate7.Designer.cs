@@ -48,12 +48,11 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.label4 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label4");
             this.label6 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label6");
             this.label5 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label5");
-            this.label12 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label12");
             this.label10 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label10");
+            this.label12 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label12");
 
             // Parameters
             this.to = reportInitializer.GetParameter("to");
-            this.DetailPageGroupByName = reportInitializer.GetParameter("DetailPageGroupByName");
             this.BKGround = reportInitializer.GetParameter("BKGround");
             this.ColorPageSort = reportInitializer.GetParameter("ColorPageSort");
             this.DetailPageSort = reportInitializer.GetParameter("DetailPageSort");
@@ -83,6 +82,7 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.selectedKey = reportInitializer.GetParameter("selectedKey");
             this.attachmentBaseUrl = reportInitializer.GetParameter("attachmentBaseUrl");
             this.attributeTypeId = reportInitializer.GetParameter("attributeTypeId");
+            this.DetailPageGroupByName = reportInitializer.GetParameter("DetailPageGroupByName");
 
             // Data Sources
             this.sqlDataSource1 = reportInitializer.GetDataSource<DevExpress.DataAccess.Sql.SqlDataSource>("sqlDataSource1");
@@ -124,7 +124,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.XRLabel label4;
         private DevExpress.XtraReports.UI.XRLabel label6;
         private DevExpress.XtraReports.UI.XRLabel label5;
-        private DevExpress.XtraReports.UI.XRLabel label12;
         private DevExpress.XtraReports.UI.XRLabel label10;
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
         private DevExpress.XtraReports.UI.XRControlStyle Title;
@@ -133,7 +132,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.XRControlStyle DetailData3_Odd;
         private DevExpress.XtraReports.UI.XRControlStyle PageInfo;
         private DevExpress.XtraReports.Parameters.Parameter to;
-        private DevExpress.XtraReports.Parameters.Parameter DetailPageGroupByName;
         private DevExpress.XtraReports.Parameters.Parameter BKGround;
         private DevExpress.XtraReports.Parameters.Parameter ColorPageSort;
         private DevExpress.XtraReports.Parameters.Parameter DetailPageSort;
@@ -163,5 +161,7 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.Parameters.Parameter selectedKey;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
         private DevExpress.XtraReports.Parameters.Parameter attributeTypeId;
+        private DevExpress.XtraReports.UI.XRLabel label12;
+        private DevExpress.XtraReports.Parameters.Parameter DetailPageGroupByName;
     }
 }

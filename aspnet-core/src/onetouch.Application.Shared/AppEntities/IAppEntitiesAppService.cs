@@ -52,9 +52,8 @@ namespace onetouch.AppEntities
 
 		Task<FileDto> GetAppEntitiesToExcel(GetAllAppEntitiesForExcelInput input);
 
-		Task<PagedResultDto<LookupLabelDto>> GetAllEntitiesByTypeCodeWithPaging(GetAllAppEntitiesInput input);
-
-        Task<List<AppEntitySycEntityObjectTypeLookupTableDto>> GetAllSycEntityObjectTypeForTableDropdown();
+		
+		Task<List<AppEntitySycEntityObjectTypeLookupTableDto>> GetAllSycEntityObjectTypeForTableDropdown();
 		
 		Task<List<AppEntitySycEntityObjectStatusLookupTableDto>> GetAllSycEntityObjectStatusForTableDropdown();
 		
@@ -81,8 +80,7 @@ namespace onetouch.AppEntities
 		Task<bool> UpdateEntityCommentsCount(long entitlyId, bool RemoveComment);
 		//MMT
 		Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code);
-		Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode);
-        //MMT
+		//MMT
 
-    }
+	}
 }

@@ -52,7 +52,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
 
             // Parameters
             this.to = reportInitializer.GetParameter("to");
-            this.DetailPageGroupByName = reportInitializer.GetParameter("DetailPageGroupByName");
             this.BKGround = reportInitializer.GetParameter("BKGround");
             this.cc = reportInitializer.GetParameter("cc");
             this.bcc = reportInitializer.GetParameter("bcc");
@@ -82,6 +81,7 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.selectedKey = reportInitializer.GetParameter("selectedKey");
             this.attachmentBaseUrl = reportInitializer.GetParameter("attachmentBaseUrl");
             this.attributeTypeId = reportInitializer.GetParameter("attributeTypeId");
+            this.DetailPageGroupByName = reportInitializer.GetParameter("DetailPageGroupByName");
 
             // Data Sources
             this.sqlDataSource1 = reportInitializer.GetDataSource<DevExpress.DataAccess.Sql.SqlDataSource>("sqlDataSource1");
@@ -131,7 +131,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.XRControlStyle DetailData3_Odd;
         private DevExpress.XtraReports.UI.XRControlStyle PageInfo;
         private DevExpress.XtraReports.Parameters.Parameter to;
-        private DevExpress.XtraReports.Parameters.Parameter DetailPageGroupByName;
         private DevExpress.XtraReports.Parameters.Parameter BKGround;
         private DevExpress.XtraReports.Parameters.Parameter cc;
         private DevExpress.XtraReports.Parameters.Parameter bcc;
@@ -161,5 +160,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.Parameters.Parameter selectedKey;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
         private DevExpress.XtraReports.Parameters.Parameter attributeTypeId;
+        private DevExpress.XtraReports.Parameters.Parameter DetailPageGroupByName;
     }
 }

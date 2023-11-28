@@ -68,7 +68,7 @@ namespace onetouch.AppSiiwiiTransaction
         [StringLength(AppTransactionConst.MaxPhoneNumberLength, MinimumLength = AppTransactionConst.MinPhoneNumberLength)]
         public virtual string SellerContactPhoneNumber { get; set; }
 
-        [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinBuyerNameLength)]
+        [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
         public virtual string BuyerCompanyName { get; set; }
 
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
@@ -79,28 +79,6 @@ namespace onetouch.AppSiiwiiTransaction
         public virtual string PriceLevel { get; set; }
         public virtual ICollection<AppTransactionDetails> AppTransactionDetails { get; set; }
         public virtual DateTime CompleteDate {set; get;}
-        //Iteration#36,1 MMT 08/16/2023 Check out and manage placed orders [Start]
-        public virtual DateTime StartDate { set; get; }
-        public virtual DateTime AvailableDate { set; get; }
-        public virtual long? ShipViaId { get; set; }
 
-        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
-        public virtual string ShipViaCode { get; set; }
-        [ForeignKey("ShipViaId")]
-        public virtual AppEntity ShipViaFk { get; set; }
-        public virtual long? PaymentTermsId { get; set; }
-
-        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
-        public virtual string PaymentTermsCode { get; set; }
-        [ForeignKey("PaymentTermsId")]
-        public virtual AppEntity PaymentTermsFk { get; set; }
-        [StringLength(AppTransactionConst.MaxBuyerDeptLength, MinimumLength = AppTransactionConst.MinBuyerDeptLength)]
-        public virtual string BuyerDepartment { set; get; }
-        public virtual string BuyerStore { set; get; }
-        public virtual long TotalQuantity{ set; get; }
-        public virtual double TotalAmount { set; get; }
-        public virtual decimal CurrencyExchangeRate { get; set; }
-        public virtual ICollection<AppTransactionContacts> AppTransactionContacts { get; set; }
-        //Iteration#36,1 MMT 08/16/2023 Check out and manage placed orders [End]
     }
 }

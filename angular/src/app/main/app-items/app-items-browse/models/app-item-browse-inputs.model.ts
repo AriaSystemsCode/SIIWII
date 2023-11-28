@@ -33,8 +33,6 @@ export class AppItemsBrowseComponentFiltersDisplayFlags {
     listingStatus:  boolean
     publishStatus: boolean
     visibilityStatus: boolean
-       //  T-SII-20231103.0007
-       appItemSizeScale:boolean
     showAll(){
         this.filterType = true
         this.search =  true
@@ -47,8 +45,6 @@ export class AppItemsBrowseComponentFiltersDisplayFlags {
         this.listingStatus = true
         this.publishStatus = true
         this.visibilityStatus = true
-          // T-SII-20231103.0007
-          this.appItemSizeScale=true;
     }
     allIsHidden : boolean
 }

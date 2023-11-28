@@ -53,7 +53,5 @@ namespace onetouch.AppSiiwiiTransaction
         [ForeignKey("ParentId")]
         public AppTransactionDetails ParentFk { get; set; }
         public ICollection<AppTransactionDetails> ParentFkList { get; set; }
-        [StringLength(AppItemConsts.MaxCodeLength, MinimumLength = AppItemConsts.MinCodeLength)]
-        public virtual string ManufacturerCode { get; set; }
     }
 }

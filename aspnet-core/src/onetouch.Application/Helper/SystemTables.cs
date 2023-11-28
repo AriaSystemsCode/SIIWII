@@ -578,30 +578,6 @@ namespace onetouch.Helpers
                 return obj.Id;
             }
         }
-        public async Task<long> GetEntityObjectStatusActiveTransaction()
-        {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "ACTIVE" && x.ObjectCode == "TRANSACTION");
-                return obj.Id;
-            }
-        }
-        public async Task<long> GetEntityObjectStatusOpenTransaction()
-        {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "OPEN" && x.ObjectCode == "TRANSACTION");
-                return obj.Id;
-            }
-        }
-        public async Task<long> GetEntityObjectStatusCancelledTransaction()
-        {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "CANCELLED" && x.ObjectCode == "TRANSACTION");
-                return obj.Id;
-            }
-        }
         public async Task<long> GetEntityObjectTypeSalesOrder()
         {
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "SALESORDER");

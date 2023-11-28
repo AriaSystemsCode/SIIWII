@@ -41,7 +41,8 @@ import { Paginator } from "primeng/paginator";
 })
 export class MarketplaceProductsComponent
     extends AppComponentBase
-    implements OnDestroy {
+    implements OnDestroy
+{
     @ViewChild("AppItemsBrowseComponent")
     appItemsBrowseComponent: AppItemsComponent;
     isFilterHidden: boolean = false;
@@ -70,38 +71,33 @@ export class MarketplaceProductsComponent
     @ViewChild("filters", { static: false }) filters!: any;
     sellerSSIN: any;
     buyerSSIN: any;
-    contactSSIN:any;
 
     constructor(
         injector: Injector,
         private _router: Router,
+        private _activatedRoute: ActivatedRoute,
+        private _appItemsServiceProxy: AppItemsServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _pricingHelperService: PricingHelpersService,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         public datepipe: DatePipe,
         public breakpointObserver: BreakpointObserver
     ) {
         super(injector);
 
-        if (localStorage.getItem("contactSSIN") && localStorage.getItem("contactSSIN") != "undefined") {
-               this.contactSSIN = JSON.parse(localStorage.getItem("contactSSIN"));
-        }
-
-        if (localStorage.getItem("SellerSSIN") && localStorage.getItem("SellerSSIN") != "undefined") {
+        if (localStorage.getItem("SellerSSIN")) {
             this.sellerSSIN = JSON.parse(localStorage.getItem("SellerSSIN"));
         }
-        if (localStorage.getItem("BuyerSSIN") && localStorage.getItem("BuyerSSIN") != "undefined") {
+        if (localStorage.getItem("BuyerSSIN")) {
             this.buyerSSIN = JSON.parse(localStorage.getItem("BuyerSSIN"));
         }
 
         // this.getAllProducts()
-        this.isSellerIdExists = localStorage.getItem("SellerSSIN")
-            ? true
-            : false;
-        if (localStorage.getItem("SellerSSIN") && localStorage.getItem("SellerSSIN") != "undefined") {
+        this.isSellerIdExists = localStorage.getItem("SellerId") ? true : false;
+        if (localStorage.getItem("SellerId")) {
             this._AppMarketplaceItemsServiceProxy
-                //.getAccountImages(Number(localStorage.getItem("SellerId")))
-                .getAccountImages(localStorage.getItem("SellerSSIN"))
+                .getAccountImages(Number(localStorage.getItem("SellerId")))
                 .subscribe((res) => {
                     console.log(">> sellerData", res);
                     this.sellerData = res;
@@ -121,22 +117,19 @@ export class MarketplaceProductsComponent
         ];
         (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
             this.getAllCurrencies();
-        // this.selectedCurrrency =
-        // localStorage.getItem("currencyCode")=="undefined"  || JSON.parse(localStorage.getItem("currencyCode")) === null
-        //         ? this.tenantDefaultCurrency
-        //         : JSON.parse(localStorage.getItem("currencyCode"));
-        // this.currency =
-        // localStorage.getItem("currencyCode")=="undefined"  ||   JSON.parse(localStorage.getItem("currencyCode")) === null
-        //         ? this.tenantDefaultCurrency.code
-        //         : JSON.parse(localStorage.getItem("currencyCode")).code;
-
-        this.setCurrency();
+        this.selectedCurrrency =
+            JSON.parse(localStorage.getItem("currencyCode")) === null
+                ? this.tenantDefaultCurrency
+                : JSON.parse(localStorage.getItem("currencyCode"));
+        this.currency =
+            JSON.parse(localStorage.getItem("currencyCode")) === null
+                ? this.tenantDefaultCurrency.code
+                : JSON.parse(localStorage.getItem("currencyCode")).code;
         this.tentantID = this.appSession?.tenant?.id;
         // init get products on screen initalization
         this.showMainSpinner();
         this._AppMarketplaceItemsServiceProxy
             .getAll(
-                this.contactSSIN,
                 localStorage.getItem("SellerSSIN"),
                 null, // tenant id
                 null,
@@ -155,7 +148,7 @@ export class MarketplaceProductsComponent
                 undefined,
                 undefined,
                 [], // ids
-                this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                this.selectedCurrrency?.code,
                 this.selectedSort.value,
                 this.skipCount,
                 this.maxResultCount
@@ -163,8 +156,7 @@ export class MarketplaceProductsComponent
             .pipe(finalize(() => this.hideMainSpinner()))
             .subscribe((result) => {
                 this.items = result.items;
-                this.pagesNumber = result.totalCount;
-                this.setCurrency();
+                this.pagesNumber = result.totalCount / this.maxResultCount;
             });
         // this.getCurrencyCurrent();
 
@@ -220,7 +212,6 @@ export class MarketplaceProductsComponent
         this.showMainSpinner();
         this._AppMarketplaceItemsServiceProxy
             .getAll(
-                this.contactSSIN,
                 localStorage.getItem("SellerSSIN"),
                 null, // tenant id
                 this.appItemListId,
@@ -239,7 +230,7 @@ export class MarketplaceProductsComponent
                 this.startShipData,
                 this.endShipData,
                 this.brands, // ids
-                this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                this.selectedCurrrency?.code,
                 this.selectedSort.value,
                 this.skipCount,
                 this.maxResultCount
@@ -248,27 +239,12 @@ export class MarketplaceProductsComponent
                 finalize(() => {
                     this.displayFitlers = false;
                     this.hideMainSpinner();
-                    this.setCurrency();
                 })
             )
             .subscribe((result) => {
                 this.items = result.items;
-                this.pagesNumber = result.totalCount;
+                this.pagesNumber = result.totalCount / this.maxResultCount;
             });
-    }
-
-    setCurrency() {
-        this.selectedCurrrency =
-            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
-                ? this.tenantDefaultCurrency
-                : JSON.parse(localStorage.getItem("currencyCode"));
-        this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
-
-        if (!this.selectedCurrrency?.code) {
-            var indx = this.currencies?.findIndex(x => x.code == this.selectedCurrrency);
-            if (indx >= 0)
-                this.selectedCurrrency = this.currencies[indx];
-        }
     }
 
     onPageChange(value: any) {
@@ -289,13 +265,8 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
     }
     handleCurrencyChange(data: any) {
-        setTimeout(
-            () => {
-                this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
-                localStorage.setItem("currencyCode", this.currency);
-                this.getAllProducts();
-            }, 1500);
-
+        this.currency = this.selectedCurrrency.code;
+        this.getAllProducts();
     }
     handleSortingChange(data: any) {
         this.getAllProducts();
@@ -318,15 +289,7 @@ export class MarketplaceProductsComponent
     }
     selectedDepartments: any;
     selectDepartment(value) {
-        console.log(value);
-
-        if (value == null) {
-            this.selectedDepartments = [];
-        } else {
-            this.selectedDepartments = [
-                value.node.data.sycEntityObjectCategory.id,
-            ];
-        }
+        this.selectedDepartments = [value.node.data.sycEntityObjectCategory.id];
         if (!this.isMobile) {
             this.getAllProducts();
         }
@@ -389,11 +352,11 @@ export class MarketplaceProductsComponent
         this.filters.resetFilters();
         (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
             (this.selectedCurrrency =
-                localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+                JSON.parse(localStorage.getItem("currencyCode")) === null
                     ? this.tenantDefaultCurrency
                     : JSON.parse(localStorage.getItem("currencyCode")));
         this.currency =
-            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+            JSON.parse(localStorage.getItem("currencyCode")) === null
                 ? this.tenantDefaultCurrency.code
                 : JSON.parse(localStorage.getItem("currencyCode")).code;
         this.tentantID = this.appSession?.tenant?.id;
@@ -403,7 +366,6 @@ export class MarketplaceProductsComponent
         this.showMainSpinner();
         this._AppMarketplaceItemsServiceProxy
             .getAll(
-                this.contactSSIN,
                 localStorage.getItem("SellerSSIN"),
                 null, // tenant id
                 null,
@@ -422,7 +384,7 @@ export class MarketplaceProductsComponent
                 undefined,
                 undefined,
                 [], // ids
-                this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency,
+                this.selectedCurrrency?.code,
                 this.selectedSort.value,
                 this.skipCount,
                 this.maxResultCount
@@ -430,16 +392,14 @@ export class MarketplaceProductsComponent
             .pipe(finalize(() => this.hideMainSpinner()))
             .subscribe((result) => {
                 this.items = result.items;
-                this.pagesNumber = result.totalCount;
-                this.setCurrency();
+                this.pagesNumber = result.totalCount / this.maxResultCount;
             });
     }
 
     ngOnDestroy() {
-        if (localStorage.getItem("SellerSSIN") && localStorage.getItem("SellerSSIN") != "undefined") {
-            // localStorage.removeItem("SellerId");
+        if (localStorage.getItem("SellerId")) {
+            localStorage.removeItem("SellerId");
             localStorage.removeItem("SellerSSIN");
-            localStorage.removeItem("BuyerSSIN");
         }
         localStorage.setItem("currencyCode", null);
     }
@@ -456,9 +416,6 @@ export class MarketplaceProductsComponent
 
     applyFilters() {
         this.getAllProducts();
-        //  this.currency = this.selectedCurrrency.code;
-        this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
-        localStorage.setItem("currencyCode", this.currency);
-
+        this.currency = this.selectedCurrrency.code;
     }
 }

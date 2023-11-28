@@ -188,7 +188,7 @@ import { EmailingTemplateServiceProxy } from "@shared/service-proxies/service-pr
 import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
-import { TreeSelectModule } from 'primeng/treeselect';
+
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
 };
@@ -230,7 +230,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         DropdownModule,
         ReactiveFormsModule,
         CheckboxModule,
-
     ],
     declarations: [
         MaintainancesComponent,
@@ -372,8 +371,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         // EntityDynamicParameterValueComponent,
         // ManageEntityDynamicParameterValuesModalComponent,
         // EntityDynamicParameterValueManagerComponent,
-        StepperComponent,
-
+        StepperComponent
     ],
     exports: [AddMemberModalComponent, AddRoleModalComponent],
     providers: [

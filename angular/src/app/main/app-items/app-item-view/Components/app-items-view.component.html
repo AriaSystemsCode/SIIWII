@@ -318,7 +318,7 @@
                             ></button>
                         </div>
                         <div class="last-updated  my-3 d-flex align-items-center gap-3 justify-content-end w-100">
-                         <p >  Last Edit  {{lastUpdatedDate | date: 'MMM d, y, h:mm a':"+timezoneOffset"}} </p>
+                         <p >  Last Updated  {{lastUpdatedDate}} </p>
                         </div>
                         <div class="header">
                             [{{ appItemForViewDto?.code }}]
@@ -349,8 +349,7 @@
                             >
                                 {{ "MSRP" | localize }}:
                                 {{ tenantDefaultCurrency.symbol
-                                }}{{appItemForViewDto?.minPrice | currency:' '}}
-                             
+                                }}{{ appItemForViewDto?.minPrice }}
                             </div>
                             <div class="d-flex">
                                 <button
@@ -610,9 +609,12 @@
                                                         <div class="ratio-qty">
                                                             <input
                                                                 type="number"
-
-                                                                [value]="appItemForViewDto?.appItemPriceInfos[parentProductPriceIndex].price| currency"
-                                                                
+                                                                [value]="
+                                                                    appItemForViewDto
+                                                                        ?.appItemPriceInfos[
+                                                                        parentProductPriceIndex
+                                                                    ]?.price
+                                                                "
                                                                 [name]="
                                                                     'priceDto.price' +
                                                                     '-' +
@@ -654,17 +656,18 @@
                                                             }}
                                                         </div>
                                                         <div class="ratio-qty">
-                                                           <!-- <input
+                                                            <input
                                                                 type="number"
-                                                                [ngModel]="priceDto.price | currency"                                                          
+                                                                [value]="
+                                                                    priceDto.price
+                                                                "
                                                                 [name]="
                                                                     'priceDto.price' +
                                                                     '-' +
                                                                     index
                                                                 "
                                                                 readOnly
-                                                            />-->
-                                                            <label>{{priceDto.price | currency:' '}}</label>
+                                                            />
                                                         </div>
                                                     </div>
                                                 </div>

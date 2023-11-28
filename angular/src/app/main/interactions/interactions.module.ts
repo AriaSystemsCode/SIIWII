@@ -14,7 +14,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 @NgModule({
     declarations: [
         InteractionsComponent,
-        CommentParentComponent,
+        CommentParentComponent
     ],
     imports: [
         CommonModule,
@@ -29,7 +29,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ],
     exports:[
         InteractionsComponent,
-        CommentParentComponent
     ],
     providers:[ReactionsService]
 })

@@ -195,9 +195,7 @@ namespace onetouch.EntityFrameworkCore
         //MMt33
         public virtual DbSet<AppTransactionHeaders> AppTransactionsHeaders { set; get; }
         public virtual DbSet<AppTransactionDetails> AppTransactionsDetails { set; get; }
-        public virtual DbSet<AppTransactionContacts> AppTransactionContacts { set; get; }
         //MMT33
-        public virtual DbSet<AppActiveTransaction> AppShoppingCart { set; get; }
         public onetouchDbContext(DbContextOptions<onetouchDbContext> options)
             : base(options)
         {

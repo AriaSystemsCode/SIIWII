@@ -10,9 +10,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 {
     public class GetAllAppTransactionsInputDto : PagedAndSortedResultRequestDto
     {
-        public Boolean WithDetails { get; set; }
-        public long Since_Id { get; set; }
-
         public string Filter { get; set; }
         public string CodeFilter { get; set; }
         public string DescriptionFilter { get; set; }
@@ -26,7 +23,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string BuyerName { get; set; }
         public string BuyerSSIN { get; set; }
         public long StatusId { get; set; }
-        public bool fromExport { set; get; } = false;
     }
   
 }

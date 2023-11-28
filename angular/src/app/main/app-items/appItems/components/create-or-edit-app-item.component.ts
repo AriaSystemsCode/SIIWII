@@ -62,7 +62,8 @@ import { ApplyVariationOutput } from "./create-edit-app-item-variations.componen
 })
 export class CreateOrEditAppItemComponent
     extends AppComponentBase
-    implements OnInit, AfterViewInit {
+    implements OnInit, AfterViewInit
+{
     @ViewChild("staticTabs", { static: false }) staticTabs: TabsetComponent;
     @ViewChild("productForm", { static: true }) productForm: NgForm;
     modalRef: BsModalRef;
@@ -121,7 +122,6 @@ export class CreateOrEditAppItemComponent
     entityObjectType: string = "PRODUCT";
     defaultCurrencyMSRPPriceIndex = -1;
     showAdvancedPricing: boolean = false;
-    PriceValidMsg: string = "";
 
     constructor(
         injector: Injector,
@@ -348,7 +348,7 @@ export class CreateOrEditAppItemComponent
             [EExtraAttributeUsage.Recommended]:
                 new CreateEditAppItemExtraAttribute({
                     header: this.l("Recommended"),
-                    title: this.l("BuyersMayAlsoBeInterestedInTheseItemSpecifics"),
+                    title:  this.l( "BuyersMayAlsoBeInterestedInTheseItemSpecifics"),
                     usageEnum: EExtraAttributeUsage.Recommended,
                     orderOfDisplay: 1,
                 }),
@@ -575,7 +575,7 @@ export class CreateOrEditAppItemComponent
         let data: SelectAppItemTypeComponent = modalRef.content;
         if (data.selectionDone && data.selectedRecord) {
             // add or edit done
-            this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false).subscribe((res: any) => {
+            this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false).subscribe((res:any)=>{
                 this.appItem.code = res;
                 this.appItem.OriginalCode = res
             })
@@ -822,12 +822,12 @@ export class CreateOrEditAppItemComponent
         let config: ModalOptions = new ModalOptions();
         config.class = "right-modal slide-right-in";
         let modalDefaultData: Partial<SelectClassificationDynamicModalComponent> =
-        {
-            savedIds: this.selectedClassificationsIds,
-            showAddAction: true,
-            showActions: true,
-            entityId: this.appItem.entityId,
-        };
+            {
+                savedIds: this.selectedClassificationsIds,
+                showAddAction: true,
+                showActions: true,
+                entityId: this.appItem.entityId,
+            };
         config.initialState = modalDefaultData;
         let modalRef: BsModalRef = this._BsModalService.show(
             SelectClassificationDynamicModalComponent,
@@ -1128,18 +1128,6 @@ export class CreateOrEditAppItemComponent
 
     // save product
     saveProduct(form: NgForm) {
-        // if (!this.appItem?.appItemPriceInfos[this.defaultCurrencyMSRPPriceIndex]?.price || this.appItem?.appItemPriceInfos[this.defaultCurrencyMSRPPriceIndex]?.price <= 0) {
-        //     this.PriceValidMsg = "Price must be greater than 0";
-        //     return this.notify.error(
-        //         this.l(this.PriceValidMsg)
-        //     );
-        // }
-        // else {
-            this.appItem?.variationItems?.forEach((variation) => {
-                variation.appItemPriceInfos = this.getParentProductPrices();
-            });
-    // }
-
         this.submitted = true;
         if (form.form.invalid) {
             form.form.markAllAsTouched();
@@ -1168,8 +1156,6 @@ export class CreateOrEditAppItemComponent
         this.seperateNewAndRemovedDepartments();
         this.seperateNewAndRemovedClassifications();
         this.extraSelectedValuesExtraData();
-        if (this.appItem.sycIdentifierId == 0)
-            this.appItem.sycIdentifierId = null;
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
@@ -1273,10 +1259,10 @@ export class CreateOrEditAppItemComponent
         ) {
             return this.notify.error(
                 this.l("ProductType") +
-                ' " ' +
-                this.selectedItemTypeData.name +
-                ' " ' +
-                this.l("doesnotHaveExtraAttributes.")
+                    ' " ' +
+                    this.selectedItemTypeData.name +
+                    ' " ' +
+                    this.l("doesnotHaveExtraAttributes.")
             );
         }
 
@@ -1303,16 +1289,16 @@ export class CreateOrEditAppItemComponent
         this.appItem.variationItems = $event.variation;
         this.appItem.appItemSizesScaleInfo = $event.appItemSizesScaleInfo;
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
-        this.hideVariations(true);
+        this.hideVariations();
         this.updateProductAvailableQuantity();
 
         if (
             this.appItem.appItemPriceInfos.length ==
-            this.appItem?.variationItems[0]?.appItemPriceInfos.length &&
+                this.appItem?.variationItems[0]?.appItemPriceInfos.length &&
             Object.values(this.appItem.appItemPriceInfos) !=
-            Object.values(
-                this.appItem?.variationItems[0]?.appItemPriceInfos
-            )
+                Object.values(
+                    this.appItem?.variationItems[0]?.appItemPriceInfos
+                )
         ) {
             this.message.confirm(
                 "",
@@ -1342,13 +1328,9 @@ export class CreateOrEditAppItemComponent
             this.appItem?.variationItems[0]?.appItemPriceInfos;
     }
 
-
-    hideVariations($event) {
-        if ($event?.target?.files.length == 0)
-            return;
+    hideVariations() {
         this.displayVariations = false;
     }
-
     allCurrencies: CurrencyInfoDto[] = [];
     getCurrencies() {
         return this._appEntitiesServiceProxy
@@ -1597,21 +1579,9 @@ export class CreateOrEditAppItemComponent
     productAdvancedPriceChangesHandler($event: AppItemPriceInfo[]) {
         this.showAdvancedPricing = false;
         this.appItem.appItemPriceInfos = $event;
-        if (this.updateVariation) {
-            this.appItem.variationItems.forEach((variation) => {
-                if (this.updateVariation) {
-                    variation.appItemPriceInfos = this.getParentProductPrices();
-                }
-            });
-        }
         this.checkAndAddDefaultPriceObject();
     }
 
-    getParentProductPrices() {
-        return this.appItem.appItemPriceInfos.map((item) =>
-            AppItemPriceInfo.fromJS({ ...item, id: 0 } as IAppItemPriceInfo)
-        );
-    }
     onUpdateVariation($event) {
         this.updateVariation = $event;
     }

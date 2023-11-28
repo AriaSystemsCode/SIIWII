@@ -23,7 +23,7 @@
             </button>
             <div id="kt_aside" ktOffcanvas [options]="menuCanvasOptions" class="kt-aside kt-aside--{{currentTheme.baseSettings.menu.fixedAside ? 'fixed':'static'}} kt-grid__item kt-grid kt-grid--desktop kt-grid--hor-desktop">
                 <!-- BEGIN: Brand -->
-                <default-brand (openSideBar)="onOpenSideBar($event)" (updateAccountSummary)="onupdateAccountSummary($event)"></default-brand>
+                <default-brand></default-brand>
                 <div class="kt-aside__brand-logo kt-aside__brand-name pr-4 text-center">
                     <p style="font-size: 16px;font-weight: 600;color: #464E5F;padding-bottom: 0;margin: 0;"><a>{{accountSummary?.name}}</a></p>
                     <p style="font-size: 12px;font-weight: 400;color: #464E5F;padding-bottom: 0;margin: 0;text-align: center;"><a>{{accountSummary?.tradeName}}</a></p>
@@ -31,7 +31,7 @@
                 <!-- END: Brand -->
                 <!-- BEGIN: Aside Menu -->
                 <div id="kt_aside_menu_wrapper" class="kt-aside-menu-wrapper kt-grid__item kt-grid__item--fluid">
-                    <side-bar-menu [openSideBar]="openSideBar"></side-bar-menu>
+                    <side-bar-menu></side-bar-menu>
                 </div>
                 <!-- END: Aside Menu -->
             </div>

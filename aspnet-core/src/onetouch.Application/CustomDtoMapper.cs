@@ -721,29 +721,16 @@ namespace onetouch
           .ForMember(a => a.AppTransactionsDetails, b => b.MapFrom(ent => ent.AppTransactionDetails));
 
             configuration.CreateMap<CreateOrEditAppTransactionsDto, AppTransactionHeaders>()
-           .ForMember(a => a.AppTransactionDetails, b => b.MapFrom(ent => ent.AppTransactionsDetails))
-           .ForMember(a=> a.EnteredUserByRole,b=>b.MapFrom(ent=>ent.EnteredByUserRole));
+           .ForMember(a => a.AppTransactionDetails, b => b.MapFrom(ent => ent.AppTransactionsDetails));
             configuration.CreateMap<AppTransactionsDetailDto, AppTransactionDetails>();
             configuration.CreateMap<AppTransactionDetails, AppTransactionsDetailDto>();
-
             configuration.CreateMap<GetAppTransactionsForViewDto, AppTransactionHeaders>()
-             .ForMember(a => a.AppTransactionDetails, b => b.MapFrom(ent => ent.AppTransactionsDetails));
-           
-          configuration.CreateMap<AppTransactionHeaders, GetAppTransactionsForViewDto>()
-          .ForMember(a=>a.AppTransactionContacts, b=>b.MapFrom(ent=> ent.AppTransactionContacts))
-          .ForMember(a => a.AppTransactionsDetails, b => b.MapFrom(ent => ent.AppTransactionDetails))
-          .ForMember(a=>a.EnteredDate, b=> b.MapFrom(z=>z.CreationTime))
-          .ForMember(a=>a.CreatorUserId,b=>b.MapFrom(z=>z.CreatorUserId));
-
-            configuration.CreateMap<GetOrderDetailsForViewDto, AppTransactionHeaders>()
-            .ForMember(a => a.AppTransactionDetails, b => b.MapFrom(ent => ent.AppTransactionsDetails));
-            configuration.CreateMap<AppTransactionHeaders, GetOrderDetailsForViewDto>()
-            .ForMember(a => a.AppTransactionsDetails, b => b.MapFrom(ent => ent.AppTransactionDetails));
-            
+           .ForMember(a => a.AppTransactionDetails, b => b.MapFrom(ent => ent.AppTransactionsDetails));
+            configuration.CreateMap<AppTransactionHeaders, GetAppTransactionsForViewDto>()
+          .ForMember(a => a.AppTransactionsDetails, b => b.MapFrom(ent => ent.AppTransactionDetails));
             configuration.CreateMap<AppMarketplaceItemSharings, ItemSharingDto>();
             configuration.CreateMap<ItemSharingDto, AppMarketplaceItemSharings>();
             configuration.CreateMap <AppItemSizeScalesHeader, AppMarketplaceItemSizeScaleHeaders>();
-            configuration.CreateMap<AppMarketplaceItemSizeScaleHeaders,AppItemSizeScalesHeader>();
             configuration.CreateMap<AppItem, onetouch.AppMarketplaceItems.AppMarketplaceItems>().ForMember(a => a.Code, b => b.MapFrom(ent => ent.SSIN))
                 .ForMember(a => a.EntitiesRelationships, b => b.MapFrom(ent => ent.EntityFk.EntitiesRelationships))
                 .ForMember(a => a.EntityAttachments, b => b.MapFrom(ent => ent.EntityFk.EntityAttachments))
@@ -761,12 +748,9 @@ namespace onetouch
                 .ForMember(a => a.ItemPricesFkList , b => b.MapFrom(ent => ent.ItemPricesFkList))
                 .ForMember(a => a.ItemSizeScaleHeadersFkList, b => b.MapFrom(ent => ent.ItemSizeScaleHeadersFkList))
                 .ForMember(a => a.ItemPricesFkList, b => b.MapFrom(ent => ent.ItemPricesFkList))
-                .ForMember(a => a.ParentFkList, b=>b.MapFrom(ent => (ent.ParentId == null & ent.ParentFk!= null) ? ent.ParentFk: null ))
-                .ForMember(a=>a.ManufacturerCode, b=>b.MapFrom(ent=>ent.Code)); //
+                .ForMember(a => a.ParentFkList, b=>b.MapFrom(ent => (ent.ParentId == null & ent.ParentFk!= null) ? ent.ParentFk: null )); //
             configuration.CreateMap<AppItemPrices , AppMarketplaceItemPrices>();
-            configuration.CreateMap<AppMarketplaceItemPrices,AppItemPrices>();
             configuration.CreateMap<AppItemSizeScalesDetails, AppMarketplaceItemSizeScaleDetails>();
-            configuration.CreateMap<AppMarketplaceItemSizeScaleDetails, AppItemSizeScalesDetails>();
             configuration.CreateMap<AppItemsList, onetouch.AppMarketplaceItemLists.AppMarketplaceItemLists>().ForMember(a => a.EntitiesRelationships, b => b.MapFrom(ent => ent.EntityFk.EntitiesRelationships))
                 .ForMember(a => a.EntityAttachments, b => b.MapFrom(ent => ent.EntityFk.EntityAttachments))
                 .ForMember(a => a.EntityCategories, b => b.MapFrom(ent => ent.EntityFk.EntityCategories))
@@ -779,17 +763,14 @@ namespace onetouch
                 .ForMember(a => a.EntityObjectTypeCode, b => b.MapFrom(ent => ent.EntityFk.EntityObjectTypeCode))
                 .ForMember(a => a.ObjectId, b => b.MapFrom(ent => ent.EntityFk.ObjectId))
                 .ForMember(a => a.EntityObjectTypeId, b => b.MapFrom(ent => ent.EntityFk.EntityObjectTypeId));
-
             configuration.CreateMap<AppItemsListDetail, AppMarketplaceItemsListDetails>();
             //MMT33
             configuration.CreateMap<AppTransactionHeaders, GetAllAppTransactionsForViewDto>()
-          .ForMember(a => a.AppTransactionsDetails, b => b.MapFrom(ent => ent.AppTransactionDetails))
-          .ForMember(a => a.AppTransactionContacts, b => b.MapFrom(ent => ent.AppTransactionContacts));
+          .ForMember(a => a.AppTransactionsDetails, b => b.MapFrom(ent => ent.AppTransactionDetails));
 
             configuration.CreateMap<GetAllAppTransactionsForViewDto, AppTransactionHeaders>()
-           .ForMember(a => a.AppTransactionDetails, b => b.MapFrom(ent => ent.AppTransactionsDetails))
-           .ForMember(a => a.AppTransactionContacts, b => b.MapFrom(ent => ent.AppTransactionContacts));
-
+           .ForMember(a => a.AppTransactionDetails, b => b.MapFrom(ent => ent.AppTransactionsDetails));
+            //
             configuration.CreateMap<onetouch.AppMarketplaceItems.AppMarketplaceItems, AppTransactionDetails>()
                 .ForMember(d => d.ItemSSIN, opt => opt.MapFrom(z => z.Code))
                 .ForMember(d => d.EntityCategories, opt => opt.MapFrom(z => z.EntityCategories))
@@ -830,25 +811,8 @@ namespace onetouch
            .ForMember(a => a.Code, b => b.MapFrom(ent => ent.SizeScaleCode));
             configuration.CreateMap<AppMarketplaceItemSizeScaleDetails, AppSizeScalesDetailDto>();
             configuration.CreateMap<onetouch.AppMarketplaceItems.AppMarketplaceItems, AppTransactionDetails>();
-            configuration.CreateMap<AppTransactionContacts, AppTransactionContactDto>()
-                .ForMember(d=>d.ContactAddressDetail ,b=>b.MapFrom (z=>z.ContactAddressFk))
-                .ForMember(d=>d.ContactRole, s=>s.MapFrom(ss=> (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), ss.ContactRole.ToString())));
-
-            configuration.CreateMap<AppAddress, ContactAppAddressDto> ().ReverseMap();
-
-            configuration.CreateMap<AppTransactionContactDto, AppTransactionContacts>()
-                .ForMember(d => d.ContactRole, s => s.MapFrom(ss => Enum.GetName(typeof(ContactRoleEnum), ss.ContactRole))); 
-
-            configuration.CreateMap<onetouch.AppMarketplaceItems.AppMarketplaceItems, AppItem>();
-            configuration.CreateMap<onetouch.AppMarketplaceItems.AppMarketplaceItems, AppEntity>()
-                .ForMember(d => d.Code, opt => opt.MapFrom(z => z.Code))
-                .ForMember(d => d.EntityCategories, opt => opt.MapFrom(z => z.EntityCategories))
-                .ForMember(d => d.Notes, opt => opt.MapFrom(z => z.Description))
-                .ForMember(d => d.SSIN, opt => opt.MapFrom(z => z.SSIN))
-                .ForMember(d => d.EntityClassifications, opt => opt.MapFrom(z => z.EntityClassifications))
-                .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityAttachments))
-                .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityExtraData));
-            configuration.CreateMap<AppAddress, ContactAddressDto>();
+            
+            // -> AppSizeScalesDetailDto
         }
     }
 }

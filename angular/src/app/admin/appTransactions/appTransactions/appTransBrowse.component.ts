@@ -6,8 +6,6 @@ import { LazyLoadEvent, SelectItem } from 'primeng/api';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
-import { ShoppingCartViewComponentComponent } from '@app/admin/app-shoppingCart/Components/shopping-cart-view-component/shopping-cart-view-component.component';
-import { ShoppingCartMode } from '@app/admin/app-shoppingCart/Components/shopping-cart-view-component/ShoppingCartMode';
 
 @Component({
     selector: 'appTransBrowse',
@@ -46,9 +44,6 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     minCreateDateFilter: moment.Moment;
     maxCompleteDateFilter: moment.Moment;
     minCompleteDateFilter: moment.Moment;
-    orderId: number = 0;
-    @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
-
 
     constructor(
         injector: Injector,
@@ -115,33 +110,29 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         return this.filterForm?.get("mainFilterType");
     }
 
-    getAppTransactions(event?: { first?: number, page?: number, pageCount?: number, rows?: number }) {
+    getAppTransactions(event?: LazyLoadEvent) {
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = this.primengTableHelper.totalRecordsCount > 0 ? this.primengTableHelper.totalRecordsCount : 10;
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
 
         this.primengTableHelper.showLoadingIndicator();
-        this.paginator.rows = event.rows;
-        var maxResultCount = this.primengTableHelper.getMaxResultCount(this.paginator, event)
-        var skipCount = (event?.page || 0) * maxResultCount
-
         const filters = this.filterForm.value;
         this.loading = true;
         // filters.transTypeFilter = filters.transTypeFilter.toUpperCase().toString().replace(/ /g, "")
         this._appTransactionServiceProxy.getAll(
-            false, 0, filters.search,
+            filters.search,
             filters.codeFilter, undefined,
             filters.mainFilterType?.id, filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
+            filters.sellerNameFilter,undefined, filters.buyerNameFilter, undefined, filters.statusFilter ,
             this.primengTableHelper.getSorting(this.dataTable),
-            skipCount,
-            maxResultCount
+            this.primengTableHelper.getSkipCount(this.paginator, event),
+            this.primengTableHelper.getMaxResultCount(this.paginator, event)
             // this.dataTable.filters
         ).subscribe(result => {
             this.loading = false;
@@ -149,16 +140,6 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             this.primengTableHelper.records = result.items;
             this.primengTableHelper.hideLoadingIndicator();
         });
-    }
-
-    onSelectionChange($event) {
-        /* if($event.entityObjectStatusCode!="DRAFT")
-             return ; */
-        if ($event?.id)
-            this.orderId = $event?.id;
-
-        if (this.orderId)
-            this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
     }
 
     reloadPage(): void {

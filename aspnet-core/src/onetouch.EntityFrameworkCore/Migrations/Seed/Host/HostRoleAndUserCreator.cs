@@ -177,8 +177,6 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Listing);
                 _context.SaveChanges();
             }
-            
-
             //Iteration#29,1 MMT News Digest changes[Start]
             var sycIdentifierDefinitionsObj = _context.SycIdentifierDefinitions.FirstOrDefault(
              r => r.Code == "NEWSDIGEST");
@@ -281,9 +279,9 @@ namespace onetouch.Migrations.Seed.Host
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via".Split(',');
+            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION".ToUpper().Split(',');
+            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER".ToUpper().Split(',');
+            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -351,8 +349,8 @@ namespace onetouch.Migrations.Seed.Host
             //MMT33[Start]
             #region Add  sycEntityObject status for listing
             ObjectCode = "TRANSACTION";
-            codes = "HOLD,ACTIVE,CANCELLED,DRAFT,COMPLETE,OPEN".ToUpper().Split(',');
-            names = "Hold,Active,Cancelled,Draft,Complete,Open".Split(',');
+            codes = "HOLD,ACTIVE,CANCELLED,DRAFT,COMPLETE".ToUpper().Split(',');
+            names = "Hold,Active,Cancelled,Draft,Complete".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -372,7 +370,7 @@ namespace onetouch.Migrations.Seed.Host
                             Name = names[i],
                             ObjectId = sydObjects.Id,
                             ObjectCode = sydObjects.Code,
-                            IsDefault = codes[i] == "OPEN" ? true : false
+                            IsDefault = codes[i] == "ACTIVE" ? true : false
 
                         };
                         _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);

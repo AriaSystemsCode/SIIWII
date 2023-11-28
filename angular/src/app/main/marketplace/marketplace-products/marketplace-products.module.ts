@@ -23,13 +23,6 @@ import { CalendarModule } from "primeng/calendar";
 import { MobileFiltersDialogComponent } from "./components/mobile-filters-dialog/mobile-filters-dialog.component";
 import { DialogModule } from "primeng/dialog";
 import { RadioButtonModule } from 'primeng/radiobutton';
-import { AppMarketplaceItemsServiceProxy } from "@shared/service-proxies/service-proxies";
-import { ProductDetailImagesComponent } from './components/product-detail-images/product-detail-images.component';
-import { CarouselModule } from 'primeng/carousel';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { TabViewModule } from 'primeng/tabview';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { AppCommonModule } from "@app/shared/common/app-common.module";
 @NgModule({
     declarations: [
         MarketplaceProductsComponent,
@@ -39,7 +32,6 @@ import { AppCommonModule } from "@app/shared/common/app-common.module";
         ProdcutCardComponent,
         ProductFiltersComponent,
         MobileFiltersDialogComponent,
-        ProductDetailImagesComponent,
     ],
     imports: [
         CommonModule,
@@ -57,12 +49,7 @@ import { AppCommonModule } from "@app/shared/common/app-common.module";
         TreeModule,
         CalendarModule,
         DialogModule,
-        RadioButtonModule,
-        CarouselModule,
-        InputNumberModule,
-        TabViewModule,
-        ConfirmDialogModule,AppCommonModule
+        RadioButtonModule
     ],
-    providers:[AppMarketplaceItemsServiceProxy]
 })
 export class MarketplaceProductsModule {}

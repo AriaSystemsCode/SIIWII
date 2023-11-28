@@ -1894,6 +1894,7 @@
 		<text name="CatalogueReport">Catalogue Report</text>
 		<text name="ProductsCatalogInfo/Print">Products Catalog Info / Print</text>
 		<text name="ChooseTemplate">Choose Template</text>
+		<text name="Continue">Continue</text>
 		<text name="PleaseChooseATemplateFirst">Please choose a template first</text>
 		<text name="PleaseFillTheRequiredProductsCatalogInfo">Please fill the required products catalog info</text>
 		<text name="ProductCatalogTitle">Product catalog title</text>
@@ -2099,6 +2100,7 @@
 		<text name="Curious">Curious</text>
 		<text name="YouAnd">You and</text>
 		<text name="Other">Other</text>
+		<text name="Comments">Comments</text>
 		<text name="Comment">Comment</text>
 		<text name="TrendingPosts">Trending Posts</text>
 		<text name="PostBy">Post by</text>
@@ -2385,36 +2387,6 @@
 		<text name="CompleteDate">Complete Date</text>
 		<text name="DateCreateRange">Date Create Range</text>
 		<text name="DateCompleteRange">Date Complete Range</text>
-		<text name="TotalQuantity">Total Quantity</text>
-		<text name="Proceedtocheckout"> Proceed to checkout</text>
-		<text name="Header"> Header</text>
-		<text name="Enteredby"> Entered by</text>
-		<text name="Buyercontactinfo"> Buyer contact info</text>
-		<text name="Sellercontactinfo"> Seller contact info</text>
-		<text name="SalesRepInformation"> Sales Rep Information</text>
-		<text name="Shippinginformation"> Shipping information</text>
-	    <text name="BillingInformation"> Billing Information</text>
-	    <text name="OrderDetails"> Order Details</text>
-		<text name="ShowVariations"> Show Variations</text>
-		<text name="DiscardShopping"> Discard Shopping</text>
-		<text name="ContinueShopping"> Continue Shopping</text>
-		<text name="Placeyourorder"> Place your order</text>
-	    <text name="Comments"> Comments</text>
-	    <text name="ShipFrom"> Ship From</text>
-	    <text name="ShipTo"> Ship To</text>
-		<text name="SelectAddresses">Select Addresses</text>
-		<text name="AddNewAddressDetails">Add New Address Details</text>
-		<text name="PleaseSelectFromTheSavedAddressesBelow">Please select from the saved addresses below</text>
-		<text name="PleaseEnterThenewAddressInformation">Please enter the new address information</text>
-        <text name="AddANewAddress">Add A New Address</text>
-	    <text name="AddressLineOne">Address Line 1</text>
-	    <text name="AddressLineTow">Address Line 2</text>
-	<text name="AddressType">Address Type</text>
-		<text name="Store">Store</text>
-       <text name="ShipVia">Ship Via</text>
-		<text name="APContact">AP Contact</text>
-		<text name="ARContact">AR Contact</text>
-		<text name="PaymentInformation">Payment Information</text>
-		<text name="PaymentTerms">Payment Terms</text>
-	</texts>  
+	
+	</texts>
 </localizationDictionary>

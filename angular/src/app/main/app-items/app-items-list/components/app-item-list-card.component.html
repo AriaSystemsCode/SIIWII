@@ -64,9 +64,8 @@
                         <span *ngIf="item?.appItemsList?.sharingLevel === 1 || item?.appItemsList?.sharingLevel === 2 " > Shared  <div class="shared-dot"></div> </span>
                         <span *ngIf="item?.appItemsList?.sharingLevel === 3 " > Private  <div class="private-dot"></div> </span>
                         <span *ngIf="item?.appItemsList?.sharingLevel === 4 " > Hidden <div class="hidden-dot"></div> </span>
-                        <span *ngIf="item?.appItemsList?.sharingLevel === null || item?.appItemsList?.sharingLevel ==0 " > Not Shared <div class="hidden-dot"></div> </span>
-                    </div>                  
-                      <p
+                        <span *ngIf="item?.appItemsList?.sharingLevel === null " > Not Shared <div class="hidden-dot"></div> </span>
+                    </div>                    <p
                         class="mb-2 font-weight-bold"
                         *ngIf="
                             mainFilterType == ItemsListFilterTypesEnum.MyItemsList &&
@@ -110,7 +109,7 @@
                                     >{{ "View" | localize }}</a
                                 >
                             </li>
-                           <!--  <li *ngIf="mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
+                            <li *ngIf="mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
                                 <a
                                     href="javascript:;"
                                     [ngClass]="{
@@ -129,7 +128,7 @@
                                     (click)="unPublish()"
                                     >{{ "UnpublishList" | localize }}
                                 </a>
-                            </li> -->
+                            </li>
                             <li *ngIf="canEdit && mainFilterType == ItemsListFilterTypesEnum.MyItemsList">
                                 <a
                                     href="javascript:;"

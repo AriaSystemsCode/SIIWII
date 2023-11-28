@@ -76,7 +76,7 @@ namespace onetouch.AppItems.Dtos
         public List<AppItemPriceInfo> AppItemPriceInfos { get; set; }
         public List<AppItemSizesScaleInfo> AppItemSizesScaleInfo { get; set;}
         public string OriginalCode { get; set; }
-        public long? SycIdentifierId { get; set; }
+        public long SycIdentifierId { get; set; }
         //MMT
     }
     //MMT

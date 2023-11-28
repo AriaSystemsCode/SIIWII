@@ -3929,144 +3929,6 @@ namespace onetouch.Migrations
                         });
                 });
 
-            modelBuilder.Entity("onetouch.AppSiiwiiTransaction.AppActiveTransaction", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("CreatorUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("DeleterUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("LastModifierUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("TransactionId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AppActiveTransaction", t =>
-                        {
-                            t.HasTrigger("AppActiveTransaction_Trigger");
-                        });
-                });
-
-            modelBuilder.Entity("onetouch.AppSiiwiiTransaction.AppTransactionContacts", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("BranchName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("BranchSSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CompanyName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CompanySSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ContactAddressCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long?>("ContactAddressId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ContactEmail")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ContactName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ContactPhoneNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<long?>("ContactPhoneTypeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ContactPhoneTypeName")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("ContactRole")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactSSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("CreatorUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("DeleterUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("LastModifierUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TransactionId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ContactAddressId");
-
-                    b.HasIndex("ContactPhoneTypeId");
-
-                    b.HasIndex("TransactionId");
-
-                    b.ToTable("AppTransactionContacts", t =>
-                        {
-                            t.HasTrigger("AppTransactionContacts_Trigger");
-                        });
-                });
-
             modelBuilder.Entity("onetouch.AppTenantPlans.AppTenantPlan", b =>
                 {
                     b.Property<int>("Id")
@@ -6659,10 +6521,6 @@ namespace onetouch.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ManufacturerCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<long?>("ParentId")
                         .HasColumnType("bigint");
 
@@ -6715,10 +6573,6 @@ namespace onetouch.Migrations
                     b.Property<int>("LineNo")
                         .HasColumnType("int");
 
-                    b.Property<string>("ManufacturerCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<decimal>("NetPrice")
                         .HasColumnType("decimal(15, 3)");
 
@@ -6755,16 +6609,13 @@ namespace onetouch.Migrations
                 {
                     b.HasBaseType("onetouch.AppEntities.AppEntity");
 
-                    b.Property<DateTime>("AvailableDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("BuyerCompanyName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("BuyerCompanySSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("BuyerContactEMailAddress")
                         .HasMaxLength(100)
@@ -6779,15 +6630,8 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("BuyerContactSSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("BuyerDepartment")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("BuyerStore")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<DateTime>("CompleteDate")
                         .HasColumnType("datetime2");
@@ -6795,9 +6639,6 @@ namespace onetouch.Migrations
                     b.Property<string>("CurrencyCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("CurrencyExchangeRate")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long?>("CurrencyId")
                         .HasColumnType("bigint");
@@ -6813,13 +6654,6 @@ namespace onetouch.Migrations
                     b.Property<long?>("LanguageId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("PaymentTermsCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long?>("PaymentTermsId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("PriceLevel")
                         .HasColumnType("nvarchar(max)");
 
@@ -6828,8 +6662,8 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SellerCompanySSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("SellerContactEMailAddress")
                         .HasMaxLength(100)
@@ -6844,32 +6678,12 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("SellerContactSSIN")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ShipViaCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long?>("ShipViaId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("TotalAmount")
-                        .HasColumnType("float");
-
-                    b.Property<long>("TotalQuantity")
-                        .HasColumnType("bigint");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.HasIndex("CurrencyId");
 
                     b.HasIndex("LanguageId");
-
-                    b.HasIndex("PaymentTermsId");
-
-                    b.HasIndex("ShipViaId");
 
                     b.ToTable("AppTransactionHeaders", t =>
                         {
@@ -7669,29 +7483,6 @@ namespace onetouch.Migrations
                     b.Navigation("AppEntityFk");
                 });
 
-            modelBuilder.Entity("onetouch.AppSiiwiiTransaction.AppTransactionContacts", b =>
-                {
-                    b.HasOne("onetouch.AppContacts.AppAddress", "ContactAddressFk")
-                        .WithMany()
-                        .HasForeignKey("ContactAddressId");
-
-                    b.HasOne("onetouch.AppEntities.AppEntity", "ContactPhoneTypeFk")
-                        .WithMany()
-                        .HasForeignKey("ContactPhoneTypeId");
-
-                    b.HasOne("onetouch.AppSiiwiiTransaction.AppTransactionHeaders", "TransactionIdFK")
-                        .WithMany("AppTransactionContacts")
-                        .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ContactAddressFk");
-
-                    b.Navigation("ContactPhoneTypeFk");
-
-                    b.Navigation("TransactionIdFK");
-                });
-
             modelBuilder.Entity("onetouch.AppTenantPlans.AppTenantPlan", b =>
                 {
                     b.HasOne("onetouch.SycPlans.SycPlan", "PlanFk")
@@ -8142,7 +7933,7 @@ namespace onetouch.Migrations
                         .IsRequired();
 
                     b.HasOne("onetouch.AppSiiwiiTransaction.AppTransactionDetails", "ParentFk")
-                        .WithMany("ParentFkList")
+                        .WithMany()
                         .HasForeignKey("ParentId");
 
                     b.HasOne("onetouch.AppSiiwiiTransaction.AppTransactionHeaders", "TransactionIdFk")
@@ -8172,21 +7963,9 @@ namespace onetouch.Migrations
                         .WithMany()
                         .HasForeignKey("LanguageId");
 
-                    b.HasOne("onetouch.AppEntities.AppEntity", "PaymentTermsFk")
-                        .WithMany()
-                        .HasForeignKey("PaymentTermsId");
-
-                    b.HasOne("onetouch.AppEntities.AppEntity", "ShipViaFk")
-                        .WithMany()
-                        .HasForeignKey("ShipViaId");
-
                     b.Navigation("CurrencyFk");
 
                     b.Navigation("LanguageFk");
-
-                    b.Navigation("PaymentTermsFk");
-
-                    b.Navigation("ShipViaFk");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.AbpUserBase", b =>
@@ -8366,15 +8145,8 @@ namespace onetouch.Migrations
                     b.Navigation("ParentFkList");
                 });
 
-            modelBuilder.Entity("onetouch.AppSiiwiiTransaction.AppTransactionDetails", b =>
-                {
-                    b.Navigation("ParentFkList");
-                });
-
             modelBuilder.Entity("onetouch.AppSiiwiiTransaction.AppTransactionHeaders", b =>
                 {
-                    b.Navigation("AppTransactionContacts");
-
                     b.Navigation("AppTransactionDetails");
                 });
 #pragma warning restore 612, 618

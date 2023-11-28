@@ -30,7 +30,7 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
   localattachmentBaseUrl: string = "http://localhost" ;
   colorPageSort;
   detailPageSort;
-  linesheetName;
+
   constructor(private _appEntitiesServiceProxy: AppEntitiesServiceProxy, private injector: Injector) {
     super(injector);
   }
@@ -148,9 +148,5 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
     //this.printInfoParam.BKGround = this.attachmentBaseUrl + "/" + this.backgroundsItems[indx].attachmentName;
     this.printInfoParam.BKGround = this.localattachmentBaseUrl + "/" + this.backgroundsItems[indx].attachmentName;
     console.log(this.printInfoParam.BKGround) 
-  }
-
-  setLinesheetName($event){
-    this.linesheetName=$event;
   }
 }

@@ -11,7 +11,6 @@ namespace onetouch.AppMarketplaceItems.Dtos
 {
     public class GetAllAppMarketItemsInput : PagedAndSortedResultRequestDto
     {
-        public string? ContactSSIN { set; get; }
         public string? AccountSSIN { set; get; }
         public int? TenantId { get; set; }
         public long? AppItemListId { get; set; }

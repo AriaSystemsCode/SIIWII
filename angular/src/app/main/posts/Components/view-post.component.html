@@ -2,12 +2,12 @@
 <div
     bsModal
     #viewPostModal="bs-modal"
-    class="modal fade text-left"
+    class="modal fade"
     tabindex="-1"
     role="dialog"
     aria-labelledby="viewPostModal"
     aria-hidden="true"
-    [config]="{ backdrop: false, ignoreBackdropClick: true }"
+    [config]="{ backdrop: false , ignoreBackdropClick: true }"
 >
     <div class="modal-dialog modal-lg">
         <div
@@ -22,19 +22,19 @@
             "
         >
             <div *ngIf="post" class="row">
-                <div class="d-block d-md-none p-5 w-100 bg-sm">
-                    <img
-                        src="assets/posts/ViewPost_Close_Btn.svg"
-                        class="pointer"
-                        (click)="hide()"
-                    />
-                </div>
+                <div  class="d-block d-md-none p-5 w-100 bg-sm"><img  src="assets/posts/ViewPost_Close_Btn.svg" class="pointer" (click)="hide()"/>
+            </div>
 
                 <div
                     *ngIf="
                         post.attachmentsURLs && post.attachmentsURLs.length > 0
                     "
-                    class="col-md-6 carouselContainer carouselChangePosArrow mr-0 mr-md-5"
+                    class="
+                    col-md-6 
+                        carouselContainer
+                        carouselChangePosArrow
+                         mr-0 mr-md-5 
+                    "
                 >
                     <!-- <carousel
                         *ngIf="post.type == PostType.SINGLEIMAGE"
@@ -49,40 +49,25 @@
                     </carousel> -->
 
                     <p-carousel
-                        *ngIf="post.type == PostType.SINGLEIMAGE"
-                        [value]="post.attachmentsURLs"
-                        [numVisible]="1"
-                        [numScroll]="1"
-                        [circular]="true"
-                        class="hiddenDotsIndicator"
-                    >
-                        <ng-template let-attach pTemplate="item">
-                            <div
-                                class="d-flex flex-column h-100 justify-content-center w-100"
-                            >
-                                <img
-                                    [src]="attachmentBaseUrl + '/' + attach"
-                                    class="carouselImg"
-                                />
-                            </div>
-                        </ng-template>
-                    </p-carousel>
-
-                    <div
-                        *ngIf="
-                            post.type == PostType.SINGLEVIDEO ||
-                            post.type == PostType.NEWSDIGEST
-                        "
-                    >
+                    *ngIf="post.type == PostType.SINGLEIMAGE"
+                    [value]="post.attachmentsURLs"
+                    [numVisible]="1"
+                    [numScroll]="1"
+                    [circular]="true"
+                    class="hiddenDotsIndicator"
+                >
+                    <ng-template let-attach pTemplate="item">
+                        <div class="d-flex flex-column h-100 justify-content-center w-100">
+                            <img [src]="attachmentBaseUrl + '/' + attach" class="carouselImg" />
+                        </div>
+                    </ng-template>
+                </p-carousel>
+                
+                    <div *ngIf="post.type == PostType.SINGLEVIDEO || post.type == PostType.NEWSDIGEST">
                         <video
-                            #myVideo
                             controls
                             class="_video"
-                            [attr.src]="
-                                attachmentBaseUrl +
-                                    '/' +
-                                    post.attachmentsURLs[0] | sanitizeurl
-                            "
+                            [attr.src]="attachmentBaseUrl + '/' + post.attachmentsURLs[0] | sanitizeurl"
                         ></video>
                     </div>
                 </div>
@@ -110,23 +95,18 @@
                         </div>
 
                         <div class="col-9 pl-4">
-                            <a
-                                class="pt-2 userName purpleColor"
+                            <a class="pt-2 userName purpleColor"
                                 [routerLink]="[
                                     '/app/main/account/view/',
                                     post?.appPost?.accountId
-                                ]"
-                            >
+                                ]"  >
                                 {{ post.appPost.accountName }}
                             </a>
                             <h6 class="userName">
-                                {{ "PostBy" | localize }},<b
-                                    >{{ post.appPost.userName }}
-                                </b>
-                                ,
+                                {{'PostBy' | localize}},<b>{{ post.appPost.userName }} </b> ,
                                 {{
                                     post.appPost.creationDatetime?.toString()
-                                        | date : "mediumDate"
+                                        | date: "mediumDate"
                                 }}
                             </h6>
                         </div>
