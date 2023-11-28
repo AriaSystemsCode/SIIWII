@@ -18,6 +18,7 @@ namespace onetouch.Web.Reports
             ["ProductsCatalogTemplate4"] = () => new ProductsCatalogTemplate4(),
             ["ProductsCatalogTemplate5"] = () => new ProductsCatalogTemplate5(),
             ["ProductsCatalogTemplate7"] = () => new ProductsCatalogTemplate7(),
+            ["OrderConfirmation"] = () => new OrderConfirmation(),
             ["Color_Size"] = () => new Color_Size(),
 
 
