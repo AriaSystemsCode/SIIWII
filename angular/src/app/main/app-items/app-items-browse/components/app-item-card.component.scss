@@ -89,34 +89,3 @@ a.btn {
     top: 20px;
     right: 10px;
 }
-
-
-.share-level{
-    span{
-        display: flex;
-        align-items: center;
-        justify-content: start;
-        gap: 5px;
-    }
-    .private-dot{
-        border-radius: 50%;
-        background-color: #FEE462;
-        height: 10px;
-        width: 10px;
-        padding-top: 3px;
-    }
-    .shared-dot{
-        border-radius: 50%;
-        background-color: #00E03B;
-        height: 10px;
-        width: 10px;
-        padding-top: 3px;
-    }
-    .hidden-dot{
-        border-radius: 50%;
-        background-color: #B3B7CE;
-        height: 10px;
-        width: 10px;
-        padding-top: 3px;
-    }
-}

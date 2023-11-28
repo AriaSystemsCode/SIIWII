@@ -36,9 +36,6 @@ export class MyItemViewComponent
     }
     ngOnInit(): void {
         this.productId = this._activatedRoute.snapshot.params["Id"];
-         // T-SII-20230917.0005
-        const timeZoneValue=  Intl.DateTimeFormat().resolvedOptions().timeZone ;
-
         this.showMainSpinner();
         const subs = this._appItemsServiceProxy
             .getAppItemForView(
@@ -50,7 +47,6 @@ export class MyItemViewComponent
                 undefined,
                 undefined,
                 undefined,
-                timeZoneValue,
                 this.productId,
                 undefined,
                 undefined,

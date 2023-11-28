@@ -49,7 +49,7 @@ import { MainImportService } from "@shared/components/import-steps/services/main
 export class AppItemsComponent extends AppComponentBase {
     appItemListId:number;
     @Output() eventTriggered :EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>> = new EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>>()
-
+ 
     singleItemPerRowMode: boolean = false;
     @ViewChild("entityTypeHistoryModal", { static: true })  entityTypeHistoryModal: EntityTypeHistoryModalComponent;
 
@@ -128,12 +128,6 @@ export class AppItemsComponent extends AppComponentBase {
             const control = this._fb.control(undefined)
             this.filterForm.addControl("appItemType",control)
         }
-           //  T-SII-20231103.0007 
-       if(flags.appItemSizeScale){
-            const control = this._fb.control(undefined)
-            this.filterForm.addControl("appItemSizeScale",control)
-        } 
-
         if(flags.categories){
             const control = this._fb.control([])
             this.filterForm.addControl("categories",control)
@@ -188,7 +182,6 @@ export class AppItemsComponent extends AppComponentBase {
         this.isModal  =  inputs.isModal
         this.canAdd  =  inputs.canAdd
         this.pageMainFilters  =  inputs.pageMainFilters
-        console.log(">>", this.pageMainFilters)
         this.filtersFlags  =  inputs.filtersFlags
         this.statusesFlags  =  inputs.statusesFlags
         this.actionsMenuFlags  =  inputs.actionsMenuFlags
@@ -261,7 +254,6 @@ export class AppItemsComponent extends AppComponentBase {
         ];
     }
     filterBody = new GetAllAppItemsInput();
-    @Output() itemEmited :EventEmitter<any> = new EventEmitter<any>()
     getAppItems(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.totalRecords = 10;
@@ -277,10 +269,7 @@ export class AppItemsComponent extends AppComponentBase {
         filterBody.arrtibuteFilters = []
         filterBody.filterType = filters.filterType.value
         filterBody.priceListId = this.priceListId
-
-           //  T-SII-20231103.0007 
-           filterBody.filterSizeScale= filters?.appItemSizeScale?.map(scale=>scale.value)
-
+        
         const extraAttributesKeys  = Object.keys(filters?.extraAttributes)
         if(extraAttributesKeys?.length) {
             extraAttributesKeys.forEach((key)=>{
@@ -301,7 +290,7 @@ export class AppItemsComponent extends AppComponentBase {
         filterBody.minimumPrice = 0
         filterBody.maximumPrice = 0
         filterBody.selectorKey = this.multiSelectionInfo?.sessionSelectionKey
-
+        
         filterBody.sorting = filters.sorting.value
         filterBody.skipCount = this.primengTableHelper.getSkipCount(this.paginator, event),
         filterBody.maxResultCount = this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -310,13 +299,13 @@ export class AppItemsComponent extends AppComponentBase {
 
         filterBody.tenantId = 0
         filterBody.selectorOnly =false
-
+        
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner();
         this.loading = true;
+        debugger;
         this._appItemsServiceProxy
             .getAll(
-                   //  T-SII-20231103.0007 
                 filterBody.tenantId,
                 filterBody.appItemListId,
                 filterBody.selectorOnly,
@@ -328,7 +317,6 @@ export class AppItemsComponent extends AppComponentBase {
                 filterBody.arrtibuteFilters,
                 filterBody.classificationFilters,
                 filterBody.categoryFilters,
-                filterBody.filterSizeScale,
                 filterBody.departmentFilters,
                 filterBody.entityObjectTypeId,
                 filterBody.minimumPrice,
@@ -352,7 +340,6 @@ export class AppItemsComponent extends AppComponentBase {
             )
             .subscribe((result) => {
                 this.items = result.items;
-                this.itemEmited.emit(result.items)
                 this.primengTableHelper.totalRecordsCount = result.totalCount;
                 this.primengTableHelper.records = result.items;
             });
@@ -404,7 +391,7 @@ export class AppItemsComponent extends AppComponentBase {
         if(event.event == AppItemBrowseEvents.Delete) this.deleteItemHandler(index)
         this.eventTriggered.emit(event)
     }
-
+    
 
     saveUserPreferenceForListView() {
         const key = "appitem-list-view-mode";

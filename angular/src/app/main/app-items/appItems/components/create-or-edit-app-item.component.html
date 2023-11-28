@@ -56,34 +56,40 @@
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <a class="text-primary text-underline"
-                                    *ngIf="listingMode === undefined && !(appItem?.id>0)"
+                                <a class="text-primary text-underline" *ngIf="listingMode === undefined"
                                     (click)="openSelectAppItemTypeModal()">
                                     {{ appItem.entityObjectTypeId ? ('Change'|localize) : ('Select'|localize) }}
                                     {{ 'the product type' | localize}}
                                 </a>
                             </div>
                         </div>
-                        <div class="row align-items-baseline">
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <h6><span class="text-danger">*</span>{{ 'ProductCode' | localize}}</h6>
-                            </div>
-                            <div class="col mb-4">
-
-                                <app-codes *ngIf="!(appItem?.id>0)" [objectType]="entityObjectType" [editMode]=false
-                                    classes="bg-white" [code]="appItem?.code"
-                                    placeHolder="{{ 'ProductCode' | localize}}" (getCodeValue)="getCodeValue($event)">
-                                </app-codes>
-                                <app-codes *ngIf="appItem?.id>0" [objectType]="entityObjectType" [readonly]="true"
-                                    [editMode]=true classes="bg-white" [code]="appItem?.code"
-                                    placeHolder="{{ 'ProductCode' | localize}}"
-                                    (getCodeValue)="getCodeValue($event)"></app-codes>
-                            </div>
-
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <span class="text-muted">50 {{ 'digits' | localize}}</span>
-                            </div>
+                    <div class="row align-items-baseline">
+                        <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                            <h6><span class="text-danger">*</span>{{ 'ProductCode' | localize}}</h6>
                         </div>
+                        <div class="col mb-4">
+
+                            <app-codes *ngIf="!(appItem?.id>0)"
+                                [objectType]="entityObjectType"
+                                [editMode]=false
+                                classes="bg-white"
+                                [code]="appItem?.code"
+                                placeHolder="{{ 'ProductCode' | localize}}"
+                                (getCodeValue)="getCodeValue($event)">
+                            </app-codes>
+                                <app-codes *ngIf="appItem?.id>0"
+                                 [objectType]="entityObjectType"
+                                 [editMode]=true
+                                 classes="bg-white"
+                                 [code]="appItem?.code"
+                                 placeHolder="{{ 'ProductCode' | localize}}"
+                                 (getCodeValue)="getCodeValue($event)"></app-codes>
+                                </div>
+
+                                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                                    <span class="text-muted">50 {{ 'digits' | localize}}</span>
+                                </div>
+                            </div>
                         <div class="row align-items-baseline mb-4">
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <h6><span class="text-danger">*</span>{{ 'ProductName' | localize}}</h6>
@@ -148,8 +154,7 @@
                             <div class="col">
                                 <div
                                     class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0  border rounded-lg thin-scroll">
-                                    <div class="mb-3" *ngIf="!categories?.length;else categoriesElse">{{
-                                        'NoCategoriesSelected' | localize}} ...</div>
+                                    <div class="mb-3" *ngIf="!categories?.length;else categoriesElse">{{ 'NoCategoriesSelected' | localize}} ...</div>
                                     <ng-template #categoriesElse>
                                         <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
                                             *ngFor="let category of categories;index  as i"
@@ -241,8 +246,7 @@
                             <div class="col">
                                 <div
                                     class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0  border rounded-lg thin-scroll">
-                                    <div class="mb-3" *ngIf="!departments?.length;else departmentsElse">{{
-                                        'NoDepartmentsSelected' | localize}} ...</div>
+                                    <div class="mb-3" *ngIf="!departments?.length;else departmentsElse">{{ 'NoDepartmentsSelected' | localize}} ...</div>
                                     <ng-template #departmentsElse>
                                         <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
                                             *ngFor="let department of departments;index  as i"
@@ -373,44 +377,41 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
-                        <div class="row align-items-end mb-4">
+                        <div class="row align-items-end mb-4" >
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <h6><span class="text-danger">*</span>
                                     {{ 'Price' | localize}}
                                 </h6>
                             </div>
-                            <div class="col-4 d-flex align-items-end" *ngIf="defaultCurrencyMSRPPriceIndex > -1"
-                                style="gap:20px">
+                            <div class="col-4 d-flex align-items-end" *ngIf="defaultCurrencyMSRPPriceIndex > -1" style="gap:20px">
                                 <div class="d-flex flex-column align-items-baseline">
                                     <h6>
                                         <span class="text-danger">*</span>
                                         {{ 'MSRP' | localize}}
                                     </h6>
                                     <div class="d-flex align-items-baseline">
-                                        <span
-                                            class="mr-2">{{appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].currencySymbol}}</span>
+                                        <span class="mr-2">{{appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].currencySymbol}}</span>
                                         <!-- <p-inputNumber [ariaRequired]="true" mode="decimal" #AppItem_Price="ngModel"
                                             [(ngModel)]="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price" name="price" [min]="1" [styleClass]="'price'"
                                             [minFractionDigits]="2" [maxFractionDigits]="2">
                                         </p-inputNumber> -->
 
-                                        <input type="number" step="any" name="price" class="form-control"
-                                            id="AppItem_Price" #AppItem_Price="ngModel"
-                                            [(ngModel)]="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price"
-                                           >
-                                           <!-- required [min]="1"  -->
-                                        <!-- <div *ngIf="!appItem?.appItemPriceInfos[defaultCurrencyMSRPPriceIndex]?.price  || appItem?.appItemPriceInfos[defaultCurrencyMSRPPriceIndex]?.price <=0">
-                                            <span class="ml-2">
-                                                <validation-messages [formCtrl]="AppItem_Price"></validation-messages> 
-                                                {{PriceValidMsg}}
-                                            </span>
-                                        </div> -->
+                                        <input type="number"
+                                        step="any"
+                                        name="price"
+                                        class="form-control"
+                                        id="AppItem_Price"
+                                        #AppItem_Price="ngModel"
+                                        [(ngModel)]="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price">
+
+                                        <span class="ml-2">
+                                            <validation-messages [formCtrl]="AppItem_Price"></validation-messages>
+                                        </span>
                                     </div>
                                 </div>
                                 <div *ngIf="defaultCurrencyMSRPPriceIndex > -1">
                                     <div class="d-flex align-items-baseline">
-                                        <button class="btn btn-primary" type="button"
-                                            (click)="showAdvancedPricingModal()">
+                                        <button class="btn btn-primary" type="button" (click)="showAdvancedPricingModal()">
                                             {{'AdvancedPricing' | localize}}
                                         </button>
                                     </div>
@@ -423,7 +424,7 @@
                                 <p-inputNumber [ariaRequired]="true" mode="decimal" #AppItem_StockAvailability="ngModel"
                                     [(ngModel)]="appItem.stockAvailability" name="stockAvailability" [min]="0"
                                     [disabled]="appItem?.variationItems?.length || sellVariationChecked"
-                                    (ngModelChange)="stockAvailabilityChanged($event)">
+                                    (ngModelChange)="stockAvailabilityChanged($event)" >
                                 </p-inputNumber>
                                 <span class="ml-2">
                                     <validation-messages [formCtrl]="AppItem_StockAvailability"></validation-messages>
@@ -431,8 +432,12 @@
                             </div>
                             <div class="col-10 offset-2 mt-4">
                                 <span>
-                                    <input type="checkbox" [(ngModel)]="sellVariationChecked" name="showVariationsBtn"
-                                        (ngModelChange)="askToRemoveAllVariations($event)" />
+                                    <input
+                                        type="checkbox"
+                                        [(ngModel)]="sellVariationChecked"
+                                        name="showVariationsBtn"
+                                        (ngModelChange)="askToRemoveAllVariations($event)"
+                                    />
                                 </span>
                                 <span>
                                     {{'PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct' | localize}}.
@@ -452,9 +457,12 @@
                                     {{ 'Variations' | localize}}
                                 </h6>
                             </div>
-                            <div class="col" *ngIf="!appItem?.variationItems?.length">
+                            <div class="col" *ngIf="!appItem?.variationItems?.length" >
                                 <div class="d-flex align-items-center">
-                                    <button type="button" class="btn btn-primary" [disabled]="!sellVariationChecked"
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary"
+                                        [disabled]="!sellVariationChecked"
                                         (click)="showCreateOrEditVariationPage()">{{"CreateVariation" | localize}}
                                     </button>
                                     <div class="hint w-50 ml-3">
@@ -467,10 +475,12 @@
                             <div class="col" *ngIf="appItem?.variationItems?.length">
                                 <div class="d-flex flex-column">
                                     <div class="mb-3">
-                                        <app-variations-meta-info [showPriceRange]='true'
+                                        <app-variations-meta-info
+                                            [showPriceRange]='true'
                                             [extraAttributes]="this.selectedItemTypeData?.extraAttributes?.extraAttributes"
                                             [variations]="appItem.variationItems"
-                                            [stockAvailability]="appItem.stockAvailability">
+                                            [stockAvailability]="appItem.stockAvailability"
+                                            >
                                         </app-variations-meta-info>
                                     </div>
                                     <div>
@@ -506,9 +516,9 @@
                                         <div class="col-lg-8 col-md-10 col">
                                             <div class="row justify-content-center pt-4">
                                                 <div class="col-md-6 col-12 mb-4"
-                                                    [ngClass]="{ 'd-none' : extraAttr.isSelectedOnVariation && extraAttr.isVariation}"
+                                                    [ngClass]="{ 'd-none' : extraAttr.isSelectedOnVariation }"
                                                     *ngFor="let extraAttr of extraAttributeObject.value.extraAttributes">
-                                                    <div *ngIf="!extraAttr.isSelectedOnVariation && !extraAttr.isVariation">
+                                                    <div *ngIf="!extraAttr.isSelectedOnVariation">
                                                         <div>
                                                             <label>{{extraAttr.name | localize}}</label>
                                                         </div>
@@ -651,16 +661,31 @@
 </div>
 
 <div [@routerTransition] *ngIf="displayVariations">
-    <app-create-edit-app-item-variations [appItem]="appItem" [selectedItemTypeData]="selectedItemTypeData"
-        (cancel)="hideVariations($event)" [defaultAppItemImage]="this.attachmentsSrcs[this.defaultImageIndex]"
-        (applyVariations)="applyVariations($event)" [isListing]="listingMode !== undefined" [listingMode]="listingMode"
-        [currencies]="selectedCurrencies" [updateVariation]="updateVariation" [productTypeId]="productTypeId"
-        [productCode]="appItem.code">
+    <app-create-edit-app-item-variations
+        [appItem]="appItem"
+        [selectedItemTypeData]="selectedItemTypeData"
+        (cancel)="hideVariations()"
+        [defaultAppItemImage]="this.attachmentsSrcs[this.defaultImageIndex]"
+        (applyVariations)="applyVariations($event)"
+        [isListing]="listingMode !== undefined"
+        [listingMode]="listingMode"
+        [currencies]="selectedCurrencies"
+        [updateVariation]="updateVariation"
+        [productTypeId]="productTypeId"
+        [productCode]="appItem.code"
+    >
     </app-create-edit-app-item-variations>
 </div>
 
 
-<app-advanced-pricing *ngIf="showAdvancedPricing" [appItem]="appItem" [prices]="appItem.appItemPriceInfos"
-    [allCurrencies]="allCurrencies" [readOnly]="false" (_submit)="productAdvancedPriceChangesHandler($event)"
-    (_cancel)="hideAdvancedPricingModal()" (updateVariation)="onUpdateVariation($event)">
+<app-advanced-pricing
+    *ngIf="showAdvancedPricing"
+    [appItem]="appItem"
+    [prices]="appItem.appItemPriceInfos"
+    [allCurrencies]="allCurrencies"
+    [readOnly]="false"
+    (_submit)="productAdvancedPriceChangesHandler($event)"
+    (_cancel)="hideAdvancedPricingModal()"
+    (updateVariation)="onUpdateVariation($event)"
+>
 </app-advanced-pricing>

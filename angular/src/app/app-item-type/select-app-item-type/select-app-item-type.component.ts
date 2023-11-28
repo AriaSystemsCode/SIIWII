@@ -57,7 +57,6 @@ export class SelectAppItemTypeComponent
     loadedChildrenRecords: TreeNodeOfGetSycEntityObjectTypeForViewDto[] = [];
     lastSelectedRecord: TreeNodeOfGetSycEntityObjectTypeForViewDto;
     getAppItemTypesList(searchQuery?: string) {
-        console.log(">>", searchQuery)
         this.loading = true;
         const subs = this._sycEntityObjectTypesServiceProxy
             .getAllWithChildsForProductWithPaging(

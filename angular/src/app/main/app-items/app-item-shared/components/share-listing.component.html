@@ -26,7 +26,7 @@
                     <input type="radio" id="public" name="publicity" (click)="hideCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="1"> {{"Public" | localize}}
                 </label>
                 <label  for="private">
-                    <input type="radio" id="private"  name="publicity" (click)="showCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="2"> Restricted
+                    <input type="radio" id="private"  name="publicity" (click)="showCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="2"> {{"Private" | localize}}
                 </label>
             </div>
         </div>
@@ -67,26 +67,21 @@
         </div>
         <div class="d-flex flex-column border-dashed-bottom pb-3 pt-3">
             <label for="notify" >
-                <input type="checkbox" [disabled]="publishItemOptions.sharingLevel === 1" name="notify" id="notify" [(ngModel)]="_notify" (change)="triggerMessage($event)"> {{"NotifyPeople" | localize}}
+                <input type="checkbox" name="notify" id="notify" [(ngModel)]="_notify" (change)="triggerMessage($event)"> {{"NotifyPeople" | localize}}
             </label>
             <textarea aria-placeholder="Message" [placeholder]="'Message' | localize" class="bg-light border-0 p-2" rows="4" [(ngModel)]="publishItemOptions.message" *ngIf="_notify">
             </textarea>
         </div>
 
     </div>
-    <div  class="subscribers" *ngIf="PublishAppItemListingService.sharingStatus !== 0" >You have {{PublishAppItemListingService.subscribersNumber}} Subscribers to this Product </div>
     <div class="modal-footer">
-        <button type="button"  class="btn btn-outline-primary" [disabled]="!showCloseText && _notify && publishItemOptions.itemSharing.length === 0" (click)="publishListing()" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
-            <!-- <span *ngIf="!_notify">{{"ShareAndPublish" | localize}}</span> -->
-            <!-- <span *ngIf="_notify">{{"NotifyAndPublish" | localize}}</span> -->
-            <span *ngIf="PublishAppItemListingService.sharingStatus === 0  ||  PublishAppItemListingService.sharingStatus === 3">Share</span>
-            <span *ngIf="(PublishAppItemListingService.sharingStatus === 1 || PublishAppItemListingService.sharingStatus === 2) && PublishAppItemListingService.subscribersNumber ===0  ">Make Private</span>
-            <span *ngIf="(PublishAppItemListingService.sharingStatus === 3) && PublishAppItemListingService.subscribersNumber !==0 ">Hide</span>
-            <span  *ngIf=" PublishAppItemListingService.sharingStatus === 4" > Unhide </span>
+        <button type="button" *ngIf="!showCloseText" class="btn btn-outline-primary" [disabled]="!showCloseText && _notify && publishItemOptions.itemSharing.length === 0" (click)="publishListing()" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
+            <span *ngIf="!_notify">{{"ShareAndPublish" | localize}}</span>
+            <span *ngIf="_notify">{{"NotifyAndPublish" | localize}}</span>
         </button>
-        <!-- <button *ngIf="showCloseText" type="button" class="btn btn-outline-primary" (click)="close()" >
+        <button *ngIf="showCloseText" type="button" class="btn btn-outline-primary" (click)="close()" >
             <span >{{l("Close")}}</span>
-        </button> -->
+        </button>
     </div>
 </div>
 

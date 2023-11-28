@@ -79,7 +79,7 @@
                 </tabset> 
             </div>
         </div> -->
-        <div class="row ml-2 mt-2">
+        <div class="row m-4">
             <div class="col" style="margin-right: 14px; display: inline-flex;">
                 <div class="image" style=" margin-right: 14px;"><i class="flaticon-alarm"></i></div>
                 <div class="text">
@@ -95,8 +95,6 @@
                 <a href="javascript:;" class="purpleColor"
                     (click)="setAllNotificationsAsRead(); $event.preventDefault(); $event.stopPropagation();"
                     *ngIf="unreadNotificationCount">{{"SetAllAsRead" | localize}}</a>
-                    <a href="javascript:;" style="color: grey !important"
-                    *ngIf="!unreadNotificationCount">{{"SetAllAsRead" | localize}}</a>
             </div>
             <div class="text-right col-4">
                 <a (click)="openNotificationSettingsModal()" class="text-right purpleColor"

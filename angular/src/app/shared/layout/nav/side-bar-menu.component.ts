@@ -1,5 +1,5 @@
 import { PermissionCheckerService } from 'abp-ng2-module';
-import { Injector, ElementRef, Component, OnInit, ViewEncapsulation, Inject, Renderer2, AfterViewInit, Input } from '@angular/core';
+import { Injector, ElementRef, Component, OnInit, ViewEncapsulation, Inject, Renderer2, AfterViewInit } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppMenu } from './app-menu';
 import { AppNavigationService } from './app-navigation.service';
@@ -21,7 +21,7 @@ export class SideBarMenuComponent extends AppComponentBase implements OnInit, Af
     currentRouteUrl = '';
     insideTm: any;
     outsideTm: any;
-@Input() openSideBar :boolean =false;
+
     menuOptions: MenuOptions = {
         // vertical scroll
         scroll: null,
@@ -131,10 +131,8 @@ export class SideBarMenuComponent extends AppComponentBase implements OnInit, Af
                 if (document.body.classList.contains('kt-aside--minimize') && KTUtil.isInResponsiveRange('desktop')) {
                     // show the left aside menu
                     this.render.removeClass(document.body, 'kt-aside--minimize');
-                     this.render.addClass(document.body, 'kt-aside--minimize-hover');
+                    this.render.addClass(document.body, 'kt-aside--minimize-hover');
                 }
-
-               
             }, 1500);
         }
     }
@@ -153,18 +151,15 @@ export class SideBarMenuComponent extends AppComponentBase implements OnInit, Af
                     clearTimeout(this.insideTm);
                     this.insideTm = null;
                 }
-                if(!this.openSideBar){
+                
                 this.outsideTm = setTimeout(() => {
                     // if the left aside menu is expand
-                  
-                  if (document.body.classList.contains('kt-aside--minimize-hover') && KTUtil.isInResponsiveRange('desktop')) {
+                    if (document.body.classList.contains('kt-aside--minimize-hover') && KTUtil.isInResponsiveRange('desktop')) {
                         // hide back the left aside menu
                         this.render.removeClass(document.body, 'kt-aside--minimize-hover');
                         this.render.addClass(document.body, 'kt-aside--minimize');
-                        abp.event.trigger('app.kt_aside_toggler.onClick');
                     }
                 }, 1000);
-            }
             }
 
     }

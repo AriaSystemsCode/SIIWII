@@ -67,7 +67,9 @@ export class PostCardComponent
     }
 
     ngOnChanges(changes: SimpleChanges) {
-       
+        this.scrollableDiv.nativeElement.addEventListener("scroll", () => {
+            this.detectHiddenSections();
+        });
         if (this.post) {
             //Get ProfilePicture
             this.getProfilePictureById(this.post.appPost.profilePictureId);
@@ -83,9 +85,6 @@ export class PostCardComponent
         const post = GetAppPostForViewDto.fromJS(this.post.toJSON());
         this.post = post;
         this.getRelatedEntity();
-        this.scrollableDiv.nativeElement.addEventListener("scroll", () => {
-            this.detectHiddenSections();
-        });
     }
 
     ngOnDestroy() {

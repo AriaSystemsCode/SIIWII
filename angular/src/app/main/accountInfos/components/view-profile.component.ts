@@ -84,7 +84,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     ngOnInit(){
         this.getAllForAccountInfo()
         this.allPriceLevel=this.getPriceLevel();
-        this.allPriceLevel.push({ label :'MSRP' ,value: 'MSRP'});
     }
     handleInvalidImages(event) {
     }

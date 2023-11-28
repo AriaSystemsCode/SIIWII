@@ -21,14 +21,20 @@ placement="bottom right"
                 >{{ "Edit" | localize }}</a
             >
         </li>
-      
+        <li *ngIf="actionsMenuFlags?.createListing && appItemType == AppItemTypeEnum?.product && !item.listed">
+            <a
+                href="javascript:;"
+                (click)="createListingHandler()"
+                >{{ "CreateNewListing" | localize }}</a
+            >
+        </li>
         <li *ngIf="actionsMenuFlags?.editListing && appItemType == AppItemTypeEnum?.listing">
             <a
                 href="javascript:;"
                 (click)="editListingHandler()"
                 >{{ "EditListing" | localize }}</a
             >
-        </li> 
+        </li>
         <li *ngIf="actionsMenuFlags?.addToList && appItemType == AppItemTypeEnum?.listing">
             <a
                 href="javascript:;"
@@ -36,14 +42,14 @@ placement="bottom right"
                 >{{ "AddToList" | localize }}</a
             >
         </li>
-        <li *ngIf=" appItemType == AppItemTypeEnum?.product">
+        <li  *ngIf="actionsMenuFlags?.publishOrUnpublish && appItemType == AppItemTypeEnum?.listing && !item.published">
             <a
                 href="javascript:;"
-                (click)="openAddtoListModal()"
-                >Add to product list</a
-            >
+                (click)="openShareProductListingModal()"
+                >
+                {{("PublishListing" | localize) }}
+            </a >
         </li>
-        
         <li  *ngIf="actionsMenuFlags?.publishOrUnpublish && appItemType == AppItemTypeEnum?.listing && item.published">
             <a
                 href="javascript:;"

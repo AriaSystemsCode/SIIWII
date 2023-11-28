@@ -97,6 +97,6 @@ export class AccountRoutingModule {
             classesToRemember += ' swal2-toast-shown';
         }
 
-       // document.body.className = this._uiCustomizationService.getAccountModuleBodyClass() + ' ' + classesToRemember;
+        document.body.className = this._uiCustomizationService.getAccountModuleBodyClass() + ' ' + classesToRemember;
     }
 }

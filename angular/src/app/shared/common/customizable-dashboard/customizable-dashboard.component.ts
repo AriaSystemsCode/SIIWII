@@ -60,13 +60,13 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
 
   ngOnInit() {
     this.loading = true;
+
     this._dashboardCustomizationServiceProxy.getDashboardDefinition(this.dashboardName, DashboardCustomizationConst.Applications.Angular)
-    .subscribe((dashboardDefinitionResult: DashboardOutput) => {
-        debugger;
+      .subscribe((dashboardDefinitionResult: DashboardOutput) => {
         this.dashboardDefinition = dashboardDefinitionResult;
         if (!this.dashboardDefinition.widgets || this.dashboardDefinition.widgets.length === 0) {
-            this.loading = false;
-            this.busy = false;
+          this.loading = false;
+          this.busy = false;
           return;
         }
 
@@ -337,7 +337,7 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
 
       var isConfirmed: Observable<boolean>;
       isConfirmed   = this.askToConfirm(message,"AreYouSure");
-
+  
      isConfirmed.subscribe((res)=>{
         if(res){
           this.busy = true;

@@ -22,12 +22,9 @@ export class AppNavigationService {
                 new AppMenuItem('Dashboard', 'Pages.Administration.Host.Dashboard', 'flaticon-line-graph', '/app/admin/hostDashboard'),
                 // new AppMenuItem('Dashboard', 'Pages.Tenant.Dashboard', 'flaticon-line-graph', '/app/main/dashboard'),
 
-               new AppMenuItem('My Transactions', 'Pages.AppSiiwiiTransactions', 'flaticon-more', '/app/admin/appTransactions/MyTransactions'),
-              //  new AppMenuItem('My Transactions', '', 'flaticon-more', '/app/admin/appTransactions/MyTransactions'),
-
                 new AppMenuItem('MyAccounts', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
 
-               // new AppMenuItem("Messages", 'Pages.AppMessage', "flaticon-app", "/app/main/Messages"),
+                new AppMenuItem("Messages", 'Pages.AppMessage', "flaticon-app", "/app/main/Messages"),
 
                 // new AppMenuItem("DevExpress", null,"flaticon-app","",[],[
                 //     new AppMenuItem("Designer", null,"flaticon-app","/app/main/dev-express-demo/designer"),
@@ -58,7 +55,7 @@ export class AppNavigationService {
             new AppMenuItem('MyProducts', 'Pages.AppItems', 'flaticon-more', '/app/main/products'),
 
             new AppMenuItem('ProductsList', 'Pages.AppItemsLists', 'flaticon-more', '/app/main/productslists'),
-            new AppMenuItem('Linesheet', 'Pages.AppItems', 'flaticon-more', '/app/main/linesheet/print'),
+            new AppMenuItem('Linesheet', '', 'flaticon-more', '/app/main/linesheet/print'),
             // new AppMenuItem('Product Selector Test Page', 'Pages.AppItems', 'flaticon-more', '/app/demo/AppItemsMultiSelection'),
             // new AppMenuItem('DemoUiComponents', 'Pages.DemoUiComponents', 'flaticon-shapes', '/app/admin/demo-ui-components')
         )

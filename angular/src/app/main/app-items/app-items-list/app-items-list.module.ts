@@ -20,7 +20,6 @@ import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { AppItemsBrowseModule } from '../app-items-browse/app-items-browse.module';
 import { AppItemSharedModule } from '../app-item-shared/app-item-shared.module';
-import { ButtonModule } from 'primeng/button';
 
 @NgModule({
   declarations:
@@ -44,8 +43,7 @@ import { ButtonModule } from 'primeng/button';
     TableModule,
     ModalModule,
     AppItemSharedModule,
-    AppItemsBrowseModule,
-    ButtonModule
+    AppItemsBrowseModule
   ],
   providers:[
       ExtraAttributeDataService,

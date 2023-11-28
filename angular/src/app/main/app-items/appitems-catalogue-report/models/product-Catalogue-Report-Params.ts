@@ -56,7 +56,6 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     orderBy: string = "";
     ColorPageSort: string = "";
     DetailPageSort: string = "";
-    DetailPageGroupByName: string="";
     DetailPageShowCategory:boolean= false
     ColorPageShowCategory:boolean= false
 
@@ -123,7 +122,6 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&BKGround=" + this.BKGround
        url += "&ColorPageSort=" + this.ColorPageSort
        url += "&DetailPageSort=" + this.DetailPageSort
-       url += "&DetailPageGroupByName=" + this.DetailPageGroupByName
        url += "&DetailPageShowCategory=" + this.DetailPageShowCategory
        url += "&ColorPageShowCategory=" + this.ColorPageShowCategory
        url += "&orderBy=" + this.orderBy

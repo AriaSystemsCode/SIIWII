@@ -164,7 +164,7 @@ export class SelectCategoriesDynamicModalComponent
     itemPath: string = "";
     nodeSelect(event: any) {
         this.itemPath = this.getPath(event.node);
-        console.log(event);
+        console.log(event)
     }
 
     getPath(item: any): any {
@@ -222,6 +222,7 @@ export class SelectCategoriesDynamicModalComponent
     getCategoriesList() {
         this.loading = true;
         let apiMethod = `getAllWithChildsFor${this.entityObjectName}WithPaging`;
+
         const subs = this._sycEntityObjectCategoriesServiceProxy[apiMethod](
             this.searchQuery,
             undefined,
@@ -329,23 +330,6 @@ export class SelectCategoriesDynamicModalComponent
                 $event.node.totalChildrenCount === $event.node.children.length;
             if (loadedCompletely) return;
             const parentId = $event.node.data.sycEntityObjectCategory.id;
-            console.log(
-                ">>",
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                parentId,
-                this.isDepartment,
-                this.entityId,
-                undefined,
-                this.sortBy,
-                0,
-                $event.node.totalChildrenCount
-            );
             const subs = this._sycEntityObjectCategoriesServiceProxy
                 .getAllChildsWithPaging(
                     undefined,

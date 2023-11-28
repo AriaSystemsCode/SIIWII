@@ -1,15 +1,14 @@
-<div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'' ]" >
-    <app-add-comment [cartStyle]="cartStyle"
+<div [ngClass]="!active ? 'd-none' : 'pt-4' " >
+    <app-add-comment
         (saveDone)="newCommentAddedHandler($event)"
         #AddCommentComponent>
     </app-add-comment>
-    <div *ngFor="let comment of comments" [ngClass]="cartStyle?'mt-2  comment-inner':'mt-4 ml-3'">
+    <div *ngFor="let comment of comments" class="mt-4 ml-3">
         <div class="mb-2">
             <app-comment [comment]="comment"></app-comment>
         </div>
         <div class="ml-5" *ngIf="comment.messages">
             <app-interactions
-            [cartStyle]="cartStyle"
                 [entityId]="comment.messages.entityId"
                 [relatedEntityId]="entityId"
                 [parentId]="comment.messages.id"
