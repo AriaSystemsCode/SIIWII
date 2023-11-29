@@ -228,4 +228,9 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     customFilterCallback(filter: (a) => void, value: any): void {
         filter(value);
     }
+
+    onHideShoppingCartModal($event){
+        if($event)
+          this.getAppTransactions();
+    }
 }

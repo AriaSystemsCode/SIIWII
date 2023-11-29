@@ -2982,7 +2982,7 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrEmpty(input.SellerSSIN), e => e.SellerContactSSIN == input.SellerSSIN)
                             .WhereIf(!string.IsNullOrEmpty(input.SellerName), e => e.SellerCompanyName.Contains(input.SellerName))
                             .WhereIf(!string.IsNullOrEmpty(input.BuyerName), e => e.BuyerCompanyName.Contains(input.BuyerName))
-                            .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId))
+                            .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId) && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
                             ;
                 var filterResult = await filteredAppTransactions
                         .OrderBy(input.Sorting ?? "id asc").ToListAsync();
