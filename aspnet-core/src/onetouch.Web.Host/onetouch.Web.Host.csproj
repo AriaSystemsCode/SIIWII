@@ -36,6 +36,7 @@
     <Content Remove="wwwroot\swagger\ui\index.html" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate2.vsrepx" />
@@ -81,6 +82,7 @@
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate7.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate5.vsrepx" />
@@ -98,6 +100,12 @@
     <Folder Include="wwwroot\Plugins\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.cs">
+      <DependentUpon>OrderConfirmationForm1.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.Designer.cs">
+      <DependentUpon>OrderConfirmationForm1.repx</DependentUpon>
+    </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\Color_Size1.cs" />
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.cs">
       <DependentUpon>ProductsCatalogTemplate1.vsrepx</DependentUpon>

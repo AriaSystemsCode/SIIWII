@@ -579,10 +579,10 @@ namespace onetouch.Migrations.Seed.Host
             if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count < 1)
             {
                 SycReport sycReport = new SycReport();
-                sycReport.Name = "OrderConfirmation";
+                sycReport.Name = "OrderConfirmationForm1";
 
                 sycReport.Code = "7";
-                sycReport.Name = "OrderConfirmation";
+                sycReport.Name = "OrderConfirmationForm1";
                 sycReport.Description = "Order confirmation form 1";
                 sycReport.Thumbnail = "Order confirmation form 1";
                 sycReport.EntityObjectTypeId = 97;
