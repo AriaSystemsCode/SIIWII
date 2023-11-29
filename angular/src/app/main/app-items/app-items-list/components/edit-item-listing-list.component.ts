@@ -198,12 +198,17 @@ export class EditItemListingListComponent
 
         this._appItemsListsServiceProxy
             .createOrEdit(body)
-            .pipe(finalize(() => (this.loading = false)))
+            .pipe(finalize(() => {
+                this.loading = false ;
+                this.redirectToAppItemList();
+            }
+                ))
             .subscribe((res) => {
                 // this.notify.success(this.l("AddedSuccessfully"));
                 this.hideMainSpinner();
                 this.mapGetAppItemListForEdit(res);
-                this.askToPublishProductList();
+             
+                //this.askToPublishProductList();
             });
     }
     askToConfirmCancelChanges(): void {
