@@ -437,6 +437,8 @@
                                 <button type="button" class="btn btn-primary bgPurple border-0 w-100 pointer"
                                     style="height: 37px;"
                                     *ngIf="showTabs && shoppingCartDetails?.entityStatusCode?.toUpperCase()=='DRAFT'"
+                                    [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
+                                    [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}"
                                     (click)="PlaceOrder()">
                                     {{l("Placeyourorder")}}
                                 </button>
