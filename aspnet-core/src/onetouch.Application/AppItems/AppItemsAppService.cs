@@ -839,6 +839,45 @@ namespace onetouch.AppItems
                         var subscribersCnt = await _appEntityRepository.CountAsync(a=>a.Code== appItem.SSIN & a.TenantId != null & a.TenantId!= a.TenantOwner);
                         output.AppItem.NumberOfSubscribers = subscribersCnt;
                     }
+                    //T-SII-20230917.0004,1 MMT 11/30/2023 Get the Item shared with users[Start]
+                    if (output.AppItem.SharingLevel == 2)
+                    {
+                        output.AppItem.ItemSharing = new List<ItemSharingDto>();
+                        var sharedUsers = await _appMarketplaceItemSharing.GetAll().Where(a => a.AppMarketplaceItemId == marketplaceItem.Id).ToListAsync();
+                        if (sharedUsers != null && sharedUsers.Count > 0)
+                        {
+                            output.AppItem.ItemSharing = ObjectMapper.Map<List<ItemSharingDto>>(sharedUsers);
+                            if (output.AppItem.ItemSharing != null && output.AppItem.ItemSharing.Count > 0)
+                            {
+                                foreach (var user in output.AppItem.ItemSharing)
+                                {
+                                    var userObj = UserManager.GetUserById(long.Parse(user.SharedUserId.ToString()));
+                                    if (userObj != null)
+                                    {
+                                        user.SharedUserSureName = userObj.Surname;
+                                        user.SharedUserName = userObj.Name;
+                                        user.SharedUserEMail = userObj.EmailAddress;
+                                        user.SharedTenantId = userObj.TenantId;
+                                        string tenantName = "";
+                                        if (userObj.TenantId != null)
+                                        {
+                                            var tenant = TenantManager.GetById(int.Parse(userObj.TenantId.ToString()));
+                                            if (tenant != null)
+                                                tenantName = tenant.TenancyName;
+                                        }
+                                        else
+                                        {
+                                            tenantName = "SIIWII";
+                                        }
+                                        user.SharedUserTenantName = tenantName;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //T-SII-20230917.0004,1 MMT 11/30/2023 Get the Item shared with users[End]
+
+
                     if (!string.IsNullOrEmpty(appItem.LastModificationTime.ToString()))
                         output.AppItem.LastModifiedDate = DateTime.Parse(appItem.LastModificationTime.ToString());
                     else
