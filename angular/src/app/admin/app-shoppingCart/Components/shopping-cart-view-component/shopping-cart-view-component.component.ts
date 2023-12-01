@@ -15,6 +15,8 @@ import { UserClickService } from '@shared/utils/user-click.service';
 import { finalize } from 'rxjs';
 import { ShoppingCartoccordionTabs } from './ShoppingCartoccordionTabs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
+import { request } from 'https';
+import { URL } from 'url';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -65,6 +67,8 @@ export class ShoppingCartViewComponentComponent
   transactionPosition = TransactionPosition;
   activeIndex = 0;
   showSaveBtn: boolean = false;
+  transactionFormPath:string='../../../../../assets/shoppingCart/file-sample_150kB.pdf';
+  onshare:boolean=false;
 
   constructor(
     injector: Injector,
@@ -675,5 +679,14 @@ export class ShoppingCartViewComponentComponent
 
   onChangeAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
+  }
+
+  printTransaction(){
+    var page = window.open(this.transactionFormPath);
+    page.print();
+  }
+
+  onShareTransaction(){
+    this.onshare=true;
   }
 }

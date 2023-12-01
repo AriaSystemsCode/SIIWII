@@ -106,6 +106,7 @@ import { ShoppingCartViewComponentComponent } from "./admin/app-shoppingCart/Com
 import { AccordionModule } from "primeng/accordion";
 import { TreeTableModule } from 'primeng/treetable';
 import { SalesOrderComponent } from "./admin/app-shoppingCart/Components/sales-order/sales-order.component";
+import {OrderPreviewComponent} from "./admin/app-shoppingCart/Components/order-preview/order-preview.component";
 import { ContactComponent } from "./admin/app-shoppingCart/Components/contact/contact.component";
 import { TreeSelectModule } from "primeng/treeselect";
 import { CalendarModule } from 'primeng/calendar';
@@ -178,6 +179,7 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
         AppTransactionsBrowseComponent,
         ShoppingCartViewComponentComponent,
         SalesOrderComponent,
+        OrderPreviewComponent,
         CreateOrEditBuyerSellerContactInfoComponent,
         ViewBuyerSellerContactInfoComponent,
         ContactComponent,

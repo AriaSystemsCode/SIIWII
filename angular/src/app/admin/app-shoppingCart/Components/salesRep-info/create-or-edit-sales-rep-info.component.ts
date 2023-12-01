@@ -50,6 +50,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   onShowSalesRepEditMode($event) {
     if ($event) {
       this.createOrEditSalesRepInfo = true;
+      this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
     }
   }
 
@@ -62,6 +63,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
     this.createOrEditTransaction();
   }
   cancel(){
+    if(JSON.parse(this.oldappTransactionsForViewDto))
     this.appTransactionsForViewDto =JSON.parse(this.oldappTransactionsForViewDto);
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.createOrEditSalesRepInfo = false;

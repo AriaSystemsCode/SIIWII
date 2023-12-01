@@ -42,7 +42,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     @Input("activeTab") activeTab: number;
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
-    @Input("createOrEditorderInfo") createOrEditorderInfo: boolean = true;
+    @Input("createOrEditorderInfo") createOrEditorderInfo: boolean ;
+    @Input("oldCreateOrEditorderInfo") oldCreateOrEditorderInfo: boolean ;
 
     enteredDate = new Date();
     startDate = new Date();
@@ -81,6 +82,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
     ngOnChanges(changes: SimpleChanges) {
         if (this.appTransactionsForViewDto) {
+            this.createOrEditorderInfo=this.oldCreateOrEditorderInfo;
             this.oldappTransactionsForViewDto = JSON.stringify(this.appTransactionsForViewDto);
             this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
             this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
@@ -355,7 +357,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
         // this.appTransactionsForViewDto.entityClassifications.length !== 0 &&
         // this.appTransactionsForViewDto.entityCategories.length !== 0 &&
-        const isValid = this.appTransactionsForViewDto?.currencyId &&
+        const isValid = this.appTransactionsForViewDto?.currencyCode &&
             this.appTransactionsForViewDto?.currencyExchangeRate &&
             moment(
                 this.appTransactionsForViewDto?.enteredDate,
@@ -440,6 +442,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.selectedClassification = this.appTransactionsForViewDto?.entityClassifications; this.selectedCategories
         this.createOrEditorderInfo = true;
         this.showSaveBtn = true;
+        this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
     }
 
     save() {
