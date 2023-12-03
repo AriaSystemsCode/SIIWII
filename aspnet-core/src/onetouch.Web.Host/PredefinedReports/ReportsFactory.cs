@@ -19,7 +19,10 @@ namespace onetouch.Web.Reports
             ["ProductsCatalogTemplate4"] = () => new ProductsCatalogTemplate4(),
             ["ProductsCatalogTemplate5"] = () => new ProductsCatalogTemplate5(),
             ["ProductsCatalogTemplate7"] = () => new ProductsCatalogTemplate7(),
+            ["ProductsCatalogTemplate8"] = () => new ProductsCatalogTemplate8(),
             ["OrderConfirmationForm1"] = () => new OrderConfirmationForm1(),
+            //["ProductsCatalog-6-Products-Portrait"] = ()=> new ProductsCatalog-6-Products-Portrait(),
+            
             ["Color_Size"] = () => new Color_Size(),
 
 

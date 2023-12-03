@@ -46,7 +46,7 @@ namespace onetouch.Web.Services
         private readonly IRepository<AppAttachment, long> _appAttachmentRepository;
         private readonly IRepository<AppEntityAttachment, long> _appEntityAttachmentRepository;
         private readonly IRepository<SycAttachmentCategory, long> _sycAttachmentCategoryRepository;
-       
+
         public CustomReportStorageWebExtension(IWebHostEnvironment env,
             IUserEmailer userEmailer
             , IRepository<AppAttachment, long> appAttachmentRepository
@@ -92,7 +92,7 @@ namespace onetouch.Web.Services
             return Path.GetFileName(url) == url;
         }
 
-        public override  byte[] GetData(string url)
+        public override byte[] GetData(string url)
         {
             // Returns report layout data stored in a Report Storage using the specified URL. 
             // This method is called only for valid URLs after the IsValidUrl method is called.
@@ -140,6 +140,9 @@ namespace onetouch.Web.Services
                     string subject = "";
                     string fileName = reportName + ".pdf";
                     string transactionId = "395363";
+                    //360186
+                    bool saveToPdf = true;
+                    string orderConfirmationRole = "Seller";
                     foreach (string parameterName in parameters.AllKeys)
                     {
                         try
@@ -156,7 +159,8 @@ namespace onetouch.Web.Services
                                     fileName = "OrderConfirmation_" + parameters.Get(parameterName).ToString() + ".pdf";
 
                                 }
-                            }catch(Exception ex)
+                            }
+                            catch (Exception ex)
                             {
 
                             }
@@ -166,9 +170,9 @@ namespace onetouch.Web.Services
                                 report.Parameters[parameterName].Value = Convert.ChangeType(
                                 parameters.Get(parameterName), report.Parameters[parameterName].Type);
 
-                             
 
-                                    if (parameterName.ToUpper() == "TransactionId")
+
+                                if (parameterName.ToUpper() == "transactionId")
                                 {
                                     transactionId = parameters.Get(parameterName).ToString();
                                     fileName = "OrderConfirmation_" + parameters.Get(parameterName).ToString() + ".pdf";
@@ -189,12 +193,12 @@ namespace onetouch.Web.Services
                         catch (Exception ex) { }
                     }
                     fileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
-                    if (parameters.AllKeys.Contains("SaveToPDF") && parameters.Get("SaveToPDF").ToString().ToUpper() == "TRUE")
+                    if (parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
                     {
                         report.ExportToPdf(fileName);
                         //var tt = _appEntityAttachmentRepository.GetAll().ToList();
-                        var appEntityAttachment = _appEntityAttachmentRepository.GetAll().Where(e=> e.EntityId == long.Parse(transactionId)).FirstOrDefault();
-                        if (appEntityAttachment!=null && appEntityAttachment.Id > 0)
+                        var appEntityAttachment = _appEntityAttachmentRepository.GetAll().Where(e => e.EntityId == long.Parse(transactionId)).FirstOrDefault();
+                        if (appEntityAttachment != null && appEntityAttachment.Id > 0)
                         {
                             _appAttachmentRepository.Delete(e => e.Id == appEntityAttachment.AttachmentId);
                             var att = new AppAttachment { Name = transactionId, Attachment = fileName, TenantId = (int)tenantId };
@@ -212,7 +216,7 @@ namespace onetouch.Web.Services
                                 AttachmentId = ret,
                                 AttachmentCategoryId = _sycAttachmentCategoryRepository.GetAll().Where(e => e.Code == "FILE").FirstOrDefault().Id
 
-                            }); 
+                            });
                         }
 
 
@@ -235,8 +239,10 @@ namespace onetouch.Web.Services
                     }
                     {
                         using (MemoryStream stream = new MemoryStream())
-                        {   report.SaveLayoutToXml(stream);
-                            return stream.ToArray(); }
+                        {
+                            report.SaveLayoutToXml(stream);
+                            return stream.ToArray();
+                        }
                     }
                 }
             }
