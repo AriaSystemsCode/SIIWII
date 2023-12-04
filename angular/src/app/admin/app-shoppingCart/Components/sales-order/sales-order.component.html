@@ -1,63 +1,44 @@
-<div class="orderForm  position-relative">
-    <div class="container-fluid orderInfoForm thin-scroll">
+<div class="orderForm">
+    <div class="container-fluid">
         <div
-            class="header p-2 my-2 d-flex align-items-center  "
+            class="header my-2 d-flex align-items-center justify-content-between"
         >
-            <!-- <h6><span class="headertxt"> Entered By : </span> {{ fullName }}</h6> -->
-            <h6><span class="headertxt"> Entered By : </span></h6>
-
+            <h6><span> Entered By : </span> {{ fullName }}</h6>
             <button
                 [disabled]="!(isContactsValid && isSalesOrderValidForm())"
-                *ngIf="createOrEditorderInfo && !showSaveBtn"
-                (click)="createOrEditTransaction()"
-                class="continuebtn text-center btn float-right"
+                *ngIf="ShoppingCartMode.createOrEdit"
+                (click)="showPreview()"
+                class="savebtn text-center btn float-right"
             >
                 Continue
             </button>
             <button
-                *ngIf="!createOrEditorderInfo"
-                (click)="showEditMode()"
+                *ngIf="isReviewMode"
+                (click)="showEdirMode()"
                 class="previewbtn text-center btn float-right"
             >
                 Change
                 <i class="pi pi-pencil"></i>
             </button>
-            <button
-            *ngIf="showSaveBtn"
-            (click)="save()"
-            class="previewbtn text-center btn float-right"
-        >
-            Save
-            <i class="pi pi-check"></i>
-        </button>
-        <button
-        *ngIf="showSaveBtn"
-        (click)="cancel()"
-        class="cancelbtn text-center btn float-right"
-    >
-        Cancel
-        <i class="pi pi-times"></i>
-    </button>
         </div>
         <hr class="my-2" />
-        <div class="pr-3">
+        <div class="orderInfoForm pr-3 thin-scroll">
             <app-contact
-            class="w-100"
-            [isCreateOrEdit]="createOrEditorderInfo"
                 [activeTab]="activeTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
-                (formValidityChanged)="isContactFormValid($event)"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                [isReviewMode]="isReviewMode"
+                (formValidityChanged)="isContactFormValid($event)"
                 [showDepartment]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo"
             ></app-contact>
 
             <div class="row">
                 <!-- classification -->
                 <div class="col-md-12 mt-3">
-                    <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
+                    <div *ngIf="ShoppingCartMode.createOrEdit" class="d-flex flex-column">
                         <label class="label">Classifications</label>
                         <div
-                            class="align-items-center big-scroll categoriesClassificationsContainer px-3 py-2 d-flex h-100 row   w-100 border"
+                            class="border rounded w-100 d-flex align-tems-center justify-content-lg-start py-2 px-3"
                         >
                             <p
                                 class="previewValue classificationsValues mr-2 p-0 my-0"
@@ -65,16 +46,12 @@
                                     let item of appTransactionsForViewDto?.entityClassifications
                                 "
                             >
-                                {{ item?.entityObjectClassificationName }}
-                                <span 
-                                (click)="classififcationNodeUnSelect(item)">
-                                <i class="flaticon2-delete fa-sm pl-2 pointer"></i>
-                            </span>
+                                {{ item.label }}
                             </p>
                             <p
                                 *ngIf="
-                                !appTransactionsForViewDto?.entityClassifications  ||   appTransactionsForViewDto?.entityClassifications
-                                        ?.length === 0
+                                    appTransactionsForViewDto?.entityClassifications
+                                        .length === 0
                                 "
                                 class="p-0 m-0 customPlaceHolder"
                             >
@@ -93,32 +70,26 @@
                                 (onNodeSelect)="
                                     classififcationNodeSelect($event)
                                 "
+                                [(selection)]="
+                                    appTransactionsForViewDto.entityClassifications
+                                "
                             ></p-tree>
                         </div>
                     </div>
-                    <div *ngIf="!createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.view">
                         <div
-                            class="align-items-center big-scroll categoriesClassificationsContainer px-3  d-flex h-100 row   w-100 "
+                            class="d-flex align-items-center justify-content-between w-75"
                         >
-                            <h6 class="previewTitle  m-0 p-0 pr-2 my-2">
+                            <h6 class="previewTitle m-0 p-0">
                                 Classifications :
                             </h6>
                             <p
-                                class="previewValue classificationsValues  m-0 p-0  my-2"
+                                class="previewValue classificationsValues m-0 p-0"
                                 *ngFor="
                                     let item of appTransactionsForViewDto?.entityClassifications
                                 "
                             >
-                                {{ item?.entityObjectClassificationName}}
-                            </p>
-                            <p
-                                class="previewValue m-0 p-0 col-4 my-2"
-                                *ngIf="
-                             !appTransactionsForViewDto?.entityClassifications  ||  appTransactionsForViewDto?.entityClassifications
-                                    ?.length === 0
-                            "
-                            >
-                                -
+                                {{ item }}
                             </p>
                         </div>
                     </div>
@@ -127,27 +98,23 @@
 
                 <!-- categories -->
                 <div class="col-md-12 mt-3">
-                    <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
+                    <div *ngIf="ShoppingCartMode.createOrEdit" class="d-flex flex-column">
                         <label class="label">Categories</label>
                         <div
-                            class="categoriesClassificationsContainer  big-scroll  h-100 row align-tems-center border flex-row px-3 py-2 rounded row thin-scroll w-100 border"
+                            class="border rounded w-100 d-flex align-tems-center justify-content-lg-start py-2 px-3"
                         >
                             <p
-                                class="previewValue categoriesValues mr-2 p-0"
+                                class="previewValue categoriesValues mr-2 p-0 my-0"
                                 *ngFor="
                                     let item of appTransactionsForViewDto?.entityCategories
                                 "
                             >
-                                {{ item?.entityObjectCategoryName }}
-                                <span 
-                                (click)="categoriesNodeUnSelect(item)">
-                                <i class="flaticon2-delete fa-sm pl-2 pointer"></i>
-                            </span>
+                                {{ item.label }}
                             </p>
                             <p
                                 *ngIf="
-                                !appTransactionsForViewDto?.entityCategories  ||  appTransactionsForViewDto?.entityCategories
-                                        ?.length === 0
+                                    appTransactionsForViewDto?.entityCategories
+                                        .length === 0
                                 "
                                 class="p-0 m-0 customPlaceHolder"
                             >
@@ -162,11 +129,11 @@
                                 [loading]="loading"
                                 selectionMode="checkbox"
                                 (onNodeSelect)="categoriesNodeSelect($event)"
-
+                                [(selection)]="
+                                    appTransactionsForViewDto.entityCategories
+                                "
                             ></p-tree>
                         </div>
-                        
-                        <!-- [(selection)]="selectedCategories"  -->
                         <!-- <p-treeSelect
                             class="md:w-20rem w-full"
                             containerStyleClass="w-full"
@@ -178,27 +145,18 @@
                             (onNodeSelect)="categoriesNodeSelect($event)"
                         ></p-treeSelect> -->
                     </div>
-                    <div *ngIf="!createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.view">
                         <div
-                            class="categoriesClassificationsContainer d-flex align-items-center big-scroll px-3    h-100 row   w-100"
+                            class="d-flex align-items-center justify-content-between w-75"
                         >
-                            <h6 class="previewTitle  m-0 p-0 pr-2 my-2">Categories :</h6>
+                            <h6 class="previewTitle m-0 p-0">Categories :</h6>
                             <p
-                                class="previewValue classificationsValues  m-0 p-0  my-2"
+                                class="previewValue classificationsValues m-0 p-0"
                                 *ngFor="
                                     let item of appTransactionsForViewDto?.entityCategories
                                 "
                             >
-                                {{ item?.entityObjectCategoryName}}
-                            </p>
-                            <p
-                                class="previewValue   m-0 p-0 col-4 my-2"
-                                *ngIf="
-                                !appTransactionsForViewDto?.entityCategories  || appTransactionsForViewDto?.entityCategories
-                                    ?.length === 0
-                            "
-                            >
-                                -
+                                {{ item }}
                             </p>
                         </div>
                     </div>
@@ -207,85 +165,81 @@
 
                 <!-- dates -->
                 <div class="col-md-6 my-3">
-                    <div *ngIf="createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.createOrEdit">
                         <label class="label">Entered Date</label>
                         <p-calendar
-                            [(ngModel)]="enteredDate"
+                            [(ngModel)]="enterdDate"
                             [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
                         ></p-calendar>
                     </div>
-                    <div *ngIf="!createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.view">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center justify-content-between w-75"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">Entered Date :</h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "dd/MM/yy " }}
+                            <h6 class="previewTitle m-0 p-0">Entered Date :</h6>
+                            <p class="previewValue m-0 p-0">
+                                {{ enterdDate | date : "dd/MM/yy " }}
                             </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 my-3">
-                    <div *ngIf="createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.createOrEdit">
                         <label class="label">Start Date</label>
                         <p-calendar
-                            [(ngModel)]="startDate"
+                            [(ngModel)]="appTransactionsForViewDto.startDate"
                             [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
                         ></p-calendar>
                     </div>
-                    <div *ngIf="!createOrEditorderInfo">
+                    <div *ngIf="isReviewMode">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center justify-content-between w-75"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">Start Date :</h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "dd/MM/yy "}}
+                            <h6 class="previewTitle m-0 p-0">Start Date :</h6>
+                            <p class="previewValue m-0 p-0">
+                                {{ appTransactionsForViewDto?.startDate }}
                             </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div *ngIf="createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.createOrEdit">
                         <label class="label">Avaialable Date</label>
                         <p-calendar
-                            [(ngModel)]="availableDate"
+                            [(ngModel)]="appTransactionsForViewDto.availableDate"
                             [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
                         ></p-calendar>
                     </div>
-                    <div *ngIf="!createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.view">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center justify-content-between w-75"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle m-0 p-0">
                                 Avaialable Date :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "dd/MM/yy " }}
+                            <p class="previewValue m-0 p-0">
+                                {{ appTransactionsForViewDto?.availableDate }}
                             </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div *ngIf="createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.createOrEdit">
                         <label class="label">Complete Date</label>
                         <p-calendar
-                            [(ngModel)]="completeDate"
+                            [(ngModel)]="appTransactionsForViewDto.completeDate"
                             [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
                         ></p-calendar>
                     </div>
-                    <div *ngIf="!createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.view">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center justify-content-between w-75"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle m-0 p-0">
                                 Complete Date :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "dd/MM/yy " }}
+                            <p class="previewValue m-0 p-0">
+                                {{ appTransactionsForViewDto?.completeDate }}
                             </p>
                         </div>
                     </div>
@@ -293,23 +247,22 @@
                 <!-- dates -->
                 <!-- currency -->
                 <div class="col-md-6 mt-3">
-                    <div *ngIf="createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.createOrEdit">
                         <label class="label">Currency</label>
                         <p-dropdown
                             [options]="currencies"
-                            [(ngModel)]="selectedCurrency"
+                            [(ngModel)]="appTransactionsForViewDto.currencyId"
                             optionLabel="code"
                             optionValue="value"
                             class="w-100"
-                            (onChange)="onchangeCurrency()"
                         ></p-dropdown>
                     </div>
-                    <div *ngIf="!createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.view">
                         <div
-                            class="d-flex align-items-center  "
+                            class="d-flex align-items-center justify-content-between"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-3 my-2">Currency :</h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle m-0 p-0">Currency :</h6>
+                            <p class="previewValue m-0 p-0">
                                 {{ appTransactionsForViewDto?.currencyCode }}
                             </p>
                         </div>
@@ -319,25 +272,24 @@
 
                 <!-- exchange rate -->
                 <div class="col-md-6 mt-3">
-                    <div *ngIf="createOrEditorderInfo" class="formGroup">
+                    <div *ngIf="ShoppingCartMode.createOrEdit" class="formGroup">
                         <label class="label">Exchange Rate</label>
                         <input
-                        [readonly]="appTransactionsForViewDto?.currencyExchangeRate && appTransactionsForViewDto?.currencyExchangeRate >0"
                             type="text"
                             placeholder="Exchange Rate..."
                             class="form-control w-100"
-                            [(ngModel)]="appTransactionsForViewDto.currencyExchangeRate"
+                            [(ngModel)]="rate"
                         />
                     </div>
-                    <div *ngIf="!createOrEditorderInfo">
+                    <div *ngIf="ShoppingCartMode.view">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center justify-content-between w-75"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle m-0 p-0">
                                 Exchange Rate :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.currencyExchangeRate }}
+                            <p class="previewValue m-0 p-0">
+                                {{ rate }}
                             </p>
                         </div>
                     </div>

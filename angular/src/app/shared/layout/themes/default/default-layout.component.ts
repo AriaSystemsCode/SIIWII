@@ -52,9 +52,6 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
             this.accountSummary = result;
         })
     }
-    onupdateAccountSummary($event){
-        this.accountSummary=$event;
-    }
     marketPlaceUrl : string = "marketplace"
     subscribeToMarketPlace(){
         const url = this._router.url

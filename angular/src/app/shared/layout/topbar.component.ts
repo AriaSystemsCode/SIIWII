@@ -149,12 +149,11 @@ export class TopBarComponent
     isRoleExist: boolean = false;
     btnLoader: boolean = false;
     modalheaderName: string;
-    showSearch:boolean =false;
-    shoppingCartSummary: ShoppingCartSummary;
-    defaultSellerLogo: string = "";
-    defaultBuyerLogo: string = "";
-    _TransactionType = TransactionType;
-    transactionType: string = "";
+   public  shoppingCartSummary: ShoppingCartSummary;
+    defaultSellerLogo:string="";
+    defaultBuyerLogo:string="";
+    _TransactionType=TransactionType;
+    transactionType:string="";
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
 
 
@@ -270,8 +269,7 @@ export class TopBarComponent
         this.appSession.user.id;
         this.registerToEvents();
         this.getUnreadMessageCount();
-        if(!this.isHost)
-          this.getShoppingCartInfo();
+        this.getShoppingCartInfo();
 
         this.messageReadService.readMessageSubject$.subscribe((res) => {
             if (res) {

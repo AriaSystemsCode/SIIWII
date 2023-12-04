@@ -46,7 +46,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     minCreateDateFilter: moment.Moment;
     maxCompleteDateFilter: moment.Moment;
     minCompleteDateFilter: moment.Moment;
-    orderId: number = 0;
+    orderId:number=0;
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
 
 
@@ -115,30 +115,30 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         return this.filterForm?.get("mainFilterType");
     }
 
-    getAppTransactions(event?: { first?: number, page?: number, pageCount?: number, rows?: number }) {
+    getAppTransactions(event?: {first?: number,page?: number, pageCount?: number, rows?: number}) {
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = this.primengTableHelper.totalRecordsCount > 0 ? this.primengTableHelper.totalRecordsCount : 10;
+            this.paginator.totalRecords = this.primengTableHelper.totalRecordsCount > 0  ? this.primengTableHelper.totalRecordsCount  : 10;
             this.paginator.changePage(0);
             return;
         }
 
         this.primengTableHelper.showLoadingIndicator();
-        this.paginator.rows = event.rows;
-        var maxResultCount = this.primengTableHelper.getMaxResultCount(this.paginator, event)
-        var skipCount = (event?.page || 0) * maxResultCount
+        this.paginator.rows=event.rows;
+        var maxResultCount  = this.primengTableHelper.getMaxResultCount(this.paginator, event)
+        var skipCount  = ( event?.page || 0 ) * maxResultCount
 
         const filters = this.filterForm.value;
         this.loading = true;
         // filters.transTypeFilter = filters.transTypeFilter.toUpperCase().toString().replace(/ /g, "")
         this._appTransactionServiceProxy.getAll(
-            false, 0, filters.search,
+       false,0,filters.search,
             filters.codeFilter, undefined,
             filters.mainFilterType?.id, filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
+            filters.sellerNameFilter,undefined, filters.buyerNameFilter, undefined, filters.statusFilter ,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
@@ -151,14 +151,11 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         });
     }
 
-    onSelectionChange($event) {
+    onSelectionChange($event){
         /* if($event.entityObjectStatusCode!="DRAFT")
              return ; */
-        if ($event?.id)
-            this.orderId = $event?.id;
-
-        if (this.orderId)
-            this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
+          this.orderId=$event?.id;
+          this.shoppingCartModal.show(this.orderId,true,true,ShoppingCartMode.view);
     }
 
     reloadPage(): void {
@@ -227,10 +224,5 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
     customFilterCallback(filter: (a) => void, value: any): void {
         filter(value);
-    }
-
-    onHideShoppingCartModal($event){
-        if($event)
-          this.getAppTransactions();
     }
 }

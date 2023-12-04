@@ -1,25 +1,19 @@
 import { Component, EventEmitter, Injector, OnDestroy, OnInit, Output, ViewChild, ViewChildren } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { AppItemViewInput } from "@app/main/app-items/app-item-view/models/app-item-view-input";
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
-    AppEntitiesServiceProxy,
     AppEntityAttachmentDto,
     AppItemForViewDto,
     AppItemsServiceProxy,
     AppMarketplaceItemForViewDto,
     AppMarketplaceItemsServiceProxy,
     AppTransactionServiceProxy,
-    CurrencyInfoDto,
     GetAppMarketplaceItemDetailForViewDto,
-    MarketplaceExtraDataAttrDto,
-    ShoppingCartSummary,
-    TransactionType,
 } from "@shared/service-proxies/service-proxies";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageService } from "abp-ng2-module";
-import { throws } from "assert";
 import { ConfirmEventType, ConfirmationService } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
@@ -52,20 +46,13 @@ export class MarketplaceViewProductComponent
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
     translateX = 0;
     orderSummary: any = [];
-    colorAttachmentForMainIamge: string = "";
-    orderType: string = "";
-    productVarImages: MarketplaceExtraDataAttrDto[];
-    currencySymbol: string = "";
-
 
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private confirmationService: ConfirmationService,
         private messageService: MessageService,
         private userClickService: UserClickService,
-        private router: Router,
         injector: Injector
     ) {
         super(injector);
@@ -112,108 +99,70 @@ export class MarketplaceViewProductComponent
     }
 
     getProductDetailsForView() {
-        this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
-            .subscribe((res: ShoppingCartSummary) => {
-                if (res.orderType == TransactionType.SalesOrder)
-                    this.orderType = 'SO';
-                else if (res.orderType == TransactionType.PurchaseOrder)
-                    this.orderType = 'PO';
+        this._AppMarketplaceItemsServiceProxy
+            .getMarketplaceAppItemForView(
+                undefined,
+                0,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                this.productBodyData.currencyCode,
+                this.productBodyData.buyerSSIN,
+                this.productBodyData.sellerSSIN,
+                this.productBodyData.id,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                0,
+                10
+            )
+            .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
+                this.productDetails = res.appItem;
+                console.log(">> res", res);
+                this.productImages = res.appItem.entityAttachments;
+                let colorVariation: any[] = res.appItem.variations.filter(
+                    (variation: any) => variation.extraAttrName === "COLOR"
+                );
+                let selectedValues = [
+                    ...colorVariation.map(
+                        (selected: any) => selected.selectedValues
+                    ),
+                ];
 
-                if (res.buyerSSIN)
-                    this.productBodyData.buyerSSIN = res.buyerSSIN;
-                if (res.sellerSSIN)
-                    this.productBodyData.sellerSSIN = res.sellerSSIN;
-
-                if (res.currencyCode)
-                    this.productBodyData.currencyCode = res.currencyCode;
-                this._AppMarketplaceItemsServiceProxy
-                    .getMarketplaceAppItemForView(
-                        undefined,
-                        0,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        this.productBodyData.currencyCode,
-                        this.productBodyData.buyerSSIN,
-                        this.productBodyData.sellerSSIN,
-                        this.productBodyData.id,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        0,
-                        10
-                    )
-                    .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
-                        this.productDetails = res.appItem;
-                        this.productDetails?.minMSRP % 1 ==0?this.productDetails.minMSRP=Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2):null; 
-
-                        console.log(">> res", res);
-                        this.productImages = res.appItem.entityAttachments;
-                        this.productVarImages = res?.appItem?.variations;
-                        let colorVariation: any[] = res.appItem.variations.filter(
-                            (variation: any) => variation.extraAttrName === "COLOR"
-                        );
-                        let selectedValues = [
-                            ...colorVariation.map(
-                                (selected: any) => selected.selectedValues
-                            ),
-                        ];
-
-                        this.colorsData = selectedValues[0].map((variation: any) => {
-                            let sizesValue = variation.edRestAttributes.map(
-                                (attr: any) => {
-                                    if (attr.extraAttrName === "SIZE") {
-                                        return [...attr.values];
-                                    }
-                                }
-                            );
-                            return {
-                                colorName: variation.value,
-                                sizes: sizesValue[0],
-                                colorImg: variation.colorImage,
-                                colorCode: variation.colorHexaCode,
-                            };
-                        });
-                    });
-
-                this.GetCurrencyInfo();
-            }
-            );
-    }
-
-    GetCurrencyInfo() {
-        this._AppEntitiesServiceProxy.getCurrencyInfo(this.productBodyData.currencyCode)
-            .subscribe((res: CurrencyInfoDto) => {
-                this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+                this.colorsData = selectedValues[0].map((variation: any) => {
+                    let sizesValue = variation.edRestAttributes.map(
+                        (attr: any) => {
+                            if (attr.extraAttrName === "SIZE") {
+                                return [...attr.values];
+                            }
+                        }
+                    );
+                    return {
+                        colorName: variation.value,
+                        sizes: sizesValue[0],
+                        colorImg: variation.entityAttachments,
+                    };
+                });
+                console.log(">>", this.colorsData);
             });
     }
 
-    isColorView: boolean = false
     setSizes(index: number) {
         this.currentIndex = index;
-        this.isColorView = true
-        this.colorAttachmentForMainIamge = this.colorsData[index].colorImg;
-        this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex].entityAttachments;
-        console.log(this.colorsData[index]);
-    }
-    setColorView(value: boolean) {
-        this.isColorView = value
     }
 
     slideToNextImage(): void {
         this.currentIndex = (this.currentIndex + 1) % this.colorsData.length;
-        this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
-        this.isColorView = true
-        this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex].colorImg;
+        this.translateX = -this.currentIndex * 50; // Adjust the width of each image as needed
     }
 
     // create order by size summary JSON
@@ -454,22 +403,12 @@ export class MarketplaceViewProductComponent
                 this.showMainSpinner();
                 this._AppTransactionServiceProxy
                     .addTransactionDetails(
-                        localStorage.getItem("transNO"), this.orderType,
+                        localStorage.getItem("transNO"),
                         bodyRequest
                     )
                     .pipe(
                         finalize(() => {
                             this.hideMainSpinner();
-                            localStorage.setItem(
-                                "SellerSSIN",
-                                JSON.stringify(this.productBodyData.sellerSSIN)
-                            );
-                            localStorage.setItem(
-                                "currencyCode",
-                                JSON.stringify(this.productBodyData.currencyCode)
-                            );
-
-                            this.router.navigateByUrl("app/main/marketplace/products");
                         })
                     )
                     .subscribe(async (res) => {
@@ -484,20 +423,9 @@ export class MarketplaceViewProductComponent
 
     }
 
-    goToShowroom() {
-        localStorage.setItem(
-            "SellerSSIN",
-            JSON.stringify(this.productBodyData.sellerSSIN)
-        );
-        localStorage.setItem(
-            "currencyCode",
-            JSON.stringify(this.productBodyData.currencyCode)
-        );
 
-        this.router.navigateByUrl("app/main/marketplace/products");
-    }
     ngOnDestroy() {
-        this.unsubscribeToAllSubscriptions();
+    this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
     }
 }

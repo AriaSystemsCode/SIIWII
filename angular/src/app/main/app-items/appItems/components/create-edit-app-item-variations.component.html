@@ -49,8 +49,8 @@
                                         *ngFor="let selectedExtraAttribute of selectedExtraAttributes;index  as i"
                                         [ngClass]="{'active':i == activeExtraAttributeIndex}"
                                         (click)="setActiveExtraAttribute(i)"
-                                     [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE'"   >
-                                       {{selectedExtraAttribute.name | localize}}
+                                        >
+                                        {{selectedExtraAttribute.name | localize}}
                                         <span (click)="removeExtraAttribute(selectedExtraAttribute,i)" class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle">
                                             <i class="flaticon2-delete"></i>
                                         </span>
@@ -221,7 +221,7 @@
                                                         dropdownToggle> {{defaultExtraAttrForAttachments.name | localize}}
                                                     </button>
                                                     <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
-                                                        <li *ngFor="let extraAttr of selectedExtraAttributes;let i = index"  [hidden]=" extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE'">
+                                                        <li *ngFor="let extraAttr of selectedExtraAttributes;let i = index">
                                                             <a (click)="setDefaultExtraAttributeForVariationAttachment(extraAttr)" >
                                                                 <span>
                                                                     <i *ngIf="extraAttr == defaultExtraAttrForAttachments" class="flaticon2-check-mark text-success mr-2 icon-sm"></i>
@@ -251,7 +251,7 @@
                                             </a>
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
-                                            <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i">
+                                            <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption.attachmentSrcs; index as i">
                                                 <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" for="variation_file_{{i}}">
                                                     <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons">
                                                         <div class="left-icon">
@@ -321,7 +321,7 @@
                                     </div>
                                 </ng-template>
                                 <form #varitationsForm="ngForm" *ngIf="showVariations">
-                                    <div class="mt-5 primeng-datatable-container table-transparent-header table-transparent-rows variation-table  pt-5 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
+                                    <div class="mt-5 primeng-datatable-container table-transparent-header table-transparent-rows variation-table thin-scroll pt-5 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
                                         <div class="mb-3 d-flex flex-row" *ngIf="selectedVaritaions.length > 0">
                                             <a class="text-primary mr-4">{{ "SelectionActions" | localize }}:</a>
                                             <div class="dropdown mr-4" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
@@ -412,6 +412,7 @@
                                             [value]="primengTableHelper.records"
                                             rows="{{primengTableHelper.records.length}}"
                                             [paginator]="false"
+                                            responsiveLayout="scroll"
                                             [breakpoint]="'960px'"
                                             [rowHover]="true" [resizableColumns]="true"
                                             [tableStyle]="{'min-width': '50rem'}">

@@ -30,7 +30,6 @@
             type="button"
             (click)="menu.toggle($event)"
             class="btn Create-New"
-            *ngIf="!isHost"
         >
             <span class="">Create New</span>
             <i class="pi pi-plus"></i>
@@ -49,8 +48,8 @@
             />
         </a>
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form d-md-block d-none">
-            <div class="position-relative search-bar w-100" *ngIf="showSearch">
+         <form class="input-group pt-3 input-group-form d-md-block d-none">
+            <div class="position-relative search-bar w-100">
                 <div class="input-group mb-3">
                     <div
                         class="input-group-prepend"
@@ -125,7 +124,7 @@
         <a
             class="nav-link active d-flex flex-column text-center"
             class="navbar-brand pt-0 d-block d-md-none m-0 rightSearch"
-            routerLinkActive="header-link-active" *ngIf="showSearch"
+            routerLinkActive="header-link-active"
         >
             <img
                 src="../../../assets/landingPage/Icon ionic-md-search.svg"
@@ -150,22 +149,22 @@
                             class="navbar-brand _navbar-brand m-auto"
                         />
                         <span class="small">{{
-                            "Marketplace" | localize
+                            "MarketPlace" | localize
                         }}</span>
                     </a>
                 </li>
-                <li  class="border-left ml-2 nav-item text-white pt-3 pl-3" *ngIf="shoppingCartSummary?.shoppingCartId >0 && transactionType">
+                <li  class="border-left ml-2 nav-item text-white pt-3 pl-3" *ngIf="transactionType">
                 <div class="orderType"> {{transactionType}}</div> 
                   </li>
 
-                <li  class="ml-2 nav-item pt-2" *ngIf="shoppingCartSummary?.shoppingCartId >0">
+                <li  class="ml-2 nav-item pt-2">
                     <img
                         [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' +  shoppingCartSummary?.sellerLogo  : defaultSellerLogo "
                         onerror="this.onerror=null;this.src=defaultSellerLogo"
                         class="navbar-brand"
                     />
                   </li>
-                  <li  class="nav-item pt-2" *ngIf="shoppingCartSummary?.shoppingCartId >0">
+                  <li  class="nav-item pt-2">
                     <img
                     [src]="shoppingCartSummary?.buyerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.buyerLogo : defaultBuyerLogo"
                     onerror="this.onerror=null;this.src=defaultBuyerLogo"
@@ -183,9 +182,8 @@
                         style="width: 20px; height: 20px; cursor: pointer;"
                         class="m-auto"
                         (click)="getShoppingCartInfo(true)"
-                        *ngIf="shoppingCartSummary?.shoppingCartId >0"
                     />
-                    <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
+                    <div *ngIf="shoppingCartSummary?.qty">
                         <span
                             class="kt-badge kt-badge--primary unread-notification-count"
                             style="
@@ -198,7 +196,7 @@
                     </div>
                 </span>
             </div>
-            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.amount" class="ml-3 mt-2 pt-3"> 
+            <div *ngIf="shoppingCartSummary?.amount" class="ml-3 mt-2 pt-3"> 
                 <h5 class="text-white">${{shoppingCartSummary?.amount}}</h5>  
             </div>
 
@@ -907,6 +905,5 @@
     </div>
     <!-- Container wrapper -->
 </nav>
-<app-shopping-cart-view-component #shoppingCartModal  (refreshShoppingCartData)="getShoppingCartInfo()" ></app-shopping-cart-view-component>
-
-<createTransactionModal *ngIf="!isHost"   (modalClose)="closeModal($event)" (refreshShoppingCartData)="getShoppingCartInfo()" [roles]="roles" [modalheaderName]="modalheaderName" [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"   ></createTransactionModal>
+<app-shopping-cart-view-component #shoppingCartModal   ></app-shopping-cart-view-component>
+<createTransactionModal (modalClose)="closeModal($event)" [roles]="roles" [modalheaderName]="modalheaderName" [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"   ></createTransactionModal>

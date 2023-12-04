@@ -11,9 +11,6 @@
             <div class="col-md-4">
                 <app-product-detail-images
                     [productImages]="productImages"
-                    [colorAttachmentForMainIamge]="colorAttachmentForMainIamge"
-                    [colorView]="isColorView"
-                    (setColorView)="setColorView($event)"
                 ></app-product-detail-images>
             </div>
             <div class="col-md-5">
@@ -21,7 +18,8 @@
                     <button class="btn m-0 p-0">
                         <a
                             style="text-decoration: underline"
-                          (click)="goToShowroom()"
+                            href="http://"
+                            target="_blank"
                             rel="noopener noreferrer"
                             >Visit the vitrual showroom</a
                         >
@@ -30,8 +28,8 @@
                         class="ssin_price my-3 d-flex align-items-center justify-content-between"
                     >
                         <div class="d-flex">
-                            <h5 class="ssin" *ngIf="productDetails?.manufacturerCode">
-                                Code : {{ productDetails?.manufacturerCode }}
+                            <h5 class="ssin">
+                                Code : {{ productDetails?.code }}
                             </h5>
                             <h6 class="type ml-1">
                                 {{
@@ -44,18 +42,15 @@
                         <div class="price">
                             <!-- show msrp price and range in this product has no special pricing -->
                             <div
+                                *ngIf="productDetails?.minSpecialPrice === null"
                                 class="msrp d-flex align-items-baseline justify-content-end"
                             >
                                 <h5 class="mr-2">MSRP</h5>
                                 <h5>
-                                    <!-- {{
+                                    {{
                                         productDetails?.appItemPriceInfos[0]
                                             .currencySymbol
-                                    }} -->
-                                    {{
-                                       currencySymbol
-                                    }}
-                                    {{ productDetails?.minMSRP }}
+                                    }}{{ productDetails?.minMSRP }}
                                 </h5>
                                 <span
                                     *ngIf="
@@ -71,58 +66,13 @@
                                         productDetails?.maxMSRP
                                     "
                                 >
-                                    <!-- {{
-                                        productDetails?.appItemPriceInfos[0]
-                                            ?.currencySymbol
-                                    }} -->
                                     {{
-                                        currencySymbol
-                                     }}
-                                    {{ productDetails?.maxMSRP }}
+                                        productDetails?.appItemPriceInfos[0]
+                                            .currencySymbol
+                                    }}{{ productDetails?.maxMSRP }}
                                 </h5>
                                 <h5>/EAC</h5>
                             </div>
-                            <div 
-                            *ngIf="productDetails?.minSpecialPrice"
-                            class="msrp d-flex align-items-baseline justify-content-end"
-                        >
-                            <h5 class="mr-2">Special Price</h5>
-                            <h5>
-                                <!-- {{
-                                    productDetails?.appItemPriceInfos[0]
-                                        .currencySymbol
-                                }} -->
-                                    {{
-                                        currencySymbol
-                                     }}
-                                    
-                                {{ productDetails?.minSpecialPrice }}
-                            </h5>
-                            <span
-                                *ngIf="
-                                    productDetails?.minSpecialPrice !==
-                                    productDetails?.maxSpecialPrice
-                                "
-                            >
-                                -
-                            </span>
-                            <h5
-                                *ngIf="
-                                productDetails?.minSpecialPrice !==
-                                productDetails?.maxSpecialPrice
-                                "
-                            >
-                                <!-- {{
-                                    productDetails?.appItemPriceInfos[0]
-                                        ?.currencySymbol
-                                }} -->
-                                    {{
-                                        currencySymbol
-                                     }}
-                                    
-                                {{ productDetails?.maxSpecialPrice }}
-                            </h5>
-                        </div>
                         </div>
                     </div>
                     <div class="product-name">
@@ -157,31 +107,8 @@
                             <div
                                 class="mr-3"
                                 *ngFor="let color of colorsData; let i = index"
-                                [title]="color.colorName"
-                                position="top"
-                                class="imagAndHexaCode"
-                                tooltipPositionStyleClass="custom-tooltip"
                             >
-                                <div
-                                    *ngIf="
-                                        color.colorCode !== null &&
-                                        color.colorImg === null
-                                    "
-                                    class="colorBox"
-                                    [ngStyle]="{'background-color':color.colorCode}"
-                                    (click)="setSizes(i)"
-                                    [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-primary '
-                                            : ''
-                                    "
-                                ></div>
                                 <img
-                                    *ngIf="
-                                        (color.colorImg === null &&
-                                            color.colorCode === null) ||
-                                        color.colorImg !== null
-                                    "
                                     (click)="setSizes(i)"
                                     [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
@@ -197,8 +124,6 @@
                                 />
                             </div>
                         </div>
-                        <!-- color selection -->
-
                         <!-- color slider -->
                         <div class="d-flex" *ngIf="colorsData?.length > 8">
                             <div class="slider-container">
@@ -208,51 +133,26 @@
                                         'translateX(' + translateX + 'px)'
                                     "
                                 >
-                                    <div
+                                    <img
                                         *ngFor="
                                             let color of colorsData;
                                             let i = index
                                         "
-                                        [title]="color.colorName"
-                                        position="top"
-                                        tooltipPositionStyleClass="custom-tooltip"
-                                    >
-                                        <div
-                                            *ngIf="
-                                                color.colorCode !== null &&
-                                                color.colorImg === null
-                                            "
-                                            class="colorBox"
-                                            [ngStyle]="{'background-color': color.colorCode}"
-                                            (click)="setSizes(i)"
-                                            [ngClass]="
-                                                i === currentIndex
-                                                    ? 'border border-primary '
-                                                    : ''
-                                            "
-                                        ></div>
-                                        <img
-                                            *ngIf="
-                                                (color.colorImg === null &&
-                                                    color.colorCode === null) ||
-                                                color.colorImg !== null
-                                            "
-                                            (click)="setSizes(i)"
-                                            [src]="
-                                                attachmentBaseUrl +
-                                                '/' +
-                                                color.colorImg
-                                            "
-                                            alt="images slides"
-                                            class="imageSlides"
-                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                            [ngClass]="
-                                                i === currentIndex
-                                                    ? 'border border-primary '
-                                                    : ''
-                                            "
-                                        />
-                                    </div>
+                                        (click)="setSizes(i)"
+                                        [src]="
+                                            attachmentBaseUrl +
+                                            '/' +
+                                            color.colorImg
+                                        "
+                                        alt="images slides"
+                                        class="imageSlides mr-3"
+                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                        [ngClass]="
+                                            i === currentIndex
+                                                ? 'border border-primary '
+                                                : ''
+                                        "
+                                    />
                                 </div>
                             </div>
                             <button
@@ -479,16 +379,11 @@
                     <div class="totals">
                         <p class="p-0 m-0">qty {{ totalOrderQTY }}</p>
                         <p class="p-0 m-0">
-                             <!-- {{
-                            productDetails?.appItemPriceInfos[0]
-                                .currencySymbol
-                        }} -->
-                        {{
-                            currencySymbol
-                         }}
-                        
                             {{ totlaOrderPrices }}
-                           
+                            {{
+                                productDetails?.appItemPriceInfos[0]
+                                    .currencySymbol
+                            }}
                         </p>
                     </div>
                     <div class="orderedSummary">
@@ -514,7 +409,7 @@
                                         style="gap: 5px"
                                     >
                                         <img
-                                             [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                            [src]="order.color.colorImg"
                                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                             alt="colorImg"
                                             style="width: 40px"
@@ -691,7 +586,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <h6>Product Type</h6>
-                            <h6 style="padding: 10px 0px">SSIN</h6>
+                            <h6 style="padding: 10px 0px">Product Code</h6>
                             <h6>Department</h6>
                             <h6 style="padding: 10px 0px">Brand</h6>
                             <h6>SoldOut Date</h6>

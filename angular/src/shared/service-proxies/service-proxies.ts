@@ -7189,60 +7189,6 @@ export class AppEntitiesServiceProxy {
     }
 
     /**
-     * @param currencyCode (optional) 
-     * @return Success
-     */
-    getCurrencyInfo(currencyCode: string | null | undefined): Observable<CurrencyInfoDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetCurrencyInfo?";
-        if (currencyCode !== undefined && currencyCode !== null)
-            url_ += "currencyCode=" + encodeURIComponent("" + currencyCode) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetCurrencyInfo(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetCurrencyInfo(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<CurrencyInfoDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<CurrencyInfoDto>;
-        }));
-    }
-
-    protected processGetCurrencyInfo(response: HttpResponseBase): Observable<CurrencyInfoDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CurrencyInfoDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
      * @return Success
      */
     getAllTitlesForTableDropdown(): Observable<LookupLabelDto[]> {
@@ -9875,7 +9821,6 @@ export class AppItemsServiceProxy {
      * @param arrtibuteFilters (optional) 
      * @param classificationFilters (optional) 
      * @param categoryFilters (optional) 
-     * @param scalesFilters (optional) 
      * @param departmentFilters (optional) 
      * @param entityObjectTypeId (optional) 
      * @param minimumPrice (optional) 
@@ -9889,7 +9834,7 @@ export class AppItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, filterType: ItemsFilterTypesEnum, lastKey: string | null | undefined, selectorKey: string | null | undefined, priceListId: number | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, classificationFilters: number[] | null | undefined, categoryFilters: number[] | null | undefined, scalesFilters: string[] | null | undefined, departmentFilters: number[] | null | undefined, entityObjectTypeId: number | undefined, minimumPrice: number | undefined, maximumPrice: number | undefined, itemType: number | undefined, listingStatus: number | undefined, publishStatus: number | undefined, visibilityStatus: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppItemForViewDto> {
+    getAll(tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, filterType: ItemsFilterTypesEnum, lastKey: string | null | undefined, selectorKey: string | null | undefined, priceListId: number | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, classificationFilters: number[] | null | undefined, categoryFilters: number[] | null | undefined, departmentFilters: number[] | null | undefined, entityObjectTypeId: number | undefined, minimumPrice: number | undefined, maximumPrice: number | undefined, itemType: number | undefined, listingStatus: number | undefined, publishStatus: number | undefined, visibilityStatus: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAll?";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
@@ -9922,8 +9867,6 @@ export class AppItemsServiceProxy {
             classificationFilters && classificationFilters.forEach(item => { url_ += "ClassificationFilters=" + encodeURIComponent("" + item) + "&"; });
         if (categoryFilters !== undefined && categoryFilters !== null)
             categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
-        if (scalesFilters !== undefined && scalesFilters !== null)
-            scalesFilters && scalesFilters.forEach(item => { url_ += "ScalesFilters=" + encodeURIComponent("" + item) + "&"; });
         if (departmentFilters !== undefined && departmentFilters !== null)
             departmentFilters && departmentFilters.forEach(item => { url_ += "departmentFilters=" + encodeURIComponent("" + item) + "&"; });
         if (entityObjectTypeId === null)
@@ -10391,7 +10334,6 @@ export class AppItemsServiceProxy {
      * @param getAppItemAttributesInputForExtraData_SkipCount (optional) 
      * @param getAppItemAttributesInputForExtraData_MaxResultCount (optional) 
      * @param currencyCode (optional) 
-     * @param timeZoneValue (optional) 
      * @param itemId (optional) 
      * @param getAppItemAttributesInputForCategories_Sorting (optional) 
      * @param getAppItemAttributesInputForCategories_SkipCount (optional) 
@@ -10407,7 +10349,7 @@ export class AppItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, timeZoneValue: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemDetailForViewDto> {
+    getAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -10437,8 +10379,6 @@ export class AppItemsServiceProxy {
             url_ += "GetAppItemAttributesInputForExtraData.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForExtraData_MaxResultCount) + "&";
         if (currencyCode !== undefined && currencyCode !== null)
             url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
-        if (timeZoneValue !== undefined && timeZoneValue !== null)
-            url_ += "TimeZoneValue=" + encodeURIComponent("" + timeZoneValue) + "&";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
         else if (itemId !== undefined)
@@ -14994,7 +14934,6 @@ export class AppMarketplaceItemsServiceProxy {
     }
 
     /**
-     * @param contactSSIN (optional) 
      * @param accountSSIN (optional) 
      * @param tenantId (optional) 
      * @param appItemListId (optional) 
@@ -15018,10 +14957,8 @@ export class AppMarketplaceItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+    getAll(accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAll?";
-        if (contactSSIN !== undefined && contactSSIN !== null)
-            url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
         if (accountSSIN !== undefined && accountSSIN !== null)
             url_ += "AccountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
         if (tenantId !== undefined && tenantId !== null)
@@ -15188,110 +15125,13 @@ export class AppMarketplaceItemsServiceProxy {
     }
 
     /**
-     * @param filter (optional) 
-     * @param nameFilter (optional) 
-     * @param codeFilter (optional) 
-     * @param descriptionFilter (optional) 
-     * @param extraDataFilter (optional) 
-     * @param sycEntityObjectTypeNameFilter (optional) 
-     * @param sycEntityObjectStatusNameFilter (optional) 
-     * @param sydObjectNameFilter (optional) 
-     * @param entityObjectTypeId (optional) 
-     * @param sorting (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @param accountSSIN (optional) 
-     * @return Success
-     */
-    getAllBrandsWithPaging(filter: string | null | undefined, nameFilter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, extraDataFilter: string | null | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, sycEntityObjectStatusNameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, entityObjectTypeId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, accountSSIN: string | null | undefined): Observable<PagedResultDtoOfLookupLabelDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAllBrandsWithPaging?";
-        if (filter !== undefined && filter !== null)
-            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        if (nameFilter !== undefined && nameFilter !== null)
-            url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
-        if (codeFilter !== undefined && codeFilter !== null)
-            url_ += "CodeFilter=" + encodeURIComponent("" + codeFilter) + "&";
-        if (descriptionFilter !== undefined && descriptionFilter !== null)
-            url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
-        if (extraDataFilter !== undefined && extraDataFilter !== null)
-            url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
-        if (sycEntityObjectTypeNameFilter !== undefined && sycEntityObjectTypeNameFilter !== null)
-            url_ += "SycEntityObjectTypeNameFilter=" + encodeURIComponent("" + sycEntityObjectTypeNameFilter) + "&";
-        if (sycEntityObjectStatusNameFilter !== undefined && sycEntityObjectStatusNameFilter !== null)
-            url_ += "SycEntityObjectStatusNameFilter=" + encodeURIComponent("" + sycEntityObjectStatusNameFilter) + "&";
-        if (sydObjectNameFilter !== undefined && sydObjectNameFilter !== null)
-            url_ += "SydObjectNameFilter=" + encodeURIComponent("" + sydObjectNameFilter) + "&";
-        if (entityObjectTypeId === null)
-            throw new Error("The parameter 'entityObjectTypeId' cannot be null.");
-        else if (entityObjectTypeId !== undefined)
-            url_ += "EntityObjectTypeId=" + encodeURIComponent("" + entityObjectTypeId) + "&";
-        if (sorting !== undefined && sorting !== null)
-            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        if (accountSSIN !== undefined && accountSSIN !== null)
-            url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllBrandsWithPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAllBrandsWithPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<PagedResultDtoOfLookupLabelDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<PagedResultDtoOfLookupLabelDto>;
-        }));
-    }
-
-    protected processGetAllBrandsWithPaging(response: HttpResponseBase): Observable<PagedResultDtoOfLookupLabelDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PagedResultDtoOfLookupLabelDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
      * @param tenantId (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
-     * @param accountSSIN (optional) 
      * @return Success
      */
-    getSharedItemLists(tenantId: number | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, accountSSIN: string | null | undefined): Observable<PagedResultDtoOfGetAllMarketplaceItemListsOutputDto> {
+    getSharedItemLists(tenantId: number | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllMarketplaceItemListsOutputDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetSharedItemLists?";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
@@ -15305,8 +15145,6 @@ export class AppMarketplaceItemsServiceProxy {
             throw new Error("The parameter 'maxResultCount' cannot be null.");
         else if (maxResultCount !== undefined)
             url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        if (accountSSIN !== undefined && accountSSIN !== null)
-            url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -17906,63 +17744,6 @@ export class AppTransactionServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createOrEditTransaction(body: GetAppTransactionsForViewDto | undefined): Observable<number> {
-        let url_ = this.baseUrl + "/api/services/app/AppTransaction/CreateOrEditTransaction";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateOrEditTransaction(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateOrEditTransaction(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<number>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<number>;
-        }));
-    }
-
-    protected processCreateOrEditTransaction(response: HttpResponseBase): Observable<number> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
     createOrEdit(body: CreateOrEditAppTransactionsDto | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/CreateOrEdit";
         url_ = url_.replace(/[?&]$/, "");
@@ -18384,13 +18165,12 @@ export class AppTransactionServiceProxy {
      * @param buyerName (optional) 
      * @param buyerSSIN (optional) 
      * @param statusId (optional) 
-     * @param fromExport (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllAppTransactionsForViewDto> {
+    getAll(withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllAppTransactionsForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAll?";
         if (withDetails === null)
             throw new Error("The parameter 'withDetails' cannot be null.");
@@ -18428,10 +18208,6 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'statusId' cannot be null.");
         else if (statusId !== undefined)
             url_ += "StatusId=" + encodeURIComponent("" + statusId) + "&";
-        if (fromExport === null)
-            throw new Error("The parameter 'fromExport' cannot be null.");
-        else if (fromExport !== undefined)
-            url_ += "fromExport=" + encodeURIComponent("" + fromExport) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -19123,16 +18899,13 @@ export class AppTransactionServiceProxy {
 
     /**
      * @param transactionId (optional) 
-     * @param transactionType (optional) 
      * @param body (optional) 
      * @return Success
      */
-    addTransactionDetails(transactionId: string | null | undefined, transactionType: string | null | undefined, body: GetAppMarketplaceItemDetailForViewDto | undefined): Observable<void> {
+    addTransactionDetails(transactionId: string | null | undefined, body: GetAppMarketplaceItemDetailForViewDto | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/AddTransactionDetails?";
         if (transactionId !== undefined && transactionId !== null)
             url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
-        if (transactionType !== undefined && transactionType !== null)
-            url_ += "transactionType=" + encodeURIComponent("" + transactionType) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -19183,7 +18956,7 @@ export class AppTransactionServiceProxy {
      * @param accountSSIN (optional) 
      * @return Success
      */
-    getAccountBranches(accountSSIN: string | null | undefined): Observable<AccountBranchDto[]> {
+    getAccountBranches(accountSSIN: string | null | undefined): Observable<TreeNodeOfAccountBranchDto[]> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAccountBranches?";
         if (accountSSIN !== undefined && accountSSIN !== null)
             url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
@@ -19204,14 +18977,14 @@ export class AppTransactionServiceProxy {
                 try {
                     return this.processGetAccountBranches(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<AccountBranchDto[]>;
+                    return _observableThrow(e) as any as Observable<TreeNodeOfAccountBranchDto[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<AccountBranchDto[]>;
+                return _observableThrow(response_) as any as Observable<TreeNodeOfAccountBranchDto[]>;
         }));
     }
 
-    protected processGetAccountBranches(response: HttpResponseBase): Observable<AccountBranchDto[]> {
+    protected processGetAccountBranches(response: HttpResponseBase): Observable<TreeNodeOfAccountBranchDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -19225,71 +18998,7 @@ export class AppTransactionServiceProxy {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(AccountBranchDto.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param accountSSIN (optional) 
-     * @param filter (optional) 
-     * @return Success
-     */
-    getAccountRelatedContactsList(accountSSIN: string | null | undefined, filter: string | null | undefined): Observable<GetContactInformationDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAccountRelatedContactsList?";
-        if (accountSSIN !== undefined && accountSSIN !== null)
-            url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
-        if (filter !== undefined && filter !== null)
-            url_ += "filter=" + encodeURIComponent("" + filter) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAccountRelatedContactsList(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAccountRelatedContactsList(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<GetContactInformationDto[]>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<GetContactInformationDto[]>;
-        }));
-    }
-
-    protected processGetAccountRelatedContactsList(response: HttpResponseBase): Observable<GetContactInformationDto[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(GetContactInformationDto.fromJS(item));
+                    result200!.push(TreeNodeOfAccountBranchDto.fromJS(item));
             }
             else {
                 result200 = <any>null;
@@ -19527,14 +19236,13 @@ export class AppTransactionServiceProxy {
      * @param buyerName (optional) 
      * @param buyerSSIN (optional) 
      * @param statusId (optional) 
-     * @param fromExport (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @param position (optional) 
      * @return Success
      */
-    getAppTransactionsForView(transactionId: number | undefined, withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, position: TransactionPosition | undefined): Observable<GetAppTransactionsForViewDto> {
+    getAppTransactionsForView(transactionId: number | undefined, withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, position: TransactionPosition | undefined): Observable<GetAppTransactionsForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAppTransactionsForView?";
         if (transactionId === null)
             throw new Error("The parameter 'transactionId' cannot be null.");
@@ -19576,10 +19284,6 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'statusId' cannot be null.");
         else if (statusId !== undefined)
             url_ += "StatusId=" + encodeURIComponent("" + statusId) + "&";
-        if (fromExport === null)
-            throw new Error("The parameter 'fromExport' cannot be null.");
-        else if (fromExport !== undefined)
-            url_ += "fromExport=" + encodeURIComponent("" + fromExport) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -20086,305 +19790,6 @@ export class AppTransactionsServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = FileDto.fromJS(resultData200);
             return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-}
-
-@Injectable()
-export class AppUpdateItemSSINServiceProxy {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
-    }
-
-    /**
-     * @return Success
-     */
-    updateSSIN(): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/UpdateSSIN";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateSSIN(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateSSIN(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processUpdateSSIN(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    shareItemsHasListing(): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/ShareItemsHasListing";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processShareItemsHasListing(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processShareItemsHasListing(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processShareItemsHasListing(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    updateItemList(): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/UpdateItemList";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateItemList(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateItemList(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processUpdateItemList(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    updateMFGCode(): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/UpdateMFGCode";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateMFGCode(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateMFGCode(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processUpdateMFGCode(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    removeListingFromAppItem(): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/RemoveListingFromAppItem";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processRemoveListingFromAppItem(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processRemoveListingFromAppItem(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processRemoveListingFromAppItem(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    shareItemListData(body: AppItemsList | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/ShareItemListData";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processShareItemListData(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processShareItemListData(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processShareItemListData(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -33132,113 +32537,6 @@ export class SycEntityObjectCategoriesServiceProxy {
         }
         return _observableOf(null as any);
     }
-
-    /**
-     * @param filter (optional) 
-     * @param codeFilter (optional) 
-     * @param nameFilter (optional) 
-     * @param sydObjectNameFilter (optional) 
-     * @param sycEntityObjectCategoryNameFilter (optional) 
-     * @param eagger (optional) 
-     * @param objectId (optional) 
-     * @param parentId (optional) 
-     * @param departmentFlag (optional) 
-     * @param entityId (optional) 
-     * @param excludeIds (optional) 
-     * @param sorting (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    getAllWithChildsForTransactionWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
-        let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForTransactionWithPaging?";
-        if (filter !== undefined && filter !== null)
-            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        if (codeFilter !== undefined && codeFilter !== null)
-            url_ += "CodeFilter=" + encodeURIComponent("" + codeFilter) + "&";
-        if (nameFilter !== undefined && nameFilter !== null)
-            url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
-        if (sydObjectNameFilter !== undefined && sydObjectNameFilter !== null)
-            url_ += "SydObjectNameFilter=" + encodeURIComponent("" + sydObjectNameFilter) + "&";
-        if (sycEntityObjectCategoryNameFilter !== undefined && sycEntityObjectCategoryNameFilter !== null)
-            url_ += "SycEntityObjectCategoryNameFilter=" + encodeURIComponent("" + sycEntityObjectCategoryNameFilter) + "&";
-        if (eagger === null)
-            throw new Error("The parameter 'eagger' cannot be null.");
-        else if (eagger !== undefined)
-            url_ += "Eagger=" + encodeURIComponent("" + eagger) + "&";
-        if (objectId === null)
-            throw new Error("The parameter 'objectId' cannot be null.");
-        else if (objectId !== undefined)
-            url_ += "ObjectId=" + encodeURIComponent("" + objectId) + "&";
-        if (parentId === null)
-            throw new Error("The parameter 'parentId' cannot be null.");
-        else if (parentId !== undefined)
-            url_ += "ParentId=" + encodeURIComponent("" + parentId) + "&";
-        if (departmentFlag === null)
-            throw new Error("The parameter 'departmentFlag' cannot be null.");
-        else if (departmentFlag !== undefined)
-            url_ += "DepartmentFlag=" + encodeURIComponent("" + departmentFlag) + "&";
-        if (entityId === null)
-            throw new Error("The parameter 'entityId' cannot be null.");
-        else if (entityId !== undefined)
-            url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
-        if (excludeIds !== undefined && excludeIds !== null)
-            excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
-        if (sorting !== undefined && sorting !== null)
-            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllWithChildsForTransactionWithPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAllWithChildsForTransactionWithPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto>;
-        }));
-    }
-
-    protected processGetAllWithChildsForTransactionWithPaging(response: HttpResponseBase): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
 }
 
 @Injectable()
@@ -34506,103 +33804,6 @@ export class SycEntityObjectClassificationsServiceProxy {
             else {
                 result200 = <any>null;
             }
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param filter (optional) 
-     * @param codeFilter (optional) 
-     * @param nameFilter (optional) 
-     * @param sydObjectNameFilter (optional) 
-     * @param sycEntityObjectClassificationNameFilter (optional) 
-     * @param objectId (optional) 
-     * @param parentId (optional) 
-     * @param excludeIds (optional) 
-     * @param entityId (optional) 
-     * @param sorting (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    getAllWithChildsForTransactionWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectClassificationNameFilter: string | null | undefined, objectId: number | undefined, parentId: number | undefined, excludeIds: number[] | null | undefined, entityId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectClassificationForViewDto> {
-        let url_ = this.baseUrl + "/api/services/app/SycEntityObjectClassifications/GetAllWithChildsForTransactionWithPaging?";
-        if (filter !== undefined && filter !== null)
-            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        if (codeFilter !== undefined && codeFilter !== null)
-            url_ += "CodeFilter=" + encodeURIComponent("" + codeFilter) + "&";
-        if (nameFilter !== undefined && nameFilter !== null)
-            url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
-        if (sydObjectNameFilter !== undefined && sydObjectNameFilter !== null)
-            url_ += "SydObjectNameFilter=" + encodeURIComponent("" + sydObjectNameFilter) + "&";
-        if (sycEntityObjectClassificationNameFilter !== undefined && sycEntityObjectClassificationNameFilter !== null)
-            url_ += "SycEntityObjectClassificationNameFilter=" + encodeURIComponent("" + sycEntityObjectClassificationNameFilter) + "&";
-        if (objectId === null)
-            throw new Error("The parameter 'objectId' cannot be null.");
-        else if (objectId !== undefined)
-            url_ += "ObjectId=" + encodeURIComponent("" + objectId) + "&";
-        if (parentId === null)
-            throw new Error("The parameter 'parentId' cannot be null.");
-        else if (parentId !== undefined)
-            url_ += "ParentId=" + encodeURIComponent("" + parentId) + "&";
-        if (excludeIds !== undefined && excludeIds !== null)
-            excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
-        if (entityId === null)
-            throw new Error("The parameter 'entityId' cannot be null.");
-        else if (entityId !== undefined)
-            url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
-        if (sorting !== undefined && sorting !== null)
-            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllWithChildsForTransactionWithPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAllWithChildsForTransactionWithPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectClassificationForViewDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectClassificationForViewDto>;
-        }));
-    }
-
-    protected processGetAllWithChildsForTransactionWithPaging(response: HttpResponseBase): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectClassificationForViewDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PagedResultDtoOfTreeNodeOfGetSycEntityObjectClassificationForViewDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -61023,7 +60224,6 @@ export class AppItemDto implements IAppItemDto {
     sharingLevel!: string | undefined;
     showItem!: boolean;
     sellerName!: string | undefined;
-    manufacturerCode!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -61054,7 +60254,6 @@ export class AppItemDto implements IAppItemDto {
             this.sharingLevel = _data["sharingLevel"];
             this.showItem = _data["showItem"];
             this.sellerName = _data["sellerName"];
-            this.manufacturerCode = _data["manufacturerCode"];
             this.id = _data["id"];
         }
     }
@@ -61083,7 +60282,6 @@ export class AppItemDto implements IAppItemDto {
         data["sharingLevel"] = this.sharingLevel;
         data["showItem"] = this.showItem;
         data["sellerName"] = this.sellerName;
-        data["manufacturerCode"] = this.manufacturerCode;
         data["id"] = this.id;
         return data;
     }
@@ -61101,7 +60299,6 @@ export interface IAppItemDto {
     sharingLevel: string | undefined;
     showItem: boolean;
     sellerName: string | undefined;
-    manufacturerCode: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -63323,7 +62520,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     appItemPriceInfos!: AppItemPriceInfo[] | undefined;
     appItemSizesScaleInfo!: AppItemSizesScaleInfo[] | undefined;
     originalCode!: string | undefined;
-    sycIdentifierId!: number | undefined;
+    sycIdentifierId!: number;
     id!: number;
 
     [key: string]: any;
@@ -63634,7 +62831,7 @@ export interface ICreateOrEditAppItemDto {
     appItemPriceInfos: AppItemPriceInfo[] | undefined;
     appItemSizesScaleInfo: AppItemSizesScaleInfo[] | undefined;
     originalCode: string | undefined;
-    sycIdentifierId: number | undefined;
+    sycIdentifierId: number;
     id: number;
 
     [key: string]: any;
@@ -64838,7 +64035,6 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
     arrtibuteFilters!: ArrtibuteFilter[] | undefined;
     classificationFilters!: number[] | undefined;
     categoryFilters!: number[] | undefined;
-    scalesFilters!: string[] | undefined;
     departmentFilters!: number[] | undefined;
     entityObjectTypeId!: number;
     minimumPrice!: number;
@@ -64890,11 +64086,6 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
                 this.categoryFilters = [] as any;
                 for (let item of _data["categoryFilters"])
                     this.categoryFilters!.push(item);
-            }
-            if (Array.isArray(_data["scalesFilters"])) {
-                this.scalesFilters = [] as any;
-                for (let item of _data["scalesFilters"])
-                    this.scalesFilters!.push(item);
             }
             if (Array.isArray(_data["departmentFilters"])) {
                 this.departmentFilters = [] as any;
@@ -64950,11 +64141,6 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
             for (let item of this.categoryFilters)
                 data["categoryFilters"].push(item);
         }
-        if (Array.isArray(this.scalesFilters)) {
-            data["scalesFilters"] = [];
-            for (let item of this.scalesFilters)
-                data["scalesFilters"].push(item);
-        }
         if (Array.isArray(this.departmentFilters)) {
             data["departmentFilters"] = [];
             for (let item of this.departmentFilters)
@@ -64986,7 +64172,6 @@ export interface IGetAllAppItemsInput {
     arrtibuteFilters: ArrtibuteFilter[] | undefined;
     classificationFilters: number[] | undefined;
     categoryFilters: number[] | undefined;
-    scalesFilters: string[] | undefined;
     departmentFilters: number[] | undefined;
     entityObjectTypeId: number;
     minimumPrice: number;
@@ -66739,7 +65924,6 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
     appItemPriceInfos!: AppItemPriceInfo[] | undefined;
     appItemSizesScaleInfo!: AppItemSizesScaleInfo[] | undefined;
     sycIdentifierId!: number | undefined;
-    manufacturerCode!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -66879,7 +66063,6 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
                     this.appItemSizesScaleInfo!.push(AppItemSizesScaleInfo.fromJS(item));
             }
             this.sycIdentifierId = _data["sycIdentifierId"];
-            this.manufacturerCode = _data["manufacturerCode"];
             this.id = _data["id"];
         }
     }
@@ -67017,7 +66200,6 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
                 data["appItemSizesScaleInfo"].push(item.toJSON());
         }
         data["sycIdentifierId"] = this.sycIdentifierId;
-        data["manufacturerCode"] = this.manufacturerCode;
         data["id"] = this.id;
         return data;
     }
@@ -67076,7 +66258,6 @@ export interface IAppMarketplaceItemForViewDto {
     appItemPriceInfos: AppItemPriceInfo[] | undefined;
     appItemSizesScaleInfo: AppItemSizesScaleInfo[] | undefined;
     sycIdentifierId: number | undefined;
-    manufacturerCode: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -69200,7 +68381,6 @@ export class AppTransactionsDetailDto implements IAppTransactionsDetailDto {
     itemDescription!: string | undefined;
     note!: string | undefined;
     ssin!: string | undefined;
-    manufacturerCode!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -69232,7 +68412,6 @@ export class AppTransactionsDetailDto implements IAppTransactionsDetailDto {
             this.itemDescription = _data["itemDescription"];
             this.note = _data["note"];
             this.ssin = _data["ssin"];
-            this.manufacturerCode = _data["manufacturerCode"];
             this.id = _data["id"];
         }
     }
@@ -69262,7 +68441,6 @@ export class AppTransactionsDetailDto implements IAppTransactionsDetailDto {
         data["itemDescription"] = this.itemDescription;
         data["note"] = this.note;
         data["ssin"] = this.ssin;
-        data["manufacturerCode"] = this.manufacturerCode;
         data["id"] = this.id;
         return data;
     }
@@ -69281,7 +68459,6 @@ export interface IAppTransactionsDetailDto {
     itemDescription: string | undefined;
     note: string | undefined;
     ssin: string | undefined;
-    manufacturerCode: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -69299,382 +68476,6 @@ export enum ContactRoleEnum {
     Creator = 8,
 }
 
-export class ContactAppAddressDto implements IContactAppAddressDto {
-    contactEmail!: string | undefined;
-    contactPhone!: string | undefined;
-    code!: string | undefined;
-    tenantId!: number | undefined;
-    accountId!: number;
-    name!: string | undefined;
-    addressLine1!: string | undefined;
-    addressLine2!: string | undefined;
-    city!: string | undefined;
-    state!: string | undefined;
-    postalCode!: string | undefined;
-    countryId!: number;
-    countryCode!: string | undefined;
-    countryIdName!: string | undefined;
-    useDTOTenant!: boolean;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IContactAppAddressDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.contactEmail = _data["contactEmail"];
-            this.contactPhone = _data["contactPhone"];
-            this.code = _data["code"];
-            this.tenantId = _data["tenantId"];
-            this.accountId = _data["accountId"];
-            this.name = _data["name"];
-            this.addressLine1 = _data["addressLine1"];
-            this.addressLine2 = _data["addressLine2"];
-            this.city = _data["city"];
-            this.state = _data["state"];
-            this.postalCode = _data["postalCode"];
-            this.countryId = _data["countryId"];
-            this.countryCode = _data["countryCode"];
-            this.countryIdName = _data["countryIdName"];
-            this.useDTOTenant = _data["useDTOTenant"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): ContactAppAddressDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ContactAppAddressDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["contactEmail"] = this.contactEmail;
-        data["contactPhone"] = this.contactPhone;
-        data["code"] = this.code;
-        data["tenantId"] = this.tenantId;
-        data["accountId"] = this.accountId;
-        data["name"] = this.name;
-        data["addressLine1"] = this.addressLine1;
-        data["addressLine2"] = this.addressLine2;
-        data["city"] = this.city;
-        data["state"] = this.state;
-        data["postalCode"] = this.postalCode;
-        data["countryId"] = this.countryId;
-        data["countryCode"] = this.countryCode;
-        data["countryIdName"] = this.countryIdName;
-        data["useDTOTenant"] = this.useDTOTenant;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IContactAppAddressDto {
-    contactEmail: string | undefined;
-    contactPhone: string | undefined;
-    code: string | undefined;
-    tenantId: number | undefined;
-    accountId: number;
-    name: string | undefined;
-    addressLine1: string | undefined;
-    addressLine2: string | undefined;
-    city: string | undefined;
-    state: string | undefined;
-    postalCode: string | undefined;
-    countryId: number;
-    countryCode: string | undefined;
-    countryIdName: string | undefined;
-    useDTOTenant: boolean;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class GetAccountInformationOutputDto implements IGetAccountInformationOutputDto {
-    id!: number;
-    name!: string | undefined;
-    accountSSIN!: string | undefined;
-    currencyCode!: CurrencyInfoDto;
-
-    [key: string]: any;
-
-    constructor(data?: IGetAccountInformationOutputDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.accountSSIN = _data["accountSSIN"];
-            this.currencyCode = _data["currencyCode"] ? CurrencyInfoDto.fromJS(_data["currencyCode"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): GetAccountInformationOutputDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetAccountInformationOutputDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["accountSSIN"] = this.accountSSIN;
-        data["currencyCode"] = this.currencyCode ? this.currencyCode.toJSON() : <any>undefined;
-        return data;
-    }
-}
-
-export interface IGetAccountInformationOutputDto {
-    id: number;
-    name: string | undefined;
-    accountSSIN: string | undefined;
-    currencyCode: CurrencyInfoDto;
-
-    [key: string]: any;
-}
-
-export class PhoneNumberAndtype implements IPhoneNumberAndtype {
-    phoneNumber!: string | undefined;
-    phoneTypeId!: number | undefined;
-    phoneTypeName!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IPhoneNumberAndtype) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.phoneNumber = _data["phoneNumber"];
-            this.phoneTypeId = _data["phoneTypeId"];
-            this.phoneTypeName = _data["phoneTypeName"];
-        }
-    }
-
-    static fromJS(data: any): PhoneNumberAndtype {
-        data = typeof data === 'object' ? data : {};
-        let result = new PhoneNumberAndtype();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["phoneNumber"] = this.phoneNumber;
-        data["phoneTypeId"] = this.phoneTypeId;
-        data["phoneTypeName"] = this.phoneTypeName;
-        return data;
-    }
-}
-
-export interface IPhoneNumberAndtype {
-    phoneNumber: string | undefined;
-    phoneTypeId: number | undefined;
-    phoneTypeName: string | undefined;
-
-    [key: string]: any;
-}
-
-export class GetContactInformationDto implements IGetContactInformationDto {
-    id!: number;
-    name!: string | undefined;
-    email!: string | undefined;
-    phone!: string | undefined;
-    ssin!: string | undefined;
-    phoneTypeId!: number | undefined;
-    phoneTypeName!: string | undefined;
-    phoneList!: PhoneNumberAndtype[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IGetContactInformationDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.email = _data["email"];
-            this.phone = _data["phone"];
-            this.ssin = _data["ssin"];
-            this.phoneTypeId = _data["phoneTypeId"];
-            this.phoneTypeName = _data["phoneTypeName"];
-            if (Array.isArray(_data["phoneList"])) {
-                this.phoneList = [] as any;
-                for (let item of _data["phoneList"])
-                    this.phoneList!.push(PhoneNumberAndtype.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): GetContactInformationDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetContactInformationDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["email"] = this.email;
-        data["phone"] = this.phone;
-        data["ssin"] = this.ssin;
-        data["phoneTypeId"] = this.phoneTypeId;
-        data["phoneTypeName"] = this.phoneTypeName;
-        if (Array.isArray(this.phoneList)) {
-            data["phoneList"] = [];
-            for (let item of this.phoneList)
-                data["phoneList"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IGetContactInformationDto {
-    id: number;
-    name: string | undefined;
-    email: string | undefined;
-    phone: string | undefined;
-    ssin: string | undefined;
-    phoneTypeId: number | undefined;
-    phoneTypeName: string | undefined;
-    phoneList: PhoneNumberAndtype[] | undefined;
-
-    [key: string]: any;
-}
-
-export class AccountBranchDto implements IAccountBranchDto {
-    code!: string | undefined;
-    name!: string | undefined;
-    parentId!: number | undefined;
-    subTotal!: number;
-    ssin!: string | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAccountBranchDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.code = _data["code"];
-            this.name = _data["name"];
-            this.parentId = _data["parentId"];
-            this.subTotal = _data["subTotal"];
-            this.ssin = _data["ssin"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AccountBranchDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AccountBranchDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["code"] = this.code;
-        data["name"] = this.name;
-        data["parentId"] = this.parentId;
-        data["subTotal"] = this.subTotal;
-        data["ssin"] = this.ssin;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAccountBranchDto {
-    code: string | undefined;
-    name: string | undefined;
-    parentId: number | undefined;
-    subTotal: number;
-    ssin: string | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
 export class AppTransactionContactDto implements IAppTransactionContactDto {
     transactionId!: number;
     contactSSIN!: string | undefined;
@@ -69690,12 +68491,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     contactPhoneTypeId!: number | undefined;
     contactAddressId!: number | undefined;
     contactAddressCode!: string | undefined;
-    contactAddressDetail!: ContactAppAddressDto;
-    selectedCompany!: GetAccountInformationOutputDto;
-    selectedContact!: GetContactInformationDto;
-    selectedBranch!: AccountBranchDto;
-    selectedPhoneType!: PhoneNumberAndtype;
-    selectContactPhoneNumber!: string | undefined;
+    contactAddressDetail!: AppAddressDto;
     id!: number | undefined;
 
     [key: string]: any;
@@ -69729,12 +68525,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.contactPhoneTypeId = _data["contactPhoneTypeId"];
             this.contactAddressId = _data["contactAddressId"];
             this.contactAddressCode = _data["contactAddressCode"];
-            this.contactAddressDetail = _data["contactAddressDetail"] ? ContactAppAddressDto.fromJS(_data["contactAddressDetail"]) : <any>undefined;
-            this.selectedCompany = _data["selectedCompany"] ? GetAccountInformationOutputDto.fromJS(_data["selectedCompany"]) : <any>undefined;
-            this.selectedContact = _data["selectedContact"] ? GetContactInformationDto.fromJS(_data["selectedContact"]) : <any>undefined;
-            this.selectedBranch = _data["selectedBranch"] ? AccountBranchDto.fromJS(_data["selectedBranch"]) : <any>undefined;
-            this.selectedPhoneType = _data["selectedPhoneType"] ? PhoneNumberAndtype.fromJS(_data["selectedPhoneType"]) : <any>undefined;
-            this.selectContactPhoneNumber = _data["selectContactPhoneNumber"];
+            this.contactAddressDetail = _data["contactAddressDetail"] ? AppAddressDto.fromJS(_data["contactAddressDetail"]) : <any>undefined;
             this.id = _data["id"];
         }
     }
@@ -69767,11 +68558,6 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["contactAddressId"] = this.contactAddressId;
         data["contactAddressCode"] = this.contactAddressCode;
         data["contactAddressDetail"] = this.contactAddressDetail ? this.contactAddressDetail.toJSON() : <any>undefined;
-        data["selectedCompany"] = this.selectedCompany ? this.selectedCompany.toJSON() : <any>undefined;
-        data["selectedContact"] = this.selectedContact ? this.selectedContact.toJSON() : <any>undefined;
-        data["selectedBranch"] = this.selectedBranch ? this.selectedBranch.toJSON() : <any>undefined;
-        data["selectedPhoneType"] = this.selectedPhoneType ? this.selectedPhoneType.toJSON() : <any>undefined;
-        data["selectContactPhoneNumber"] = this.selectContactPhoneNumber;
         data["id"] = this.id;
         return data;
     }
@@ -69792,381 +68578,8 @@ export interface IAppTransactionContactDto {
     contactPhoneTypeId: number | undefined;
     contactAddressId: number | undefined;
     contactAddressCode: string | undefined;
-    contactAddressDetail: ContactAppAddressDto;
-    selectedCompany: GetAccountInformationOutputDto;
-    selectedContact: GetContactInformationDto;
-    selectedBranch: AccountBranchDto;
-    selectedPhoneType: PhoneNumberAndtype;
-    selectContactPhoneNumber: string | undefined;
+    contactAddressDetail: AppAddressDto;
     id: number | undefined;
-
-    [key: string]: any;
-}
-
-export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewDto {
-    lastRecord!: boolean;
-    firstRecord!: boolean;
-    enteredDate!: moment.Moment;
-    creatorUserId!: number;
-    enteredByUserRole!: string | undefined;
-    buyerCompanySSIN!: string | undefined;
-    buyerCompanyName!: string | undefined;
-    sellerId!: number | undefined;
-    sellerCompanyName!: string | undefined;
-    buyerContactEMailAddress!: string | undefined;
-    languageId!: number | undefined;
-    languageCode!: string | undefined;
-    currencyId!: number | undefined;
-    currencyCode!: string | undefined;
-    sellerContactEMailAddress!: string | undefined;
-    buyerContactPhoneNumber!: string | undefined;
-    sellerContactPhoneNumber!: string | undefined;
-    buyerContactName!: string | undefined;
-    sellerContactName!: string | undefined;
-    priceLevel!: string | undefined;
-    buyerContactSSIN!: string | undefined;
-    sellerContactSSIN!: string | undefined;
-    transactionType!: TransactionType;
-    entityStatusCode!: string | undefined;
-    completeDate!: moment.Moment;
-    sellerCompanySSIN!: string | undefined;
-    startDate!: moment.Moment;
-    availableDate!: moment.Moment;
-    shipViaId!: number | undefined;
-    shipViaCode!: string | undefined;
-    paymentTermsId!: number | undefined;
-    paymentTermsCode!: string | undefined;
-    buyerDepartment!: string | undefined;
-    appTransactionsDetails!: AppTransactionsDetailDto[] | undefined;
-    appTransactionContacts!: AppTransactionContactDto[] | undefined;
-    buyerStore!: string | undefined;
-    totalQuantity!: number;
-    totalAmount!: number;
-    lFromPlaceOrder!: boolean;
-    currencyExchangeRate!: number;
-    tenantId!: number | undefined;
-    attachmentSourceTenantId!: number | undefined;
-    name!: string | undefined;
-    code!: string | undefined;
-    notes!: string | undefined;
-    isHostRecord!: boolean;
-    addFromAttachments!: boolean;
-    relatedEntityId!: number | undefined;
-    entityObjectTypeId!: number;
-    entityObjectTypeCode!: string | undefined;
-    entityObjectStatusId!: number | undefined;
-    objectId!: number;
-    entityAddresses!: AppEntityAddressDto[] | undefined;
-    entityCategories!: AppEntityCategoryDto[] | undefined;
-    entityClassifications!: AppEntityClassificationDto[] | undefined;
-    entityAttachments!: AppEntityAttachmentDto[] | undefined;
-    entityExtraData!: AppEntityExtraDataDto[] | undefined;
-    entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
-    relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
-    appEntityTypes!: AppEntityTypes;
-    ssin!: string | undefined;
-    tenantOwner!: number;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IGetAppTransactionsForViewDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.lastRecord = _data["lastRecord"];
-            this.firstRecord = _data["firstRecord"];
-            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.enteredByUserRole = _data["enteredByUserRole"];
-            this.buyerCompanySSIN = _data["buyerCompanySSIN"];
-            this.buyerCompanyName = _data["buyerCompanyName"];
-            this.sellerId = _data["sellerId"];
-            this.sellerCompanyName = _data["sellerCompanyName"];
-            this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
-            this.languageId = _data["languageId"];
-            this.languageCode = _data["languageCode"];
-            this.currencyId = _data["currencyId"];
-            this.currencyCode = _data["currencyCode"];
-            this.sellerContactEMailAddress = _data["sellerContactEMailAddress"];
-            this.buyerContactPhoneNumber = _data["buyerContactPhoneNumber"];
-            this.sellerContactPhoneNumber = _data["sellerContactPhoneNumber"];
-            this.buyerContactName = _data["buyerContactName"];
-            this.sellerContactName = _data["sellerContactName"];
-            this.priceLevel = _data["priceLevel"];
-            this.buyerContactSSIN = _data["buyerContactSSIN"];
-            this.sellerContactSSIN = _data["sellerContactSSIN"];
-            this.transactionType = _data["transactionType"];
-            this.entityStatusCode = _data["entityStatusCode"];
-            this.completeDate = _data["completeDate"] ? moment(_data["completeDate"].toString()) : <any>undefined;
-            this.sellerCompanySSIN = _data["sellerCompanySSIN"];
-            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
-            this.availableDate = _data["availableDate"] ? moment(_data["availableDate"].toString()) : <any>undefined;
-            this.shipViaId = _data["shipViaId"];
-            this.shipViaCode = _data["shipViaCode"];
-            this.paymentTermsId = _data["paymentTermsId"];
-            this.paymentTermsCode = _data["paymentTermsCode"];
-            this.buyerDepartment = _data["buyerDepartment"];
-            if (Array.isArray(_data["appTransactionsDetails"])) {
-                this.appTransactionsDetails = [] as any;
-                for (let item of _data["appTransactionsDetails"])
-                    this.appTransactionsDetails!.push(AppTransactionsDetailDto.fromJS(item));
-            }
-            if (Array.isArray(_data["appTransactionContacts"])) {
-                this.appTransactionContacts = [] as any;
-                for (let item of _data["appTransactionContacts"])
-                    this.appTransactionContacts!.push(AppTransactionContactDto.fromJS(item));
-            }
-            this.buyerStore = _data["buyerStore"];
-            this.totalQuantity = _data["totalQuantity"];
-            this.totalAmount = _data["totalAmount"];
-            this.lFromPlaceOrder = _data["lFromPlaceOrder"];
-            this.currencyExchangeRate = _data["currencyExchangeRate"];
-            this.tenantId = _data["tenantId"];
-            this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
-            this.name = _data["name"];
-            this.code = _data["code"];
-            this.notes = _data["notes"];
-            this.isHostRecord = _data["isHostRecord"];
-            this.addFromAttachments = _data["addFromAttachments"];
-            this.relatedEntityId = _data["relatedEntityId"];
-            this.entityObjectTypeId = _data["entityObjectTypeId"];
-            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
-            this.entityObjectStatusId = _data["entityObjectStatusId"];
-            this.objectId = _data["objectId"];
-            if (Array.isArray(_data["entityAddresses"])) {
-                this.entityAddresses = [] as any;
-                for (let item of _data["entityAddresses"])
-                    this.entityAddresses!.push(AppEntityAddressDto.fromJS(item));
-            }
-            if (Array.isArray(_data["entityCategories"])) {
-                this.entityCategories = [] as any;
-                for (let item of _data["entityCategories"])
-                    this.entityCategories!.push(AppEntityCategoryDto.fromJS(item));
-            }
-            if (Array.isArray(_data["entityClassifications"])) {
-                this.entityClassifications = [] as any;
-                for (let item of _data["entityClassifications"])
-                    this.entityClassifications!.push(AppEntityClassificationDto.fromJS(item));
-            }
-            if (Array.isArray(_data["entityAttachments"])) {
-                this.entityAttachments = [] as any;
-                for (let item of _data["entityAttachments"])
-                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
-            }
-            if (Array.isArray(_data["entityExtraData"])) {
-                this.entityExtraData = [] as any;
-                for (let item of _data["entityExtraData"])
-                    this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
-            }
-            if (Array.isArray(_data["entitiesRelationships"])) {
-                this.entitiesRelationships = [] as any;
-                for (let item of _data["entitiesRelationships"])
-                    this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
-            }
-            if (Array.isArray(_data["relatedEntitiesRelationships"])) {
-                this.relatedEntitiesRelationships = [] as any;
-                for (let item of _data["relatedEntitiesRelationships"])
-                    this.relatedEntitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
-            }
-            this.appEntityTypes = _data["appEntityTypes"];
-            this.ssin = _data["ssin"];
-            this.tenantOwner = _data["tenantOwner"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): GetAppTransactionsForViewDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetAppTransactionsForViewDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["lastRecord"] = this.lastRecord;
-        data["firstRecord"] = this.firstRecord;
-        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["enteredByUserRole"] = this.enteredByUserRole;
-        data["buyerCompanySSIN"] = this.buyerCompanySSIN;
-        data["buyerCompanyName"] = this.buyerCompanyName;
-        data["sellerId"] = this.sellerId;
-        data["sellerCompanyName"] = this.sellerCompanyName;
-        data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
-        data["languageId"] = this.languageId;
-        data["languageCode"] = this.languageCode;
-        data["currencyId"] = this.currencyId;
-        data["currencyCode"] = this.currencyCode;
-        data["sellerContactEMailAddress"] = this.sellerContactEMailAddress;
-        data["buyerContactPhoneNumber"] = this.buyerContactPhoneNumber;
-        data["sellerContactPhoneNumber"] = this.sellerContactPhoneNumber;
-        data["buyerContactName"] = this.buyerContactName;
-        data["sellerContactName"] = this.sellerContactName;
-        data["priceLevel"] = this.priceLevel;
-        data["buyerContactSSIN"] = this.buyerContactSSIN;
-        data["sellerContactSSIN"] = this.sellerContactSSIN;
-        data["transactionType"] = this.transactionType;
-        data["entityStatusCode"] = this.entityStatusCode;
-        data["completeDate"] = this.completeDate ? this.completeDate.toISOString() : <any>undefined;
-        data["sellerCompanySSIN"] = this.sellerCompanySSIN;
-        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
-        data["availableDate"] = this.availableDate ? this.availableDate.toISOString() : <any>undefined;
-        data["shipViaId"] = this.shipViaId;
-        data["shipViaCode"] = this.shipViaCode;
-        data["paymentTermsId"] = this.paymentTermsId;
-        data["paymentTermsCode"] = this.paymentTermsCode;
-        data["buyerDepartment"] = this.buyerDepartment;
-        if (Array.isArray(this.appTransactionsDetails)) {
-            data["appTransactionsDetails"] = [];
-            for (let item of this.appTransactionsDetails)
-                data["appTransactionsDetails"].push(item.toJSON());
-        }
-        if (Array.isArray(this.appTransactionContacts)) {
-            data["appTransactionContacts"] = [];
-            for (let item of this.appTransactionContacts)
-                data["appTransactionContacts"].push(item.toJSON());
-        }
-        data["buyerStore"] = this.buyerStore;
-        data["totalQuantity"] = this.totalQuantity;
-        data["totalAmount"] = this.totalAmount;
-        data["lFromPlaceOrder"] = this.lFromPlaceOrder;
-        data["currencyExchangeRate"] = this.currencyExchangeRate;
-        data["tenantId"] = this.tenantId;
-        data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
-        data["name"] = this.name;
-        data["code"] = this.code;
-        data["notes"] = this.notes;
-        data["isHostRecord"] = this.isHostRecord;
-        data["addFromAttachments"] = this.addFromAttachments;
-        data["relatedEntityId"] = this.relatedEntityId;
-        data["entityObjectTypeId"] = this.entityObjectTypeId;
-        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
-        data["entityObjectStatusId"] = this.entityObjectStatusId;
-        data["objectId"] = this.objectId;
-        if (Array.isArray(this.entityAddresses)) {
-            data["entityAddresses"] = [];
-            for (let item of this.entityAddresses)
-                data["entityAddresses"].push(item.toJSON());
-        }
-        if (Array.isArray(this.entityCategories)) {
-            data["entityCategories"] = [];
-            for (let item of this.entityCategories)
-                data["entityCategories"].push(item.toJSON());
-        }
-        if (Array.isArray(this.entityClassifications)) {
-            data["entityClassifications"] = [];
-            for (let item of this.entityClassifications)
-                data["entityClassifications"].push(item.toJSON());
-        }
-        if (Array.isArray(this.entityAttachments)) {
-            data["entityAttachments"] = [];
-            for (let item of this.entityAttachments)
-                data["entityAttachments"].push(item.toJSON());
-        }
-        if (Array.isArray(this.entityExtraData)) {
-            data["entityExtraData"] = [];
-            for (let item of this.entityExtraData)
-                data["entityExtraData"].push(item.toJSON());
-        }
-        if (Array.isArray(this.entitiesRelationships)) {
-            data["entitiesRelationships"] = [];
-            for (let item of this.entitiesRelationships)
-                data["entitiesRelationships"].push(item.toJSON());
-        }
-        if (Array.isArray(this.relatedEntitiesRelationships)) {
-            data["relatedEntitiesRelationships"] = [];
-            for (let item of this.relatedEntitiesRelationships)
-                data["relatedEntitiesRelationships"].push(item.toJSON());
-        }
-        data["appEntityTypes"] = this.appEntityTypes;
-        data["ssin"] = this.ssin;
-        data["tenantOwner"] = this.tenantOwner;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IGetAppTransactionsForViewDto {
-    lastRecord: boolean;
-    firstRecord: boolean;
-    enteredDate: moment.Moment;
-    creatorUserId: number;
-    enteredByUserRole: string | undefined;
-    buyerCompanySSIN: string | undefined;
-    buyerCompanyName: string | undefined;
-    sellerId: number | undefined;
-    sellerCompanyName: string | undefined;
-    buyerContactEMailAddress: string | undefined;
-    languageId: number | undefined;
-    languageCode: string | undefined;
-    currencyId: number | undefined;
-    currencyCode: string | undefined;
-    sellerContactEMailAddress: string | undefined;
-    buyerContactPhoneNumber: string | undefined;
-    sellerContactPhoneNumber: string | undefined;
-    buyerContactName: string | undefined;
-    sellerContactName: string | undefined;
-    priceLevel: string | undefined;
-    buyerContactSSIN: string | undefined;
-    sellerContactSSIN: string | undefined;
-    transactionType: TransactionType;
-    entityStatusCode: string | undefined;
-    completeDate: moment.Moment;
-    sellerCompanySSIN: string | undefined;
-    startDate: moment.Moment;
-    availableDate: moment.Moment;
-    shipViaId: number | undefined;
-    shipViaCode: string | undefined;
-    paymentTermsId: number | undefined;
-    paymentTermsCode: string | undefined;
-    buyerDepartment: string | undefined;
-    appTransactionsDetails: AppTransactionsDetailDto[] | undefined;
-    appTransactionContacts: AppTransactionContactDto[] | undefined;
-    buyerStore: string | undefined;
-    totalQuantity: number;
-    totalAmount: number;
-    lFromPlaceOrder: boolean;
-    currencyExchangeRate: number;
-    tenantId: number | undefined;
-    attachmentSourceTenantId: number | undefined;
-    name: string | undefined;
-    code: string | undefined;
-    notes: string | undefined;
-    isHostRecord: boolean;
-    addFromAttachments: boolean;
-    relatedEntityId: number | undefined;
-    entityObjectTypeId: number;
-    entityObjectTypeCode: string | undefined;
-    entityObjectStatusId: number | undefined;
-    objectId: number;
-    entityAddresses: AppEntityAddressDto[] | undefined;
-    entityCategories: AppEntityCategoryDto[] | undefined;
-    entityClassifications: AppEntityClassificationDto[] | undefined;
-    entityAttachments: AppEntityAttachmentDto[] | undefined;
-    entityExtraData: AppEntityExtraDataDto[] | undefined;
-    entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
-    relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
-    appEntityTypes: AppEntityTypes;
-    ssin: string | undefined;
-    tenantOwner: number;
-    id: number;
 
     [key: string]: any;
 }
@@ -70539,7 +68952,6 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
     buyerName!: string | undefined;
     buyerSSIN!: string | undefined;
     statusId!: number;
-    fromExport!: boolean;
     sorting!: string | undefined;
     skipCount!: number;
     maxResultCount!: number;
@@ -70576,7 +68988,6 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
             this.buyerName = _data["buyerName"];
             this.buyerSSIN = _data["buyerSSIN"];
             this.statusId = _data["statusId"];
-            this.fromExport = _data["fromExport"];
             this.sorting = _data["sorting"];
             this.skipCount = _data["skipCount"];
             this.maxResultCount = _data["maxResultCount"];
@@ -70611,7 +69022,6 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
         data["buyerName"] = this.buyerName;
         data["buyerSSIN"] = this.buyerSSIN;
         data["statusId"] = this.statusId;
-        data["fromExport"] = this.fromExport;
         data["sorting"] = this.sorting;
         data["skipCount"] = this.skipCount;
         data["maxResultCount"] = this.maxResultCount;
@@ -70635,10 +69045,493 @@ export interface IGetAllAppTransactionsInputDto {
     buyerName: string | undefined;
     buyerSSIN: string | undefined;
     statusId: number;
-    fromExport: boolean;
     sorting: string | undefined;
     skipCount: number;
     maxResultCount: number;
+
+    [key: string]: any;
+}
+
+export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewDto {
+    lastRecord!: boolean;
+    firstRecord!: boolean;
+    enteredByUserRole!: string | undefined;
+    buyerCompanySSIN!: string | undefined;
+    buyerCompanyName!: string | undefined;
+    sellerId!: number | undefined;
+    sellerCompanyName!: string | undefined;
+    buyerContactEMailAddress!: string | undefined;
+    languageId!: number | undefined;
+    languageCode!: string | undefined;
+    currencyId!: number | undefined;
+    currencyCode!: string | undefined;
+    sellerContactEMailAddress!: string | undefined;
+    buyerContactPhoneNumber!: string | undefined;
+    sellerContactPhoneNumber!: string | undefined;
+    buyerContactName!: string | undefined;
+    sellerContactName!: string | undefined;
+    priceLevel!: string | undefined;
+    buyerContactSSIN!: string | undefined;
+    sellerContactSSIN!: string | undefined;
+    transactionType!: TransactionType;
+    entityStatusCode!: string | undefined;
+    completeDate!: moment.Moment;
+    sellerCompanySSIN!: string | undefined;
+    startDate!: moment.Moment;
+    availableDate!: moment.Moment;
+    shipViaId!: number | undefined;
+    shipViaCode!: string | undefined;
+    paymentTermsId!: number | undefined;
+    paymentTermsCode!: string | undefined;
+    buyerDepartment!: string | undefined;
+    appTransactionsDetails!: AppTransactionsDetailDto[] | undefined;
+    appTransactionContacts!: AppTransactionContactDto[] | undefined;
+    buyerStore!: string | undefined;
+    totalQuantity!: number;
+    totalAmount!: number;
+    lFromPlaceOrder!: boolean;
+    currencyExchangeRate!: number;
+    tenantId!: number | undefined;
+    attachmentSourceTenantId!: number | undefined;
+    name!: string | undefined;
+    code!: string | undefined;
+    notes!: string | undefined;
+    isHostRecord!: boolean;
+    addFromAttachments!: boolean;
+    relatedEntityId!: number | undefined;
+    entityObjectTypeId!: number;
+    entityObjectTypeCode!: string | undefined;
+    entityObjectStatusId!: number | undefined;
+    objectId!: number;
+    entityAddresses!: AppEntityAddressDto[] | undefined;
+    entityCategories!: AppEntityCategoryDto[] | undefined;
+    entityClassifications!: AppEntityClassificationDto[] | undefined;
+    entityAttachments!: AppEntityAttachmentDto[] | undefined;
+    entityExtraData!: AppEntityExtraDataDto[] | undefined;
+    entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
+    relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
+    appEntityTypes!: AppEntityTypes;
+    ssin!: string | undefined;
+    tenantOwner!: number;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAppTransactionsForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.lastRecord = _data["lastRecord"];
+            this.firstRecord = _data["firstRecord"];
+            this.enteredByUserRole = _data["enteredByUserRole"];
+            this.buyerCompanySSIN = _data["buyerCompanySSIN"];
+            this.buyerCompanyName = _data["buyerCompanyName"];
+            this.sellerId = _data["sellerId"];
+            this.sellerCompanyName = _data["sellerCompanyName"];
+            this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
+            this.languageId = _data["languageId"];
+            this.languageCode = _data["languageCode"];
+            this.currencyId = _data["currencyId"];
+            this.currencyCode = _data["currencyCode"];
+            this.sellerContactEMailAddress = _data["sellerContactEMailAddress"];
+            this.buyerContactPhoneNumber = _data["buyerContactPhoneNumber"];
+            this.sellerContactPhoneNumber = _data["sellerContactPhoneNumber"];
+            this.buyerContactName = _data["buyerContactName"];
+            this.sellerContactName = _data["sellerContactName"];
+            this.priceLevel = _data["priceLevel"];
+            this.buyerContactSSIN = _data["buyerContactSSIN"];
+            this.sellerContactSSIN = _data["sellerContactSSIN"];
+            this.transactionType = _data["transactionType"];
+            this.entityStatusCode = _data["entityStatusCode"];
+            this.completeDate = _data["completeDate"] ? moment(_data["completeDate"].toString()) : <any>undefined;
+            this.sellerCompanySSIN = _data["sellerCompanySSIN"];
+            this.startDate = _data["startDate"] ? moment(_data["startDate"].toString()) : <any>undefined;
+            this.availableDate = _data["availableDate"] ? moment(_data["availableDate"].toString()) : <any>undefined;
+            this.shipViaId = _data["shipViaId"];
+            this.shipViaCode = _data["shipViaCode"];
+            this.paymentTermsId = _data["paymentTermsId"];
+            this.paymentTermsCode = _data["paymentTermsCode"];
+            this.buyerDepartment = _data["buyerDepartment"];
+            if (Array.isArray(_data["appTransactionsDetails"])) {
+                this.appTransactionsDetails = [] as any;
+                for (let item of _data["appTransactionsDetails"])
+                    this.appTransactionsDetails!.push(AppTransactionsDetailDto.fromJS(item));
+            }
+            if (Array.isArray(_data["appTransactionContacts"])) {
+                this.appTransactionContacts = [] as any;
+                for (let item of _data["appTransactionContacts"])
+                    this.appTransactionContacts!.push(AppTransactionContactDto.fromJS(item));
+            }
+            this.buyerStore = _data["buyerStore"];
+            this.totalQuantity = _data["totalQuantity"];
+            this.totalAmount = _data["totalAmount"];
+            this.lFromPlaceOrder = _data["lFromPlaceOrder"];
+            this.currencyExchangeRate = _data["currencyExchangeRate"];
+            this.tenantId = _data["tenantId"];
+            this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
+            this.name = _data["name"];
+            this.code = _data["code"];
+            this.notes = _data["notes"];
+            this.isHostRecord = _data["isHostRecord"];
+            this.addFromAttachments = _data["addFromAttachments"];
+            this.relatedEntityId = _data["relatedEntityId"];
+            this.entityObjectTypeId = _data["entityObjectTypeId"];
+            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
+            this.entityObjectStatusId = _data["entityObjectStatusId"];
+            this.objectId = _data["objectId"];
+            if (Array.isArray(_data["entityAddresses"])) {
+                this.entityAddresses = [] as any;
+                for (let item of _data["entityAddresses"])
+                    this.entityAddresses!.push(AppEntityAddressDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityCategories"])) {
+                this.entityCategories = [] as any;
+                for (let item of _data["entityCategories"])
+                    this.entityCategories!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityClassifications"])) {
+                this.entityClassifications = [] as any;
+                for (let item of _data["entityClassifications"])
+                    this.entityClassifications!.push(AppEntityClassificationDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityAttachments"])) {
+                this.entityAttachments = [] as any;
+                for (let item of _data["entityAttachments"])
+                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityExtraData"])) {
+                this.entityExtraData = [] as any;
+                for (let item of _data["entityExtraData"])
+                    this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entitiesRelationships"])) {
+                this.entitiesRelationships = [] as any;
+                for (let item of _data["entitiesRelationships"])
+                    this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
+            }
+            if (Array.isArray(_data["relatedEntitiesRelationships"])) {
+                this.relatedEntitiesRelationships = [] as any;
+                for (let item of _data["relatedEntitiesRelationships"])
+                    this.relatedEntitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
+            }
+            this.appEntityTypes = _data["appEntityTypes"];
+            this.ssin = _data["ssin"];
+            this.tenantOwner = _data["tenantOwner"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): GetAppTransactionsForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAppTransactionsForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["lastRecord"] = this.lastRecord;
+        data["firstRecord"] = this.firstRecord;
+        data["enteredByUserRole"] = this.enteredByUserRole;
+        data["buyerCompanySSIN"] = this.buyerCompanySSIN;
+        data["buyerCompanyName"] = this.buyerCompanyName;
+        data["sellerId"] = this.sellerId;
+        data["sellerCompanyName"] = this.sellerCompanyName;
+        data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
+        data["languageId"] = this.languageId;
+        data["languageCode"] = this.languageCode;
+        data["currencyId"] = this.currencyId;
+        data["currencyCode"] = this.currencyCode;
+        data["sellerContactEMailAddress"] = this.sellerContactEMailAddress;
+        data["buyerContactPhoneNumber"] = this.buyerContactPhoneNumber;
+        data["sellerContactPhoneNumber"] = this.sellerContactPhoneNumber;
+        data["buyerContactName"] = this.buyerContactName;
+        data["sellerContactName"] = this.sellerContactName;
+        data["priceLevel"] = this.priceLevel;
+        data["buyerContactSSIN"] = this.buyerContactSSIN;
+        data["sellerContactSSIN"] = this.sellerContactSSIN;
+        data["transactionType"] = this.transactionType;
+        data["entityStatusCode"] = this.entityStatusCode;
+        data["completeDate"] = this.completeDate ? this.completeDate.toISOString() : <any>undefined;
+        data["sellerCompanySSIN"] = this.sellerCompanySSIN;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["availableDate"] = this.availableDate ? this.availableDate.toISOString() : <any>undefined;
+        data["shipViaId"] = this.shipViaId;
+        data["shipViaCode"] = this.shipViaCode;
+        data["paymentTermsId"] = this.paymentTermsId;
+        data["paymentTermsCode"] = this.paymentTermsCode;
+        data["buyerDepartment"] = this.buyerDepartment;
+        if (Array.isArray(this.appTransactionsDetails)) {
+            data["appTransactionsDetails"] = [];
+            for (let item of this.appTransactionsDetails)
+                data["appTransactionsDetails"].push(item.toJSON());
+        }
+        if (Array.isArray(this.appTransactionContacts)) {
+            data["appTransactionContacts"] = [];
+            for (let item of this.appTransactionContacts)
+                data["appTransactionContacts"].push(item.toJSON());
+        }
+        data["buyerStore"] = this.buyerStore;
+        data["totalQuantity"] = this.totalQuantity;
+        data["totalAmount"] = this.totalAmount;
+        data["lFromPlaceOrder"] = this.lFromPlaceOrder;
+        data["currencyExchangeRate"] = this.currencyExchangeRate;
+        data["tenantId"] = this.tenantId;
+        data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
+        data["name"] = this.name;
+        data["code"] = this.code;
+        data["notes"] = this.notes;
+        data["isHostRecord"] = this.isHostRecord;
+        data["addFromAttachments"] = this.addFromAttachments;
+        data["relatedEntityId"] = this.relatedEntityId;
+        data["entityObjectTypeId"] = this.entityObjectTypeId;
+        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
+        data["entityObjectStatusId"] = this.entityObjectStatusId;
+        data["objectId"] = this.objectId;
+        if (Array.isArray(this.entityAddresses)) {
+            data["entityAddresses"] = [];
+            for (let item of this.entityAddresses)
+                data["entityAddresses"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityCategories)) {
+            data["entityCategories"] = [];
+            for (let item of this.entityCategories)
+                data["entityCategories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityClassifications)) {
+            data["entityClassifications"] = [];
+            for (let item of this.entityClassifications)
+                data["entityClassifications"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityAttachments)) {
+            data["entityAttachments"] = [];
+            for (let item of this.entityAttachments)
+                data["entityAttachments"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityExtraData)) {
+            data["entityExtraData"] = [];
+            for (let item of this.entityExtraData)
+                data["entityExtraData"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entitiesRelationships)) {
+            data["entitiesRelationships"] = [];
+            for (let item of this.entitiesRelationships)
+                data["entitiesRelationships"].push(item.toJSON());
+        }
+        if (Array.isArray(this.relatedEntitiesRelationships)) {
+            data["relatedEntitiesRelationships"] = [];
+            for (let item of this.relatedEntitiesRelationships)
+                data["relatedEntitiesRelationships"].push(item.toJSON());
+        }
+        data["appEntityTypes"] = this.appEntityTypes;
+        data["ssin"] = this.ssin;
+        data["tenantOwner"] = this.tenantOwner;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IGetAppTransactionsForViewDto {
+    lastRecord: boolean;
+    firstRecord: boolean;
+    enteredByUserRole: string | undefined;
+    buyerCompanySSIN: string | undefined;
+    buyerCompanyName: string | undefined;
+    sellerId: number | undefined;
+    sellerCompanyName: string | undefined;
+    buyerContactEMailAddress: string | undefined;
+    languageId: number | undefined;
+    languageCode: string | undefined;
+    currencyId: number | undefined;
+    currencyCode: string | undefined;
+    sellerContactEMailAddress: string | undefined;
+    buyerContactPhoneNumber: string | undefined;
+    sellerContactPhoneNumber: string | undefined;
+    buyerContactName: string | undefined;
+    sellerContactName: string | undefined;
+    priceLevel: string | undefined;
+    buyerContactSSIN: string | undefined;
+    sellerContactSSIN: string | undefined;
+    transactionType: TransactionType;
+    entityStatusCode: string | undefined;
+    completeDate: moment.Moment;
+    sellerCompanySSIN: string | undefined;
+    startDate: moment.Moment;
+    availableDate: moment.Moment;
+    shipViaId: number | undefined;
+    shipViaCode: string | undefined;
+    paymentTermsId: number | undefined;
+    paymentTermsCode: string | undefined;
+    buyerDepartment: string | undefined;
+    appTransactionsDetails: AppTransactionsDetailDto[] | undefined;
+    appTransactionContacts: AppTransactionContactDto[] | undefined;
+    buyerStore: string | undefined;
+    totalQuantity: number;
+    totalAmount: number;
+    lFromPlaceOrder: boolean;
+    currencyExchangeRate: number;
+    tenantId: number | undefined;
+    attachmentSourceTenantId: number | undefined;
+    name: string | undefined;
+    code: string | undefined;
+    notes: string | undefined;
+    isHostRecord: boolean;
+    addFromAttachments: boolean;
+    relatedEntityId: number | undefined;
+    entityObjectTypeId: number;
+    entityObjectTypeCode: string | undefined;
+    entityObjectStatusId: number | undefined;
+    objectId: number;
+    entityAddresses: AppEntityAddressDto[] | undefined;
+    entityCategories: AppEntityCategoryDto[] | undefined;
+    entityClassifications: AppEntityClassificationDto[] | undefined;
+    entityAttachments: AppEntityAttachmentDto[] | undefined;
+    entityExtraData: AppEntityExtraDataDto[] | undefined;
+    entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
+    relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
+    appEntityTypes: AppEntityTypes;
+    ssin: string | undefined;
+    tenantOwner: number;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class GetAccountInformationOutputDto implements IGetAccountInformationOutputDto {
+    id!: number;
+    name!: string | undefined;
+    accountSSIN!: string | undefined;
+    currencyCode!: CurrencyInfoDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAccountInformationOutputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.accountSSIN = _data["accountSSIN"];
+            this.currencyCode = _data["currencyCode"] ? CurrencyInfoDto.fromJS(_data["currencyCode"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetAccountInformationOutputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAccountInformationOutputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["accountSSIN"] = this.accountSSIN;
+        data["currencyCode"] = this.currencyCode ? this.currencyCode.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetAccountInformationOutputDto {
+    id: number;
+    name: string | undefined;
+    accountSSIN: string | undefined;
+    currencyCode: CurrencyInfoDto;
+
+    [key: string]: any;
+}
+
+export class GetContactInformationDto implements IGetContactInformationDto {
+    id!: number;
+    name!: string | undefined;
+    email!: string | undefined;
+    phone!: string | undefined;
+    ssin!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IGetContactInformationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.email = _data["email"];
+            this.phone = _data["phone"];
+            this.ssin = _data["ssin"];
+        }
+    }
+
+    static fromJS(data: any): GetContactInformationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetContactInformationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["email"] = this.email;
+        data["phone"] = this.phone;
+        data["ssin"] = this.ssin;
+        return data;
+    }
+}
+
+export interface IGetContactInformationDto {
+    id: number;
+    name: string | undefined;
+    email: string | undefined;
+    phone: string | undefined;
+    ssin: string | undefined;
 
     [key: string]: any;
 }
@@ -70706,17 +69599,8 @@ export interface IPagedResultDtoOfGetAccountInformationOutputDto {
 export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsForViewDto {
     creationTime!: moment.Moment;
     entityObjectStatusCode!: string | undefined;
-    sellerCode!: string | undefined;
-    buyerCode!: string | undefined;
-    paymentDiscount!: number;
-    discountDays!: number;
-    eomDays!: number;
-    eom!: boolean;
-    netDueDays!: number;
     lastRecord!: boolean;
     firstRecord!: boolean;
-    enteredDate!: moment.Moment;
-    creatorUserId!: number;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -70796,17 +69680,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             }
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
             this.entityObjectStatusCode = _data["entityObjectStatusCode"];
-            this.sellerCode = _data["sellerCode"];
-            this.buyerCode = _data["buyerCode"];
-            this.paymentDiscount = _data["paymentDiscount"];
-            this.discountDays = _data["discountDays"];
-            this.eomDays = _data["eomDays"];
-            this.eom = _data["eom"];
-            this.netDueDays = _data["netDueDays"];
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
-            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -70920,17 +69795,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         }
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
         data["entityObjectStatusCode"] = this.entityObjectStatusCode;
-        data["sellerCode"] = this.sellerCode;
-        data["buyerCode"] = this.buyerCode;
-        data["paymentDiscount"] = this.paymentDiscount;
-        data["discountDays"] = this.discountDays;
-        data["eomDays"] = this.eomDays;
-        data["eom"] = this.eom;
-        data["netDueDays"] = this.netDueDays;
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
-        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -71033,17 +69899,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
 export interface IGetAllAppTransactionsForViewDto {
     creationTime: moment.Moment;
     entityObjectStatusCode: string | undefined;
-    sellerCode: string | undefined;
-    buyerCode: string | undefined;
-    paymentDiscount: number;
-    discountDays: number;
-    eomDays: number;
-    eom: boolean;
-    netDueDays: number;
     lastRecord: boolean;
     firstRecord: boolean;
-    enteredDate: moment.Moment;
-    creatorUserId: number;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -71187,7 +70044,6 @@ export class ShoppingCartSummary implements IShoppingCartSummary {
     amount!: number;
     validateOrder!: ValidateTransaction;
     orderType!: TransactionType;
-    currencyCode!: string | undefined;
 
     [key: string]: any;
 
@@ -71217,7 +70073,6 @@ export class ShoppingCartSummary implements IShoppingCartSummary {
             this.amount = _data["amount"];
             this.validateOrder = _data["validateOrder"];
             this.orderType = _data["orderType"];
-            this.currencyCode = _data["currencyCode"];
         }
     }
 
@@ -71245,7 +70100,6 @@ export class ShoppingCartSummary implements IShoppingCartSummary {
         data["amount"] = this.amount;
         data["validateOrder"] = this.validateOrder;
         data["orderType"] = this.orderType;
-        data["currencyCode"] = this.currencyCode;
         return data;
     }
 }
@@ -71262,14 +70116,12 @@ export interface IShoppingCartSummary {
     amount: number;
     validateOrder: ValidateTransaction;
     orderType: TransactionType;
-    currencyCode: string | undefined;
 
     [key: string]: any;
 }
 
 export class DataView implements IDataView {
     code!: string | undefined;
-    manufacturerCode!: string | undefined;
     name!: string | undefined;
     qty!: number;
     price!: number;
@@ -71303,7 +70155,6 @@ export class DataView implements IDataView {
                     this[property] = _data[property];
             }
             this.code = _data["code"];
-            this.manufacturerCode = _data["manufacturerCode"];
             this.name = _data["name"];
             this.qty = _data["qty"];
             this.price = _data["price"];
@@ -71335,7 +70186,6 @@ export class DataView implements IDataView {
                 data[property] = this[property];
         }
         data["code"] = this.code;
-        data["manufacturerCode"] = this.manufacturerCode;
         data["name"] = this.name;
         data["qty"] = this.qty;
         data["price"] = this.price;
@@ -71356,7 +70206,6 @@ export class DataView implements IDataView {
 
 export interface IDataView {
     code: string | undefined;
-    manufacturerCode: string | undefined;
     name: string | undefined;
     qty: number;
     price: number;
@@ -71839,6 +70688,150 @@ export interface IGetOrderDetailsForViewDto {
     [key: string]: any;
 }
 
+export class AccountBranchDto implements IAccountBranchDto {
+    code!: string | undefined;
+    name!: string | undefined;
+    parentId!: number | undefined;
+    subTotal!: number;
+    ssin!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAccountBranchDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.parentId = _data["parentId"];
+            this.subTotal = _data["subTotal"];
+            this.ssin = _data["ssin"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AccountBranchDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AccountBranchDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["parentId"] = this.parentId;
+        data["subTotal"] = this.subTotal;
+        data["ssin"] = this.ssin;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAccountBranchDto {
+    code: string | undefined;
+    name: string | undefined;
+    parentId: number | undefined;
+    subTotal: number;
+    ssin: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class TreeNodeOfAccountBranchDto implements ITreeNodeOfAccountBranchDto {
+    data!: AccountBranchDto;
+    children!: TreeNodeOfAccountBranchDto[] | undefined;
+    leaf!: boolean;
+    expanded!: boolean;
+    label!: string | undefined;
+    totalChildrenCount!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ITreeNodeOfAccountBranchDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.data = _data["data"] ? AccountBranchDto.fromJS(_data["data"]) : <any>undefined;
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children!.push(TreeNodeOfAccountBranchDto.fromJS(item));
+            }
+            this.leaf = _data["leaf"];
+            this.expanded = _data["expanded"];
+            this.label = _data["label"];
+            this.totalChildrenCount = _data["totalChildrenCount"];
+        }
+    }
+
+    static fromJS(data: any): TreeNodeOfAccountBranchDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TreeNodeOfAccountBranchDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        data["leaf"] = this.leaf;
+        data["expanded"] = this.expanded;
+        data["label"] = this.label;
+        data["totalChildrenCount"] = this.totalChildrenCount;
+        return data;
+    }
+}
+
+export interface ITreeNodeOfAccountBranchDto {
+    data: AccountBranchDto;
+    children: TreeNodeOfAccountBranchDto[] | undefined;
+    leaf: boolean;
+    expanded: boolean;
+    label: string | undefined;
+    totalChildrenCount: number | undefined;
+
+    [key: string]: any;
+}
+
 export enum TransactionPosition {
     Current = 0,
     Previous = 1,
@@ -72229,1606 +71222,6 @@ export class GetAppTransactionForEditOutput implements IGetAppTransactionForEdit
 
 export interface IGetAppTransactionForEditOutput {
     appTransaction: CreateOrEditAppTransactionDto;
-
-    [key: string]: any;
-}
-
-export class UserOrganizationUnit implements IUserOrganizationUnit {
-    tenantId!: number | undefined;
-    userId!: number;
-    organizationUnitId!: number;
-    isDeleted!: boolean;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IUserOrganizationUnit) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.userId = _data["userId"];
-            this.organizationUnitId = _data["organizationUnitId"];
-            this.isDeleted = _data["isDeleted"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): UserOrganizationUnit {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserOrganizationUnit();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["userId"] = this.userId;
-        data["organizationUnitId"] = this.organizationUnitId;
-        data["isDeleted"] = this.isDeleted;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IUserOrganizationUnit {
-    tenantId: number | undefined;
-    userId: number;
-    organizationUnitId: number;
-    isDeleted: boolean;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class UserToken implements IUserToken {
-    tenantId!: number | undefined;
-    userId!: number;
-    loginProvider!: string | undefined;
-    name!: string | undefined;
-    value!: string | undefined;
-    expireDate!: moment.Moment | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IUserToken) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.userId = _data["userId"];
-            this.loginProvider = _data["loginProvider"];
-            this.name = _data["name"];
-            this.value = _data["value"];
-            this.expireDate = _data["expireDate"] ? moment(_data["expireDate"].toString()) : <any>undefined;
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): UserToken {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserToken();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["userId"] = this.userId;
-        data["loginProvider"] = this.loginProvider;
-        data["name"] = this.name;
-        data["value"] = this.value;
-        data["expireDate"] = this.expireDate ? this.expireDate.toISOString() : <any>undefined;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IUserToken {
-    tenantId: number | undefined;
-    userId: number;
-    loginProvider: string | undefined;
-    name: string | undefined;
-    value: string | undefined;
-    expireDate: moment.Moment | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class User implements IUser {
-    profilePictureId!: string | undefined;
-    shouldChangePasswordOnNextLogin!: boolean;
-    signInTokenExpireTimeUtc!: moment.Moment | undefined;
-    signInToken!: string | undefined;
-    googleAuthenticatorKey!: string | undefined;
-    organizationUnits!: UserOrganizationUnit[] | undefined;
-    normalizedUserName!: string;
-    normalizedEmailAddress!: string;
-    concurrencyStamp!: string | undefined;
-    tokens!: UserToken[] | undefined;
-    deleterUser!: User;
-    creatorUser!: User;
-    lastModifierUser!: User;
-    authenticationSource!: string | undefined;
-    userName!: string;
-    tenantId!: number | undefined;
-    emailAddress!: string;
-    name!: string;
-    surname!: string;
-    readonly fullName!: string | undefined;
-    password!: string;
-    emailConfirmationCode!: string | undefined;
-    passwordResetCode!: string | undefined;
-    lockoutEndDateUtc!: moment.Moment | undefined;
-    accessFailedCount!: number;
-    isLockoutEnabled!: boolean;
-    phoneNumber!: string | undefined;
-    isPhoneNumberConfirmed!: boolean;
-    securityStamp!: string | undefined;
-    isTwoFactorEnabled!: boolean;
-    logins!: UserLogin[] | undefined;
-    roles!: UserRole[] | undefined;
-    claims!: UserClaim[] | undefined;
-    permissions!: UserPermissionSetting[] | undefined;
-    settings!: Setting[] | undefined;
-    isEmailConfirmed!: boolean;
-    isActive!: boolean;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IUser) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.profilePictureId = _data["profilePictureId"];
-            this.shouldChangePasswordOnNextLogin = _data["shouldChangePasswordOnNextLogin"];
-            this.signInTokenExpireTimeUtc = _data["signInTokenExpireTimeUtc"] ? moment(_data["signInTokenExpireTimeUtc"].toString()) : <any>undefined;
-            this.signInToken = _data["signInToken"];
-            this.googleAuthenticatorKey = _data["googleAuthenticatorKey"];
-            if (Array.isArray(_data["organizationUnits"])) {
-                this.organizationUnits = [] as any;
-                for (let item of _data["organizationUnits"])
-                    this.organizationUnits!.push(UserOrganizationUnit.fromJS(item));
-            }
-            this.normalizedUserName = _data["normalizedUserName"];
-            this.normalizedEmailAddress = _data["normalizedEmailAddress"];
-            this.concurrencyStamp = _data["concurrencyStamp"];
-            if (Array.isArray(_data["tokens"])) {
-                this.tokens = [] as any;
-                for (let item of _data["tokens"])
-                    this.tokens!.push(UserToken.fromJS(item));
-            }
-            this.deleterUser = _data["deleterUser"] ? User.fromJS(_data["deleterUser"]) : <any>undefined;
-            this.creatorUser = _data["creatorUser"] ? User.fromJS(_data["creatorUser"]) : <any>undefined;
-            this.lastModifierUser = _data["lastModifierUser"] ? User.fromJS(_data["lastModifierUser"]) : <any>undefined;
-            this.authenticationSource = _data["authenticationSource"];
-            this.userName = _data["userName"];
-            this.tenantId = _data["tenantId"];
-            this.emailAddress = _data["emailAddress"];
-            this.name = _data["name"];
-            this.surname = _data["surname"];
-            (<any>this).fullName = _data["fullName"];
-            this.password = _data["password"];
-            this.emailConfirmationCode = _data["emailConfirmationCode"];
-            this.passwordResetCode = _data["passwordResetCode"];
-            this.lockoutEndDateUtc = _data["lockoutEndDateUtc"] ? moment(_data["lockoutEndDateUtc"].toString()) : <any>undefined;
-            this.accessFailedCount = _data["accessFailedCount"];
-            this.isLockoutEnabled = _data["isLockoutEnabled"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.isPhoneNumberConfirmed = _data["isPhoneNumberConfirmed"];
-            this.securityStamp = _data["securityStamp"];
-            this.isTwoFactorEnabled = _data["isTwoFactorEnabled"];
-            if (Array.isArray(_data["logins"])) {
-                this.logins = [] as any;
-                for (let item of _data["logins"])
-                    this.logins!.push(UserLogin.fromJS(item));
-            }
-            if (Array.isArray(_data["roles"])) {
-                this.roles = [] as any;
-                for (let item of _data["roles"])
-                    this.roles!.push(UserRole.fromJS(item));
-            }
-            if (Array.isArray(_data["claims"])) {
-                this.claims = [] as any;
-                for (let item of _data["claims"])
-                    this.claims!.push(UserClaim.fromJS(item));
-            }
-            if (Array.isArray(_data["permissions"])) {
-                this.permissions = [] as any;
-                for (let item of _data["permissions"])
-                    this.permissions!.push(UserPermissionSetting.fromJS(item));
-            }
-            if (Array.isArray(_data["settings"])) {
-                this.settings = [] as any;
-                for (let item of _data["settings"])
-                    this.settings!.push(Setting.fromJS(item));
-            }
-            this.isEmailConfirmed = _data["isEmailConfirmed"];
-            this.isActive = _data["isActive"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): User {
-        data = typeof data === 'object' ? data : {};
-        let result = new User();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["profilePictureId"] = this.profilePictureId;
-        data["shouldChangePasswordOnNextLogin"] = this.shouldChangePasswordOnNextLogin;
-        data["signInTokenExpireTimeUtc"] = this.signInTokenExpireTimeUtc ? this.signInTokenExpireTimeUtc.toISOString() : <any>undefined;
-        data["signInToken"] = this.signInToken;
-        data["googleAuthenticatorKey"] = this.googleAuthenticatorKey;
-        if (Array.isArray(this.organizationUnits)) {
-            data["organizationUnits"] = [];
-            for (let item of this.organizationUnits)
-                data["organizationUnits"].push(item.toJSON());
-        }
-        data["normalizedUserName"] = this.normalizedUserName;
-        data["normalizedEmailAddress"] = this.normalizedEmailAddress;
-        data["concurrencyStamp"] = this.concurrencyStamp;
-        if (Array.isArray(this.tokens)) {
-            data["tokens"] = [];
-            for (let item of this.tokens)
-                data["tokens"].push(item.toJSON());
-        }
-        data["deleterUser"] = this.deleterUser ? this.deleterUser.toJSON() : <any>undefined;
-        data["creatorUser"] = this.creatorUser ? this.creatorUser.toJSON() : <any>undefined;
-        data["lastModifierUser"] = this.lastModifierUser ? this.lastModifierUser.toJSON() : <any>undefined;
-        data["authenticationSource"] = this.authenticationSource;
-        data["userName"] = this.userName;
-        data["tenantId"] = this.tenantId;
-        data["emailAddress"] = this.emailAddress;
-        data["name"] = this.name;
-        data["surname"] = this.surname;
-        data["fullName"] = this.fullName;
-        data["password"] = this.password;
-        data["emailConfirmationCode"] = this.emailConfirmationCode;
-        data["passwordResetCode"] = this.passwordResetCode;
-        data["lockoutEndDateUtc"] = this.lockoutEndDateUtc ? this.lockoutEndDateUtc.toISOString() : <any>undefined;
-        data["accessFailedCount"] = this.accessFailedCount;
-        data["isLockoutEnabled"] = this.isLockoutEnabled;
-        data["phoneNumber"] = this.phoneNumber;
-        data["isPhoneNumberConfirmed"] = this.isPhoneNumberConfirmed;
-        data["securityStamp"] = this.securityStamp;
-        data["isTwoFactorEnabled"] = this.isTwoFactorEnabled;
-        if (Array.isArray(this.logins)) {
-            data["logins"] = [];
-            for (let item of this.logins)
-                data["logins"].push(item.toJSON());
-        }
-        if (Array.isArray(this.roles)) {
-            data["roles"] = [];
-            for (let item of this.roles)
-                data["roles"].push(item.toJSON());
-        }
-        if (Array.isArray(this.claims)) {
-            data["claims"] = [];
-            for (let item of this.claims)
-                data["claims"].push(item.toJSON());
-        }
-        if (Array.isArray(this.permissions)) {
-            data["permissions"] = [];
-            for (let item of this.permissions)
-                data["permissions"].push(item.toJSON());
-        }
-        if (Array.isArray(this.settings)) {
-            data["settings"] = [];
-            for (let item of this.settings)
-                data["settings"].push(item.toJSON());
-        }
-        data["isEmailConfirmed"] = this.isEmailConfirmed;
-        data["isActive"] = this.isActive;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IUser {
-    profilePictureId: string | undefined;
-    shouldChangePasswordOnNextLogin: boolean;
-    signInTokenExpireTimeUtc: moment.Moment | undefined;
-    signInToken: string | undefined;
-    googleAuthenticatorKey: string | undefined;
-    organizationUnits: UserOrganizationUnit[] | undefined;
-    normalizedUserName: string;
-    normalizedEmailAddress: string;
-    concurrencyStamp: string | undefined;
-    tokens: UserToken[] | undefined;
-    deleterUser: User;
-    creatorUser: User;
-    lastModifierUser: User;
-    authenticationSource: string | undefined;
-    userName: string;
-    tenantId: number | undefined;
-    emailAddress: string;
-    name: string;
-    surname: string;
-    fullName: string | undefined;
-    password: string;
-    emailConfirmationCode: string | undefined;
-    passwordResetCode: string | undefined;
-    lockoutEndDateUtc: moment.Moment | undefined;
-    accessFailedCount: number;
-    isLockoutEnabled: boolean;
-    phoneNumber: string | undefined;
-    isPhoneNumberConfirmed: boolean;
-    securityStamp: string | undefined;
-    isTwoFactorEnabled: boolean;
-    logins: UserLogin[] | undefined;
-    roles: UserRole[] | undefined;
-    claims: UserClaim[] | undefined;
-    permissions: UserPermissionSetting[] | undefined;
-    settings: Setting[] | undefined;
-    isEmailConfirmed: boolean;
-    isActive: boolean;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppItemSharing implements IAppItemSharing {
-    itemId!: number | undefined;
-    itemFk!: AppItem;
-    itemListId!: number | undefined;
-    itemListFk!: AppItemsList;
-    sharedTenantId!: number | undefined;
-    sharedUserId!: number | undefined;
-    userFk!: User;
-    sharedUserEMail!: string | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppItemSharing) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.itemId = _data["itemId"];
-            this.itemFk = _data["itemFk"] ? AppItem.fromJS(_data["itemFk"]) : <any>undefined;
-            this.itemListId = _data["itemListId"];
-            this.itemListFk = _data["itemListFk"] ? AppItemsList.fromJS(_data["itemListFk"]) : <any>undefined;
-            this.sharedTenantId = _data["sharedTenantId"];
-            this.sharedUserId = _data["sharedUserId"];
-            this.userFk = _data["userFk"] ? User.fromJS(_data["userFk"]) : <any>undefined;
-            this.sharedUserEMail = _data["sharedUserEMail"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppItemSharing {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppItemSharing();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["itemId"] = this.itemId;
-        data["itemFk"] = this.itemFk ? this.itemFk.toJSON() : <any>undefined;
-        data["itemListId"] = this.itemListId;
-        data["itemListFk"] = this.itemListFk ? this.itemListFk.toJSON() : <any>undefined;
-        data["sharedTenantId"] = this.sharedTenantId;
-        data["sharedUserId"] = this.sharedUserId;
-        data["userFk"] = this.userFk ? this.userFk.toJSON() : <any>undefined;
-        data["sharedUserEMail"] = this.sharedUserEMail;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppItemSharing {
-    itemId: number | undefined;
-    itemFk: AppItem;
-    itemListId: number | undefined;
-    itemListFk: AppItemsList;
-    sharedTenantId: number | undefined;
-    sharedUserId: number | undefined;
-    userFk: User;
-    sharedUserEMail: string | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppItemPrices implements IAppItemPrices {
-    tenantId!: number | undefined;
-    code!: string | undefined;
-    price!: number;
-    appItemId!: number;
-    appItemCode!: string | undefined;
-    currencyId!: number | undefined;
-    currencyCode!: string | undefined;
-    currencyFk!: AppEntity;
-    appItemFk!: AppItem;
-    isDefault!: boolean;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppItemPrices) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.code = _data["code"];
-            this.price = _data["price"];
-            this.appItemId = _data["appItemId"];
-            this.appItemCode = _data["appItemCode"];
-            this.currencyId = _data["currencyId"];
-            this.currencyCode = _data["currencyCode"];
-            this.currencyFk = _data["currencyFk"] ? AppEntity.fromJS(_data["currencyFk"]) : <any>undefined;
-            this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
-            this.isDefault = _data["isDefault"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppItemPrices {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppItemPrices();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["code"] = this.code;
-        data["price"] = this.price;
-        data["appItemId"] = this.appItemId;
-        data["appItemCode"] = this.appItemCode;
-        data["currencyId"] = this.currencyId;
-        data["currencyCode"] = this.currencyCode;
-        data["currencyFk"] = this.currencyFk ? this.currencyFk.toJSON() : <any>undefined;
-        data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
-        data["isDefault"] = this.isDefault;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppItemPrices {
-    tenantId: number | undefined;
-    code: string | undefined;
-    price: number;
-    appItemId: number;
-    appItemCode: string | undefined;
-    currencyId: number | undefined;
-    currencyCode: string | undefined;
-    currencyFk: AppEntity;
-    appItemFk: AppItem;
-    isDefault: boolean;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppSizeScalesDetail implements IAppSizeScalesDetail {
-    tenantId!: number | undefined;
-    sizeScaleId!: number;
-    sizeCode!: string | undefined;
-    sizeRatio!: number;
-    d1Position!: string | undefined;
-    d2Position!: string | undefined;
-    d3Position!: string | undefined;
-    sizeId!: number | undefined;
-    dimensionName!: string | undefined;
-    sizeFk!: AppEntity;
-    appSizeScalesHeaderFk!: AppSizeScalesHeader;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppSizeScalesDetail) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.sizeScaleId = _data["sizeScaleId"];
-            this.sizeCode = _data["sizeCode"];
-            this.sizeRatio = _data["sizeRatio"];
-            this.d1Position = _data["d1Position"];
-            this.d2Position = _data["d2Position"];
-            this.d3Position = _data["d3Position"];
-            this.sizeId = _data["sizeId"];
-            this.dimensionName = _data["dimensionName"];
-            this.sizeFk = _data["sizeFk"] ? AppEntity.fromJS(_data["sizeFk"]) : <any>undefined;
-            this.appSizeScalesHeaderFk = _data["appSizeScalesHeaderFk"] ? AppSizeScalesHeader.fromJS(_data["appSizeScalesHeaderFk"]) : <any>undefined;
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppSizeScalesDetail {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppSizeScalesDetail();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["sizeScaleId"] = this.sizeScaleId;
-        data["sizeCode"] = this.sizeCode;
-        data["sizeRatio"] = this.sizeRatio;
-        data["d1Position"] = this.d1Position;
-        data["d2Position"] = this.d2Position;
-        data["d3Position"] = this.d3Position;
-        data["sizeId"] = this.sizeId;
-        data["dimensionName"] = this.dimensionName;
-        data["sizeFk"] = this.sizeFk ? this.sizeFk.toJSON() : <any>undefined;
-        data["appSizeScalesHeaderFk"] = this.appSizeScalesHeaderFk ? this.appSizeScalesHeaderFk.toJSON() : <any>undefined;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppSizeScalesDetail {
-    tenantId: number | undefined;
-    sizeScaleId: number;
-    sizeCode: string | undefined;
-    sizeRatio: number;
-    d1Position: string | undefined;
-    d2Position: string | undefined;
-    d3Position: string | undefined;
-    sizeId: number | undefined;
-    dimensionName: string | undefined;
-    sizeFk: AppEntity;
-    appSizeScalesHeaderFk: AppSizeScalesHeader;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppSizeScalesHeader implements IAppSizeScalesHeader {
-    tenantId!: number | undefined;
-    entityId!: number;
-    parentId!: number | undefined;
-    code!: string | undefined;
-    noOfDimensions!: number;
-    isDefault!: boolean;
-    name!: string | undefined;
-    dimesion1Name!: string | undefined;
-    dimesion2Name!: string | undefined;
-    dimesion3Name!: string | undefined;
-    entityFk!: AppEntity;
-    appSizeScalesHeaderFk!: AppSizeScalesHeader;
-    appSizeScalesDetails!: AppSizeScalesDetail[] | undefined;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppSizeScalesHeader) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.entityId = _data["entityId"];
-            this.parentId = _data["parentId"];
-            this.code = _data["code"];
-            this.noOfDimensions = _data["noOfDimensions"];
-            this.isDefault = _data["isDefault"];
-            this.name = _data["name"];
-            this.dimesion1Name = _data["dimesion1Name"];
-            this.dimesion2Name = _data["dimesion2Name"];
-            this.dimesion3Name = _data["dimesion3Name"];
-            this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
-            this.appSizeScalesHeaderFk = _data["appSizeScalesHeaderFk"] ? AppSizeScalesHeader.fromJS(_data["appSizeScalesHeaderFk"]) : <any>undefined;
-            if (Array.isArray(_data["appSizeScalesDetails"])) {
-                this.appSizeScalesDetails = [] as any;
-                for (let item of _data["appSizeScalesDetails"])
-                    this.appSizeScalesDetails!.push(AppSizeScalesDetail.fromJS(item));
-            }
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppSizeScalesHeader {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppSizeScalesHeader();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["entityId"] = this.entityId;
-        data["parentId"] = this.parentId;
-        data["code"] = this.code;
-        data["noOfDimensions"] = this.noOfDimensions;
-        data["isDefault"] = this.isDefault;
-        data["name"] = this.name;
-        data["dimesion1Name"] = this.dimesion1Name;
-        data["dimesion2Name"] = this.dimesion2Name;
-        data["dimesion3Name"] = this.dimesion3Name;
-        data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
-        data["appSizeScalesHeaderFk"] = this.appSizeScalesHeaderFk ? this.appSizeScalesHeaderFk.toJSON() : <any>undefined;
-        if (Array.isArray(this.appSizeScalesDetails)) {
-            data["appSizeScalesDetails"] = [];
-            for (let item of this.appSizeScalesDetails)
-                data["appSizeScalesDetails"].push(item.toJSON());
-        }
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppSizeScalesHeader {
-    tenantId: number | undefined;
-    entityId: number;
-    parentId: number | undefined;
-    code: string | undefined;
-    noOfDimensions: number;
-    isDefault: boolean;
-    name: string | undefined;
-    dimesion1Name: string | undefined;
-    dimesion2Name: string | undefined;
-    dimesion3Name: string | undefined;
-    entityFk: AppEntity;
-    appSizeScalesHeaderFk: AppSizeScalesHeader;
-    appSizeScalesDetails: AppSizeScalesDetail[] | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppItemSizeScalesDetails implements IAppItemSizeScalesDetails {
-    tenantId!: number | undefined;
-    sizeCode!: string | undefined;
-    sizeScaleId!: number;
-    sizeRatio!: number;
-    d1Position!: string | undefined;
-    d2Position!: string | undefined;
-    d3Position!: string | undefined;
-    sizeId!: number | undefined;
-    dimensionName!: string | undefined;
-    sizeFk!: AppEntity;
-    sizeScaleFK!: AppItemSizeScalesHeader;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppItemSizeScalesDetails) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.sizeCode = _data["sizeCode"];
-            this.sizeScaleId = _data["sizeScaleId"];
-            this.sizeRatio = _data["sizeRatio"];
-            this.d1Position = _data["d1Position"];
-            this.d2Position = _data["d2Position"];
-            this.d3Position = _data["d3Position"];
-            this.sizeId = _data["sizeId"];
-            this.dimensionName = _data["dimensionName"];
-            this.sizeFk = _data["sizeFk"] ? AppEntity.fromJS(_data["sizeFk"]) : <any>undefined;
-            this.sizeScaleFK = _data["sizeScaleFK"] ? AppItemSizeScalesHeader.fromJS(_data["sizeScaleFK"]) : <any>undefined;
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppItemSizeScalesDetails {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppItemSizeScalesDetails();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["sizeCode"] = this.sizeCode;
-        data["sizeScaleId"] = this.sizeScaleId;
-        data["sizeRatio"] = this.sizeRatio;
-        data["d1Position"] = this.d1Position;
-        data["d2Position"] = this.d2Position;
-        data["d3Position"] = this.d3Position;
-        data["sizeId"] = this.sizeId;
-        data["dimensionName"] = this.dimensionName;
-        data["sizeFk"] = this.sizeFk ? this.sizeFk.toJSON() : <any>undefined;
-        data["sizeScaleFK"] = this.sizeScaleFK ? this.sizeScaleFK.toJSON() : <any>undefined;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppItemSizeScalesDetails {
-    tenantId: number | undefined;
-    sizeCode: string | undefined;
-    sizeScaleId: number;
-    sizeRatio: number;
-    d1Position: string | undefined;
-    d2Position: string | undefined;
-    d3Position: string | undefined;
-    sizeId: number | undefined;
-    dimensionName: string | undefined;
-    sizeFk: AppEntity;
-    sizeScaleFK: AppItemSizeScalesHeader;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppItemSizeScalesHeader implements IAppItemSizeScalesHeader {
-    sizeScaleCode!: string | undefined;
-    noOfDimensions!: number;
-    tenantId!: number | undefined;
-    appItemId!: number;
-    sizeScaleName!: string | undefined;
-    sizeScaleId!: number | undefined;
-    name!: string | undefined;
-    dimesion1Name!: string | undefined;
-    dimesion2Name!: string | undefined;
-    dimesion3Name!: string | undefined;
-    parentId!: number | undefined;
-    appItemFk!: AppItem;
-    sizeScaleFK!: AppSizeScalesHeader;
-    itemSizeScaleFK!: AppItemSizeScalesHeader;
-    appItemSizeScalesDetails!: AppItemSizeScalesDetails[] | undefined;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppItemSizeScalesHeader) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.sizeScaleCode = _data["sizeScaleCode"];
-            this.noOfDimensions = _data["noOfDimensions"];
-            this.tenantId = _data["tenantId"];
-            this.appItemId = _data["appItemId"];
-            this.sizeScaleName = _data["sizeScaleName"];
-            this.sizeScaleId = _data["sizeScaleId"];
-            this.name = _data["name"];
-            this.dimesion1Name = _data["dimesion1Name"];
-            this.dimesion2Name = _data["dimesion2Name"];
-            this.dimesion3Name = _data["dimesion3Name"];
-            this.parentId = _data["parentId"];
-            this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
-            this.sizeScaleFK = _data["sizeScaleFK"] ? AppSizeScalesHeader.fromJS(_data["sizeScaleFK"]) : <any>undefined;
-            this.itemSizeScaleFK = _data["itemSizeScaleFK"] ? AppItemSizeScalesHeader.fromJS(_data["itemSizeScaleFK"]) : <any>undefined;
-            if (Array.isArray(_data["appItemSizeScalesDetails"])) {
-                this.appItemSizeScalesDetails = [] as any;
-                for (let item of _data["appItemSizeScalesDetails"])
-                    this.appItemSizeScalesDetails!.push(AppItemSizeScalesDetails.fromJS(item));
-            }
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppItemSizeScalesHeader {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppItemSizeScalesHeader();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["sizeScaleCode"] = this.sizeScaleCode;
-        data["noOfDimensions"] = this.noOfDimensions;
-        data["tenantId"] = this.tenantId;
-        data["appItemId"] = this.appItemId;
-        data["sizeScaleName"] = this.sizeScaleName;
-        data["sizeScaleId"] = this.sizeScaleId;
-        data["name"] = this.name;
-        data["dimesion1Name"] = this.dimesion1Name;
-        data["dimesion2Name"] = this.dimesion2Name;
-        data["dimesion3Name"] = this.dimesion3Name;
-        data["parentId"] = this.parentId;
-        data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
-        data["sizeScaleFK"] = this.sizeScaleFK ? this.sizeScaleFK.toJSON() : <any>undefined;
-        data["itemSizeScaleFK"] = this.itemSizeScaleFK ? this.itemSizeScaleFK.toJSON() : <any>undefined;
-        if (Array.isArray(this.appItemSizeScalesDetails)) {
-            data["appItemSizeScalesDetails"] = [];
-            for (let item of this.appItemSizeScalesDetails)
-                data["appItemSizeScalesDetails"].push(item.toJSON());
-        }
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppItemSizeScalesHeader {
-    sizeScaleCode: string | undefined;
-    noOfDimensions: number;
-    tenantId: number | undefined;
-    appItemId: number;
-    sizeScaleName: string | undefined;
-    sizeScaleId: number | undefined;
-    name: string | undefined;
-    dimesion1Name: string | undefined;
-    dimesion2Name: string | undefined;
-    dimesion3Name: string | undefined;
-    parentId: number | undefined;
-    appItemFk: AppItem;
-    sizeScaleFK: AppSizeScalesHeader;
-    itemSizeScaleFK: AppItemSizeScalesHeader;
-    appItemSizeScalesDetails: AppItemSizeScalesDetails[] | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppItem implements IAppItem {
-    tenantId!: number | undefined;
-    code!: string | undefined;
-    name!: string | undefined;
-    description!: string | undefined;
-    variations!: string | undefined;
-    entityId!: number;
-    price!: number;
-    stockAvailability!: number;
-    parentId!: number | undefined;
-    entityFk!: AppEntity;
-    parentFk!: AppItem;
-    parentEntityId!: number | undefined;
-    parentEntityFk!: AppEntity;
-    listingItemId!: number | undefined;
-    listingItemFk!: AppItem;
-    publishedListingItemId!: number | undefined;
-    publishedListingItemFk!: AppItem;
-    itemType!: number;
-    sharingLevel!: number;
-    parentFkList!: AppItem[] | undefined;
-    listingItemFkList!: AppItem[] | undefined;
-    publishedListingItemFkList!: AppItem[] | undefined;
-    itemSharingFkList!: AppItemSharing[] | undefined;
-    itemPricesFkList!: AppItemPrices[] | undefined;
-    itemSizeScaleHeadersFkList!: AppItemSizeScalesHeader[] | undefined;
-    timeStamp!: moment.Moment;
-    tenantOwner!: number;
-    ssin!: string | undefined;
-    sycIdentifierId!: number | undefined;
-    sycIdentifierIdFk!: SycIdentifierDefinition;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppItem) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.code = _data["code"];
-            this.name = _data["name"];
-            this.description = _data["description"];
-            this.variations = _data["variations"];
-            this.entityId = _data["entityId"];
-            this.price = _data["price"];
-            this.stockAvailability = _data["stockAvailability"];
-            this.parentId = _data["parentId"];
-            this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
-            this.parentFk = _data["parentFk"] ? AppItem.fromJS(_data["parentFk"]) : <any>undefined;
-            this.parentEntityId = _data["parentEntityId"];
-            this.parentEntityFk = _data["parentEntityFk"] ? AppEntity.fromJS(_data["parentEntityFk"]) : <any>undefined;
-            this.listingItemId = _data["listingItemId"];
-            this.listingItemFk = _data["listingItemFk"] ? AppItem.fromJS(_data["listingItemFk"]) : <any>undefined;
-            this.publishedListingItemId = _data["publishedListingItemId"];
-            this.publishedListingItemFk = _data["publishedListingItemFk"] ? AppItem.fromJS(_data["publishedListingItemFk"]) : <any>undefined;
-            this.itemType = _data["itemType"];
-            this.sharingLevel = _data["sharingLevel"];
-            if (Array.isArray(_data["parentFkList"])) {
-                this.parentFkList = [] as any;
-                for (let item of _data["parentFkList"])
-                    this.parentFkList!.push(AppItem.fromJS(item));
-            }
-            if (Array.isArray(_data["listingItemFkList"])) {
-                this.listingItemFkList = [] as any;
-                for (let item of _data["listingItemFkList"])
-                    this.listingItemFkList!.push(AppItem.fromJS(item));
-            }
-            if (Array.isArray(_data["publishedListingItemFkList"])) {
-                this.publishedListingItemFkList = [] as any;
-                for (let item of _data["publishedListingItemFkList"])
-                    this.publishedListingItemFkList!.push(AppItem.fromJS(item));
-            }
-            if (Array.isArray(_data["itemSharingFkList"])) {
-                this.itemSharingFkList = [] as any;
-                for (let item of _data["itemSharingFkList"])
-                    this.itemSharingFkList!.push(AppItemSharing.fromJS(item));
-            }
-            if (Array.isArray(_data["itemPricesFkList"])) {
-                this.itemPricesFkList = [] as any;
-                for (let item of _data["itemPricesFkList"])
-                    this.itemPricesFkList!.push(AppItemPrices.fromJS(item));
-            }
-            if (Array.isArray(_data["itemSizeScaleHeadersFkList"])) {
-                this.itemSizeScaleHeadersFkList = [] as any;
-                for (let item of _data["itemSizeScaleHeadersFkList"])
-                    this.itemSizeScaleHeadersFkList!.push(AppItemSizeScalesHeader.fromJS(item));
-            }
-            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
-            this.tenantOwner = _data["tenantOwner"];
-            this.ssin = _data["ssin"];
-            this.sycIdentifierId = _data["sycIdentifierId"];
-            this.sycIdentifierIdFk = _data["sycIdentifierIdFk"] ? SycIdentifierDefinition.fromJS(_data["sycIdentifierIdFk"]) : <any>undefined;
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppItem {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppItem();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["code"] = this.code;
-        data["name"] = this.name;
-        data["description"] = this.description;
-        data["variations"] = this.variations;
-        data["entityId"] = this.entityId;
-        data["price"] = this.price;
-        data["stockAvailability"] = this.stockAvailability;
-        data["parentId"] = this.parentId;
-        data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
-        data["parentFk"] = this.parentFk ? this.parentFk.toJSON() : <any>undefined;
-        data["parentEntityId"] = this.parentEntityId;
-        data["parentEntityFk"] = this.parentEntityFk ? this.parentEntityFk.toJSON() : <any>undefined;
-        data["listingItemId"] = this.listingItemId;
-        data["listingItemFk"] = this.listingItemFk ? this.listingItemFk.toJSON() : <any>undefined;
-        data["publishedListingItemId"] = this.publishedListingItemId;
-        data["publishedListingItemFk"] = this.publishedListingItemFk ? this.publishedListingItemFk.toJSON() : <any>undefined;
-        data["itemType"] = this.itemType;
-        data["sharingLevel"] = this.sharingLevel;
-        if (Array.isArray(this.parentFkList)) {
-            data["parentFkList"] = [];
-            for (let item of this.parentFkList)
-                data["parentFkList"].push(item.toJSON());
-        }
-        if (Array.isArray(this.listingItemFkList)) {
-            data["listingItemFkList"] = [];
-            for (let item of this.listingItemFkList)
-                data["listingItemFkList"].push(item.toJSON());
-        }
-        if (Array.isArray(this.publishedListingItemFkList)) {
-            data["publishedListingItemFkList"] = [];
-            for (let item of this.publishedListingItemFkList)
-                data["publishedListingItemFkList"].push(item.toJSON());
-        }
-        if (Array.isArray(this.itemSharingFkList)) {
-            data["itemSharingFkList"] = [];
-            for (let item of this.itemSharingFkList)
-                data["itemSharingFkList"].push(item.toJSON());
-        }
-        if (Array.isArray(this.itemPricesFkList)) {
-            data["itemPricesFkList"] = [];
-            for (let item of this.itemPricesFkList)
-                data["itemPricesFkList"].push(item.toJSON());
-        }
-        if (Array.isArray(this.itemSizeScaleHeadersFkList)) {
-            data["itemSizeScaleHeadersFkList"] = [];
-            for (let item of this.itemSizeScaleHeadersFkList)
-                data["itemSizeScaleHeadersFkList"].push(item.toJSON());
-        }
-        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
-        data["tenantOwner"] = this.tenantOwner;
-        data["ssin"] = this.ssin;
-        data["sycIdentifierId"] = this.sycIdentifierId;
-        data["sycIdentifierIdFk"] = this.sycIdentifierIdFk ? this.sycIdentifierIdFk.toJSON() : <any>undefined;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppItem {
-    tenantId: number | undefined;
-    code: string | undefined;
-    name: string | undefined;
-    description: string | undefined;
-    variations: string | undefined;
-    entityId: number;
-    price: number;
-    stockAvailability: number;
-    parentId: number | undefined;
-    entityFk: AppEntity;
-    parentFk: AppItem;
-    parentEntityId: number | undefined;
-    parentEntityFk: AppEntity;
-    listingItemId: number | undefined;
-    listingItemFk: AppItem;
-    publishedListingItemId: number | undefined;
-    publishedListingItemFk: AppItem;
-    itemType: number;
-    sharingLevel: number;
-    parentFkList: AppItem[] | undefined;
-    listingItemFkList: AppItem[] | undefined;
-    publishedListingItemFkList: AppItem[] | undefined;
-    itemSharingFkList: AppItemSharing[] | undefined;
-    itemPricesFkList: AppItemPrices[] | undefined;
-    itemSizeScaleHeadersFkList: AppItemSizeScalesHeader[] | undefined;
-    timeStamp: moment.Moment;
-    tenantOwner: number;
-    ssin: string | undefined;
-    sycIdentifierId: number | undefined;
-    sycIdentifierIdFk: SycIdentifierDefinition;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppItemsListDetail implements IAppItemsListDetail {
-    itemsListId!: number;
-    itemsListFK!: AppItemsList;
-    itemsListCode!: string | undefined;
-    itemId!: number;
-    itemFK!: AppItem;
-    itemCode!: string | undefined;
-    state!: string | undefined;
-    itemSSIN!: string | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppItemsListDetail) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.itemsListId = _data["itemsListId"];
-            this.itemsListFK = _data["itemsListFK"] ? AppItemsList.fromJS(_data["itemsListFK"]) : <any>undefined;
-            this.itemsListCode = _data["itemsListCode"];
-            this.itemId = _data["itemId"];
-            this.itemFK = _data["itemFK"] ? AppItem.fromJS(_data["itemFK"]) : <any>undefined;
-            this.itemCode = _data["itemCode"];
-            this.state = _data["state"];
-            this.itemSSIN = _data["itemSSIN"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppItemsListDetail {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppItemsListDetail();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["itemsListId"] = this.itemsListId;
-        data["itemsListFK"] = this.itemsListFK ? this.itemsListFK.toJSON() : <any>undefined;
-        data["itemsListCode"] = this.itemsListCode;
-        data["itemId"] = this.itemId;
-        data["itemFK"] = this.itemFK ? this.itemFK.toJSON() : <any>undefined;
-        data["itemCode"] = this.itemCode;
-        data["state"] = this.state;
-        data["itemSSIN"] = this.itemSSIN;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppItemsListDetail {
-    itemsListId: number;
-    itemsListFK: AppItemsList;
-    itemsListCode: string | undefined;
-    itemId: number;
-    itemFK: AppItem;
-    itemCode: string | undefined;
-    state: string | undefined;
-    itemSSIN: string | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class AppItemsList implements IAppItemsList {
-    tenantId!: number | undefined;
-    code!: string;
-    name!: string | undefined;
-    description!: string | undefined;
-    sharingLevel!: number;
-    entityId!: number;
-    entityFk!: AppEntity;
-    appItemsListDetails!: AppItemsListDetail[] | undefined;
-    itemSharingFkList!: AppItemSharing[] | undefined;
-    timeStamp!: moment.Moment;
-    ssin!: string | undefined;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAppItemsList) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.code = _data["code"];
-            this.name = _data["name"];
-            this.description = _data["description"];
-            this.sharingLevel = _data["sharingLevel"];
-            this.entityId = _data["entityId"];
-            this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
-            if (Array.isArray(_data["appItemsListDetails"])) {
-                this.appItemsListDetails = [] as any;
-                for (let item of _data["appItemsListDetails"])
-                    this.appItemsListDetails!.push(AppItemsListDetail.fromJS(item));
-            }
-            if (Array.isArray(_data["itemSharingFkList"])) {
-                this.itemSharingFkList = [] as any;
-                for (let item of _data["itemSharingFkList"])
-                    this.itemSharingFkList!.push(AppItemSharing.fromJS(item));
-            }
-            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
-            this.ssin = _data["ssin"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AppItemsList {
-        data = typeof data === 'object' ? data : {};
-        let result = new AppItemsList();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["code"] = this.code;
-        data["name"] = this.name;
-        data["description"] = this.description;
-        data["sharingLevel"] = this.sharingLevel;
-        data["entityId"] = this.entityId;
-        data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
-        if (Array.isArray(this.appItemsListDetails)) {
-            data["appItemsListDetails"] = [];
-            for (let item of this.appItemsListDetails)
-                data["appItemsListDetails"].push(item.toJSON());
-        }
-        if (Array.isArray(this.itemSharingFkList)) {
-            data["itemSharingFkList"] = [];
-            for (let item of this.itemSharingFkList)
-                data["itemSharingFkList"].push(item.toJSON());
-        }
-        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
-        data["ssin"] = this.ssin;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAppItemsList {
-    tenantId: number | undefined;
-    code: string;
-    name: string | undefined;
-    description: string | undefined;
-    sharingLevel: number;
-    entityId: number;
-    entityFk: AppEntity;
-    appItemsListDetails: AppItemsListDetail[] | undefined;
-    itemSharingFkList: AppItemSharing[] | undefined;
-    timeStamp: moment.Moment;
-    ssin: string | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
 
     [key: string]: any;
 }

@@ -110,16 +110,10 @@ import { ContactComponent } from "./admin/app-shoppingCart/Components/contact/co
 import { TreeSelectModule } from "primeng/treeselect";
 import { CalendarModule } from 'primeng/calendar';
 import { AddressComponent } from "./admin/app-shoppingCart/Components/address/address.component";
-import { CreateOrEditBuyerSellerContactInfoComponent } from "./admin/app-shoppingCart/Components/buyer-seller-contact-info/create-or-edit-buyer-seller-contact-info.component";
-import { ViewBuyerSellerContactInfoComponent } from "./admin/app-shoppingCart/Components/buyer-seller-contact-info/view-buyer-seller-contact-info.component";
+import { CreateOrEditBuyerSellerContactInfoComponent } from "./admin/app-shoppingCart/buyer-seller-contact-info/create-or-edit-buyer-seller-contact-info.component";
+import { ViewBuyerSellerContactInfoComponent } from "./admin/app-shoppingCart/buyer-seller-contact-info/view-buyer-seller-contact-info.component";
 import { NotesComponent } from "./admin/shared/notes/notes.component";
 import { InteractionsModule } from "./main/interactions/interactions.module";
-import { ViewSalesRepInfoComponent } from "./admin/app-shoppingCart/Components/salesRep-info/view-sales-rep-info.component";
-import { CreateOrEditSalesRepInfoComponent } from "./admin/app-shoppingCart/Components/salesRep-info/create-or-edit-sales-rep-info.component";
-import { ViewShippingInformationComponent } from "./admin/app-shoppingCart/shipping-info/view-shipping-information/view-shipping-information.component";
-import { CreateOrAddShippingInformationComponent } from "./admin/app-shoppingCart/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
-import { CreateOrEditBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/create-or-edit-billing-info/create-or-edit-billing-info.component";
-import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/view-billing-info/view-billing-info.component";
 
 @NgModule({
     declarations: [
@@ -182,13 +176,7 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
         ViewBuyerSellerContactInfoComponent,
         ContactComponent,
         AddressComponent,
-        NotesComponent,
-        CreateOrEditSalesRepInfoComponent,
-        ViewSalesRepInfoComponent,
-        ViewShippingInformationComponent,
-        CreateOrAddShippingInformationComponent,
-        CreateOrEditBillingInfoComponent,
-        ViewBillingInfoComponent
+        NotesComponent
     ],
     imports: [
         BrowserAnimationsModule,
@@ -230,7 +218,7 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
         AccordionModule,
         TreeTableModule,
         TreeSelectModule,
-        CalendarModule, TooltipModule
+        CalendarModule,
     ],
     providers: [
         ImpersonationService,

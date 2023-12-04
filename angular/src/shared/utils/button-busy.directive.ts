@@ -38,13 +38,9 @@ export class ButtonBusyDirective implements OnInit, AfterViewInit {
         if (isBusy) {
             // disable button
             this._button.setAttribute('disabled', 'disabled');
-            if(this.busyText=='emptyText'){
-                this._button.innerHTML = '<i class="fa fa-spin fa-spinner"></i>';
-            }else{
+
             this._button.innerHTML = '<i class="fa fa-spin fa-spinner"></i>' +
                 '<span>' + (this.busyText ? this.busyText : this._appLocalizationService.l('ProcessingWithThreeDot')) + '</span>';
-            }
-
 
             this._button.setAttribute('_disabledBefore', true);
         } else {

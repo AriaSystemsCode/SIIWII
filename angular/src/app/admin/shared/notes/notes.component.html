@@ -1,25 +1,22 @@
 <div class="d-block">
-    <h4 class="notes-title purpleColor font-weight-bold">{{l("Notes")}}
-    </h4>
+    <h4 class="notes-title purpleColor font-weight-bold">Notes</h4>
     <div class="notes-cont   w-100  p-3 ml-2 mt-3 purpleColor">
         <div [ngClass]=" disabledModeOn? 'note-sub-cont p-3  has-saved-note': 'note-sub-cont p-3'">
             <div   [ngClass]="disabledModeOn?'notes-info ':'notes-info d-none'">
+                <span class="date">Aug. 16 2023, 23 PM</span>
                 <i class="edit-note fas fa-pen purpleColor pull-right" (click)="changeDisabledMode()"></i>
             </div>
             <form #noteForm="ngForm" method="post" novalidate (ngSubmit)="saveNote(noteVal.value)">
 
-        <textarea (focus)="addCurrentDate()" placeholder="Type Your Notes Here" required #noteVal ngModel name="note"
+        <textarea placeholder="Type Your Notes Here" required #noteVal ngModel name="note"
            [disabled]="disabledModeOn" 
-           class="form-control note-control w-100 mb-2 p-0" [value]="savedNoteData">
-           {{savedNoteData}}</textarea>
+           class="form-control note-control w-100 mb-2 p-0" [value]="savedNoteData">{{savedNoteData}}</textarea>
         <div  [ngClass]="disabledModeOn?'buttons-cont d-none':'buttons-cont '">
-            <button class="btn btn-primary bgPurple border-0"
-            [buttonBusy]="saving"
-            [busyText]="emptyText"
-            [disabled]="!noteForm.form.valid"
+            <button class="btn btn-primary bgPurple border-0" [disabled]="!noteForm.form.valid"
             type="submit">Save</button>
         </div>
     </form>
+
         </div>
 
     </div>

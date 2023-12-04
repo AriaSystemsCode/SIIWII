@@ -1,0 +1,24 @@
+<div>
+    <div class="container-fluid">
+        <div class="header my-2 d-flex align-items-center justify-content-between">
+            <h6><span> Company & Contact Information : </span></h6>
+            <button [disabled]="!(isContactsValid)" (click)="createOrEdit()" class="savebtn text-center btn float-right">
+                Continue
+            </button>
+        </div>
+        <hr class="my-2" />
+        <div class="InfoForm pr-3 thin-scroll">
+            <div class="row ml-1">
+                <app-contact
+                [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                [isReviewMode]="false"
+                (formValidityChanged)="isContactFormValid($event)"
+                [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"
+            ></app-contact>
+            </div>
+        </div>
+        <hr class="my-2" />
+    </div>
+</div>

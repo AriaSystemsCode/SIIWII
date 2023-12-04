@@ -92,7 +92,7 @@
                 </p> -->
             </div>
             <ng-container *ngIf="singleItemPerRowMode && (!actionsMenuFlags?.allIsHidden || browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections )">
-                <!-- <div
+                <div
                     *ngIf="
                         mainFilterCtrl?.value?.value== 0 && !item?.appItem?.listed && actionsMenuFlags?.createListing
                     "
@@ -105,7 +105,7 @@
                     >
                         {{ "CreateListing" | localize }}
                     </button>
-                </div> -->
+                </div>
 
                 <div
                     *ngIf="mainFilterCtrl?.value?.value== 1 && actionsMenuFlags?.publishOrUnpublish"

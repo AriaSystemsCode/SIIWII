@@ -373,7 +373,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         // ManageEntityDynamicParameterValuesModalComponent,
         // EntityDynamicParameterValueManagerComponent,
         StepperComponent,
-
     ],
     exports: [AddMemberModalComponent, AddRoleModalComponent],
     providers: [

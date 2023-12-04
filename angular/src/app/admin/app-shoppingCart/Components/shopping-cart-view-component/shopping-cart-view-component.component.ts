@@ -1,7 +1,4 @@
-import {
-  Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild
-  , AfterViewInit, ViewChildren, QueryList,
-} from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppTransactionServiceProxy, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -25,22 +22,13 @@ export class ShoppingCartViewComponentComponent
   extends AppComponentBase
   implements OnInit {
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
-  @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
-  @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
-
   orderInfoValid: boolean = false;
   buyerContactInfoValid = false;
   SellerContactInfoValid = false;
   SalesRepInfoValid = false;
   shippingInfOValid = false;
   BillingInfoValid = false;
-  createOrEditorderInfo: boolean = true;
-  createOrEditbuyerContactInfo: boolean = true;
-  createOrEditSellerContactInfo: boolean = true;
-  createOrEditSalesRepInfo: boolean = true;
-  createOrEditshippingInfO: boolean = true;
-  createOrEditBillingInfo: boolean = true;
-  loadNotesComp: boolean = false;
+  loadNotesComp:boolean=false;
   transactionNum: Number = 0;
   disableProceedBtn: boolean = true;
   productCode;
@@ -55,16 +43,16 @@ export class ShoppingCartViewComponentComponent
   cols!: any[];
   shoppingCartDetails: GetOrderDetailsForViewDto;
   shoppingCartTreeNodes!: TreeNode[];
-  //minimize: boolean = false;
+  minimize: boolean = false;
   shoppingCartMode: ShoppingCartMode;
-  _shoppingCartMode = ShoppingCartMode;
+  _shoppingCartMode=ShoppingCartMode;
   showTabs: boolean = false;
   transactionType: string = "";
   appTransactionsForViewDto: GetAppTransactionsForViewDto;
   showCarousel: boolean = false;
   transactionPosition = TransactionPosition;
   activeIndex = 0;
-  showSaveBtn: boolean = false;
+  @ViewChild('commentParentComponent',{ static:true }) commentParentComponent : CommentParentComponent
 
   constructor(
     injector: Injector,
@@ -77,54 +65,32 @@ export class ShoppingCartViewComponentComponent
   }
   ngOnInit(): void {
   }
-  loadCommentsList() {
-    // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
-    this.commentParentComponent.first.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
-  }
+  loadCommentsList(){
+    //this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
+}
 
-  show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
+  show(orderId: number = 0, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
     this.resetData();
     this.orderId = orderId;
-    this.loadNotesComp = true;
+    this.loadNotesComp=true;
     this.showCarousel = showCarousel;
     this.validateOrder = validateOrder;
     this.shoppingCartMode = shoppingCartMode;
-
-    if (shoppingCartMode == ShoppingCartMode.createOrEdit) {
+    if (shoppingCartMode == ShoppingCartMode.createOrEdit)
       this.showTabs = false;
-      this.createOrEditorderInfo = true;
-      this.createOrEditbuyerContactInfo = true;
-      this.createOrEditSellerContactInfo = true;
-      this.createOrEditSalesRepInfo = true;
-      this.createOrEditshippingInfO = true;
-      this.createOrEditBillingInfo = true;
-    }
-    else {
+    else
       this.showTabs = true;
-      this.createOrEditorderInfo = false;
-      this.createOrEditbuyerContactInfo = false;
-      this.createOrEditSellerContactInfo = false;
-      this.createOrEditSalesRepInfo = false;
-      this.createOrEditshippingInfO = false;
-      this.createOrEditBillingInfo = false;
-    }
-
     this.getColumns();
     this.getShoppingCartData();
   }
 
-  resetTabValidation() {
-    var valid: boolean = false;
-
-    if (this.shoppingCartDetails?.entityStatusCode?.toUpperCase() == 'OPEN')
-      valid = true;
-
-    this.orderInfoValid = valid;
-    this.buyerContactInfoValid = valid;
-    this.SellerContactInfoValid = valid;
-    this.SalesRepInfoValid = valid;
-    this.shippingInfOValid = valid;
-    this.BillingInfoValid = valid;
+  resetTabValidation(){
+    this.orderInfoValid = false;
+    this.buyerContactInfoValid = false;
+    this.SellerContactInfoValid = false;
+    this.SalesRepInfoValid = false;
+    this.shippingInfOValid = false;
+    this.BillingInfoValid = false;
   }
 
   resetData() {
@@ -139,20 +105,15 @@ export class ShoppingCartViewComponentComponent
     this.showVariations = false;
     this.oldShowVariations = false;
     this.validateOrder = false;
+    this.orderId = 0;
     this.cols = [];
     this.showTabs = false;
-    this.createOrEditorderInfo = true;
-    this.createOrEditbuyerContactInfo = true;
-    this.createOrEditSellerContactInfo = true;
-    this.createOrEditSalesRepInfo = true;
-    this.createOrEditshippingInfO = true;
-    this.createOrEditBillingInfo = true;
   }
 
   getColumns() {
     this.cols = [
       { field: "image", header: "Image" },
-      { field: "manufacturerCode", header: "Code" },
+      { field: "code", header: "Code" },
       { field: "name", header: "Name" },
       { field: "qty", header: "Quantity" },
       { field: "price", header: "Price" },
@@ -163,11 +124,9 @@ export class ShoppingCartViewComponentComponent
   getShoppingCartData(temp: TreeNode<any>[] = null) {
 
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
-
-        this.loadCommentsList()
 
         //lines
         this._AppTransactionServiceProxy
@@ -180,10 +139,6 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
-            this.resetTabValidation();
-
-            this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
-
             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
             if (res.transactionType == TransactionType.PurchaseOrder)
               this.transactionType = "Purchase Order";
@@ -233,16 +188,6 @@ export class ShoppingCartViewComponentComponent
       localStorage.setItem(
         "SellerSSIN",
         JSON.stringify(this.shoppingCartDetails.sellerCompanySSIN)
-      );
-
-      localStorage.setItem(
-        "currencyCode",
-        JSON.stringify(this.appTransactionsForViewDto.currencyCode)
-      );
-
-      localStorage.setItem(
-        "transNO",
-        this.shoppingCartDetails.code
       );
       this.router.navigateByUrl("app/main/marketplace/products");
     }
@@ -346,7 +291,7 @@ export class ShoppingCartViewComponentComponent
   }
   onDelete(rowNode) {
     Swal.fire({
-      title: "Remove",
+      title: "Remove this post",
       text: "Are you sure you want to permanently remove this ?",
       showCancelButton: true,
       cancelButtonText: "No",
@@ -476,43 +421,36 @@ export class ShoppingCartViewComponentComponent
   hide() {
     this.resetData();
     this.modal.hide();
-    let indx = -1;
-    indx = this.minimizedOrders?.findIndex(x => x.orderId == this.shoppingCartDetails?.orderId);
-    if (indx >= 0)
-      this.minimizedOrders.splice(indx, 1);
     this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-    if (this.shoppingCartMode == ShoppingCartMode.view)
-      this.hideShoppingCartModal.emit(true);
   }
 
   minimizedOrders: any[] = [];
   minimizeScreen() {
-    let indx = -1;
-    indx = this.minimizedOrders?.findIndex(x => x.orderId == this.shoppingCartDetails.orderId);
-    if (indx >= 0) {
-    }
-    else {
+    if (this.minimizedOrders.length !== 0) {
+      this.minimizedOrders.forEach((order: any) => {
+        if (order.orderId !== this.shoppingCartDetails.orderId) {
+          this.minimizedOrders.push({
+            orderId: this.shoppingCartDetails.orderId,
+            name: this.shoppingCartDetails.name,
+          });
+        }
+      });
+    } else {
       this.minimizedOrders.push({
         orderId: this.shoppingCartDetails.orderId,
         name: this.shoppingCartDetails.name,
       });
     }
-    //  this.minimize = true;
-    this.modal.hide();
+    this.minimize = true;
   }
 
-  maximizeScreen(orderId: number) {
-    // this.minimize = false;
-    let indx = -1;
-    indx = this.minimizedOrders?.findIndex(x => x.orderId == orderId);
-    if (indx >= 0)
-      this.minimizedOrders.splice(indx, 1);
-    this.show(orderId, this.showCarousel, this.validateOrder, this.shoppingCartMode);
+  maximizeScreen() {
+    this.minimize = false
   }
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
         this.hideMainSpinner();
@@ -593,13 +531,10 @@ export class ShoppingCartViewComponentComponent
     }).then((result) => {
       if (result.isConfirmed) {
         this.showMainSpinner();
+        this.appTransactionsForViewDto = new GetAppTransactionsForViewDto();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
-        this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-          .pipe(finalize(() => {
-            this.hideMainSpinner();
-            this.hide();
-          }
-          ))
+        this._AppTransactionServiceProxy.createOrEdit(this.appTransactionsForViewDto)
+          .pipe(finalize(() => this.hideMainSpinner()))
           .subscribe((res) => {
             if (res) {
               Swal.fire({
@@ -630,7 +565,7 @@ export class ShoppingCartViewComponentComponent
 
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
         this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);
@@ -643,27 +578,27 @@ export class ShoppingCartViewComponentComponent
         this.orderInfoValid = true;
         break;
 
-      case ShoppingCartoccordionTabs.BuyerContactInfo:
-        this.buyerContactInfoValid = true;
-        break;
+        case ShoppingCartoccordionTabs.BuyerContactInfo:
+          this.buyerContactInfoValid = true;
+          break;
 
 
-      case ShoppingCartoccordionTabs.SellerContactInfo:
-        this.SellerContactInfoValid = true;
-        break;
+          case ShoppingCartoccordionTabs.SellerContactInfo:
+            this.SellerContactInfoValid  = true;
+            break;
 
-      case ShoppingCartoccordionTabs.SalesRepInfo:
-        this.SalesRepInfoValid = true;
-        break;
+            case ShoppingCartoccordionTabs.SalesRepInfo:
+            this.SalesRepInfoValid  = true;
+            break;
 
-      case ShoppingCartoccordionTabs.ShippingInfo:
-        this.shippingInfOValid = true;
-        break;
+            case ShoppingCartoccordionTabs.ShippingInfo:
+            this.shippingInfOValid  = true;
+            break;
 
 
-      case ShoppingCartoccordionTabs.BillingInfo:
-        this.BillingInfoValid = true;
-        break;
+            case ShoppingCartoccordionTabs.BillingInfo:
+              this.BillingInfoValid  = true;
+              break;
       default:
         break;
     }
@@ -676,4 +611,5 @@ export class ShoppingCartViewComponentComponent
   onChangeAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
   }
+
 }

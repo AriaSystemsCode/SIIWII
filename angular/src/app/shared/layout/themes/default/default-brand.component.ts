@@ -23,7 +23,6 @@ export class DefaultBrandComponent extends AppComponentBase implements OnInit {
     tenantLogo:any;
     loading:boolean = false
    @Output() openSideBar: EventEmitter <boolean>= new EventEmitter<false>();  
-   @Output() updateAccountSummary: EventEmitter <any>= new EventEmitter<any>();  
     _openSideBar:boolean=false;
 
     constructor(
@@ -58,7 +57,6 @@ export class DefaultBrandComponent extends AppComponentBase implements OnInit {
         this.loading = true
         this._accountsServiceProxy.getAccountSummary().subscribe(result =>{
             this.accountSummary = result;
-            this.updateAccountSummary.emit(this.accountSummary);
             if(result.logoUrl!=undefined)
                 this.tenantLogo=`${this.attachmentBaseUrl}/${this.accountSummary.logoUrl}`
                 this.loading = false

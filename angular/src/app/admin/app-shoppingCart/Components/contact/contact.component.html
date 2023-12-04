@@ -1,22 +1,18 @@
 <!-- <app-address></app-address> -->
-<form #contactForm="ngForm" class="pl-2">
-    <div class="row" *ngIf="isCreateOrEdit">
+<form #phoneNumberForm="ngForm" class="pl-2">
+    <div class="row">
         <!-- company name -->
         <div class="col-md-5">
-            <div class="formGroup">
+            <div *ngIf="!isReviewMode" class="formGroup">
                 <label class="label">Company Name</label>
-                <p-dropdown [filter]="true"   [filterValue]="companyFilterValue" (onFilter)="handleCompanySearch($event)" class="w-100" [placeholder]="tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder" 
-                  [options]="companeyNames"
-                    *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo && activeTab!=shoppingCartoccordionTabs.SellerContactInfo" [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
-                    [ngClass]="{'tempAccount': tempAccount}" 
-                    optionLabel="name" name="selectedCompany"  [virtualScroll]="true" [itemSize]="30" (onChange)="onChangeCompany()" ></p-dropdown>
-                  
-                <div *ngIf="activeTab==shoppingCartoccordionTabs.orderInfo || activeTab==shoppingCartoccordionTabs.SellerContactInfo">
-                    <p class="previewValue text-nowrap m-0 p-0  pl-2 col-4" *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
-                        {{ appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name}}
-                    </p>
-                    <p class="previewValue text-nowrap m-0 p-0 pl-5 col-4" *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
-                        -
+                <p-dropdown class="w-100" placeholder="Select Company Name" [options]="companeyNames"
+                    [(ngModel)]="selectedCompany" optionLabel="name" name="selectedCompany"></p-dropdown>
+            </div>
+            <div *ngIf="isReviewMode">
+                <div class="d-flex align-items-center justify-content-between w-75">
+                    <h6 class="previewTitle m-0 p-0">Company Name :</h6>
+                    <p class="previewValue m-0 p-0">
+                        {{ selectedCompany}}
                     </p>
                 </div>
             </div>
@@ -26,30 +22,22 @@
         <!-- phone -->
         <div class="col-md-6">
             <div class="row">
-                <div class="col-4 pl-2">
-                    <label class="label">Phone type</label>
+                <div *ngIf="ShoppingCartMode.createOrEdit" class="col-2">
+                    <label class="label">Phone#</label>
                 </div>
-                <div class="col">
-                    <label class="label">Phone Number</label>
-                </div>
-                <div class="col-12">
+                <div *ngIf="ShoppingCartMode.createOrEdit" class="col-12">
                     <div class="groupForm">
-                        <p-dropdown [options]="allPhoneTypes"
-                        class=" col-4"
-                            styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
-                            name="selectedPhoneType" optionLabel="phoneTypeName"  [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType" [style]="{'width':'100%'}"
-                            (onChange)="onchangePhoneType($event)"></p-dropdown>
-
+                        <p-dropdown
+                            placeholder="Phone Type"
+                            [options]="phoneTypes"
+                            [(ngModel)]="selectedPhoneType"
+                            name="selectedPhoneType"
+                            optionLabel="label"
+                        ></p-dropdown>
                         <div class="w-100">
-                            <!-- [readonly]="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType" 
-                                [disabled]="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType"
-                                [ngStyle]="{
-                                    'cursor': !appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType ? 'not-allowed' : 'pointer'}"  -->
                             <input placeholder="Phone Number..." type="text" class="form-control ml-3 w-100"
-                                [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber"
-                                #phoneNumberInput="ngModel"  name="phoneNumber" minlength="5" maxlength="20"
-                                pattern="[0-9]*" 
-                                />
+                                [(ngModel)]="PhoneNumber" #phoneNumberInput="ngModel" required name="phoneNumber"
+                                pattern="[0-9]*" />
                         </div>
                     </div>
                     <div *ngIf="
@@ -57,36 +45,51 @@
                             (phoneNumberInput.dirty || phoneNumberInput.touched)
                         " class="text-danger">
                         <small *ngIf="phoneNumberInput.errors.required">
-                            Phone number is required with length 5-20
-                        </small>
-                        <small *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber && (appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber?.length <5 || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber?.length>20 )">
-                            Phone number is required with length 5-20
+                            Phone number is required.
                         </small>
                         <small *ngIf="phoneNumberInput.errors.pattern">
                             Phone number must contain only numbers.
                         </small>
                     </div>
                 </div>
+                <div class="col-md-12" *ngIf="ShoppingCartMode.view">
+                    <div
+                        class="d-flex align-items-center justify-content-between w-75"
+                    >
+                        <h6 class="previewTitle m-0 p-0">Phone :</h6>
+                        <p class="previewValue m-0 p-0">
+                            {{PhoneNumber}}
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- phone -->
 
+
+
         <!-- contact name -->
         <div class="col-md-5 my-2">
-            <div class="formGroup">
+            <div *ngIf="ShoppingCartMode.createOrEdit">
                 <label class="label">Contact Name</label>
-                <p-dropdown   [filter]="true" [filterValue]="contactFilterValue" (onFilter)="handleContactSearch($event)" class="w-100" [placeholder]="tempContact ? contactNamePlaceholder : defaultcontactNamePlaceholder" 
-                placeholder="Select Contact Name" [options]="allContacts"
-                *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo" [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
-                [ngClass]="{'tempAccount': tempContact}"  optionLabel="name" name="selectedContact" (onChange)="onChangeContact($event)" ></p-dropdown>
-               
-                        
-                    <div *ngIf="activeTab==shoppingCartoccordionTabs.orderInfo">
-                    <p class=" previewValue text-nowrap  m-0 p-0 pl-2 col-4" *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
-                        {{ appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name }}
-                    </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  pl-5 col-4" *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
-                        -
+                <input type="text" placeholder="Contact Name..." class="form-control w-100" name="contactName"
+                    [(ngModel)]="contactName" #name="ngModel" required />
+                <div *ngIf="
+                    name.invalid &&
+                        (name.dirty || name.touched)
+                    " class="text-danger">
+                    <small *ngIf="name.errors.required">
+                        Contact Name is required.
+                    </small>
+                </div>
+            </div>
+            <div *ngIf="ShoppingCartMode.view">
+                <div
+                    class="d-flex align-items-center justify-content-between w-75"
+                >
+                    <h6 class="previewTitle m-0 p-0">Contact Name :</h6>
+                    <p class="previewValue m-0 p-0">
+                        {{ contactName }}
                     </p>
                 </div>
             </div>
@@ -94,33 +97,48 @@
         <!-- contact name -->
 
         <!-- Email -->
-        <div class="col-md-6 my-2 pr-0">
-            <div>
+        <div class="col-md-6 my-2 ml-3">
+            <div *ngIf="ShoppingCartMode.createOrEdit">
                 <label class="label">Email</label>
-                <input type="text" placeholder="Email..." class="form-control w-100"
-                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail"
-                    name="email" />
+                <input type="text" placeholder="Email..." class="form-control w-100" [(ngModel)]="email" name="email" />
+            </div>
+            <div *ngIf="ShoppingCartMode.view">
+                <div
+                    class="d-flex align-items-center justify-content-between w-75"
+                >
+                    <h6 class="previewTitle m-0 p-0">Email :</h6>
+                    <p class="previewValue m-0 p-0">
+                        {{ email }}
+                    </p>
+                </div>
             </div>
         </div>
         <!-- Email -->
 
         <!-- branches -->
-        <div class="col-md-11 my-2 pr-0">
-            <div>
-                <label class="label">Branch</label>
-                <p-dropdown class="w-50" placeholder="Select Branch" [options]="allBranches"
-                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch" optionLabel="name" name="branch" appendTo="body"
-                    baseZIndex="99999"></p-dropdown>
+        <div class="col-md-11 my-2">
+            <div *ngIf="!isReviewMode">
+                <label class="label">Branches</label>
+                <p-dropdown class="w-50" placeholder="Select Branch" [options]="companeyNames"
+                    [(ngModel)]="selectedBranch" optionLabel="name" name="branch" appendTo="body"></p-dropdown>
+            </div>
+            <div *ngIf="isReviewMode">
+                <div class="d-flex align-items-center justify-content-between w-75">
+                    <h6 class="previewTitle m-0 p-0">Branches :</h6>
+                    <p class="previewValue m-0 p-0">
+                        {{ appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName }}
+                    </p>
+                </div>
             </div>
         </div>
         <!-- branches -->
 
         <!-- Department -->
         <div class="col-md-11 my-2" *ngIf="showDepartment">
-            <div>
+            <div *ngIf="!isReviewMode">
                 <label class="label">Department</label>
                 <input type="text" placeholder="Department Name..." class="form-control w-100" name="DepartmentName"
-                    [(ngModel)]="appTransactionsForViewDto.buyerDepartment" #DepartmentName="ngModel" required />
+                    [(ngModel)]="departmentName" #DepartmentName="ngModel" required />
                 <div *ngIf="
                     DepartmentName.invalid &&
                         (DepartmentName.dirty || DepartmentName.touched)
@@ -130,112 +148,11 @@
                     </small>
                 </div>
             </div>
-        </div>
-        <!-- Departments -->
-
-    </div>
-
-    <div class="row" *ngIf="!isCreateOrEdit">
-        <!-- company name -->
-        <div class="col-md-6 my-2">
-            <div>
-                <div class="d-flex align-items-center   w-75">
-                    <h6 class="previewTitle m-0 p-0  col-4">Company :</h6>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4" *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
-                        {{ appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name}}
-                    </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4" *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
-                        -
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- company name -->
-
-        <!-- phone -->
-        <div class="col-md-6 my-2">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="d-flex align-items-center   w-75">
-                        <h6 class="previewTitle m-0 p-0  col-4">Phone :</h6>
-                        <p class=" previewValue text-nowrap  m-0 p-0  col-4"
-                            *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber">
-                            {{appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber}}
-                        </p>
-                        <p class=" previewValue text-nowrap  m-0 p-0  col-4"
-                            *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber">
-                            -
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- phone -->
-
-        <!-- contact name -->
-        <div class="col-md-6 my-2">
-            <div>
-                <div class="d-flex align-items-center   w-75">
-                    <h6 class="previewTitle m-0 p-0  col-5">Contact Name :</h6>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4" *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
-                        {{ appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name }}
-                    </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4" *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
-                        -
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- contact name -->
-
-        <!-- Email -->
-        <div class="col-md-6 my-2">
-            <div>
-                <div class="d-flex align-items-center   w-75">
-                    <h6 class="previewTitle m-0 p-0  col-4">Email :</h6>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4"
-                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
-                        {{
-                        appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail
-                        }}
-                    </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4"
-                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
-                        -
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- Email -->
-
-        <!-- branches -->
-        <div class="col-md-6 my-2">
-            <div>
-                <div class="d-flex align-items-center   w-75">
-                    <h6 class="previewTitle m-0 p-0  col-4">Branch :</h6>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4"
-                        *ngIf="appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName">
-                        {{ appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName }}
-                    </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4"
-                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName">
-                        -
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- branches -->
-
-        <!-- Department -->
-        <div class="col-md-11 my-2" *ngIf="showDepartment">
-            <div>
-                <div class="d-flex align-items-center   w-75">
-                    <h6 class="previewTitle m-0 p-0  col-4">Department Name :</h6>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4" *ngIf="appTransactionsForViewDto?.buyerDepartment">
-                        {{ appTransactionsForViewDto?.buyerDepartment }}
-                    </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  col-4" *ngIf="!appTransactionsForViewDto?.buyerDepartment">
-                        -
+            <div *ngIf="isReviewMode">
+                <div class="d-flex align-items-center justify-content-between w-75">
+                    <h6 class="previewTitle m-0 p-0">Department Name :</h6>
+                    <p class="previewValue m-0 p-0">
+                        {{ departmentName }}
                     </p>
                 </div>
             </div>

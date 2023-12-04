@@ -29,7 +29,7 @@
                 placeholder="Please Select your Role"
                 optionLabel="name"
                 (onChange)="handleRoleChange($event)"
-                #Role
+                 #Role
             ></p-dropdown>
             <small class="text-danger" *ngIf="isRoleExist">
                 Please Select Role
@@ -76,7 +76,6 @@
 
                             <div *ngIf="!isCompantIdExist">
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
                                     *ngIf="!isBuyerTempAccount"
                                     [options]="buyerCompanies"
                                     formControlName="buyerCompanyName"
@@ -89,7 +88,6 @@
                                     (onChange)="
                                         handleBuyerCompanyChange($event)
                                     "
-                                    required
                                 ></p-dropdown>
                             </div>
                             <small
@@ -111,7 +109,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >Buyer Contact Name</label
+                                >Buyer Contact Name*</label
                             >
                             <input
                                 type="text"
@@ -152,25 +150,23 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >{{buyerPhoneLabel}}*
+                                >Buyer Mobile Number*
                             </label>
                             <input
                                 type="text"
                                 class="form-control"
-                                placeholder="Buyer Phone Number..."
+                                placeholder="Buyer Mobile Number..."
                                 formControlName="buyerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
                             />
                             <small
-                                class="text-danger"
-                                *ngIf="invalidBuyerPhoneNumber && !orderForm
-                                .get('buyerContactPhoneNumber')
-                                ?.hasError('required')"
-                            >
-                                {{ invalidBuyerPhoneNumber }}
-                            </small>
-                            <!-- <small
+                            class="text-danger"
+                            *ngIf="invalidBuyerPhoneNumber"
+                        >
+                        {{invalidBuyerPhoneNumber}}
+                        </small>
+                            <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
@@ -180,7 +176,7 @@
                                 "
                             >
                                 phone Number is Required
-                            </small> -->
+                            </small>
                             <small
                                 class="text-danger"
                                 *ngIf="
@@ -203,31 +199,13 @@
                                 >Buyer Email*
                             </label>
                             <input
-                            type="email"
+                                type="text"
                                 name=""
                                 id=""
                                 class="form-control"
                                 placeholder="Buyer Email..."
                                 formControlName="buyerContactEMailAddress"
-                                minlength="5"
-                                maxlength="100"
-                                required
                             />
-                            
-                            <small
-                                class="text-danger"
-                                *ngIf="invalidBuyerContactEMailAddress &&
-                                !orderForm
-                                    .get('buyerContactEMailAddress')
-                                    ?.hasError('required')  && 
-                                   ! orderForm
-                                        .get('buyerContactEMailAddress')
-                                        ?.hasError('email')"
-
-                            >
-                                {{ invalidBuyerContactEMailAddress }}
-                            </small>
-
                             <small
                                 class="text-danger"
                                 *ngIf="
@@ -286,7 +264,6 @@
                             </div>
                             <div *ngIf="!isSellerCompanyIdExist">
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
                                     [options]="sellerCompanies"
                                     formControlName="sellerCompanyName"
                                     [filter]="true"
@@ -298,7 +275,6 @@
                                     (onChange)="
                                         handleSellerCompanyChange($event)
                                     "
-                                    required
                                 ></p-dropdown>
                             </div>
 
@@ -321,7 +297,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >Seller Contact Name</label
+                                >Seller Contact Name*</label
                             >
                             <p-dropdown
                                 [options]="sellerContacts"
@@ -348,22 +324,22 @@
                     </div>
                     <!-- seller Name -->
 
-                    <!-- phone Number -->
+                    <!-- mobile Number -->
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >{{sellerPhoneLabel}}*
+                                >Seller Mobile Number*
                             </label>
                             <input
                                 type="text"
                                 name="mobileNumber"
                                 class="form-control"
-                                placeholder="Phone Number..."
+                                placeholder="Mobile Number..."
                                 formControlName="sellerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
                             />
-                            <!-- <small
+                            <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
@@ -372,16 +348,14 @@
                                         ?.hasError('required')
                                 "
                             >
-                                phone Number is Required
-                            </small> -->
-                            <small
-                                class="text-danger"
-                                *ngIf="invalidSellerPhoneNumber && !orderForm
-                                .get('sellerContactPhoneNumber')
-                                ?.hasError('required')"
-                            >
-                                {{ invalidSellerPhoneNumber }}
+                                phone Number is Required 
                             </small>
+                            <small
+                            class="text-danger"
+                            *ngIf="invalidSellerPhoneNumber"
+                        >
+                        {{invalidSellerPhoneNumber}}
+                        </small>
                             <small
                                 class="text-danger"
                                 *ngIf="
@@ -395,7 +369,7 @@
                             </small>
                         </div>
                     </div>
-                    <!-- seller Phone number -->
+                    <!-- seller mobile number -->
 
                     <!-- Seller email -->
                     <div class="col-md-6">
@@ -404,34 +378,19 @@
                                 >Seller Email*</label
                             >
                             <input
-                            type="email"
+                                type="text"
                                 name="sellerContactEMailAddress"
                                 class="form-control"
                                 placeholder="Seller Email..."
                                 formControlName="sellerContactEMailAddress"
-                                minlength="5"
-                                maxlength="100"
-                                required
                             />
-                            <small
-                            class="text-danger"
-                            *ngIf="invalidSellerContactEMailAddress  &&
-                            !orderForm
-                                .get('sellerContactEMailAddress')
-                                ?.hasError('required')  && 
-                                ! orderForm
-                                     .get('sellerContactEMailAddress')
-                                     ?.hasError('email')"
-                        >
-                            {{ invalidSellerContactEMailAddress }}
-                        </small>
                             <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
                                     orderForm
                                         .get('sellerContactEMailAddress')
-                                        ?.hasError('required') 
+                                        ?.hasError('required')
                                 "
                             >
                                 Email Address is Required
@@ -450,14 +409,6 @@
                         </div>
                     </div>
                     <!-- Seller email -->
-
-                    <div class="col-12 my-2">
-                        <div *ngIf="areSame" class="alert alert-danger" role="alert">
-                            <p class="mb-0">
-                                Buyer and Seller are same person please choose another option
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </form>
         </div>
@@ -469,7 +420,7 @@
             (click)="getStarted()"
             class="btn"
         >
-        Start Shopping
+            Let's get started
         </button>
     </div>
 </p-dialog>

@@ -737,10 +737,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         if(this.accountLevel === AccountLevelEnum.Profile) {
             
         if( this.accountInfoOldCurrencyId   && this.accountInfoTemp.currencyId !=this.accountInfoOldCurrencyId ){
-                        //    this.l('The default currency of all prices that you assign to all products will be affected by this change. Do you need to proceed with this change?'),
             this.message.confirm(
                 '',
-            this.l('Are you sure you want to change the default currency? , The pricing you assign to all of the products may change as a result of the change in your default currency. Do you have to make this change now?'),
+                this.l('The default currency of all prices that you assign to all products will be affected by this change. Do you need to proceed with this change?'),
                 (isConfirmed) => {
                     if (!isConfirmed) {
                        this.accountInfoTemp.currencyId =this.accountInfoOldCurrencyId ;
@@ -1041,7 +1040,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     connect(): void {
-        this._AccountsServiceProxy.connect(this.accountDataForView.partnerId)
+        this._AccountsServiceProxy.connect(this.accountDataForView.id)
         .subscribe(() => {
             this.notify.success(this.l('SuccessfullyConnected'));
             this.accountDataForView.status = true
@@ -1098,15 +1097,15 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
     openViewMemberProfile(){
         const memberId : number = this.selectedMember?.memberId
-        const userId : any = this.selectedMember?.userId
+        const userId : number = this.selectedMember?.userId
         const isExternalAccount : boolean = this.accountLevel == AccountLevelEnum.External
         const isManualAccount : boolean = this.accountLevel == AccountLevelEnum.Manual
         const isMyAccount : boolean = !this.viewMode && this.accountLevel == AccountLevelEnum.Profile
         const isConnectedWithAccount :boolean = this.viewMode && this.accountDataForView.status
         const isNotConnectedWithAccount :boolean = this.viewMode && !this.accountDataForView.status
 
-        const isManualContact : boolean =(!userId || userId=="0" ) && ( isConnectedWithAccount || isManualAccount )
-        const isExternalContact : boolean = (!userId || userId=="0" )  && isExternalAccount
+        const isManualContact : boolean = !userId && ( isConnectedWithAccount || isManualAccount )
+        const isExternalContact : boolean = !userId && isExternalAccount
         const isMyTeamMember : boolean = isMyAccount
 
         const canDelete : boolean = (isManualContact || isExternalContact ) && !isNotConnectedWithAccount
@@ -1136,13 +1135,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     // Create or edit member component methods
     openCreateOrEditMember( ){
         const memberId : number = this.selectedMember?.memberId
-        const userId : any = this.selectedMember?.userId    
+        const userId : number = this.selectedMember?.userId
         const isExternalAccount : boolean = this.accountLevel == AccountLevelEnum.External
         const isManualAccount : boolean = this.accountLevel == AccountLevelEnum.Manual
         const isConnectedWithAccount :boolean = this.viewMode && this.accountDataForView.status
 
-        const isManualContact : boolean = (!userId || userId=="0" ) && ( isConnectedWithAccount || isManualAccount )
-        const isExternalContact : boolean =(!userId || userId=="0" ) && isExternalAccount
+        const isManualContact : boolean = !userId && ( isConnectedWithAccount || isManualAccount )
+        const isExternalContact : boolean = !userId && isExternalAccount
         const isMyTeamMember : boolean = !this.viewMode && this.accountLevel == AccountLevelEnum.Profile
 
         const canAdd : boolean = isManualContact || isExternalContact
@@ -1170,14 +1169,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     // Member List component methods
     openMembersList(){
         const memberId : number = this.selectedMember?.memberId
-        const userId : any = this.selectedMember?.userId
+        const userId : number = this.selectedMember?.userId
         const isExternalAccount : boolean = this.accountLevel == AccountLevelEnum.External
         const isManualAccount : boolean = this.accountLevel == AccountLevelEnum.Manual
         const isConnectedWithAccount :boolean = this.viewMode && this.accountDataForView.status
         const isNotConnectedWithAccount :boolean = this.viewMode && !this.accountDataForView.status
 
-        const isManualContact : boolean = (!userId || userId=="0" ) && ( isConnectedWithAccount || isManualAccount )
-        const isExternalContact : boolean= (!userId || userId=="0" ) && isExternalAccount
+        const isManualContact : boolean = !userId && ( isConnectedWithAccount || isManualAccount )
+        const isExternalContact : boolean = !userId && isExternalAccount
         const isMyTeamMember : boolean = !this.viewMode && this.accountLevel == AccountLevelEnum.Profile
 
         const canAdd : boolean = isManualContact || isExternalContact

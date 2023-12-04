@@ -251,11 +251,7 @@ input.ng-invalid.ng-touched {
     bottom: 11px;
     background-color: #fff;
 }
-.times-icon{
-  color: red;
-  font-size: 1.5em !important;
-}
- 
+
 .mini-order {
     border-radius: 4px;
     background: #f2f3f8;
@@ -265,15 +261,3 @@ input.ng-invalid.ng-touched {
     gap: 10px;
     flex-direction: row-reverse;
 }
-.mini-order:hover{
-    background: #f2f3f8 !important;
-}
-
-/*---------------------custome style for comment component--------------------*/
-.comment-warper{
-    position: relative;
-    height: 56vh;
-}
-
-
-

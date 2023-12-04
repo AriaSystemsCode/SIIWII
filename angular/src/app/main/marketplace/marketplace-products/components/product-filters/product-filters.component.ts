@@ -54,16 +54,13 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     @Output() handleEndSoldOutDate: EventEmitter<any> = new EventEmitter();
     @Output() handleStockSiwtch: EventEmitter<any> = new EventEmitter();
     @Output() handleBrandsSelection: EventEmitter<any> = new EventEmitter();
-    accountSSIN:string;
+
     constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _SycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
-        private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private _appMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
-
-        this.accountSSIN=localStorage.getItem("SellerSSIN");
         this.getAllProductCAtalogs();
         this.getParentDepartments();
         this.getAllBrands();
@@ -72,28 +69,8 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     // get all brands
     brands: any[] = [];
     getAllBrands() {
-        // this._appEntitiesServiceProxy
-        //     .getAllEntitiesByTypeCodeWithPaging(
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         null,
-        //         "BRAND",
-        //         null,
-        //         null,
-        //         86,
-        //         "name",
-        //         0,
-        //         10
-        //     )
-        //     .subscribe((res) => {
-        //         console.log(">>", res);
-        //         this.brands = res.items;
-        //     });
-
-          this._appMarketplaceItemsServiceProxy
-            .getAllBrandsWithPaging(
+        this._appEntitiesServiceProxy
+            .getAllEntitiesByTypeCodeWithPaging(
                 null,
                 null,
                 null,
@@ -105,7 +82,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
                 86,
                 "name",
                 0,
-                10,this.accountSSIN
+                10
             )
             .subscribe((res) => {
                 console.log(">>", res);
@@ -121,7 +98,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
     // get all product list ( catalog or collection )
     getAllProductCAtalogs() {
         this._AppMarketplaceItemsServiceProxy
-            .getSharedItemLists(null, "name", 0, 200,this.accountSSIN)
+            .getSharedItemLists(null, "name", 0, 200)
             .subscribe(
                 (res: PagedResultDtoOfGetAllMarketplaceItemListsOutputDto) => {
                     this.productList = res.items;
@@ -218,11 +195,7 @@ export class ProductFiltersComponent implements OnInit, OnDestroy {
         this.handledeDratmentsTreeSelections.emit(value);
     }
 
-    nodeUnselect(value: any) {
-        console.log(value);
-
-        this.handledeDratmentsTreeSelections.emit(null);
-    }
+    nodeUnselect(value: any) {}
 
     handleStartPriceTyping(event) {
         clearTimeout(this.timeOut);

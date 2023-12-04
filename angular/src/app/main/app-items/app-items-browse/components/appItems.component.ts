@@ -128,12 +128,6 @@ export class AppItemsComponent extends AppComponentBase {
             const control = this._fb.control(undefined)
             this.filterForm.addControl("appItemType",control)
         }
-           //  T-SII-20231103.0007 
-       if(flags.appItemSizeScale){
-            const control = this._fb.control(undefined)
-            this.filterForm.addControl("appItemSizeScale",control)
-        } 
-
         if(flags.categories){
             const control = this._fb.control([])
             this.filterForm.addControl("categories",control)
@@ -278,9 +272,6 @@ export class AppItemsComponent extends AppComponentBase {
         filterBody.filterType = filters.filterType.value
         filterBody.priceListId = this.priceListId
 
-           //  T-SII-20231103.0007 
-           filterBody.filterSizeScale= filters?.appItemSizeScale?.map(scale=>scale.value)
-
         const extraAttributesKeys  = Object.keys(filters?.extraAttributes)
         if(extraAttributesKeys?.length) {
             extraAttributesKeys.forEach((key)=>{
@@ -316,7 +307,6 @@ export class AppItemsComponent extends AppComponentBase {
         this.loading = true;
         this._appItemsServiceProxy
             .getAll(
-                   //  T-SII-20231103.0007 
                 filterBody.tenantId,
                 filterBody.appItemListId,
                 filterBody.selectorOnly,
@@ -328,7 +318,6 @@ export class AppItemsComponent extends AppComponentBase {
                 filterBody.arrtibuteFilters,
                 filterBody.classificationFilters,
                 filterBody.categoryFilters,
-                filterBody.filterSizeScale,
                 filterBody.departmentFilters,
                 filterBody.entityObjectTypeId,
                 filterBody.minimumPrice,

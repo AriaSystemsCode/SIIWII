@@ -29,7 +29,6 @@ import { CarouselModule } from 'primeng/carousel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TabViewModule } from 'primeng/tabview';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { AppCommonModule } from "@app/shared/common/app-common.module";
 @NgModule({
     declarations: [
         MarketplaceProductsComponent,
@@ -61,7 +60,7 @@ import { AppCommonModule } from "@app/shared/common/app-common.module";
         CarouselModule,
         InputNumberModule,
         TabViewModule,
-        ConfirmDialogModule,AppCommonModule
+        ConfirmDialogModule
     ],
     providers:[AppMarketplaceItemsServiceProxy]
 })

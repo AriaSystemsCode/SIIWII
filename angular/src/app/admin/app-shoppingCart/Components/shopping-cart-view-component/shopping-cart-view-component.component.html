@@ -1,6 +1,6 @@
-<div bsModal #shoppingCartModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
-    aria-labelledby="shoppingCartModal" aria-hidden="true" [config]="{ backdrop: false , ignoreBackdropClick: true }"
-    style="overflow-y: scroll;">
+<div  bsModal #shoppingCartModal="bs-modal"
+    class="modal fade" tabindex="-1" role="dialog" aria-labelledby="shoppingCartModal" aria-hidden="true"
+    [config]="{ backdrop: false , ignoreBackdropClick: true }" style="overflow-y: scroll;">
     <div *ngIf="!showCarousel">
         <ng-container *ngTemplateOutlet="shoppingcartContainer"></ng-container>
 
@@ -106,133 +106,115 @@
                     <h1 class="mb-4 purpleColor"> {{shoppingCartDetails?.name}} </h1>
                     <p-accordion class="shoppingCartAccordionTabBG mt-4" [(activeIndex)]="activeIndex">
                         <!-- order information tab -->
-
-                        <!-- [ngClass]="{'shoppingCartAccordionNotValidTab':!orderInfoValid}" -->
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"
+                            [ngClass]="{'shoppingCartAccordionNotValidTab':!orderInfoValid}">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg" *ngIf="orderInfoValid" />
-                                    <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
-                                        *ngIf="!orderInfoValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Information</h6>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="content">
-                                <app-sales-order [activeTab]="activeIndex ?  activeIndex :0"
+                                <app-sales-order [activeTab]="activeIndex"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     (orderInfoValid)="ontabInfoValid($event)"
-                                    [createOrEditorderInfo]="createOrEditorderInfo"
                                     (ontabChange)="ontabChange($event)"></app-sales-order>
                             </ng-template>
                         </p-accordionTab>
                         <!-- order information tab -->
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"
+                            [ngClass]="{'shoppingCartAccordionNotValidTab':!buyerContactInfoValid}">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="buyerContactInfoValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
-                                        *ngIf="!buyerContactInfoValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="content">
-                                <div>
+                                <div *ngIf="orderInfoValid ||  shoppingCartMode == _shoppingCartMode.view">
                                     <app-create-or-edit-buyer-seller-contact-info
-                                        [activeTab]="activeIndex ?  activeIndex :1"
+                                        *ngIf="shoppingCartMode == _shoppingCartMode.createOrEdit"
+                                        [activeTab]="activeIndex"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
-                                        (ontabChange)="ontabChange($event)"
-                                        [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"></app-create-or-edit-buyer-seller-contact-info>
+                                        (ontabChange)="ontabChange($event)"></app-create-or-edit-buyer-seller-contact-info>
+                                    <app-view-buyer-seller-contact-info
+                                        *ngIf="shoppingCartMode == _shoppingCartMode.view" [activeTab]="activeIndex"
+                                        [appTransactionsForViewDto]="appTransactionsForViewDto"></app-view-buyer-seller-contact-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"
+                            [ngClass]="{'shoppingCartAccordionNotValidTab':!SellerContactInfoValid}">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="SellerContactInfoValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
-                                        *ngIf="!SellerContactInfoValid"></i>
-                                        <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Sellercontactinfo")}}</h6>
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Sellercontactinfo")}}</h6>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="content">
-                                <div>
+                                <div *ngIf="buyerContactInfoValid ||  shoppingCartMode == _shoppingCartMode.view">
                                     <app-create-or-edit-buyer-seller-contact-info
-                                        [activeTab]="activeIndex ?  activeIndex :2"
+                                        *ngIf="shoppingCartMode == _shoppingCartMode.createOrEdit"
+                                        [activeTab]="activeIndex"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
-                                        (ontabChange)="ontabChange($event)" [showSaveBtn]="showSaveBtn"
-                                        [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"></app-create-or-edit-buyer-seller-contact-info>
+                                        (ontabChange)="ontabChange($event)"></app-create-or-edit-buyer-seller-contact-info>
+                                    <app-view-buyer-seller-contact-info
+                                        *ngIf="shoppingCartMode == _shoppingCartMode.view" [activeTab]="activeIndex"
+                                        [appTransactionsForViewDto]="appTransactionsForViewDto"></app-view-buyer-seller-contact-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"
+                            [ngClass]="{'shoppingCartAccordionNotValidTab':!SalesRepInfoValid}">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="SalesRepInfoValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
-                                        *ngIf="!SalesRepInfoValid"></i>
-                                        <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("SalesRepInformation")}}
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("SalesRepInformation")}}
                                     </h6>
                                 </div>
                             </ng-template>
 
                             <ng-template pTemplate="content">
-                                <div>
-                                    <app-create-or-edit-sales-rep-info [activeTab]="activeIndex ?  activeIndex :3"
-                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
-                                        (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
-                                        [showSaveBtn]="showSaveBtn"
-                                        [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"></app-create-or-edit-sales-rep-info>
-                                </div>
+                                <div *ngIf="SellerContactInfoValid ||  shoppingCartMode == _shoppingCartMode.view">
+                                    SalesRepInformationcontent</div>
                             </ng-template>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"
+                            [ngClass]="{'shoppingCartAccordionNotValidTab':!shippingInfOValid}">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="shippingInfOValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
-                                        *ngIf="!shippingInfOValid"></i>
-                                        <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                     </h6>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="content">
-                                <div>
-                                    <app-create-or-add-shipping-information [activeTab]="activeIndex ?  activeIndex :4"
-                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
-                                        (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
-                                        [createOrEditshippingInfO]="createOrEditshippingInfO">
-                                    </app-create-or-add-shipping-information>
-                                </div>
+                                <div *ngIf="SalesRepInfoValid ||  shoppingCartMode == _shoppingCartMode.view">
+                                    Shippinginformationcontent</div>
                             </ng-template>
                         </p-accordionTab>
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"
+                            [ngClass]="{'shoppingCartAccordionNotValidTab':!BillingInfoValid}">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="BillingInfoValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
-                                        *ngIf="!BillingInfoValid"></i>
-                                        <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="content">
-                                <div>
-                                    <app-create-or-edit-billing-info [activeTab]="activeIndex ?  activeIndex :5"
-                                        [appTransactionsForViewDto]="appTransactionsForViewDto"
-                                        (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
-                                        [createOrEditBillingInfo]="createOrEditBillingInfo">
-                                    </app-create-or-edit-billing-info>
-                                </div>
+                                <div *ngIf="shippingInfOValid ||  shoppingCartMode == _shoppingCartMode.view">
+                                    BillingInformationcontent</div>
                             </ng-template>
                         </p-accordionTab>
                         <p-accordionTab class="shoppingCartAccordionTabBG">
@@ -242,7 +224,7 @@
                                 </div>
                             </ng-template>
                             <div class="summarySection">
-                                <div class="row p-3  w-100 summarySection ml-0 mr-0">
+                                <div class="row p-3  summarySection ml-0 mr-0">
                                     <div class="row col-4">
                                         <h6 class=" mt-2 purpleColor font-weight-bold pr-2">
                                             {{l("ProductCode")}}
@@ -294,7 +276,7 @@
                                             <ng-template pTemplate="header">
                                                 <tr>
                                                     <th *ngFor="let col of cols" class="purpleColor"
-                                                        [ngClass]="{'col-2':col.field=='manufacturerCode'}">
+                                                        [ngClass]="{'col-2':col.field=='code'}">
                                                         {{ col.header }}
                                                     </th>
                                                     <!--  <th> <img
@@ -319,7 +301,7 @@
                                             <td>{{ rowData.image }}</td> -->
                                                     <!-- style="white-space: nowrap;  overflow: hidden;" -->
                                                     <td *ngFor="let col of cols; let i = index" class="p-treeTable"
-                                                        [ngClass]="{'col-2':col.field=='manufacturerCode'}">
+                                                        [ngClass]="{'col-2':col.field=='code'}">
                                                         <p-treeTableToggler [rowNode]="rowNode"
                                                             *ngIf="i === 0"></p-treeTableToggler>
                                                         <label *ngIf="(col.field!='image') &&  (col.field!='qty')">
@@ -410,60 +392,52 @@
                 </div>
                 <div class="col-4  p-4">
                     <div class="row">
-                        <h4 class="purpleColor font-weight-bold col-12"> {{l("Order Summary")}} </h4>
-                        <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor">
-                            <div class="row w-100">
-                                <div class="col-6 font-weight-bold">{{l("TotalAmount")}}</div>
-                                <div class="font-weight-bold">${{shoppingCartDetails?.totalAmount ?
-                                    shoppingCartDetails?.totalAmount : '0.00' }}</div>
-                            </div>
-                            <div class="row w-100 mt-4 mb-4">
-                                <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
-                                <div class="font-weight-bold">{{shoppingCartDetails?.totalQty ?
-                                    shoppingCartDetails?.totalQty : 0 }}</div>
-                            </div>
-                            <div class=" row w-100 mt-4 ml-1">
-                                <button type="button"
-                                    class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
-                                    style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
-                                    {{l("Proceedtocheckout")}}
-                                </button>
-                                <!-- <button type="button" class="btn btn-primary bgPurple border-0 w-100 pointer"
-                                    style="height: 37px;" *ngIf="showTabs" (click)="PlaceOrder()"
-                                    [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
-                                    [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}">
-                                    {{l("Placeyourorder")}}
-                                </button> -->
-                                <button type="button" class="btn btn-primary bgPurple border-0 w-100 pointer"
-                                    style="height: 37px;"
-                                    *ngIf="showTabs && shoppingCartDetails?.entityStatusCode?.toUpperCase()=='DRAFT'"
-                                    (click)="PlaceOrder()">
-                                    {{l("Placeyourorder")}}
-                                </button>
-                            </div>
+                                          <h4 class="purpleColor font-weight-bold"> {{l("Order Summary")}} </h4>
+                    <div class="row summarySection p-4 ml-2 mt-3 purpleColor">
+                        <div class="row w-100">
+                            <div class="col-6 font-weight-bold">{{l("TotalAmount")}}</div>
+                            <div class="font-weight-bold">${{shoppingCartDetails?.totalAmount ?
+                                shoppingCartDetails?.totalAmount : 0 }}</div>
                         </div>
-                    </div>
-
+                        <div class="row w-100 mt-4 mb-4">
+                            <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
+                            <div class="font-weight-bold">${{shoppingCartDetails?.totalQty ?
+                                shoppingCartDetails?.totalQty : 0 }}</div>
+                        </div>
+                        <div class=" row w-100 mt-4 ml-1">
+                            <button type="button"
+                                class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
+                                style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
+                                {{l("Proceedtocheckout")}}
+                            </button>
+                            <button type="button" class="btn btn-primary bgPurple border-0 w-100 pointer"
+                                style="height: 37px;" *ngIf="showTabs" (click)="PlaceOrder()"
+                                [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
+                                [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}">
+                                {{l("Placeyourorder")}}
+                            </button>
+                        </div>
+                    </div>  
+                    </div>          
+                    
                     <ng-container *ngIf="loadNotesComp;">
 
-                        <div class="row mt-4">
-                            <div class="col-12">
+                   <div class="row mt-4">
+                    <div class="col-12">
 
-                                <!-- app Notes shared component-->
-                                <app-notes [entityId]="orderId"></app-notes>
-                            </div>
-
-                        </div>
-
-                    </ng-container>
-                    <div class="row mt-4">
-                        <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
-                        <div class="w-100 comment-warper summarySection p-4 ml-2 mt-3 purpleColor">
-                            <app-comment-parent [cartStyle]="true" #commentParentComponent>
-                            </app-comment-parent>
-                        </div>
-
+                 <!-- app Notes shared component-->
+                   <app-notes [entityId]="orderId"></app-notes>  
                     </div>
+
+                   </div>            
+             <div class="row mt-4">
+                <app-comment-parent
+                #commentParentComponent
+            >
+            </app-comment-parent>
+                </div>
+                </ng-container>
+
 
                 </div>
 
@@ -478,12 +452,13 @@
         </div>
     </div>
 
-</ng-template>
-<div [ngClass]="minimizedOrders && minimizedOrders.length>0 ? 'minimizedScreen px-3 py-2' : 'maximizedScreen'">
-    <div *ngFor="let item of minimizedOrders" class="d-flex align-items-center justify-content-center p-2">
-        <button (click)="maximizeScreen(item.orderId)" class="btn mini-order">
-            <h6 class="m-0 p-0 purpleColor">{{item.name}}</h6>
-            <img src="../../../../../assets/shoppingCart/MinimizedTrans.png" class="pointer" />
+<div [ngClass]="minimize ? 'minimizedScreen px-3 py-2' : 'maximizedScreen'" >
+    <div  *ngFor="let item of minimizedOrders" class="d-flex align-items-center justify-content-center p-2">
+        <button (click)="maximizeScreen()" class="btn mini-order">
+            <h6 class="m-0 p-0" >{{item.name}}</h6>
+            <img src="../../../../../assets/shoppingCart/minimize.svg" class="pointer"/>
         </button>
     </div>
 </div>
+
+</ng-template>

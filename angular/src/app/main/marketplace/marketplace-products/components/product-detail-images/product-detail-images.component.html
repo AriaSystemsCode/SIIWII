@@ -26,6 +26,7 @@
         </div>
 
         <div *ngIf="productImages.length > 7">
+
             <div class="slider-container">
                 <div
                     class="slider"
@@ -45,24 +46,16 @@
                 </div>
             </div>
             <!-- <button (click)="slideToPreviousImage()">&#8593; Previous</button> -->
-            <button (click)="slideToNextImage()" class="indicator-btns">
+            <button (click)="slideToNextImage()" class="indicator-btns" >
                 <i class="fa fa-chevron-down"></i>
             </button>
         </div>
 
         <div class="main-image">
             <img
-                *ngIf="!colorView"
                 [src]="
                     attachmentBaseUrl + '/' + productImages[currentIndex].url
                 "
-                alt="images slides"
-                class="main"
-                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-            />
-            <img
-                *ngIf="colorView"
-                [src]="attachmentBaseUrl + '/' + colorAttachmentForMainIamge"
                 alt="images slides"
                 class="main"
                 onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
