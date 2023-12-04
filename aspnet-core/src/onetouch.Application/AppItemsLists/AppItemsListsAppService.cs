@@ -398,30 +398,27 @@ namespace onetouch.AppItemsLists
                 }
                 //MMT33-2
                 output.ShowSync = false;
-                if (appItemsList.SSIN != null)
+                var marketplaceItemList = await _appMarketplaceItemListRepository.GetAll().Where(a => a.Code == appItemsList.SSIN).FirstOrDefaultAsync();
+                if (marketplaceItemList != null)
                 {
-                    var marketplaceItemList = await _appMarketplaceItemListRepository.GetAll().Where(a => a.Code == appItemsList.SSIN).FirstOrDefaultAsync();
-                    if (marketplaceItemList != null)
-                    {
-                        if (marketplaceItemList.TimeStamp < appItemsList.TimeStamp)
-                            output.ShowSync = true;
+                    if (marketplaceItemList.TimeStamp < appItemsList.TimeStamp)
+                        output.ShowSync = true;
 
-                        output.AppItemsList.SharingLevel = marketplaceItemList.SharingLevel;
-                    }
-                    else
-                    {
-                        output.ShowSync = false;
-                        output.AppItemsList.SharingLevel = 0;
-                    }
-                    if (output.AppItemsList.SharingLevel == 0)
-                    {
-                        output.NumberOfSubscribers = 0;
-                    }
-                    else
-                    {
-                        var subscribersCnt = await _appEntityRepository.CountAsync(a => a.Code == appItemsList.SSIN & a.TenantId != null & a.TenantId != a.TenantOwner);
-                        output.NumberOfSubscribers = subscribersCnt;
-                    }
+                    output.AppItemsList.SharingLevel = marketplaceItemList.SharingLevel;
+                }
+                else
+                {
+                    output.ShowSync = false;
+                    output.AppItemsList.SharingLevel = 0;
+                }
+                if (output.AppItemsList.SharingLevel == 0)
+                {
+                    output.NumberOfSubscribers = 0;
+                }
+                else
+                {
+                    var subscribersCnt = await _appEntityRepository.CountAsync(a => a.Code == appItemsList.SSIN & a.TenantId != null & a.TenantId != a.TenantOwner);
+                    output.NumberOfSubscribers = subscribersCnt;
                 }
                 if (!string.IsNullOrEmpty(appItemsList.LastModificationTime.ToString()))
                     output.LastModifiedDate = DateTime.Parse(appItemsList.LastModificationTime.ToString());

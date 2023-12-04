@@ -23,7 +23,12 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual DateTime EnteredDate { set; get; }
         public long CreatorUserId { set; get; }
     }
+    public class ShareUserInfo 
+    { 
+        public long? UserId { set; get; }
+        public string Email { set; get; }
 
+    }
     //xx
     public enum TransactionPosition
     {   
@@ -50,7 +55,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     public class DataView
     {   
         public string code { get; set; }
-        public  string ManufacturerCode { set; get; }
         public string name { get; set; }
         public double Qty { get; set; }
         public decimal Price { get; set; }
@@ -90,7 +94,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public int EomDays { set; get; }
         public bool Eom { set; get; }
         public int NetDueDays { set; get; }
-       
 
     }
 
@@ -111,7 +114,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 
         public ValidateTransaction ValidateOrder { get; set; }
         public TransactionType OrderType { get; set; }
-        public string CurrencyCode { set; get; }
 
     }
 

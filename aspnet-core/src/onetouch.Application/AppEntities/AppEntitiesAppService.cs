@@ -750,22 +750,8 @@ namespace onetouch.AppEntities
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
                     Symbol = appEntity.EntityExtraData != null & appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ? appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
-                }).OrderBy(a=>a.Code)
+                })
                 .ToListAsync();
-        }
-        public async Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode)
-        {
-            CurrencyInfoDto rertunObj = new CurrencyInfoDto();
-            var currencyId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();
-            var currencyObject = await _appEntityRepository.GetAll().Include(a => a.EntityExtraData).Where(x => x.EntityObjectTypeId == currencyId && x.Code == currencyCode).FirstOrDefaultAsync();
-            if (currencyObject != null)
-            {
-                rertunObj.Value = currencyObject.Id;
-                rertunObj.Label = currencyObject.Name.ToString();
-                rertunObj.Code = currencyObject.Code;
-                rertunObj.Symbol = currencyObject.EntityExtraData != null & currencyObject.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ? currencyObject.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : "";
-            }
-            return rertunObj;
         }
 
         public async Task<List<LookupLabelDto>> GetAllTitlesForTableDropdown()

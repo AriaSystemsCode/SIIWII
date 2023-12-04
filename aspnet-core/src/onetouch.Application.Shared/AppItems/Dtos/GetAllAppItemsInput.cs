@@ -48,8 +48,7 @@ namespace onetouch.AppItems.Dtos
         public GetAppItemExtraAttributesInput GetAppItemAttributesInputForExtraData { get; set; }
         //MMT
         public string CurrencyCode { get; set; }
-
-        public string TimeZoneValue { get; set; }
+       
 
     }
 
@@ -70,7 +69,6 @@ namespace onetouch.AppItems.Dtos
         public long[] ClassificationFilters { get; set; }
 
         public long[] CategoryFilters { get; set; }
-        public string[] ScalesFilters { get; set; }   
 
         public long[] departmentFilters { get; set; }
         public long EntityObjectTypeId { get; set; }

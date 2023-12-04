@@ -24,6 +24,5 @@ namespace onetouch.AppItems.Dtos
         //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
         public bool ShowItem { set; get; }
         public virtual string SellerName { get; set; }
-        public virtual string ManufacturerCode { get; set; }
     }
 }

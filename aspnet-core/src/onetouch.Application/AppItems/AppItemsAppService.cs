@@ -100,7 +100,6 @@ namespace onetouch.AppItems
         private readonly IRepository<AppMarketplaceItems.AppMarketplaceItems, long> _appMarketplaceItem;
         private readonly IRepository<AppMarketplaceItemPrices, long> _appMarketplaceItemPricesRepository;
         //MMT33
-        TimeZoneInfoAppService _timeZoneInfoAppService;
         //MMT
         private readonly IRepository<AppItemSelector, long> _appItemSelectorRepository;
         private readonly Helper _helper;
@@ -132,11 +131,10 @@ namespace onetouch.AppItems
             IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem,IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
-            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService
+            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository
             )
         {
             //MMT33-2
-            _timeZoneInfoAppService = timeZoneInfoAppService;
             _appAttachmentRepository = appAttachmentRepository;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
             _appEntityAttachmentRepository = appEntityAttachment;
@@ -204,12 +202,6 @@ namespace onetouch.AppItems
                     input.CategoryFilters = new long[] { };
                 if (input.departmentFilters == null)
                     input.departmentFilters = new long[] { };
-                //xx
-                if (input.ScalesFilters == null)
-                    input.ScalesFilters = new string[] { };
-
-                var allScales = input.ScalesFilters.ToList();
-                //xx
                 var allCategories = input.CategoryFilters.ToList();
                 allCategories.AddRange(input.departmentFilters.ToList());
                 input.CategoryFilters = allCategories.ToArray();
@@ -230,7 +222,7 @@ namespace onetouch.AppItems
                     input.ArrtibuteFilters = new List<ArrtibuteFilter>();
                 var attrs = input.ArrtibuteFilters.Select(r => r.ArrtibuteValueId).ToList();
                 #endregion
-                var filteredAppItems = _appItemRepository.GetAll().AsNoTracking().Include(x=>x.ItemSizeScaleHeadersFkList).Select(x => new
+                var filteredAppItems = _appItemRepository.GetAll().AsNoTracking().Select(x => new
                 {
                     x.PublishedListingItemFkList,
                     x.TenantId,
@@ -248,8 +240,7 @@ namespace onetouch.AppItems
                     x.ItemType,
                     x.PublishedListingItemFk,
                     x.TenantOwner,
-                    x.SSIN,
-                    x.ItemSizeScaleHeadersFkList
+                    x.SSIN
 
                 })
                 .WhereIf(input.ArrtibuteFilters != null && input.ArrtibuteFilters.Count() > 0,
@@ -264,9 +255,7 @@ namespace onetouch.AppItems
                 .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyOwnedItems, a => a.TenantId == AbpSession.TenantId && a.TenantOwner == AbpSession.TenantId)
                 .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyPatrnersItems, a => a.TenantId == AbpSession.TenantId && a.TenantOwner != AbpSession.TenantId)
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
-                //xx
-                .WhereIf(input.ScalesFilters != null && input.ScalesFilters.Count() > 0 , a => a.ItemSizeScaleHeadersFkList.Where(r=>allScales.Contains(r.Name.TrimEnd())).Count()>0)
-                //xx
+
                 .WhereIf(input.AppItemListId != null && input.AppItemListId > 0, e => AppItemListDetails.Contains(e.Id))
                 .WhereIf(input.SelectorOnly == true && SelectedItems != null && SelectedItems.Count() > 0, e => SelectedItems.Contains(e.Id))
                 //.WhereIf(input.VisibilityStatus > 0, e => e.PublishedListingItemFkList.Where(r => r.SharingLevel == input.VisibilityStatus).Count() > 0)
@@ -301,10 +290,7 @@ namespace onetouch.AppItems
                     //)
                     //    )
                     //    );
-                    //D-SII-20230918.0001,1 MMT 09/19/2023 Display Items only and exclude listing[T-SII-20230829.0001][Start]
-                    //.Where(x => x.ParentId == null);
-                    .Where(x => x.ParentId == null && x.TenantId == AbpSession.TenantId && x.ItemType ==0);
-                    //D-SII-20230918.0001,1 MMT 09/19/2023 Display Items only and exclude listing[T-SII-20230829.0001][End]
+                    .Where(x => x.ParentId == null);
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[END]
 
 
@@ -840,19 +826,8 @@ namespace onetouch.AppItems
                         output.AppItem.NumberOfSubscribers = subscribersCnt;
                     }
                     if (!string.IsNullOrEmpty(appItem.LastModificationTime.ToString()))
-                        output.AppItem.LastModifiedDate = DateTime.Parse(appItem.LastModificationTime.ToString());
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(appItem.CreationTime.ToString()))
-                            output.AppItem.LastModifiedDate = DateTime.Parse(appItem.CreationTime.ToString());
-                    }
-
-                    if (output.AppItem.LastModifiedDate != null && !string.IsNullOrEmpty(input.TimeZoneValue))
-                    {
-                        var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
-                        var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(output.AppItem.LastModifiedDate, currentTimeZone);
-                        output.AppItem.LastModifiedDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
-                    }
+                    output.AppItem.LastModifiedDate = DateTime.Parse(appItem.LastModificationTime.ToString());
+                    
                     //MMT33-2
                     //if (varAppItems.Select(r => r.Price).Count() > 0)
                     //{
@@ -2004,7 +1979,7 @@ namespace onetouch.AppItems
                             itemPriceObj.AppItemId = appItemChild.Id;
                             itemPriceObj.TenantId = AbpSession.TenantId;
                             //MMT33-3
-                            if ( itemPriceObj.CurrencyCode == currency)//itemPriceObj.Code == "MSRP" &&
+                            if (itemPriceObj.Code == "MSRP" && itemPriceObj.CurrencyCode == currency)
                                 itemPriceObj.IsDefault = true;
                             //MMT33-3
                             // appItem.ItemPricesFkList.Add(itemPriceObj);
@@ -2183,7 +2158,7 @@ namespace onetouch.AppItems
 
                 foreach (var itemPrice in input.AppItemPriceInfos)
                 {
-                    if (itemPrice.CurrencyCode == currency) //itemPrice.Code == "MSRP" &&
+                    if (itemPrice.Code == "MSRP" && itemPrice.CurrencyCode == currency)
                     {
                         itemPrice.IsDefault= true;
                     }
@@ -6495,7 +6470,7 @@ namespace onetouch.AppItems
                                     using (TextReader reader = new StringReader(productEntityObjectType.SycEntityObjectType.ExtraAttributes))
                                     {
                                         productExtraAttributes = (ItemExtraAttributes)serializer.Deserialize(reader);
-                                        if (productExtraAttributes.ExtraAttributes.Count > 0 && !string.IsNullOrEmpty(attr.EntityObjectTypeCode))
+                                        if (productExtraAttributes.ExtraAttributes.Count > 0)
                                         {
                                             var attExtrData = productExtraAttributes.ExtraAttributes.Where(z => z.Name.ToLower().Contains(attr.EntityObjectTypeCode.ToLower())).ToList();
                                             if (attExtrData.Count > 0)
@@ -6528,7 +6503,7 @@ namespace onetouch.AppItems
                                 using (TextReader reader = new StringReader(productEntityObjectType.SycEntityObjectType.ExtraAttributes))
                                 {
                                     productExtraAttributes = (ItemExtraAttributes)serializer.Deserialize(reader);
-                                    if (productExtraAttributes.ExtraAttributes.Count > 0 && !string.IsNullOrEmpty(attr.EntityObjectTypeCode))
+                                    if (productExtraAttributes.ExtraAttributes.Count > 0)
                                     {
                                         var attExtrData = productExtraAttributes.ExtraAttributes.Where(z => z.Name.ToLower().Contains(attr.EntityObjectTypeCode.ToLower())).ToList();
                                         if (attExtrData.Count > 0)

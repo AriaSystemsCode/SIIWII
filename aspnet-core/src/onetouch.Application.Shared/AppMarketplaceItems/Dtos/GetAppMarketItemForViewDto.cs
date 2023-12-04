@@ -175,7 +175,6 @@ namespace onetouch.AppMarketplaceItems.Dtos
         public List<AppItemPriceInfo> AppItemPriceInfos { get; set; }
         public List<AppItemSizesScaleInfo> AppItemSizesScaleInfo { get; set; }
         public long? SycIdentifierId { get; set; }
-        public virtual string ManufacturerCode { get; set; }
         //MMT
     }
 }

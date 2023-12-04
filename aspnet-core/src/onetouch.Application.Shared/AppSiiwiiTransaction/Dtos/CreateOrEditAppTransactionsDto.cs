@@ -105,14 +105,12 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string Email { set; get; }
         public string Phone { set; get; }
         public string SSIN { set; get; }
-        public long? PhoneTypeId { get; set; }
-        public string PhoneTypeName { set; get; }
-        public List<PhoneNumberAndtype> PhoneList { get; set; }
     }
-    public class PhoneNumberAndtype 
-    { 
-        public string PhoneNumber { set; get; }
-        public long? PhoneTypeId { get; set; }
-        public string PhoneTypeName { set; get; }
+    public class ContactInformationOutputDto
+    {
+        public long Id { set; get; }
+        public string Name { set; get; }
+        public string Email { set; get; }
+        public long UserId { set; get; }
     }
 }

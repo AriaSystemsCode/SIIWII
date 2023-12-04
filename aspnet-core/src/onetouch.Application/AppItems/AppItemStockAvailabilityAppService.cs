@@ -229,6 +229,7 @@ namespace onetouch.AppItems
                     {
                         continue;
                     }
+
                     AppItemStockAvailabilityExcelRecordDTO itemExcelRecordErrorDTO = new AppItemStockAvailabilityExcelRecordDTO();
                     itemExcelRecordErrorDTO.ParentCode = itemExcelDto.ParentCode;
                     itemExcelRecordErrorDTO.Code = itemExcelDto.Code;
@@ -243,7 +244,7 @@ namespace onetouch.AppItems
                     itemExcelDto.rowNumber = rowNumber;
                     if (!string.IsNullOrEmpty(itemExcelDto.ParentCode))
                     {
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace (" ",string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId != null && x.ListingItemId == null);
+                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ParentId != null && x.ListingItemId == null);
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
@@ -264,7 +265,7 @@ namespace onetouch.AppItems
                     }
                     else
                     {
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId == null && x.ListingItemId == null);
+                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ParentId == null && x.ListingItemId == null);
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
@@ -353,19 +354,12 @@ namespace onetouch.AppItems
                 foreach (AppItemStockAvailabilityExcelRecordDTO logRecord in itemExcelResultsDTO.ExcelRecords)
                 {
                     rowNumber++;
-                    if (rowNumber == 2)
-                    {
+                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
+                   // {
+                        if (rowNumber > 2)
+                        { itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
                         itemExcelResultsDTO.FromList.Add(rowNumber);
                         itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("A" + rowNumber.ToString()).Value.ToString());
-                    }
-                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
-                    // {
-                    if (rowNumber > 2 && (int.DivRem(rowNumber, 100).Remainder == 0))
-                        { itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
-                    else { continue; }
-
-                    itemExcelResultsDTO.FromList.Add(rowNumber);
-                    itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("A" + rowNumber.ToString()).Value.ToString());
                     //}
                     //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
                     //Sheet.Cell("AA" + rowNumber.ToString()).Value = logRecord.Status;

@@ -1,7 +1,6 @@
 ﻿using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using onetouch.AppItems.Dtos;
-using onetouch.AppMarketplaceItems.Dtos;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.AppTransactions.Dtos;
 using System;
@@ -33,7 +32,5 @@ namespace onetouch.AppSiiwiiTransaction
         Task<bool> UpdateByProductLineId(long orderId, long lineId, Int32 qty);
 
         Task<bool> UpdateByProductSSINColor(long orderId, long parentId, string colorCode, long colorId, Int32 qty);
-        Task AddTransactionDetails(GetAppMarketplaceItemDetailForViewDto input, string transactionId, string transactionType);
-
     }
 }

@@ -761,8 +761,7 @@ namespace onetouch
                 .ForMember(a => a.ItemPricesFkList , b => b.MapFrom(ent => ent.ItemPricesFkList))
                 .ForMember(a => a.ItemSizeScaleHeadersFkList, b => b.MapFrom(ent => ent.ItemSizeScaleHeadersFkList))
                 .ForMember(a => a.ItemPricesFkList, b => b.MapFrom(ent => ent.ItemPricesFkList))
-                .ForMember(a => a.ParentFkList, b=>b.MapFrom(ent => (ent.ParentId == null & ent.ParentFk!= null) ? ent.ParentFk: null ))
-                .ForMember(a=>a.ManufacturerCode, b=>b.MapFrom(ent=>ent.Code)); //
+                .ForMember(a => a.ParentFkList, b=>b.MapFrom(ent => (ent.ParentId == null & ent.ParentFk!= null) ? ent.ParentFk: null )); //
             configuration.CreateMap<AppItemPrices , AppMarketplaceItemPrices>();
             configuration.CreateMap<AppMarketplaceItemPrices,AppItemPrices>();
             configuration.CreateMap<AppItemSizeScalesDetails, AppMarketplaceItemSizeScaleDetails>();
@@ -833,8 +832,6 @@ namespace onetouch
             configuration.CreateMap<AppTransactionContacts, AppTransactionContactDto>()
                 .ForMember(d=>d.ContactAddressDetail ,b=>b.MapFrom (z=>z.ContactAddressFk))
                 .ForMember(d=>d.ContactRole, s=>s.MapFrom(ss=> (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), ss.ContactRole.ToString())));
-
-            configuration.CreateMap<AppAddress, ContactAppAddressDto> ().ReverseMap();
 
             configuration.CreateMap<AppTransactionContactDto, AppTransactionContacts>()
                 .ForMember(d => d.ContactRole, s => s.MapFrom(ss => Enum.GetName(typeof(ContactRoleEnum), ss.ContactRole))); 

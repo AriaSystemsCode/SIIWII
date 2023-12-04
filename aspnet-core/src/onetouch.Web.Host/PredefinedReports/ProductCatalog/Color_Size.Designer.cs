@@ -134,7 +134,6 @@
             this.table2.Name = "table2";
             this.table2.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
             this.tableRow2});
-            this.table2.Scripts.OnBeforePrint = "table2_BeforePrint";
             this.table2.SizeF = new System.Drawing.SizeF(1299F, 39.60747F);
             this.table2.StylePriority.UseBackColor = false;
             this.table2.StylePriority.UseTextAlignment = false;
