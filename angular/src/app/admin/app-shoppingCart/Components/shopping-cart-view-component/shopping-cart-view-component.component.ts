@@ -17,6 +17,7 @@ import { ShoppingCartoccordionTabs } from './ShoppingCartoccordionTabs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
 import { request } from 'https';
 import { URL } from 'url';
+import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -67,9 +68,12 @@ export class ShoppingCartViewComponentComponent
   transactionPosition = TransactionPosition;
   activeIndex = 0;
   showSaveBtn: boolean = false;
-  transactionFormPath:string='../../../../../assets/shoppingCart/file-sample_150kB.pdf';
+  transactionFormPath:string="";
   onshare:boolean=false;
-
+  printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
+  reportUrl:string="";
+  invokeAction = '/DXXRDV';
+  reportTitle="OrderConfirmationForm1";
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -151,6 +155,7 @@ export class ShoppingCartViewComponentComponent
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
+    this.onshare=false;
   }
 
   getColumns() {
@@ -170,6 +175,10 @@ export class ShoppingCartViewComponentComponent
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
+
+
+        //I37
+       //this.transactionFormPath =res?.attachments;
 
         this.loadCommentsList()
 
@@ -688,5 +697,15 @@ export class ShoppingCartViewComponentComponent
 
   onShareTransaction(){
     this.onshare=true;
+  }
+
+  onGeneratOrderReport($event){
+    if($event){
+      this.printInfoParam.reportTitle=this.reportTitle;
+      this.printInfoParam.TransactionId=this.orderId.toString();
+      this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+      this.printInfoParam.saveToPDF=true;
+      this.reportUrl = this.printInfoParam.getReportUrl()
+    }
   }
 }

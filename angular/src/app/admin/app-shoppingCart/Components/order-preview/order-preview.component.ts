@@ -15,7 +15,7 @@ import { GetAppTransactionsForViewDto } from "@shared/service-proxies/service-pr
 export class OrderPreviewComponent extends AppComponentBase implements OnInit, OnChanges {
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("transactionFormPath")   transactionFormPath:string;
-
+   // invokeAction = '/DXXRDV'
 
     constructor(
         injector: Injector,
@@ -26,8 +26,8 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if(this.transactionFormPath)
-          document.getElementById("objectID").setAttribute("data", this.transactionFormPath);
+      if(this.transactionFormPath)
+          document.getElementById("objectID").setAttribute("data", this.transactionFormPath); 
 
 
     }

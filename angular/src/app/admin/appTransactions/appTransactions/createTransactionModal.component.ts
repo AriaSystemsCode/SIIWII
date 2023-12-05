@@ -38,6 +38,8 @@ import { AppComponentBase } from "@shared/common/app-component-base";
 import { throws } from "assert";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { AppConsts } from "@shared/AppConsts";
+import { get } from "http";
+import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 
 @Component({
     templateUrl: "./createTransactionModal.component.html",
@@ -90,6 +92,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
 
     body: any;
     setCurrentUserActiveTransaction: boolean = false;
+    invokeAction = '/DXXRDV';
+    reportUrl="";
+    printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
+    reportTitle="OrderConfirmationForm1";
+
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -607,6 +614,14 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                             });
                     }
                     this.hideMainSpinner();
+
+                    //////
+                    this.printInfoParam.reportTitle=this.reportTitle;
+                    this.printInfoParam.TransactionId=response;
+                    this.printInfoParam.orderType=this.formType.toUpperCase();
+                    this.printInfoParam.saveToPDF=true;
+                    this.reportUrl = this.printInfoParam.getReportUrl()
+                    ///////
                     console.log(response);
                     this.display = false;
                     this.modalClose.emit(false);

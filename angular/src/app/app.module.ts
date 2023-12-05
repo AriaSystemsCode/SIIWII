@@ -121,6 +121,7 @@ import { ViewShippingInformationComponent } from "./admin/app-shoppingCart/shipp
 import { CreateOrAddShippingInformationComponent } from "./admin/app-shoppingCart/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
 import { CreateOrEditBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/create-or-edit-billing-info/create-or-edit-billing-info.component";
 import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/view-billing-info/view-billing-info.component";
+import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
 
 @NgModule({
     declarations: [
@@ -232,7 +233,7 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
         AccordionModule,
         TreeTableModule,
         TreeSelectModule,
-        CalendarModule, TooltipModule
+        CalendarModule, TooltipModule,DevExpressDemoModule
     ],
     providers: [
         ImpersonationService,

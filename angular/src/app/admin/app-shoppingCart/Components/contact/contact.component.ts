@@ -48,6 +48,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     ngOnInit(): void {
+        if(this.appTransactionContactsIndex>=0)
         this.resetSelectedData();
 
     }

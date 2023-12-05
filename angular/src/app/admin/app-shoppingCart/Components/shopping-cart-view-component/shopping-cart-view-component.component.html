@@ -66,8 +66,8 @@
                     <button type="button" class="btn btn-primary bgPurple border-0 mr-4 pl-4 pr-4 shareBtn"
                         [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
                         [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
-                        style="height: 37px;">
-                        <img src="../../../../../assets/shoppingCart/share.svg" (click)="onShareTransaction()" />
+                        style="height: 37px;"  (click)="onShareTransaction()" >
+                        <img src="../../../../../assets/shoppingCart/share.svg"/>
                         {{l("Share")}}
                     </button>
                     <button type="button" class="btn btn-primary bgPurple border-0" (click)="printTransaction()" style="width: 85px;
@@ -131,7 +131,8 @@
                                     (orderInfoValid)="ontabInfoValid($event)"
                                     [createOrEditorderInfo]="createOrEditorderInfo"
                                     [oldCreateOrEditorderInfo]="createOrEditorderInfo"
-                                    (ontabChange)="ontabChange($event)"></app-sales-order>
+                                    (ontabChange)="ontabChange($event)"
+                                    (generatOrderReport)="onGeneratOrderReport($event)"></app-sales-order>
                             </ng-template>
                         </p-accordionTab>
                         <!-- order information tab -->
@@ -153,7 +154,8 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)"
-                                        [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"></app-create-or-edit-buyer-seller-contact-info>
+                                        [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"
+                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -175,7 +177,8 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)" [showSaveBtn]="showSaveBtn"
-                                        [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"></app-create-or-edit-buyer-seller-contact-info>
+                                        [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"
+                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -198,7 +201,8 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [showSaveBtn]="showSaveBtn"
-                                        [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"></app-create-or-edit-sales-rep-info>
+                                        [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"
+                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-sales-rep-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -219,7 +223,8 @@
                                     <app-create-or-add-shipping-information [activeTab]="activeIndex ?  activeIndex :4"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
-                                        [createOrEditshippingInfO]="createOrEditshippingInfO">
+                                        [createOrEditshippingInfO]="createOrEditshippingInfO"
+                                        (generatOrderReport)="onGeneratOrderReport($event)">
                                     </app-create-or-add-shipping-information>
                                 </div>
                             </ng-template>
@@ -239,7 +244,8 @@
                                     <app-create-or-edit-billing-info [activeTab]="activeIndex ?  activeIndex :5"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
-                                        [createOrEditBillingInfo]="createOrEditBillingInfo">
+                                        [createOrEditBillingInfo]="createOrEditBillingInfo"
+                                        (generatOrderReport)="onGeneratOrderReport($event)">
                                     </app-create-or-edit-billing-info>
                                 </div>
                             </ng-template>
@@ -513,3 +519,10 @@
         </button>
     </div>
 </div>
+
+<report-viewer
+class="w-100 d-none"
+  [reportUrl]="reportUrl"
+  [invokeAction]="invokeAction"
+>
+</report-viewer>

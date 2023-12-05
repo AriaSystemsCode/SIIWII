@@ -51,6 +51,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     completeDate = new Date();
     showSaveBtn: boolean = false;
     oldappTransactionsForViewDto;
+    @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -406,7 +408,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
-            .pipe(finalize(() => this.hideMainSpinner()))
+            .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
             .subscribe((res) => {
                 if (res) {
                     this.oldappTransactionsForViewDto = JSON.stringify(this.appTransactionsForViewDto);

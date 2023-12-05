@@ -59,6 +59,9 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     DetailPageGroupByName: string="";
     DetailPageShowCategory:boolean= false
     ColorPageShowCategory:boolean= false
+    TransactionId: string="";
+    orderType: string="";
+    saveToPDF:boolean= true;
 
 
     private attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
@@ -126,7 +129,9 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&DetailPageGroupByName=" + this.DetailPageGroupByName
        url += "&DetailPageShowCategory=" + this.DetailPageShowCategory
        url += "&ColorPageShowCategory=" + this.ColorPageShowCategory
-       url += "&orderBy=" + this.orderBy
+       url += "&TransactionId=" + this.TransactionId
+       url += "&orderType=" + this.orderType
+       url += "&saveToPDF=" + this.saveToPDF
               return url
     }
 }

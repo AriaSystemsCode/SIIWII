@@ -21,7 +21,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   @Input("showSaveBtn") showSaveBtn: boolean = false;
   @Input("createOrEditSalesRepInfo") createOrEditSalesRepInfo: boolean = true;
   oldappTransactionsForViewDto;
-
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   constructor(
     injector: Injector,
@@ -34,7 +34,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   ngOnInit(): void {
   }
   ngOnChanges(changes: SimpleChanges) {
-    this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
+    this.oldappTransactionsForViewDto =JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
 
     this.salesReps = [];
     this.salesReps.push(1);
@@ -50,7 +50,8 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   onShowSalesRepEditMode($event) {
     if ($event) {
       this.createOrEditSalesRepInfo = true;
-      this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
+      this.oldappTransactionsForViewDto=JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+
     }
   }
 
@@ -63,8 +64,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
     this.createOrEditTransaction();
   }
   cancel(){
-    if(JSON.parse(this.oldappTransactionsForViewDto))
-    this.appTransactionsForViewDto =JSON.parse(this.oldappTransactionsForViewDto);
+    this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.createOrEditSalesRepInfo = false;
     this.showSaveBtn = false;
@@ -72,10 +72,10 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   createOrEditTransaction() {
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => this.hideMainSpinner()))
+      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
       .subscribe((res) => {
         if (res) {
-          this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
+          this.oldappTransactionsForViewDto=JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
           if (!this.showSaveBtn)
             this.ontabChange.emit(ShoppingCartoccordionTabs.SalesRepInfo);
 
@@ -87,7 +87,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
 
 
   onUpdateAppTransactionsForViewDto($event) {
-    this.oldappTransactionsForViewDto = Object.assign({}, this.appTransactionsForViewDto);
+    this.oldappTransactionsForViewDto =JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     this.appTransactionsForViewDto = $event;
   }
 

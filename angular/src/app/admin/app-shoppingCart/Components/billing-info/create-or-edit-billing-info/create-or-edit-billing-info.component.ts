@@ -33,6 +33,9 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
   apContactSelectedAdd:any;
   arContactSelectedAdd:any
   @Input("createOrEditBillingInfo") createOrEditBillingInfo: boolean=true;
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+
+  
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -146,7 +149,7 @@ this.apContactSelectedAdd=null;
     this.showMainSpinner()
     this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => this.hideMainSpinner()))
+      .pipe(finalize(() => {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
