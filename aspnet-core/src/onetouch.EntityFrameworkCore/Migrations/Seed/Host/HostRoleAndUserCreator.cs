@@ -38,6 +38,7 @@ namespace onetouch.Migrations.Seed.Host
             CreateHostFileExt();
             CreateHostSystemData();
             CreateHostObjectEntityStatus();
+            CreateHostReportSystemData();
         }
 
         private void CreateHostRoleAndUsers()
@@ -177,7 +178,7 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Listing);
                 _context.SaveChanges();
             }
-            
+
 
             //Iteration#29,1 MMT News Digest changes[Start]
             var sycIdentifierDefinitionsObj = _context.SycIdentifierDefinitions.FirstOrDefault(
@@ -563,6 +564,32 @@ namespace onetouch.Migrations.Seed.Host
 
                     }
                 }
+                _context.SaveChanges();
+            }
+            #endregion SycEntityObjectTypes
+
+        }
+
+        private void CreateHostReportSystemData()
+        {
+            #region Add sydReports
+            var keyList = _context.LanguageTexts.Select(e => e.Key).ToList();
+
+            var sycEntityObjectTypes = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "OrderConfirmation").ToList();
+            if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "OrderConfirmationForm1";
+
+                sycReport.Code = "7";
+                sycReport.Name = "OrderConfirmationForm1";
+                sycReport.Description = "Order confirmation form 1";
+                sycReport.Thumbnail = "Order confirmation form 1";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
                 _context.SaveChanges();
             }
             #endregion SycEntityObjectTypes
