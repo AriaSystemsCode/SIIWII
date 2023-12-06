@@ -74,7 +74,7 @@ export abstract class AppComponentBase {
     appUrlService: AppUrlService;
     spinnerService: NgxSpinnerService;
     tokenService: TokenService;
-    notify:ToastService
+    notify: ToastService
     private ngxSpinnerTextService: NgxSpinnerTextService;
     public uploader: FileUploader;
     protected bsModalService: BsModalService;
@@ -88,10 +88,10 @@ export abstract class AppComponentBase {
     topDaysNo: number = 7;
     appItemsFilterBody = new GetAllAppItemsInput();
 
-    tenantDefaultCurrency : CurrencyInfoDto 
-    _sycAttachmentCategoriesServiceProxy : SycAttachmentCategoriesServiceProxy
-    
-    
+    tenantDefaultCurrency: CurrencyInfoDto
+    _sycAttachmentCategoriesServiceProxy: SycAttachmentCategoriesServiceProxy
+
+
     constructor(injector: Injector, private _location?: Location) {
         this.localization = injector.get(LocalizationService);
         this.permission = injector.get(PermissionCheckerService);
@@ -115,7 +115,7 @@ export abstract class AppComponentBase {
     }
 
 
-    setAppItemsFilterBody(){
+    setAppItemsFilterBody() {
         this.appItemsFilterBody.categoryFilters = undefined
         this.appItemsFilterBody.classificationFilters = undefined
         this.appItemsFilterBody.departmentFilters = undefined
@@ -129,10 +129,10 @@ export abstract class AppComponentBase {
         this.appItemsFilterBody.minimumPrice = 0
         this.appItemsFilterBody.maximumPrice = 0
         this.appItemsFilterBody.sorting = undefined
-        this.appItemsFilterBody.skipCount =0
+        this.appItemsFilterBody.skipCount = 0
         this.appItemsFilterBody.filter = undefined
         this.appItemsFilterBody.tenantId = 0
-        this.appItemsFilterBody.selectorOnly =false
+        this.appItemsFilterBody.selectorOnly = false
         this.tenantDefaultCurrency = this.appSession?.tenant?.currencyInfoDto
     }
     flattenDeep(array) {
@@ -229,25 +229,25 @@ export abstract class AppComponentBase {
             }
         );
     }
-    tempAttachments:string[]=[]
-    addTempAttachments(tempAttachment:string[]){
+    tempAttachments: string[] = []
+    addTempAttachments(tempAttachment: string[]) {
         this.tempAttachments.push(...tempAttachment);
     }
-    removeAllUnusedTempAttachments(){
+    removeAllUnusedTempAttachments() {
         const tempAttachmentCount = this.tempAttachments?.length
-        if(!tempAttachmentCount) return
+        if (!tempAttachmentCount) return
         const paramKeyName = 'files'
-        const params = this.tempAttachments.reduce((accum,item,index)=>{
-            accum += index == 0? `?`:`&`;
+        const params = this.tempAttachments.reduce((accum, item, index) => {
+            accum += index == 0 ? `?` : `&`;
             accum += `${paramKeyName}=${item}`;
             return accum
-        },"")
+        }, "")
         const url = this.attachmentBaseUrl + this.deleteFilesUrl + params
         const headers = { Authorization: "Bearer " + this.tokenService.getToken() }
-        ajax.get(url,headers)
-        .subscribe(res=>{
-            // console.log(res)
-        })
+        ajax.get(url, headers)
+            .subscribe(res => {
+                // console.log(res)
+            })
     }
     createUploader(url: string, success?: (result: any) => void): FileUploader {
         const uploader = new FileUploader({
@@ -340,12 +340,12 @@ export abstract class AppComponentBase {
         this.uploader.uploadAll();
     }
 
-    openImageViewer(attachment: string,sycAttachmentCategory?:SycAttachmentCategoryDto): void {
+    openImageViewer(attachment: string, sycAttachmentCategory?: SycAttachmentCategoryDto): void {
         let config: ModalOptions = new ModalOptions();
         config.class = "img-viewer";
         config.initialState = {
             imgSrc: attachment,
-            aspectRatio:sycAttachmentCategory.aspectRatio
+            aspectRatio: sycAttachmentCategory.aspectRatio
         };
         this.bsModalService.show(ImageViewerComponent, config);
     }
@@ -401,8 +401,8 @@ export abstract class AppComponentBase {
         let currentIndex: number = 0;
 
         const testValue = Object.values(_enum)[0]
-        const isEnumValueNumber : boolean = typeof testValue == 'number'
-        let totalIndices = Object.keys(_enum).length / ( isEnumValueNumber ? 2 : 1);
+        const isEnumValueNumber: boolean = typeof testValue == 'number'
+        let totalIndices = Object.keys(_enum).length / (isEnumValueNumber ? 2 : 1);
         const selectOptions: SelectItem[] = [];
         for (const label in _enum) {
             if (Object.prototype.hasOwnProperty.call(_enum, label)) {
@@ -444,7 +444,7 @@ export abstract class AppComponentBase {
     //     }
     //     return selectOptions;
     // }
-     unsubscribeToAllSubscriptions() {
+    unsubscribeToAllSubscriptions() {
         this.subscriptions.forEach((subs) => subs.unsubscribe());
     }
     // use it on or after view init cycle hook ( after dom loaded )
@@ -488,7 +488,7 @@ export abstract class AppComponentBase {
             this.l("YouAreAboutToLoseAllTheChangesYouHaveDone,AreYouSure?")
         );
     }
-    stopFormListening : boolean = false
+    stopFormListening: boolean = false
     initFormListeners() {
         // handle reload and close
         const beforeUnloadEventHandler: Subscription = fromEvent(
@@ -525,20 +525,20 @@ export abstract class AppComponentBase {
         else this.__router.navigate([defaultUrl]);
     }
 
-    askToConfirm(message:string,title:string,options:SweetAlertOptions={}):  Observable<boolean>{
+    askToConfirm(message: string, title: string, options: SweetAlertOptions = {}): Observable<boolean> {
 
-        var  confirmSubject : Subject<boolean> = new Subject<boolean>()
-        var  confirmObservable$ : Observable<boolean> = confirmSubject.asObservable()
+        var confirmSubject: Subject<boolean> = new Subject<boolean>()
+        var confirmObservable$: Observable<boolean> = confirmSubject.asObservable()
         this.message.confirm(
             this.l(message),
             this.l(title),
             (_isConfirmed) => {
                 if (_isConfirmed)
-                return  confirmSubject.next(true)
+                    return confirmSubject.next(true)
                 else
-                return  confirmSubject.next(false)
+                    return confirmSubject.next(false)
 
-            },{
+            }, {
                 confirmButtonColor: '#411549',
                 cancelButtonColor: '#705275',
                 reverseButtons: true,
@@ -547,16 +547,16 @@ export abstract class AppComponentBase {
         );
         return confirmObservable$;
     }
-    getSycAttachmentCategoriesByCodes(codes:string[]){
+    getSycAttachmentCategoriesByCodes(codes: string[]) {
         return this._sycAttachmentCategoriesServiceProxy.getSycAttachmentCategoriesByCodes(codes)
     }
-    async renderImageAndGetDimensions(file:File) : Promise<HTMLImageElement> {
-        return new Promise((resolve,reject)=>{
+    async renderImageAndGetDimensions(file: File): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
             var fr = new FileReader;
-            fr.onload = function() { // file is loaded
+            fr.onload = function () { // file is loaded
                 var img = new Image;
 
-                img.onload = function() {
+                img.onload = function () {
                     resolve(img)// image is loaded; sizes are available
                 };
 
@@ -567,23 +567,41 @@ export abstract class AppComponentBase {
         })
     }
     parseTenantId(tenantIdAsStr?: string): number | undefined {
-        let tenantId : number | undefined
-        if(tenantIdAsStr){
+        let tenantId: number | undefined
+        if (tenantIdAsStr) {
             tenantId = parseInt(tenantIdAsStr, 10);
-            if ( isNaN(tenantId) ) {
+            if (isNaN(tenantId)) {
                 tenantId = undefined;
             }
         }
         return tenantId;
     }
 
-    getPriceLevel():SelectItem[] {
-           let allPriceLevel: SelectItem[] = [];
-            allPriceLevel.push({ label :'A' ,value: 'A'});
-            allPriceLevel.push({ label :'B' ,value: 'B'});
-            allPriceLevel.push({ label :'C' ,value: 'C'});
-            allPriceLevel.push({ label :'D' ,value: 'D'});
+    getPriceLevel(): SelectItem[] {
+        let allPriceLevel: SelectItem[] = [];
+        allPriceLevel.push({ label: 'A', value: 'A' });
+        allPriceLevel.push({ label: 'B', value: 'B' });
+        allPriceLevel.push({ label: 'C', value: 'C' });
+        allPriceLevel.push({ label: 'D', value: 'D' });
 
-            return allPriceLevel;
+        return allPriceLevel;
+    }
+
+    getTransactionRole(roleValue): string {
+        let transactionRole = "";
+        if (roleValue.includes("Seller"))
+            transactionRole = "Seller"
+
+        if (roleValue.includes("Buyer"))
+            transactionRole = "Buyer"
+
+        if (roleValue.includes("Sales Rep"))
+            transactionRole = "Independent Sales Rep"
+
+        if (roleValue.includes("buying office"))
+            transactionRole = "Independent Buying Office"
+
+        return transactionRole;
+
     }
 }

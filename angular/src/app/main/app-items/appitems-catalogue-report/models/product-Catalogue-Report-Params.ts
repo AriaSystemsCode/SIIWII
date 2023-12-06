@@ -2,7 +2,7 @@ import { AppConsts } from "@shared/AppConsts"
 import { NameValueOfString } from "@shared/service-proxies/service-proxies"
 
 export class ProductCatalogueReportParamsI {
-    productsCatalogTemplate : string
+    reportTemplateName : string
     itemsListId:number=null;
     reportTitle:string
     userId:number
@@ -29,7 +29,7 @@ export class ProductCatalogueReportParamsI {
 }
 
 export class ProductCatalogueReportParams implements ProductCatalogueReportParamsI {
-    productsCatalogTemplate : string
+    reportTemplateName : string
     itemsListId:number=null;
     reportTitle:string
     userId:number
@@ -99,7 +99,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
         else
         bccUsers += this.bccUsers[i].value;
     }
-       url += this.productsCatalogTemplate + "?"
+       url += this.reportTemplateName + "?"
        url += 'itemsListId=' + this.itemsListId
        url += '&reportTitle=' + this.reportTitle
        url += '&userId=' + this.userId

@@ -73,7 +73,7 @@ export class ShoppingCartViewComponentComponent
   printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
   reportUrl:string="";
   invokeAction = '/DXXRDV';
-  reportTitle="OrderConfirmationForm1";
+  reportTemplateName="OrderConfirmationForm1";
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -431,6 +431,7 @@ export class ShoppingCartViewComponentComponent
   }
   onEditQty(rowNode) {
     rowNode.node.data.invalidUpdatedQty = "";
+    let updateIsDone =false;
     switch (rowNode.level) {
       case 0:
       case 2:
@@ -446,6 +447,7 @@ export class ShoppingCartViewComponentComponent
             this.getShoppingCartData();
             rowNode.node.data.showEditQty = false;
             this.hideMainSpinner();
+            updateIsDone=true;
           });
         break;
 
@@ -471,6 +473,7 @@ export class ShoppingCartViewComponentComponent
               this.getShoppingCartData();
               rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
+              updateIsDone=true;
             });
         } else {
           rowNode.node.data.invalidUpdatedQty =
@@ -478,12 +481,19 @@ export class ShoppingCartViewComponentComponent
             rowNode.node.data.noOfPrePacks +
             ")";
           this.hideMainSpinner();
+          updateIsDone=true;
         }
+        if(updateIsDone){
+          this.onGeneratOrderReport(true)
+        }
+
 
         break;
 
       default:
         break;
+
+         
     }
   }
   hide() {
@@ -701,9 +711,10 @@ export class ShoppingCartViewComponentComponent
 
   onGeneratOrderReport($event){
     if($event){
-      this.printInfoParam.reportTitle=this.reportTitle;
+      this.printInfoParam.reportTemplateName=this.reportTemplateName;
       this.printInfoParam.TransactionId=this.orderId.toString();
-      this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+    //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+      this.printInfoParam.orderType=this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
       this.printInfoParam.saveToPDF=true;
       this.reportUrl = this.printInfoParam.getReportUrl()
     }

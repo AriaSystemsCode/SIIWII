@@ -95,7 +95,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     invokeAction = '/DXXRDV';
     reportUrl="";
     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
-    reportTitle="OrderConfirmationForm1";
+    reportTemplateName="OrderConfirmationForm1";
 
     constructor(
         injector: Injector,
@@ -610,15 +610,16 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                                 this.addNew = true;
                                 this.userClickService.userClicked("refreshShoppingInfoInTopbar");
                                 this.display = false;
-                                this.hideMainSpinner();
+                            this.hideMainSpinner();
                             });
                     }
                     this.hideMainSpinner();
 
                     //////
-                    this.printInfoParam.reportTitle=this.reportTitle;
+                    this.printInfoParam.reportTitle=this.reportTemplateName;
                     this.printInfoParam.TransactionId=response;
-                    this.printInfoParam.orderType=this.formType.toUpperCase();
+                //  this.printInfoParam.orderType=this.formType.toUpperCase();
+                    this.printInfoParam.orderType=this.getTransactionRole(this.body.enteredByUserRole);
                     this.printInfoParam.saveToPDF=true;
                     this.reportUrl = this.printInfoParam.getReportUrl()
                     ///////
