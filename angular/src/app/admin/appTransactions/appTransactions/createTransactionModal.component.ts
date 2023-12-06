@@ -621,6 +621,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                 //  this.printInfoParam.orderType=this.formType.toUpperCase();
                     this.printInfoParam.orderType=this.getTransactionRole(this.body.enteredByUserRole);
                     this.printInfoParam.saveToPDF=true;
+                    this.printInfoParam.tenantId = this.appSession?.tenantId
+                    this.printInfoParam.userId = this.appSession?.userId
                     this.reportUrl = this.printInfoParam.getReportUrl()
                     ///////
                     console.log(response);

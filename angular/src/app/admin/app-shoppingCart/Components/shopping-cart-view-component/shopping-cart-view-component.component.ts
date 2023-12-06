@@ -713,6 +713,8 @@ export class ShoppingCartViewComponentComponent
     //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
       this.printInfoParam.orderType=this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
       this.printInfoParam.saveToPDF=true;
+      this.printInfoParam.tenantId = this.appSession?.tenantId
+      this.printInfoParam.userId = this.appSession?.userId
       this.reportUrl = this.printInfoParam.getReportUrl()
     }
   }
