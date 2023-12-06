@@ -431,7 +431,7 @@ export class ShoppingCartViewComponentComponent
   }
   onEditQty(rowNode) {
     rowNode.node.data.invalidUpdatedQty = "";
-    let updateIsDone =false;
+  
     switch (rowNode.level) {
       case 0:
       case 2:
@@ -447,7 +447,7 @@ export class ShoppingCartViewComponentComponent
             this.getShoppingCartData();
             rowNode.node.data.showEditQty = false;
             this.hideMainSpinner();
-            updateIsDone=true;
+            this.onGeneratOrderReport(true)
           });
         break;
 
@@ -473,7 +473,7 @@ export class ShoppingCartViewComponentComponent
               this.getShoppingCartData();
               rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
-              updateIsDone=true;
+              this.onGeneratOrderReport(true)
             });
         } else {
           rowNode.node.data.invalidUpdatedQty =
@@ -481,9 +481,6 @@ export class ShoppingCartViewComponentComponent
             rowNode.node.data.noOfPrePacks +
             ")";
           this.hideMainSpinner();
-          updateIsDone=true;
-        }
-        if(updateIsDone){
           this.onGeneratOrderReport(true)
         }
 

@@ -589,16 +589,16 @@ export abstract class AppComponentBase {
 
     getTransactionRole(roleValue): string {
         let transactionRole = "";
-        if (roleValue.includes("Seller"))
+        if (roleValue?.includes("Seller"))
             transactionRole = "Seller"
 
-        if (roleValue.includes("Buyer"))
+        if (roleValue?.includes("Buyer"))
             transactionRole = "Buyer"
 
-        if (roleValue.includes("Sales Rep"))
+        if (roleValue?.includes("Sales Rep"))
             transactionRole = "Independent Sales Rep"
 
-        if (roleValue.includes("buying office"))
+        if (roleValue?.includes("buying office"))
             transactionRole = "Independent Buying Office"
 
         return transactionRole;
