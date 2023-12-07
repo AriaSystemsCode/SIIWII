@@ -2962,6 +2962,7 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var transOrg = await _appTransactionsHeaderRepository.GetAll().Include(a => a.AppTransactionContacts).Include(z => z.EntityCategories).ThenInclude(z =>z.EntityObjectCategoryFk)
                     .Include(a=>a.EntityClassifications).ThenInclude(z=>z.EntityObjectClassificationFk)
+                    .Include(a=>a.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                 .Where(a => a.Id == transactionId).FirstOrDefaultAsync();
                 var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(a => a.AppTransactionContacts)
@@ -3008,7 +3009,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (FilteredAppTransaction != null)
                 {
                     var viewTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(FilteredAppTransaction);
-
+                    viewTrans.EnteredByUserRole= FilteredAppTransaction.EnteredUserByRole;
                     if (FilteredAppTransaction != null)
                     {
                         AppTransactionHeaders FilteredAppTransactionPrev = null;
@@ -3024,7 +3025,9 @@ namespace onetouch.AppSiiwiiTransaction
 
                         if (FilteredAppTransactionNext == null)
                             viewTrans.LastRecord = true;
-
+                        //MMT
+                        //EntityAttachments
+                        //MMT
                         return viewTrans;
                     }
 
