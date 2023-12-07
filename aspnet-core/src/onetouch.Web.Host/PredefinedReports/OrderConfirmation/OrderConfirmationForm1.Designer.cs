@@ -107,6 +107,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.label32 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label32");
             this.label45 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label45");
             this.label46 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label46");
+            this.label47 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label47");
 
             // Parameters
             this.TransactionId = reportInitializer.GetParameter("TransactionId");
@@ -114,6 +115,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.userId = reportInitializer.GetParameter("userId");
             this.orderType = reportInitializer.GetParameter("orderType");
             this.saveToPDF = reportInitializer.GetParameter("saveToPDF");
+            this.attachmentBaseUrl = reportInitializer.GetParameter("attachmentBaseUrl");
 
             // Data Sources
             this.sqlDataSource1 = reportInitializer.GetDataSource<DevExpress.DataAccess.Sql.SqlDataSource>("sqlDataSource1");
@@ -220,5 +222,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.Parameters.Parameter saveToPDF;
         private DevExpress.XtraReports.UI.XRLabel label45;
         private DevExpress.XtraReports.UI.XRLabel label46;
+        private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
+        private DevExpress.XtraReports.UI.XRLabel label47;
     }
 }

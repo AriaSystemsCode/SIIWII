@@ -139,31 +139,14 @@ namespace onetouch.Web.Services
                     string body = "";
                     string subject = "";
                     string fileName = reportName + ".pdf";
-                    string transactionId = "395363";
-                    //360186
+                    string transactionId = "=";
+                    
                     bool saveToPdf = true;
-                    string orderConfirmationRole = "Seller";
+                    string orderConfirmationRole = "";
                     foreach (string parameterName in parameters.AllKeys)
                     {
                         try
-                        {
-                            try
-                            {
-                                // to be removed after connect with order confirmation UI
-                                if (parameterName.ToUpper() == "REPORTTITLE")
-                                {
-                                    report.Parameters["TransactionId"].Value = Convert.ChangeType(
-                                    parameters.Get(parameterName), report.Parameters["TransactionId"].Type);
-
-                                    transactionId = parameters.Get(parameterName).ToString();
-                                    fileName = "OrderConfirmation_" + parameters.Get(parameterName).ToString() + ".pdf";
-
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
+                        { 
 
                             if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null)
                             {
@@ -193,7 +176,7 @@ namespace onetouch.Web.Services
                         catch (Exception ex) { }
                     }
                     fileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
-                    if (parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
+                    if (false && parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
                     {
                         report.ExportToPdf(fileName);
                         //var tt = _appEntityAttachmentRepository.GetAll().ToList();
