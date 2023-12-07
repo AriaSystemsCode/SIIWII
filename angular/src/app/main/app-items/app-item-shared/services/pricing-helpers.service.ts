@@ -77,11 +77,11 @@ export class PricingHelpersService extends AppComponentBase {
   getPricingInstance(level:string,currency:CurrencyInfoDto){
     return new AppItemPriceInfo({ 
       code :level, 
-      currencyCode:currency.code,
-      currencyId:currency.value,
-      currencyName:currency.label,
+      currencyCode:currency?.code,
+      currencyId:currency?.value,
+      currencyName:currency?.label,
       price:0,
-      currencySymbol:currency.symbol
+      currencySymbol:currency?.symbol
     } as IAppItemPriceInfo) 
   }
   getPricingIndex(prices:AppItemPriceInfo[], level:string, currencyId?:number){
