@@ -7,6 +7,7 @@ import * as moment from "moment";
 import { forEach } from "lodash";
 import { GetAppTransactionsForViewDto } from "@shared/service-proxies/service-proxies";
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 
 
 @Component({
@@ -16,8 +17,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 })
 export class OrderPreviewComponent extends AppComponentBase implements OnInit, OnChanges {
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-    @Input("transactionFormPath")   transactionFormPath:string;
-   // invokeAction = '/DXXRDV'
+    @Input("transactionFormPath") transactionFormPath;
+    pdfPath: SafeResourceUrl;
 
     constructor(
         injector: Injector,
@@ -29,19 +30,15 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     }
 
     ngOnChanges(changes: SimpleChanges) {
-      if(this.transactionFormPath)
-          document.getElementById("objectID").setAttribute("data", this.transactionFormPath); 
-
-
+        this.transactionFormPath = this.attachmentBaseUrl + "/attachments/2154/OrderConfirmationForm1.pdf";
+        this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(
+            this.transactionFormPath
+        );
     }
 
-    getSafePdfUrl(): SafeResourceUrl {
-        this.transactionFormPath="https://localhost:44301/attachments/2154/OrderConfirmationForm1.pdf";
-        return this.sanitizer.bypassSecurityTrustResourceUrl(this.transactionFormPath);
-      }
 
 
 
-   
-    
+
+
 }
