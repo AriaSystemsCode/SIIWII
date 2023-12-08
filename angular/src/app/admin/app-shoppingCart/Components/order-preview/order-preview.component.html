@@ -2,9 +2,13 @@
     <div class="container-fluid orderInfoForm thin-scroll">
 
         <div class="row">
-             <object  id="objectID" data="" class="w-100" style="height: 700px;" >
+             <!-- <object  id="objectID" data="" class="w-100" style="height: 700px;" >
                 <p>Unable to display PDF file. <a [href]="transactionFormPath" target="_blank">Download</a> instead.</p>
-              </object>  
+              </object>   -->
+              <object [data]="getSafePdfUrl()" type="application/pdf" class="w-100" style="height: 700px;">
+                <p>Unable to display PDF file. <a [href]="transactionFormPath" target="_blank">Download</a> instead.</p>
+              </object>
+              
               
               <!-- type="application/pdf"  -->
           <!-- <report-viewer
