@@ -95,7 +95,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     invokeAction = '/DXXRDV';
     reportUrl="";
     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
-    reportTemplateName="OrderConfirmationForm1";
 
     constructor(
         injector: Injector,
@@ -616,7 +615,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     this.hideMainSpinner();
 
                     //////
-                    this.printInfoParam.reportTemplateName=this.reportTemplateName;
+                    this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
                     this.printInfoParam.TransactionId=response;
                 //  this.printInfoParam.orderType=this.formType.toUpperCase();
                     this.printInfoParam.orderType=this.getTransactionRole(this.body.enteredByUserRole);

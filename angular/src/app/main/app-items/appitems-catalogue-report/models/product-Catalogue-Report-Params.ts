@@ -61,7 +61,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     ColorPageShowCategory:boolean= false
     TransactionId: string="";
     orderType: string="";
-    saveToPDF:boolean= true;
+    saveToPDF:boolean= false;
 
 
     private attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
