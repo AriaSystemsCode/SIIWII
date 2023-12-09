@@ -31,13 +31,33 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
 
     ngOnChanges(changes: SimpleChanges) {
         //I37-Remove this.transactionFormPath 
-        this.transactionFormPath = this.attachmentBaseUrl + "/attachments/2154/OrderConfirmationForm1.pdf";
+      //  this.transactionFormPath = this.attachmentBaseUrl + "/attachments/2154/OrderConfirmationForm1.pdf";
         this.transactionFormPath =  "../../../../../assets/OrderConfirmationForm1.pdf";
         this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(
             this.transactionFormPath
         );
     }
-
+/* 
+    iframeError() {
+        console.error('Error loading iframe');
+        // Display an error message or take other actions when the iframe cannot be loaded
+        const errorMessage = document.createElement('p');
+        errorMessage.innerText = 'Unable to display PDF file.';
+    
+        const downloadLink = document.createElement('a');
+        downloadLink.href = this.transactionFormPath;
+        downloadLink.target = '_blank';
+        downloadLink.innerText = 'Download instead.';
+    
+        const errorContainer = document.createElement('div');
+        errorContainer.appendChild(errorMessage);
+        errorContainer.appendChild(downloadLink);
+    
+        // Replace the content of the iframe with the error message
+        const iframe = document.querySelector('iframe');
+        iframe.parentNode.replaceChild(errorContainer, iframe);
+      }
+ */
 
 
 
