@@ -139,7 +139,7 @@ namespace onetouch.Web.Services
                     string body = "";
                     string subject = "";
                     string fileName = reportName + ".pdf";
-                    string transactionId = "=";
+                    string transactionId = "";
                     
                     bool saveToPdf = true;
                     string orderConfirmationRole = "";
@@ -155,7 +155,7 @@ namespace onetouch.Web.Services
 
 
 
-                                if (parameterName.ToUpper() == "transactionId")
+                                if (parameterName.ToUpper() == "TRANSACTIONID")
                                 {
                                     transactionId = parameters.Get(parameterName).ToString();
                                     fileName = "OrderConfirmation_" + parameters.Get(parameterName).ToString() + ".pdf";
@@ -176,7 +176,7 @@ namespace onetouch.Web.Services
                         catch (Exception ex) { }
                     }
                     fileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
-                    if (false && parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
+                    if (parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
                     {
                         report.ExportToPdf(fileName);
                         //var tt = _appEntityAttachmentRepository.GetAll().ToList();
