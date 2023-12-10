@@ -73,7 +73,7 @@ export class ShoppingCartViewComponentComponent
   printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
   reportUrl:string="";
   invokeAction = '/DXXRDV';
-  reportTemplateName="OrderConfirmationForm1";
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -177,8 +177,8 @@ export class ShoppingCartViewComponentComponent
         this.appTransactionsForViewDto = res;
 
 
-        //I37
-       //this.transactionFormPath =res?.attachments;
+        //I37-entityAttachments
+       this.transactionFormPath =res?.entityAttachments[0]?.url;
 
         this.loadCommentsList()
 
@@ -708,7 +708,7 @@ export class ShoppingCartViewComponentComponent
 
   onGeneratOrderReport($event){
     if($event){
-      this.printInfoParam.reportTemplateName=this.reportTemplateName;
+      this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
       this.printInfoParam.TransactionId=this.orderId.toString();
     //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
       this.printInfoParam.orderType=this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);

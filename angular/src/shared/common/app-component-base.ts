@@ -90,7 +90,7 @@ export abstract class AppComponentBase {
 
     tenantDefaultCurrency: CurrencyInfoDto
     _sycAttachmentCategoriesServiceProxy: SycAttachmentCategoriesServiceProxy
-
+    public transactionReportTemplateName:"OrderConfirmationForm1";
 
     constructor(injector: Injector, private _location?: Location) {
         this.localization = injector.get(LocalizationService);
@@ -112,6 +112,7 @@ export abstract class AppComponentBase {
         this._sycAttachmentCategoriesServiceProxy = injector.get(SycAttachmentCategoriesServiceProxy);
         this.onDestroyHandler();
         this.setAppItemsFilterBody();
+        this.transactionReportTemplateName="OrderConfirmationForm1";
     }
 
 
