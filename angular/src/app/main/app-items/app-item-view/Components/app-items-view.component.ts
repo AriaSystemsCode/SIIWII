@@ -839,7 +839,7 @@ export class AppItemsViewComponent
     openShareProductListingModal() {
         console.log(">> listing");
         const listingId: number = this.productId;
-        const alreadyPublished: boolean = false;
+        const alreadyPublished: boolean = true;
         const successCallBack = () => {
             this.notify.success(this.l("PublishedSuccessfully"));
             // this.eventTriggered.emit({
@@ -847,13 +847,19 @@ export class AppItemsViewComponent
             //     data: true,
             // });
         };
+        const optinalData="mai";
         this._publishAppItemListingService.openProductListingSharingModal(
             alreadyPublished,
             listingId,
-            successCallBack
+            successCallBack,
+            optinalData
         );
         this._publishAppItemListingService.subscribersNumber =
             this.appItemForViewDto.numberOfSubscribers;
+            this._publishAppItemListingService.sharingLevel =
+            this.appItemForViewDto.sharingLevel;
+            this._publishAppItemListingService.itemSharing =
+            this.appItemForViewDto.itemSharing;
         this._publishAppItemListingService.productId = this.productId;
         this._publishAppItemListingService.screen = 1
     }

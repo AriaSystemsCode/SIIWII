@@ -55,6 +55,12 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             this.publishItemOptions.itemSharing = [];
         if (!this.publishItemOptions.sharingLevel)
             this.publishItemOptions.sharingLevel = 1;
+        if(this.PublishAppItemListingService.sharingLevel){
+            this.publishItemOptions.sharingLevel = this.PublishAppItemListingService.sharingLevel;
+        }
+        if(this.PublishAppItemListingService.itemSharing){
+            this.publishItemOptions.itemSharing = this.PublishAppItemListingService.itemSharing;
+        }
     }
 
     publishListing() {
