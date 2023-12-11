@@ -420,6 +420,7 @@ export class CreateEditAppItemVariationsComponent
                     extraAttr.lookupData = lookupData;
                     extraAttr.displayedLookupData = extraAttr.lookupData;
                 });
+                this.tempAddNewAttributes()
                 resolve(true);
             } else {
                 reject(false);
@@ -427,7 +428,33 @@ export class CreateEditAppItemVariationsComponent
             }
         });
     }
-
+    tempAddNewAttributes(){
+        var uniqueTempIds = new Set<number>();
+        const getUniqueId = function() : number { 
+            var r = Math.floor(Math.random() * 1e10) + 1e11;
+            if(uniqueTempIds.has(r)) getUniqueId()
+            else {
+                uniqueTempIds.add(r);
+                return r
+            }
+        }
+        this.appItem.variationItems.forEach(variation=>{
+            variation.entityExtraData.forEach(entityExtraData=>{
+                const extraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == entityExtraData?.entityObjectTypeCode)[0]
+                const isExist = extraAttr?.lookupData.filter(item=>item.code == entityExtraData?.attributeCode)[0] 
+                if(!isExist) {
+                    const tempAtt = new LookupLabelDto({
+                        code:entityExtraData?.attributeCode,
+                        value:getUniqueId(),
+                        label:entityExtraData?.attributeValue,
+                        stockAvailability:0,
+                        isHostRecord:false,
+                    })
+                    extraAttr?.lookupData?.push(tempAtt)
+                }
+            })
+        })
+    }
     removeExtraAttribute(extraAttr: IsVariationExtraAttribute, index: number) {
         // this.selectedExtaAttrCtrl.removeControl(name)
         if (extraAttr.entityObjectTypeCode == this.sizeExtraAttrCode) {
