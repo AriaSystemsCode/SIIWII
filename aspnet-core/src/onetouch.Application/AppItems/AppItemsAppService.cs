@@ -705,8 +705,11 @@ namespace onetouch.AppItems
                 //Sort by Size Id
                 var appItem = await _appItemRepository.GetAll().Include(z => z.ItemSizeScaleHeadersFkList).ThenInclude(z => z.AppItemSizeScalesDetails).
                      FirstOrDefaultAsync(z => z.Id == appItemId);
+                
+                string attribName = "";
+                if (appItems.FirstOrDefault().EntityFk.EntityExtraData.FirstOrDefault(a => a.AttributeId != attributeId)!=null)
+                    attribName = appItems.FirstOrDefault().EntityFk.EntityExtraData.FirstOrDefault(a => a.AttributeId != attributeId).EntityObjectTypeCode;
 
-                var attribName = appItems.FirstOrDefault().EntityFk.EntityExtraData.FirstOrDefault(a => a.AttributeId != attributeId).EntityObjectTypeCode;
                 if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
                 {
                     List<AppItemAttributePriceDto> appRetItemAttributePriceDto = new List<AppItemAttributePriceDto>();
