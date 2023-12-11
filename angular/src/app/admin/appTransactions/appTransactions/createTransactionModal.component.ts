@@ -618,7 +618,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
                     this.printInfoParam.TransactionId=response;
                 //  this.printInfoParam.orderType=this.formType.toUpperCase();
-                    this.printInfoParam.orderType=this.getTransactionRole(this.body.enteredByUserRole);
+                    this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.body.enteredByUserRole);
                     this.printInfoParam.saveToPDF=true;
                     this.printInfoParam.tenantId = this.appSession?.tenantId
                     this.printInfoParam.userId = this.appSession?.userId
