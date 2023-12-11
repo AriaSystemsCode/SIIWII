@@ -176,10 +176,6 @@ export class ShoppingCartViewComponentComponent
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
 
-
-        //I37-entityAttachments
-       this.transactionFormPath =res?.entityAttachments[0]?.url;
-
         this.loadCommentsList()
 
         //lines
@@ -193,6 +189,11 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
+             //I37-entityAttachments
+       this.transactionFormPath =res?.entityAttachments[0]?.url;
+       //I37-remove value
+       this.transactionFormPath =this.attachmentBaseUrl+"/attachments/2154/OrderConfirmation_361667.pdf";
+
             this.resetTabValidation();
 
             this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
@@ -711,7 +712,7 @@ export class ShoppingCartViewComponentComponent
       this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
       this.printInfoParam.TransactionId=this.orderId.toString();
     //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
-      this.printInfoParam.orderType=this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+      this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
       this.printInfoParam.saveToPDF=true;
       this.printInfoParam.tenantId = this.appSession?.tenantId
       this.printInfoParam.userId = this.appSession?.userId

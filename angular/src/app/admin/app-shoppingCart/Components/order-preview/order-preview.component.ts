@@ -30,9 +30,8 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        //I37-Remove this.transactionFormPath 
       //  this.transactionFormPath = this.attachmentBaseUrl + "/attachments/2154/OrderConfirmationForm1.pdf";
-        this.transactionFormPath =  "../../../../../assets/OrderConfirmationForm1.pdf";
+      //  this.transactionFormPath =  "../../../../../assets/OrderConfirmationForm1.pdf";
         this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(
             this.transactionFormPath
         );
