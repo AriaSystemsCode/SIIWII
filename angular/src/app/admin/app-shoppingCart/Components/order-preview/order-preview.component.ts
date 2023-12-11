@@ -1,9 +1,9 @@
 import { Component, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
-import { Observable, finalize } from "rxjs";
+import { Observable, catchError, finalize } from "rxjs";
 import { GetAppTransactionsForViewDto } from "@shared/service-proxies/service-proxies";
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 
 
 @Component({
@@ -15,6 +15,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("transactionFormPath") transactionFormPath;
     pdfPath: SafeResourceUrl;
+    input = document.querySelector('input[type=file]');
 
     constructor(
         injector: Injector,
@@ -32,48 +33,17 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
             this.loadPdf();
     }
     loadPdf() {
-      //  const encodedUrl = encodeURIComponent(this.transactionFormPath);
-        this.getPdfBinary(this.transactionFormPath).subscribe((arrayBuffer: ArrayBuffer) => {
-            const binaryString = this.arrayBufferToBinaryString(arrayBuffer);
-            const dataUrl = 'data:application/pdf;base64,' + btoa(binaryString);
-            this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
-        });
-
+        fetch(this.transactionFormPath)
+            .then(response => response.blob())
+            .then(blob => {
+                this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
+                // const reader = new FileReader();
+                // reader.onload = (e) => {
+                //     const fileContent = e.target.result as ArrayBuffer;
+                //     const blob = new Blob([new Uint8Array(fileContent)], { type: 'application/pdf' });
+                //     this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
+                // };
+                // reader.readAsArrayBuffer(this.transactionFormPath);
+            });
     }
-
-    getPdfBinary(url): Observable<ArrayBuffer> {
-        return this.http.get(url, { responseType: 'arraybuffer' });
-    }
-    arrayBufferToBinaryString(arrayBuffer: ArrayBuffer): string {
-        const binaryArray = new Uint8Array(arrayBuffer);
-        const binaryString = String.fromCharCode.apply(null, binaryArray);
-        return binaryString;
-    }
-
-    /* 
-        iframeError() {
-            console.error('Error loading iframe');
-            // Display an error message or take other actions when the iframe cannot be loaded
-            const errorMessage = document.createElement('p');
-            errorMessage.innerText = 'Unable to display PDF file.';
-        
-            const downloadLink = document.createElement('a');
-            downloadLink.href = this.transactionFormPath;
-            downloadLink.target = '_blank';
-            downloadLink.innerText = 'Download instead.';
-        
-            const errorContainer = document.createElement('div');
-            errorContainer.appendChild(errorMessage);
-            errorContainer.appendChild(downloadLink);
-        
-            // Replace the content of the iframe with the error message
-            const iframe = document.querySelector('iframe');
-            iframe.parentNode.replaceChild(errorContainer, iframe);
-          }
-     */
-
-
-
-
-
 }
