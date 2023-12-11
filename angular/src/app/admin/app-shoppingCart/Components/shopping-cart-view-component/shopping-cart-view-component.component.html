@@ -95,8 +95,8 @@
                         {{l("ContinueShopping")}}
                     </button>
 
-                    <button type="button" class="btn btn-primary bgPurple border-0 mr-4 pl-4 pr-4 discartBtn"
-                        style="height: 37px;" (click)="onDiscardShopping()">
+                    <button  *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'" type="button" class="btn btn-primary bgPurple border-0 mr-4 pl-4 pr-4 discartBtn"
+                    style="height: 37px;" (click)="onDiscardShopping()">
                         {{l("DiscardShopping")}}
                     </button>
                 </div>
