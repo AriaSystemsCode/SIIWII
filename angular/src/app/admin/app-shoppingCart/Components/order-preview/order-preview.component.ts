@@ -1,12 +1,9 @@
-import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
+import { Component, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
-import { Router } from "express-serve-static-core";
-import { finalize } from "rxjs";
-import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
-import * as moment from "moment";
-import { forEach } from "lodash";
+import { Observable, catchError, finalize } from "rxjs";
 import { GetAppTransactionsForViewDto } from "@shared/service-proxies/service-proxies";
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 
 
@@ -19,48 +16,51 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("transactionFormPath") transactionFormPath;
     pdfPath: SafeResourceUrl;
+    input = document.querySelector('input[type=file]');
+
+    printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
+    reportUrl:string="";
+    invokeAction = '/DXXRDV';
+    @Input("orderId") orderId;
 
     constructor(
         injector: Injector,
-        private sanitizer: DomSanitizer
+        private sanitizer: DomSanitizer,
+        private http: HttpClient
     ) {
         super(injector);
     }
     ngOnInit(): void {
+        if (this.transactionFormPath)
+            this.loadPdf();
     }
-
     ngOnChanges(changes: SimpleChanges) {
-        //I37-Remove this.transactionFormPath 
-      //  this.transactionFormPath = this.attachmentBaseUrl + "/attachments/2154/OrderConfirmationForm1.pdf";
-        this.transactionFormPath =  "../../../../../assets/OrderConfirmationForm1.pdf";
-        this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(
-            this.transactionFormPath
-        );
+        if (this.transactionFormPath)
+            this.loadPdf();
     }
-/* 
-    iframeError() {
-        console.error('Error loading iframe');
-        // Display an error message or take other actions when the iframe cannot be loaded
-        const errorMessage = document.createElement('p');
-        errorMessage.innerText = 'Unable to display PDF file.';
-    
-        const downloadLink = document.createElement('a');
-        downloadLink.href = this.transactionFormPath;
-        downloadLink.target = '_blank';
-        downloadLink.innerText = 'Download instead.';
-    
-        const errorContainer = document.createElement('div');
-        errorContainer.appendChild(errorMessage);
-        errorContainer.appendChild(downloadLink);
-    
-        // Replace the content of the iframe with the error message
-        const iframe = document.querySelector('iframe');
-        iframe.parentNode.replaceChild(errorContainer, iframe);
-      }
- */
+    loadPdf() {
+        this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+        this.printInfoParam.TransactionId = this.orderId.toString();
+        //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+        this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+        this.printInfoParam.saveToPDF = true;
+        this.printInfoParam.tenantId = this.appSession?.tenantId
+        this.printInfoParam.userId = this.appSession?.userId
+        this.reportUrl = this.printInfoParam.getReportUrl()
 
+        this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(this.transactionFormPath);
 
-
-
-
+        // fetch(this.transactionFormPath)
+        //     .then(response => response.blob())
+        //     .then(blob => {
+        //         this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
+        //         // const reader = new FileReader();
+        //         // reader.onload = (e) => {
+        //         //     const fileContent = e.target.result as ArrayBuffer;
+        //         //     const blob = new Blob([new Uint8Array(fileContent)], { type: 'application/pdf' });
+        //         //     this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
+        //         // };
+        //         // reader.readAsArrayBuffer(this.transactionFormPath);
+        //     });
+    }
 }

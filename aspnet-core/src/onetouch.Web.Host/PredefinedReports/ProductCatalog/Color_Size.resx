@@ -128,7 +128,7 @@ private void tableCell52_BeforePrint(object sender, System.ComponentModel.Cancel
 }
 
 private void Color_Size_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-Color_Size.Width = 1000;    
+    
 }
 
 private void Detail_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -145,7 +145,6 @@ private void Detail_BeforePrint_1(object sender, System.ComponentModel.CancelEve
 }
 
 private void table2_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-    table2.WidthF=1200;
     
 }
 </value>

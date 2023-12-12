@@ -70,7 +70,9 @@
                         <img src="../../../../../assets/shoppingCart/share.svg"/>
                         {{l("Share")}}
                     </button>
-                    <button type="button" class="btn btn-primary bgPurple border-0" (click)="printTransaction()" style="width: 85px;
+                    <button type="button" [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
+                    [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                    class="btn btn-primary bgPurple border-0" (click)="printTransaction()" style="width: 85px;
                     height: 37px;
                     border-radius: 4px;">
                         <img src="../../../../../assets/shoppingCart/print.svg" />
@@ -419,14 +421,14 @@
                             </div>
                         </p-accordionTab>
                         <!-- order Preview tab -->
-                        <p-accordionTab class="shoppingCartAccordionTabBG">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="content">
-                                <app-order-preview [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                <app-order-preview [orderId]="orderId" [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     [transactionFormPath]="transactionFormPath"></app-order-preview>
                             </ng-template>
                         </p-accordionTab>
@@ -435,7 +437,7 @@
 
 
 
-                </div>
+                </div> 
                 <div class="col-4  p-4">
                     <div class="row">
                         <h4 class="purpleColor font-weight-bold col-12"> {{l("Order Summary")}} </h4>

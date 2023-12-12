@@ -2,12 +2,11 @@
     <div class="container-fluid orderInfoForm thin-scroll">
 
         <div class="row">
-            <object [data]="pdfPath" type="application/pdf" width="100%" height="800px">
-                <p>Unable to display PDF file. <a [href]="pdfPath" target="_blank">Download</a> instead.</p>
-            </object>
-            <!-- <iframe id="pdfPath" class="w-100 pt-4" [src]="pdfPath"  height="800px" frameborder="0" (error)="iframeError()">
+            <!-- <iframe id="pdfPath" class="w-100 pt-4" [src]="pdfPath" height="800px" frameborder="0">
                 <p>Unable to display PDF file. <a [href]="pdfPath" target="_blank">Download</a> instead.</p>
             </iframe> -->
-        </div> 
+            <report-viewer class="w-100 pt-4" height="800px" [reportUrl]="reportUrl" [invokeAction]="invokeAction">
+            </report-viewer>
+        </div>
     </div>
 </div>

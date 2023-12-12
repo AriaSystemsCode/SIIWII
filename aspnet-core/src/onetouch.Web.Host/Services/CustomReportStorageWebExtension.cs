@@ -139,31 +139,14 @@ namespace onetouch.Web.Services
                     string body = "";
                     string subject = "";
                     string fileName = reportName + ".pdf";
-                    string transactionId = "395363";
-                    //360186
+                    string transactionId = "";
+                    
                     bool saveToPdf = true;
-                    string orderConfirmationRole = "Seller";
+                    string orderConfirmationRole = "";
                     foreach (string parameterName in parameters.AllKeys)
                     {
                         try
-                        {
-                            try
-                            {
-                                // to be removed after connect with order confirmation UI
-                                if (parameterName.ToUpper() == "REPORTTITLE")
-                                {
-                                    report.Parameters["TransactionId"].Value = Convert.ChangeType(
-                                    parameters.Get(parameterName), report.Parameters["TransactionId"].Type);
-
-                                    transactionId = parameters.Get(parameterName).ToString();
-                                    fileName = "OrderConfirmation_" + parameters.Get(parameterName).ToString() + ".pdf";
-
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
+                        { 
 
                             if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null)
                             {
@@ -172,7 +155,7 @@ namespace onetouch.Web.Services
 
 
 
-                                if (parameterName.ToUpper() == "transactionId")
+                                if (parameterName.ToUpper() == "TRANSACTIONID")
                                 {
                                     transactionId = parameters.Get(parameterName).ToString();
                                     fileName = "OrderConfirmation_" + parameters.Get(parameterName).ToString() + ".pdf";
@@ -192,24 +175,24 @@ namespace onetouch.Web.Services
                         }
                         catch (Exception ex) { }
                     }
-                    fileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
+                    var longFileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
                     if (parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
                     {
-                        report.ExportToPdf(fileName);
+                        report.ExportToPdf(longFileName);
                         //var tt = _appEntityAttachmentRepository.GetAll().ToList();
                         var appEntityAttachment = _appEntityAttachmentRepository.GetAll().Where(e => e.EntityId == long.Parse(transactionId)).FirstOrDefault();
                         if (appEntityAttachment != null && appEntityAttachment.Id > 0)
                         {
                             _appAttachmentRepository.Delete(e => e.Id == appEntityAttachment.AttachmentId);
                             var att = new AppAttachment { Name = transactionId, Attachment = fileName, TenantId = (int)tenantId };
-                            var ret = _appAttachmentRepository.InsertAndGetIdAsync(att).Result;
+                            var ret = _appAttachmentRepository.InsertAndGetId(att);
                             appEntityAttachment.AttachmentId = ret;
 
                         }
                         else
                         {
                             var att = new AppAttachment { Name = transactionId, Attachment = fileName, TenantId = (int)tenantId };
-                            var ret = _appAttachmentRepository.InsertAndGetIdAsync(att).Result;
+                            var ret = _appAttachmentRepository.InsertAndGetId(att);
                             _appEntityAttachmentRepository.Insert(new AppEntityAttachment()
                             {
                                 EntityId = long.Parse(transactionId),

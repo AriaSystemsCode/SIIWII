@@ -575,7 +575,7 @@ namespace onetouch.Migrations.Seed.Host
             #region Add sydReports
             var keyList = _context.LanguageTexts.Select(e => e.Key).ToList();
 
-            var sycEntityObjectTypes = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "OrderConfirmation").ToList();
+            var sycEntityObjectTypes = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "OrderConfirmationForm1").ToList();
             if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count < 1)
             {
                 SycReport sycReport = new SycReport();
@@ -585,6 +585,42 @@ namespace onetouch.Migrations.Seed.Host
                 sycReport.Name = "OrderConfirmationForm1";
                 sycReport.Description = "Order confirmation form 1";
                 sycReport.Thumbnail = "Order confirmation form 1";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            var sycReports = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate8").ToList();
+            if (sycReports == null || sycReports.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate8";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate8";
+                sycReport.Description = "Products Catalog Template 8 Products";
+                sycReport.Thumbnail = "ProductsCatalogTemplate8";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            var sycReports9 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate9").ToList();
+            if (sycReports9 == null || sycReports9.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate9";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate9";
+                sycReport.Description = "Products Catalog Template 9 Products";
+                sycReport.Thumbnail = "ProductsCatalogTemplate9";
                 sycReport.EntityObjectTypeId = 97;
 
                 _context.SycReports.Add(sycReport);

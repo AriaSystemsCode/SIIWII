@@ -60,7 +60,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     DetailPageShowCategory:boolean= false
     ColorPageShowCategory:boolean= false
     TransactionId: string="";
-    orderType: string="";
+    orderConfirmationRole: string="";
     saveToPDF:boolean= false;
 
 
@@ -130,7 +130,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&DetailPageShowCategory=" + this.DetailPageShowCategory
        url += "&ColorPageShowCategory=" + this.ColorPageShowCategory
        url += "&TransactionId=" + this.TransactionId
-       url += "&orderType=" + this.orderType
+       url += "&orderConfirmationRole=" + this.orderConfirmationRole
        url += "&saveToPDF=" + this.saveToPDF
               return url
     }
