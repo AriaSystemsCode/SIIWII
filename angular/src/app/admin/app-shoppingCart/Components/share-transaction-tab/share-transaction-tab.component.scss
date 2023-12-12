@@ -1,0 +1,21 @@
+.tab-cont {
+    background-color: #f1f2f3;
+    padding: 10px;
+    .mainheadertxt{
+        color: #4a0d4a;
+    }
+    .shareSectionCont{
+        background-color: #fff;
+    }
+    .addContBtn{
+        background-color: #f6851d;
+        color: #fff;
+    }
+    .selected-contact-list{
+        border-radius: 5px;
+        border: 2px solid #f1f2f3;
+        height: 150px;
+        max-height: 150px;
+        overflow-y: auto;
+    }
+}

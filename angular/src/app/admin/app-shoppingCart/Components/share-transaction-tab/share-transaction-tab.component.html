@@ -1,0 +1,63 @@
+<div class="tab-cont  position-relative">
+    <div class="container-fluid orderInfoForm ">
+        <div
+        class="header pt-4 p-2 my-2 d-flex align-items-center  ">
+        <h4><span class="mainheadertxt">Share Transaction</span></h4>
+    </div>
+    <div class="orderForm shareSectionCont  position-relative p-2">
+        <div class="container-fluid orderInfoForm thin-scroll">
+            <div class="header p-2 my-2 d-flex align-items-center  ">
+                <h6><span class="headertxt">Manage Transaction To Siiwii Users</span></h6>
+            </div>
+            <hr class="my-2" />
+            </div>
+        <div class="row">
+            <div class="col-12 pt-3 pl-4 pr-4">
+                <label class="label">Select User</label>
+            </div>
+
+            <div class="col-9 p-3 pl-4 pr-4">
+                <input type="text"                             
+                class="form-control w-100"
+                [(ngModel)]="searchContact"/>
+            </div>
+<div class="col-3 pt-3">
+    <button               
+    class="addContBtn text-center btn">
+    Add</button>
+</div>
+<div class="col-12 pt-3 pl-4 pr-4">
+    <label class="label">Selected Users List</label>
+</div>
+<div class="col-12 p-3 pl-4 pr-4">
+    <div class="selected-contact-list w-100">
+         
+    </div>
+</div>
+
+        </div>
+        <div class="container-fluid orderInfoForm thin-scroll">
+            <div class="header p-2 my-2 d-flex align-items-center  ">
+                <h6><span class="headertxt">Manage Transaction To Siiwii Users</span></h6>
+            </div>
+            <hr class="my-2" />
+            </div>
+        <div class="row">
+            <div class="col-12 pt-3 pl-4 pr-4">
+                <label class="label">Email Transaction To Non Siiwii Users</label>
+            </div>
+
+            <div class="col-12 p-3 pl-4 pr-4">
+                <input type="text"                             
+                class="form-control w-100"
+                [(ngModel)]="emailList"/>
+            </div>
+
+<div class="col-12 p-3">
+    <textarea class="form-control w-100 ml-4" placeholder="Add a message here....."></textarea>
+</div>
+
+        </div>
+    </div>
+ </div>
+</div>

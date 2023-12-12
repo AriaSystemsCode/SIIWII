@@ -122,6 +122,7 @@ import { CreateOrAddShippingInformationComponent } from "./admin/app-shoppingCar
 import { CreateOrEditBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/create-or-edit-billing-info/create-or-edit-billing-info.component";
 import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/view-billing-info/view-billing-info.component";
 import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
+import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Components/share-transaction-tab/share-transaction-tab.component";
 
 @NgModule({
     declarations: [
@@ -191,7 +192,8 @@ import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.m
         ViewShippingInformationComponent,
         CreateOrAddShippingInformationComponent,
         CreateOrEditBillingInfoComponent,
-        ViewBillingInfoComponent
+        ViewBillingInfoComponent,
+        ShareTransactionTabComponent
     ],
     imports: [
         BrowserAnimationsModule,
