@@ -223,6 +223,16 @@ namespace onetouch.AppItems
                 #region Excel validation rules only.
                 List<string> RecordsCodes = result.Select(r => r.Code).ToList();
                 List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
+                //XX
+                var resJoin1 = from r in result
+                               join i in _appItemRepository.GetAll().AsNoTracking().Include(x => x.ParentFk).Where(x => x.ItemType == 0)
+                               on r.Code.Replace(" ", string.Empty) equals i.Code.Replace(" ", string.Empty) into j1
+                               from j in j1
+                               select new { item = j, code = j.Code.Replace(" ", string.Empty), parentCode = j.ParentFk.Code };
+
+
+                var resJoin = resJoin1.ToList().OrderBy(z => z.code);
+                //XX
                 foreach (AppItemStockAvailabilityExcelDto itemExcelDto in result)
                 {
                     if (itemExcelDto.Code  == "Code")
@@ -243,12 +253,19 @@ namespace onetouch.AppItems
                     itemExcelDto.rowNumber = rowNumber;
                     if (!string.IsNullOrEmpty(itemExcelDto.ParentCode))
                     {
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace (" ",string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId != null && x.ListingItemId == null);
+                        //xx
+                        //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace (" ",string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId != null && x.ListingItemId == null);
+                        var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId != null && x.item.ItemType == 0).FirstOrDefault();
+                        var itemExists = itemExisting == null ? null : itemExisting.item;
+                        //xx
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
-                            var itemParentObj = _appItemRepository.GetAll().FirstOrDefault(x => x.Id == itemExists.ParentId);
-                            if (itemParentObj != null && itemParentObj.Code != itemExcelDto.ParentCode)
+                            //XX
+                            //var itemParentObj = _appItemRepository.GetAll().FirstOrDefault(x => x.Id == itemExists.ParentId);
+                            //if (itemParentObj != null && itemParentObj.Code != itemExcelDto.ParentCode)
+                            if (itemExisting.parentCode != null && itemExisting.parentCode != itemExcelDto.ParentCode)
+                            //xx
                             {
                                 itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " Parent code does not match application item parent code.");
                                 recordErrorMEssage = "Code :" + itemExcelDto.Code + " Parent code does not match application item parent code.";
@@ -264,7 +281,11 @@ namespace onetouch.AppItems
                     }
                     else
                     {
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId == null && x.ListingItemId == null);
+                        //xx
+                        //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId == null && x.ListingItemId == null);
+                        var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId == null && x.item.ItemType == 0).FirstOrDefault();
+                        var itemExists = itemExisting == null ? null : itemExisting.item;
+                        //xx
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;

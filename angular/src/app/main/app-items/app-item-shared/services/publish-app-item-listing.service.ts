@@ -14,6 +14,8 @@ export class PublishAppItemListingService extends AppComponentBase {
     sharingLevel:number;
     itemId:number;
     screenNumber:number // 1 for product details page 2 for product list page
+    itemSharing!: any[] | undefined; //add optional param for list sharing contact 
+
     constructor(
         private injector: Injector,
         private _appItemsServiceProxy: AppItemsServiceProxy,
@@ -29,7 +31,8 @@ export class PublishAppItemListingService extends AppComponentBase {
     async openProductListingSharingModal(
         alreadyPublished: boolean,
         listingAppItemId: number,
-        successCallBack: Function
+        successCallBack: Function,
+        optinalData?:any/*added to pass more optional data for the popup*/ 
     ) {
         let publishItemOptions: PublishItemOptions;
         if (alreadyPublished) {

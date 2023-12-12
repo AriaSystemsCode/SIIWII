@@ -923,9 +923,9 @@ namespace onetouch.AppMarketplaceItems
                                                 attlook.StockAvailability = itemVarSum;
                                                 //SSIN
                                                 var itemSsin = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString() &&
-                                                                                       a.AttributeId == long.Parse(secondAttId)
-                                                                                       ).Any()).ToList()
+                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString()) 
+                                                                                       .WhereIf(secondAttId!=null,a=>a.AttributeId == long.Parse(secondAttId))
+                                                                                       .Any()).ToList()
                                                                                        .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && w.AttributeValue == varItem).Any()).FirstOrDefault();
 
 
