@@ -175,24 +175,24 @@ namespace onetouch.Web.Services
                         }
                         catch (Exception ex) { }
                     }
-                    fileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
+                    var longFileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
                     if (parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
                     {
-                        report.ExportToPdf(fileName);
+                        report.ExportToPdf(longFileName);
                         //var tt = _appEntityAttachmentRepository.GetAll().ToList();
                         var appEntityAttachment = _appEntityAttachmentRepository.GetAll().Where(e => e.EntityId == long.Parse(transactionId)).FirstOrDefault();
                         if (appEntityAttachment != null && appEntityAttachment.Id > 0)
                         {
                             _appAttachmentRepository.Delete(e => e.Id == appEntityAttachment.AttachmentId);
                             var att = new AppAttachment { Name = transactionId, Attachment = fileName, TenantId = (int)tenantId };
-                            var ret = _appAttachmentRepository.InsertAndGetIdAsync(att).Result;
+                            var ret = _appAttachmentRepository.InsertAndGetId(att);
                             appEntityAttachment.AttachmentId = ret;
 
                         }
                         else
                         {
                             var att = new AppAttachment { Name = transactionId, Attachment = fileName, TenantId = (int)tenantId };
-                            var ret = _appAttachmentRepository.InsertAndGetIdAsync(att).Result;
+                            var ret = _appAttachmentRepository.InsertAndGetId(att);
                             _appEntityAttachmentRepository.Insert(new AppEntityAttachment()
                             {
                                 EntityId = long.Parse(transactionId),
