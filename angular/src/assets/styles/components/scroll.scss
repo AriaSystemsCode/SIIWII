@@ -3,10 +3,10 @@
 // custom thin scrollbar
 .thin-scroll,
 .p-table-scrollable-body {
-    @include thin-scroll();
+    @include thin-scroll(6px ,10px);
 }
 
 
 .big-scroll{
-    @include thin-scroll(  6px ,6px );
+    @include thin-scroll(  6px ,10px );
 }
