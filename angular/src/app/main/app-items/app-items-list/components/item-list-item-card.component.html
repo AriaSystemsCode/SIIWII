@@ -24,6 +24,12 @@
                         | textSubstring: 120
                     }}
                 </p>
+                <p class="text-dark mb-2">
+                <b>Code:</b> 
+                  {{
+                    item?.itemCode
+                    }}
+                </p>
                 <div>
                     <p class="text-dark mb-2" *ngIf="item?.appItemsListItemVariations">
                         <ng-container *ngFor="let extraAttr of variationSummary.selectedVariations | keyvalue;let last as last">
