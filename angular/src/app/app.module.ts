@@ -74,6 +74,8 @@ import { ActiveDelegatedUsersComboComponent } from "./shared/layout/active-deleg
 import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { MenuModule } from "primeng/menu"; // add this import
 import { DialogModule } from "primeng/dialog";
+import { ChipModule } from 'primeng/chip';
+
 // Metronic
 import {
     PerfectScrollbarModule,
@@ -235,7 +237,8 @@ import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Component
         AccordionModule,
         TreeTableModule,
         TreeSelectModule,
-        CalendarModule, TooltipModule,DevExpressDemoModule
+        CalendarModule, TooltipModule,DevExpressDemoModule,
+        ChipModule
     ],
     providers: [
         ImpersonationService,

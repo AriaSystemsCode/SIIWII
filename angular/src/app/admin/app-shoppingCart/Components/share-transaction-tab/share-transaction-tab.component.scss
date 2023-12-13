@@ -12,10 +12,11 @@
         color: #fff;
     }
     .selected-contact-list{
-        border-radius: 5px;
-        border: 2px solid #f1f2f3;
+        flex-direction: row;
+        gap: 0.5rem!important;
         height: 150px;
         max-height: 150px;
         overflow-y: auto;
+        align-content: flex-start;
     }
 }
