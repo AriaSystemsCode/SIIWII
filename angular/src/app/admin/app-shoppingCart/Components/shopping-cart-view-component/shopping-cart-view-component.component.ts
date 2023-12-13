@@ -3,7 +3,7 @@ import {
   , AfterViewInit, ViewChildren, QueryList,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppTransactionServiceProxy, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -65,10 +65,12 @@ export class ShoppingCartViewComponentComponent
   transactionPosition = TransactionPosition;
   activeIndex = 0;
   showSaveBtn: boolean = false;
+  currencySymbol: string = "";
 
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+    private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     private userClickService: UserClickService,
     private router: Router
   ) {
@@ -199,6 +201,13 @@ export class ShoppingCartViewComponentComponent
 
 
           });
+
+
+          //Currency
+            this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+                .subscribe((res: CurrencyInfoDto) => {
+                    this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+                });
         this.modal.hide();
         this.modal.show();
         this.hideMainSpinner();
