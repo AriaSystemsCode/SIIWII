@@ -670,6 +670,7 @@ export class CreateOrEditAppItemComponent
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
+            if(! (!element?.parent && !element?.leaf)){
             console.log(element);
             const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
                 new AppEntityDtoWithActions<AppEntityCategoryDto>({
@@ -679,11 +680,12 @@ export class CreateOrEditAppItemComponent
                             element.data.sycEntityObjectCategory.id,
                         entityObjectCategoryCode:
                             element.data.sycEntityObjectCategory.code,
-                        entityObjectCategoryName:
-                            element.data.sycEntityObjectCategory.name,
+                            entityObjectCategoryName: this.getPath(element),
                     }),
                 });
+       
             this.categories.push(newCategory);
+        }
         });
         this.appItem.entityCategories = selectedCategories;
         this.formTouched = true;
@@ -905,8 +907,7 @@ export class CreateOrEditAppItemComponent
                             element.data.sycEntityObjectClassification.id,
                         entityObjectClassificationCode:
                             element.data.sycEntityObjectClassification.code,
-                        entityObjectClassificationName:
-                            element.data.sycEntityObjectClassification.name,
+                            entityObjectClassificationName: this.getPath(element),
                     }),
                 });
             this.classifications.push(newClass);
