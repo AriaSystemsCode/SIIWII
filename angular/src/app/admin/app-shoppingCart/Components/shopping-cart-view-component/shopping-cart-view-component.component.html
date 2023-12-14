@@ -416,7 +416,8 @@
                         <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor">
                             <div class="row w-100">
                                 <div class="col-6 font-weight-bold">{{l("TotalAmount")}}</div>
-                                <div class="font-weight-bold">${{shoppingCartDetails?.totalAmount | currency:' ' }}</div>
+                                <div class="font-weight-bold">{{currencySymbol}} {{shoppingCartDetails?.totalAmount ?
+                                    shoppingCartDetails?.totalAmount : '0.00' }}</div>
                             </div>
                             <div class="row w-100 mt-4 mb-4">
                                 <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
