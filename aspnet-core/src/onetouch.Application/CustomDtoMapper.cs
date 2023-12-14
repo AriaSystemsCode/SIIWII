@@ -334,7 +334,7 @@ namespace onetouch
             configuration.CreateMap<AppItemPriceInfo, AppItemPrices>().ReverseMap();
             configuration.CreateMap<AppItemPrices, AppItemPriceInfo>()
             .ForMember(d => d.CurrencyName, s => s.MapFrom(ss => ss.CurrencyFk == null ? null : ss.CurrencyFk.Name))
-            .ForMember(d => d.CurrencySymbol, s => s.MapFrom(ss => ss.CurrencyFk != null & ss.CurrencyFk.EntityExtraData != null & (ss.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue != null) ? ss.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : null));
+            .ForMember(d => d.CurrencySymbol, s => s.MapFrom(ss => ss.CurrencyFk != null && ss.CurrencyFk.EntityExtraData != null && ss.CurrencyFk.EntityExtraData.Count > 0  && (ss.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue != null) ? ss.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : null));
             //MMT
             configuration.CreateMap<AppItemDto, AppItem>();
             configuration.CreateMap<AppItem, AppItem>()
