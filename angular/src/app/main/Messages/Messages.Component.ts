@@ -66,7 +66,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     entityAttachments = [];
     RecipientsName = [];
     highlightFirstMsg: boolean;
-    displayMessageDetails:boolean=false;
+    displayMessageDetails: boolean = false;
+    primaryCount: number = 0;
+    updatesCount: number = 0;
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -82,8 +84,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     ngOnInit(): void {
         this.messages = [];
         this.highlightFirstMsg = true;
-        this.displayMessageDetails=false;
-       this.selectMessagetype(1, this.l("Inbox"));
+        this.displayMessageDetails = false;
+        this.selectMessagetype(1, this.l("Inbox"));
         this._sycEntityObjectClassificationsServiceProxy
             .getAllChildsForLables()
             .subscribe((result) => {
@@ -142,8 +144,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                             .subscribe((result) => {
                                 if (result && result.profilePicture) {
                                     message.profilePictureUrl =
-                                    "data:image/jpeg;base64," +
-                                    result.profilePicture;
+                                        "data:image/jpeg;base64," +
+                                        result.profilePicture;
                                 }
                             });
                         /*   if(this.messageTypeIndex==2)
@@ -184,10 +186,13 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                                 });
                         } */
                     }
-                  
+
 
                     this.totalCount = result.totalCount;
                     this.totalUnread = result.totalUnread;
+                    //I37-get primary & Updates Count
+                    this.primaryCount = 0;
+                    this.updatesCount = 0;
 
                     this.itemsToShow = this.messages.slice(
                         0,
@@ -196,9 +201,25 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                     this.isFullListDisplayed = false;
                 }
 
-               if ((window.innerWidth > 767 ) && (this.messages.length > 0))
-                this.selectMessage(this.messages[0]);
+                if ((window.innerWidth > 767) && (this.messages.length > 0))
+                    this.selectMessage(this.messages[0]);
             });
+    }
+    showSideBar: boolean = false;
+    showHideSideBarTitle: string = !this.showSideBar ? "Show details" : "Hide details";
+    onShowSideBar(showSideBar:boolean) {
+        this.showSideBar = showSideBar;
+        this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
+    }
+
+    getPrimaryMessage() {
+        //I37-get primary 
+        this.getMesssage();
+    }
+
+    getUpdatesMessage() {
+        //I37-get Updates 
+        this.getMesssage();
     }
 
     onScroll(): void {
@@ -224,9 +245,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
 
         this._MessageServiceProxy
             .getMessagesForView(message.id)
-            .pipe(finalize(() => { this.displayMessageDetails = true;  this.hideMainSpinner();}))
+            .pipe(finalize(() => { this.displayMessageDetails = true; this.hideMainSpinner(); }))
             .subscribe((result) => {
-                this.messagesDetails=result;
+                this.messagesDetails = result;
                 for (var i = 0; i < result.length; i++) {
 
                     const message = result[i].messages
@@ -257,8 +278,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    messageDetailsGoback(){
-        this.displayMessageDetails=false;
+    messageDetailsGoback() {
+        this.displayMessageDetails = false;
     }
 
     readMessage(target) {
