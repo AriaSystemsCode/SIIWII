@@ -13,7 +13,7 @@ import { AddressComponent } from '../../address/address.component';
 export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
   @Input("activeTab") activeTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-  @Output("shippingInfOValid") shippingInfOValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
+  @Output("BillingInfoValid") BillingInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   isContactsValid: boolean = false;
@@ -83,7 +83,6 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
    }
    
   isContactFormValid(value,sectionIndex) {
-
   if(this.activeTab==this.shoppingCartoccordionTabs.BillingInfo)
   {
   this.isContactsValid = value;
@@ -104,7 +103,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
   }
   if(this.apContactSelectedAdd&&this.arContactSelectedAdd&&this.enableSAveApcontact&&this.enableSAveArcontact){
     this.isContactsValid=true;
-    this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+    this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 
     }else{
       this.isContactsValid=false;
