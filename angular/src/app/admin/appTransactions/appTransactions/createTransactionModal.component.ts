@@ -108,6 +108,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             buyerContactName: [""],
             buyerContactEMailAddress: ["", [Validators.email]],
             buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            istemp: [false],
         });
         this.getAllCompanies();
     }
