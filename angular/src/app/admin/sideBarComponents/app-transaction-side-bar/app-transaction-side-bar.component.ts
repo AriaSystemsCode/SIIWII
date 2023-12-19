@@ -1,6 +1,7 @@
-import { Component, Injector, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnInit, Output } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppTransactionServiceProxy, GetOrderDetailsForViewDto } from '@shared/service-proxies/service-proxies';
+
 
 @Component({
   selector: 'app-transaction-side-bar',
@@ -12,6 +13,9 @@ export class AppTransactionSideBarComponent
 
   shoppingCartDetails: GetOrderDetailsForViewDto;
   @Input() id = 0;
+
+  @Output("hideSideBar") hideSideBar: EventEmitter<boolean> = new EventEmitter<boolean>();
+
 
   constructor(
     injector: Injector,
@@ -31,6 +35,10 @@ export class AppTransactionSideBarComponent
       .subscribe((res) => {
         this.shoppingCartDetails = res;
       });
+  }
+
+  onhideSideBar(){
+    this.hideSideBar.emit(true);
   }
 
 

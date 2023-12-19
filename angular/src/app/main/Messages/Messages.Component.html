@@ -515,7 +515,8 @@ appRootUrl() +
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col d-none  d-md-block p-2 m-5 m-md-0" style="padding: 0">
+            <div [ngClass]="{ 'col-md-8': !showSideBar, 'col-md-6': showSideBar }"
+             class="col d-none  d-md-block p-2 m-5 m-md-0" style="padding: 0">
                 <div *ngIf="messagesDetails">
                     <span class="subject-msg">{{ messagesDetails[0].messages.subject }}
                     </span>
@@ -527,7 +528,7 @@ appRootUrl() +
                              border-radius: 4px;
                              border: 1px solid #E2E2EA !important;
                              background-color: transparent !important;
-                             color: #F88011 !important" (click)="onShowSideBar(!this.showSideBar)">
+                             color: #F88011 !important" (click)="onShowSideBar(!showSideBar)">
 
                                     <span class="pr-3" style="
                              font-family: Poppins;
@@ -607,7 +608,7 @@ appRootUrl() +
 
                     <hr class="mt-5" style="border: 1px solid #e7e8ef; opacity: 1" />
 
-
+                    
                     <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
                         [scrollTop]="scrolltop" style="position: relative">
                         <div *ngFor="
@@ -1098,9 +1099,9 @@ appRootUrl() +
 
 
 
-            <div class="col p-2 m-5 m-md-0" style="padding: 0" *ngIf="showSideBar">
+            <div class="col p-2 m-5 m-md-0" style="padding: 0;border-left: 4px solid #e7e8ef;" *ngIf="showSideBar">
                 <!-- //I37-get messagesDetails[0].messages?.entityTypeName   & messagesDetails[0].messages?.orderId -->
-                <!-- <app-appsidebar [entityTypeName]="'transaction'" [id]=""></app-appsidebar>  -->
+                <app-app-side-bar [entityTypeName]="'transaction'" [id]="" (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
             </div>
         </div>
     </div>
