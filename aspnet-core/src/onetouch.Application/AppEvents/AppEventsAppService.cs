@@ -38,6 +38,8 @@ namespace onetouch.AppEvents
         private readonly IRepository<AppEventGuest, long> _lookup_appEventGuestsRepository;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly ISycAttachmentCategoriesAppService _sycAttachmentCategoriesAppService;
+        private readonly IRepository<AppEntitiesRelationship, long> _relationshipRepository;
+
         private readonly IConfigurationRoot _appConfiguration;
         private readonly Helper _helper;
 
@@ -49,7 +51,8 @@ namespace onetouch.AppEvents
             IRepository<AppEventGuest, long> lookup_appEventGuestsRepository,
             ISycAttachmentCategoriesAppService sycAttachmentCategoriesAppService,
             IAppConfigurationAccessor appConfigurationAccessor,
-            IRepository<AppEntityAddress, long> appEntityAddressRepository
+            IRepository<AppEntityAddress, long> appEntityAddressRepository,
+            IRepository<AppEntitiesRelationship, long> relationshipRepository
             )
         {
             _appEventRepository = appEventRepository;
@@ -61,6 +64,7 @@ namespace onetouch.AppEvents
             _sycAttachmentCategoriesAppService = sycAttachmentCategoriesAppService;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntityAddressRepository = appEntityAddressRepository;
+            _relationshipRepository = relationshipRepository;
         }
         [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAppEventForViewDto>> GetAll(GetAllAppEventsInput input)
@@ -348,6 +352,16 @@ namespace onetouch.AppEvents
             await _appEntitiesAppService.Delete(entityDto);
 
             await _lookup_appEventGuestsRepository.DeleteAsync(e => e.EventId == input.Id);
+
+            // get related entity and delete if found T-SII-20220413.0007 [begin]
+            try
+            {
+                var relatedEntity = _relationshipRepository.GetAll().Where(e => e.RelatedEntityId == entityDto.Id).FirstOrDefault();
+
+                if (relatedEntity != null && relatedEntity.Id > 0)
+                { await _relationshipRepository.DeleteAsync(relatedEntity.Id); }
+            }catch(Exception ex) { }
+            // T-SII-20220413.0007 [end]
 
             await _appEventRepository.DeleteAsync(input.Id);
         }
