@@ -54,8 +54,8 @@
                 <div class="d-flex flex-grow-1  pl-3">
                     <img class="mr-3 rounded-circle" height="30px" src="../../../../../assets/icons/user-icon.jpg" alt="user-icon.jpg">
                     <div class="flex-grow-1">
-                        <h5 class="mb-1" *ngIf="!user.sharedUserEMail">{{user?.sharedUserName}} {{user?.sharedUserSureName}} @ {{user?.sharedUserTenantName}}</h5>
-                        <h5 class="mb-1 text-black-50" *ngIf="user.sharedUserEMail">{{user?.sharedUserEMail}}</h5>
+                        <h5 class="mb-1" *ngIf="user.sharedUserName">{{user?.sharedUserName}} {{user?.sharedUserSureName}} @ {{user?.sharedUserTenantName}}</h5>
+                        <h5 class="mb-1 text-black-50" *ngIf="!user.sharedUserName">{{user?.sharedUserEMail}}</h5>
                     </div>
                 </div>
                 <div class="align-self-center ">
