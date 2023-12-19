@@ -35,10 +35,9 @@ import { Ng2TelInputModule } from 'ng2-tel-input';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { TreeviewModule } from 'ngx-treeview';
 import { TreeModule } from 'primeng/tree';
-import { AppsidebarComponent } from '@app/admin/shared/appsidebar/appsidebar.component';
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 @NgModule({
-  declarations: [MessagesComponent,SendMessageModalComponent,niceDateFormatPipe,AppsidebarComponent],
+  declarations: [MessagesComponent,SendMessageModalComponent,niceDateFormatPipe],
   imports: [
     CommonModule,
     MessagesRoutingModule,

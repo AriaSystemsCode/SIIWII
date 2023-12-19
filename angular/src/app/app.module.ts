@@ -125,13 +125,14 @@ import { CreateOrEditBillingInfoComponent } from "./admin/app-shoppingCart/Compo
 import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/view-billing-info/view-billing-info.component";
 import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
 import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Components/share-transaction-tab/share-transaction-tab.component";
+import { AppsidebarComponent } from "./admin/shared/appsidebar/appsidebar.component";
 import { AppTransactionSideBarComponent } from "./admin/app-shoppingCart/Components/app-transaction-side-bar/app-transaction-side-bar.component";
 
 @NgModule({
     declarations: [
         AppComponent,
         DefaultLayoutComponent,
-        Theme2LayoutComponent, 
+        Theme2LayoutComponent,
         Theme3LayoutComponent,
         Theme4LayoutComponent,
         Theme5LayoutComponent,
