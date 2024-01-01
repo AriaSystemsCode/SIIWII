@@ -223,7 +223,7 @@ namespace onetouch.AppItems
                 #region Excel validation rules only.
                 List<string> RecordsCodes = result.Select(r => r.Code).ToList();
                 List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
-                //XX
+                //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
                 var resJoin1 = from r in result
                                join i in _appItemRepository.GetAll().AsNoTracking().Include(x => x.ParentFk).Where(x => x.ItemType == 0)
                                on r.Code.Replace(" ", string.Empty) equals i.Code.Replace(" ", string.Empty) into j1
@@ -232,7 +232,7 @@ namespace onetouch.AppItems
 
 
                 var resJoin = resJoin1.ToList().OrderBy(z => z.code);
-                //XX
+                //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[End]
                 foreach (AppItemStockAvailabilityExcelDto itemExcelDto in result)
                 {
                     if (itemExcelDto.Code  == "Code")
@@ -253,19 +253,19 @@ namespace onetouch.AppItems
                     itemExcelDto.rowNumber = rowNumber;
                     if (!string.IsNullOrEmpty(itemExcelDto.ParentCode))
                     {
-                        //xx
+                        //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
                         //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace (" ",string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId != null && x.ListingItemId == null);
                         var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId != null && x.item.ItemType == 0).FirstOrDefault();
                         var itemExists = itemExisting == null ? null : itemExisting.item;
-                        //xx
+                        //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[End]
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
-                            //XX
+                            //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
                             //var itemParentObj = _appItemRepository.GetAll().FirstOrDefault(x => x.Id == itemExists.ParentId);
                             //if (itemParentObj != null && itemParentObj.Code != itemExcelDto.ParentCode)
                             if (itemExisting.parentCode != null && itemExisting.parentCode != itemExcelDto.ParentCode)
-                            //xx
+                            //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[End]
                             {
                                 itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " Parent code does not match application item parent code.");
                                 recordErrorMEssage = "Code :" + itemExcelDto.Code + " Parent code does not match application item parent code.";
@@ -281,11 +281,11 @@ namespace onetouch.AppItems
                     }
                     else
                     {
-                        //xx
+                        //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
                         //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId == null && x.ListingItemId == null);
                         var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId == null && x.item.ItemType == 0).FirstOrDefault();
                         var itemExists = itemExisting == null ? null : itemExisting.item;
-                        //xx
+                        //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[End]
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
