@@ -459,34 +459,41 @@ namespace onetouch.AppItems
                     {
                         foreach (var ch in listObj.ParentFkList)
                         {
-                            _context.AppEntityExtraData.IgnoreQueryFilters().Where(z=>z.EntityId == ch.EntityId).ExecuteDelete ();
-                            _context.AppEntityCategories.IgnoreQueryFilters().Where(z => z.EntityId == ch.EntityId).ExecuteDelete();
-                            _context.AppEntityClassifications.IgnoreQueryFilters().Where(z => z.EntityId == ch.EntityId).ExecuteDelete();
-                            _context.AppEntityAttachments.IgnoreQueryFilters().Where(z => z.EntityId == ch.EntityId).ExecuteDelete();
-                            // _context.AppEntities.DeleteByKey(ch.EntityFk);
-                            //  _context.AppItems.IgnoreQueryFilters().Where(z => z.Id == ch.Id).ExecuteDelete();
-                            if (ch.EntityFk != null)
+                            var varItemExist = _context.AppItems.IgnoreQueryFilters().Where(z=>z.EntityId== ch.EntityId && z.ItemType==0 && z.IsDeleted==false).FirstOrDefault();
+                            if (varItemExist == null)
                             {
-                                ch.EntityFk.IsDeleted = true;
-                                _context.Update<AppEntity>(ch.EntityFk);
+                                _context.AppEntityExtraData.IgnoreQueryFilters().Where(z => z.EntityId == ch.EntityId).ExecuteDelete();
+                                _context.AppEntityCategories.IgnoreQueryFilters().Where(z => z.EntityId == ch.EntityId).ExecuteDelete();
+                                _context.AppEntityClassifications.IgnoreQueryFilters().Where(z => z.EntityId == ch.EntityId).ExecuteDelete();
+                                _context.AppEntityAttachments.IgnoreQueryFilters().Where(z => z.EntityId == ch.EntityId).ExecuteDelete();
+                                // _context.AppEntities.DeleteByKey(ch.EntityFk);
+                                //  _context.AppItems.IgnoreQueryFilters().Where(z => z.Id == ch.Id).ExecuteDelete();
+                                if (ch.EntityFk != null)
+                                {
+                                    ch.EntityFk.IsDeleted = true;
+                                    _context.Update<AppEntity>(ch.EntityFk);
+                                }
+                                //_context.AppItems.IgnoreQueryFilters().Where(z => z.Id == listObj.Id).ExecuteDelete();
+                                ch.IsDeleted = true;
+                                _context.Update<AppItem>(ch);
                             }
-                            //_context.AppItems.IgnoreQueryFilters().Where(z => z.Id == listObj.Id).ExecuteDelete();
-                            ch.IsDeleted = true;
-                            _context.Update<AppItem>(ch);
                         }
                     }
-
-                    _context.AppEntityExtraData.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId).ExecuteDelete();
-                    _context.AppEntityCategories.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId).ExecuteDelete();
-                    _context.AppEntityClassifications.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId).ExecuteDelete();
-                    _context.AppEntityAttachments.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId).ExecuteDelete();
-                    //_context.AppEntities.IgnoreQueryFilters().Where(z => z.Id == listObj.EntityId).ExecuteDelete(); 
-                    // _context.AppEntities.DeleteByKey(listObj.EntityFk);
-                    listObj.EntityFk.IsDeleted = true;
-                    _context.Update<AppEntity>(listObj.EntityFk);
-                    //_context.AppItems.IgnoreQueryFilters().Where(z => z.Id == listObj.Id).ExecuteDelete();
-                    listObj.IsDeleted = true;
-                    _context.Update<AppItem>(listObj);
+                    var itemExist = _context.AppItems.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId && z.ItemType == 0 && z.IsDeleted == false).FirstOrDefault();
+                    if (itemExist == null)
+                    {
+                        _context.AppEntityExtraData.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId).ExecuteDelete();
+                        _context.AppEntityCategories.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId).ExecuteDelete();
+                        _context.AppEntityClassifications.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId).ExecuteDelete();
+                        _context.AppEntityAttachments.IgnoreQueryFilters().Where(z => z.EntityId == listObj.EntityId).ExecuteDelete();
+                        //_context.AppEntities.IgnoreQueryFilters().Where(z => z.Id == listObj.EntityId).ExecuteDelete(); 
+                        // _context.AppEntities.DeleteByKey(listObj.EntityFk);
+                        listObj.EntityFk.IsDeleted = true;
+                        _context.Update<AppEntity>(listObj.EntityFk);
+                        //_context.AppItems.IgnoreQueryFilters().Where(z => z.Id == listObj.Id).ExecuteDelete();
+                        listObj.IsDeleted = true;
+                        _context.Update<AppItem>(listObj);
+                    }
                 }
                 _context.SaveChanges();
             }

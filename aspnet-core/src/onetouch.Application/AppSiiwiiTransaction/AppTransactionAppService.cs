@@ -1194,10 +1194,20 @@ namespace onetouch.AppSiiwiiTransaction
         }
         public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter)
         {
+
             var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+
+            //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[Start]
+            var myAccount = await _appContactRepository.GetAll().Include(a => a.CurrencyFk)
+                .ThenInclude(z => z.EntityExtraData).FirstOrDefaultAsync(a => a.TenantId == AbpSession.TenantId & a.IsProfileData == true &
+                 a.ParentId == null);
+            //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[End]
             List<GetAccountInformationOutputDto> returnObjectList = new List<GetAccountInformationOutputDto>();
             var accountsList = _appContactRepository.GetAll().Include(a => a.CurrencyFk).ThenInclude(z => z.EntityExtraData)
                 .WhereIf(!string.IsNullOrEmpty(accountFilter.Filter), a => a.Name.ToLower().Contains(accountFilter.Filter.ToLower()))
+                //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[Start]
+                .WhereIf(myAccount != null,z=>z.Id != myAccount.Id)
+                //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[End]
                 .Where(a => a.TenantId == AbpSession.TenantId & a.ParentId == null && a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id);
 
 
