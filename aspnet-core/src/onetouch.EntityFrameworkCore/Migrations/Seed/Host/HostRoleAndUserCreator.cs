@@ -628,6 +628,42 @@ namespace onetouch.Migrations.Seed.Host
 
                 _context.SaveChanges();
             }
+
+            var sycReports10 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate10").ToList();
+            if (sycReports10 == null || sycReports10.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate10";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate10";
+                sycReport.Description = "Products Catalog Template 10 Products";
+                sycReport.Thumbnail = "ProductsCatalogTemplate10";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            var sycReports11 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate11").ToList();
+            if (sycReports11 == null || sycReports10.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate11";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate11";
+                sycReport.Description = "Products Catalog Template 11 Products";
+                sycReport.Thumbnail = "ProductsCatalogTemplate11";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
             #endregion SycEntityObjectTypes
 
         }

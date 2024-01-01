@@ -37,8 +37,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.repx" />
+    <None Remove="PredefinedReports\ProductCatalog\Colorsportrait.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.vsrepx" />
+    <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.vsrepx" />
+    <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate2.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate3.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate4.vsrepx" />
@@ -85,7 +88,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\Colorsportrait.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.vsrepx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate7.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate5.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate4.vsrepx" />
@@ -110,12 +116,30 @@
     <Compile Update="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.Designer.cs">
       <DependentUpon>OrderConfirmationForm1.repx</DependentUpon>
     </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Colorsportrait.cs">
+      <DependentUpon>Colorsportrait.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Colorsportrait.Designer.cs">
+      <DependentUpon>Colorsportrait.repx</DependentUpon>
+    </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\Color_Size1.cs" />
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.cs">
       <DependentUpon>ProductsCatalogTemplate1.vsrepx</DependentUpon>
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.Designer.cs">
       <DependentUpon>ProductsCatalogTemplate1.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.cs">
+      <DependentUpon>ProductsCatalogTemplate11.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.Designer.cs">
+      <DependentUpon>ProductsCatalogTemplate11.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.cs">
+      <DependentUpon>ProductsCatalogTemplate10.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.Designer.cs">
+      <DependentUpon>ProductsCatalogTemplate10.vsrepx</DependentUpon>
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate2.cs">
       <DependentUpon>ProductsCatalogTemplate2.vsrepx</DependentUpon>
@@ -134,6 +158,13 @@
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate4.Designer.cs">
       <DependentUpon>ProductsCatalogTemplate4.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate5 - Copy.cs">
+      <SubType>XtraReport</SubType>
+      <DependentUpon>ProductsCatalogTemplate5.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate5 - Copy.Designer.cs">
+      <DependentUpon>ProductsCatalogTemplate5.vsrepx</DependentUpon>
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate5.cs">
       <DependentUpon>ProductsCatalogTemplate5.vsrepx</DependentUpon>
