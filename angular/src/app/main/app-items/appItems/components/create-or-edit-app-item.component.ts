@@ -782,8 +782,8 @@ export class CreateOrEditAppItemComponent
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
+            if(! (!element?.parent && !element?.leaf)){
             console.log(element);
-
             const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
                 new AppEntityDtoWithActions<AppEntityCategoryDto>({
                     entityDto: new AppEntityCategoryDto({
@@ -796,6 +796,7 @@ export class CreateOrEditAppItemComponent
                     }),
                 });
             this.departments.push(newCategory);
+            }
         });
     }
 
@@ -899,6 +900,7 @@ export class CreateOrEditAppItemComponent
     ): void {
         this.formTouched = true;
         selected.forEach((element) => {
+            if(! (!element?.parent && !element?.leaf)){
             const newClass: AppEntityDtoWithActions<AppEntityClassificationDto> =
                 new AppEntityDtoWithActions<AppEntityClassificationDto>({
                     entityDto: new AppEntityClassificationDto({
@@ -911,6 +913,7 @@ export class CreateOrEditAppItemComponent
                     }),
                 });
             this.classifications.push(newClass);
+            }
         });
     }
 

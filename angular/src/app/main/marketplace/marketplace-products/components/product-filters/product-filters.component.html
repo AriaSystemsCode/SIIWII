@@ -52,7 +52,8 @@
                     ></p-tree>
                 </div>
             </p-accordionTab>
-            <p-accordionTab header="Brands" [selected]="true">
+            <p-accordionTab header="Brands" [selected]="true" 
+            *ngIf="isSellerIdExists">
                 <div
                     *ngFor="let brand of brands"
                     class="d-flex align-items-center justify-content-lg-start px-2"
