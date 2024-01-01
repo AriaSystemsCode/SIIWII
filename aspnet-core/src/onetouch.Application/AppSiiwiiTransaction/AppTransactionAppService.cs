@@ -250,8 +250,13 @@ namespace onetouch.AppSiiwiiTransaction
                 input.LanguageId = account.LanguageId;
                 input.LanguageCode = account.LanguageCode;
                     if (string.IsNullOrEmpty(input.CurrencyCode))
+                    {
                         input.CurrencyCode = sellerCurrency;
-            }
+                        //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[Start]
+                        input.CurrencyId = account.CurrencyId;
+                        //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[End]
+                    }
+                }
 
                 if (string.IsNullOrEmpty(input.CurrencyCode))
                 {
@@ -265,9 +270,14 @@ namespace onetouch.AppSiiwiiTransaction
                 if (string.IsNullOrEmpty(input.CurrencyCode))
                 {
                     input.CurrencyCode = "USD";
+                    //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[Start]
+                    var currencyObj = _appEntity.GetAll().Where(z => z.Code == "USD" && z.TenantId == null).FirstOrDefault();
+                    if (currencyObj != null)
+                        input.CurrencyId = currencyObj.Id;
+                    //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[End]
                 }
 
-                    if (input.StartDate == new DateTime(1, 1, 1))
+                if (input.StartDate == new DateTime(1, 1, 1))
                 input.StartDate = DateTime.Now.Date;
 
             if (input.AvailableDate == new DateTime(1, 1, 1))
