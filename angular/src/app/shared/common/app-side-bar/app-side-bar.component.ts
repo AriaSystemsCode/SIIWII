@@ -6,18 +6,16 @@ import { AppComponentBase } from '@shared/common/app-component-base';
   templateUrl: './app-side-bar.component.html',
   styleUrls: ['./app-side-bar.component.scss']
 })
-export class AppSideBarComponent extends AppComponentBase  implements OnChanges {
- 
+export class AppSideBarComponent extends AppComponentBase implements OnChanges {
 
-  @Input() entityTypeName="";
-  @Input()  id:string;
-   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef }) dynamicComponentContainer: ViewContainerRef;
+  //I37-dynamic component 
+  @Input() entityTypeName = "";
+  @Input() id: string;
+  @ViewChild('dynamicComponentContainer', { read: ViewContainerRef }) dynamicComponentContainer: ViewContainerRef;
   componentFound: boolean = true;
   @Output("hideSideBar") hideSideBar: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-   
-
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) { 
+  constructor(private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) {
     super(injector);
   }
 
@@ -30,16 +28,17 @@ export class AppSideBarComponent extends AppComponentBase  implements OnChanges 
 
   async loadDynamicComponent() {
     try {
-      const componentName = "app-" + this.entityTypeName + "-side-Bar";
-      const componenPath = '@app/admin/sideBarComponents/'+componentName+'/'+componentName+'.component';
-      const componentModule = await import(componenPath);
-      
+      const componentName = "app-" + this.entityTypeName + "-side-bar";
+      const componentPath = `@app/admin/sideBarComponents/${componentName}/${componentName}.component`;
+      const componentModule = await import(componentPath);
+
       const componentType = componentModule[componentName];
       const componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
       const componentRef = componentFactory.create(this.injector);
-      (componentRef.instance  as { id: string }).id = this.id;
-     this.dynamicComponentContainer.insert(componentRef.hostView);  
-          this.componentFound = true;
+      (componentRef.instance as { id: string }).id = this.id;
+      this.dynamicComponentContainer.insert(componentRef.hostView);
+
+
     }
     catch (error) {
       console.error('Error loading dynamic component:', error);
@@ -47,7 +46,7 @@ export class AppSideBarComponent extends AppComponentBase  implements OnChanges 
     }
   }
 
-  onhideSideBar(){
+  onhideSideBar() {
     this.hideSideBar.emit(true);
   }
 }

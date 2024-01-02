@@ -54,7 +54,7 @@ appRootUrl() +
                             fill="#4A0D4A"></path>
                     </svg>
                 </button>
-                <ul class="dropdown-menu" *dropdownMenu>
+                <ul class="dropdown-menu" *dropdownMenu  style="position: sticky;">
                     <li>
                         <a href="javascript:;" (click)="selectMessagetype(1, l('Inbox'))" [ngClass]="{
                                     activeLink: messageTypeIndex == 1

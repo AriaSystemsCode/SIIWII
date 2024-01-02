@@ -1,5 +1,6 @@
 <ng-container #dynamicComponentContainer></ng-container>
-
-<app-transaction-side-bar [id]="id" (hideSideBar)="onhideSideBar()"></app-transaction-side-bar>
 <div *ngIf="!componentFound">Preview not available to this type</div>  
+
+<!-- //I37-Remove the following lines -->
+<app-transaction-side-bar [id]="id" (hideSideBar)="onhideSideBar()"></app-transaction-side-bar>
 
