@@ -1177,7 +1177,10 @@ namespace onetouch.AppItemsLists
                     if (publishChild == null)
                     {
                         var marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x=> x.Code== child.ItemSSIN);
-
+                        //T-SII-20231205.0004,1 MMT 01/01/2024 -Products List - internal error while sharing the products list[Start]
+                        if (marketplaceItem == null)
+                            continue;
+                        //T-SII-20231205.0004,1 MMT 01/01/2024 -Products List - internal error while sharing the products list[End]
                         publishChild = new AppMarketplaceItemsListDetails();
                         ObjectMapper.Map(child, publishChild);
                         publishChild.Id = 0;
