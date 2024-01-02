@@ -4355,8 +4355,12 @@ namespace onetouch.AppItems
                     if (itemExists != null)
                     {
                         itemExcelDto.Id = itemExists.Id;
-                        itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
-                        recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
+                        //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[Start]
+                        //itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
+                        //recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
+                        itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " already exists!");
+                        recordErrorMEssage = "Code :" + itemExcelDto.Code + " already exists!";
+                        //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[End]
                         itemExcelResultsDTO.HasDuplication = true;
                         hasWarning = true;
                     }
