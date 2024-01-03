@@ -20,3 +20,45 @@
         align-content: flex-start;
     }
 }
+.removeShare{
+    color: #4a0d4a;
+    cursor: pointer;
+}
+.reloadContact{
+    color: #fff;
+    cursor: pointer;
+    background-color: #f6851d;
+    border-radius: 50%;
+    font-size: 9px; 
+    padding: 4px;
+    margin-left: 5px;
+}
+.removedContact{
+    text-decoration: line-through;
+
+}
+:host ::ng-deep div.p-chip.removedContact{
+    border:1px solid #f6851d;
+
+}
+:host ::ng-deep div.p-chip{
+    background-color:#F3F6F9;
+}
+.closeShareMode{
+    margin-left: auto;
+    color: #4a0d4a;
+    font-size: 17px;
+}
+.btn-danger{
+    background-color: white !important;
+    color: #F88011 !important;
+    border: 1px solid #F88011 !important;
+}
+.btn-success,.btn-danger{
+    outline: none;
+}
+.btn-success,.btn-success:focus,.btn-success:active{
+    background-color: #4a0d4a;
+    border: none;
+
+}

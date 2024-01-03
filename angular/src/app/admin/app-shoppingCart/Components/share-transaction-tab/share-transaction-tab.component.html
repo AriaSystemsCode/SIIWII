@@ -2,64 +2,100 @@
     <div class="container-fluid orderInfoForm ">
         <div
         class="header pt-4 p-2 my-2 d-flex align-items-center  ">
-        <h4><span class="mainheadertxt">Share Transaction</span></h4>
+        <h4><span class="mainheadertxt d-inline">{{'ShareTransaction' | localize}}</span></h4>
+        <i class="fas fa-times closeShareMode" (click)="closeShareMode()"></i>
     </div>
     <div class="orderForm shareSectionCont  position-relative p-2">
         <div class="container-fluid orderInfoForm thin-scroll">
             <div class="header p-2 my-2 d-flex align-items-center  ">
-                <h6><span class="headertxt">Manage Transaction To Siiwii Users</span></h6>
+                <h6><span class="headertxt">{{'ManageTransactionToSiiwiiUsers' | localize}}</span></h6>
             </div>
             <hr class="my-2" />
             </div>
         <div class="row">
             <div class="col-12 pt-3 pl-4 pr-4">
-                <label class="label">Select User</label>
+                <label class="label">{{'SelectUsers' | localize}}</label>
             </div>
 
-            <div class="col-11 p-3 pl-4 pr-4">
-                <input type="text"                             
-                class="form-control w-100"
-                [(ngModel)]="searchContact"/>
+            <div class="col-11 pt-3 pb-3 pl-4 pr-0">
+                <p-autoComplete styleClass='w-100' [(ngModel)]="searchContact" 
+                [suggestions]="suggestionsContacts"  
+                (completeMethod)="filterContacts($event)" 
+                (onSelect)="toggleToEditMode()"
+                [multiple]="true">
+                <ng-template let-contact pTemplate="item">
+                    <div class="d-flex  flex-row gap-2 gap-2">
+                        <img src="{{contact.image}}"  style="width: 18px;margin-right:10px;"/>
+                        <div>{{ contact.name }}</div>
+                    </div>
+                </ng-template>
+                <ng-template let-contact pTemplate="selectedItem">
+                    <div class="d-flex  flex-row gap-2 gap-2">
+                        <img src="{{contact.image}}"  style="width: 18px;margin-right:10px;"/>
+                        <div>{{ contact.name }}</div>
+                    </div>
+                </ng-template>
+
+            </p-autoComplete> 
+
             </div>
-<div class="col-1 pt-3">
-    <button               
-    class="addContBtn text-center btn">
-    Add</button>
+<div class="col-1 pt-2">
+    <button  [disabled]="!searchContact||searchContact.length==0"  (click)="updateSelectedContacts()"            
+    class="addContBtn mt-1 text-center btn">
+    {{'Add2'| localize}}</button>
 </div>
 <div class="col-12 pt-3 pl-4 pr-4">
-    <label class="label">Selected Users List</label>
+    <label class="label">{{'SelectedUsersList' | localize}}</label>
 </div>
 <div class="col-12 p-3 pl-4 pr-4">
 
     <div class="card flex align-items-center gap-2 p-3 flex-wrap selected-contact-list w-100">
-        <p-chip label="Amy Elsner" image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"></p-chip>
-        <p-chip label="Asiya Javayant" image="https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png"></p-chip>
-        <p-chip label="Onyama Limba" image="https://primefaces.org/cdn/primeng/images/demo/avatar/onyamalimba.png"></p-chip>
-        <p-chip label="Xuxue Feng" image="https://primefaces.org/cdn/primeng/images/demo/avatar/xuxuefeng.png" [removable]="true"></p-chip>
+        <p-chip *ngFor="let item of sharingList" [styleClass]="item.removed ? 'pl-0 pr-2 mr-2 ml-2 removedContact':'pl-0 pr-2 mr-2 ml-2'" >
+            <img src="{{item.image}}" class="ng-star-inserted">
+            <span class="ml-2 font-medium"  [ngClass]="item.removed ? 'removedContact' : ''">{{item.name}}</span>
+            <i *ngIf="!item.removed" class="fas fa-times-circle ml-auto p-2 removeShare" (click)="removefromShareList(item.id)"></i>
+            <i *ngIf="item.removed" class="fas fa-redo-alt reloadContact" (click)="reloadContact(item.id)"></i>
+        </p-chip>
     </div>
 </div>
         </div>
-        <div class="container-fluid orderInfoForm thin-scroll">
+        <div class="container-fluid orderInfoForm thin-scroll" *ngIf="editMode">
             <div class="header p-2 my-2 d-flex align-items-center  ">
-                <h6><span class="headertxt">Manage Transaction To Siiwii Users</span></h6>
+                <h6><span class="headertxt">{{'EmailTransactionToNonSiiwiiUsers'| localize}}</span></h6>
             </div>
             <hr class="my-2" />
             </div>
-        <div class="row">
+        <div class="row" *ngIf="editMode">
             <div class="col-12 pt-3 pl-4 pr-4">
-                <label class="label">Email Transaction To Non Siiwii Users</label>
+                <label class="label">{{'TypeEmailAddress'| localize}}</label>
             </div>
 
             <div class="col-12 p-3 pl-4 pr-4">
-                <input type="text"                             
+                <input type="email"   
+                (focusout)="validateEmailFormate()" 
                 class="form-control w-100"
                 [(ngModel)]="emailList"/>
+
+                <small 
+                class="text-danger"
+                *ngIf="!validEmailFormate">
+              {{'InvalidEmailFormate'| localize}}
+            </small>
             </div>
 
-<div class="col-12 p-3 pl-4 pr-4">
-    <textarea class="form-control w-100 ml-4" placeholder="Add a message here....."></textarea>
+<div class="col-12 p-3 pl-4 pr-4" *ngIf="editMode">
+    <textarea class="form-control w-100 " placeholder="{{'Addamessagehere'| localize}}....."></textarea>
 </div>
 
+        </div>
+        <div class="row">
+            <div class="col-12 p-3 pl-4 pr-4">
+                <button class="text-center btn btn-success float-right ml-2 mr-2" *ngIf="editMode||readyForSave">{{'Save'| localize}}</button>
+                <button class="text-center btn btn-success float-right ml-2 mr-2" *ngIf="sharedBefore&&!editMode&&!readyForSave" (click)="closeShareMode()">{{'Done'| localize}}</button>
+            
+                <button class="text-center btn btn-danger float-right ml-2 mr-2"  *ngIf="editMode" (click)="closeShareMode()">{{'Cancel'| localize}}</button>
+            
+            </div>
         </div>
     </div>
  </div>
