@@ -102,7 +102,7 @@
       <Controls>
         <Item1 Ref="67" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="637.6458,844.200745" LocationFloat="0,0" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
           <Controls>
-            <Item1 Ref="68" ControlType="XRPictureBox" Name="pictureBox1" Sizing="ZoomImage" ProcessNullValues="Suppress" KeepTogether="false" SizeF="350.2708,606.312439" LocationFloat="121.205978,12.0416584" Dpi="254" Borders="None">
+            <Item1 Ref="68" ControlType="XRPictureBox" Name="pictureBox1" Sizing="ZoomImage" ProcessNullValues="Suppress" KeepTogether="false" SizeF="326.987518,627.159" LocationFloat="121.205971,12.0416422" Dpi="254" Borders="None">
               <ExpressionBindings>
                 <Item1 Ref="69" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[imageURL]" />
               </ExpressionBindings>

@@ -1,1347 +1,764 @@
-<!-- <div [@routerTransition]>
-    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-     -->
 <div class="boxes row  mt-md-5 mb-5">
-    <div class="leftbox col-md-2 col-sm-2 d-none d-md-block">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light leftPanel">
-            <ul class="list-unstyled components">
-                <button
-                    (click)="SendMessageModal.show()"
-                    class="composeBtn btn btn-primary"
-                >
-                    <i class="fa fa-plus"></i>{{ "Compose" | localize }}
+
+
+    <div class="rightbox col mr-0 mr-md-5">
+        <div class="d-flex flex-row" style="justify-content: space-between;">
+            <div class="btn-group dropdown actionDropdown mr-3" dropdown container="body">
+                <h4 style="color: #4A0D4A !important;
+                font-family: Poppins !important;
+                font-size: 20px !important;
+                font-style: normal !important;
+                font-weight: 600 !important;
+                line-height: normal !important;">Messages</h4>
+
+                <button class="btn btn-primary btn-sm ml-5 ng-tns-c357-9 pb-0" dropdownToggle style="cursor: pointer;
+                    border-radius: 4px;
+                    border: 1px solid #E2E2EA !important;
+                    background-color: transparent !important;
+                    color: black !important;height: 38px">
+
+                    <img *ngIf="messageTypeIndex==1" [src]="
+appRootUrl() +
+'assets/message/Messaging_Inbox_icon.svg'
+" border="0" class="pr-2 pb-1" />
+
+                    <img *ngIf="messageTypeIndex==2" [src]="
+appRootUrl() +
+'assets/message/Messaging_SentItems_icon.svg'
+" border="0" class="pr-2 pb-1" />
+
+                    <img *ngIf="messageTypeIndex==3"
+                        src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png" border="0"
+                        class="pr-2 pb-1" />
+
+                    <img *ngIf="messageTypeIndex==4" [src]="
+appRootUrl() +
+'assets/message/Messaging_Archive_icon.svg'
+" border="0" class="pr-2 pb-1" />
+
+                    <img *ngIf="messageTypeIndex==5" [src]="
+appRootUrl() +
+'assets/message/Messaging_Trash_icon.svg'
+" border="0" class="pr-2 pb-1" />
+
+                    <span class="pr-3" style="color: var(--American-Purple, #4A0D4A);
+                    font-family: Poppins;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: normal;">{{ messageType }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="7" viewBox="0 0 12 7" fill="none"
+                        class="mb-1">
+                        <path
+                            d="M6.46824 6.80994L11.8083 1.50758C11.9319 1.38495 12 1.22124 12 1.04668C12 0.872118 11.9319 0.708408 11.8083 0.585771L11.4151 0.195289C11.1589 -0.0587999 10.7425 -0.0587999 10.4867 0.195289L6.00249 4.64781L1.51326 0.190349C1.38965 0.0677115 1.22487 -4.70996e-07 1.04916 -4.78676e-07C0.873261 -4.86365e-07 0.708482 0.0677114 0.584775 0.190348L0.191706 0.58083C0.0680971 0.703564 -3.79055e-08 0.867177 -4.55358e-08 1.04174C-5.3166e-08 1.2163 0.0680971 1.38001 0.191706 1.50264L5.53664 6.80994C5.66064 6.93287 5.8262 7.00039 6.00219 7C6.17888 7.00039 6.34434 6.93287 6.46824 6.80994Z"
+                            fill="#4A0D4A"></path>
+                    </svg>
                 </button>
-                <!-- <button class="composeBtn btn btn-primary" >
-                    <i class="fa fa-plus"></i>Compose </button> -->
-                <li>
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(1, l('Inbox'))"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 1
-                        }"
-                    >
-                        <img
-                            [src]="
-                                appRootUrl() +
-                                'assets/message/Messaging_Inbox_icon.svg'
-                            "
-                            border="0"
-                        />
-                        &nbsp; {{ "Inbox" | localize }}</a
-                    >
+                <ul class="dropdown-menu" *dropdownMenu  style="position: sticky;">
+                    <li>
+                        <a href="javascript:;" (click)="selectMessagetype(1, l('Inbox'))" [ngClass]="{
+                                    activeLink: messageTypeIndex == 1
+                                }">
+                            <img [src]="
+                                        appRootUrl() +
+                                        'assets/message/Messaging_Inbox_icon.svg'
+                                    " border="0" />
+                            &nbsp; {{ "Inbox" | localize }}</a>
 
-                    <label style="text-align: center !important"  *ngIf="totalUnread>0">
-                        <span class="number-count" style="left: 10px">{{
-                            totalUnread
-                        }}</span>
-                    </label>
-                </li>
+                        <label style="text-align: center !important" *ngIf="totalUnread>0">
+                            <span class="number-count" style="left: 10px">{{
+                                totalUnread
+                                }}</span>
+                        </label>
+                    </li>
 
-                <li>
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(2, 'Sent')"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 2
-                        }"
-                    >
-                        <img
-                            [src]="
-                                appRootUrl() +
-                                'assets/message/Messaging_SentItems_icon.svg'
-                            "
-                            border="0"
-                        />
-                        &nbsp;
-                        <span class="link-item">{{ "Sent items" }}</span></a
-                    >
-                    <!-- <label [ngClass]="{ labels: MessageTypeIndex == 2 }"><span class="number-count">23</span>
-                        </label> -->
-                </li>
-                <li>
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(3, l('Favorite'))"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 3
-                        }"
-                    >
-                        <img
-                            src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
-                            border="0"
-                        />
-                        &nbsp; {{ "Favorite" | localize }}</a
-                    >
-                    <!--   <label [ngClass]="{ labels: MessageTypeIndex == 3 }" ></label> -->
-                </li>
-
-                <li>
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(4, l('Archive'))"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 4
-                        }"
-                    >
-                        <img
-                            [src]="
-                                appRootUrl() +
-                                'assets/message/Messaging_Archive_icon.svg'
-                            "
-                            border="0"
-                        />
-                        &nbsp; {{ "Archive" | localize }}</a
-                    >
-                    <!--    <label [ngClass]="{ labels: MessageTypeIndex == 4 }"> </label> -->
-                </li>
-
-                <li class="link-item">
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(5, l('Trash'))"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 5
-                        }"
-                    >
-                        <img
-                            [src]="
-                                appRootUrl() +
-                                'assets/message/Messaging_Trash_icon.svg'
-                            "
-                            border="0"
-                        />
-                        &nbsp; {{ "Trash" | localize }}</a
-                    >
-                    <!--   <label [ngClass]="{ labels: MessageTypeIndex == 5 }"> </label> -->
-                </li>
-                <hr />
-                <!-- <div style="display: block; text-align: left;margin-left: -5px;">
-                        <h5 style="color: #464E5F;font-size: 13px;">
+                    <li>
+                        <a href="javascript:;" (click)="selectMessagetype(2, 'Sent')" [ngClass]="{
+                                    activeLink: messageTypeIndex == 2
+                                }">
+                            <img [src]="
+                                        appRootUrl() +
+                                        'assets/message/Messaging_SentItems_icon.svg'
+                                    " border="0" />
                             &nbsp;
-                            <img style="margin-top:-4px;" align="left" [src]="
-                                    appRootUrl() +
-                                    'assets/common/images/Messages/Labels.svg'
-                                " border="0" />
-                            <span style="color: #464E5F;font-size: 13px;">Lables</span>
-                        </h5>
-                    </div>
+                            <span class="link-item">{{ "Sent items" }}</span></a>
+                        <!-- <label [ngClass]="{ labels: MessageTypeIndex == 2 }"><span class="number-count">23</span>
+                                </label> -->
+                    </li>
+                    <li>
+                        <a href="javascript:;" (click)="selectMessagetype(3, l('Favorite'))" [ngClass]="{
+                                    activeLink: messageTypeIndex == 3
+                                }">
+                            <img src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
+                                border="0" />
+                            &nbsp; {{ "Favorite" | localize }}</a>
+                        <!--   <label [ngClass]="{ labels: MessageTypeIndex == 3 }" ></label> -->
+                    </li>
 
-                    <li class="link-item" *ngFor="let label of lablesList">
-                        <span style="color: #007bff;"> &rarr; &nbsp;</span>
-                        <a href="javascript:;" (click)="selectMessagetype(0, l(label.label))" [ngClass]="{
-                                activeLink: MessageType == label.label
-                            }">{{ label.label | localize }}</a>
-                    </li> -->
-            </ul>
-        </nav>
-    </div>
- 
-    <div class="rightbox col mr-0 mr-md-5 p-0">
+                    <li>
+                        <a href="javascript:;" (click)="selectMessagetype(4, l('Archive'))" [ngClass]="{
+                                    activeLink: messageTypeIndex == 4
+                                }">
+                            <img [src]="
+                                        appRootUrl() +
+                                        'assets/message/Messaging_Archive_icon.svg'
+                                    " border="0" />
+                            &nbsp; {{ "Archive" | localize }}</a>
+                        <!--    <label [ngClass]="{ labels: MessageTypeIndex == 4 }"> </label> -->
+                    </li>
+
+                    <li class="link-item">
+                        <a href="javascript:;" (click)="selectMessagetype(5, l('Trash'))" [ngClass]="{
+                                    activeLink: messageTypeIndex == 5
+                                }">
+                            <img [src]="
+                                        appRootUrl() +
+                                        'assets/message/Messaging_Trash_icon.svg'
+                                    " border="0" />
+                            &nbsp; {{ "Trash" | localize }}</a>
+                        <!--   <label [ngClass]="{ labels: MessageTypeIndex == 5 }"> </label> -->
+                    </li>
+                </ul>
+
+
+
+                <div *ngIf="messageTypeIndex==1">
+                    <button class="btn btn-primary btn-sm ng-tns-c357-9 pb-0 m-0 ml-3" style="cursor: pointer;
+                    border-radius: 4px;
+                    border: 1px solid #E2E2EA !important;
+                    background-color: #f5e9ff !important;
+                    color:#A461D8 !important;height: 38px">
+
+                        <span class="pr-3" style="
+                    font-family: Poppins;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: normal;" (click)="getPrimaryMessage()">Primary</span>
+                        <span> {{primaryCount}}</span>
+                    </button>
+
+                    <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0" style="cursor: pointer;
+                border-radius: 4px;
+                border: 1px solid #E2E2EA !important;
+                background-color: transparent !important;
+                color: #F88011 !important;height: 38px" (click)="getUpdatesMessage()">
+
+                        <span class="pr-3" style="
+                font-family: Poppins;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 600;
+                line-height: normal;">Updates</span>
+                        <span> {{updatesCount}}</span>
+                    </button>
+                </div>
+            </div>
+            <div class="d-none d-md-block">
+                <button (click)="SendMessageModal.show()" class="composeBtn btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16" fill="none"
+                        class="mr-2 mb-1">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M13.5619 4.72553C13.5619 4.28481 13.9191 3.92754 14.3598 3.92754C14.8006 3.92754 15.1578 4.28481 15.1578 4.72553V12.6581C15.1578 14.5035 13.6618 15.9996 11.8163 15.9996H3.33766C1.49216 15.9996 -0.00390625 14.5035 -0.00390625 12.6581V4.17946C-0.00390625 2.33396 1.49216 0.837891 3.33766 0.837891H11.0183C11.459 0.837891 11.8163 1.19516 11.8163 1.63588C11.8163 2.07659 11.459 2.43386 11.0183 2.43386H3.33766C2.37359 2.43386 1.59207 3.21539 1.59207 4.17946V12.6581C1.59207 13.6221 2.37359 14.4036 3.33766 14.4036H11.8163C12.7803 14.4036 13.5619 13.6221 13.5619 12.6581V4.72553ZM14.2659 0.24769C14.5699 -0.0714687 15.075 -0.0838211 15.3941 0.2201C15.7133 0.524021 15.7256 1.02913 15.4217 1.34828L7.78141 9.37165C7.47749 9.69081 6.97238 9.70316 6.65323 9.39924C6.33407 9.09532 6.32172 8.59021 6.62564 8.27106L14.2659 0.24769Z"
+                            fill="white" />
+                    </svg>
+                    {{ "Compose" | localize }}
+                </button>
+            </div>
+        </div>
+        <hr />
         <div class="row">
             <div class="col-md-4 pt-2 pl-4">
                 <div class="d-none d-md-block">
-                <h4>{{ messageType }}</h4>
-                <div class="search" style="width: 100%; padding-right: 17px">
-                    <input
-                    placeholder="Search messages"
-                        [(ngModel)]="filterText"
-                        name="filterText"
-                        autoFocus
-                        class="icon form-control m-input"
-                        type="text"
-                        (keyup.enter)="getMesssage(true)"
-                    />
+                    <!-- <h4>{{ messageType }}</h4> -->
+                    <div class="search" style="width: 100%; padding-right: 17px">
+                        <input placeholder="Search for messages" [(ngModel)]="filterText" name="filterText" autoFocus
+                            class="icon form-control m-input" type="text" (keyup.enter)="getMesssage(true)" />
+                    </div>
                 </div>
-                </div> 
 
-                <div class="d-block d-md-none d-flex flex-row pt-4 pr-2"  *ngIf="!displayMessageDetails">
-                    
+                <div class="d-block d-md-none d-flex flex-row pt-4 pr-2" *ngIf="!displayMessageDetails">
+
                     <div class="mt-2 pl-4 mr-5">
-                        <div
-                        class="btn-group dropdown"
-                        dropdown
-                        container="body"
-                        placement="bottom right"
-                    >
-                    <img
-                    class="pb-2 pr-1"
-                    *ngIf="messageTypeIndex == 1"
-                    [src]="
-                        appRootUrl() +
-                        'assets/message/Messaging_Inbox_icon.svg'
-                    "
-                    border="0"
-                />
-<img
-class="pb-2 pr-1"
-*ngIf="messageTypeIndex == 2"
-                    [src]="
-                        appRootUrl() +
-                        'assets/message/Messaging_SentItems_icon.svg'
-                    "
-                    border="0"
-                />
+                        <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
+                            <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 1" [src]="
+                            appRootUrl() +
+                            'assets/message/Messaging_Inbox_icon.svg'
+                        " border="0" />
+                            <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 2" [src]="
+                            appRootUrl() +
+                            'assets/message/Messaging_SentItems_icon.svg'
+                        " border="0" />
 
 
-<img
-class="pb-2 pr-1"
-*ngIf="messageTypeIndex == 3"
-                    src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
-                    border="0"
-                />
+                            <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 3"
+                                src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
+                                border="0" />
 
 
-<img
-class="pb-2 pr-1"
-*ngIf="messageTypeIndex == 4"
-                    [src]="
-                        appRootUrl() +
-                        'assets/message/Messaging_Archive_icon.svg'
-                    "
-                    border="0"
-                />
+                            <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 4" [src]="
+                            appRootUrl() +
+                            'assets/message/Messaging_Archive_icon.svg'
+                        " border="0" />
 
 
 
-<img
-class="pb-2 pr-1"
-*ngIf="messageTypeIndex == 5"
-                    [src]="
-                        appRootUrl() +
-                        'assets/message/Messaging_Trash_icon.svg'
-                    "
-                    border="0"
-                />
-                    <h3 class="pr-1 pt-1 pl-2">{{messageType}}
-                    </h3>
-                        <button
-                            class="dropdown-toggle" style="border: none;background-color: transparent;"
-                            dropdownToggle
-                            type="button"
-                        ></button>
-                        <ul
-                            class="dropdown-menu dropdown-action-btn dropdown-menu-right messageType"
-                            *dropdownMenu
-                        > 
-                                   <li>
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(1, l('Inbox'))"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 1
-                        }"
-                    >
-                        <img
-                            [src]="
-                                appRootUrl() +
-                                'assets/message/Messaging_Inbox_icon.svg'
-                            "
-                            border="0"
-                        />
-                        &nbsp; {{ "Inbox" | localize }}</a
-                    >
+                            <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 5" [src]="
+                            appRootUrl() +
+                            'assets/message/Messaging_Trash_icon.svg'
+                        " border="0" />
+                            <h3 class="pr-1 pt-1 pl-2">{{messageType}}
+                            </h3>
+                            <button class="dropdown-toggle" style="border: none;background-color: transparent;"
+                                dropdownToggle type="button"></button>
+                            <ul class="dropdown-menu dropdown-action-btn dropdown-menu-right messageType" *dropdownMenu>
+                                <li>
+                                    <a href="javascript:;" (click)="selectMessagetype(1, l('Inbox'))" [ngClass]="{
+                                activeLink: messageTypeIndex == 1
+                            }">
+                                        <img [src]="
+                                    appRootUrl() +
+                                    'assets/message/Messaging_Inbox_icon.svg'
+                                " border="0" />
+                                        &nbsp; {{ "Inbox" | localize }}</a>
 
-                    <label style="text-align: center !important" *ngIf="totalUnread>0">
-                        <span class="number-count" style="left: 10px">{{
-                            totalUnread
-                        }}</span>
-                    </label>
-                </li>
+                                    <label style="text-align: center !important" *ngIf="totalUnread>0">
+                                        <span class="number-count" style="left: 10px">{{
+                                            totalUnread
+                                            }}</span>
+                                    </label>
+                                </li>
 
-                <li>
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(2, 'Sent')"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 2
-                        }"
-                    >
-                        <img
-                            [src]="
-                                appRootUrl() +
-                                'assets/message/Messaging_SentItems_icon.svg'
-                            "
-                            border="0"
-                        />
-                        &nbsp;
-                        <span class="link-item">{{ "Sent items" }}</span></a
-                    >
-                    <!-- <label [ngClass]="{ labels: MessageTypeIndex == 2 }"><span class="number-count">23</span>
-                        </label> -->
-                </li>
-                <li>
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(3, l('Favorite'))"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 3
-                        }"
-                    >
-                        <img
-                            src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
-                            border="0"
-                        />
-                        &nbsp; {{ "Favorite" | localize }}</a
-                    >
-                    <!--   <label [ngClass]="{ labels: MessageTypeIndex == 3 }" ></label> -->
-                </li>
+                                <li>
+                                    <a href="javascript:;" (click)="selectMessagetype(2, 'Sent')" [ngClass]="{
+                                activeLink: messageTypeIndex == 2
+                            }">
+                                        <img [src]="
+                                    appRootUrl() +
+                                    'assets/message/Messaging_SentItems_icon.svg'
+                                " border="0" />
+                                        &nbsp;
+                                        <span class="link-item">{{ "Sent items" }}</span></a>
+                                    <!-- <label [ngClass]="{ labels: MessageTypeIndex == 2 }"><span class="number-count">23</span>
+                            </label> -->
+                                </li>
+                                <li>
+                                    <a href="javascript:;" (click)="selectMessagetype(3, l('Favorite'))" [ngClass]="{
+                                activeLink: messageTypeIndex == 3
+                            }">
+                                        <img src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
+                                            border="0" />
+                                        &nbsp; {{ "Favorite" | localize }}</a>
+                                    <!--   <label [ngClass]="{ labels: MessageTypeIndex == 3 }" ></label> -->
+                                </li>
 
-                <li>
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(4, l('Archive'))"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 4
-                        }"
-                    >
-                        <img
-                            [src]="
-                                appRootUrl() +
-                                'assets/message/Messaging_Archive_icon.svg'
-                            "
-                            border="0"
-                        />
-                        &nbsp; {{ "Archive" | localize }}</a
-                    >
-                    <!--    <label [ngClass]="{ labels: MessageTypeIndex == 4 }"> </label> -->
-                </li>
+                                <li>
+                                    <a href="javascript:;" (click)="selectMessagetype(4, l('Archive'))" [ngClass]="{
+                                activeLink: messageTypeIndex == 4
+                            }">
+                                        <img [src]="
+                                    appRootUrl() +
+                                    'assets/message/Messaging_Archive_icon.svg'
+                                " border="0" />
+                                        &nbsp; {{ "Archive" | localize }}</a>
+                                    <!--    <label [ngClass]="{ labels: MessageTypeIndex == 4 }"> </label> -->
+                                </li>
 
-                <li class="link-item p-0">
-                    <a
-                        href="javascript:;"
-                        (click)="selectMessagetype(5, l('Trash'))"
-                        [ngClass]="{
-                            activeLink: messageTypeIndex == 5
-                        }"
-                    >
-                        <img
-                            [src]="
-                                appRootUrl() +
-                                'assets/message/Messaging_Trash_icon.svg'
-                            "
-                            border="0"
-                        />
-                        &nbsp; <span class="pt-3">{{ "Trash" | localize }} </span></a
-                    >
-                    <!--   <label [ngClass]="{ labels: MessageTypeIndex == 5 }"> </label> -->
-                </li>
+                                <li class="link-item p-0">
+                                    <a href="javascript:;" (click)="selectMessagetype(5, l('Trash'))" [ngClass]="{
+                                activeLink: messageTypeIndex == 5
+                            }">
+                                        <img [src]="
+                                    appRootUrl() +
+                                    'assets/message/Messaging_Trash_icon.svg'
+                                " border="0" />
+                                        &nbsp; <span class="pt-3">{{ "Trash" | localize }} </span></a>
+                                    <!--   <label [ngClass]="{ labels: MessageTypeIndex == 5 }"> </label> -->
+                                </li>
 
                             </ul>
                         </div>
 
                     </div>
-                    <div class="p-2">  
-                    <img src="../../../assets/message/Mob_InsidePage_Messaging_Header_Edit_Btn.svg" class="pointer arrow-back p-2 ml-3"
-                    (click)="SendMessageModal.show()" />
+                    <div class="p-2">
+                        <img src="../../../assets/message/Mob_InsidePage_Messaging_Header_Edit_Btn.svg"
+                            class="pointer arrow-back p-2 ml-3" (click)="SendMessageModal.show()" />
+                    </div>
+                    <div class="search">
+                        <input placeholder="Search messages" [(ngModel)]="filterText" name="filterText" autoFocus
+                            class="icon form-control m-input" type="text" (keyup.enter)="getMesssage(true)" />
+                    </div>
+
                 </div>
-                    <div class="search" >
-                        <input
-                        placeholder="Search messages"
-                            [(ngModel)]="filterText"
-                            name="filterText"
-                            autoFocus
-                            class="icon form-control m-input"
-                            type="text"
-                            (keyup.enter)="getMesssage(true)"
-                        />
-                    </div>
-                 
-                    </div>
-                    <hr class="d-block d-md-none"/>
-                    
+                <hr class="d-block d-md-none" />
+
                 <!--  <div #container style="overflow-y:scroll;height: 250px;" infiniteScroll
-        [infiniteScrollDistance]="3"
-        [infiniteScrollThrottle]="100" [infiniteScrollDisabled]="isFullListDisplayed" (scroll)="onScroll()">
-     -->
+            [infiniteScrollDistance]="3"
+            [infiniteScrollThrottle]="100" [infiniteScrollDisabled]="isFullListDisplayed" (scroll)="onScroll()">
+         -->
                 <div #container class="messages-inbox m-0 d-none d-md-block" (scroll)="onScroll()">
                     <div class="row">
-                        <div
-                            class="col-md-12"
-                            *ngFor="let message of itemsToShow; let i = index"
-                        >
+                        <div class="col-md-12" *ngFor="let message of itemsToShow; let i = index">
                             <div class="wrapper-dev">
-                                <div
-                                    class="active-msg mr-2"
-                                    (click)="selectMessage(message)"
-                                    [ngClass]="{
-                                        SelectedMessage: isActive(message, i)
-                                    }"
-                                >
-                                    <img
-                                        [src]="
-                                            message.profilePictureUrl
-                                                ? message.profilePictureUrl
-                                                : 'assets/chat/user-chat.png'
-                                        "
-                                        class="rounded-circle"
-                                        style="
-                                            width: 50px;
-                                            height: 50px;
-                                            object-fit: cover;
-                                        "
-                                    />
+                                <div class="active-msg mr-2" (click)="selectMessage(message)" [ngClass]="{
+                                            SelectedMessage: isActive(message, i)
+                                        }">
+                                    <img [src]="
+                                                message.profilePictureUrl
+                                                    ? message.profilePictureUrl
+                                                    : 'assets/chat/user-chat.png'
+                                            " class="rounded-circle" style="
+                                                width: 50px;
+                                                height: 50px;
+                                                object-fit: cover;
+                                            " />
                                     <ul class="msg-content row">
                                         <li class="Messages col-6 col-md mr-5 mr-md-0">
                                             <!-- I2-10  -->
                                             <!--
-                                            <a *ngIf="this.messageTypeIndex!=2">
-                                                <span
-                                                    [ngClass]="{
-                                                        'msg-sender':
-                                                            message.entityObjectStatusCode ==
-                                                            'UNREAD'
-                                                    }"
-                                                    class=""
-                                                    >{{
-                                                        message.senderName
-                                                    }}</span
-                                                >
-
-                                                <br />
-                                                <span class="msg-receiveDate">{{
-                                                    message.sendDate._d3px
-                                                        | niceDateFormatPipe
-                                                }}</span>
-                                            </a>
-                                            <a *ngIf="this.messageTypeIndex==2">
-
-                                                <span
-                                                    [ngClass]="{
-                                                        'msg-sender':
-                                                            message.entityObjectStatusCode ==
-                                                            'UNREAD'
-                                                    }"
-                                                    class=""
-                                                    >TO: {{
-                                                        message.to
-                                                    }}</span
-                                                >
-
-                                                <br />
-                                                <span class="msg-receiveDate">{{
-                                                    message.sendDate._d3px
-                                                        | niceDateFormatPipe
-                                                }}</span>
-                                            </a> -->
+                                                <a *ngIf="this.messageTypeIndex!=2">
+                                                    <span
+                                                        [ngClass]="{
+                                                            'msg-sender':
+                                                                message.entityObjectStatusCode ==
+                                                                'UNREAD'
+                                                        }"
+                                                        class=""
+                                                        >{{
+                                                            message.senderName
+                                                        }}</span
+                                                    >
+    
+                                                    <br />
+                                                    <span class="msg-receiveDate">{{
+                                                        message.sendDate._d3px
+                                                            | niceDateFormatPipe
+                                                    }}</span>
+                                                </a>
+                                                <a *ngIf="this.messageTypeIndex==2">
+    
+                                                    <span
+                                                        [ngClass]="{
+                                                            'msg-sender':
+                                                                message.entityObjectStatusCode ==
+                                                                'UNREAD'
+                                                        }"
+                                                        class=""
+                                                        >TO: {{
+                                                            message.to
+                                                        }}</span
+                                                    >
+    
+                                                    <br />
+                                                    <span class="msg-receiveDate">{{
+                                                        message.sendDate._d3px
+                                                            | niceDateFormatPipe
+                                                    }}</span>
+                                                </a> -->
                                             <!-- I2-10  -->
                                             <a>
-                                                <span
-                                                    [ngClass]="{
-                                                        'msg-sender':
-                                                            message.entityObjectStatusCode ==
-                                                            'UNREAD'
-                                                    }"
-                                                    class=""
-                                                >
+                                                <span [ngClass]="{
+                                                            'msg-sender':
+                                                                message.entityObjectStatusCode ==
+                                                                'UNREAD'
+                                                        }" class="">
                                                     {{
-                                                        this.messageTypeIndex ==
-                                                        2
-                                                            ? "TO: " +
-                                                              message.recipientsName
-                                                            : message.senderName
+                                                    this.messageTypeIndex ==
+                                                    2
+                                                    ? "TO: " +
+                                                    message.recipientsName
+                                                    : message.senderName
                                                     }}
                                                 </span>
 
                                                 <br />
                                                 <span class="msg-receiveDate">{{
                                                     message.sendDate._d3px
-                                                        | niceDateFormatPipe
-                                                }}</span>
+                                                    | niceDateFormatPipe
+                                                    }}</span>
                                             </a>
                                         </li>
-                                        <div class="col-2 d-block d-md-none ml-5 mt-5 pl-5" style="white-space: nowrap;"> {{message.receiveDate |  date: "shortTime" }}</div>
+                                        <div class="col-2 d-block d-md-none ml-5 mt-5 pl-5"
+                                            style="white-space: nowrap;">
+                                            {{message.receiveDate | date: "shortTime" }}
+                                        </div>
                                     </ul>
-                                    <div class="body-msg row"> 
+                                    <div class="body-msg row">
                                         <div class="col-1 mr-5"></div>
                                         <div class="ml-md-4 ml-0">
-                                        <p
-                                            class=""
-                                            [ngClass]="{
-                                                'subject-msg-fs13':
-                                                    message.entityObjectStatusCode ==
-                                                    'UNREAD'
-                                            }"
-                                        >
-                                            {{ message.subject | slice: 0:32 }}
-                                        </p>
-                                        <p class="subject-body">
-                                            {{ message.body | slice: 0:100 }}
-                                        </p>
-                                    </div>
+                                            <p class="" [ngClass]="{
+                                                    'subject-msg-fs13':
+                                                        message.entityObjectStatusCode ==
+                                                        'UNREAD'
+                                                }">
+                                                {{ message.subject | slice: 0:32 }}
+                                            </p>
+                                            <p class="subject-body">
+                                                {{ message.body | slice: 0:100 }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <hr class="d-block d-md-none"/>
+                            <hr class="d-block d-md-none" />
                         </div>
                     </div>
                 </div>
 
-                <div #container class="messages-inbox m-0 d-block d-md-none" (scroll)="onScroll()" *ngIf="!displayMessageDetails">
+                <div #container class="messages-inbox m-0 d-block d-md-none" (scroll)="onScroll()"
+                    *ngIf="!displayMessageDetails">
                     <div class="row">
-                        <div
-                            class="col-md-12"
-                            *ngFor="let message of itemsToShow; let i = index"
-                        >
+                        <div class="col-md-12" *ngFor="let message of itemsToShow; let i = index">
                             <div class="wrapper-dev">
-                                <div
-                                    class="active-msg mr-2"
-                                    (click)="selectMessage(message)"
-                                    [ngClass]="{
-                                        SelectedMessage: isActive(message, i)
-                                    }"
-                                >
-                                    <img
-                                        [src]="
-                                            message.profilePictureUrl
-                                                ? message.profilePictureUrl
-                                                : 'assets/chat/user-chat.png'
-                                        "
-                                        class="rounded-circle"
-                                        style="
-                                            width: 50px;
-                                            height: 50px;
-                                            object-fit: cover;
-                                        "
-                                    />
+                                <div class="active-msg mr-2" (click)="selectMessage(message)" [ngClass]="{
+                                            SelectedMessage: isActive(message, i)
+                                        }">
+                                    <img [src]="
+                                                message.profilePictureUrl
+                                                    ? message.profilePictureUrl
+                                                    : 'assets/chat/user-chat.png'
+                                            " class="rounded-circle" style="
+                                                width: 50px;
+                                                height: 50px;
+                                                object-fit: cover;
+                                            " />
                                     <ul class="msg-content row">
                                         <li class="Messages col-6 col-md mr-5 mr-md-0">
                                             <!-- I2-10  -->
                                             <!--
-                                            <a *ngIf="this.messageTypeIndex!=2">
-                                                <span
-                                                    [ngClass]="{
-                                                        'msg-sender':
-                                                            message.entityObjectStatusCode ==
-                                                            'UNREAD'
-                                                    }"
-                                                    class=""
-                                                    >{{
-                                                        message.senderName
-                                                    }}</span
-                                                >
-
-                                                <br />
-                                                <span class="msg-receiveDate">{{
-                                                    message.sendDate._d3px
-                                                        | niceDateFormatPipe
-                                                }}</span>
-                                            </a>
-                                            <a *ngIf="this.messageTypeIndex==2">
-
-                                                <span
-                                                    [ngClass]="{
-                                                        'msg-sender':
-                                                            message.entityObjectStatusCode ==
-                                                            'UNREAD'
-                                                    }"
-                                                    class=""
-                                                    >TO: {{
-                                                        message.to
-                                                    }}</span
-                                                >
-
-                                                <br />
-                                                <span class="msg-receiveDate">{{
-                                                    message.sendDate._d3px
-                                                        | niceDateFormatPipe
-                                                }}</span>
-                                            </a> -->
+                                                <a *ngIf="this.messageTypeIndex!=2">
+                                                    <span
+                                                        [ngClass]="{
+                                                            'msg-sender':
+                                                                message.entityObjectStatusCode ==
+                                                                'UNREAD'
+                                                        }"
+                                                        class=""
+                                                        >{{
+                                                            message.senderName
+                                                        }}</span
+                                                    >
+    
+                                                    <br />
+                                                    <span class="msg-receiveDate">{{
+                                                        message.sendDate._d3px
+                                                            | niceDateFormatPipe
+                                                    }}</span>
+                                                </a>
+                                                <a *ngIf="this.messageTypeIndex==2">
+    
+                                                    <span
+                                                        [ngClass]="{
+                                                            'msg-sender':
+                                                                message.entityObjectStatusCode ==
+                                                                'UNREAD'
+                                                        }"
+                                                        class=""
+                                                        >TO: {{
+                                                            message.to
+                                                        }}</span
+                                                    >
+    
+                                                    <br />
+                                                    <span class="msg-receiveDate">{{
+                                                        message.sendDate._d3px
+                                                            | niceDateFormatPipe
+                                                    }}</span>
+                                                </a> -->
                                             <!-- I2-10  -->
                                             <a>
-                                                <span
-                                                    [ngClass]="{
-                                                        'msg-sender':
-                                                            message.entityObjectStatusCode ==
-                                                            'UNREAD'
-                                                    }"
-                                                    class=""
-                                                >
+                                                <span [ngClass]="{
+                                                            'msg-sender':
+                                                                message.entityObjectStatusCode ==
+                                                                'UNREAD'
+                                                        }" class="">
                                                     {{
-                                                        this.messageTypeIndex ==
-                                                        2
-                                                            ? "TO: " +
-                                                              message.recipientsName
-                                                            : message.senderName
+                                                    this.messageTypeIndex ==
+                                                    2
+                                                    ? "TO: " +
+                                                    message.recipientsName
+                                                    : message.senderName
                                                     }}
                                                 </span>
 
                                                 <br />
                                                 <span class="msg-receiveDate">{{
                                                     message.sendDate._d3px
-                                                        | niceDateFormatPipe
-                                                }}</span>
+                                                    | niceDateFormatPipe
+                                                    }}</span>
                                             </a>
                                         </li>
-                                        <div class="col-2 d-block d-md-none ml-5 mt-5 pl-5" style="white-space: nowrap;"> {{message.receiveDate |  date: "shortTime" }}</div>
+                                        <div class="col-2 d-block d-md-none ml-5 mt-5 pl-5"
+                                            style="white-space: nowrap;">
+                                            {{message.receiveDate | date: "shortTime" }}
+                                        </div>
                                     </ul>
-                                    <div class="body-msg row"> 
+                                    <div class="body-msg row">
                                         <div class="col-1 mr-5"></div>
                                         <div class="ml-md-4 ml-0">
-                                        <p
-                                            class=""
-                                            [ngClass]="{
-                                                'subject-msg-fs13':
-                                                    message.entityObjectStatusCode ==
-                                                    'UNREAD'
-                                            }"
-                                        >
-                                            {{ message.subject | slice: 0:32 }}
-                                        </p>
-                                        <p class="subject-body">
-                                            {{ message.body | slice: 0:100 }}
-                                        </p>
-                                    </div>
+                                            <p class="" [ngClass]="{
+                                                    'subject-msg-fs13':
+                                                        message.entityObjectStatusCode ==
+                                                        'UNREAD'
+                                                }">
+                                                {{ message.subject | slice: 0:32 }}
+                                            </p>
+                                            <p class="subject-body">
+                                                {{ message.body | slice: 0:100 }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <hr class="d-block d-md-none"/>
+                            <hr class="d-block d-md-none" />
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-8 col d-none  d-md-block p-2 m-5 m-md-0" style="padding: 0">
+            <div [ngClass]="{ 'col-md-8': !showSideBar, 'col-md-6': showSideBar }"
+             class="col d-none  d-md-block p-2 m-5 m-md-0" style="padding: 0">
                 <div *ngIf="messagesDetails">
-                    <span class="subject-msg"
-                        >{{ messagesDetails[0].messages.subject }}
+                    <span class="subject-msg">{{ messagesDetails[0].messages.subject }}
                     </span>
                     <div class="actions-message pr-4" style="">
                         <div class="row">
-                            <div
-                                *ngIf="!messagesDetails[0].messages.isFavorite"
-                                (click)="
-                                    favoriteMessage(messagesDetails[0].messages)
-                                "
-                                title="UnFavorite"
-                                class="mr-3"
-                            >
-                                <img
-                                    src="assets/message/Messaging_Favorite_icon.svg"
-                                    style="width: 20px"
-                                />
+                            <!-- //I37- *ngIf=" messagesDetails[0].messages.hasSideBar" -->
+                            <div class="mr-3">
+                                <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0" style="cursor: pointer;
+                             border-radius: 4px;
+                             border: 1px solid #E2E2EA !important;
+                             background-color: transparent !important;
+                             color: #F88011 !important" (click)="onShowSideBar(!showSideBar)">
+
+                                    <span class="pr-3" style="
+                             font-family: Poppins;
+                             font-size: 16px;
+                             font-style: normal;
+                             font-weight: 600;
+                             line-height: normal;">{{showHideSideBarTitle}}</span>
+                                </button>
+                            </div>
+                            <div *ngIf="!messagesDetails[0].messages.isFavorite" (click)="
+                                        favoriteMessage(messagesDetails[0].messages)
+                                    " title="UnFavorite" class="mr-3">
+                                <img src="assets/message/Messaging_Favorite_icon.svg" style="width: 20px" />
                             </div>
 
-                            <div
-                                *ngIf="messagesDetails[0].messages.isFavorite"
-                                (click)="
-                                    favoriteMessage(messagesDetails[0].messages)
-                                "
-                                title="Favorite"
-                                class="mr-3"
-                            >
-                                <img
-                                    src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
-                                    style="width: 20px"
-                                />
+                            <div *ngIf="messagesDetails[0].messages.isFavorite" (click)="
+                                        favoriteMessage(messagesDetails[0].messages)
+                                    " title="Favorite" class="mr-3">
+                                <img src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
+                                    style="width: 20px" />
                             </div>
                             <!-- <span class="mr-10">
-                                <img src="assets/message/replay.svg" style="width:13px;">
-
-                            </span> -->
-
-                            <div title="Archive"  class="mr-3">
-                                <img
-                                    src="{{
-                                        appRootUrl()
-                                    }}assets/message/Messaging_Archiving_icon.svg"
-                                    style="width: 20px"
-                                    (click)="
-                                        archiveMessage(
-                                            messagesDetails[0].messages
-                                        )
-                                    "
-                                />
-                            </div>
-                            <div
-                                class="btn-group dropdown actionDropdown mr-3"
-                                dropdown
-                                container="body"
-                            >
-                                <button
-                                    class="dropdown-toggle btn btn-sm btn-primary btn-action"
-                                    dropdownToggle
-                                    style="cursor: pointer"
-                                ></button>
-
-                                <ul class="dropdown-menu" *dropdownMenu>
-                                    <li>
-                                        <a
-                                            href="javascript:;"
-                                            (click)="
-                                                SendMessageModal.show(
-                                                    messagesDetails[0].messages
-                                                        .id,
-                                                    messagesDetails[0].messages
-                                                        .threadId,
-                                                    false
-                                                )
-                                            "
-                                            class="link-action"
-                                            >{{ l("Reply") }}</a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            href="javascript:;"
-                                            (click)="
-                                                SendMessageModal.show(
-                                                    messagesDetails[0].messages
-                                                        .id,
-                                                    messagesDetails[0].messages
-                                                        .threadId,
-                                                    true
-                                                )
-                                            "
-                                            class="link-action"
-                                            >{{ l("Forward") }}</a
-                                        >
-                                    </li>
-                                    <!-- <li>
-                                        <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
-                                    </li> -->
-                                    <li>
-                                        <a
-                                            (click)="
-                                                onClickDeleteMsg(
-                                                    messagesDetails[0].messages
-                                                )
-                                            "
-                                            class="link-action"
-                                            >{{ l("DeleteMessage") }}</a
-                                        >
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr style="border: 1px solid #e7e8ef; opacity: 1" />
-                   
-
-                    <div
-                        #messageEl
-                        id="contentmsg"
-                        class="w-100"
-                        [ngClass]="{ Scroll: messagesDetails.length > 1 }"
-                        [scrollTop]="scrolltop"
-                        style="position: relative"
-                    >
-                        <div
-                            *ngFor="
-                                let messagedetail of messagesDetails;
-                                let i = index
-                            " 
-                        >
-                            <!-- <div class="btn-group dropdown btn-actions-message" dropdown container="body">
-
-                                    <button *ngIf="i>0"
-                                        class="dropdown-toggle btn btn-sm btn-primary btn-action btn-actions-message"
-                                        dropdownToggle>
-                                    </button>
-                                    <ul class="dropdown-menu" *dropdownMenu>
-
-                                        <li>
-                                            <a href="javascript:;" class="link-action">{{l('Reply')}}</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;" class="link-action">{{l('Forward')}}</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
-                                        </li>
-                                        <li>
-                                            <a (click)="onClickDeleteMsg(MessagesDetails[0].messages)"
-                                                class="link-action">{{l('DeleteMessage')}}</a>
-                                        </li>
-
-                                    </ul>
-                                </div> -->
-                            <!-- <span class="">
-                                    <img src="assets/message/replay.svg" style="float: right;    width: 13px;
-                                    margin-right: 6px;margin-top: 5px;">
-
-
+                                    <img src="assets/message/replay.svg" style="width:13px;">
+    
                                 </span> -->
-                            <img
-                                [src]="
-                                    messagedetail.messages.profilePictureUrl
-                                        ? messagedetail.messages
-                                              .profilePictureUrl
-                                        : 'assets/chat/user-chat.png'
-                                "
-                                class="rounded-circle"
-                                style="
-                                    width: 30px;
-                                    height: 30px;
-                                    object-fit: cover;
-                                "
-                            />
-                            <span
-                                style="
-                                    font-size: 15px;
-                                    font-weight: bold;
-                                    color: #464e5f;
-                                    padding-left: 7px;
-                                    position: absolute;
-                                "
-                                >{{ messagedetail.messages.senderName }}</span
-                            ><br />
-                            <div class="to-block">
-                                <span class="to">{{ "To" | localize }} :</span>
-                                <span
-                                    style="
-                                        font-size: 13px;
-                                        color: #464e5f;
-                                        padding-left: 1px;
-                                    "
-                                    >{{ messagedetail.messages.toName }}
-                                </span>
-                            </div>
-                            <br />
-                            <div class="message-data">
-                                <span
-                                    style="
-                                        font-size: 10px;
-                                        color: #b5b5c3;
-                                        position: absolute;
-                                        right: 0;
-                                        top: -14px;
-                                    "
-                                    >{{
-                                        messagedetail.messages.sendDate
-                                            | niceDateFormatPipe
-                                    }}</span
-                                >
-                            </div>
-                            <br />
-                            <span
-                                [innerHTML]="
-                                    messagedetail.messages.bodyFormat | safeHtml
-                                "
-                                class="msg-bodyformat"
-                                [ngClass]="
-                                    longmsgId == messagedetail.messages.id ||
-                                    messagesDetails.length == 1
-                                        ? ''
-                                        : 'long-msg'
-                                "
-                                (click)="
-                                    clickEventLongMsg(messagedetail.messages.id)
-                                "
-                            >
-                            </span>
-                            <br />
-                            <hr
-                                *ngIf="i != messagesDetails.length - 1"
-                                style="border: 1px solid #e7e8ef; opacity: 1"
-                            />
-                            <br />
-                        </div>
-                    </div>
-                    <div>
-                        <p
-                            *ngIf="
-                                messagesDetails[0].messages.entityAttachments
-                                    .length > 0
-                            "
-                            class="title-attach"
-                        >
-                            <span
-                                >{{
-                                    messagesDetails[0].messages
-                                        .entityAttachments.length
-                                }}
-                                {{ "Attachments" | localize }}</span
-                            >
-                        </p>
-
-                        <div
-                            class="files-uploaded"
-                            *ngFor="let item of entityAttachments"
-                        >
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="
-                                    item.fileName.includes('.doc') ||
-                                    item.fileName.includes('.docs')
-                                "
-                            >
-                                <img
-                                    src="assets/message/microsoft-word.svg"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
-                            </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="item.fileName.includes('.ppt')"
-                            >
-                                <img
-                                    src="assets/message/microsoft-powerpoint.svg"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
-                            </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="
-                                    item.fileName.includes('.jpg') ||
-                                    item.fileName.includes('.png') ||
-                                    item.fileName.includes('.svg')
-                                "
-                            >
-                                <img
-                                    [src]="getImage(item.url)"
-                                    height="30px"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
-                            </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="item.fileName.includes('.xls')"
-                            >
-                                <img
-                                    src="assets/message/excel.svg"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
-                            </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="item.fileName.includes('.pdf')"
-                            >
-                                <img
-                                    src="assets/message/adobe.svg"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
-                            </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="
-                                    !item.fileName.includes('.xls') &&
-                                    !item.fileName.includes('.pdf') &&
-                                    !item.fileName.includes('.docs') &&
-                                    !item.fileName.includes('.doc') &&
-                                    !item.fileName.includes('.ppt') &&
-                                    !item.fileName.includes('.jpg') &&
-                                    !item.fileName.includes('.svg') &&
-                                    !item.fileName.includes('.png')
-                                "
-                            >
-                                <img
-                                    src="assets/message/document.png"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
-                            </div>
-
-                            <p class="display-name">
-                                <span>{{ item.displayName }}</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- <div class="files-uploaded">
-                    <div class="uploaded-attchments">
-                       <img src="assets/message/word.png">
-
-                   </div>
-                   <p><span>Wordfile.doc</span></p>
-                </div> -->
-
-                    <div class="btns-replay">
-                        <button
-                            (click)="
-                                SendMessageModal.show(
-                                    messagesDetails[0].messages.id,
-                                    messagesDetails[0].messages.threadId,
-                                    false,
-                                    messagesDetails[0].messages
-                                        .mesasgeObjectType
-                                )
-                            "
-                            class="ReplyBtn btn btn-primary"
-                        >
-                            <img
-                                src="assets/message/replay.svg"
-                                style="width: 13px"
-                            />
-                            <span> {{ "Reply" | localize }}</span>
-                        </button>
-                        <button
-                            (click)="
-                                SendMessageModal.show(
-                                    messagesDetails[0].messages.id,
-                                    messagesDetails[0].messages.threadId,
-                                    true
-                                )
-                            "
-                            class="ForwardBtn btn btn-primary"
-                        >
-                            <span style="padding-right: 5px">{{
-                                "Forward" | localize
-                            }}</span
-                            ><img
-                                src="assets/message/forward.svg"
-                                style="width: 13px"
-                            />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-8 col d-block  d-md-none pr-2  m-md-0" style="padding: 0" *ngIf="displayMessageDetails && messagesDetails">
-                <div class="pl-5 row">
-                    <img src="../../../assets/message/Header_arrow-back_Btn.svg" class="pointer"
-                    (click)="messageDetailsGoback()" />
-                       <div class="mt-1"><span class="pl-3 subject-msg">{{ messagesDetails[0].messages.subject }} </span> </div>
-                       <div class="actions-message pr-4" >
-                        <div class="row">
-                            <div
-                                *ngIf="!messagesDetails[0].messages.isFavorite"
-                                (click)="
-                                    favoriteMessage(messagesDetails[0].messages)
-                                "
-                                title="UnFavorite"
-                            >
-                                <img
-                                    src="assets/message/Messaging_Favorite_icon.svg"
-                                    style="width: 20px"
-                                    class="mr-3"
-                                />
-                            </div>
-
-                            <div
-                                *ngIf="messagesDetails[0].messages.isFavorite"
-                                (click)="
-                                    favoriteMessage(messagesDetails[0].messages)
-                                "
-                                title="Favorite"
-                                class="mr-3"
-                            >
-                                <img
-                                    src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
-                                    style="width: 20px"
-                                />
-                            </div>
-                            <!-- <span class="mr-10">
-                                <img src="assets/message/replay.svg" style="width:13px;">
-
-                            </span> -->
 
                             <div title="Archive" class="mr-3">
-                                <img
-                                    src="{{
-                                        appRootUrl()
-                                    }}assets/message/Messaging_Archiving_icon.svg"
-                                    style="width: 20px"
-                                    (click)="
-                                        archiveMessage(
-                                            messagesDetails[0].messages
-                                        )
-                                    "
-                                />
+                                <img src="{{
+                                            appRootUrl()
+                                        }}assets/message/Messaging_Archiving_icon.svg" style="width: 20px" (click)="
+                                            archiveMessage(
+                                                messagesDetails[0].messages
+                                            )
+                                        " />
                             </div>
-                            <div
-                                class="btn-group dropdown actionDropdown mr-3"
-                                dropdown
-                                container="body"
-                            >
-                                <button
-                                    class="dropdown-toggle btn btn-sm btn-primary btn-action"
-                                    dropdownToggle
-                                    style="cursor: pointer"
-                                ></button>
+                            <div class="btn-group dropdown actionDropdown mr-3" dropdown container="body">
+                                <button class="dropdown-toggle btn btn-sm btn-primary btn-action" dropdownToggle
+                                    style="cursor: pointer"></button>
 
                                 <ul class="dropdown-menu" *dropdownMenu>
                                     <li>
-                                        <a
-                                            href="javascript:;"
-                                            (click)="
-                                                SendMessageModal.show(
-                                                    messagesDetails[0].messages
-                                                        .id,
-                                                    messagesDetails[0].messages
-                                                        .threadId,
-                                                    false
-                                                )
-                                            "
-                                            class="link-action"
-                                            >{{ l("Reply") }}</a
-                                        >
+                                        <a href="javascript:;" (click)="
+                                                    SendMessageModal.show(
+                                                        messagesDetails[0].messages
+                                                            .id,
+                                                        messagesDetails[0].messages
+                                                            .threadId,
+                                                        false
+                                                    )
+                                                " class="link-action">{{ l("Reply") }}</a>
                                     </li>
                                     <li>
-                                        <a
-                                            href="javascript:;"
-                                            (click)="
-                                                SendMessageModal.show(
-                                                    messagesDetails[0].messages
-                                                        .id,
-                                                    messagesDetails[0].messages
-                                                        .threadId,
-                                                    true
-                                                )
-                                            "
-                                            class="link-action"
-                                            >{{ l("Forward") }}</a
-                                        >
+                                        <a href="javascript:;" (click)="
+                                                    SendMessageModal.show(
+                                                        messagesDetails[0].messages
+                                                            .id,
+                                                        messagesDetails[0].messages
+                                                            .threadId,
+                                                        true
+                                                    )
+                                                " class="link-action">{{ l("Forward") }}</a>
                                     </li>
                                     <!-- <li>
-                                        <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
-                                    </li> -->
+                                            <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
+                                        </li> -->
                                     <li>
-                                        <a
-                                            (click)="
-                                                onClickDeleteMsg(
-                                                    messagesDetails[0].messages
-                                                )
-                                            "
-                                            class="link-action"
-                                            >{{ l("DeleteMessage") }}</a
-                                        >
+                                        <a (click)="
+                                                    onClickDeleteMsg(
+                                                        messagesDetails[0].messages
+                                                    )
+                                                " class="link-action">{{ l("DeleteMessage") }}</a>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
-                    </div>
-                     <div  class="ml-5">
-                   
 
-                    <hr style="border: 1px solid #e7e8ef; opacity: 1" />
-                   
+                    <hr class="mt-5" style="border: 1px solid #e7e8ef; opacity: 1" />
 
-                    <div
-                        #messageEl
-                        id="contentmsg"
-                        class="w-100"
-                        [ngClass]="{ Scroll: messagesDetails.length > 1 }"
-                        [scrollTop]="scrolltop"
-                        style="position: relative"
-                    >
-                        <div
-                            *ngFor="
-                                let messagedetail of messagesDetails;
-                                let i = index
-                            " 
-                        >
+                    
+                    <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
+                        [scrollTop]="scrolltop" style="position: relative">
+                        <div *ngFor="
+                                    let messagedetail of messagesDetails;
+                                    let i = index
+                                ">
                             <!-- <div class="btn-group dropdown btn-actions-message" dropdown container="body">
-
-                                    <button *ngIf="i>0"
-                                        class="dropdown-toggle btn btn-sm btn-primary btn-action btn-actions-message"
-                                        dropdownToggle>
-                                    </button>
-                                    <ul class="dropdown-menu" *dropdownMenu>
-
-                                        <li>
-                                            <a href="javascript:;" class="link-action">{{l('Reply')}}</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;" class="link-action">{{l('Forward')}}</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
-                                        </li>
-                                        <li>
-                                            <a (click)="onClickDeleteMsg(MessagesDetails[0].messages)"
-                                                class="link-action">{{l('DeleteMessage')}}</a>
-                                        </li>
-
-                                    </ul>
-                                </div> -->
+    
+                                        <button *ngIf="i>0"
+                                            class="dropdown-toggle btn btn-sm btn-primary btn-action btn-actions-message"
+                                            dropdownToggle>
+                                        </button>
+                                        <ul class="dropdown-menu" *dropdownMenu>
+    
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('Reply')}}</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('Forward')}}</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
+                                            </li>
+                                            <li>
+                                                <a (click)="onClickDeleteMsg(MessagesDetails[0].messages)"
+                                                    class="link-action">{{l('DeleteMessage')}}</a>
+                                            </li>
+    
+                                        </ul>
+                                    </div> -->
                             <!-- <span class="">
-                                    <img src="assets/message/replay.svg" style="float: right;    width: 13px;
-                                    margin-right: 6px;margin-top: 5px;">
-
-
-                                </span> -->
-                            <img
-                                [src]="
-                                    messagedetail.messages.profilePictureUrl
-                                        ? messagedetail.messages
-                                              .profilePictureUrl
-                                        : 'assets/chat/user-chat.png'
-                                "
-                                class="rounded-circle"
-                                style="
-                                    width: 30px;
-                                    height: 30px;
-                                    object-fit: cover;
-                                "
-                            />
-                            <span
-                                style="
-                                    font-size: 15px;
-                                    font-weight: bold;
-                                    color: #464e5f;
-                                    padding-left: 7px;
-                                    position: absolute;
-                                "
-                                >{{ messagedetail.messages.senderName }}</span
-                            ><br />
+                                        <img src="assets/message/replay.svg" style="float: right;    width: 13px;
+                                        margin-right: 6px;margin-top: 5px;">
+    
+    
+                                    </span> -->
+                            <img [src]="
+                                        messagedetail.messages.profilePictureUrl
+                                            ? messagedetail.messages
+                                                  .profilePictureUrl
+                                            : 'assets/chat/user-chat.png'
+                                    " class="rounded-circle" style="
+                                        width: 30px;
+                                        height: 30px;
+                                        object-fit: cover;
+                                    " />
+                            <span style="
+                                        font-size: 15px;
+                                        font-weight: bold;
+                                        color: #464e5f;
+                                        padding-left: 7px;
+                                        position: absolute;
+                                    ">{{ messagedetail.messages.senderName }}</span><br />
                             <div class="to-block">
                                 <span class="to">{{ "To" | localize }} :</span>
-                                <span
-                                    style="
-                                        font-size: 13px;
-                                        color: #464e5f;
-                                        padding-left: 1px;
-                                    "
-                                    >{{ messagedetail.messages.toName }}
+                                <span style="
+                                            font-size: 13px;
+                                            color: #464e5f;
+                                            padding-left: 1px;
+                                        ">{{ messagedetail.messages.toName }}
                                 </span>
                             </div>
                             <br />
                             <div class="message-data">
-                                <span
-                                    style="
-                                        font-size: 10px;
-                                        color: #b5b5c3;
-                                        position: absolute;
-                                        right: 0;
-                                        top: -14px;
-                                    "
-                                    >{{
-                                        messagedetail.messages.sendDate
-                                            | niceDateFormatPipe
-                                    }}</span
-                                >
+                                <span style="
+                                            font-size: 10px;
+                                            color: #b5b5c3;
+                                            position: absolute;
+                                            right: 0;
+                                            top: -14px;
+                                        ">{{
+                                    messagedetail.messages.sendDate
+                                    | niceDateFormatPipe
+                                    }}</span>
                             </div>
                             <br />
-                            <span
-                                [innerHTML]="
-                                    messagedetail.messages.bodyFormat | safeHtml
-                                "
-                                class="msg-bodyformat"
-                                [ngClass]="
-                                    longmsgId == messagedetail.messages.id ||
-                                    messagesDetails.length == 1
-                                        ? ''
-                                        : 'long-msg'
-                                "
-                                (click)="
-                                    clickEventLongMsg(messagedetail.messages.id)
-                                "
-                            >
+                            <span [innerHTML]="
+                                        messagedetail.messages.bodyFormat | safeHtml
+                                    " class="msg-bodyformat" [ngClass]="
+                                        longmsgId == messagedetail.messages.id ||
+                                        messagesDetails.length == 1
+                                            ? ''
+                                            : 'long-msg'
+                                    " (click)="
+                                        clickEventLongMsg(messagedetail.messages.id)
+                                    ">
                             </span>
                             <br />
-                            <hr
-                                *ngIf="i != messagesDetails.length - 1"
-                                style="border: 1px solid #e7e8ef; opacity: 1"
-                            />
+                            <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
                             <br />
                         </div>
                     </div>
                     <div>
-                        <p
-                            *ngIf="
-                                messagesDetails[0].messages.entityAttachments
-                                    .length > 0
-                            "
-                            class="title-attach"
-                        >
-                            <span
-                                >{{
-                                    messagesDetails[0].messages
-                                        .entityAttachments.length
+                        <p *ngIf="
+                                    messagesDetails[0].messages.entityAttachments
+                                        .length > 0
+                                " class="title-attach">
+                            <span>{{
+                                messagesDetails[0].messages
+                                .entityAttachments.length
                                 }}
-                                {{ "Attachments" | localize }}</span
-                            >
+                                {{ "Attachments" | localize }}</span>
                         </p>
 
-                        <div
-                            class="files-uploaded"
-                            *ngFor="let item of entityAttachments"
-                        >
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="
-                                    item.fileName.includes('.doc') ||
-                                    item.fileName.includes('.docs')
-                                "
-                            >
-                                <img
-                                    src="assets/message/microsoft-word.svg"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
+                        <div class="files-uploaded" *ngFor="let item of entityAttachments">
+                            <div class="uploaded-attchments" *ngIf="
+                                        item.fileName.includes('.doc') ||
+                                        item.fileName.includes('.docs')
+                                    ">
+                                <img src="assets/message/microsoft-word.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
                             </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="item.fileName.includes('.ppt')"
-                            >
-                                <img
-                                    src="assets/message/microsoft-powerpoint.svg"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.ppt')">
+                                <img src="assets/message/microsoft-powerpoint.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
                             </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="
-                                    item.fileName.includes('.jpg') ||
-                                    item.fileName.includes('.png') ||
-                                    item.fileName.includes('.svg')
-                                "
-                            >
-                                <img
-                                    [src]="getImage(item.url)"
-                                    height="30px"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
+                            <div class="uploaded-attchments" *ngIf="
+                                        item.fileName.includes('.jpg') ||
+                                        item.fileName.includes('.png') ||
+                                        item.fileName.includes('.svg')
+                                    ">
+                                <img [src]="getImage(item.url)" height="30px" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
                             </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="item.fileName.includes('.xls')"
-                            >
-                                <img
-                                    src="assets/message/excel.svg"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.xls')">
+                                <img src="assets/message/excel.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
                             </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="item.fileName.includes('.pdf')"
-                            >
-                                <img
-                                    src="assets/message/adobe.svg"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.pdf')">
+                                <img src="assets/message/adobe.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
                             </div>
-                            <div
-                                class="uploaded-attchments"
-                                *ngIf="
-                                    !item.fileName.includes('.xls') &&
-                                    !item.fileName.includes('.pdf') &&
-                                    !item.fileName.includes('.docs') &&
-                                    !item.fileName.includes('.doc') &&
-                                    !item.fileName.includes('.ppt') &&
-                                    !item.fileName.includes('.jpg') &&
-                                    !item.fileName.includes('.svg') &&
-                                    !item.fileName.includes('.png')
-                                "
-                            >
-                                <img
-                                    src="assets/message/document.png"
-                                    (click)="
-                                        downloadFile(item.url, item.displayName)
-                                    "
-                                />
+                            <div class="uploaded-attchments" *ngIf="
+                                        !item.fileName.includes('.xls') &&
+                                        !item.fileName.includes('.pdf') &&
+                                        !item.fileName.includes('.docs') &&
+                                        !item.fileName.includes('.doc') &&
+                                        !item.fileName.includes('.ppt') &&
+                                        !item.fileName.includes('.jpg') &&
+                                        !item.fileName.includes('.svg') &&
+                                        !item.fileName.includes('.png')
+                                    ">
+                                <img src="assets/message/document.png" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
                             </div>
 
                             <p class="display-name">
@@ -1351,72 +768,351 @@ class="pb-2 pr-1"
                     </div>
 
                     <!-- <div class="files-uploaded">
-                    <div class="uploaded-attchments">
-                       <img src="assets/message/word.png">
-
-                   </div>
-                   <p><span>Wordfile.doc</span></p>
-                </div> -->
+                        <div class="uploaded-attchments">
+                           <img src="assets/message/word.png">
+    
+                       </div>
+                       <p><span>Wordfile.doc</span></p>
+                    </div> -->
 
                     <div class="btns-replay">
-                        <button
-                            (click)="
-                                SendMessageModal.show(
-                                    messagesDetails[0].messages.id,
-                                    messagesDetails[0].messages.threadId,
-                                    false,
-                                    messagesDetails[0].messages
-                                        .mesasgeObjectType
-                                )
-                            "
-                            class="ReplyBtn btn btn-primary"
-                        >
-                            <img
-                                src="assets/message/replay.svg"
-                                style="width: 13px"
-                            />
+                        <button (click)="
+                                    SendMessageModal.show(
+                                        messagesDetails[0].messages.id,
+                                        messagesDetails[0].messages.threadId,
+                                        false,
+                                        messagesDetails[0].messages
+                                            .mesasgeObjectType
+                                    )
+                                " class="ReplyBtn btn btn-primary">
+                            <img src="assets/message/replay.svg" style="width: 13px" />
                             <span> {{ "Reply" | localize }}</span>
                         </button>
-                        <button
-                            (click)="
-                                SendMessageModal.show(
-                                    messagesDetails[0].messages.id,
-                                    messagesDetails[0].messages.threadId,
-                                    true
-                                )
-                            "
-                            class="ForwardBtn btn btn-primary"
-                        >
+                        <button (click)="
+                                    SendMessageModal.show(
+                                        messagesDetails[0].messages.id,
+                                        messagesDetails[0].messages.threadId,
+                                        true
+                                    )
+                                " class="ForwardBtn btn btn-primary">
                             <span style="padding-right: 5px">{{
                                 "Forward" | localize
-                            }}</span
-                            ><img
-                                src="assets/message/forward.svg"
-                                style="width: 13px"
-                            />
+                                }}</span><img src="assets/message/forward.svg" style="width: 13px" />
                         </button>
                     </div>
                 </div>
             </div>
-            
+
+            <div class="col-md-6 col d-block  d-md-none pr-2  m-md-0" style="padding: 0"
+                *ngIf="displayMessageDetails && messagesDetails">
+                <div class="pl-5 row">
+                    <img src="../../../assets/message/Header_arrow-back_Btn.svg" class="pointer"
+                        (click)="messageDetailsGoback()" />
+                    <div class="mt-1"><span class="pl-3 subject-msg">{{ messagesDetails[0].messages.subject }} </span>
+                    </div>
+                    <div class="actions-message pr-4">
+                        <div class="row">
+                            <!-- //I37- *ngIf=" messagesDetails[0].messages.hasSideBar" -->
+                            <div class="mr-3">
+                                <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0" style="cursor: pointer;
+                             border-radius: 4px;
+                             border: 1px solid #E2E2EA !important;
+                             background-color: transparent !important;
+                             color: #F88011 !important" (click)="onShowSideBar(!this.showSideBar)">
+
+                                    <span class="pr-3" style="
+                             font-family: Poppins;
+                             font-size: 16px;
+                             font-style: normal;
+                             font-weight: 600;
+                             line-height: normal;">{{showHideSideBarTitle}}</span>
+                                </button>
+                            </div>
+                            <div *ngIf="!messagesDetails[0].messages.isFavorite" (click)="
+                                        favoriteMessage(messagesDetails[0].messages)
+                                    " title="UnFavorite">
+                                <img src="assets/message/Messaging_Favorite_icon.svg" style="width: 20px"
+                                    class="mr-3" />
+                            </div>
+
+                            <div *ngIf="messagesDetails[0].messages.isFavorite" (click)="
+                                        favoriteMessage(messagesDetails[0].messages)
+                                    " title="Favorite" class="mr-3">
+                                <img src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
+                                    style="width: 20px" />
+                            </div>
+                            <!-- <span class="mr-10">
+                                    <img src="assets/message/replay.svg" style="width:13px;">
+    
+                                </span> -->
+
+                            <div title="Archive" class="mr-3">
+                                <img src="{{
+                                            appRootUrl()
+                                        }}assets/message/Messaging_Archiving_icon.svg" style="width: 20px" (click)="
+                                            archiveMessage(
+                                                messagesDetails[0].messages
+                                            )
+                                        " />
+                            </div>
+                            <div class="btn-group dropdown actionDropdown mr-3" dropdown container="body">
+                                <button class="dropdown-toggle btn btn-sm btn-primary btn-action" dropdownToggle
+                                    style="cursor: pointer"></button>
+
+                                <ul class="dropdown-menu" *dropdownMenu>
+                                    <li>
+                                        <a href="javascript:;" (click)="
+                                                    SendMessageModal.show(
+                                                        messagesDetails[0].messages
+                                                            .id,
+                                                        messagesDetails[0].messages
+                                                            .threadId,
+                                                        false
+                                                    )
+                                                " class="link-action">{{ l("Reply") }}</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" (click)="
+                                                    SendMessageModal.show(
+                                                        messagesDetails[0].messages
+                                                            .id,
+                                                        messagesDetails[0].messages
+                                                            .threadId,
+                                                        true
+                                                    )
+                                                " class="link-action">{{ l("Forward") }}</a>
+                                    </li>
+                                    <!-- <li>
+                                            <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
+                                        </li> -->
+                                    <li>
+                                        <a (click)="
+                                                    onClickDeleteMsg(
+                                                        messagesDetails[0].messages
+                                                    )
+                                                " class="link-action">{{ l("DeleteMessage") }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ml-5">
+
+
+                    <hr class="mt-5" style="border: 1px solid #e7e8ef; opacity: 1" />
+
+
+                    <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
+                        [scrollTop]="scrolltop" style="position: relative">
+                        <div *ngFor="
+                                    let messagedetail of messagesDetails;
+                                    let i = index
+                                ">
+                            <!-- <div class="btn-group dropdown btn-actions-message" dropdown container="body">
+    
+                                        <button *ngIf="i>0"
+                                            class="dropdown-toggle btn btn-sm btn-primary btn-action btn-actions-message"
+                                            dropdownToggle>
+                                        </button>
+                                        <ul class="dropdown-menu" *dropdownMenu>
+    
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('Reply')}}</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('Forward')}}</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" class="link-action">{{l('BlockUser')}}</a>
+                                            </li>
+                                            <li>
+                                                <a (click)="onClickDeleteMsg(MessagesDetails[0].messages)"
+                                                    class="link-action">{{l('DeleteMessage')}}</a>
+                                            </li>
+    
+                                        </ul>
+                                    </div> -->
+                            <!-- <span class="">
+                                        <img src="assets/message/replay.svg" style="float: right;    width: 13px;
+                                        margin-right: 6px;margin-top: 5px;">
+    
+    
+                                    </span> -->
+                            <img [src]="
+                                        messagedetail.messages.profilePictureUrl
+                                            ? messagedetail.messages
+                                                  .profilePictureUrl
+                                            : 'assets/chat/user-chat.png'
+                                    " class="rounded-circle" style="
+                                        width: 30px;
+                                        height: 30px;
+                                        object-fit: cover;
+                                    " />
+                            <span style="
+                                        font-size: 15px;
+                                        font-weight: bold;
+                                        color: #464e5f;
+                                        padding-left: 7px;
+                                        position: absolute;
+                                    ">{{ messagedetail.messages.senderName }}</span><br />
+                            <div class="to-block">
+                                <span class="to">{{ "To" | localize }} :</span>
+                                <span style="
+                                            font-size: 13px;
+                                            color: #464e5f;
+                                            padding-left: 1px;
+                                        ">{{ messagedetail.messages.toName }}
+                                </span>
+                            </div>
+                            <br />
+                            <div class="message-data">
+                                <span style="
+                                            font-size: 10px;
+                                            color: #b5b5c3;
+                                            position: absolute;
+                                            right: 0;
+                                            top: -14px;
+                                        ">{{
+                                    messagedetail.messages.sendDate
+                                    | niceDateFormatPipe
+                                    }}</span>
+                            </div>
+                            <br />
+                            <span [innerHTML]="
+                                        messagedetail.messages.bodyFormat | safeHtml
+                                    " class="msg-bodyformat" [ngClass]="
+                                        longmsgId == messagedetail.messages.id ||
+                                        messagesDetails.length == 1
+                                            ? ''
+                                            : 'long-msg'
+                                    " (click)="
+                                        clickEventLongMsg(messagedetail.messages.id)
+                                    ">
+                            </span>
+                            <br />
+                            <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
+                            <br />
+                        </div>
+                    </div>
+                    <div>
+                        <p *ngIf="
+                                    messagesDetails[0].messages.entityAttachments
+                                        .length > 0
+                                " class="title-attach">
+                            <span>{{
+                                messagesDetails[0].messages
+                                .entityAttachments.length
+                                }}
+                                {{ "Attachments" | localize }}</span>
+                        </p>
+
+                        <div class="files-uploaded" *ngFor="let item of entityAttachments">
+                            <div class="uploaded-attchments" *ngIf="
+                                        item.fileName.includes('.doc') ||
+                                        item.fileName.includes('.docs')
+                                    ">
+                                <img src="assets/message/microsoft-word.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.ppt')">
+                                <img src="assets/message/microsoft-powerpoint.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="
+                                        item.fileName.includes('.jpg') ||
+                                        item.fileName.includes('.png') ||
+                                        item.fileName.includes('.svg')
+                                    ">
+                                <img [src]="getImage(item.url)" height="30px" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.xls')">
+                                <img src="assets/message/excel.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.pdf')">
+                                <img src="assets/message/adobe.svg" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+                            <div class="uploaded-attchments" *ngIf="
+                                        !item.fileName.includes('.xls') &&
+                                        !item.fileName.includes('.pdf') &&
+                                        !item.fileName.includes('.docs') &&
+                                        !item.fileName.includes('.doc') &&
+                                        !item.fileName.includes('.ppt') &&
+                                        !item.fileName.includes('.jpg') &&
+                                        !item.fileName.includes('.svg') &&
+                                        !item.fileName.includes('.png')
+                                    ">
+                                <img src="assets/message/document.png" (click)="
+                                            downloadFile(item.url, item.displayName)
+                                        " />
+                            </div>
+
+                            <p class="display-name">
+                                <span>{{ item.displayName }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- <div class="files-uploaded">
+                        <div class="uploaded-attchments">
+                           <img src="assets/message/word.png">
+    
+                       </div>
+                       <p><span>Wordfile.doc</span></p>
+                    </div> -->
+
+                    <div class="btns-replay">
+                        <button (click)="
+                                    SendMessageModal.show(
+                                        messagesDetails[0].messages.id,
+                                        messagesDetails[0].messages.threadId,
+                                        false,
+                                        messagesDetails[0].messages
+                                            .mesasgeObjectType
+                                    )
+                                " class="ReplyBtn btn btn-primary">
+                            <img src="assets/message/replay.svg" style="width: 13px" />
+                            <span> {{ "Reply" | localize }}</span>
+                        </button>
+                        <button (click)="
+                                    SendMessageModal.show(
+                                        messagesDetails[0].messages.id,
+                                        messagesDetails[0].messages.threadId,
+                                        true
+                                    )
+                                " class="ForwardBtn btn btn-primary">
+                            <span style="padding-right: 5px">{{
+                                "Forward" | localize
+                                }}</span><img src="assets/message/forward.svg" style="width: 13px" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col p-2 m-5 m-md-0" style="padding: 0;border-left: 4px solid #e7e8ef;" *ngIf="showSideBar">
+                <!-- //I37-get messagesDetails[0].messages?.entityTypeName   & messagesDetails[0].messages?.orderId -->
+                <app-app-side-bar [entityTypeName]="'transaction'" [id]="" (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
+            </div>
         </div>
     </div>
+
 </div>
 
-<SendMessageModal
-    #SendMessageModal
-    (modalSave)="selectMessagetype(1, l('Inbox'))"
-></SendMessageModal>
-<confirm-modal
-    [content1]="l('Are you sure?')"
-    [content2]="l('Are you sure to remove this message?')"
-    [buttonYes]="l('Yes,Remove')"
-    [buttonNo]="l('CancelAction')"
-    [display]="displayDeleteMessage"
-    [type]="'deleteMessage'"
-    (buttonClicked)="onEmitButtonSaveYes($event)"
-></confirm-modal>
+<SendMessageModal #SendMessageModal (modalSave)="selectMessagetype(1, l('Inbox'))"></SendMessageModal>
+<confirm-modal [content1]="l('Are you sure?')" [content2]="l('Are you sure to remove this message?')"
+    [buttonYes]="l('Yes,Remove')" [buttonNo]="l('CancelAction')" [display]="displayDeleteMessage"
+    [type]="'deleteMessage'" (buttonClicked)="onEmitButtonSaveYes($event)"></confirm-modal>
 <!-- <SendMessageModal  #SendMessageModal></SendMessageModal>
-      -->
+          -->
 <!-- </div>
-    </div> -->
+        </div> -->

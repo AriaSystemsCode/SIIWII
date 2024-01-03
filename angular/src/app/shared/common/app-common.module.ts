@@ -69,6 +69,8 @@ import { CheckboxModule } from "primeng/checkbox";
 import { GenericFormModalComponent } from "./generic-forms/generic-form-modal.component";
 import { MatrixGridComponent } from "./matrix-grid/matrix-grid.component";
 import { SelectionModalComponent } from "./selection-modals/selection-modal.component";
+import { AppSideBarComponent } from "./app-side-bar/app-side-bar.component";
+import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app-transaction-side-bar/app-transaction-side-bar.component";
 
 @NgModule({
     imports: [
@@ -133,7 +135,8 @@ import { SelectionModalComponent } from "./selection-modals/selection-modal.comp
         ProgressComponent,
         MatrixGridComponent,
         GenericFormModalComponent,
-        SelectionModalComponent
+        SelectionModalComponent,
+        AppSideBarComponent,AppTransactionSideBarComponent
     ],
     exports: [
         TimeZoneComboComponent,
@@ -154,7 +157,7 @@ import { SelectionModalComponent } from "./selection-modals/selection-modal.comp
         ProgressComponent,
         MatrixGridComponent,
         GenericFormModalComponent,
-        SelectionModalComponent
+        SelectionModalComponent,AppSideBarComponent
     ],
     providers: [
         DateTimeService,
