@@ -1202,13 +1202,16 @@ namespace onetouch.AppSiiwiiTransaction
             return accounts;
 
         }
-        public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter)
+        public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false)
         {
 
             var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
-
-            //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[Start]
-            var myAccount = await _appContactRepository.GetAll().Include(a => a.CurrencyFk)
+            //T-SII-20240103.0001,1 MMT 01/04/2024 - Transactions - (Order info) and(Buyer / Seller Contact Info) accordions are not show the company information[Start]
+            AppContact myAccount = null;
+            if (lExclueMyAcc == true)
+                //T-SII-20240103.0001,1 MMT 01/04/2024 -Transactions- (Order info) and ( Buyer/Seller Contact Info) accordions are not show the company information[End]
+                //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[Start]
+                myAccount = await _appContactRepository.GetAll().Include(a => a.CurrencyFk)
                 .ThenInclude(z => z.EntityExtraData).FirstOrDefaultAsync(a => a.TenantId == AbpSession.TenantId & a.IsProfileData == true &
                  a.ParentId == null);
             //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[End]
