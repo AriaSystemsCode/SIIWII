@@ -5149,31 +5149,37 @@ namespace onetouch.AppItems
                                 SizeRatio = 0
                             });
                         }
-                        for (int pos = 0; pos < d2sizesArray.Length; pos++)
+                        if (d2sizesArray.Length > 0 && !string.IsNullOrEmpty(d2sizesArray[0]))
                         {
-                            appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                            for (int pos = 0; pos < d2sizesArray.Length; pos++)
                             {
-                                SizeCode = d2sizesArray[pos].TrimEnd(),
-                                D2Position = pos.ToString(),
-                                DimensionName = excelDto.D2Name,
-                                SizeId = null,
-                                D3Position = null,
-                                D1Position = null,
-                                SizeRatio = 0
-                            });
+                                appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                                {
+                                    SizeCode = d2sizesArray[pos].TrimEnd(),
+                                    D2Position = pos.ToString(),
+                                    DimensionName = excelDto.D2Name,
+                                    SizeId = null,
+                                    D3Position = null,
+                                    D1Position = null,
+                                    SizeRatio = 0
+                                });
+                            }
                         }
-                        for (int pos = 0; pos < d3sizesArray.Length; pos++)
+                        if (d3sizesArray.Length > 0 && !string.IsNullOrEmpty(d3sizesArray[0]))
                         {
-                            appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                            for (int pos = 0; pos < d3sizesArray.Length; pos++)
                             {
-                                SizeCode = d3sizesArray[pos].TrimEnd(),
-                                D3Position = pos.ToString(),
-                                SizeId = null,
-                                D1Position = null,
-                                D2Position = null,
-                                SizeRatio = 0,
-                                DimensionName = excelDto.D3Name,
-                            });
+                                appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                                {
+                                    SizeCode = d3sizesArray[pos].TrimEnd(),
+                                    D3Position = pos.ToString(),
+                                    SizeId = null,
+                                    D1Position = null,
+                                    D2Position = null,
+                                    SizeRatio = 0,
+                                    DimensionName = excelDto.D3Name,
+                                });
+                            }
                         }
                         var sizes = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
                         if (sizes != null)
@@ -5277,7 +5283,7 @@ namespace onetouch.AppItems
                         appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(sizescale.Result.AppSizeScalesDetails);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
-                        appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
+                        //appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
                         if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
                         {
                             var sizeScaleH = itemScaleData.FirstOrDefault(x => x.ParentId == null);
@@ -5411,11 +5417,11 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
                                 appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
                             }
-                            appItemSizeScalesHeader.AppItemId = appItem.Id;
-
-                            appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                           
                         }
+                        appItemSizeScalesHeader.AppItemId = appItem.Id;
 
+                        appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
                         // string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("SIZE-SCALE");
                         // scaleHeader.SizeScaleCode = (scaleHeader.ParentId == null ? "SizeScale-" : "SizeRatio-") + seq;
 
