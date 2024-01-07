@@ -516,7 +516,7 @@ export class CreateEditAppItemVariationsComponent
         const variationMatricesWithoutValuesIds = this.variationMatrices.map(item=>{
             const var_ = new VariationItemDto()
             var_.init(item)
-            var_.entityExtraData.forEach(item=>item.attributeValueId == undefined)
+            var_.entityExtraData.forEach(item=>item.attributeValueId = undefined)
             return var_
         })
         this._appItemsServiceProxy
