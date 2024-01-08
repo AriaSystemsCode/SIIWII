@@ -14,6 +14,7 @@ using NPOI.SS.Formula.Functions;
 using NUglify.Helpers;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
+using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.Authorization;
 using onetouch.Authorization.Users;
 using onetouch.Authorization.Users.Dto;
@@ -45,13 +46,13 @@ namespace onetouch.Message
         private readonly IRepository<AppEntityClassification, long> _appEntityClassificationRepository;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IRepository<AppEntityReactionsCount, long> _appEntityReactionsCount;
-
+        private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
             IRepository<AppEntityClassification, long> appEntityClassificationRepository,
-            IRepository<AppEntityReactionsCount, long> appEntityReactionsCount)
+            IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory)
         {
             _MessagesRepository = messagesRepository;
             _lookup_MessagesRepository = lookup_MessagesRepository;
@@ -60,6 +61,7 @@ namespace onetouch.Message
             _appEntitiesAppService = appEntitiesAppService;
             _appEntityClassificationRepository = appEntityClassificationRepository;
             _appEntityReactionsCount = appEntityReactionsCount;
+            _sycEntityObjectCategory = sycEntityObjectCategory;
         }
 
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)
@@ -108,7 +110,10 @@ namespace onetouch.Message
         (x.EntityFk.EntityObjectStatusId != entityObjectArchiveID &&
          x.EntityFk.EntityObjectStatusId != ObjectStatusDeleted))
 
-
+//Iteration37-MMT[Start]
+.WhereIf(input.MessageCategoryFilter != null, x=>x.EntityFk.EntityCategories
+.Where(z=> z.EntityObjectCategoryCode.Replace("-",string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), input.MessageCategoryFilter.ToString())).ToString()).Count()>0)
+//Iteration37-MMT[End]
 .WhereIf(input.messageTypeIndex == 3, x => (x.EntityFk.EntityObjectStatusId != ObjectStatusDeleted) && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId) )
                                     //xx
                                     .WhereIf(input.messageTypeIndex == 3, x => x.EntityFk.EntityClassifications.Count(x => x.EntityObjectClassificationId == entityObjectClassStarred) > 0)
@@ -224,6 +229,11 @@ namespace onetouch.Message
                                    .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
+                            //Iteration37-MMT[Start]
+                            .WhereIf(input.MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
+                            .Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), input.MessageCategoryFilter.ToString())).ToString()).Count() > 0)
+                            //Iteration37-MMT[End]
+
                             .WhereIf( input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
                                 e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
                                      e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
@@ -477,6 +487,10 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<List<GetMessagesForViewDto>> CreateMessage(CreateMessageInput input)
         {
+            if (input.MessageCategory==null)
+            {
+                input.MessageCategory = MessageCategory.PRIMARYMESSAGE;
+            }
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var message = await CreateMessageForSenderUser(input);
@@ -523,10 +537,23 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         private async Task<AppMessage> CreateMessageForSenderUser(CreateMessageInput input)
         {
+            
             AppEntityDto appEntity = new AppEntityDto();
             ObjectMapper.Map(input, appEntity);
             appEntity.Name = "Message";
             appEntity.Code = input.Code;
+            //Iteration37,1 [Start]
+            SycEntityObjectCategory messageCategory = null;
+            if (input.MessageCategory != null)
+            {
+                messageCategory = _sycEntityObjectCategory.GetAll().Where(z => z.Code.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), input.MessageCategory.ToString())).ToString()).FirstOrDefault();
+            }
+            if (messageCategory != null)
+            {
+                appEntity.EntityCategories = new List<AppEntityCategoryDto>();
+                appEntity.EntityCategories.Add(new AppEntityCategoryDto { EntityObjectCategoryCode= messageCategory.Code, EntityObjectCategoryId = messageCategory.Id, EntityObjectCategoryName= messageCategory.Name });
+            }
+            //Iteration37,1 [End]
             if (string.IsNullOrEmpty(input.Code))
             {
                 appEntity.Code = Guid.NewGuid().ToString();
@@ -594,6 +621,19 @@ namespace onetouch.Message
                 AppEntityDto appEntity = new AppEntityDto();
                 ObjectMapper.Map(input, appEntity);
                 appEntity.Name = "Message";
+                //Iteration37,1 [Start]
+                SycEntityObjectCategory messageCategory = null;
+                if (input.CreateMessageInput.MessageCategory != null)
+                {
+                    messageCategory = _sycEntityObjectCategory.GetAll().Where(z => z.Code.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), input.CreateMessageInput.MessageCategory.ToString())).ToString()).FirstOrDefault();
+                }
+                if (messageCategory != null)
+                {
+                    appEntity.EntityCategories = new List<AppEntityCategoryDto>();
+                    appEntity.EntityCategories.Add(new AppEntityCategoryDto { EntityObjectCategoryCode = messageCategory.Code, EntityObjectCategoryId = messageCategory.Id, EntityObjectCategoryName = messageCategory.Name });
+                }
+                //Iteration37,1 [End]
+
                 //appEntity.Code = input.CreateMessageInput.Code;
                 if (string.IsNullOrEmpty(input.CreateMessageInput.Code))
                 {
@@ -754,13 +794,15 @@ namespace onetouch.Message
             }
         }
         [AbpAllowAnonymous]
-        public async Task<long> GetUnreadCounts()
+        public async Task<long> GetUnreadCounts(string? MessageCategoryFilter)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var entityObjectStatusUnreadID = await _helper.SystemTables.GetEntityObjectStatusUnreadMessageID();
                 var unreadCount = 0;
                 unreadCount = await _MessagesRepository.GetAll()
+                    .WhereIf(MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
+.Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), MessageCategoryFilter)).ToString()).Count() > 0)
                        .Where(x => (x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) || (x.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) > 0))
                        .Where(e => e.ParentId == null)
                        .Where(x => x.TenantId == AbpSession.TenantId && (x.UserId == AbpSession.UserId)).CountAsync();

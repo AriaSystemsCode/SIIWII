@@ -117,6 +117,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
 
     getMesssage(search?: boolean): void {
+        //I37- send to get Primary or updates messages
         this._MessageServiceProxy
             .getAll(
                 this.filterText,

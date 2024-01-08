@@ -452,7 +452,7 @@ namespace onetouch
             configuration.CreateMap<AppMessage, MessagesDto>()
                 .ForMember(d => d.SendDate, s => s.MapFrom(ss => ss.CreationTime))
                 .ForMember(d => d.ReceiveDate, s => s.MapFrom(ss => ss.CreationTime))
-                .ForMember(d => d.EntityObjectTypeCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeCode))
+                .ForMember(d => d.EntityObjectTypeCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeFk.Code))//.EntityObjectTypeCode
                 .ForMember(d => d.EntityObjectStatusCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectStatusCode));
             configuration.CreateMap<CreateMessageInput, AppMessage>().ReverseMap();
             configuration.CreateMap<CreateMessageInput, AppEntityDto>().ReverseMap();

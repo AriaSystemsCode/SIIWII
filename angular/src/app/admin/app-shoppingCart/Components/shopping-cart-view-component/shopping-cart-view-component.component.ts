@@ -707,7 +707,9 @@ export class ShoppingCartViewComponentComponent
   onShareTransaction(){
     this.onshare=true;
   }
-
+ offShareTransaction(){
+    this.onshare=false;
+  }
   onGeneratOrderReport($event){
     if($event){
       this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;

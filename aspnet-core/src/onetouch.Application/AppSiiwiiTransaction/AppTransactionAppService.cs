@@ -3069,6 +3069,41 @@ namespace onetouch.AppSiiwiiTransaction
         }
 
         //End
+        //MMT37[Start]
+        public async Task<List<ContactInformationOutputDto>> GetAccountConnectedContacts(string filter)
+        {
+            List<ContactInformationOutputDto> output = new List<ContactInformationOutputDto>();
+            //var transactionContacts = _appTransactionContactsRepository.GetAll()
+
+            //  .Where(z => z.TransactionId == tansactionId);
+            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            //var contact = //from t in transactionContacts
+            //join c in
+            //      _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.ParentId != null && z.PartnerId != null)
+            //   on t.CompanySSIN equals c.SSIN into j
+            //    from e in j.DefaultIfEmpty()
+            //  select new { TenantId = e.Id }; Tenants.Contains(long.Parse(z.PartnerId.ToString())) && 
+
+
+            // var Tenants = (await contact.ToListAsync()).Where(z => z.TenantId != null).Select(z => z.TenantId).ToList();
+            var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                 .WhereIf(!string.IsNullOrEmpty(filter), z => z.Name.Contains(filter))
+                .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
+
+            if (contacts != null && contacts.Count() > 0)
+            {
+                foreach (var con in contacts)
+                {
+                    if (con.EntityFk.EntityExtraData !=null && con.EntityFk.EntityExtraData.FirstOrDefault() !=null && con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue!=null)
+                    output.Add(new ContactInformationOutputDto { Id = con.Id, Email = con.EMailAddress, Name = con.Name, UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue) });
+                }
+
+            }
+            return output;
+        }
+        //public async Task ShareTransaction(long TransactionId, List<> ShareWithUsers)
+        //{ }
+        //MMT37[End]
     }
 
 }

@@ -119,6 +119,7 @@ namespace onetouch.EntityFrameworkCore
         public virtual DbSet<AppItem> AppItems { get; set; }
 
         //MMT33-2
+        public virtual DbSet<AppEntitySharings> AppEntitySharings { get; set; }
         public virtual DbSet<AppMarketplaceItems.AppMarketplaceItems> AppMarketplaceItems { get; set; }
         public virtual DbSet<AppMarketplaceItemPrices> AppMarketplaceItemPrices { get; set; }
         public virtual DbSet<AppMarketplaceItemSelectors> AppMarketplaceItemSelectors { get; set; }
