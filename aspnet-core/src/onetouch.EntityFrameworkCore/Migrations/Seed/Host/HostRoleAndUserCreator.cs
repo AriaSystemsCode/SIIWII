@@ -39,6 +39,9 @@ namespace onetouch.Migrations.Seed.Host
             CreateHostSystemData();
             CreateHostObjectEntityStatus();
             CreateHostReportSystemData();
+            //MMT-Iteration37[Start]
+            CreateMessagesCategories();
+            //MMT-Iteration37[End]
         }
 
         private void CreateHostRoleAndUsers()
@@ -667,6 +670,44 @@ namespace onetouch.Migrations.Seed.Host
             #endregion SycEntityObjectTypes
 
         }
+        //MMT-Iteration37[Start]
+        private void CreateMessagesCategories()
+        {
+            var messageObject =  _context.SydObjects.Where(z => z.Code == "MESSAGE" && z.IsDeleted == false).FirstOrDefault();
+            if (messageObject != null)
+            {
+                var primaryObject = _context.SycEntityObjectCategories.Where(z => z.Code == "PRIMARY-MESSAGE" && z.ObjectId == messageObject.Id).FirstOrDefault();
+                if (primaryObject == null)
+                {
+                    primaryObject = new SycEntityObjectCategory();
+                    primaryObject.ObjectId = messageObject.Id;
+                    primaryObject.ParentId = null;
+                    primaryObject.TenantId = null;
+                    primaryObject.Name = "Primary Message";
+                    primaryObject.ObjectCode = messageObject.Code;
+                    primaryObject.Code = "PRIMARY-MESSAGE";
+                    primaryObject.IsDefault = false;
+                    _context.SycEntityObjectCategories.Add(primaryObject);
+                    _context.SaveChanges();
+                }
+                var updateCategory = _context.SycEntityObjectCategories.Where(z => z.Code == "UPDATE-MESSAGE" && z.ObjectId == messageObject.Id).FirstOrDefault();
+                if (updateCategory == null)
+                {
+                    updateCategory = new SycEntityObjectCategory();
+                    updateCategory.ObjectId = messageObject.Id;
+                    updateCategory.ParentId = null;
+                    updateCategory.TenantId = null;
+                    updateCategory.Name = "Update Message";
+                    updateCategory.ObjectCode = messageObject.Code;
+                    updateCategory.Code = "UPDATE-MESSAGE";
+                    updateCategory.IsDefault = false;
+                    _context.SycEntityObjectCategories.Add(updateCategory);
+                    _context.SaveChanges();
+                }
+
+            }
+        }
+        //MMT-Iteration37[End]
 
     }
 }
