@@ -35,6 +35,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   addressSelectedShipTo:boolean=false;
   shipFromSelectedAdd:any;
   shipToSelectedAdd:any;
+  shipingTabVaild:boolean=true;
 
   constructor(
     injector: Injector,
@@ -75,10 +76,16 @@ updateTabInfo(addObj,contactRole){
 
  
   }
-  if(this.shipFromSelectedAdd&&this.shipToSelectedAdd&&this.isshipFromContactsValid&&this.isShipToContactsValid){
-  this.enableSAveShipFrom=true;
-  }else{
-    this.enableSAveShipFrom=false;
+  if (this.shipingTabVaild){
+    let shipFromObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+    let shipToObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
+    shipFromObj[0]?.contactAddressDetail?this.enableSAveShipFrom = true:shipFromObj[0]?.contactAddressId?this.enableSAveShipFrom = true:this.enableSAveShipFrom = false;
+    shipToObj[0]?.contactAddressDetail?this.enableSAveShipTo = true:shipToObj[0]?.contactAddressId?this.enableSAveShipTo = true:this.enableSAveShipTo = false;
+
+    if(this.enableSAveShipFrom&&this.enableSAveShipTo){
+      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+
+    }
   }
 if(contactRole==ContactRoleEnum.ShipFromContact){
 this.shipFromSelectedAdd=addObj.selectedAddressObj
@@ -128,30 +135,35 @@ enterStore(){
     this.oldappTransactionsForViewDto.buyerStore=this.storeVal;
 }
   isContactFormValid(value,sectionIndex) {
+    let shipFromObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+    let shipToObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
     if(this.activeTab==this.shoppingCartoccordionTabs.ShippingInfo)
     {
     this.shippingTabValid = value;
     if (this.shippingTabValid){
-      if(sectionIndex==1){
-              this.shipFromSelectedAdd?this.enableSAveShipFrom = true:this.enableSAveShipFrom = false;
-      }else{
-        this.shipToSelectedAdd?this.enableSAveShipTo = true:this.enableSAveShipTo = false;     
-      }
 
+      if(sectionIndex==1){
+        shipFromObj[0]?.contactAddressDetail?this.enableSAveShipFrom = true:shipFromObj[0]?.contactAddressId?this.enableSAveShipFrom = true:this.enableSAveShipFrom = false;
+      }else{
+        shipToObj[0]?.contactAddressDetail?this.enableSAveShipTo = true:shipToObj[0]?.contactAddressId?this.enableSAveShipTo = true:this.enableSAveShipTo = false;
+      }
+      if(this.enableSAveShipFrom&&this.enableSAveShipTo){
+        this.shipingTabVaild=true;
+        this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+  
+      }else{
+          this.shipingTabVaild=false;
+        }
     }else{
       if(sectionIndex==1){
       this.enableSAveShipFrom = false;
       }else{
         this.enableSAveShipTo = false;
       }
+      this.enableSAveShipFrom&&this.enableSAveShipTo?this.shipingTabVaild=true:this.shipingTabVaild=false;
 
     }
-    if(this.shipFromSelectedAdd&&this.shipToSelectedAdd&&this.enableSAveShipFrom&&this.enableSAveShipTo){
-      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
-      this.enableSAveShipFrom=true;
-      }else{
-        this.enableSAveShipFrom=false;
-      }
+
   }
 
   }

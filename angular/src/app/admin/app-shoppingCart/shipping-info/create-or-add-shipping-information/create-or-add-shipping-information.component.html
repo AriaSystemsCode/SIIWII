@@ -4,7 +4,7 @@
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
             <button [disabled]="(!enableSAveShipFrom)" (click)="createOrEditTransaction()" 
-            class="continuebtn text-center btn float-right" *ngIf="!showSaveBtn ">
+            class="continuebtn text-center btn float-right" [disabled]="(!shipingTabVaild)"  *ngIf="!showSaveBtn ">
                  {{l("Continue")}}
             </button>
             <button *ngIf="showSaveBtn" (click)="save()"
