@@ -1,4 +1,4 @@
-<div class="card" (click)="viewProduct(product.id)" >
+<div class="card w-100" (click)="viewProduct(product.id)" >
     <img
         class="img"
         [src]="attachmentBaseUrl + '/' + product?.imageUrl"
@@ -10,7 +10,7 @@
         <div class="ssin">
             {{ product?.manufacturerCode }}
         </div>
-        <p class="card-text desc fw-bold">
+        <p class="card-text desc fw-bold" [title]="product?.name">
             {{ product?.name }}
         </p>
 
