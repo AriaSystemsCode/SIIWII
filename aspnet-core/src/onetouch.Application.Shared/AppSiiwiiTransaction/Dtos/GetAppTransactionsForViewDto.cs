@@ -149,4 +149,11 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     { 
         public bool IsSelected { get; set; }
     }
+    public class ContactInformationOutputDto
+    {
+       public long Id { set; get; }
+       public string Email { set; get; }
+       public string Name { set; get; } 
+       public long UserId{ set; get; }
+    }
 }
