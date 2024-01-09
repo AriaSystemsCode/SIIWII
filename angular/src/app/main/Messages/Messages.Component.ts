@@ -61,14 +61,15 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     itemsToLoad: number = 5;
     itemsToShow;
     totalUnread: number;
+    totalPrimaryUnread: number;
+    totalUpdatesUnread: number;
     isFullListDisplayed: boolean = false;
     messageId: any;
     entityAttachments = [];
     RecipientsName = [];
     highlightFirstMsg: boolean;
     displayMessageDetails: boolean = false;
-    primaryCount: number = 0;
-    updatesCount: number = 0;
+    messageCategoryFilter: string = "PRIMARYMESSAGE";
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -86,6 +87,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.highlightFirstMsg = true;
         this.displayMessageDetails = false;
         this.selectMessagetype(1, this.l("Inbox"));
+        this.messageCategoryFilter = "PRIMARYMESSAGE";
         this._sycEntityObjectClassificationsServiceProxy
             .getAllChildsForLables()
             .subscribe((result) => {
@@ -117,7 +119,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
 
     getMesssage(search?: boolean): void {
-        //I37- send to get Primary or updates messages
+        if (this.messageTypeIndex != 1)
+            this.messageCategoryFilter = null;
+
         this._MessageServiceProxy
             .getAll(
                 this.filterText,
@@ -126,7 +130,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.messageTypeIndex,
                 0,
                 undefined,
-                undefined,
+                undefined, this.messageCategoryFilter,
                 "",
                 this.skipCount,
                 this.maxResultCount
@@ -190,10 +194,15 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
 
 
                     this.totalCount = result.totalCount;
-                    this.totalUnread = result.totalUnread;
-                    //I37-get primary & Updates Count
-                    this.primaryCount = 0;
-                    this.updatesCount = 0;
+
+                    // this.totalUnread = result.totalUnread
+                    this._MessageServiceProxy.getUnreadCounts('PRIMARYMESSAGE').subscribe((result) => {
+                        this.totalPrimaryUnread = result;
+                    });
+
+                    this._MessageServiceProxy.getUnreadCounts('UPDATEMESSAGE').subscribe((result) => {
+                        this.totalUpdatesUnread = result;
+                    });
 
                     this.itemsToShow = this.messages.slice(
                         0,
@@ -208,18 +217,22 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
     showSideBar: boolean = false;
     showHideSideBarTitle: string = !this.showSideBar ? "Show details" : "Hide details";
-    onShowSideBar(showSideBar:boolean) {
+    onShowSideBar(showSideBar: boolean) {
         this.showSideBar = showSideBar;
         this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
     }
 
     getPrimaryMessage() {
-        //I37-get primary 
+        this.messageCategoryFilter = "PRIMARYMESSAGE";
+        this.messages = [];
+        this.messagesDetails = null;
         this.getMesssage();
     }
 
     getUpdatesMessage() {
-        //I37-get Updates 
+        this.messageCategoryFilter = "UPDATEMESSAGE";
+        this.messages = [];
+        this.messagesDetails = null;
         this.getMesssage();
     }
 
@@ -270,6 +283,10 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 if (message.entityObjectStatusCode == "UNREAD") {
                     this._MessageServiceProxy.read(message.id).subscribe(() => {
                         this.totalUnread = this.totalUnread - 1;
+                        if (this.messageCategoryFilter == "PRIMARYMESSAGE")
+                            this.totalPrimaryUnread = this.totalPrimaryUnread - 1;
+                        else if (this.messageCategoryFilter == "UPDATEMESSAGE")
+                            this.totalUpdatesUnread = this.totalUpdatesUnread - 1;
                         this.readMessage(true);
                     });
                     //xxx

@@ -64,7 +64,7 @@ export class CommentParentComponent extends AppComponentBase {
             undefined,
             this.entityId,
             this.parentId,
-            undefined,
+            undefined,"UPDATEMESSAGE",
             undefined,
             this.skipCount,
             this.maxResultCount)

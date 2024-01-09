@@ -43,3 +43,6 @@ export class AppTransactionSideBarComponent
 
 
 }
+
+
+export class defultSideBar extends AppTransactionSideBarComponent{}

@@ -1,6 +1,20 @@
 <ng-container #dynamicComponentContainer></ng-container>
-<div *ngIf="!componentFound">Preview not available to this type</div>  
+<div *ngIf="!componentFound" class="d-flex flex-row">
+    <h6 class="purpleColor  col-11 pb-4 mb-4">
+        {{" Preview not available to this type"}} </h6>
+    <div (click)="onhideSideBar()" class="pointer w-100"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="14"
+        viewBox="0 0 15 14" fill="none">
+        <g clip-path="url(#clip0_662_76)">
+            <path
+                d="M8.87423 7.01168L14.7149 1.56019C15.095 1.2056 15.095 0.632263 14.7149 0.277666C14.335 -0.0769304 13.7207 -0.0769304 13.3408 0.277666L7.49992 5.72915L1.65921 0.277666C1.27911 -0.0769304 0.665002 -0.0769304 0.285077 0.277666C-0.0950257 0.632263 -0.0950257 1.2056 0.285077 1.56019L6.12578 7.01168L0.285077 12.4632C-0.0950257 12.8178 -0.0950257 13.3911 0.285077 13.7457C0.474417 13.9226 0.72337 14.0114 0.972145 14.0114C1.22092 14.0114 1.4697 13.9226 1.65921 13.7457L7.49992 8.29421L13.3408 13.7457C13.5303 13.9226 13.7791 14.0114 14.0279 14.0114C14.2766 14.0114 14.5254 13.9226 14.7149 13.7457C15.095 13.3911 15.095 12.8178 14.7149 12.4632L8.87423 7.01168Z"
+                fill="#4A0D4A" />
+        </g>
+        <defs>
+            <clipPath id="clip0_662_76">
+                <rect width="15" height="14" fill="white" />
+            </clipPath>
+        </defs>
+    </svg></div>
 
-<!-- //I37-Remove the following lines -->
-<app-transaction-side-bar [id]="id" (hideSideBar)="onhideSideBar()"></app-transaction-side-bar>
+</div>  
 

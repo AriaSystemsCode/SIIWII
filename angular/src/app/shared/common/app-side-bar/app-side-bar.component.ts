@@ -1,4 +1,4 @@
-import { Component, ComponentFactoryResolver, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, EventEmitter, inject, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild, ViewContainerRef } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
 @Component({
@@ -8,18 +8,19 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 })
 export class AppSideBarComponent extends AppComponentBase implements OnChanges {
 
-  //I37-dynamic component 
   @Input() entityTypeName = "";
   @Input() id: string;
   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef }) dynamicComponentContainer: ViewContainerRef;
-  componentFound: boolean = true;
+  componentFound: boolean = false;
   @Output("hideSideBar") hideSideBar: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) {
+  dynamicComp: any;
+  viewContainerRef = inject(ViewContainerRef);
+  constructor(private injector: Injector) {
     super(injector);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.componentFound = false;
     if (this.entityTypeName)
       this.loadDynamicComponent();
   }
@@ -29,16 +30,15 @@ export class AppSideBarComponent extends AppComponentBase implements OnChanges {
   async loadDynamicComponent() {
     try {
       const componentName = "app-" + this.entityTypeName + "-side-bar";
-      const componentPath = `@app/admin/sideBarComponents/${componentName}/${componentName}.component`;
-      const componentModule = await import(componentPath);
-
-      const componentType = componentModule[componentName];
-      const componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
-      const componentRef = componentFactory.create(this.injector);
-      (componentRef.instance as { id: string }).id = this.id;
-      this.dynamicComponentContainer.insert(componentRef.hostView);
-
-
+     // const componentclass = `App${componentName}SideBarComponent`;
+    
+     const { defultSideBar } = await import(`../../../admin/sideBarComponents/${componentName}/${componentName}.component`);
+      this.dynamicComp = this.viewContainerRef.createComponent(defultSideBar);
+     (this.dynamicComp.instance as { id: string }).id = this.id;
+     this.dynamicComp.instance.hideSideBar.subscribe((output) => {;
+      this.onhideSideBar();
+    });
+      this.componentFound=true;
     }
     catch (error) {
       console.error('Error loading dynamic component:', error);
