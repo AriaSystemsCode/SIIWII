@@ -15,7 +15,7 @@ namespace onetouch.Message.Dto
 		public long? MainComponentEntitlyId { get; set; }
 		public long? ParentId { get; set; }
 		public long? ThreadId { get; set; }
-		public MessageCategory MessageCategoryFilter { get; set; }
+		public string MessageCategoryFilter { get; set; }
 		
 	}
 	public enum MessageCategory
