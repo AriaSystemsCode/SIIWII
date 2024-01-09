@@ -112,7 +112,7 @@ namespace onetouch.Message
 
 //Iteration37-MMT[Start]
 .WhereIf(input.MessageCategoryFilter != null, x=>x.EntityFk.EntityCategories
-.Where(z=> z.EntityObjectCategoryCode.Replace("-",string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), input.MessageCategoryFilter.ToString())).ToString()).Count()>0)
+.Where(z=> z.EntityObjectCategoryCode.Replace("-",string.Empty) ==input.MessageCategoryFilter).Count()>0)
 //Iteration37-MMT[End]
 .WhereIf(input.messageTypeIndex == 3, x => (x.EntityFk.EntityObjectStatusId != ObjectStatusDeleted) && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId) )
                                     //xx
