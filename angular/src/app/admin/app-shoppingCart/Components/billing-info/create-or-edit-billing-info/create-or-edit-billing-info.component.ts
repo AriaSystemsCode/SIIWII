@@ -67,6 +67,12 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
       this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode=addObj.code;
       this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId=addObj.id;
       this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId=addObj.typeId;
+
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole=contactRole;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode=addObj.code;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId=addObj.id;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId=addObj.typeId;
+      
    
     }
     if (this.isContactsValid){

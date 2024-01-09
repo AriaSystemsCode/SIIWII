@@ -135,7 +135,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                 undefined,
                 undefined,
                 undefined,
-                undefined
+                undefined,true
             )
             .subscribe((res: any) => {
                 this.buyerCompanies = [...res.items];
@@ -244,7 +244,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     undefined,
                     undefined,
                     undefined,
-                    undefined
+                    undefined,true
                 )
                 .subscribe((res: any) => {
                     this.buyerCompanies = [...res.items];
@@ -276,7 +276,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     undefined,
                     undefined,
                     undefined,
-                    undefined
+                    undefined,true
                 )
                 .subscribe((res: any) => {
                     this.sellerCompanies = [...res.items];
