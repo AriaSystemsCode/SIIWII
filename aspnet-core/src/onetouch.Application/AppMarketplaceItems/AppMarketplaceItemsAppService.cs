@@ -741,8 +741,8 @@ namespace onetouch.AppMarketplaceItems
                                 firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
 
                             var firstItem = varAppItems.FirstOrDefault();
-                            List<string> attributeValues = firstItem.EntityExtraData.Select(x => x.EntityObjectTypeCode).Distinct().ToList();
-                            List<string> attributeIDs = firstItem.EntityExtraData.Select(x => x.AttributeId.ToString()).Distinct().ToList();
+                            List<string> attributeValues = firstItem.EntityExtraData.OrderBy(z=>z.AttributeId).Select(x => x.EntityObjectTypeCode).Distinct().ToList();
+                            List<string> attributeIDs = firstItem.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.AttributeId.ToString()).Distinct().ToList();
                             var firstAttributeID = firstItem.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId),
                                 a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
                                 .FirstOrDefault().ToString();
