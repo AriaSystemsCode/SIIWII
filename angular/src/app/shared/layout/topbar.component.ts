@@ -485,7 +485,7 @@ export class TopBarComponent
         this.userClickService.userClicked(target);
     }
     getUnreadMessageCount() {
-        this._MessageServiceProxy.getUnreadCounts().subscribe((result) => {
+        this._MessageServiceProxy.getUnreadCounts(null).subscribe((result) => {
             this.unreadMessageCount = result;
         });
     }

@@ -155,5 +155,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
        public string Email { set; get; }
        public string Name { set; get; } 
        public long UserId{ set; get; }
+        public Guid? UserImage { set; get; }
     }
 }

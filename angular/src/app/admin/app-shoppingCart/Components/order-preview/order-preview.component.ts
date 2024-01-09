@@ -31,11 +31,11 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         super(injector);
     }
     ngOnInit(): void {
-        if (this.transactionFormPath)
+       // if (this.transactionFormPath)
             this.loadPdf();
     }
     ngOnChanges(changes: SimpleChanges) {
-        if (this.transactionFormPath)
+       // if (this.transactionFormPath)
             this.loadPdf();
     }
     loadPdf() {
@@ -48,7 +48,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         this.printInfoParam.userId = this.appSession?.userId
         this.reportUrl = this.printInfoParam.getReportUrl()
 
-        this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(this.transactionFormPath);
+       // this.pdfPath = this.sanitizer.bypassSecurityTrustResourceUrl(this.transactionFormPath);
 
         // fetch(this.transactionFormPath)
         //     .then(response => response.blob())

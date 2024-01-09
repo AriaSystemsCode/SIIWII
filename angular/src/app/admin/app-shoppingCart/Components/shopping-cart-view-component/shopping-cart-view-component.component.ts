@@ -189,10 +189,8 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
-             //I37-entityAttachments
        this.transactionFormPath =res?.entityAttachments[0]?.url;
-       //I37-remove value
-    this.transactionFormPath =this.attachmentBaseUrl+"/attachments/2154/OrderConfirmation_361667.pdf";
+    //this.transactionFormPath =this.attachmentBaseUrl+"/attachments/2154/OrderConfirmation_361667.pdf";
 
 
             this.resetTabValidation();

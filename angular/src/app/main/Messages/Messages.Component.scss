@@ -509,3 +509,15 @@ body .btn.btn-action:after {
 .messageType a {
     color: #595959 !important;
 }
+
+
+.clickBtn {
+    background-color: white !important;
+}
+.clickBtn:focus {
+    background-color: #f5e9ff !important;
+}
+
+.clickBtn:hover {
+    background-color: transparent !important;
+}

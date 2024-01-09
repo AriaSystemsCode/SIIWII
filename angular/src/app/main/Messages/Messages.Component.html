@@ -65,11 +65,11 @@ appRootUrl() +
                                     " border="0" />
                             &nbsp; {{ "Inbox" | localize }}</a>
 
-                        <label style="text-align: center !important" *ngIf="totalUnread>0">
+                        <!-- <label style="text-align: center !important" *ngIf="totalUnread>0">
                             <span class="number-count" style="left: 10px">{{
                                 totalUnread
                                 }}</span>
-                        </label>
+                        </label> -->
                     </li>
 
                     <li>
@@ -123,10 +123,9 @@ appRootUrl() +
 
 
                 <div *ngIf="messageTypeIndex==1">
-                    <button class="btn btn-primary btn-sm ng-tns-c357-9 pb-0 m-0 ml-3" style="cursor: pointer;
+                    <button class="btn btn-primary btn-sm ng-tns-c357-9 pb-0 m-0 ml-3 clickBtn" style="cursor: pointer;
                     border-radius: 4px;
                     border: 1px solid #E2E2EA !important;
-                    background-color: #f5e9ff !important;
                     color:#A461D8 !important;height: 38px">
 
                         <span class="pr-3" style="
@@ -135,13 +134,16 @@ appRootUrl() +
                     font-style: normal;
                     font-weight: 600;
                     line-height: normal;" (click)="getPrimaryMessage()">Primary</span>
-                        <span> {{primaryCount}}</span>
+                        <label style="text-align: center !important" *ngIf="totalPrimaryUnread>0">
+                            <span  style="left: 10px">{{
+                                totalPrimaryUnread
+                                }}</span>
+                        </label>
                     </button>
 
-                    <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0" style="cursor: pointer;
+                    <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
                 border-radius: 4px;
                 border: 1px solid #E2E2EA !important;
-                background-color: transparent !important;
                 color: #F88011 !important;height: 38px" (click)="getUpdatesMessage()">
 
                         <span class="pr-3" style="
@@ -150,7 +152,11 @@ appRootUrl() +
                 font-style: normal;
                 font-weight: 600;
                 line-height: normal;">Updates</span>
-                        <span> {{updatesCount}}</span>
+                       <label style="text-align: center !important" *ngIf="totalUpdatesUnread>0">
+                        <span  style="left: 10px">{{
+                            totalUpdatesUnread
+                            }}</span>
+                    </label>
                     </button>
                 </div>
             </div>
@@ -222,11 +228,11 @@ appRootUrl() +
                                 " border="0" />
                                         &nbsp; {{ "Inbox" | localize }}</a>
 
-                                    <label style="text-align: center !important" *ngIf="totalUnread>0">
+                                    <!-- <label style="text-align: center !important" *ngIf="totalUnread>0">
                                         <span class="number-count" style="left: 10px">{{
                                             totalUnread
                                             }}</span>
-                                    </label>
+                                    </label> -->
                                 </li>
 
                                 <li>
@@ -515,14 +521,13 @@ appRootUrl() +
                     </div>
                 </div>
             </div>
-            <div [ngClass]="{ 'col-md-8': !showSideBar, 'col-md-6': showSideBar }"
+            <div [ngClass]="{ 'col-md-8': !showSideBar, 'col-md-5': showSideBar }"
              class="col d-none  d-md-block p-2 m-5 m-md-0" style="padding: 0">
                 <div *ngIf="messagesDetails">
                     <span class="subject-msg">{{ messagesDetails[0].messages.subject }}
                     </span>
                     <div class="actions-message pr-4" style="">
                         <div class="row">
-                            <!-- //I37- *ngIf=" messagesDetails[0].messages.hasSideBar" -->
                             <div class="mr-3">
                                 <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0" style="cursor: pointer;
                              border-radius: 4px;
@@ -803,7 +808,7 @@ appRootUrl() +
                 </div>
             </div>
 
-            <div class="col-md-6 col d-block  d-md-none pr-2  m-md-0" style="padding: 0"
+            <div class="col-md-5 col d-block  d-md-none pr-2  m-md-0" style="padding: 0"
                 *ngIf="displayMessageDetails && messagesDetails">
                 <div class="pl-5 row">
                     <img src="../../../assets/message/Header_arrow-back_Btn.svg" class="pointer"
@@ -812,7 +817,6 @@ appRootUrl() +
                     </div>
                     <div class="actions-message pr-4">
                         <div class="row">
-                            <!-- //I37- *ngIf=" messagesDetails[0].messages.hasSideBar" -->
                             <div class="mr-3">
                                 <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0" style="cursor: pointer;
                              border-radius: 4px;
@@ -1100,8 +1104,7 @@ appRootUrl() +
 
 
             <div class="col p-2 m-5 m-md-0" style="padding: 0;border-left: 4px solid #e7e8ef;" *ngIf="showSideBar">
-                <!-- //I37-get messagesDetails[0].messages?.entityTypeName   & messagesDetails[0].messages?.orderId -->
-                <app-app-side-bar [entityTypeName]="'transaction'" [id]="" (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
+                <app-app-side-bar [entityTypeName]="messagesDetails[0].messages?.entityObjectTypeCode" [id]="messagesDetails[0].messages?.entityId " (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
             </div>
         </div>
     </div>
