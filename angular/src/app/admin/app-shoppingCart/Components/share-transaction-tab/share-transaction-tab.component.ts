@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Injector,Output  } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
+import { AppTransactionServiceProxy } from '@shared/service-proxies/service-proxies';
+import { filter } from 'lodash';
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
   query: string;
@@ -25,6 +27,8 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   readyForSave:boolean=false;
   constructor(
     injector: Injector,
+    private _AppTransactionServiceProxy:AppTransactionServiceProxy
+
   ) {
     super(injector);
 
@@ -52,16 +56,27 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   }
   validateSelectedContact(){
     let isValidContacts=true;
-    let currentsharingList=JSON.stringify(this.sharingList);
+    let currentsharingListString=JSON.stringify(this.sharingList);
+    let currentsharingList=JSON.parse(JSON.stringify(this.sharingList));
+
+    let arrindex ;
+
     this.searchContact.forEach(function(item){
-      if(currentsharingList.includes(JSON.stringify(item))){
-        isValidContacts=false;
+      if(currentsharingListString.includes(JSON.stringify(item))){
+        debugger
+        arrindex= currentsharingList.indexOf(item);
+        currentsharingList.splice(arrindex, 1);
 
       }
     })
+    if(currentsharingList.length==0){
+      isValidContacts=false;
+
+    }
+    this.sharingList=currentsharingList;
     return isValidContacts;
   } 
-  toggleToEditMode(){
+  selectContact(value){
     this.editMode=true;
   }
 
@@ -82,20 +97,11 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   filterContacts(event: AutoCompleteCompleteEvent) {
     let filtered: any[] = [];
     let query = event.query;
-     this.contact=JSON.parse(JSON.stringify(this.sharingList));
-     this.contact.push(    {
-      id:4,
-      name:'tes4',
-      image:'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png'
-    })
-    for (let i = 0; i < (this.contact as any[]).length; i++) {
-        let contactItem = (this.contact as any[])[i];
-        if (contactItem.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-            filtered.push(contactItem); 
-        } 
-    }
+this._AppTransactionServiceProxy.getAccountConnectedContacts(query).subscribe(result=>{
+  this.suggestionsContacts=result;
+})
 
-    this.suggestionsContacts = filtered;
+
 }
   removefromShareList(id){
     this.sharingListForSave = this.sharingListForSave.filter(contact => {
