@@ -288,7 +288,12 @@ namespace onetouch.AppSiiwiiTransaction
            input.CurrencyExchangeRate = input.CurrencyExchangeRate == 0 ? 1 : input.CurrencyExchangeRate ;
 
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
-                
+                //Iteration#37 -MMT [Start]
+                if (appTrans.ShipViaFk != null)
+                    appTrans.ShipViaName = appTrans.ShipViaFk.Name;
+                if (appTrans.PaymentTermsFk != null)
+                    appTrans.PaymentTermsName= appTrans.PaymentTermsFk.Name;
+                //Iteration#37 -MMT [End]
                 if (input.lFromPlaceOrder)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 else
@@ -557,10 +562,36 @@ namespace onetouch.AppSiiwiiTransaction
                         foreach (var cont in contacts)
                         {
                             var appCont = appTrans.AppTransactionContacts.FirstOrDefault(a => a.Id == cont.Id);
-                            if  (appCont == null)
-                               await _appTransactionContactsRepository.DeleteAsync(a => a.Id == cont.Id && a.TransactionId == appTrans.Id);
+                            if (appCont == null)
+                                await _appTransactionContactsRepository.DeleteAsync(a => a.Id == cont.Id && a.TransactionId == appTrans.Id);
                             else
+                            {
+                                //Iteration37 - MMT [Start]
+                                if (appCont.ContactAddressId != null)
+                                {
+                                    var addObj = _appAddressRepository.GetAll().Where(z => z.Id == appCont.ContactAddressId).FirstOrDefault();
+                                    if (addObj != null)
+                                    {
+                                        appCont.ContactAddressCode = addObj.Code;
+                                        appCont.ContactAddressCity = addObj.City;
+                                        appCont.ContactAddressCountryId = addObj.CountryId;
+                                        appCont.ContactAddressCountryCode = addObj.CountryCode;
+                                        appCont.ContactAddressCountryFk = addObj.CountryFk;
+                                        appCont.ContactAddressLine1 = addObj.AddressLine1;
+                                        appCont.ContactAddressLine2 = addObj.AddressLine2;
+                                        appCont.ContactAddressName = addObj.Name;
+                                        appCont.ContactAddressPostalCode = addObj.PostalCode;
+                                        appCont.ContactAddressState = addObj.State;
+                                    }
+                                }
+                                else
+                                {
+                                    if (appCont.ContactAddressCode ==null)
+                                    appCont.ContactAddressCountryId = null;
+                                }
+                                //Iteration37 - MMT [Start]
                                 await _appTransactionContactsRepository.UpdateAsync(appCont);
+                            }
                         }
                     }
                     var appContSeller = appTrans.AppTransactionContacts.FirstOrDefault(a => a.ContactRole == ContactRoleEnum.Seller.ToString() && a.BranchName!=null);
@@ -607,6 +638,29 @@ namespace onetouch.AppSiiwiiTransaction
                                 BranchSSIN = appContSeller.BranchSSIN,
                                 TransactionId = appContSeller.TransactionId
                             };*/
+                            if (shipFromContact.ContactAddressId  != null)
+                            {
+                                var addObj = _appAddressRepository.GetAll().Where(z => z.Id ==shipFromContact.ContactAddressId).FirstOrDefault();
+                                if (addObj != null)
+                                {
+
+                                    shipFromContact.ContactAddressCode = addObj.Code;
+                                    shipFromContact.ContactAddressCity = addObj.City;
+                                    shipFromContact.ContactAddressCountryId = addObj.CountryId;
+                                    shipFromContact.ContactAddressCountryCode = addObj.CountryCode;
+                                    shipFromContact.ContactAddressCountryFk = addObj.CountryFk;
+                                    shipFromContact.ContactAddressLine1 = addObj.AddressLine1;
+                                    shipFromContact.ContactAddressLine2 = addObj.AddressLine2;
+                                    shipFromContact.ContactAddressName = addObj.Name;
+                                    shipFromContact.ContactAddressPostalCode = addObj.PostalCode;
+                                    shipFromContact.ContactAddressState = addObj.State;
+                                }
+                            }
+                            else
+                            {
+                                if (shipFromContact.ContactAddressCode == null)
+                                    shipFromContact.ContactAddressCountryId = null;
+                            }
                             await _appTransactionContactsRepository.UpdateAsync(shipFromContact);
                         }
                             //AR Contact [Start]
@@ -634,24 +688,48 @@ namespace onetouch.AppSiiwiiTransaction
                                 arContact.BranchSSIN = shipperBranchSSIN;
                                 arContact.ContactAddressId = sellerAddressId;
                                 arContact.ContactAddressCode = sellerAddressCode;
-                                /*var shipFromContactObj = new AppTransactionContacts
+                            /*var shipFromContactObj = new AppTransactionContacts
+                            {
+                                ContactName = appContSeller.ContactName,
+                                ContactEmail = appContSeller.ContactEmail,
+                                ContactSSIN = appContSeller.ContactSSIN,
+                                ContactPhoneTypeId = appContSeller.ContactPhoneTypeId,
+                                ContactPhoneNumber = appContSeller.ContactPhoneNumber,
+                                ContactPhoneTypeName = appContSeller.ContactPhoneTypeName,
+                                ContactAddressId = sellerAddressId,
+                                ContactAddressCode = sellerAddressCode,
+                                ContactRole = ContactRoleEnum.ShipFromContact.ToString(),
+                                CompanySSIN = appContSeller.CompanySSIN,
+                                CompanyName = appContSeller.CompanyName,
+                                BranchName = appContSeller.BranchName,
+                                BranchSSIN = appContSeller.BranchSSIN,
+                                TransactionId = appContSeller.TransactionId
+                            };*/
+                            //Iteration37 - MMT [Start]
+                            if (arContact.ContactAddressId  != null)
+                            {
+                                var addObj = _appAddressRepository.GetAll().Where(z => z.Id == arContact.ContactAddressId).FirstOrDefault();
+                                if (addObj != null)
                                 {
-                                    ContactName = appContSeller.ContactName,
-                                    ContactEmail = appContSeller.ContactEmail,
-                                    ContactSSIN = appContSeller.ContactSSIN,
-                                    ContactPhoneTypeId = appContSeller.ContactPhoneTypeId,
-                                    ContactPhoneNumber = appContSeller.ContactPhoneNumber,
-                                    ContactPhoneTypeName = appContSeller.ContactPhoneTypeName,
-                                    ContactAddressId = sellerAddressId,
-                                    ContactAddressCode = sellerAddressCode,
-                                    ContactRole = ContactRoleEnum.ShipFromContact.ToString(),
-                                    CompanySSIN = appContSeller.CompanySSIN,
-                                    CompanyName = appContSeller.CompanyName,
-                                    BranchName = appContSeller.BranchName,
-                                    BranchSSIN = appContSeller.BranchSSIN,
-                                    TransactionId = appContSeller.TransactionId
-                                };*/
-                                await _appTransactionContactsRepository.UpdateAsync(arContact);
+                                    arContact.ContactAddressCode = addObj.Code;
+                                    arContact.ContactAddressCity = addObj.City;
+                                    arContact.ContactAddressCountryId = addObj.CountryId;
+                                    arContact.ContactAddressCountryCode = addObj.CountryCode;
+                                    arContact.ContactAddressCountryFk = addObj.CountryFk;
+                                    arContact.ContactAddressLine1 = addObj.AddressLine1;
+                                    arContact.ContactAddressLine2 = addObj.AddressLine2;
+                                    arContact.ContactAddressName = addObj.Name;
+                                    arContact.ContactAddressPostalCode = addObj.PostalCode;
+                                    arContact.ContactAddressState = addObj.State; }
+                            }
+                            else
+                            {
+                                if (arContact.ContactAddressCode == null)
+                                    arContact.ContactAddressCountryId = null;
+                            }
+                            //Iteration37 - MMT [Start]
+
+                            await _appTransactionContactsRepository.UpdateAsync(arContact);
                                 //AR Contact [End]
                             }
                     }
@@ -703,6 +781,28 @@ namespace onetouch.AppSiiwiiTransaction
                                 TransactionId= appContBuyer.TransactionId
                                 
                            };*/
+                            if (shiToContact.ContactAddressId != null)
+                            {
+                                var addObj = _appAddressRepository.GetAll().Where(z => z.Id == shiToContact.ContactAddressId).FirstOrDefault();
+                                if (addObj != null)
+                                {
+                                    shiToContact.ContactAddressCode = addObj.Code;
+                                    shiToContact.ContactAddressCity = addObj.City;
+                                    shiToContact.ContactAddressCountryId = addObj.CountryId;
+                                    shiToContact.ContactAddressCountryCode = addObj.CountryCode;
+                                    shiToContact.ContactAddressCountryFk = addObj.CountryFk;
+                                    shiToContact.ContactAddressLine1 = addObj.AddressLine1;
+                                    shiToContact.ContactAddressLine2 = addObj.AddressLine2;
+                                    shiToContact.ContactAddressName = addObj.Name;
+                                    shiToContact.ContactAddressPostalCode = addObj.PostalCode;
+                                    shiToContact.ContactAddressState = addObj.State;
+                                }
+                            }
+                            else
+                            {
+                                if (shiToContact.ContactAddressCode == null)
+                                    shiToContact.ContactAddressCountryId = null;
+                            }
                             await _appTransactionContactsRepository.UpdateAsync(shiToContact);
 
                         }
@@ -732,25 +832,47 @@ namespace onetouch.AppSiiwiiTransaction
                                 apContact.ContactAddressId = buyerAddressId;
                                 apContact.ContactAddressCode = buyerAddressCode;
 
-                                /*var shipToContact = new AppTransactionContacts
-                                {
-                                    ContactName = appContBuyer.ContactName,
-                                    ContactEmail = appContBuyer.ContactEmail,
-                                    ContactSSIN = appContBuyer.ContactSSIN,
-                                    ContactPhoneTypeId = appContBuyer.ContactPhoneTypeId,
-                                    ContactPhoneNumber = appContBuyer.ContactPhoneNumber,
-                                    ContactPhoneTypeName = appContBuyer.ContactPhoneTypeName,
-                                    ContactAddressId = buyerAddressId,
-                                    ContactAddressCode = buyerAddressCode,
-                                    ContactRole = ContactRoleEnum.ShipToContact.ToString(),
-                                    CompanySSIN = appContBuyer.CompanySSIN,
-                                    CompanyName = appContBuyer.CompanyName,
-                                    BranchName = appContBuyer.BranchName,
-                                    BranchSSIN = appContBuyer.BranchSSIN,
-                                    TransactionId= appContBuyer.TransactionId
+                            /*var shipToContact = new AppTransactionContacts
+                            {
+                                ContactName = appContBuyer.ContactName,
+                                ContactEmail = appContBuyer.ContactEmail,
+                                ContactSSIN = appContBuyer.ContactSSIN,
+                                ContactPhoneTypeId = appContBuyer.ContactPhoneTypeId,
+                                ContactPhoneNumber = appContBuyer.ContactPhoneNumber,
+                                ContactPhoneTypeName = appContBuyer.ContactPhoneTypeName,
+                                ContactAddressId = buyerAddressId,
+                                ContactAddressCode = buyerAddressCode,
+                                ContactRole = ContactRoleEnum.ShipToContact.ToString(),
+                                CompanySSIN = appContBuyer.CompanySSIN,
+                                CompanyName = appContBuyer.CompanyName,
+                                BranchName = appContBuyer.BranchName,
+                                BranchSSIN = appContBuyer.BranchSSIN,
+                                TransactionId= appContBuyer.TransactionId
 
-                               };*/
-                                await _appTransactionContactsRepository.UpdateAsync(apContact);
+                           };*/
+                            if (apContact.ContactAddressId != null)
+                            {
+                                var addObj = _appAddressRepository.GetAll().Where(z => z.Id == apContact.ContactAddressId).FirstOrDefault();
+                                if (addObj != null)
+                                {
+                                    apContact.ContactAddressCode = addObj.Code;
+                                    apContact.ContactAddressCity = addObj.City;
+                                    apContact.ContactAddressCountryId = addObj.CountryId;
+                                    apContact.ContactAddressCountryCode= addObj.CountryCode;
+                                    apContact.ContactAddressCountryFk = addObj.CountryFk;
+                                    apContact.ContactAddressLine1 = addObj.AddressLine1;
+                                    apContact.ContactAddressLine2 = addObj.AddressLine2;
+                                    apContact.ContactAddressName = addObj.Name;
+                                    apContact.ContactAddressPostalCode = addObj.PostalCode;
+                                    apContact.ContactAddressState = addObj.State;
+                                }
+                            }
+                            else
+                            {
+                                if (apContact.ContactAddressCode == null)
+                                    apContact.ContactAddressCountryId = null;
+                            }
+                            await _appTransactionContactsRepository.UpdateAsync(apContact);
 
                             }
                             //AP Contact[End]
