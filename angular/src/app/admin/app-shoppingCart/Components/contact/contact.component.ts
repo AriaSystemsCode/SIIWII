@@ -252,7 +252,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 undefined,
                 undefined,
                 0,
-                30
+                30,false
             )
             .subscribe((res: PagedResultDtoOfGetAccountInformationOutputDto) => {
                 this.companeyNames = [...res.items];
@@ -384,7 +384,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                     undefined,
                     undefined,
                     undefined,
-                    undefined
+                    undefined,false
                 )
                 .subscribe((res: any) => {
                     this.companeyNames = [...res.items];
