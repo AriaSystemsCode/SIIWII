@@ -3216,8 +3216,27 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 foreach (var con in contacts)
                 {
-                    if (con.EntityFk.EntityExtraData !=null && con.EntityFk.EntityExtraData.FirstOrDefault() !=null && con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue!=null)
-                    output.Add(new ContactInformationOutputDto { Id = con.Id, Email = con.EMailAddress, Name = con.Name, UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue) });
+                    if (con.EntityFk.EntityExtraData != null && con.EntityFk.EntityExtraData.FirstOrDefault() != null && con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue != null)
+                    {
+                        try
+                        {
+                            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                            {
+                                var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
+                                if (user != null)
+                                    output.Add(new ContactInformationOutputDto
+                                    {
+                                        Id = con.Id,
+                                        Email = con.EMailAddress,
+                                        Name = con.Name,
+                                        UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
+                                        UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null
+                                    });
+                            }
+                        }
+                        catch(Exception ex)
+                        { }
+                    }
                 }
 
             }

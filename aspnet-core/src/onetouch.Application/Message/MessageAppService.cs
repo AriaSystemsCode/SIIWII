@@ -231,7 +231,7 @@ namespace onetouch.Message
                                    .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
                             //Iteration37-MMT[Start]
                             .WhereIf(input.MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
-                            .Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), input.MessageCategoryFilter.ToString())).ToString()).Count() > 0)
+                            .Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) ==  input.MessageCategoryFilter.ToString()).Count() > 0)
                             //Iteration37-MMT[End]
 
                             .WhereIf( input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
@@ -489,7 +489,7 @@ namespace onetouch.Message
         {
             if (input.MessageCategory==null)
             {
-                input.MessageCategory = MessageCategory.PRIMARYMESSAGE;
+                input.MessageCategory = ((MessageCategory)Enum.Parse(typeof(MessageCategory), (MessageCategory.PRIMARYMESSAGE).ToString())).ToString() .ToString();
             }
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -546,7 +546,7 @@ namespace onetouch.Message
             SycEntityObjectCategory messageCategory = null;
             if (input.MessageCategory != null)
             {
-                messageCategory = _sycEntityObjectCategory.GetAll().Where(z => z.Code.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), input.MessageCategory.ToString())).ToString()).FirstOrDefault();
+                messageCategory = _sycEntityObjectCategory.GetAll().Where(z => z.Code.Replace("-", string.Empty) == input.MessageCategory.ToString()).FirstOrDefault();
             }
             if (messageCategory != null)
             {
@@ -625,7 +625,7 @@ namespace onetouch.Message
                 SycEntityObjectCategory messageCategory = null;
                 if (input.CreateMessageInput.MessageCategory != null)
                 {
-                    messageCategory = _sycEntityObjectCategory.GetAll().Where(z => z.Code.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), input.CreateMessageInput.MessageCategory.ToString())).ToString()).FirstOrDefault();
+                    messageCategory = _sycEntityObjectCategory.GetAll().Where(z => z.Code.Replace("-", string.Empty) ==  input.CreateMessageInput.MessageCategory.ToString()).FirstOrDefault();
                 }
                 if (messageCategory != null)
                 {
