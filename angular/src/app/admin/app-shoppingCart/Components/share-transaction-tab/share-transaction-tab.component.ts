@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Injector,Output  } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppTransactionServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppConsts } from '@shared/AppConsts';
+import { AppTransactionServiceProxy, AppPostsServiceProxy} from '@shared/service-proxies/service-proxies';
 import { filter } from 'lodash';
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
@@ -25,8 +26,11 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   sharedBefore:boolean=true;
   editMode:boolean=true;
   readyForSave:boolean=false;
+  attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
+
   constructor(
     injector: Injector,
+    private _postService: AppPostsServiceProxy,
     private _AppTransactionServiceProxy:AppTransactionServiceProxy
 
   ) {
@@ -56,7 +60,6 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   }
   validateSelectedContact(){
     let isValidContacts=true;
-    let currentsharingListString=JSON.stringify(this.sharingList);
     let currentsharingList=JSON.parse(JSON.stringify(this.sharingList));
     let indexInsideArray;
     let arrindex ;
@@ -77,6 +80,7 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
     return isValidContacts;
   } 
   selectContact(value){
+    debugger
     this.editMode=true;
   }
 
@@ -95,10 +99,41 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
     }
 
   }
+  getProfilePictureById(id: string,contact:any,objectName:string) {
+    let contactImage;
+   const currentObject= this[objectName]
+    this._postService
+        .getProfilePictureAllByID(id)
+        .subscribe((data) => {
+            if (data.profilePicture) {
+                contactImage ="data:image/jpeg;base64," + data.profilePicture;
+                contact.userImage=contactImage;
+                if(currentObject){
+                let indexInsideArray=currentObject.findIndex(a => a.id === contact.id);
+
+                this[objectName].filter(item=>{
+                  if(item.id==contact.id) currentObject[indexInsideArray].userImage=contactImage;
+                })
+                this.suggestionsContacts=currentObject;  
+                }
+
+
+            }
+        });
+} 
   filterContacts(event: AutoCompleteCompleteEvent) {
     let filtered: any[] = [];
     let query = event.query;
 this._AppTransactionServiceProxy.getAccountConnectedContacts(query).subscribe(result=>{
+  for (let i =0; i<result.length;i++){
+    if(result[i].userImage){
+      result.filter(item=>{
+        if(item.id==result[i].id) result[i].isLoading=true;
+      })
+      this.getProfilePictureById(result[i].userImage,result[i],'suggestionsContacts');
+    }
+
+  }
   this.suggestionsContacts=result;
 })
 
@@ -121,7 +156,8 @@ this.readyForSave=true;
   }
   closeShareMode(){
     this.offShareTransactionEvent.emit();
-  }  validateEmailFormate(){
+  } 
+   validateEmailFormate(){
     let emailList=this.emailList.split(/[ ,]+/);
     var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     let emailIsValid=true;
