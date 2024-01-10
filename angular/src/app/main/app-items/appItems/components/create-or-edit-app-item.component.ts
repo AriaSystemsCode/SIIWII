@@ -1379,6 +1379,11 @@ export class CreateOrEditAppItemComponent
                 this.selectedCurrencies.push(currency);
             }
         });
+        const defaultCurrencyAlreadyAdded: boolean =
+                this.selectedCurrencies.findIndex(
+                    (item) => item.value == this.tenantDefaultCurrency.value
+                ) > -1;
+        if(!defaultCurrencyAlreadyAdded) this.selectedCurrencies.push(this.tenantDefaultCurrency) 
         this.formTouched = true;
         this.displayVariations = true;
     }
