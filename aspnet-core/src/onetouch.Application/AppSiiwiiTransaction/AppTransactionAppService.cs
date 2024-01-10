@@ -3132,6 +3132,11 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     var viewTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(FilteredAppTransaction);
                     viewTrans.EnteredByUserRole= FilteredAppTransaction.EnteredUserByRole;
+                    if (viewTrans.EntityAttachments != null && viewTrans.EntityAttachments.Count > 0)
+                    {
+                        string filePath = viewTrans.EntityAttachments[0].FileName ;
+                        viewTrans.OrderConfirmationFile = System.IO.File.ReadAllBytes(filePath);
+                    }
                     if (FilteredAppTransaction != null)
                     {
                         AppTransactionHeaders FilteredAppTransactionPrev = null;
