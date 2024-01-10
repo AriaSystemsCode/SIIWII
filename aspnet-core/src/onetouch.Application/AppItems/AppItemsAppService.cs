@@ -5355,11 +5355,17 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
                                 appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
                             }
-                            appItemSizeScalesHeader.AppItemId = appItem.Id;
+                            //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[Start]
+                            //appItemSizeScalesHeader.AppItemId = appItem.Id;
 
-                            appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                            //appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                            //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[End]
                         }
+                        //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[Start]
+                        appItemSizeScalesHeader.AppItemId = appItem.Id;
 
+                        appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                        //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[End]
                         // string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("SIZE-SCALE");
                         // scaleHeader.SizeScaleCode = (scaleHeader.ParentId == null ? "SizeScale-" : "SizeRatio-") + seq;
 
