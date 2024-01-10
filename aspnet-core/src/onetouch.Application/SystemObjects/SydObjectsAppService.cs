@@ -161,9 +161,12 @@ namespace onetouch.SystemObjects
         public async Task<IReadOnlyList<object>> GetAllLookups()
         {
             var objectLookupId = await _helper.SystemTables.GetObjectLookupId();
+            //T-SII-20231207.0003,1 MMT 01/10/2024 remove size-scale from lookups list[Start]
+            //var filteredSydObjects = _sycEntityObjectType.GetAll()
+            //            .Where(e => e.ObjectId == objectLookupId);
             var filteredSydObjects = _sycEntityObjectType.GetAll()
-                        .Where(e => e.ObjectId == objectLookupId);
-
+                        .Where(e => e.ObjectId == objectLookupId && e.Code!= "SIZE-SCALE");
+            //T-SII-20231207.0003,1 MMT 01/10/2024 remove size-scale from lookups list[End]
             // I3-13 [Begin]
             //var sydObjects = filteredSydObjects.Select(x => new { x.Id , Label = x.Name, Icon = "pi pi-fw pi-home" });
             var sydObjects = filteredSydObjects.Select(x => new { x.Id, Label = x.Name, Icon = "pi pi-fw pi-home", x.Code });
