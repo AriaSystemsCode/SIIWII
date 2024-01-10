@@ -770,7 +770,7 @@ namespace onetouch.AppMarketplaceItems
                                 //    (a.FirstOrDefault().AttributeCode.ToString() == null ? a.FirstOrDefault().AttributeValueId.ToString() : a.FirstOrDefault().AttributeCode.ToString()))
                                 //    .ToList().Distinct().ToList().Distinct().ToList();
                                 var secondAttributeValuesFor1st1 =
-                                secondAttributeValuesFor1st11.Select(a => a.AttributeValue.ToString() + "," + a.AttributeValueId.ToString()).ToList();
+                                secondAttributeValuesFor1st11.Where(z=>z.AttributeValue!=null && z.AttributeValueId != null).Select(a => a.AttributeValue.ToString() + "," + a.AttributeValueId.ToString()).ToList();
                                 //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
                                 //.ToList();
                                 if (secondAttributeValuesFor1st1 != null && secondAttributeValuesFor1st1.Count > 0)
