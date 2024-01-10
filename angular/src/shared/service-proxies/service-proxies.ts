@@ -19764,6 +19764,72 @@ export class AppTransactionServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param tansactionId (optional) 
+     * @param filter (optional) 
+     * @return Success
+     */
+    getTransactionContacts(tansactionId: number | undefined, filter: string | null | undefined): Observable<ContactInformationOutputDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetTransactionContacts?";
+        if (tansactionId === null)
+            throw new Error("The parameter 'tansactionId' cannot be null.");
+        else if (tansactionId !== undefined)
+            url_ += "tansactionId=" + encodeURIComponent("" + tansactionId) + "&";
+        if (filter !== undefined && filter !== null)
+            url_ += "filter=" + encodeURIComponent("" + filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTransactionContacts(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTransactionContacts(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ContactInformationOutputDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ContactInformationOutputDto[]>;
+        }));
+    }
+
+    protected processGetTransactionContacts(response: HttpResponseBase): Observable<ContactInformationOutputDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ContactInformationOutputDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -25161,12 +25227,13 @@ export class MessageServiceProxy {
      * @param mainComponentEntitlyId (optional) 
      * @param parentId (optional) 
      * @param threadId (optional) 
+     * @param messageCategoryFilter (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, bodyFilter: string | null | undefined, subjectFilter: string | null | undefined, messageTypeIndex: number | undefined, mainComponentEntitlyId: number | null | undefined, parentId: number | null | undefined, threadId: number | null | undefined, messageCategoryFilter: MessageCategory, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<MessagePagedResultDto> {
+    getAll(filter: string | null | undefined, bodyFilter: string | null | undefined, subjectFilter: string | null | undefined, messageTypeIndex: number | undefined, mainComponentEntitlyId: number | null | undefined, parentId: number | null | undefined, threadId: number | null | undefined, messageCategoryFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<MessagePagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Message/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -25184,9 +25251,7 @@ export class MessageServiceProxy {
             url_ += "ParentId=" + encodeURIComponent("" + parentId) + "&";
         if (threadId !== undefined && threadId !== null)
             url_ += "ThreadId=" + encodeURIComponent("" + threadId) + "&";
-        if (messageCategoryFilter === undefined || messageCategoryFilter === null)
-            throw new Error("The parameter 'messageCategoryFilter' must be defined and cannot be null.");
-        else
+        if (messageCategoryFilter !== undefined && messageCategoryFilter !== null)
             url_ += "MessageCategoryFilter=" + encodeURIComponent("" + messageCategoryFilter) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
@@ -25252,12 +25317,13 @@ export class MessageServiceProxy {
      * @param mainComponentEntitlyId (optional) 
      * @param parentId (optional) 
      * @param threadId (optional) 
+     * @param messageCategoryFilter (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllComments(filter: string | null | undefined, bodyFilter: string | null | undefined, subjectFilter: string | null | undefined, messageTypeIndex: number | undefined, mainComponentEntitlyId: number | null | undefined, parentId: number | null | undefined, threadId: number | null | undefined, messageCategoryFilter: MessageCategory, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<MessagePagedResultDto> {
+    getAllComments(filter: string | null | undefined, bodyFilter: string | null | undefined, subjectFilter: string | null | undefined, messageTypeIndex: number | undefined, mainComponentEntitlyId: number | null | undefined, parentId: number | null | undefined, threadId: number | null | undefined, messageCategoryFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<MessagePagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Message/GetAllComments?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -25275,9 +25341,7 @@ export class MessageServiceProxy {
             url_ += "ParentId=" + encodeURIComponent("" + parentId) + "&";
         if (threadId !== undefined && threadId !== null)
             url_ += "ThreadId=" + encodeURIComponent("" + threadId) + "&";
-        if (messageCategoryFilter === undefined || messageCategoryFilter === null)
-            throw new Error("The parameter 'messageCategoryFilter' must be defined and cannot be null.");
-        else
+        if (messageCategoryFilter !== undefined && messageCategoryFilter !== null)
             url_ += "MessageCategoryFilter=" + encodeURIComponent("" + messageCategoryFilter) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
@@ -69768,6 +69832,14 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     selectedBranch!: AccountBranchDto;
     selectedPhoneType!: PhoneNumberAndtype;
     selectContactPhoneNumber!: string | undefined;
+    contactAddressName!: string | undefined;
+    contactAddressLine1!: string | undefined;
+    contactAddressLine2!: string | undefined;
+    contactAddressCity!: string | undefined;
+    contactAddressState!: string | undefined;
+    contactAddressPostalCode!: string | undefined;
+    contactAddressCountryId!: number;
+    contactAddressCountryCode!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -69807,6 +69879,14 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.selectedBranch = _data["selectedBranch"] ? AccountBranchDto.fromJS(_data["selectedBranch"]) : <any>undefined;
             this.selectedPhoneType = _data["selectedPhoneType"] ? PhoneNumberAndtype.fromJS(_data["selectedPhoneType"]) : <any>undefined;
             this.selectContactPhoneNumber = _data["selectContactPhoneNumber"];
+            this.contactAddressName = _data["contactAddressName"];
+            this.contactAddressLine1 = _data["contactAddressLine1"];
+            this.contactAddressLine2 = _data["contactAddressLine2"];
+            this.contactAddressCity = _data["contactAddressCity"];
+            this.contactAddressState = _data["contactAddressState"];
+            this.contactAddressPostalCode = _data["contactAddressPostalCode"];
+            this.contactAddressCountryId = _data["contactAddressCountryId"];
+            this.contactAddressCountryCode = _data["contactAddressCountryCode"];
             this.id = _data["id"];
         }
     }
@@ -69844,6 +69924,14 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["selectedBranch"] = this.selectedBranch ? this.selectedBranch.toJSON() : <any>undefined;
         data["selectedPhoneType"] = this.selectedPhoneType ? this.selectedPhoneType.toJSON() : <any>undefined;
         data["selectContactPhoneNumber"] = this.selectContactPhoneNumber;
+        data["contactAddressName"] = this.contactAddressName;
+        data["contactAddressLine1"] = this.contactAddressLine1;
+        data["contactAddressLine2"] = this.contactAddressLine2;
+        data["contactAddressCity"] = this.contactAddressCity;
+        data["contactAddressState"] = this.contactAddressState;
+        data["contactAddressPostalCode"] = this.contactAddressPostalCode;
+        data["contactAddressCountryId"] = this.contactAddressCountryId;
+        data["contactAddressCountryCode"] = this.contactAddressCountryCode;
         data["id"] = this.id;
         return data;
     }
@@ -69870,6 +69958,14 @@ export interface IAppTransactionContactDto {
     selectedBranch: AccountBranchDto;
     selectedPhoneType: PhoneNumberAndtype;
     selectContactPhoneNumber: string | undefined;
+    contactAddressName: string | undefined;
+    contactAddressLine1: string | undefined;
+    contactAddressLine2: string | undefined;
+    contactAddressCity: string | undefined;
+    contactAddressState: string | undefined;
+    contactAddressPostalCode: string | undefined;
+    contactAddressCountryId: number;
+    contactAddressCountryCode: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -72026,6 +72122,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
     email!: string | undefined;
     name!: string | undefined;
     userId!: number;
+    userImage!: string | undefined;
 
     [key: string]: any;
 
@@ -72048,6 +72145,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
             this.email = _data["email"];
             this.name = _data["name"];
             this.userId = _data["userId"];
+            this.userImage = _data["userImage"];
         }
     }
 
@@ -72068,6 +72166,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
         data["email"] = this.email;
         data["name"] = this.name;
         data["userId"] = this.userId;
+        data["userImage"] = this.userImage;
         return data;
     }
 }
@@ -72077,6 +72176,7 @@ export interface IContactInformationOutputDto {
     email: string | undefined;
     name: string | undefined;
     userId: number;
+    userImage: string | undefined;
 
     [key: string]: any;
 }
@@ -79990,11 +80090,6 @@ export interface IGetMaintainanceForEditOutput {
     [key: string]: any;
 }
 
-export enum MessageCategory {
-    PRIMARYMESSAGE = 0,
-    UPDATEMESSAGE = 1,
-}
-
 export enum MesasgeObjectType {
     Message = 0,
     Comment = 1,
@@ -80380,7 +80475,7 @@ export class CreateMessageInput implements ICreateMessageInput {
     threadId!: number | undefined;
     mesasgeObjectType!: MesasgeObjectType;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
-    messageCategory!: MessageCategory;
+    messageCategory!: string | undefined;
 
     [key: string]: any;
 
@@ -80475,7 +80570,7 @@ export interface ICreateMessageInput {
     threadId: number | undefined;
     mesasgeObjectType: MesasgeObjectType;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
-    messageCategory: MessageCategory;
+    messageCategory: string | undefined;
 
     [key: string]: any;
 }
