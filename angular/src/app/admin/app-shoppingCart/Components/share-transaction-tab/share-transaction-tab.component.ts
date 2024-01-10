@@ -58,13 +58,13 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
     let isValidContacts=true;
     let currentsharingListString=JSON.stringify(this.sharingList);
     let currentsharingList=JSON.parse(JSON.stringify(this.sharingList));
-
+    let indexInsideArray;
     let arrindex ;
 
     this.searchContact.forEach(function(item){
-      if(currentsharingListString.includes(JSON.stringify(item))){
-        debugger
-        arrindex= currentsharingList.indexOf(item);
+      indexInsideArray=currentsharingList.findIndex(a => a.id === item.id);
+      if(indexInsideArray>0){
+        arrindex= currentsharingList.findIndex(a => a.id === item.id)
         currentsharingList.splice(arrindex, 1);
 
       }
@@ -81,9 +81,10 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   }
 
   updateSelectedContacts(){
-    let newsharingList=this.sharingList;
+    let newsharingList;
    
     if( this.validateSelectedContact()){
+      newsharingList=this.sharingList;
      this.searchContact.forEach(function(item){
       newsharingList.push(item);
 
