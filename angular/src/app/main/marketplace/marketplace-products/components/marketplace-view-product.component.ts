@@ -156,8 +156,6 @@ export class MarketplaceViewProductComponent
                         this.productDetails = res.appItem;
                         this.productDetails?.minMSRP % 1 ==0?this.productDetails.minMSRP=Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2):null; 
                         this.productDetails?.maxMSRP % 1 ==0?this.productDetails.maxMSRP=Math.round(this.productDetails.maxMSRP * 100 / 100).toFixed(2):null; 
-
-                        console.log(">> res", res);
                         this.productImages = res.appItem.entityAttachments;
                         this.productVarImages = res?.appItem?.variations;
                         let colorVariation: any[] = res.appItem.variations.filter(
@@ -347,7 +345,7 @@ export class MarketplaceViewProductComponent
 
     // total ordered Price in order by size
     calculatePriceSum(sizes): number {
-        let sum = 0;
+        let sum:any = 0;
         sizes.forEach((item) => {
             let multiby = item.price * item.orderedQty;
             sum = sum + multiby;
@@ -357,10 +355,13 @@ export class MarketplaceViewProductComponent
 
     // totla ratios in order by prepack
     getTotlaPrepackSum() {
-        let sum = 0;
+        let sum:any = 0;
         this.colorsData[this.currentIndex].sizes.forEach((item) => {
             sum = sum + item.sizeRatio;
         });
+        console.log('first pack ' , sum)
+        sum=Math.round(sum * 100 / 100).toFixed(2);
+        console.log('second pack ' , sum)
 
         return sum;
     }

@@ -96,7 +96,7 @@
                                         currencySymbol
                                      }}
                                     
-                                {{ productDetails?.minSpecialPrice }}
+                                {{ productDetails?.minSpecialPrice| currency:' ' }}
                             </h5>
                             <span
                                 *ngIf="
@@ -350,7 +350,7 @@
                                     >
                                         {{ size.sizeRatio }}
                                     </td>
-                                    <th>{{ getTotlaPrepackSum() }}</th>
+                                    <th>{{ getTotlaPrepackSum()}}</th>
                                 </tr>
                             </tbody>
                         </table>
@@ -600,7 +600,7 @@
                                                 {{
                                                     calculatePriceSum(
                                                         order.color.sizes
-                                                    ) | currency:' '
+                                                    )| currency:' '
                                                 }}
                                             </th>
                                             <th></th>
@@ -624,13 +624,13 @@
                                                                 .orderedPrePacks
                                                     }}
                                                 </td>
-                                                <td>{{ size.price }}</td>
+                                                <td>{{ size.price | currency:' '}}</td>
                                                 <td>
                                                     {{
                                                         size.sizeRatio *
                                                             order.color.sizes[0]
                                                                 .orderedPrePacks *
-                                                            size.price
+                                                            size.price | currency:' '
                                                     }}
                                                 </td>
                                             </tr>
@@ -651,7 +651,7 @@
                                                     getTotalPrepackSizeAmount(
                                                         order.color.sizes,
                                                         orderIndex
-                                                    )
+                                                    )| currency:' '
                                                 }}
                                             </th>
                                             <th></th>
