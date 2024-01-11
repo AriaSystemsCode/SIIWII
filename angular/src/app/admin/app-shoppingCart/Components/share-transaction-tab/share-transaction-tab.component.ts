@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector,Output  } from '@angular/core';
+import { Component, EventEmitter, Injector,Output,Input  } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppConsts } from '@shared/AppConsts';
 import { AppTransactionServiceProxy, AppPostsServiceProxy} from '@shared/service-proxies/service-proxies';
@@ -14,6 +14,8 @@ interface AutoCompleteCompleteEvent {
 })
 export class ShareTransactionTabComponent  extends AppComponentBase{
   @Output() offShareTransactionEvent = new EventEmitter<any>();
+  @Input("orderId") orderId:number;
+
   emailList:string;
   sharingList:any;
   sharingListForSave:any;
@@ -57,6 +59,22 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
       contact.removed=false;
     })
   this.sharingListForSave=this.sharingList;
+  this.loadContactList();
+  }
+  loadContactList(){
+    this._AppTransactionServiceProxy.getTransactionContacts(this.orderId,'').subscribe(result=>{
+      for (let i =0; i<result.length;i++){
+        if(result[i].userImage){
+          result.filter(item=>{
+            if(item.id==result[i].id) result[i].isLoading=true;
+          })
+          this.getProfilePictureById(result[i].userImage,result[i],'sharingList');
+        }
+    
+      }
+      this.sharingList=result;
+    })
+    
   }
   validateSelectedContact(){
     let isValidContacts=true;
