@@ -508,7 +508,7 @@
 
             </div>
             <div class="col-12 h-100 " *ngIf="onshare">
-                <app-share-transaction-tab (offShareTransactionEvent)="offShareTransaction()"></app-share-transaction-tab>
+                <app-share-transaction-tab [orderId]="orderId" (offShareTransactionEvent)="offShareTransaction()"></app-share-transaction-tab>
             </div>
         </div>
     </div>
