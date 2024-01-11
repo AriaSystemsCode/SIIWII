@@ -24,14 +24,18 @@
                 (onSelect)="selectContact($event)"
                 [multiple]="true">
                 <ng-template let-contact pTemplate="item">
-                    <div class="d-flex  flex-row gap-2 gap-2">
-                        <img src="{{contact.image}}" *ngIf="contact.image"  style="width: 18px;margin-right:10px;"/>
+                    <div class="d-flex  flex-row gap-2 gap-2"  *ngIf="contact"  >
+                        <img  class="userImage"
+                         [src]="contact?.userImage?contact.userImage:'assets/common/images/default-profile-picture.png'"  
+                        />
                         <div>{{ contact.name }}</div>
                     </div>
                 </ng-template>
                 <ng-template let-contact pTemplate="selectedItem">
                     <div class="d-flex  flex-row gap-2 gap-2">
-                        <img src="{{contact.image}}" *ngIf="contact.image" style="width: 18px;margin-right:10px;"/>
+                        <img   class="userImage" 
+                        [src]="contact?.userImage?contact?.userImage:'assets/common/images/default-profile-picture.png'"  
+                        />
                         <div>{{ contact.name }}</div>
                     </div>
                 </ng-template>
@@ -51,8 +55,9 @@
 
     <div class="card flex align-items-center gap-2 p-3 flex-wrap selected-contact-list w-100">
         <p-chip *ngFor="let item of sharingList" [styleClass]="item.removed ? 'pl-0 pr-2 mr-2 ml-2 removedContact':'pl-0 pr-2 mr-2 ml-2'" >
-            <img *ngIf="item.image" src="{{item.image}}" class="ng-star-inserted">
-            <span class="ml-2 font-medium"  [ngClass]="item.removed ? 'removedContact' : ''">{{item.name}}</span>
+            
+            <img *ngIf="item?.userImage" [src]="item?.userImage" />
+            <img *ngIf="!item?.userImage"  [src]="'assets/common/images/default-profile-picture.png'"  style="width: 18px;margin-right:10px;"/>            <span class="ml-2 font-medium"  [ngClass]="item.removed ? 'removedContact' : ''">{{item.name}}</span>
             <i *ngIf="!item.removed" class="fas fa-times-circle ml-auto p-2 removeShare" (click)="removefromShareList(item.id)"></i>
             <i *ngIf="item.removed" class="fas fa-redo-alt reloadContact" (click)="reloadContact(item.id)"></i>
         </p-chip>
