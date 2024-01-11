@@ -69976,6 +69976,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     firstRecord!: boolean;
     enteredDate!: moment.Moment;
     creatorUserId!: number;
+    orderConfirmationFile!: string | undefined;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -70057,6 +70058,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.firstRecord = _data["firstRecord"];
             this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
+            this.orderConfirmationFile = _data["orderConfirmationFile"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -70172,6 +70174,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["firstRecord"] = this.firstRecord;
         data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
+        data["orderConfirmationFile"] = this.orderConfirmationFile;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -70276,6 +70279,7 @@ export interface IGetAppTransactionsForViewDto {
     firstRecord: boolean;
     enteredDate: moment.Moment;
     creatorUserId: number;
+    orderConfirmationFile: string | undefined;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -70885,6 +70889,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     firstRecord!: boolean;
     enteredDate!: moment.Moment;
     creatorUserId!: number;
+    orderConfirmationFile!: string | undefined;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -70975,6 +70980,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.firstRecord = _data["firstRecord"];
             this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
+            this.orderConfirmationFile = _data["orderConfirmationFile"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -71099,6 +71105,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["firstRecord"] = this.firstRecord;
         data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
+        data["orderConfirmationFile"] = this.orderConfirmationFile;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -71212,6 +71219,7 @@ export interface IGetAllAppTransactionsForViewDto {
     firstRecord: boolean;
     enteredDate: moment.Moment;
     creatorUserId: number;
+    orderConfirmationFile: string | undefined;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;

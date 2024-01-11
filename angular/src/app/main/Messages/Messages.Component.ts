@@ -50,6 +50,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     messages: MessagesDto[] = [];
     messagesDetails: GetMessagesForViewDto[] = null;
     selectedMessage: number = 0;
+    selectedMessageIndx:number=0;
     filterText: string = "";
     bodyFilter: string = "";
     subjectFilter: string = "";
@@ -115,6 +116,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.noOfItemsToShowInitially = 5;
         this.messagesDetails = null;
         this.selectedMessage = 0;
+        this.selectedMessageIndx=0;
         this.getMesssage();
     }
 
@@ -256,6 +258,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.showMainSpinner();
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
+        this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);
 
         this._MessageServiceProxy
             .getMessagesForView(message.id)
