@@ -44,12 +44,19 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="flex align-items-center gap-1 my-2">
-                            <p-checkbox
+                            <!-- <p-checkbox
                                 value="Buyer"
                                 [disabled]="isBuyer"
                                 (click)="$event.stopPropagation()"
                                 (onChange)="selectTempBuyer()"
-                            ></p-checkbox>
+                            ></p-checkbox> -->
+                            <input
+                            type="checkbox"
+                            name="istemp"
+                            class="m-2"
+                            formControlName="istemp"
+                            (click)="selectTempBuyer()"
+                        />
                             <label for="ny" class="p-0 mb-0"
                                 >Temp Account</label
                             >
@@ -89,6 +96,7 @@
                                     (onChange)="
                                         handleBuyerCompanyChange($event)
                                     "
+                                    required
                                 ></p-dropdown>
                             </div>
                             <small
@@ -110,7 +118,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >Buyer Contact Name*</label
+                                >Buyer Contact Name</label
                             >
                             <input
                                 type="text"
@@ -151,23 +159,25 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >Buyer Mobile Number*
+                                >{{buyerPhoneLabel}}*
                             </label>
                             <input
                                 type="text"
                                 class="form-control"
-                                placeholder="Buyer Mobile Number..."
+                                placeholder="Buyer Phone Number..."
                                 formControlName="buyerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
                             />
                             <small
                                 class="text-danger"
-                                *ngIf="invalidBuyerPhoneNumber"
+                                *ngIf="invalidBuyerPhoneNumber && !orderForm
+                                .get('buyerContactPhoneNumber')
+                                ?.hasError('required')"
                             >
                                 {{ invalidBuyerPhoneNumber }}
                             </small>
-                            <small
+                            <!-- <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
@@ -177,7 +187,7 @@
                                 "
                             >
                                 phone Number is Required
-                            </small>
+                            </small> -->
                             <small
                                 class="text-danger"
                                 *ngIf="
@@ -200,13 +210,31 @@
                                 >Buyer Email*
                             </label>
                             <input
-                                type="text"
+                            type="email"
                                 name=""
                                 id=""
                                 class="form-control"
                                 placeholder="Buyer Email..."
                                 formControlName="buyerContactEMailAddress"
+                                minlength="5"
+                                maxlength="100"
+                                required
                             />
+                            
+                            <small
+                                class="text-danger"
+                                *ngIf="invalidBuyerContactEMailAddress &&
+                                !orderForm
+                                    .get('buyerContactEMailAddress')
+                                    ?.hasError('required')  && 
+                                   ! orderForm
+                                        .get('buyerContactEMailAddress')
+                                        ?.hasError('email')"
+
+                            >
+                                {{ invalidBuyerContactEMailAddress }}
+                            </small>
+
                             <small
                                 class="text-danger"
                                 *ngIf="
@@ -277,6 +305,7 @@
                                     (onChange)="
                                         handleSellerCompanyChange($event)
                                     "
+                                    required
                                 ></p-dropdown>
                             </div>
 
@@ -299,7 +328,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >Seller Contact Name*</label
+                                >Seller Contact Name</label
                             >
                             <p-dropdown
                                 [options]="sellerContacts"
@@ -326,22 +355,22 @@
                     </div>
                     <!-- seller Name -->
 
-                    <!-- mobile Number -->
+                    <!-- phone Number -->
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >Seller Mobile Number*
+                                >{{sellerPhoneLabel}}*
                             </label>
                             <input
                                 type="text"
                                 name="mobileNumber"
                                 class="form-control"
-                                placeholder="Mobile Number..."
+                                placeholder="Phone Number..."
                                 formControlName="sellerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
                             />
-                            <small
+                            <!-- <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
@@ -351,10 +380,12 @@
                                 "
                             >
                                 phone Number is Required
-                            </small>
+                            </small> -->
                             <small
                                 class="text-danger"
-                                *ngIf="invalidSellerPhoneNumber"
+                                *ngIf="invalidSellerPhoneNumber && !orderForm
+                                .get('sellerContactPhoneNumber')
+                                ?.hasError('required')"
                             >
                                 {{ invalidSellerPhoneNumber }}
                             </small>
@@ -371,7 +402,7 @@
                             </small>
                         </div>
                     </div>
-                    <!-- seller mobile number -->
+                    <!-- seller Phone number -->
 
                     <!-- Seller email -->
                     <div class="col-md-6">
@@ -380,19 +411,34 @@
                                 >Seller Email*</label
                             >
                             <input
-                                type="text"
+                            type="email"
                                 name="sellerContactEMailAddress"
                                 class="form-control"
                                 placeholder="Seller Email..."
                                 formControlName="sellerContactEMailAddress"
+                                minlength="5"
+                                maxlength="100"
+                                required
                             />
+                            <small
+                            class="text-danger"
+                            *ngIf="invalidSellerContactEMailAddress  &&
+                            !orderForm
+                                .get('sellerContactEMailAddress')
+                                ?.hasError('required')  && 
+                                ! orderForm
+                                     .get('sellerContactEMailAddress')
+                                     ?.hasError('email')"
+                        >
+                            {{ invalidSellerContactEMailAddress }}
+                        </small>
                             <small
                                 class="text-danger"
                                 *ngIf="
                                     submitted &&
                                     orderForm
                                         .get('sellerContactEMailAddress')
-                                        ?.hasError('required')
+                                        ?.hasError('required') 
                                 "
                             >
                                 Email Address is Required

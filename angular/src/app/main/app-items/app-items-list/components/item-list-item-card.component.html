@@ -24,6 +24,12 @@
                         | textSubstring: 120
                     }}
                 </p>
+                <p class="text-dark mb-2">
+                <b>Code:</b> 
+                  {{
+                    item?.itemCode
+                    }}
+                </p>
                 <div>
                     <p class="text-dark mb-2" *ngIf="item?.appItemsListItemVariations">
                         <ng-container *ngFor="let extraAttr of variationSummary.selectedVariations | keyvalue;let last as last">
@@ -50,7 +56,7 @@
                         placement="bottom right"
                         *ngIf="!viewMode"
                     >
-                        <button
+                        <!-- <button
                             class="dropdown-toggle btn btn-sm btn-action"
                             dropdownToggle
                             type="button"
@@ -81,7 +87,14 @@
                                     }}</a
                                 >
                             </li>
-                        </ul>
+                        </ul> -->
+                            <button 
+                            class="btn btn-outline-primary pl-4 pr-4"
+                            (click)="openVariationModal()"
+                            type="button"
+                        >
+                            {{ "Variation" | localize }}
+                        </button>
                     </div>
                     <div *ngIf="item.state != StateEnum.ActiveOrEmpty" [ngClass]="{ 'text-success':item.state == StateEnum.ToBeAdded, 'text-danger':item.state == StateEnum.ToBeRemoved }">
                         <span [ngSwitch]="item.state">

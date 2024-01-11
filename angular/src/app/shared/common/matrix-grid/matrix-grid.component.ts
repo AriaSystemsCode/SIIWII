@@ -26,7 +26,7 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
   @Input() reorderableColumns?: boolean = false;
   @Input() reorderableRows?: boolean = false;
   @Input() canAddCols?: boolean = false;
-  @Input() canAddRows?: boolean = false;
+  @Input() canAddRows?: boolean ;
   @Input() canRemoveCols?: boolean = false;
   @Input() canRemoveRows?: boolean = false;
   @Input() rowHeaderIsUnique:boolean = true
@@ -67,6 +67,11 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
     if(this.rowHeaderFormInput?.extraData?.length){
       // this.dropDownLists.push()
     }
+
+    if(this.cols?.columns?.length>0)
+      this.canAddRows=true;
+      else
+      this.canAddRows=false;
   }
   addNewRows(rows:MatrixGridRows[]){
     rows.forEach(row=>{
@@ -110,6 +115,12 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
         element.rowValues.splice(index,1)
       }
     })
+
+    if(this.cols?.columns?.length>0)
+      this.canAddRows=true;
+      else
+      this.canAddRows=false;
+    
   }
   hide(){
     this.active = true

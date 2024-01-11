@@ -48,7 +48,8 @@ namespace onetouch.AppItems.Dtos
         public GetAppItemExtraAttributesInput GetAppItemAttributesInputForExtraData { get; set; }
         //MMT
         public string CurrencyCode { get; set; }
-        //MMT
+
+        public string TimeZoneValue { get; set; }
 
     }
 
@@ -69,6 +70,7 @@ namespace onetouch.AppItems.Dtos
         public long[] ClassificationFilters { get; set; }
 
         public long[] CategoryFilters { get; set; }
+        public string[] ScalesFilters { get; set; }   
 
         public long[] departmentFilters { get; set; }
         public long EntityObjectTypeId { get; set; }
@@ -84,7 +86,10 @@ namespace onetouch.AppItems.Dtos
         public virtual byte PublishStatus { get; set; }
 
         public virtual byte VisibilityStatus { get; set; }
-
+        //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
+        //public virtual string ShowProducts { set; get; } = "M"; // (M (My Products) - W (My Owned Product) - P (My partner Products)) 
+        //public virtual string SharingLevel { set; get; } = "A"; // (A (All) - P (Shared Public) - R (Shared Restricted) - H (Shared Hidden) - N (Not Shared)) 
+        //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
     }
 
     public class ArrtibuteFilter
@@ -102,7 +107,10 @@ namespace onetouch.AppItems.Dtos
         MyListing,
         SharedWithMe,
         Public,
-        SharedWithMeAndPublic
+        SharedWithMeAndPublic,
+        MyOwnedItems,
+        MyPatrnersItems
+           
     }
 
     public enum SelectorOptionsEnum

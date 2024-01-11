@@ -91,6 +91,9 @@ namespace onetouch.Sessions
                 if (contactEntityExtraData != null)
                 {
                     var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
+                    //T-SII-20231118.0001,1 MMT 12/10/2023 Random error after login[Start]
+                    if (contact!=null)
+                    //T-SII-20231118.0001,1 MMT 12/10/2023 Random error after login[End]
                     output.User.MemberId = contact.Id;
                 }
                 var contactAccount = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId  && x.ParentId==null && x.PartnerId ==null);//&& x.AccountId == null

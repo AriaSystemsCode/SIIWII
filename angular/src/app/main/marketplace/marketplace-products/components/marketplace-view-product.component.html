@@ -21,8 +21,7 @@
                     <button class="btn m-0 p-0">
                         <a
                             style="text-decoration: underline"
-                            href="http://"
-                            target="_blank"
+                          (click)="goToShowroom()"
                             rel="noopener noreferrer"
                             >Visit the vitrual showroom</a
                         >
@@ -49,10 +48,14 @@
                             >
                                 <h5 class="mr-2">MSRP</h5>
                                 <h5>
-                                    {{
+                                    <!-- {{
                                         productDetails?.appItemPriceInfos[0]
                                             .currencySymbol
-                                    }}{{ productDetails?.minMSRP }}
+                                    }} -->
+                                    {{
+                                       currencySymbol
+                                    }}
+                                    {{ productDetails?.minMSRP }}
                                 </h5>
                                 <span
                                     *ngIf="
@@ -68,10 +71,14 @@
                                         productDetails?.maxMSRP
                                     "
                                 >
-                                    {{
+                                    <!-- {{
                                         productDetails?.appItemPriceInfos[0]
                                             ?.currencySymbol
-                                    }}{{ productDetails?.maxMSRP }}
+                                    }} -->
+                                    {{
+                                        currencySymbol
+                                     }}
+                                    {{ productDetails?.maxMSRP }}
                                 </h5>
                                 <h5>/EAC</h5>
                             </div>
@@ -81,10 +88,15 @@
                         >
                             <h5 class="mr-2">Special Price</h5>
                             <h5>
-                                {{
+                                <!-- {{
                                     productDetails?.appItemPriceInfos[0]
                                         .currencySymbol
-                                }}{{ productDetails?.minSpecialPrice }}
+                                }} -->
+                                    {{
+                                        currencySymbol
+                                     }}
+                                    
+                                {{ productDetails?.minSpecialPrice }}
                             </h5>
                             <span
                                 *ngIf="
@@ -100,10 +112,15 @@
                                 productDetails?.maxSpecialPrice
                                 "
                             >
-                                {{
+                                <!-- {{
                                     productDetails?.appItemPriceInfos[0]
                                         ?.currencySymbol
-                                }}{{ productDetails?.maxSpecialPrice }}
+                                }} -->
+                                    {{
+                                        currencySymbol
+                                     }}
+                                    
+                                {{ productDetails?.maxSpecialPrice }}
                             </h5>
                         </div>
                         </div>
@@ -460,13 +477,18 @@
                         <h6 class="p-0 m-0">Ordered Summary</h6>
                     </div>
                     <div class="totals">
-                        <p class="p-0 m-0">qty {{ totalOrderQTY }}</p>
+                        <p class="p-0 m-0">qty {{ totalOrderQTY  }}</p>
                         <p class="p-0 m-0">
-                            {{ totlaOrderPrices }}
-                            {{
-                                productDetails?.appItemPriceInfos[0]
-                                    .currencySymbol
-                            }}
+                             <!-- {{
+                            productDetails?.appItemPriceInfos[0]
+                                .currencySymbol
+                        }} -->
+                        {{
+                            currencySymbol
+                         }}
+                        
+                            {{ totlaOrderPrices| currency:' ' }}
+                           
                         </p>
                     </div>
                     <div class="orderedSummary">
@@ -492,7 +514,7 @@
                                         style="gap: 5px"
                                     >
                                         <img
-                                            [src]="order.color.colorImg"
+                                             [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                             alt="colorImg"
                                             style="width: 40px"
@@ -531,11 +553,11 @@
                                             <tr *ngIf="size.orderedQty !== 0">
                                                 <td>{{ size.label }}</td>
                                                 <td>{{ size.orderedQty }}</td>
-                                                <td>{{ size.price }}</td>
+                                                <td>{{ size.price| currency:' ' }}</td>
                                                 <td>
                                                     {{
-                                                        size.orderedQty *
-                                                            size.price
+                                                        (size.orderedQty *
+                                                            size.price) | currency:' '
                                                     }}
                                                 </td>
                                                 <td>
@@ -578,7 +600,7 @@
                                                 {{
                                                     calculatePriceSum(
                                                         order.color.sizes
-                                                    )
+                                                    ) | currency:' '
                                                 }}
                                             </th>
                                             <th></th>
@@ -669,7 +691,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <h6>Product Type</h6>
-                            <h6 style="padding: 10px 0px">Product Code</h6>
+                            <h6 style="padding: 10px 0px">SSIN</h6>
                             <h6>Department</h6>
                             <h6 style="padding: 10px 0px">Brand</h6>
                             <h6>SoldOut Date</h6>

@@ -109,6 +109,7 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
     this.matrixGrid.addNewRows([{ rowHeader: { label: '', value: '' }, rowValues: this.pricingHelpersService.setRowValues() }])
   }
   submit(){
+    debugger
     if(!this.isValid) return this.notify.error(this.l('FormIsInvalid'))
     const defaultCurrencyExist = this.rows.filter(item=>item.rowHeader.value == this.tenantDefaultCurrency.value).length;
     if(!defaultCurrencyExist) return this.notify.error(this.l("DefaultCurrencyMustExist"))
@@ -144,8 +145,8 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
       const currencyName : string = row.rowHeader.label
       const currencyId : number = row.rowHeader.value
       row.rowValues.forEach(cell=>{
-        if(!cell.value) return
-        const level = cell.label
+       // if(!cell.value) return
+        const level = cell?.label
         const oldItemIndex :number = getPriceInfoIndex( currencyCode, level ) 
         const item = new AppItemPriceInfo()
         if(oldItemIndex > -1) item.init(this.prices[oldItemIndex])
@@ -153,7 +154,7 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
         item.currencyId = currencyId
         item.currencyName = currencyName
         item.code = level
-        item.price = cell.value
+        item.price = cell?.value
         newPrices.push(item)
       })
     })

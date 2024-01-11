@@ -1,9 +1,10 @@
-<div class="tab-cont">
+<div class="position-relative tab-cont thin-scroll">
+
     <div *ngIf="createOrEditBillingInfo">
-    <div class="container-fluid pt-1 mb-3">
-        <div class="header my-2 d-flex align-items-center justify-content-between">
+    <div class="container-fluid pt-1 mb-3 ">
+        <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
-            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
+            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
                  {{l("Continue")}}
             </button>
         </div>
@@ -12,14 +13,13 @@
             <div class="row ml-1"> 
                 <app-contact  
                 class="w-100"
-                [shipInfoIndex]="1"
+                [billingIndexInfo]="1"
                 (loadAddressComponent)="reloadAddresscomponentAPContact($event)"
                 [isCreateOrEdit]="createOrEditBillingInfo"
                 [activeTab]="activeTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
-                (formValidityChanged)="isContactFormValid($event)"
-                [showDepartment]="activeTab ==shoppingCartoccordionTabs.BillingInfo"
+                (formValidityChanged)="isContactFormValid($event,1)"
             ></app-contact>
             </div>
         </div>
@@ -34,7 +34,7 @@
         
     </div>
     <div class="container-fluid pt-1">
-        <div class="header my-2 d-flex align-items-center justify-content-between">
+        <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">  {{l("ARContact")}} : </span></h6>
             <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()"
              class="continuebtn text-center btn float-right">
@@ -46,14 +46,13 @@
             <div class="row ml-1"> 
                 <app-contact  
                 class="w-100"
-                [shipInfoIndex]="2"
+                [billingIndexInfo]="2"
                 (loadAddressComponent)="reloadAddresscomponentARContact($event)"
                 [isCreateOrEdit]="createOrEditBillingInfo"
                 [activeTab]="activeTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
-                (formValidityChanged)="isContactFormValid($event)"
-                [showDepartment]="activeTab ==shoppingCartoccordionTabs.BillingInfo"
+                (formValidityChanged)="isContactFormValid($event,2)"
             ></app-contact>
             </div>
         </div>
@@ -69,9 +68,9 @@
 
     </div>
     <div class="container-fluid pt-1 mb-3 mt-3">
-        <div class="header my-2 d-flex align-items-center justify-content-between">
+        <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
-            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
+            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
                  {{l("Continue")}}
             </button>
         </div>
@@ -94,9 +93,16 @@
 
 
 <div *ngIf="!createOrEditBillingInfo">
-    <app-view-shipping-information
+    <app-view-billing-info
+    (showBillingEditMode)="onshowBillingEditMode($event)"
+    (onshowSaveBtn)="onshowSaveBtn($event)"
     [activeTab]="activeTab"
+    [contactIdApContact]="contactIdApContact"
+    [contactIdARContact]="contactIdARContact"
+    [createOrEditBillingInfo]="createOrEditBillingInfo"
+    [selectedAddressDetailsAp]="apContactSelectedAdd"
+    [selectedAddressDetailsAr]="arContactSelectedAdd"
     [appTransactionsForViewDto]="appTransactionsForViewDto">
-</app-view-shipping-information>
+</app-view-billing-info>
 </div>
 </div>

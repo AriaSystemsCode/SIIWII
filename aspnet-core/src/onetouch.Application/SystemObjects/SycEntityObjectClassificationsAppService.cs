@@ -649,6 +649,34 @@ namespace onetouch.SystemObjects
 
             return true;
         }
+        //MMT36
+        [AbpAllowAnonymous]
+        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>>> GetAllWithChildsForTransactionWithPaging(GetAllSycEntityObjectClassificationsInput input)
+        {
+            input.ObjectId = await _helper.SystemTables.GetObjectTransactionId();
 
+            if (input.EntityId != 0)
+            {
+                input.ExcludeIds = new List<long>();
+                var EntityRelated = await _appEntitiesAppService.GetAppEntityClassificationsWithPaging(new GetAppEntityAttributesInput { EntityId = input.EntityId });
+                if (EntityRelated != null && EntityRelated.TotalCount > 0)
+                {
+                    input.ExcludeIds.AddRange(EntityRelated.Items.Select(r => r.EntityObjectClassificationId).ToList());
+                }
+            }
+
+            PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> allParents = await GetAll(input);
+            //foreach (var item in allParents.Items)
+            //{
+            //    if (!item.Leaf)
+            //    {
+            //        await LoadChilds(item);
+            //    }
+            //}
+
+            return allParents;
+
+        }
+        //MMT36
     }
 }

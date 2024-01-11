@@ -322,6 +322,7 @@
                     <div *ngIf="createOrEditorderInfo" class="formGroup">
                         <label class="label">Exchange Rate</label>
                         <input
+                        [readonly]="appTransactionsForViewDto?.currencyExchangeRate && appTransactionsForViewDto?.currencyExchangeRate >0"
                             type="text"
                             placeholder="Exchange Rate..."
                             class="form-control w-100"

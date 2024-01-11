@@ -38,6 +38,7 @@ export class AppItemsMultiSelectionDemoComponent extends AppComponentBase implem
         undefined,
         undefined,
         undefined,
+        undefined,
         0,
         0,
         undefined,

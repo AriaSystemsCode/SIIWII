@@ -154,6 +154,7 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
       body.arrtibuteFilters,
       body.classificationFilters,
       body.categoryFilters,
+      undefined,
       body.departmentFilters,
       body.entityObjectTypeId,
       body.minimumPrice,

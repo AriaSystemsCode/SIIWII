@@ -1,4 +1,4 @@
-<div class="selected-addr-comp mb-3"  *ngIf="selectedAddress">
+<div class="selected-addr-comp mb-3"  *ngIf="selectedAddress&&isCreateOredit">
     <div class="selected-add-edit row">
         <div class="col-md-12 mb-3">
             <label class="label mt-2 mb-2">{{l("AddressType")}}</label>
@@ -20,7 +20,7 @@
         </div>
         <div class="col-md-12 mb-3" >
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
-            <textarea class="form-control w-50  d-inline-block ml-4" readonly>{{selectedAddress.name}}</textarea>
+            <textarea class="form-control w-50  d-inline-block ml-4" readonly>{{selectedAddress.addressLine1+' ,'}}{{selectedAddress.addressLine2+' ,'}}{{selectedAddress.city+' ,'}}{{selectedAddress.state+' ,'}}{{selectedAddress.countryName}}</textarea>
             <div class="pull-right">
             <button   class="savebtn text-center btn float-right" (click)="showAddressList()">
                 {{l("Change")}}
@@ -36,11 +36,15 @@
     <div class="selected-add-view row">
         <div class="col-md-12">
             <label class="label mt-2 mb-2">{{l("AddressType")}} :</label>
-            <label class="label mt-2 mb-2 add-type ml-3"></label>
+            <label class="label mt-2 mb-2 add-type ml-3" *ngIf="selectedAddressDetails"></label>
+            <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
         </div>
         <div class="col-md-12">
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}} :</label>
-            <label class="label mt-2 mb-2 selected-add ml-4">{{selectedAddress.name}}</label>   
+            <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="selectedAddressDetails">
+                {{selectedAddressDetails.addressLine1+' ,'}}{{selectedAddressDetails.addressLine2+' ,'}}{{selectedAddressDetails.city+' ,'}}{{selectedAddressDetails.state+' ,'}}{{selectedAddressDetails.countryName}}
+            </label>
+            <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
             </div>
 
             </div>

@@ -3,7 +3,7 @@ import {
   , AfterViewInit, ViewChildren, QueryList,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppTransactionServiceProxy, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -26,6 +26,7 @@ export class ShoppingCartViewComponentComponent
   implements OnInit {
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
   @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
+  @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   orderInfoValid: boolean = false;
   buyerContactInfoValid = false;
@@ -64,10 +65,12 @@ export class ShoppingCartViewComponentComponent
   transactionPosition = TransactionPosition;
   activeIndex = 0;
   showSaveBtn: boolean = false;
+  currencySymbol: string = "";
 
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+    private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     private userClickService: UserClickService,
     private router: Router
   ) {
@@ -113,12 +116,17 @@ export class ShoppingCartViewComponentComponent
   }
 
   resetTabValidation() {
-    this.orderInfoValid = false;
-    this.buyerContactInfoValid = false;
-    this.SellerContactInfoValid = false;
-    this.SalesRepInfoValid = false;
-    this.shippingInfOValid = false;
-    this.BillingInfoValid = false;
+    var valid: boolean = false;
+
+    if (this.shoppingCartDetails?.entityStatusCode?.toUpperCase() == 'OPEN')
+      valid = true;
+
+    this.orderInfoValid = valid;
+    this.buyerContactInfoValid = valid;
+    this.SellerContactInfoValid = valid;
+    this.SalesRepInfoValid = valid;
+    this.shippingInfOValid = valid;
+    this.BillingInfoValid = valid;
   }
 
   resetData() {
@@ -160,6 +168,7 @@ export class ShoppingCartViewComponentComponent
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
+
         this.loadCommentsList()
 
         //lines
@@ -173,6 +182,10 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
+            this.resetTabValidation();
+
+            this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
+
             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
             if (res.transactionType == TransactionType.PurchaseOrder)
               this.transactionType = "Purchase Order";
@@ -188,6 +201,13 @@ export class ShoppingCartViewComponentComponent
 
 
           });
+
+
+          //Currency
+            this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+                .subscribe((res: CurrencyInfoDto) => {
+                    this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+                });
         this.modal.hide();
         this.modal.show();
         this.hideMainSpinner();
@@ -335,7 +355,7 @@ export class ShoppingCartViewComponentComponent
   }
   onDelete(rowNode) {
     Swal.fire({
-      title: "Remove this post",
+      title: "Remove",
       text: "Are you sure you want to permanently remove this ?",
       showCancelButton: true,
       cancelButtonText: "No",
@@ -465,35 +485,37 @@ export class ShoppingCartViewComponentComponent
   hide() {
     this.resetData();
     this.modal.hide();
-    let indx =-1; 
-    indx= this.minimizedOrders?.findIndex(x => x.orderId == this.shoppingCartDetails?.orderId);
-    if (indx >= 0) 
-      this.minimizedOrders.splice(indx,1);
+    let indx = -1;
+    indx = this.minimizedOrders?.findIndex(x => x.orderId == this.shoppingCartDetails?.orderId);
+    if (indx >= 0)
+      this.minimizedOrders.splice(indx, 1);
     this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+    if (this.shoppingCartMode == ShoppingCartMode.view)
+      this.hideShoppingCartModal.emit(true);
   }
 
   minimizedOrders: any[] = [];
   minimizeScreen() {
-      let indx =-1; 
-      indx= this.minimizedOrders?.findIndex(x => x.orderId == this.shoppingCartDetails.orderId);
-      if (indx >= 0) {
-      }
-      else {
-        this.minimizedOrders.push({
-          orderId: this.shoppingCartDetails.orderId,
-          name: this.shoppingCartDetails.name,
-        });
-      }
-    //  this.minimize = true;
-      this.modal.hide();
+    let indx = -1;
+    indx = this.minimizedOrders?.findIndex(x => x.orderId == this.shoppingCartDetails.orderId);
+    if (indx >= 0) {
     }
+    else {
+      this.minimizedOrders.push({
+        orderId: this.shoppingCartDetails.orderId,
+        name: this.shoppingCartDetails.name,
+      });
+    }
+    //  this.minimize = true;
+    this.modal.hide();
+  }
 
   maximizeScreen(orderId: number) {
-   // this.minimize = false;
-    let indx =-1; 
-    indx= this.minimizedOrders?.findIndex(x => x.orderId == orderId);
-    if (indx >= 0) 
-      this.minimizedOrders.splice(indx,1);
+    // this.minimize = false;
+    let indx = -1;
+    indx = this.minimizedOrders?.findIndex(x => x.orderId == orderId);
+    if (indx >= 0)
+      this.minimizedOrders.splice(indx, 1);
     this.show(orderId, this.showCarousel, this.validateOrder, this.shoppingCartMode);
   }
 
@@ -582,7 +604,11 @@ export class ShoppingCartViewComponentComponent
         this.showMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-          .pipe(finalize(() => this.hideMainSpinner()))
+          .pipe(finalize(() => {
+            this.hideMainSpinner();
+            this.hide();
+          }
+          ))
           .subscribe((res) => {
             if (res) {
               Swal.fire({

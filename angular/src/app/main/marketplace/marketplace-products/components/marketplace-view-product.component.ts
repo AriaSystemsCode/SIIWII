@@ -4,17 +4,22 @@ import { AppItemViewInput } from "@app/main/app-items/app-item-view/models/app-i
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+    AppEntitiesServiceProxy,
     AppEntityAttachmentDto,
     AppItemForViewDto,
     AppItemsServiceProxy,
     AppMarketplaceItemForViewDto,
     AppMarketplaceItemsServiceProxy,
     AppTransactionServiceProxy,
+    CurrencyInfoDto,
     GetAppMarketplaceItemDetailForViewDto,
+    MarketplaceExtraDataAttrDto,
     ShoppingCartSummary,
+    TransactionType,
 } from "@shared/service-proxies/service-proxies";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageService } from "abp-ng2-module";
+import { throws } from "assert";
 import { ConfirmEventType, ConfirmationService } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
@@ -48,9 +53,15 @@ export class MarketplaceViewProductComponent
     translateX = 0;
     orderSummary: any = [];
     colorAttachmentForMainIamge: string = "";
+    orderType: string = "";
+    productVarImages: MarketplaceExtraDataAttrDto[];
+    currencySymbol: string = "";
+
+
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private confirmationService: ConfirmationService,
         private messageService: MessageService,
         private userClickService: UserClickService,
@@ -103,6 +114,11 @@ export class MarketplaceViewProductComponent
     getProductDetailsForView() {
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
+                if (res.orderType == TransactionType.SalesOrder)
+                    this.orderType = 'SO';
+                else if (res.orderType == TransactionType.PurchaseOrder)
+                    this.orderType = 'PO';
+
                 if (res.buyerSSIN)
                     this.productBodyData.buyerSSIN = res.buyerSSIN;
                 if (res.sellerSSIN)
@@ -138,8 +154,12 @@ export class MarketplaceViewProductComponent
                     )
                     .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
                         this.productDetails = res.appItem;
+                        this.productDetails?.minMSRP % 1 ==0?this.productDetails.minMSRP=Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2):null; 
+                        this.productDetails?.maxMSRP % 1 ==0?this.productDetails.maxMSRP=Math.round(this.productDetails.maxMSRP * 100 / 100).toFixed(2):null; 
+
                         console.log(">> res", res);
                         this.productImages = res.appItem.entityAttachments;
+                        this.productVarImages = res?.appItem?.variations;
                         let colorVariation: any[] = res.appItem.variations.filter(
                             (variation: any) => variation.extraAttrName === "COLOR"
                         );
@@ -165,8 +185,17 @@ export class MarketplaceViewProductComponent
                             };
                         });
                     });
+
+                this.GetCurrencyInfo();
             }
             );
+    }
+
+    GetCurrencyInfo() {
+        this._AppEntitiesServiceProxy.getCurrencyInfo(this.productBodyData.currencyCode)
+            .subscribe((res: CurrencyInfoDto) => {
+                this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+            });
     }
 
     isColorView: boolean = false
@@ -174,6 +203,7 @@ export class MarketplaceViewProductComponent
         this.currentIndex = index;
         this.isColorView = true
         this.colorAttachmentForMainIamge = this.colorsData[index].colorImg;
+        this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex].entityAttachments;
         console.log(this.colorsData[index]);
     }
     setColorView(value: boolean) {
@@ -425,7 +455,7 @@ export class MarketplaceViewProductComponent
                 this.showMainSpinner();
                 this._AppTransactionServiceProxy
                     .addTransactionDetails(
-                        localStorage.getItem("transNO"),
+                        localStorage.getItem("transNO"), this.orderType,
                         bodyRequest
                     )
                     .pipe(
@@ -455,7 +485,18 @@ export class MarketplaceViewProductComponent
 
     }
 
+    goToShowroom() {
+        localStorage.setItem(
+            "SellerSSIN",
+            JSON.stringify(this.productBodyData.sellerSSIN)
+        );
+        localStorage.setItem(
+            "currencyCode",
+            JSON.stringify(this.productBodyData.currencyCode)
+        );
 
+        this.router.navigateByUrl("app/main/marketplace/products");
+    }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

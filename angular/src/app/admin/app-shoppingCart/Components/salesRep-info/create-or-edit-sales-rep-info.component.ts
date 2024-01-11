@@ -91,11 +91,14 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
 
   isContactsValid: boolean = false;
   isContactFormValid(value) {
+    if(this.activeTab==this.shoppingCartoccordionTabs.SalesRepInfo)
+    {
     this.isContactsValid = value;
     if (value) {
       this.isContactsValid = true;
       this.SalesRepInfoValid.emit(ShoppingCartoccordionTabs.SalesRepInfo);
     }
+  }
 
   }
 

@@ -86,6 +86,8 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
 
   isContactsValid: boolean = false;
   isContactFormValid(value) {
+    if(this.activeTab==this.shoppingCartoccordionTabs.BuyerContactInfo ||this.activeTab==this.shoppingCartoccordionTabs.SellerContactInfo)
+    {
     this.isContactsValid = value;
     if (value) {
       this.isContactsValid = true;
@@ -95,6 +97,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
       if (this.activeTab == this.shoppingCartoccordionTabs.SellerContactInfo)
         this.buyer_seller_contactInfoValid.emit(ShoppingCartoccordionTabs.SellerContactInfo);
     }
+  }
 
   }
 

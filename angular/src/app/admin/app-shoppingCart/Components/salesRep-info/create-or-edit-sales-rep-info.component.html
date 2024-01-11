@@ -5,9 +5,6 @@
                 <div class="header p-3 my-2 d-flex align-items-center justify-content-between p-2">
                     <h6 *ngIf="salesRepIndex>0"><span class="headertxt"> Sales Rep {{salesRepIndex}} : </span></h6>
                     <div>
-                        <button  class="addbtn mr-3" (click)="addNewSalesRep()" *ngIf="salesReps?.length <= 2">
-                            Add <i class="fa fa-plus" style="color:#F88011"></i>
-                        </button>
                         <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
                             *ngIf="salesRepIndex==0 &&!showSaveBtn " class="continuebtn text-center btn float-right">
                             Continue
@@ -42,6 +39,11 @@
                 <hr class="my-2" *ngIf="salesRepIndex>0" />
             </div>
         </div>
+        <br/>
+        <button  class="addbtn mr-3" (click)="addNewSalesRep()" *ngIf="salesReps?.length <= 2">
+            Add <i class="fa fa-plus" style="color:#F88011"></i>
+        </button>
+        <br/><br/>
     </div>
 
     <div *ngIf="!createOrEditSalesRepInfo">

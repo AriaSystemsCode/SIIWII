@@ -84,9 +84,11 @@ export class LanguageTextsComponent extends AppComponentBase implements AfterVie
             this.sourceName = params['sourceName'] || 'onetouch';
             this.targetValueFilter = params['targetValueFilter'] || 'ALL';
             this.filterText = params['filterText'] || '';
+            
+            this.getLanguageTexts();
 
             this.reloadPage();
-        });
+        }); 
     }
 
     reloadPage(): void {

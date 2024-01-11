@@ -59,6 +59,10 @@ using onetouch.AppMarketplaceItems;
 using Z.EntityFramework.Plus;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using onetouch.AppMarketplaceItemLists;
+using Abp.Extensions;
+using onetouch.Attachments;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
+using Org.BouncyCastle.Utilities.Encoders;
 
 namespace onetouch.AppItems
 {
@@ -79,6 +83,7 @@ namespace onetouch.AppItems
         private readonly IAppNotifier _appNotifier;
         private readonly IConfigurationRoot _appConfiguration;
         //MMT
+        private readonly IRepository<AppAttachment, long> _appAttachmentRepository;
         private readonly IRepository<SycEntityObjectType, long> _sycEntityObjectTypeRepository;
         private readonly IRepository<AppEntityAttachment, long> _appEntityAttachmentRepository;
         private readonly ISycEntityObjectClassificationsAppService _sycEntityObjectClassificationsAppService;
@@ -91,10 +96,11 @@ namespace onetouch.AppItems
         private readonly AppSizeScaleAppService _appSizeScaleAppService;
         private readonly IRepository<AppSizeScalesHeader, long> _appSizeScalesHeaderRepository;
         //MMT33
-        private readonly IRepository<AppMarketplaceItemSharing , long> _appMarketplaceItemSharing;
-        private readonly IRepository<AppMarketplaceItem, long> _appMarketplaceItem;
+        private readonly IRepository<AppMarketplaceItemSharings , long> _appMarketplaceItemSharing;
+        private readonly IRepository<AppMarketplaceItems.AppMarketplaceItems, long> _appMarketplaceItem;
         private readonly IRepository<AppMarketplaceItemPrices, long> _appMarketplaceItemPricesRepository;
         //MMT33
+        TimeZoneInfoAppService _timeZoneInfoAppService;
         //MMT
         private readonly IRepository<AppItemSelector, long> _appItemSelectorRepository;
         private readonly Helper _helper;
@@ -124,12 +130,14 @@ namespace onetouch.AppItems
             AppSizeScaleAppService appSizeScaleAppService,
             IRepository<AppItemsListDetail, long> appItemsListDetailRepository, IRepository<SycCounter, long> SycCounter, IRepository<SydObject, long> syObjectRepository,
             IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
-            IRepository<AppMarketplaceItem, long> appMarketplaceItem,IRepository<AppMarketplaceItemSharing, long> appMarketplaceItemSharing,
+            IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem,IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
-            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository
+            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService
             )
         {
             //MMT33-2
+            _timeZoneInfoAppService = timeZoneInfoAppService;
+            _appAttachmentRepository = appAttachmentRepository;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
             _appEntityAttachmentRepository = appEntityAttachment;
             _appMarketplaceItem = appMarketplaceItem;
@@ -196,6 +204,12 @@ namespace onetouch.AppItems
                     input.CategoryFilters = new long[] { };
                 if (input.departmentFilters == null)
                     input.departmentFilters = new long[] { };
+                //xx
+                if (input.ScalesFilters == null)
+                    input.ScalesFilters = new string[] { };
+
+                var allScales = input.ScalesFilters.ToList();
+                //xx
                 var allCategories = input.CategoryFilters.ToList();
                 allCategories.AddRange(input.departmentFilters.ToList());
                 input.CategoryFilters = allCategories.ToArray();
@@ -205,7 +219,7 @@ namespace onetouch.AppItems
                 {
                     SelectedItems = _appItemSelectorRepository.GetAll().Where(e => e.Key == input.SelectorKey).Select(e => e.SelectedId).ToList();
                 }
-                if ( input.SelectorOnly == true )
+                if (input.SelectorOnly == true)
                 {
                     input.SkipCount = 0;
                     input.MaxResultCount = SelectedItems.Count;
@@ -216,7 +230,8 @@ namespace onetouch.AppItems
                     input.ArrtibuteFilters = new List<ArrtibuteFilter>();
                 var attrs = input.ArrtibuteFilters.Select(r => r.ArrtibuteValueId).ToList();
                 #endregion
-                var filteredAppItems = _appItemRepository.GetAll().AsNoTracking().Select(x => new {
+                var filteredAppItems = _appItemRepository.GetAll().AsNoTracking().Include(x=>x.ItemSizeScaleHeadersFkList).Select(x => new
+                {
                     x.PublishedListingItemFkList,
                     x.TenantId,
                     x.Code,
@@ -231,7 +246,11 @@ namespace onetouch.AppItems
                     x.ParentId,
                     x.SharingLevel,
                     x.ItemType,
-                    x.PublishedListingItemFk
+                    x.PublishedListingItemFk,
+                    x.TenantOwner,
+                    x.SSIN,
+                    x.ItemSizeScaleHeadersFkList
+
                 })
                 .WhereIf(input.ArrtibuteFilters != null && input.ArrtibuteFilters.Count() > 0,
                 e =>
@@ -240,80 +259,173 @@ namespace onetouch.AppItems
                 (e.ParentFkList != null &&
                 e.ParentFkList.Where(x1 => x1.EntityFk.EntityExtraData.Where(x2 => attrs.Contains((long)x2.AttributeValueId)).Count() > 0).Count() > 0)
                 )
+                //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
+                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyItems || input.FilterType == ItemsFilterTypesEnum.MyListing, a => a.TenantId == AbpSession.TenantId)
+                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyOwnedItems, a => a.TenantId == AbpSession.TenantId && a.TenantOwner == AbpSession.TenantId)
+                .WhereIf(input.FilterType == ItemsFilterTypesEnum.MyPatrnersItems, a => a.TenantId == AbpSession.TenantId && a.TenantOwner != AbpSession.TenantId)
+                //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
+                //xx
+                .WhereIf(input.ScalesFilters != null && input.ScalesFilters.Count() > 0 , a => a.ItemSizeScaleHeadersFkList.Where(r=>allScales.Contains(r.Name.TrimEnd())).Count()>0)
+                //xx
                 .WhereIf(input.AppItemListId != null && input.AppItemListId > 0, e => AppItemListDetails.Contains(e.Id))
                 .WhereIf(input.SelectorOnly == true && SelectedItems != null && SelectedItems.Count() > 0, e => SelectedItems.Contains(e.Id))
-                .WhereIf(input.VisibilityStatus > 0, e => e.PublishedListingItemFkList.Where(r => r.SharingLevel == input.VisibilityStatus).Count() > 0)
-                .WhereIf(input.PublishStatus > 0, e => (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count > 0 && input.PublishStatus == 1) || ((e.PublishedListingItemFkList == null || (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count == 0)) && input.PublishStatus == 2))
-                .WhereIf(input.ListingStatus > 0, e => (e.ListingItemFkList != null && e.ListingItemFkList.Count > 0 && input.ListingStatus == 2) || ((e.ListingItemFkList == null || (e.ListingItemFkList != null && e.ListingItemFkList.Count == 0)) && input.ListingStatus == 1))
+                //.WhereIf(input.VisibilityStatus > 0, e => e.PublishedListingItemFkList.Where(r => r.SharingLevel == input.VisibilityStatus).Count() > 0)
+                //.WhereIf(input.PublishStatus > 0, e => (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count > 0 && input.PublishStatus == 1) || ((e.PublishedListingItemFkList == null || (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count == 0)) && input.PublishStatus == 2))
+               // .WhereIf(input.ListingStatus > 0, e => (e.ListingItemFkList != null && e.ListingItemFkList.Count > 0 && input.ListingStatus == 2) || ((e.ListingItemFkList == null || (e.ListingItemFkList != null && e.ListingItemFkList.Count == 0)) && input.ListingStatus == 1))
                 .WhereIf(input.EntityObjectTypeId > 0, e => e.EntityFk.EntityObjectTypeId == input.EntityObjectTypeId)
                 .WhereIf(input.CategoryFilters != null && input.CategoryFilters.Count() > 0, e => e.EntityFk.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
                 .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.Description.Contains(input.Filter))
-                .Where(x => x.ParentId == null &&
-                (
-                (input.FilterType == ItemsFilterTypesEnum.MyItems && x.ItemType == input.ItemType && x.TenantId == AbpSession.TenantId && x.SharingLevel == 0)
-                || (input.FilterType == ItemsFilterTypesEnum.MyListing && x.ItemType == input.ItemType && x.TenantId == AbpSession.TenantId && x.SharingLevel == 0)
-                || ((input.FilterType == ItemsFilterTypesEnum.Public)
-                      && x.SharingLevel == 1 && x.ItemType == input.ItemType)
-                || ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
-                      && x.TenantId != AbpSession.TenantId && (x.SharingLevel == 2 || x.SharingLevel == 1) && x.ItemType == input.ItemType
-                      && x.PublishedListingItemFk.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)
-                || (
-                        (input.FilterType == ItemsFilterTypesEnum.SharedWithMeAndPublic && x.ItemType == input.ItemType)
-                        &&
-                        (
-                            (
-                              (x.SharingLevel == 2 || x.SharingLevel == 1) && x.PublishedListingItemFk.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0
-                            )
-                            ||
-                            (
-                                x.SharingLevel == 1
-                            )
-                        )
-                    )
-                        ));
+                    //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
+                    //.Where(x => x.ParentId == null &&
+                    //(
+                    //(input.FilterType == ItemsFilterTypesEnum.MyItems && x.ItemType == input.ItemType && x.TenantId == AbpSession.TenantId && x.SharingLevel == 0)
+                    //|| (input.FilterType == ItemsFilterTypesEnum.MyListing && x.ItemType == input.ItemType && x.TenantId == AbpSession.TenantId && x.SharingLevel == 0)
+                    //|| ((input.FilterType == ItemsFilterTypesEnum.Public)
+                    //     && x.SharingLevel == 1 && x.ItemType == input.ItemType)
+                    //|| ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
+                    //    && x.TenantId != AbpSession.TenantId && (x.SharingLevel == 2 || x.SharingLevel == 1) && x.ItemType == input.ItemType
+                    // && x.PublishedListingItemFk.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)
+                    //|| (
+                    //      (input.FilterType == ItemsFilterTypesEnum.SharedWithMeAndPublic && x.ItemType == input.ItemType)
+                    //    &&
+                    //  (
+                    //    (
+                    //    (x.SharingLevel == 2 || x.SharingLevel == 1) && x.PublishedListingItemFk.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0
+                    // )
+                    //   ||
+                    // (
+                    //            x.SharingLevel == 1
+                    //        )
+                    //    )
+                    //)
+                    //    )
+                    //    );
+                    //D-SII-20230918.0001,1 MMT 09/19/2023 Display Items only and exclude listing[T-SII-20230829.0001][Start]
+                    //.Where(x => x.ParentId == null);
+                    .Where(x => x.ParentId == null && x.TenantId == AbpSession.TenantId && x.ItemType ==0);
+                    //D-SII-20230918.0001,1 MMT 09/19/2023 Display Items only and exclude listing[T-SII-20230829.0001][End]
+                //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[END]
 
-                var filteredOrderedAppItems = filteredAppItems.OrderBy(input.Sorting ?? "id asc")
-                  .PageBy(input);
-                var appItems = from o in filteredOrderedAppItems
-                                   //               .WhereIf(input.ArrtibuteFilters != null && input.ArrtibuteFilters.Count() > 0,
-                                   //e =>
-                                   //(e.EntityFk.EntityExtraData != null && e.EntityFk.EntityExtraData.Where(r => attrs.Contains(((long)r.AttributeValueId))).Count() > 0)
-                                   //||
-                                   //(e.ParentFkList != null &&
-                                   //e.ParentFkList.Where(x1 => x1.EntityFk.EntityExtraData.Where(x2 => attrs.Contains((long)x2.AttributeValueId)).Count() > 0).Count() > 0)
-                                   //)
-                                   //.WhereIf(input.VisibilityStatus > 0, e => e.PublishedListingItemFkList.Where(r => r.SharingLevel == input.VisibilityStatus).Count() > 0)
-                                   //.WhereIf(input.PublishStatus > 0, e => (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count > 0 && input.PublishStatus == 1) || ((e.PublishedListingItemFkList == null || (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count == 0)) && input.PublishStatus == 2))
-                                   //.WhereIf(input.ListingStatus > 0, e => (e.ListingItemFkList != null && e.ListingItemFkList.Count > 0 && input.ListingStatus == 2) || ((e.ListingItemFkList == null || (e.ListingItemFkList != null && e.ListingItemFkList.Count == 0)) && input.ListingStatus == 1))
-                                   //.WhereIf(input.EntityObjectTypeId > 0, e => e.EntityFk.EntityObjectTypeId == input.EntityObjectTypeId)
-                                   //.WhereIf(input.CategoryFilters != null && input.CategoryFilters.Count() > 0, e => e.EntityFk.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
-                                   //.WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
-                                   //.WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.Description.Contains(input.Filter))
+
+                //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
+                //var filteredOrderedAppItems = filteredAppItems.OrderBy(input.Sorting ?? "id asc");
+                //  .PageBy(input);
+                var filteredOrderedAppItems = filteredAppItems.OrderBy(input.Sorting ?? "id asc");
+                
+                IQueryable<GetAppItemForViewDto> appItems = null;
+                
+                if (input.PublishStatus==0)
+                {
+                    appItems = from d in filteredOrderedAppItems
+                               join
+                                          m in _appMarketplaceItem.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId)
+                                          on d.SSIN equals m.Code into j1
+                               from j2 in j1.DefaultIfEmpty()
                                select new GetAppItemForViewDto()
                                {
                                    AppItem = new AppItemDto
                                    {
-                                       Code = o.Code,
-                                       Name = o.Name,
-                                       Description = o.EntityFk.Notes,
-                                       Price = o.Price,
-                                       Id = o.Id,
-                                       Listed = o.ListingItemFkList.Count() > 0,
-                                       Published = o.PublishedListingItemFkList.Count() > 0,
-                                       ImageUrl = (o.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
-                                        (o.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.TenantId + "/" + o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
-                                        : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
+
+                                       Code = d.Code,
+                                       Name = d.Name,
+                                       Description = d.EntityFk.Notes,
+                                       Price = d.Price,
+                                       Id = d.Id,
+                                      
+                                       SSIN = d.SSIN,
+                                       SharingLevel = j2.SharingLevel != null ? j2.SharingLevel.ToString() : null,
+                                    
+                                       Listed = d.ListingItemFkList.Count() > 0,
+                                       // Published = d.PublishedListingItemFkList.Count() > 0,
+                                       ImageUrl = (d.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                                   (d.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + d.TenantId + "/" + d.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                                   : "attachments/" + (d.TenantId.HasValue ? d.TenantId : -1) + "/" + d.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
                                    },
-                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false
+                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(d.Id)) ? true : false
 
                                };
-                var appItemsList = await appItems.ToListAsync();
+                }
+                else
+                {
+                    if (input.PublishStatus != 3) //(input.SharingLevel != "N")
+                    {
+                        var joined = filteredOrderedAppItems.Join(_appMarketplaceItem.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId)
+                                                  .WhereIf(input.PublishStatus == 1, a => a.SharingLevel == 1)
+                                               .WhereIf(input.PublishStatus == 2, a => a.SharingLevel == 2)
+                                               .WhereIf(input.PublishStatus == 4, a => a.SharingLevel == 4),
+                                           //  .WhereIf(input.SharingLevel == "N", a => a == null || a.SharingLevel == 3),
+                       x => x.SSIN.Trim(), sa => sa.Code.Trim(), (s, sa) => new { item = s, marketplaceItem = sa });
+                        appItems = from o in joined
+                                   select new GetAppItemForViewDto()
+                                   {
+                                       AppItem = new AppItemDto
+                                       {
+                                           Code = o.item.Code,
+                                           Name = o.item.Name,
+                                           Description = o.item.EntityFk.Notes,
+                                           Price = o.item.Price,
+                                           Id = o.item.Id,
+                                          
+                                           SSIN = o.item.SSIN,
+                                           SharingLevel = o.marketplaceItem != null ? o.marketplaceItem.SharingLevel.ToString() : null,
+                                           //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
+                                           Listed = o.item.ListingItemFkList.Count() > 0,
+                                           Published = o.item.PublishedListingItemFkList.Count() > 0,
+                                           ImageUrl = (o.item.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                                            (o.item.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.item.TenantId + "/" + o.item.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                                            : "attachments/" + (o.item.TenantId.HasValue ? o.item.TenantId : -1) + "/" + o.item.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
+                                       },
+                                       Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.item.Id)) ? true : false
+
+                                   };
+                    }
+                    else
+                    {
+                        // var appItemsJoin 
+                        //var appItemsJoin
+                            appItems = from d in filteredOrderedAppItems join
+                                             m in _appMarketplaceItem.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId && a.SharingLevel == 3)
+                                             on d.SSIN equals m.Code into j1
+                                       from j2 in j1.DefaultIfEmpty()
+                                       select new GetAppItemForViewDto()
+                                             {
+                                                 AppItem = new AppItemDto
+                                                 {
+
+                                                     Code = d.Code,
+                                                     Name = d.Name,
+                                                     Description = d.EntityFk.Notes,
+                                                     Price =d.Price,
+                                                     Id = d.Id,
+                                                     //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
+                                                     SSIN =d.SSIN,
+                                                     SharingLevel = j2.SharingLevel != null ? j2.SharingLevel.ToString() : null,
+                                                     //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
+                                                     Listed =d.ListingItemFkList.Count() > 0,
+                                                     // Published = d.PublishedListingItemFkList.Count() > 0,
+                                                     ImageUrl = (d.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                                           (d.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + d.TenantId + "/" + d.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                                           : "attachments/" + (d.TenantId.HasValue ? d.TenantId : -1) + "/" + d.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
+                                                 },
+                                                 Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(d.Id)) ? true : false
+
+                                             };
+                       
+
+                    }
+                }
+                
+                           
+               
+                var appItemsPage = appItems.PageBy(input);
+
+                var appItemsList = await appItemsPage.ToListAsync();
                 if (input.SelectorOnly != null && input.SelectorOnly == true)
                 {
                     appItemsList = appItemsList.Where(e => e.Selected).ToList();
                 }
-                var totalCount = await filteredAppItems.CountAsync();
+                var totalCount = await appItems.CountAsync();
 
                 stopwatch.Stop();
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
@@ -324,133 +436,133 @@ namespace onetouch.AppItems
                 );
             }
         }
-        public async Task<PagedResultDto<GetAppItemForViewDto>> old_GetAll(GetAllAppItemsInput input)
-        {
-            var stopwatch = new System.Diagnostics.Stopwatch();
-            stopwatch.Start();
-            #region prepare parameters
-            if (input.FilterType == ItemsFilterTypesEnum.MyItems)
-            { input.ItemType = 0; }
-            if (input.FilterType == ItemsFilterTypesEnum.MyListing)
-            { input.ItemType = 1; }
-            if (input.FilterType == ItemsFilterTypesEnum.Public ||
-                input.FilterType == ItemsFilterTypesEnum.SharedWithMe ||
-                input.FilterType == ItemsFilterTypesEnum.SharedWithMeAndPublic)
-            { input.ItemType = 2; }
-            input.Sorting = input.Sorting ?? "id";
-            List<long> AppItemListDetails = new List<long>();
-            if (input.AppItemListId != null && input.AppItemListId > 0)
-            {
-                AppItemListDetails = _appItemsListDetailRepository.GetAll().Where(x => x.ItemsListId == input.AppItemListId).Select(x => x.ItemId).ToList();
-            }
-            //if (input.SelectorOption == null)
-            //{ input.SelectorOption = SelectorOptionsEnum.NONE; }
-            #endregion prepare parameters
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                #region merge categories and departments
-                if (input.CategoryFilters == null)
-                    input.CategoryFilters = new long[] { };
-                if (input.departmentFilters == null)
-                    input.departmentFilters = new long[] { };
-                var allCategories = input.CategoryFilters.ToList();
-                allCategories.AddRange(input.departmentFilters.ToList());
-                input.CategoryFilters = allCategories.ToArray();
-                #endregion merge categories and departments
-                List<long> SelectedItems = new List<long>();
-                if (input.SelectorKey != null)
-                {
-                    SelectedItems = _appItemSelectorRepository.GetAll().Where(e => e.Key == input.SelectorKey).Select(e => e.SelectedId).ToList();
-                }
-                //get curr tenant id to pass to the sp
-                input.TenantId = AbpSession.TenantId;
-                if (input.ArrtibuteFilters == null)
-                    input.ArrtibuteFilters = new List<ArrtibuteFilter>();
-                var attrs = input.ArrtibuteFilters.Select(r => r.ArrtibuteValueId).ToList();
-                var filteredAppItems = _appItemRepository.GetAll()
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
-                //  .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories).OrderBy("id")
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                .Include(x => x.ParentFkList)
-                .Include(x => x.ListingItemFkList)
-                .Include(x => x.PublishedListingItemFkList)
-                .WhereIf(input.AppItemListId != null && input.AppItemListId > 0, e => AppItemListDetails.Contains(e.Id))
-                .WhereIf(input.ArrtibuteFilters != null && input.ArrtibuteFilters.Count() > 0,
-                e =>
-                (e.EntityFk.EntityExtraData != null && e.EntityFk.EntityExtraData.Where(r => attrs.Contains(((long)r.AttributeValueId))).Count() > 0)
-                ||
-                (e.ParentFkList != null &&
-                e.ParentFkList.Where(x1 => x1.EntityFk.EntityExtraData.Where(x2 => attrs.Contains((long)x2.AttributeValueId)).Count() > 0).Count() > 0)
-                )
-                .WhereIf(input.VisibilityStatus > 0, e => e.PublishedListingItemFkList.Where(r => r.SharingLevel == input.VisibilityStatus).Count() > 0)
-                .WhereIf(input.PublishStatus > 0, e => (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count > 0 && input.PublishStatus == 1) || ((e.PublishedListingItemFkList == null || (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count == 0)) && input.PublishStatus == 2))
-                .WhereIf(input.ListingStatus > 0, e => (e.ListingItemFkList != null && e.ListingItemFkList.Count > 0 && input.ListingStatus == 2) || ((e.ListingItemFkList == null || (e.ListingItemFkList != null && e.ListingItemFkList.Count == 0)) && input.ListingStatus == 1))
-                .WhereIf(input.EntityObjectTypeId > 0, e => e.EntityFk.EntityObjectTypeId == input.EntityObjectTypeId)
-                .WhereIf(input.CategoryFilters != null && input.CategoryFilters.Count() > 0, e => e.EntityFk.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
-                .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
-                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.Description.Contains(input.Filter))
-                //.Where(x => ((xx.Contains(x.Id) || true) &&
-                .Where(x => x.ParentId == null &&
-                (
-                (input.FilterType == ItemsFilterTypesEnum.MyItems && x.ItemType == input.ItemType && x.TenantId == AbpSession.TenantId && x.SharingLevel == 0)
-                || (input.FilterType == ItemsFilterTypesEnum.MyListing && x.ItemType == input.ItemType && x.TenantId == AbpSession.TenantId && x.SharingLevel == 0)
-                || ((input.FilterType == ItemsFilterTypesEnum.Public)
-                      && x.SharingLevel == 1 && x.ItemType == input.ItemType)
-                || ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
-                      && x.TenantId != AbpSession.TenantId && (x.SharingLevel == 2 || x.SharingLevel == 1) && x.ItemType == input.ItemType
-                      && x.PublishedListingItemFk.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)
-                || (
-                        (input.FilterType == ItemsFilterTypesEnum.SharedWithMeAndPublic && x.ItemType == input.ItemType)
-                        &&
-                        (
-                            (
-                              (x.SharingLevel == 2 || x.SharingLevel == 1) && x.PublishedListingItemFk.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0
-                            )
-                            ||
-                            (
-                                x.SharingLevel == 1
-                            )
-                        )
-                    )
-                        ));
-                var filteredOrderedAppItems = filteredAppItems.OrderBy(input.Sorting ?? "id asc")
-                   .PageBy(input);
-                var appItems = from o in filteredOrderedAppItems
-                               select new GetAppItemForViewDto()
-                               {
-                                   AppItem = new AppItemDto
-                                   {
-                                       Code = o.Code,
-                                       Name = o.Name,
-                                       Description = o.EntityFk.Notes,
-                                       Price = o.Price,
-                                       Id = o.Id,
-                                       Listed = o.ListingItemFkList.Count() > 0,
-                                       Published = o.PublishedListingItemFkList.Count() > 0,
-                                       ImageUrl = (o.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
-                                        (o.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.TenantId + "/" + o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
-                                        : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
-                                   },
-                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false
+        //public async Task<PagedResultDto<GetAppItemForViewDto>> old_GetAll(GetAllAppItemsInput input)
+        //{
+        //    var stopwatch = new System.Diagnostics.Stopwatch();
+        //    stopwatch.Start();
+        //    #region prepare parameters
+        //    if (input.FilterType == ItemsFilterTypesEnum.MyItems)
+        //    { input.ItemType = 0; }
+        //    if (input.FilterType == ItemsFilterTypesEnum.MyListing)
+        //    { input.ItemType = 1; }
+        //    if (input.FilterType == ItemsFilterTypesEnum.Public ||
+        //        input.FilterType == ItemsFilterTypesEnum.SharedWithMe ||
+        //        input.FilterType == ItemsFilterTypesEnum.SharedWithMeAndPublic)
+        //    { input.ItemType = 2; }
+        //    input.Sorting = input.Sorting ?? "id";
+        //    List<long> AppItemListDetails = new List<long>();
+        //    if (input.AppItemListId != null && input.AppItemListId > 0)
+        //    {
+        //        AppItemListDetails = _appItemsListDetailRepository.GetAll().Where(x => x.ItemsListId == input.AppItemListId).Select(x => x.ItemId).ToList();
+        //    }
+        //    //if (input.SelectorOption == null)
+        //    //{ input.SelectorOption = SelectorOptionsEnum.NONE; }
+        //    #endregion prepare parameters
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+        //        #region merge categories and departments
+        //        if (input.CategoryFilters == null)
+        //            input.CategoryFilters = new long[] { };
+        //        if (input.departmentFilters == null)
+        //            input.departmentFilters = new long[] { };
+        //        var allCategories = input.CategoryFilters.ToList();
+        //        allCategories.AddRange(input.departmentFilters.ToList());
+        //        input.CategoryFilters = allCategories.ToArray();
+        //        #endregion merge categories and departments
+        //        List<long> SelectedItems = new List<long>();
+        //        if (input.SelectorKey != null)
+        //        {
+        //            SelectedItems = _appItemSelectorRepository.GetAll().Where(e => e.Key == input.SelectorKey).Select(e => e.SelectedId).ToList();
+        //        }
+        //        //get curr tenant id to pass to the sp
+        //        input.TenantId = AbpSession.TenantId;
+        //        if (input.ArrtibuteFilters == null)
+        //            input.ArrtibuteFilters = new List<ArrtibuteFilter>();
+        //        var attrs = input.ArrtibuteFilters.Select(r => r.ArrtibuteValueId).ToList();
+        //        var filteredAppItems = _appItemRepository.GetAll()
+        //        .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+        //        //  .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+        //        //.Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories).OrderBy("id")
+        //        .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+        //        .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+        //        .Include(x => x.ParentFkList)
+        //       // .Include(x => x.ListingItemFkList)
+        //       // .Include(x => x.PublishedListingItemFkList)
+        //        .WhereIf(input.AppItemListId != null && input.AppItemListId > 0, e => AppItemListDetails.Contains(e.Id))
+        //        .WhereIf(input.ArrtibuteFilters != null && input.ArrtibuteFilters.Count() > 0,
+        //        e =>
+        //        (e.EntityFk.EntityExtraData != null && e.EntityFk.EntityExtraData.Where(r => attrs.Contains(((long)r.AttributeValueId))).Count() > 0)
+        //        ||
+        //        (e.ParentFkList != null &&
+        //        e.ParentFkList.Where(x1 => x1.EntityFk.EntityExtraData.Where(x2 => attrs.Contains((long)x2.AttributeValueId)).Count() > 0).Count() > 0)
+        //        )
+        //        //.WhereIf(input.VisibilityStatus > 0, e => e.PublishedListingItemFkList.Where(r => r.SharingLevel == input.VisibilityStatus).Count() > 0)
+        //        //.WhereIf(input.PublishStatus > 0, e => (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count > 0 && input.PublishStatus == 1) || ((e.PublishedListingItemFkList == null || (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count == 0)) && input.PublishStatus == 2))
+        //        //.WhereIf(input.ListingStatus > 0, e => (e.ListingItemFkList != null && e.ListingItemFkList.Count > 0 && input.ListingStatus == 2) || ((e.ListingItemFkList == null || (e.ListingItemFkList != null && e.ListingItemFkList.Count == 0)) && input.ListingStatus == 1))
+        //        .WhereIf(input.EntityObjectTypeId > 0, e => e.EntityFk.EntityObjectTypeId == input.EntityObjectTypeId)
+        //        .WhereIf(input.CategoryFilters != null && input.CategoryFilters.Count() > 0, e => e.EntityFk.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
+        //        .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
+        //        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.Description.Contains(input.Filter))
+        //        //.Where(x => ((xx.Contains(x.Id) || true) &&
+        //       // .Where(x => x.ParentId == null &&
+        //        (
+        //        (input.FilterType == ItemsFilterTypesEnum.MyItems && x.ItemType == input.ItemType && x.TenantId == AbpSession.TenantId && x.SharingLevel == 0)
+        //        || (input.FilterType == ItemsFilterTypesEnum.MyListing && x.ItemType == input.ItemType && x.TenantId == AbpSession.TenantId && x.SharingLevel == 0)
+        //        || ((input.FilterType == ItemsFilterTypesEnum.Public)
+        //              && x.SharingLevel == 1 && x.ItemType == input.ItemType)
+        //        || ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
+        //              && x.TenantId != AbpSession.TenantId && (x.SharingLevel == 2 || x.SharingLevel == 1) && x.ItemType == input.ItemType
+        //              && x.PublishedListingItemFk.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)
+        //        || (
+        //                (input.FilterType == ItemsFilterTypesEnum.SharedWithMeAndPublic && x.ItemType == input.ItemType)
+        //                &&
+        //                (
+        //                    (
+        //                      (x.SharingLevel == 2 || x.SharingLevel == 1) && x.PublishedListingItemFk.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0
+        //                    )
+        //                    ||
+        //                    (
+        //                        x.SharingLevel == 1
+        //                    )
+        //                )
+        //            )
+        //                ));
+        //        var filteredOrderedAppItems = filteredAppItems.OrderBy(input.Sorting ?? "id asc")
+        //           .PageBy(input);
+        //        var appItems = from o in filteredOrderedAppItems
+        //                       select new GetAppItemForViewDto()
+        //                       {
+        //                           AppItem = new AppItemDto
+        //                           {
+        //                               Code = o.Code,
+        //                               Name = o.Name,
+        //                               Description = o.EntityFk.Notes,
+        //                               Price = o.Price,
+        //                               Id = o.Id,
+        //                               Listed = o.ListingItemFkList.Count() > 0,
+        //                               Published = o.PublishedListingItemFkList.Count() > 0,
+        //                               ImageUrl = (o.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+        //                                (o.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.TenantId + "/" + o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+        //                                : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
+        //                           },
+        //                           Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false
 
-                               };
-                var appItemsList = await appItems.ToListAsync();
-                if (input.SelectorOnly != null && input.SelectorOnly == true)
-                {
-                    appItemsList = appItemsList.Where(e => e.Selected).ToList();
-                }
-                var totalCount = await filteredAppItems.CountAsync();
-                stopwatch.Stop();
-                var elapsed_time = stopwatch.ElapsedMilliseconds;
-                return new PagedResultDto<GetAppItemForViewDto>(
-                    totalCount,
-                    appItemsList
-                );
-            }
+        //                       };
+        //        var appItemsList = await appItems.ToListAsync();
+        //        if (input.SelectorOnly != null && input.SelectorOnly == true)
+        //        {
+        //            appItemsList = appItemsList.Where(e => e.Selected).ToList();
+        //        }
+        //        var totalCount = await filteredAppItems.CountAsync();
+        //        stopwatch.Stop();
+        //        var elapsed_time = stopwatch.ElapsedMilliseconds;
+        //        return new PagedResultDto<GetAppItemForViewDto>(
+        //            totalCount,
+        //            appItemsList
+        //        );
+        //    }
 
-        }
+        //}
 
         public async Task<PagedResultDto<LookupLabelDto>> GetSecondAttributeValues(ExtraDataSecondAttributeValuesInput input)
         {
@@ -559,18 +671,24 @@ namespace onetouch.AppItems
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 List<AppItemAttributePriceDto> appItemAttributePriceDto = new List<AppItemAttributePriceDto>();
-                var appItems = await _appItemRepository.GetAll().Include(x => x.ItemPricesFkList)
+                var appItems = await _appItemRepository.GetAll().Include(x => x.ItemPricesFkList.Where(s => s.Code == priceLevel && s.CurrencyCode == currencyCode))
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                    .Where(x => x.ParentId == appItemId & x.EntityFk.EntityExtraData.Where(z => z.AttributeId == attributeId && z.AttributeValue == attributeCode).Count() > 0).ToListAsync();
+
+                    .Where(x => x.ParentId == appItemId).ToListAsync(); 
                 if (appItems != null && appItems.Count > 0)
                 {
-                    foreach (var item in appItems)
+                    var filteredItems = appItems.Where(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == attributeId && z.AttributeValue == attributeCode).Count() > 0).ToList();
+                    foreach (var item in filteredItems)
                     {
-                        var extraAttributes = item.EntityFk.EntityExtraData.Where(z => item.EntityFk.EntityExtraData.Count() > 1 ? z.AttributeId != attributeId : z.AttributeId == attributeId).ToList();
+                       // item.ItemPricesFkList = await  _appItemPricesRepository.GetAll()
+                         //   .Where(s=> s.AppItemId == item.Id && s.Code== priceLevel && s.CurrencyCode==currencyCode).ToListAsync();
+                        var extraAttributes = item.EntityFk.EntityExtraData.Where(z => (item.EntityFk.EntityExtraData.Count() > 1 ? z.AttributeId != attributeId : z.AttributeId == attributeId) && z.AttributeValue != null).ToList();
                         if (extraAttributes != null && extraAttributes.Count > 0)
                         {
                             foreach (var extr in extraAttributes)
                             {
+                                if (extr.AttributeValue == null)
+                                    continue;
                                 appItemAttributePriceDto.Add(new AppItemAttributePriceDto
                                 {
                                     AppItemId = item.Id,
@@ -584,6 +702,30 @@ namespace onetouch.AppItems
                         }
                     }
                 }
+                //Sort by Size Id
+                var appItem = await _appItemRepository.GetAll().Include(z => z.ItemSizeScaleHeadersFkList).ThenInclude(z => z.AppItemSizeScalesDetails).
+                     FirstOrDefaultAsync(z => z.Id == appItemId);
+                
+                string attribName = "";
+                if (appItems.FirstOrDefault().EntityFk.EntityExtraData.FirstOrDefault(a => a.AttributeId != attributeId)!=null)
+                    attribName = appItems.FirstOrDefault().EntityFk.EntityExtraData.FirstOrDefault(a => a.AttributeId != attributeId).EntityObjectTypeCode;
+
+                if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
+                {
+                    List<AppItemAttributePriceDto> appRetItemAttributePriceDto = new List<AppItemAttributePriceDto>();
+                    var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
+                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode).ToList();
+                    var ss = appItemAttributePriceDto;
+                    //secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode).ToList();
+                    foreach (var t in zz)
+                    {
+                        if (ss.FirstOrDefault(z => z.AttributeValue == t) != null)
+                            appRetItemAttributePriceDto.Add(ss.FirstOrDefault(z => z.AttributeValue == t));
+                    }
+                    return appRetItemAttributePriceDto;
+
+                }
+                //End
                 return appItemAttributePriceDto;
             }
         }
@@ -637,6 +779,10 @@ namespace onetouch.AppItems
 
 
                 var output = new GetAppItemDetailForViewDto { AppItem = ObjectMapper.Map<AppItemForViewDto>(appItem) };
+                //
+                output.AppItem.AppItemSizesScaleInfo
+                    .ForEach(a=>a.AppSizeScalesDetails = a.AppSizeScalesDetails.OrderBy(d => d.D1Position).OrderBy(d => d.D2Position).OrderBy(d => d.D3Position).ToList());
+                //
                 if (appItem != null)
                 {
                     string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
@@ -696,9 +842,59 @@ namespace onetouch.AppItems
                         var subscribersCnt = await _appEntityRepository.CountAsync(a=>a.Code== appItem.SSIN & a.TenantId != null & a.TenantId!= a.TenantOwner);
                         output.AppItem.NumberOfSubscribers = subscribersCnt;
                     }
+                    //T-SII-20230917.0004,1 MMT 11/30/2023 Get the Item shared with users[Start]
+                    if (output.AppItem.SharingLevel == 2)
+                    {
+                        output.AppItem.ItemSharing = new List<ItemSharingDto>();
+                        var sharedUsers = await _appMarketplaceItemSharing.GetAll().Where(a => a.AppMarketplaceItemId == marketplaceItem.Id).ToListAsync();
+                        if (sharedUsers != null && sharedUsers.Count > 0)
+                        {
+                            output.AppItem.ItemSharing = ObjectMapper.Map<List<ItemSharingDto>>(sharedUsers);
+                            if (output.AppItem.ItemSharing != null && output.AppItem.ItemSharing.Count > 0)
+                            {
+                                foreach (var user in output.AppItem.ItemSharing)
+                                {
+                                    var userObj = UserManager.GetUserById(long.Parse(user.SharedUserId.ToString()));
+                                    if (userObj != null)
+                                    {
+                                        user.SharedUserSureName = userObj.Surname;
+                                        user.SharedUserName = userObj.Name;
+                                        user.SharedUserEMail = userObj.EmailAddress;
+                                        user.SharedTenantId = userObj.TenantId;
+                                        string tenantName = "";
+                                        if (userObj.TenantId != null)
+                                        {
+                                            var tenant = TenantManager.GetById(int.Parse(userObj.TenantId.ToString()));
+                                            if (tenant != null)
+                                                tenantName = tenant.TenancyName;
+                                        }
+                                        else
+                                        {
+                                            tenantName = "SIIWII";
+                                        }
+                                        user.SharedUserTenantName = tenantName;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //T-SII-20230917.0004,1 MMT 11/30/2023 Get the Item shared with users[End]
+
+
                     if (!string.IsNullOrEmpty(appItem.LastModificationTime.ToString()))
-                    output.AppItem.LastModifiedDate = DateTime.Parse(appItem.LastModificationTime.ToString());
-                    
+                        output.AppItem.LastModifiedDate = DateTime.Parse(appItem.LastModificationTime.ToString());
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(appItem.CreationTime.ToString()))
+                            output.AppItem.LastModifiedDate = DateTime.Parse(appItem.CreationTime.ToString());
+                    }
+
+                    if (output.AppItem.LastModifiedDate != null && !string.IsNullOrEmpty(input.TimeZoneValue))
+                    {
+                        var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                        var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(output.AppItem.LastModifiedDate, currentTimeZone);
+                        output.AppItem.LastModifiedDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+                    }
                     //MMT33-2
                     //if (varAppItems.Select(r => r.Price).Count() > 0)
                     //{
@@ -775,7 +971,25 @@ namespace onetouch.AppItems
                             //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
                             //.ToList();
                             if (secondAttributeValuesFor1st1 != null && secondAttributeValuesFor1st1.Count > 0)
-                                secondAttributeValuesFor1st = secondAttributeValuesFor1st1.Distinct().ToList();
+                            {
+                                var attribName = firstItem.EntityFk.EntityExtraData.FirstOrDefault(a => a.AttributeId == long.Parse(secondAttId)).EntityObjectTypeCode ;
+                                if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
+                                {
+                                    var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
+                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy (s=> s.D2Position).OrderBy(s=> s.D3Position).Select(a => a.SizeCode + "," + a.SizeId.ToString()).ToList();
+                                    var ss = secondAttributeValuesFor1st1.Distinct().ToList();
+                                    secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode + "," + a.SizeId.ToString()).ToList();
+                                    foreach (var t in zz)
+                                    {
+                                        if (!ss.Contains(t.ToString()))
+                                            secondAttributeValuesFor1st.Remove(t.ToString());
+                                    }
+                                    //secondAttributeValuesFor1st = zz;
+
+                                }
+                                else
+                                    secondAttributeValuesFor1st = secondAttributeValuesFor1st1.Distinct().ToList();
+                            }
                             // if (secondAttributeValuesFor1st1.FirstOrDefault() != null)
                             //  {
                             //      secondAttributeValuesFor1st = secondAttributeValuesFor1st1.FirstOrDefault().Distinct().ToList();
@@ -901,13 +1115,18 @@ namespace onetouch.AppItems
                                         eDRestAttributes.ExtraAttributeId = long.Parse(attributeIDs[loop_counter].Split(',')[0].ToString());
                                         eDRestAttributes.ExtraAttrName = attributeValues[loop_counter].Split(',')[0].ToString();
                                         var lookupLabelDtoList = secondAttributeValuesFor1st; //variationsLists[loop_counter + 3].Split('|').ToList().GetRange(0, Math.Min(10, variationsLists[loop_counter + 3].Split('|').ToList().Count)).ToList();
-                                        if (lookupLabelDtoList != null && lookupLabelDtoList.Count > 0)
+                                        if (lookupLabelDtoList != null && lookupLabelDtoList.Count > 0 && eDRestAttributes.ExtraAttributeId == 105)
                                             eDRestAttributes.Values = lookupLabelDtoList.Select(r => new LookupLabelDto()
                                             {
                                                 Label = r.Split(',')[0],
                                                 Code = r.Split(',')[1]
                                             }
                                                 ).ToList();
+
+                                        else
+                                        {
+                                            eDRestAttributes.Values = new List<LookupLabelDto>();
+                                        }
 
                                         foreach (var attlook in eDRestAttributes.Values)
                                         {
@@ -1527,6 +1746,10 @@ namespace onetouch.AppItems
                 var codeIsDublicated = await _appItemRepository.FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && input.Code == x.Code && x.Id != input.Id && x.ItemType == input.ItemType );
                 if(codeIsDublicated != null) throw new UserFriendlyException("Code is Dublicated, Please choose another code");
             }*/
+            //MMT33-3
+            var currencyVar = await TenantManager.GetTenantCurrency();
+            string currency = currencyVar.Code;
+            //MMT33-3
             DateTime start = DateTime.Now;
             var itemObjectId = await _helper.SystemTables.GetObjectItemId();
             if (input.ItemType == 1)
@@ -1642,7 +1865,7 @@ namespace onetouch.AppItems
             }
             entity.TenantOwner = appItem.TenantOwner;
             //MMT30[End]
-
+           
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
             await CurrentUnitOfWork.SaveChangesAsync();
             //MMT
@@ -1815,12 +2038,17 @@ namespace onetouch.AppItems
 
                         foreach (var itemPrice in child.AppItemPriceInfos)
                         {
+                            
                             //if (itemPrice.Id == 0)
                             //{
                             var itemPriceObj = ObjectMapper.Map<AppItemPrices>(itemPrice);
                             itemPriceObj.AppItemCode = appItemChild.Code;
                             itemPriceObj.AppItemId = appItemChild.Id;
                             itemPriceObj.TenantId = AbpSession.TenantId;
+                            //MMT33-3
+                            if ( itemPriceObj.CurrencyCode == currency)//itemPriceObj.Code == "MSRP" &&
+                                itemPriceObj.IsDefault = true;
+                            //MMT33-3
                             // appItem.ItemPricesFkList.Add(itemPriceObj);
                             if (itemPriceObj.Id == 0)
                                 await _appItemPricesRepository.InsertAsync(itemPriceObj);
@@ -1997,6 +2225,10 @@ namespace onetouch.AppItems
 
                 foreach (var itemPrice in input.AppItemPriceInfos)
                 {
+                    if (itemPrice.CurrencyCode == currency) //itemPrice.Code == "MSRP" &&
+                    {
+                        itemPrice.IsDefault= true;
+                    }
                     //if (itemPrice.Id == 0)
                     //{
                     var itemPriceObj = ObjectMapper.Map<AppItemPrices>(itemPrice);
@@ -2537,7 +2769,7 @@ namespace onetouch.AppItems
                 await CurrentUnitOfWork.SaveChangesAsync();
             }
         }
-        [AbpAuthorize(AppPermissions.Pages_AccountInfo_Publish)]
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task SyncProduct(long appItemId)
         {
             SharingItemOptions input = new SharingItemOptions();
@@ -2546,7 +2778,7 @@ namespace onetouch.AppItems
             await ShareProduct(input);
 
         }
-        [AbpAuthorize(AppPermissions.Pages_AccountInfo_Publish)]
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task UnHideProduct(long appItemId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -2579,7 +2811,7 @@ namespace onetouch.AppItems
             }
 
         }
-        [AbpAuthorize(AppPermissions.Pages_AccountInfo_Publish)]
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task HideProduct(long appItemId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -2610,8 +2842,37 @@ namespace onetouch.AppItems
             }
 
          }
+        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
+        {
+            if (sourceTenantId == null) sourceTenantId = -1;
+            if (distinationTenantId == null) distinationTenantId = -1;
 
-        [AbpAuthorize(AppPermissions.Pages_AccountInfo_Publish)]
+            var tmpPath = _appConfiguration[$"Attachment:PathTemp"] + @"\" + sourceTenantId + @"\" + fileName;
+            var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + sourceTenantId + @"\" + fileName;
+            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + fileName;
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId);
+            }
+
+            try
+            {
+                System.IO.File.Copy(tmpPath.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    System.IO.File.Copy(pathSource.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+                }
+                catch (Exception ex1)
+                {
+
+                }
+            }
+        }
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task ShareProduct(SharingItemOptions input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -2622,38 +2883,43 @@ namespace onetouch.AppItems
                 {
                     var appItem = await _appItemRepository.GetAll().AsNoTracking()
                     //yy
-                    .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails).AsNoTracking()
+                    //.Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails).AsNoTracking()
                     //yy
+                    .Include(x => x.EntityFk).AsNoTracking()
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                     //Mariam
-                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)//.ThenInclude(x => x.EntityObjectTypeFk)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                     //Mariam
                     .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                     //Mariam
-                    .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                    .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)//.ThenInclude(x => x.EntityObjectTypeFk)
                     .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
-                    .Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList).AsNoTracking()
-                    .Include(a => a.ItemPricesFkList).AsNoTracking()
+                    //.Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList).AsNoTracking()
+                    //.Include(a => a.ItemPricesFkList).AsNoTracking()
                     //Mariam
                     .AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.AppItemId);
                     //XX
-                    AppMarketplaceItem marketplaceItemObject = null;
+                    AppMarketplaceItems.AppMarketplaceItems marketplaceItemObject = null;
                     long publishedEntityId = 0;
                     byte sharingLevel = 0;
+
+                    appItem.ItemSizeScaleHeadersFkList =await _appItemSizeScalesHeaderRepository.GetAll()
+                        .Include(a => a.AppItemSizeScalesDetails).AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
+                    appItem.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a=>a.AppItemId ==input.AppItemId).ToListAsync();
                     var itemObjectId = await _helper.SystemTables.GetObjectListingId();
-                    List<AppMarketplaceItem> children = new List<AppMarketplaceItem>();
+                    List<AppMarketplaceItems.AppMarketplaceItems> children = new List<AppMarketplaceItems.AppMarketplaceItems>();
                     //XX
-                    AppMarketplaceItem marketplaceItem = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
+                    AppMarketplaceItems.AppMarketplaceItems marketplaceItem = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
                         .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
                         .Where(x => x.Code == appItem.SSIN).FirstOrDefaultAsync();
 
                     if (marketplaceItem == null || marketplaceItem.Id == 0)
                     {
                         
-                        marketplaceItem = ObjectMapper.Map<AppMarketplaceItem>(appItem);
+                        marketplaceItem = ObjectMapper.Map<onetouch.AppMarketplaceItems.AppMarketplaceItems>(appItem);
                         marketplaceItem.Id = 0;
                         marketplaceItem.ObjectId = itemObjectId;
                         //mmt
@@ -2662,7 +2928,8 @@ namespace onetouch.AppItems
                             //XX
                             marketplaceItem.Variations.Replace($"/{marketplaceItem.TenantId.ToString()}/", "/-1/");
                         marketplaceItem.TenantId = null;
-                        marketplaceItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        marketplaceItem.SSIN = appItem.SSIN;  //await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        x.ChangeTracker.Clear();
                         marketplaceItem.TenantOwner = int.Parse(appItem.TenantId.ToString());
                         //Mmt
                         //XX
@@ -2673,11 +2940,11 @@ namespace onetouch.AppItems
                         //XX
 
                         //yy
-                        marketplaceItem.ItemSizeScaleHeadersFkList = new List<AppMarketplaceItemSizeScalesHeader>(); //listingItem.ItemSizeScaleHeadersFkList;
+                        marketplaceItem.ItemSizeScaleHeadersFkList = new List<AppMarketplaceItemSizeScaleHeaders>(); //listingItem.ItemSizeScaleHeadersFkList;
                         var sizeScale = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(z => z.ParentId == null);
                         if (sizeScale != null)
                         {
-                            AppMarketplaceItemSizeScalesHeader sizeScaleMarketplace = ObjectMapper.Map<AppMarketplaceItemSizeScalesHeader>(sizeScale);
+                            AppMarketplaceItemSizeScaleHeaders sizeScaleMarketplace = ObjectMapper.Map<AppMarketplaceItemSizeScaleHeaders>(sizeScale);
                             sizeScaleMarketplace.Id = 0;
                             sizeScaleMarketplace.AppMarketplaceItemId = 0;
                             //sizeScaleMarketplace.TenantId = null;
@@ -2721,7 +2988,7 @@ namespace onetouch.AppItems
                             {
                                 foreach (var parentAttach in marketplaceItemObject.EntityAttachments)
                                 {
-
+                                    await _appAttachmentRepository.DeleteAsync(parentAttach.AttachmentFk);
                                     await _appEntityAttachmentRepository.DeleteAsync(parentAttach);
                                 }
                             }
@@ -2743,7 +3010,7 @@ namespace onetouch.AppItems
                                 }
                             }
 
-                           // await CurrentUnitOfWork.SaveChangesAsync();
+                            await CurrentUnitOfWork.SaveChangesAsync();
                         }
                         publishedEntityId = marketplaceItem.Id;
                         sharingLevel = marketplaceItem.SharingLevel;
@@ -2766,12 +3033,15 @@ namespace onetouch.AppItems
                         marketplaceItem.ItemSizeScaleHeadersFkList = null;
                         marketplaceItem.ParentFkList = null;
                         marketplaceItem.Code = code;
+                        marketplaceItem.Name = appItem.Name ;
                         marketplaceItem.SSIN = ssin;
+                        marketplaceItem.TenantId = null;
+                        marketplaceItem.Notes = appItem.EntityFk.Notes;
                         marketplaceItem.Id = publishedEntityId;
                         marketplaceItem.ItemPricesFkList = ObjectMapper.Map<List<AppMarketplaceItemPrices>>(appItem.ItemPricesFkList);
                         marketplaceItem.ItemPricesFkList.ForEach(a => a.Id = 0);
                         marketplaceItem.ItemPricesFkList.ForEach(a => a.AppMarketplaceItemId = marketplaceItem.Id);
-
+                        marketplaceItem.ItemPricesFkList.ForEach(a => a.AppItemFk = null);
 
                     }
 
@@ -2782,7 +3052,7 @@ namespace onetouch.AppItems
 
                     // if (marketplaceItem == null || marketplaceItem.Id == 0)
                     // {
-
+                    marketplaceItem.EntityExtraData = null;
                     if (marketplaceItem.EntityExtraData != null)
                     {
                         foreach (var parentExtrData in marketplaceItem.EntityExtraData)
@@ -2790,8 +3060,10 @@ namespace onetouch.AppItems
                             parentExtrData.Id = 0;
                             parentExtrData.EntityCode = marketplaceItem.Code;
                             parentExtrData.EntityId = 0;
+                            parentExtrData.EntityFk = null;
                         }
                     }
+                    
                     if (marketplaceItem.EntityAttachments != null)
                     {
                         foreach (var parentAttach in marketplaceItem.EntityAttachments)
@@ -2799,6 +3071,10 @@ namespace onetouch.AppItems
                             parentAttach.Id = 0;
                             parentAttach.AttachmentId = 0;
                             parentAttach.AttachmentFk.Id = 0;
+                            parentAttach.EntityId = 0;
+                            parentAttach.EntityFk = null;
+                            parentAttach.AttachmentFk.TenantId = null;
+                            MoveFile(parentAttach.AttachmentFk.Attachment, AbpSession.TenantId, -1);
                         }
                     }
                     if (marketplaceItem.EntityAddresses != null)
@@ -2846,7 +3122,7 @@ namespace onetouch.AppItems
                     //}
                     //Mariam
 
-                    if (marketplaceItem != null)
+                    if (!input.SyncProduct && marketplaceItem != null && publishedEntityId != 0)
                     {
                         marketplaceItem.Id = publishedEntityId;
                         await _appMarketplaceItemSharing.DeleteAsync(x=>x.AppMarketplaceItemId == publishedEntityId);
@@ -2854,13 +3130,13 @@ namespace onetouch.AppItems
                     }
                     if (!input.SyncProduct)
                     {
-                        marketplaceItem.ItemSharingFkList = new List<AppMarketplaceItemSharing>();
+                        marketplaceItem.ItemSharingFkList = new List<AppMarketplaceItemSharings>();
                         foreach (var sharingDto in input.ItemSharing)
                         {
-                            AppMarketplaceItemSharing sharing;
+                            AppMarketplaceItemSharings sharing;
                             if (sharingDto.Id == 0)
                             {
-                                sharing = ObjectMapper.Map<AppMarketplaceItemSharing>(sharingDto);
+                                sharing = ObjectMapper.Map<AppMarketplaceItemSharings>(sharingDto);
                             }
                             else
                             {
@@ -2878,24 +3154,52 @@ namespace onetouch.AppItems
                     //publishItem.EntityId = savedEntity;
                     if (marketplaceItem.Id == 0)
                     {
-
+                        marketplaceItem.ItemSizeScaleHeadersFkList = null;
+                        var entityObjType = await _sycEntityObjectTypeRepository.GetAll().AsNoTracking().Where(z => z.Id == marketplaceItem.EntityObjectTypeId)
+                               .AsNoTracking().FirstOrDefaultAsync();
+                       // x.SycEntityObjectTypes.Attach(entityObjType);
+                        x.Entry<SycEntityObjectType>(entityObjType).State = EntityState.Unchanged;
+                        x.ChangeTracker.Clear();
                         marketplaceItem = await _appMarketplaceItem.InsertAsync(marketplaceItem);
                         await CurrentUnitOfWork.SaveChangesAsync();
-                        
+                        //xx
+                        if (appItem.EntityFk.EntityExtraData != null)
+                        {
+                            marketplaceItem.EntityExtraData = new List<AppEntityExtraData>();
+                            foreach (var chEx in appItem.EntityFk.EntityExtraData)
+                            {
+                                chEx.Id = 0;
+                                chEx.EntityCode = marketplaceItem.Code;
+                                chEx.EntityId = marketplaceItem.Id;
+                                marketplaceItem.EntityExtraData.Add(chEx);
+                            }
+                           
+                        }
+                        //xx
                         // return;
                         //yy
-                        if (appItem.ItemSizeScaleHeadersFkList.Count > 1)
+                        if (appItem.ItemSizeScaleHeadersFkList.Count > 0)
                         {
-                            if (marketplaceItem.ItemSizeScaleHeadersFkList.Count > 0)
+                            marketplaceItem.ItemSizeScaleHeadersFkList = null;
+                            //if (marketplaceItem.ItemSizeScaleHeadersFkList.Count > 0)
                             {
-                                var itemSizeScale = marketplaceItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
+                                var itemSizeScale = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
+                                var marketplaceScale = ObjectMapper.Map<AppMarketplaceItemSizeScaleHeaders>(itemSizeScale);
+                                marketplaceScale.Id = 0;
+                                marketplaceScale.AppMarketplaceItemId = marketplaceItem.Id;
+                                marketplaceScale.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
+                                marketplaceItem.ItemSizeScaleHeadersFkList = new List<AppMarketplaceItemSizeScaleHeaders>();
+                                marketplaceItem.ItemSizeScaleHeadersFkList.Add(marketplaceScale);
+                                await _appMarketplaceItem.UpdateAsync(marketplaceItem);
+                                await CurrentUnitOfWork.SaveChangesAsync();
                                 if (itemSizeScale != null)
                                 {
-                                    var sizeRatio = marketplaceItem.ItemSizeScaleHeadersFkList.FirstOrDefault(z => z.ParentId != null);
-                                    if (sizeRatio != null)
+                                    var ItemsizeRatio = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(z => z.ParentId != null);
+                                    if (ItemsizeRatio != null)
                                     {
+                                        var sizeRatio = ObjectMapper.Map<AppMarketplaceItemSizeScaleHeaders>(ItemsizeRatio);
                                         sizeRatio.Id = 0;
-                                        sizeRatio.ParentId = itemSizeScale.Id;
+                                        sizeRatio.ParentId = marketplaceScale.Id;
                                         sizeRatio.AppMarketplaceItemId = marketplaceItem.Id;
                                         //sizeRatio.TenantId = null;
                                         sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
@@ -2906,6 +3210,8 @@ namespace onetouch.AppItems
                                 }
                             }
                         }
+                        await _appMarketplaceItem.UpdateAsync(marketplaceItem);
+                        await CurrentUnitOfWork.SaveChangesAsync();
                         //yy
                     }
                     else
@@ -2914,38 +3220,88 @@ namespace onetouch.AppItems
                          //await _appMarketplaceItem.UpdateAsync(marketplaceItem);
                          //await CurrentUnitOfWork.SaveChangesAsync();
                        
-                        x.AppMarketplaceItems.Update(marketplaceItem); ;
+                        x.AppMarketplaceItems.Update(marketplaceItem); 
                         await x.SaveChangesAsync();
-                       
+                        x.ChangeTracker.Clear();
+                        if (appItem.EntityFk.EntityExtraData != null)
+                        {
+                            marketplaceItem.EntityExtraData = new List<AppEntityExtraData>();
+                            foreach (var chEx in appItem.EntityFk.EntityExtraData)
+                            {
+                                chEx.Id = 0;
+                                chEx.EntityCode = marketplaceItem.Code;
+                                chEx.EntityId = marketplaceItem.Id;
+                                marketplaceItem.EntityExtraData.Add(chEx);
+                            }
+                             x.AppMarketplaceItems.Update(marketplaceItem);
+                            await x.SaveChangesAsync();
+                        }
                         if (appItem.ItemSizeScaleHeadersFkList.Count > 1)
                         {
-                            //if (marketplaceItem.ItemSizeScaleHeadersFkList.Count > 0)
+                            ////if (marketplaceItem.ItemSizeScaleHeadersFkList.Count > 0)
+                            //{
+                            //    //marketplaceItem.ItemSizeScaleHeadersFkList=  ObjectMapper.Map<List<AppMarketplaceItemSizeScaleHeaders>>(appItem.ItemSizeScaleHeadersFkList);  
+                            //    marketplaceItem.ItemSizeScaleHeadersFkList = null;
+
+                            //    var itemSizeScale = marketplaceItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
+                            //    if (itemSizeScale != null)
+                            //    {
+                            //        itemSizeScale.Id = 0;
+                            //        itemSizeScale.AppMarketplaceItemId = marketplaceItem.Id;
+                            //        itemSizeScale.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
+                            //        itemSizeScale.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = 0);
+                            //        //marketplaceItem.ItemSizeScaleHeadersFkList.Add(itemSizeScale);
+
+                            //        var sizeRatio = marketplaceItem.ItemSizeScaleHeadersFkList.FirstOrDefault(z => z.ParentId != null);
+                            //        if (sizeRatio != null)
+                            //        {
+                            //            sizeRatio.Id = 0;
+                            //            sizeRatio.ParentId = itemSizeScale.Id;
+                            //            sizeRatio.AppMarketplaceItemId = marketplaceItem.Id;
+                            //            //sizeRatio.TenantId = null;
+                            //            sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
+                            //            //sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.TenantId = null);
+                            //            sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = 0);
+                            //           /// marketplaceItem.ItemSizeScaleHeadersFkList.Add(sizeRatio);
+                            //        }
+                            //    }
+                            //}
+                            //x.ChangeTracker.Clear();
+                            //await x.SaveChangesAsync();
+                            if (appItem.ItemSizeScaleHeadersFkList.Count > 0)
                             {
-                               marketplaceItem.ItemSizeScaleHeadersFkList=  ObjectMapper.Map<List<AppMarketplaceItemSizeScalesHeader>>(appItem.ItemSizeScaleHeadersFkList);  
-
-                                var itemSizeScale = marketplaceItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
-                                if (itemSizeScale != null)
+                                marketplaceItem.ItemSizeScaleHeadersFkList = null;
+                                //if (marketplaceItem.ItemSizeScaleHeadersFkList.Count > 0)
                                 {
-                                    itemSizeScale.Id = 0;
-                                    itemSizeScale.AppMarketplaceItemId = marketplaceItem.Id;
-                                    itemSizeScale.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
-                                    itemSizeScale.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = 0);
-                                    //marketplaceItem.ItemSizeScaleHeadersFkList.Add(itemSizeScale);
-
-                                    var sizeRatio = marketplaceItem.ItemSizeScaleHeadersFkList.FirstOrDefault(z => z.ParentId != null);
-                                    if (sizeRatio != null)
+                                    var itemSizeScale = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
+                                    var marketplaceScale = ObjectMapper.Map<AppMarketplaceItemSizeScaleHeaders>(itemSizeScale);
+                                    marketplaceScale.Id = 0;
+                                    marketplaceScale.AppMarketplaceItemId = marketplaceItem.Id;
+                                    marketplaceScale.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
+                                    marketplaceItem.ItemSizeScaleHeadersFkList = new List<AppMarketplaceItemSizeScaleHeaders>();
+                                    marketplaceItem.ItemSizeScaleHeadersFkList.Add(marketplaceScale);
+                                    await _appMarketplaceItem.UpdateAsync(marketplaceItem);
+                                    await CurrentUnitOfWork.SaveChangesAsync();
+                                    if (itemSizeScale != null)
                                     {
-                                        sizeRatio.Id = 0;
-                                        sizeRatio.ParentId = itemSizeScale.Id;
-                                        sizeRatio.AppMarketplaceItemId = marketplaceItem.Id;
-                                        //sizeRatio.TenantId = null;
-                                        sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
-                                        //sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.TenantId = null);
-                                        sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = 0);
-                                       /// marketplaceItem.ItemSizeScaleHeadersFkList.Add(sizeRatio);
+                                        var ItemsizeRatio = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(z => z.ParentId != null);
+                                        if (ItemsizeRatio != null)
+                                        {
+                                            var sizeRatio = ObjectMapper.Map<AppMarketplaceItemSizeScaleHeaders>(ItemsizeRatio);
+                                            sizeRatio.Id = 0;
+                                            sizeRatio.ParentId = marketplaceScale.Id;
+                                            sizeRatio.AppMarketplaceItemId = marketplaceItem.Id;
+                                            //sizeRatio.TenantId = null;
+                                            sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
+                                            //sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.TenantId = null);
+                                            sizeRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = 0);
+                                            marketplaceItem.ItemSizeScaleHeadersFkList.Add(sizeRatio);
+                                        }
                                     }
                                 }
                             }
+                            await _appMarketplaceItem.UpdateAsync(marketplaceItem);
+                            await CurrentUnitOfWork.SaveChangesAsync();
                         }
                         //List<AppMarketplaceItem> modifyList = new List<AppMarketplaceItem>();
                         //modifyList.Add(marketplaceItem);
@@ -2980,11 +3336,42 @@ namespace onetouch.AppItems
                     }
 
                     //Save child items
+                    ////List<long> entities = new List<long>();
+                    ////var entityObj = appItem.ParentFkList.Select(x => x.EntityFk.EntityExtraData.Where(z => z.EntityObjectTypeId != null).Select(z=>z.EntityObjectTypeId).ToList()).Distinct().ToList();
+                    ////if (entityObj != null)
+                    ////{
+                    ////    foreach (var ent in entityObj)
+                    ////    {
+                    ////        foreach (var en in ent)
+                    ////        {
+                    ////            //if (entities.FirstOrDefault(a => a == en) == null)
+                    ////            {
+                    ////                entities.AddIfNotContains<long>(long.Parse(en.ToString()));
+                    ////            }
+                    ////        }
+                    ////       // var xx = ent.
+                    ////    }
+                    ////}
+                    ////foreach (var xx in entities)
+                    ////{
+                    ////    var entityObjType = await _sycEntityObjectTypeRepository.GetAll().AsNoTracking().Where(z => z.Id == xx)
+                    ////                                             .AsNoTracking().FirstOrDefaultAsync();
+                    ////    if (entityObjType != null)
+                    ////    {
+                    ////       // x.ChangeTracker.Clear();
+                    ////        // x.SycEntityObjectTypes.Attach(entityObjType);
+                    ////        // x.Entry<SycEntityObjectType>(entityObjType)
+                    ////        x.SycEntityObjectTypes.Attach(entityObjType);
+                    ////        x.Entry<SycEntityObjectType>(entityObjType).State = EntityState.Unchanged;
+
+                    //    }
+                    //}
                     foreach (var child in appItem.ParentFkList)
                     {
+                        child.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a => a.AppItemId == child.Id).ToListAsync();
                         //var child = appItem.ParentFkList[a];
                         //var publishChild = await _appItemRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.PublishedListingItemId == child.Id);
-                        AppMarketplaceItem publishChild = new AppMarketplaceItem(); ;
+                        AppMarketplaceItems.AppMarketplaceItems publishChild = new AppMarketplaceItems.AppMarketplaceItems(); ;
                         if (publishedEntityId!=0)
                             publishChild = await _appMarketplaceItem.GetAll().Include(x=>x.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                                 .Include(z=>z.EntityExtraData)
@@ -2992,7 +3379,7 @@ namespace onetouch.AppItems
                         //marketplaceItem.ParentFkList.FirstOrDefault(x => x.Code == child.SSIN);
                         long publishId = 0;
                         if (publishChild == null)
-                            publishChild = new AppMarketplaceItem();
+                            publishChild = new AppMarketplaceItems.AppMarketplaceItems();
                         else
                         {
                             publishId = publishChild.Id;
@@ -3010,8 +3397,9 @@ namespace onetouch.AppItems
                         string newSSIN = "";
                         if (publishId == 0)
                         {
-                            x.ChangeTracker.Clear();
-                            newSSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                           // x.ChangeTracker.Clear();
+                            newSSIN = child.SSIN ;//await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                           // x.ChangeTracker.Clear();
                         }
                         else
                         {
@@ -3028,11 +3416,11 @@ namespace onetouch.AppItems
                             {
                                 foreach (var parentAttach in publishChild.EntityAttachments)
                                 {
-
+                                    await _appAttachmentRepository.DeleteAsync(parentAttach.AttachmentFk);
                                     await _appEntityAttachmentRepository.DeleteAsync(parentAttach);
                                 }
                             }
-
+                            await x.SaveChangesAsync();
                             //SS
                         }
                         ObjectMapper.Map(child, publishChild);
@@ -3046,10 +3434,13 @@ namespace onetouch.AppItems
                                 extrData.Id = 0;
 
                                 extrData.EntityId = 0;
-
+                                    //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[Start]
+                                    if (extrData.AttributeId == 202 && !string.IsNullOrEmpty(extrData.AttributeValue))
+                                        MoveFile(extrData.AttributeValue, AbpSession.TenantId, -1);
+                                    //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[End]
                                     //if (extrData.EntityObjectTypeId != null && extrData.EntityObjectTypeId != 0)
                                     //{
-                                       
+
                                     //    var entityObjTypeEx = await _sycEntityObjectTypeRepository.GetAll().AsNoTracking().Where(z => z.Id == extrData.EntityObjectTypeId)
                                     //    .AsNoTracking().FirstOrDefaultAsync();
                                     //    x.SycEntityObjectTypes.Attach(entityObjTypeEx);
@@ -3068,6 +3459,8 @@ namespace onetouch.AppItems
                                 parentAttach.Id = 0;
                                 parentAttach.AttachmentId = 0;
                                 parentAttach.AttachmentFk.Id = 0;
+                                parentAttach.AttachmentFk.TenantId = null;
+                                MoveFile(parentAttach.AttachmentFk.Attachment, AbpSession.TenantId, -1);
                             }
                         }
                         if (publishChild.EntityAddresses != null)
@@ -3105,6 +3498,8 @@ namespace onetouch.AppItems
                         publishChild.Id = publishId;
                         publishChild.ObjectId = itemObjectId;
                         publishChild.ParentId = marketplaceItem.Id;
+                        publishChild.Notes = child.EntityFk.Notes;
+                        publishChild.Name = child.Name;
                         //publishChild.ParentEntityId = publishItem.EntityId;
                         if (!input.SyncProduct)
                             publishChild.SharingLevel = input.SharingLevel;
@@ -3131,14 +3526,14 @@ namespace onetouch.AppItems
                         {
 
 
-                            var entityObjType = await _sycEntityObjectTypeRepository.GetAll().AsNoTracking().Where(z => z.Id == publishChild.EntityObjectTypeId)
-                                .AsNoTracking().FirstOrDefaultAsync();
-                            x.SycEntityObjectTypes.Attach(entityObjType);
+                            //var entityObjType = await _sycEntityObjectTypeRepository.GetAll().AsNoTracking().Where(z => z.Id == publishChild.EntityObjectTypeId)
+                          //      .AsNoTracking().FirstOrDefaultAsync();
+                          //  x.SycEntityObjectTypes.Attach(entityObjType);
                             // publishChild.EntityObjectTypeFk = entityObjType;
                             // publishChild.EntityObjectTypeId = -1;//entityObjType.Id;
-                            x.Entry<SycEntityObjectType>(entityObjType).State = EntityState.Unchanged;
+                         //   x.Entry<SycEntityObjectType>(entityObjType).State = EntityState.Unchanged;
                             //x.SycEntityObjectTypes.Entry(publishChild.EntityObjectTypeId).State = EntityState.Unchanged;\
-                            x.ChangeTracker.Clear();
+                           // x.ChangeTracker.Clear();
                             //publishChild.EntityObjectTypeId = 0;
                             //x.AppMarketplaceItems.Add(publishChild);
                             publishChild = await _appMarketplaceItem.InsertAsync(publishChild);
@@ -3146,16 +3541,37 @@ namespace onetouch.AppItems
                             if (child.EntityFk.EntityExtraData != null)
                             {
                                 publishChild.EntityExtraData = new List<AppEntityExtraData>();
+                                x.ChangeTracker.Clear();
                                 foreach (var chEx in child.EntityFk.EntityExtraData)
                                 {
                                     chEx.Id = 0;
                                     chEx.EntityCode = publishChild.Code;
                                     chEx.EntityId = publishChild.Id;
+                                    chEx.EntityObjectTypeFk = null;
                                     publishChild.EntityExtraData.Add(chEx);
+                                  
+                                   //if (chEx.EntityObjectTypeId != null)
+                                   // {
+                                   //     var entityObjType = await _sycEntityObjectTypeRepository.GetAll().AsNoTracking().Where(z => z.Id == chEx.EntityObjectTypeId)
+                                   //      .AsNoTracking().FirstOrDefaultAsync();
+                                   // ////   // if (x.Entry<SycEntityObjectType>(entityObjType).Attach().FirstOrDefault(x => x.Id == entityObjType.Id) == null)
+                                   // ////    {
+                                   //         // x.SycEntityObjectTypes.Attach(entityObjType);
+                                   // ////       // x.Entry<SycEntityObjectType>(entityObjType)
+                                   //       x.Entry<SycEntityObjectType>(entityObjType).State = EntityState.Unchanged;
+
+                                   // ////    }
+                                   // }
                                 }
-                                await _appMarketplaceItem.UpdateAsync(publishChild);
-                                await CurrentUnitOfWork.SaveChangesAsync();
+                                //x.ChangeTracker.Clear();
+                                //publishChild = await _appMarketplaceItem.InsertAsync(publishChild);
+                                //await x.SaveChangesAsync();
+                                x.ChangeTracker.Clear();
+                                 publishChild = await _appMarketplaceItem.UpdateAsync(publishChild);
+                                 await CurrentUnitOfWork.SaveChangesAsync();
+                                x.ChangeTracker.Clear();
                             }
+                            
                         }
                         else
                         {
@@ -3170,16 +3586,18 @@ namespace onetouch.AppItems
                                     chEx.Id = 0;
                                     chEx.EntityCode = publishChild.Code;
                                     chEx.EntityId = publishChild.Id;
+                                    chEx.EntityObjectTypeFk = null;
                                     publishChild.EntityExtraData.Add(chEx);
                                 }
+                                x.ChangeTracker.Clear();
                                 await _appMarketplaceItem.UpdateAsync(publishChild);
                                 await CurrentUnitOfWork.SaveChangesAsync();
-
+                                x.ChangeTracker.Clear();
                             }
                         }
                         
                     }
-                 //   await x.SaveChangesAsync();
+                    await CurrentUnitOfWork.SaveChangesAsync();
                     //send notification to the users
 
                     //await _appNotifier.SharedProduct(tenant);
@@ -3200,10 +3618,10 @@ namespace onetouch.AppItems
             ////save ItemSharing
             foreach (var sharingDto in input.ItemSharing)
             {
-                AppMarketplaceItemSharing sharing;
+                AppMarketplaceItemSharings sharing;
                 if (sharingDto.Id == 0)
                 {
-                    sharing = ObjectMapper.Map<AppMarketplaceItemSharing>(sharingDto);
+                    sharing = ObjectMapper.Map<AppMarketplaceItemSharings>(sharingDto);
                 }
                 else
                 {
@@ -3365,7 +3783,7 @@ namespace onetouch.AppItems
                                     (o.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + AbpSession.TenantId + "/" + o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
                                     : "attachments/" + AbpSession.TenantId + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
                                     ,
-                                    EntityExtraData = o.EntityFk.EntityExtraData.Select(x => new AppEntityExtraDataDto { AttributeId = x.AttributeId, AttributeValue = x.AttributeValueFk.Name, AttributeValueId = x.AttributeValueId, EntityId = x.EntityId, EntityObjectTypeCode = x.EntityObjectTypeFk.Code, EntityObjectTypeId = x.EntityObjectTypeId, EntityObjectTypeName = x.EntityObjectTypeFk.Name, Id = x.Id }).ToList()
+                                    EntityExtraData = o.EntityFk.EntityExtraData.Select(x => new AppEntityExtraDataDto { AttributeId = x.AttributeId, AttributeValue = (!string.IsNullOrEmpty(x.AttributeValueFk.Name) ? x.AttributeValueFk.Name: x.AttributeValue  ), AttributeValueId = x.AttributeValueId, EntityId = x.EntityId, EntityObjectTypeCode = x.EntityObjectTypeFk.Code, EntityObjectTypeId = x.EntityObjectTypeId, EntityObjectTypeName = x.EntityObjectTypeFk.Name, Id = x.Id }).ToList()
                                     ,
                                     EntityAttachments = o.EntityFk.EntityAttachments.Select(x => new AppEntityAttachmentDto { AttachmentCategoryId = x.AttachmentCategoryId, Id = x.Id, Attributes = x.Attributes, DisplayName = x.AttachmentFk.Name, FileName = x.AttachmentFk.Attachment, IsDefault = x.IsDefault, Url = "attachments/" + AbpSession.TenantId + "/" + x.AttachmentFk.Attachment }).ToList()
                                 };
@@ -3937,8 +4355,12 @@ namespace onetouch.AppItems
                     if (itemExists != null)
                     {
                         itemExcelDto.Id = itemExists.Id;
-                        itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
-                        recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
+                        //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[Start]
+                        //itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
+                        //recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
+                        itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " already exists!");
+                        recordErrorMEssage = "Code :" + itemExcelDto.Code + " already exists!";
+                        //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[End]
                         itemExcelResultsDTO.HasDuplication = true;
                         hasWarning = true;
                     }
@@ -4933,11 +5355,17 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
                                 appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
                             }
-                            appItemSizeScalesHeader.AppItemId = appItem.Id;
+                            //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[Start]
+                            //appItemSizeScalesHeader.AppItemId = appItem.Id;
 
-                            appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                            //appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                            //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[End]
                         }
+                        //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[Start]
+                        appItemSizeScalesHeader.AppItemId = appItem.Id;
 
+                        appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
+                        //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[End]
                         // string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("SIZE-SCALE");
                         // scaleHeader.SizeScaleCode = (scaleHeader.ParentId == null ? "SizeScale-" : "SizeRatio-") + seq;
 
@@ -6119,7 +6547,7 @@ namespace onetouch.AppItems
                                     using (TextReader reader = new StringReader(productEntityObjectType.SycEntityObjectType.ExtraAttributes))
                                     {
                                         productExtraAttributes = (ItemExtraAttributes)serializer.Deserialize(reader);
-                                        if (productExtraAttributes.ExtraAttributes.Count > 0)
+                                        if (productExtraAttributes.ExtraAttributes.Count > 0 && !string.IsNullOrEmpty(attr.EntityObjectTypeCode))
                                         {
                                             var attExtrData = productExtraAttributes.ExtraAttributes.Where(z => z.Name.ToLower().Contains(attr.EntityObjectTypeCode.ToLower())).ToList();
                                             if (attExtrData.Count > 0)
@@ -6152,7 +6580,7 @@ namespace onetouch.AppItems
                                 using (TextReader reader = new StringReader(productEntityObjectType.SycEntityObjectType.ExtraAttributes))
                                 {
                                     productExtraAttributes = (ItemExtraAttributes)serializer.Deserialize(reader);
-                                    if (productExtraAttributes.ExtraAttributes.Count > 0)
+                                    if (productExtraAttributes.ExtraAttributes.Count > 0 && !string.IsNullOrEmpty(attr.EntityObjectTypeCode))
                                     {
                                         var attExtrData = productExtraAttributes.ExtraAttributes.Where(z => z.Name.ToLower().Contains(attr.EntityObjectTypeCode.ToLower())).ToList();
                                         if (attExtrData.Count > 0)

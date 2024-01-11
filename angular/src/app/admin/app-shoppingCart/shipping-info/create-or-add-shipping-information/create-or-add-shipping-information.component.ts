@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter,ViewChild,ViewChildren } from '@angular/core';
 import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto,ContactRoleEnum } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto,ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
@@ -35,6 +35,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   addressSelectedShipTo:boolean=false;
   shipFromSelectedAdd:any;
   shipToSelectedAdd:any;
+  shipingTabVaild:boolean=true;
 
   constructor(
     injector: Injector,
@@ -48,9 +49,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   ngOnInit() {
     this.oldappTransactionsForViewDto =JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let shipFromObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-    this.shipFromSelectedAdd=shipFromObj[0]?.contactAddressDetail;
+    shipFromObj[0]?.companySSIN?this.shipFromSelectedAdd=shipFromObj[0]?.contactAddressDetail:null;
     let shipToObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-    this.shipToSelectedAdd=shipToObj[0]?.contactAddressDetail;
+    shipToObj[0]?.companySSIN?this.shipToSelectedAdd=shipToObj[0]?.contactAddressDetail:null;
     this.storeVal=this.appTransactionsForViewDto?.buyerStore;
     this.shipViaValue=this.appTransactionsForViewDto?.shipViaId;
     this.loadShipViaList();
@@ -59,28 +60,53 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
 updateTabInfo(addObj,contactRole){
  let contactIndex= this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
  
-  if(contactIndex<0||contactIndex==this.appTransactionsForViewDto?.appTransactionContacts?.length){
-    this.oldappTransactionsForViewDto?.appTransactionContacts.push({contactRole:contactRole,
-                                                                   contactAddressCode:addObj.code,
-                                                                   contactAddressId:addObj.id,
-                                                                  contactAddressTypyId:addObj.typeId})
+  if(contactIndex<0||contactIndex==this.oldappTransactionsForViewDto?.appTransactionContacts?.length){
+    var appTransactionContactDto: AppTransactionContactDto = new AppTransactionContactDto();
+    appTransactionContactDto.contactRole=contactRole;
+    appTransactionContactDto.contactAddressCode=addObj.code;
+    appTransactionContactDto.contactAddressId=addObj.id;
+    appTransactionContactDto.contactAddressTypyId=addObj.typeId;
+
+    this.oldappTransactionsForViewDto?.appTransactionContacts.push(appTransactionContactDto);
   }else{
-    this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex]={...this.appTransactionsForViewDto?.appTransactionContacts[contactIndex],contactRole:contactRole,
-      contactAddressCode:addObj.code,
-      contactAddressId:addObj.id,
-     contactAddressTypyId:addObj.typeId}
+    this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole=contactRole;
+    this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode=addObj.code;
+    this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId=addObj.id;
+    this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId=addObj.typeId;
+    this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole=contactRole;
+    this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode=addObj.code;
+    this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId=addObj.id;
+    this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId=addObj.typeId;
+ 
+  }
+  if (this.shipingTabVaild){
+    let shipFromObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+    let shipToObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
+    shipFromObj[0]?.contactAddressDetail?this.enableSAveShipFrom = true:shipFromObj[0]?.contactAddressId?this.enableSAveShipFrom = true:this.enableSAveShipFrom = false;
+    shipToObj[0]?.contactAddressDetail?this.enableSAveShipTo = true:shipToObj[0]?.contactAddressId?this.enableSAveShipTo = true:this.enableSAveShipTo = false;
 
-  }
-  if(contactRole==7&&addObj.id&&addObj.typeId){
-    this.isshipFromContactsValid?this.enableSAveShipFrom=true:this.enableSAveShipFrom=false;
-  }
-  if(contactRole==6&&addObj.id&&addObj.typeId){
-    this.isShipToContactsValid?this.enableSAveShipTo=true:this.enableSAveShipTo=false;
+    if(this.enableSAveShipFrom&&this.enableSAveShipTo){
+      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
+    }
   }
+if(contactRole==ContactRoleEnum.ShipFromContact){
+this.shipFromSelectedAdd=addObj.selectedAddressObj
+}else{
+  this.shipToSelectedAdd=addObj.selectedAddressObj
+
 }
-
-
+}
+cancel(){
+  //this.appTransactionsForViewDto =JSON.parse(this.oldappTransactionsForViewDto);
+  this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
+  this.createOrEditshippingInfO = false;
+  this.showSaveBtn = false;
+}
+save() {
+  this.createOrEditshippingInfO = false;
+  this.createOrEditTransaction();
+}
 updateShipToAddress(addObj){
   this.updateTabInfo(addObj,ContactRoleEnum.ShipToContact);
 }
@@ -112,22 +138,36 @@ enterStore(){
     this.oldappTransactionsForViewDto.buyerStore=this.storeVal;
 }
   isContactFormValid(value,sectionIndex) {
+    let shipFromObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+    let shipToObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
+    if(this.activeTab==this.shoppingCartoccordionTabs.ShippingInfo)
+    {
     this.shippingTabValid = value;
     if (this.shippingTabValid){
+
       if(sectionIndex==1){
-              this.addressSelectedShipTo?this.enableSAveShipFrom = true:this.enableSAveShipFrom = false;
+        shipFromObj[0]?.contactAddressDetail?this.enableSAveShipFrom = true:shipFromObj[0]?.contactAddressId?this.enableSAveShipFrom = true:this.enableSAveShipFrom = false;
       }else{
-        this.addressSelectedShipTo?this.enableSAveShipTo = true:this.enableSAveShipTo = false;     
+        shipToObj[0]?.contactAddressDetail?this.enableSAveShipTo = true:shipToObj[0]?.contactAddressId?this.enableSAveShipTo = true:this.enableSAveShipTo = false;
       }
-      this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+      if(this.enableSAveShipFrom&&this.enableSAveShipTo){
+        this.shipingTabVaild=true;
+        this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
+  
+      }else{
+          this.shipingTabVaild=false;
+        }
     }else{
       if(sectionIndex==1){
       this.enableSAveShipFrom = false;
       }else{
         this.enableSAveShipTo = false;
       }
+      this.enableSAveShipFrom&&this.enableSAveShipTo?this.shipingTabVaild=true:this.shipingTabVaild=false;
 
     }
+
+  }
 
   }
   loadShipViaList(){
@@ -136,26 +176,36 @@ enterStore(){
       this.shipViaList=res;
     })
     }
+    onshowSaveBtn($event) {
+      this.showSaveBtn = $event;
+    }
+    onshowShippingEditMode($event) {
+      if ($event) {
+        this.createOrEditshippingInfO = true;
+      }
+    }
   onUpdateAppTransactionsForViewDto($event) {
     this.oldappTransactionsForViewDto = $event;
   }
   reloadAddresscomponentShipFrom(data){
     this.loadAddresComponentShipFrom=true;
    this.contactIdShipFrom=data.compId;
-
-    if(data.compssin){
+this.shipFromSelectedAdd=null;
+   // if(data.compssin){
    this.AddressComponentChild['first']?.getAddressList(data.compssin);
 
-    }
+    //}
 
   }
   reloadAddresscomponentShipTo(data){
-    if(data.compssin){
+    this.shipToSelectedAdd=null;
+
+   // if(data.compssin){
    this.contactIdShipTo=data.compId;
    this.loadAddresComponentShipTo=true;
    this.AddressComponentChild['second']? this.AddressComponentChild['second'].getAddressList(data.compssin):this.AddressComponentChild['last'].getAddressList(data.compssin);
 
-    }
+   // }
 
   }
 

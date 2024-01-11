@@ -82,6 +82,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     addNew = true;
     invalidBuyerPhoneNumber = "";
     invalidSellerPhoneNumber = "";
+    invalidBuyerContactEMailAddress = "";
+    invalidSellerContactEMailAddress = "";
+    sellerPhoneLabel: string = "Seller Phone Number";
+    buyerPhoneLabel: string = "Buyer Phone Number";
+
+
     body: any;
     setCurrentUserActiveTransaction: boolean = false;
     constructor(
@@ -89,7 +95,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         private fb: FormBuilder,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private userClickService:UserClickService,
+        private userClickService: UserClickService,
         private router: Router
     ) {
         super(injector);
@@ -102,6 +108,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             buyerContactName: [""],
             buyerContactEMailAddress: ["", [Validators.email]],
             buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            istemp: [false],
         });
         this.getAllCompanies();
     }
@@ -128,7 +135,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                 undefined,
                 undefined,
                 undefined,
-                undefined
+                undefined,true
             )
             .subscribe((res: any) => {
                 this.buyerCompanies = [...res.items];
@@ -237,7 +244,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     undefined,
                     undefined,
                     undefined,
-                    undefined
+                    undefined,true
                 )
                 .subscribe((res: any) => {
                     this.buyerCompanies = [...res.items];
@@ -269,7 +276,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     undefined,
                     undefined,
                     undefined,
-                    undefined
+                    undefined,true
                 )
                 .subscribe((res: any) => {
                     this.sellerCompanies = [...res.items];
@@ -299,6 +306,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                 .getAccountRelatedContacts(this.buyerComapnyId, event.filter)
                 .subscribe((res: any) => {
                     this.buyerContacts = [...res];
+
                 });
         }, 500);
     }
@@ -324,6 +332,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             .setValue(event.value.phone);
 
         this.invalidBuyerPhoneNumber = "";
+        this.buyerPhoneLabel = event?.value?.phoneTypeName ? "Buyer " + event?.value?.phoneTypeName + " Number" : this.buyerPhoneLabel;
     }
     handleSellerNameChange(event: any) {
         console.log(">>", event.value);
@@ -335,40 +344,65 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         this.orderForm
             .get("sellerContactPhoneNumber")
             .setValue(event.value.phone);
+
+        this.sellerPhoneLabel = event?.value?.phoneTypeName ? "Seller " + event?.value?.phoneTypeName + " Number" : this.sellerPhoneLabel;
+
     }
 
     areSame: boolean = false;
     async getStarted() {
-
-        if (this.sellerCompanyId !== this.buyerComapnyId) {
+        if ((!this.sellerCompanyId || !this.buyerComapnyId)  || (this.sellerCompanyId !== this.buyerComapnyId)) {
             this.areSame = false;
             this.submitted = true;
             this.invalidBuyerPhoneNumber = "";
+            this.invalidBuyerContactEMailAddress = "";
+            this.invalidSellerContactEMailAddress = "";
+
             if (
-                this.orderForm.get("buyerContactPhoneNumber")?.value?.length < 5
+                this.orderForm.get("buyerContactPhoneNumber")?.value && this.orderForm.get("buyerContactPhoneNumber")?.value?.length < 5
             )
                 this.invalidBuyerPhoneNumber = "Buyer phone Number too short";
 
             if (
-                this.orderForm.get("buyerContactPhoneNumber")?.value?.length >
+                this.orderForm.get("buyerContactPhoneNumber")?.value && this.orderForm.get("buyerContactPhoneNumber")?.value?.length >
                 20
             )
                 this.invalidBuyerPhoneNumber = "Buyer phone Number too long";
 
             this.invalidSellerPhoneNumber = "";
             if (
-                this.orderForm.get("sellerContactPhoneNumber")?.value?.length <
-                5
+                this.orderForm.get("sellerContactPhoneNumber")?.value && this.orderForm.get("sellerContactPhoneNumber")?.value?.length < 5
             )
                 this.invalidSellerPhoneNumber = "Seller phone Number too short";
 
             if (
-                this.orderForm.get("sellerContactPhoneNumber")?.value?.length >
+                this.orderForm.get("sellerContactPhoneNumber")?.value && this.orderForm.get("sellerContactPhoneNumber")?.value?.length >
                 20
             )
                 this.invalidSellerPhoneNumber = "Seller phone Number too long";
 
-            if (this.invalidSellerPhoneNumber || this.invalidBuyerPhoneNumber)
+            if (
+                this.orderForm.get("buyerContactEMailAddress")?.value && this.orderForm.get("buyerContactEMailAddress")?.value?.length < 5
+            )
+                this.invalidBuyerContactEMailAddress = "Email Address is too short";
+
+            if (
+                this.orderForm.get("buyerContactEMailAddress")?.value && this.orderForm.get("buyerContactEMailAddress")?.value?.length > 100
+            )
+                this.invalidBuyerContactEMailAddress = "Email Address is too long";
+
+            if (
+                this.orderForm.get("sellerContactEMailAddress")?.value && this.orderForm.get("sellerContactEMailAddress")?.value?.length < 5
+            )
+                this.invalidSellerContactEMailAddress = "Email Address is too short";
+
+            if (
+                this.orderForm.get("sellerContactEMailAddress")?.value && this.orderForm.get("sellerContactEMailAddress")?.value?.length > 100
+            )
+                this.invalidSellerContactEMailAddress = " Email Address is too long";
+
+
+            if (this.invalidSellerPhoneNumber || this.invalidBuyerPhoneNumber || this.invalidBuyerContactEMailAddress || this.invalidSellerContactEMailAddress)
                 return;
             if (this.orderForm.invalid) {
                 return;
@@ -382,16 +416,16 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     this.body = {
                         sellerContactName:
                             this.orderForm.value?.sellerContactName?.name &&
-                            this.orderForm.value?.sellerContactName?.name !==
+                                this.orderForm.value?.sellerContactName?.name !==
                                 null
                                 ? this.orderForm.value?.sellerContactName?.name
                                 : null,
                         buyerContactName: this.isBuyerTempAccount
                             ? this.orderForm.value?.buyerContactName
                             : this.orderForm.value?.buyerContactName?.name &&
-                              this.orderForm.value?.buyerContactName !== null
-                            ? this.orderForm.value?.buyerContactName?.name
-                            : null,
+                                this.orderForm.value?.buyerContactName !== null
+                                ? this.orderForm.value?.buyerContactName?.name
+                                : null,
                         sellerContactId:
                             this.sellerContactId === 0
                                 ? null
@@ -411,17 +445,17 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                         buyerCompanyName: this.isCompantIdExist
                             ? formValue?.buyerCompanyName
                             : this.orderForm.value?.buyerCompanyName?.name &&
-                              this.orderForm.value?.buyerCompanyName?.name !==
-                                  null
-                            ? this.orderForm.value?.buyerCompanyName?.name
-                            : null,
+                                this.orderForm.value?.buyerCompanyName?.name !==
+                                null
+                                ? this.orderForm.value?.buyerCompanyName?.name
+                                : null,
                         sellerCompanyName: this.isSellerCompanyIdExist
                             ? this.orderForm.value?.sellerCompanyName
                             : this.orderForm.value?.sellerCompanyName?.name &&
-                              this.orderForm.value?.sellerCompanyName?.name !==
-                                  null
-                            ? this.orderForm.value?.sellerCompanyName?.name
-                            : null, // company name condition if dropdown or input
+                                this.orderForm.value?.sellerCompanyName?.name !==
+                                null
+                                ? this.orderForm.value?.sellerCompanyName?.name
+                                : null, // company name condition if dropdown or input
                         enteredByUserRole: this.role,
                         code: this.orderNo,
                         transactionType: this.formType === "SO" ? 0 : 1,
@@ -435,17 +469,17 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     //     sellerId: this.sellerCompanyId,
                     // if (this.formType === "SO") {
 
-                   /*  if (
-                        !this.sellerCompanySSIN?.toString() ||
-                        !this.buyerCompanySSIN?.toString()
-                    ) {
-                        this.addNew = true;
-                        console.log(
-                            ">> before calling add addTransaction function 2",
-                            this.orderNo
-                        );
-                        this.addTransaction();
-                    } else await this.validateShoppingCart(); */
+                    /*  if (
+                         !this.sellerCompanySSIN?.toString() ||
+                         !this.buyerCompanySSIN?.toString()
+                     ) {
+                         this.addNew = true;
+                         console.log(
+                             ">> before calling add addTransaction function 2",
+                             this.orderNo
+                         );
+                         this.addTransaction();
+                     } else await this.validateShoppingCart(); */
                     await this.validateShoppingCart();
                     // } else {
                     // this.btnLoader = true;
@@ -461,7 +495,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     // }
                 }
             }
-        }else{
+        } else {
             this.areSame = true
         }
     }
@@ -503,7 +537,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                         break;
 
                     case ValidateTransaction.FoundInAnotherTransaction:
-                        case ValidateTransaction.FoundShoppingCartForTemp:
+                    case ValidateTransaction.FoundShoppingCartForTemp:
                         this.hideMainSpinner();
                         await Swal.fire({
                             title: "",
@@ -529,12 +563,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                                 this.shoppingCartModal.show(res.shoppingCartId);
                                 this.display = false;
                                 this.hideMainSpinner();
-                            } else
-                            {
+                            } else {
                                 this.setCurrentUserActiveTransaction = true;
-                                 this.addNew = true;
+                                this.addNew = true;
                             }
-                               
+
                         });
                         break;
                     default:
@@ -549,7 +582,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             });
     }
 
-   
+
 
     addTransaction() {
         console.log(">> before add new condition", this.orderNo);
@@ -563,7 +596,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                 .pipe(finalize(() => (this.btnLoader = false)))
                 .subscribe((response: any) => {
                     if (this.setCurrentUserActiveTransaction) {
-                         this._AppTransactionServiceProxy
+                        this._AppTransactionServiceProxy
                             .setCurrentUserActiveTransaction(
                                 response
                             )
@@ -589,9 +622,15 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     );
                     localStorage.setItem("transNO", this.orderNo);
                     localStorage.setItem(
+                        "contactSSIN",
+                        JSON.stringify(this.buyerContactSSIN)
+                    );
+
+                    localStorage.setItem(
                         "SellerSSIN",
                         JSON.stringify(this.sellerCompanySSIN)
                     );
+
                     if (this.isBuyerTempAccount) {
                         localStorage.setItem(
                             "currencyCode",
@@ -602,15 +641,20 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                             "BuyerSSIN",
                             JSON.stringify(this.buyerCompanySSIN)
                         );
+
+                        
+                        if (this.formType.toUpperCase() == "PO")
+                            this.currencyCode=  this.appSession.tenant.currencyInfoDto;
+                            
                         localStorage.setItem(
                             "currencyCode",
                             JSON.stringify(this.currencyCode)
                         );
                     }
-                  if(location.href.toString() ==  AppConsts.appBaseUrl+"/app/main/marketplace/products")
-                         location.reload();
-                else
-                    this.router.navigateByUrl("app/main/marketplace/products");
+                    if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
+                        location.reload();
+                    else
+                        this.router.navigateByUrl("app/main/marketplace/products");
                 });
         }
         this.display = false;
@@ -633,6 +677,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         this.isSellerCompanyIdExist = false;
         this.invalidSellerPhoneNumber = "";
         this.invalidBuyerPhoneNumber = "";
+        this.invalidBuyerContactEMailAddress = "";
+        this.invalidSellerContactEMailAddress = "";
     }
 
     cancel() {
@@ -653,6 +699,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         this.roles = [];
         this.invalidSellerPhoneNumber = "";
         this.invalidBuyerPhoneNumber = "";
+        this.invalidBuyerContactEMailAddress = "";
+        this.invalidSellerContactEMailAddress = "";
+
     }
 
     ngOnInit(): void {

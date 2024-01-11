@@ -198,7 +198,9 @@ namespace onetouch.AppItemSelectors
                 appItemSelectorCount = items.Items.Count;
 
                 var itemsIds = items.Items.Select(e => e.AppItem.Id).Where(e=> !appOldItemSelector.Contains(e)).ToList();
-
+                //T-SII-20231218.0001,1 MMT 01/03/2024 Invert button displays incorrect selected Items count[Start]
+                appItemSelectorCount = itemsIds.Count;
+                //T-SII-20231218.0001,1 MMT 01/03/2024 Invert button displays incorrect selected Items count[End]
                 foreach (var id in itemsIds)
                 {
                     var appItemSelector = new AppItemSelector();

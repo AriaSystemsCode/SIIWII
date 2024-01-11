@@ -7189,6 +7189,60 @@ export class AppEntitiesServiceProxy {
     }
 
     /**
+     * @param currencyCode (optional) 
+     * @return Success
+     */
+    getCurrencyInfo(currencyCode: string | null | undefined): Observable<CurrencyInfoDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetCurrencyInfo?";
+        if (currencyCode !== undefined && currencyCode !== null)
+            url_ += "currencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCurrencyInfo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCurrencyInfo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CurrencyInfoDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CurrencyInfoDto>;
+        }));
+    }
+
+    protected processGetCurrencyInfo(response: HttpResponseBase): Observable<CurrencyInfoDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CurrencyInfoDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return Success
      */
     getAllTitlesForTableDropdown(): Observable<LookupLabelDto[]> {
@@ -9821,6 +9875,7 @@ export class AppItemsServiceProxy {
      * @param arrtibuteFilters (optional) 
      * @param classificationFilters (optional) 
      * @param categoryFilters (optional) 
+     * @param scalesFilters (optional) 
      * @param departmentFilters (optional) 
      * @param entityObjectTypeId (optional) 
      * @param minimumPrice (optional) 
@@ -9834,7 +9889,7 @@ export class AppItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, filterType: ItemsFilterTypesEnum, lastKey: string | null | undefined, selectorKey: string | null | undefined, priceListId: number | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, classificationFilters: number[] | null | undefined, categoryFilters: number[] | null | undefined, departmentFilters: number[] | null | undefined, entityObjectTypeId: number | undefined, minimumPrice: number | undefined, maximumPrice: number | undefined, itemType: number | undefined, listingStatus: number | undefined, publishStatus: number | undefined, visibilityStatus: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppItemForViewDto> {
+    getAll(tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, filterType: ItemsFilterTypesEnum, lastKey: string | null | undefined, selectorKey: string | null | undefined, priceListId: number | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, classificationFilters: number[] | null | undefined, categoryFilters: number[] | null | undefined, scalesFilters: string[] | null | undefined, departmentFilters: number[] | null | undefined, entityObjectTypeId: number | undefined, minimumPrice: number | undefined, maximumPrice: number | undefined, itemType: number | undefined, listingStatus: number | undefined, publishStatus: number | undefined, visibilityStatus: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAll?";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
@@ -9867,6 +9922,8 @@ export class AppItemsServiceProxy {
             classificationFilters && classificationFilters.forEach(item => { url_ += "ClassificationFilters=" + encodeURIComponent("" + item) + "&"; });
         if (categoryFilters !== undefined && categoryFilters !== null)
             categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (scalesFilters !== undefined && scalesFilters !== null)
+            scalesFilters && scalesFilters.forEach(item => { url_ += "ScalesFilters=" + encodeURIComponent("" + item) + "&"; });
         if (departmentFilters !== undefined && departmentFilters !== null)
             departmentFilters && departmentFilters.forEach(item => { url_ += "departmentFilters=" + encodeURIComponent("" + item) + "&"; });
         if (entityObjectTypeId === null)
@@ -10334,6 +10391,7 @@ export class AppItemsServiceProxy {
      * @param getAppItemAttributesInputForExtraData_SkipCount (optional) 
      * @param getAppItemAttributesInputForExtraData_MaxResultCount (optional) 
      * @param currencyCode (optional) 
+     * @param timeZoneValue (optional) 
      * @param itemId (optional) 
      * @param getAppItemAttributesInputForCategories_Sorting (optional) 
      * @param getAppItemAttributesInputForCategories_SkipCount (optional) 
@@ -10349,7 +10407,7 @@ export class AppItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemDetailForViewDto> {
+    getAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, timeZoneValue: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -10379,6 +10437,8 @@ export class AppItemsServiceProxy {
             url_ += "GetAppItemAttributesInputForExtraData.MaxResultCount=" + encodeURIComponent("" + getAppItemAttributesInputForExtraData_MaxResultCount) + "&";
         if (currencyCode !== undefined && currencyCode !== null)
             url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        if (timeZoneValue !== undefined && timeZoneValue !== null)
+            url_ += "TimeZoneValue=" + encodeURIComponent("" + timeZoneValue) + "&";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
         else if (itemId !== undefined)
@@ -14934,6 +14994,7 @@ export class AppMarketplaceItemsServiceProxy {
     }
 
     /**
+     * @param contactSSIN (optional) 
      * @param accountSSIN (optional) 
      * @param tenantId (optional) 
      * @param appItemListId (optional) 
@@ -14957,8 +15018,10 @@ export class AppMarketplaceItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+    getAll(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAll?";
+        if (contactSSIN !== undefined && contactSSIN !== null)
+            url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
         if (accountSSIN !== undefined && accountSSIN !== null)
             url_ += "AccountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
         if (tenantId !== undefined && tenantId !== null)
@@ -18207,9 +18270,10 @@ export class AppTransactionServiceProxy {
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
+     * @param lExclueMyAcc (optional) 
      * @return Success
      */
-    getRelatedAccounts(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountInformationOutputDto> {
+    getRelatedAccounts(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, lExclueMyAcc: boolean | null | undefined): Observable<PagedResultDtoOfGetAccountInformationOutputDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetRelatedAccounts?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -18259,6 +18323,8 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'maxResultCount' cannot be null.");
         else if (maxResultCount !== undefined)
             url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (lExclueMyAcc !== undefined && lExclueMyAcc !== null)
+            url_ += "lExclueMyAcc=" + encodeURIComponent("" + lExclueMyAcc) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -19060,13 +19126,16 @@ export class AppTransactionServiceProxy {
 
     /**
      * @param transactionId (optional) 
+     * @param transactionType (optional) 
      * @param body (optional) 
      * @return Success
      */
-    addTransactionDetails(transactionId: string | null | undefined, body: GetAppMarketplaceItemDetailForViewDto | undefined): Observable<void> {
+    addTransactionDetails(transactionId: string | null | undefined, transactionType: string | null | undefined, body: GetAppMarketplaceItemDetailForViewDto | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/AddTransactionDetails?";
         if (transactionId !== undefined && transactionId !== null)
             url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+        if (transactionType !== undefined && transactionType !== null)
+            url_ += "transactionType=" + encodeURIComponent("" + transactionType) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -20070,6 +20139,246 @@ export class AppUpdateItemSSINServiceProxy {
     }
 
     protected processUpdateSSIN(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    shareItemsHasListing(): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/ShareItemsHasListing";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareItemsHasListing(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareItemsHasListing(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processShareItemsHasListing(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    updateItemList(): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/UpdateItemList";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateItemList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateItemList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateItemList(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    updateMFGCode(): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/UpdateMFGCode";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateMFGCode(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateMFGCode(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateMFGCode(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    removeListingFromAppItem(): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/RemoveListingFromAppItem";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveListingFromAppItem(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveListingFromAppItem(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processRemoveListingFromAppItem(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    shareItemListData(body: AppItemsList | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/ShareItemListData";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareItemListData(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareItemListData(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processShareItemListData(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -64532,6 +64841,7 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
     arrtibuteFilters!: ArrtibuteFilter[] | undefined;
     classificationFilters!: number[] | undefined;
     categoryFilters!: number[] | undefined;
+    scalesFilters!: string[] | undefined;
     departmentFilters!: number[] | undefined;
     entityObjectTypeId!: number;
     minimumPrice!: number;
@@ -64583,6 +64893,11 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
                 this.categoryFilters = [] as any;
                 for (let item of _data["categoryFilters"])
                     this.categoryFilters!.push(item);
+            }
+            if (Array.isArray(_data["scalesFilters"])) {
+                this.scalesFilters = [] as any;
+                for (let item of _data["scalesFilters"])
+                    this.scalesFilters!.push(item);
             }
             if (Array.isArray(_data["departmentFilters"])) {
                 this.departmentFilters = [] as any;
@@ -64638,6 +64953,11 @@ export class GetAllAppItemsInput implements IGetAllAppItemsInput {
             for (let item of this.categoryFilters)
                 data["categoryFilters"].push(item);
         }
+        if (Array.isArray(this.scalesFilters)) {
+            data["scalesFilters"] = [];
+            for (let item of this.scalesFilters)
+                data["scalesFilters"].push(item);
+        }
         if (Array.isArray(this.departmentFilters)) {
             data["departmentFilters"] = [];
             for (let item of this.departmentFilters)
@@ -64669,6 +64989,7 @@ export interface IGetAllAppItemsInput {
     arrtibuteFilters: ArrtibuteFilter[] | undefined;
     classificationFilters: number[] | undefined;
     categoryFilters: number[] | undefined;
+    scalesFilters: string[] | undefined;
     departmentFilters: number[] | undefined;
     entityObjectTypeId: number;
     minimumPrice: number;
@@ -68981,6 +69302,382 @@ export enum ContactRoleEnum {
     Creator = 8,
 }
 
+export class ContactAppAddressDto implements IContactAppAddressDto {
+    contactEmail!: string | undefined;
+    contactPhone!: string | undefined;
+    code!: string | undefined;
+    tenantId!: number | undefined;
+    accountId!: number;
+    name!: string | undefined;
+    addressLine1!: string | undefined;
+    addressLine2!: string | undefined;
+    city!: string | undefined;
+    state!: string | undefined;
+    postalCode!: string | undefined;
+    countryId!: number;
+    countryCode!: string | undefined;
+    countryIdName!: string | undefined;
+    useDTOTenant!: boolean;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IContactAppAddressDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.contactEmail = _data["contactEmail"];
+            this.contactPhone = _data["contactPhone"];
+            this.code = _data["code"];
+            this.tenantId = _data["tenantId"];
+            this.accountId = _data["accountId"];
+            this.name = _data["name"];
+            this.addressLine1 = _data["addressLine1"];
+            this.addressLine2 = _data["addressLine2"];
+            this.city = _data["city"];
+            this.state = _data["state"];
+            this.postalCode = _data["postalCode"];
+            this.countryId = _data["countryId"];
+            this.countryCode = _data["countryCode"];
+            this.countryIdName = _data["countryIdName"];
+            this.useDTOTenant = _data["useDTOTenant"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): ContactAppAddressDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactAppAddressDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["contactEmail"] = this.contactEmail;
+        data["contactPhone"] = this.contactPhone;
+        data["code"] = this.code;
+        data["tenantId"] = this.tenantId;
+        data["accountId"] = this.accountId;
+        data["name"] = this.name;
+        data["addressLine1"] = this.addressLine1;
+        data["addressLine2"] = this.addressLine2;
+        data["city"] = this.city;
+        data["state"] = this.state;
+        data["postalCode"] = this.postalCode;
+        data["countryId"] = this.countryId;
+        data["countryCode"] = this.countryCode;
+        data["countryIdName"] = this.countryIdName;
+        data["useDTOTenant"] = this.useDTOTenant;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IContactAppAddressDto {
+    contactEmail: string | undefined;
+    contactPhone: string | undefined;
+    code: string | undefined;
+    tenantId: number | undefined;
+    accountId: number;
+    name: string | undefined;
+    addressLine1: string | undefined;
+    addressLine2: string | undefined;
+    city: string | undefined;
+    state: string | undefined;
+    postalCode: string | undefined;
+    countryId: number;
+    countryCode: string | undefined;
+    countryIdName: string | undefined;
+    useDTOTenant: boolean;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class GetAccountInformationOutputDto implements IGetAccountInformationOutputDto {
+    id!: number;
+    name!: string | undefined;
+    accountSSIN!: string | undefined;
+    currencyCode!: CurrencyInfoDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAccountInformationOutputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.accountSSIN = _data["accountSSIN"];
+            this.currencyCode = _data["currencyCode"] ? CurrencyInfoDto.fromJS(_data["currencyCode"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetAccountInformationOutputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAccountInformationOutputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["accountSSIN"] = this.accountSSIN;
+        data["currencyCode"] = this.currencyCode ? this.currencyCode.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetAccountInformationOutputDto {
+    id: number;
+    name: string | undefined;
+    accountSSIN: string | undefined;
+    currencyCode: CurrencyInfoDto;
+
+    [key: string]: any;
+}
+
+export class PhoneNumberAndtype implements IPhoneNumberAndtype {
+    phoneNumber!: string | undefined;
+    phoneTypeId!: number | undefined;
+    phoneTypeName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPhoneNumberAndtype) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.phoneNumber = _data["phoneNumber"];
+            this.phoneTypeId = _data["phoneTypeId"];
+            this.phoneTypeName = _data["phoneTypeName"];
+        }
+    }
+
+    static fromJS(data: any): PhoneNumberAndtype {
+        data = typeof data === 'object' ? data : {};
+        let result = new PhoneNumberAndtype();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["phoneNumber"] = this.phoneNumber;
+        data["phoneTypeId"] = this.phoneTypeId;
+        data["phoneTypeName"] = this.phoneTypeName;
+        return data;
+    }
+}
+
+export interface IPhoneNumberAndtype {
+    phoneNumber: string | undefined;
+    phoneTypeId: number | undefined;
+    phoneTypeName: string | undefined;
+
+    [key: string]: any;
+}
+
+export class GetContactInformationDto implements IGetContactInformationDto {
+    id!: number;
+    name!: string | undefined;
+    email!: string | undefined;
+    phone!: string | undefined;
+    ssin!: string | undefined;
+    phoneTypeId!: number | undefined;
+    phoneTypeName!: string | undefined;
+    phoneList!: PhoneNumberAndtype[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IGetContactInformationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.email = _data["email"];
+            this.phone = _data["phone"];
+            this.ssin = _data["ssin"];
+            this.phoneTypeId = _data["phoneTypeId"];
+            this.phoneTypeName = _data["phoneTypeName"];
+            if (Array.isArray(_data["phoneList"])) {
+                this.phoneList = [] as any;
+                for (let item of _data["phoneList"])
+                    this.phoneList!.push(PhoneNumberAndtype.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetContactInformationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetContactInformationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["email"] = this.email;
+        data["phone"] = this.phone;
+        data["ssin"] = this.ssin;
+        data["phoneTypeId"] = this.phoneTypeId;
+        data["phoneTypeName"] = this.phoneTypeName;
+        if (Array.isArray(this.phoneList)) {
+            data["phoneList"] = [];
+            for (let item of this.phoneList)
+                data["phoneList"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IGetContactInformationDto {
+    id: number;
+    name: string | undefined;
+    email: string | undefined;
+    phone: string | undefined;
+    ssin: string | undefined;
+    phoneTypeId: number | undefined;
+    phoneTypeName: string | undefined;
+    phoneList: PhoneNumberAndtype[] | undefined;
+
+    [key: string]: any;
+}
+
+export class AccountBranchDto implements IAccountBranchDto {
+    code!: string | undefined;
+    name!: string | undefined;
+    parentId!: number | undefined;
+    subTotal!: number;
+    ssin!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAccountBranchDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.parentId = _data["parentId"];
+            this.subTotal = _data["subTotal"];
+            this.ssin = _data["ssin"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AccountBranchDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AccountBranchDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["parentId"] = this.parentId;
+        data["subTotal"] = this.subTotal;
+        data["ssin"] = this.ssin;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAccountBranchDto {
+    code: string | undefined;
+    name: string | undefined;
+    parentId: number | undefined;
+    subTotal: number;
+    ssin: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
 export class AppTransactionContactDto implements IAppTransactionContactDto {
     transactionId!: number;
     contactSSIN!: string | undefined;
@@ -68996,7 +69693,12 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     contactPhoneTypeId!: number | undefined;
     contactAddressId!: number | undefined;
     contactAddressCode!: string | undefined;
-    contactAddressDetail!: AppAddressDto;
+    contactAddressDetail!: ContactAppAddressDto;
+    selectedCompany!: GetAccountInformationOutputDto;
+    selectedContact!: GetContactInformationDto;
+    selectedBranch!: AccountBranchDto;
+    selectedPhoneType!: PhoneNumberAndtype;
+    selectContactPhoneNumber!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -69030,7 +69732,12 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.contactPhoneTypeId = _data["contactPhoneTypeId"];
             this.contactAddressId = _data["contactAddressId"];
             this.contactAddressCode = _data["contactAddressCode"];
-            this.contactAddressDetail = _data["contactAddressDetail"] ? AppAddressDto.fromJS(_data["contactAddressDetail"]) : <any>undefined;
+            this.contactAddressDetail = _data["contactAddressDetail"] ? ContactAppAddressDto.fromJS(_data["contactAddressDetail"]) : <any>undefined;
+            this.selectedCompany = _data["selectedCompany"] ? GetAccountInformationOutputDto.fromJS(_data["selectedCompany"]) : <any>undefined;
+            this.selectedContact = _data["selectedContact"] ? GetContactInformationDto.fromJS(_data["selectedContact"]) : <any>undefined;
+            this.selectedBranch = _data["selectedBranch"] ? AccountBranchDto.fromJS(_data["selectedBranch"]) : <any>undefined;
+            this.selectedPhoneType = _data["selectedPhoneType"] ? PhoneNumberAndtype.fromJS(_data["selectedPhoneType"]) : <any>undefined;
+            this.selectContactPhoneNumber = _data["selectContactPhoneNumber"];
             this.id = _data["id"];
         }
     }
@@ -69063,6 +69770,11 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["contactAddressId"] = this.contactAddressId;
         data["contactAddressCode"] = this.contactAddressCode;
         data["contactAddressDetail"] = this.contactAddressDetail ? this.contactAddressDetail.toJSON() : <any>undefined;
+        data["selectedCompany"] = this.selectedCompany ? this.selectedCompany.toJSON() : <any>undefined;
+        data["selectedContact"] = this.selectedContact ? this.selectedContact.toJSON() : <any>undefined;
+        data["selectedBranch"] = this.selectedBranch ? this.selectedBranch.toJSON() : <any>undefined;
+        data["selectedPhoneType"] = this.selectedPhoneType ? this.selectedPhoneType.toJSON() : <any>undefined;
+        data["selectContactPhoneNumber"] = this.selectContactPhoneNumber;
         data["id"] = this.id;
         return data;
     }
@@ -69083,7 +69795,12 @@ export interface IAppTransactionContactDto {
     contactPhoneTypeId: number | undefined;
     contactAddressId: number | undefined;
     contactAddressCode: string | undefined;
-    contactAddressDetail: AppAddressDto;
+    contactAddressDetail: ContactAppAddressDto;
+    selectedCompany: GetAccountInformationOutputDto;
+    selectedContact: GetContactInformationDto;
+    selectedBranch: AccountBranchDto;
+    selectedPhoneType: PhoneNumberAndtype;
+    selectContactPhoneNumber: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -69929,15 +70646,30 @@ export interface IGetAllAppTransactionsInputDto {
     [key: string]: any;
 }
 
-export class GetAccountInformationOutputDto implements IGetAccountInformationOutputDto {
-    id!: number;
-    name!: string | undefined;
-    accountSSIN!: string | undefined;
-    currencyCode!: CurrencyInfoDto;
+export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInputDto {
+    withDetails!: boolean;
+    since_Id!: number;
+    filter!: string | undefined;
+    codeFilter!: string | undefined;
+    descriptionFilter!: string | undefined;
+    entityTypeIdFilter!: number | undefined;
+    fromCreationDateFilter!: moment.Moment | undefined;
+    toCreationDateFilter!: moment.Moment | undefined;
+    fromCompleteDateFilter!: moment.Moment | undefined;
+    toCompleteDateFilter!: moment.Moment | undefined;
+    sellerName!: string | undefined;
+    sellerSSIN!: string | undefined;
+    buyerName!: string | undefined;
+    buyerSSIN!: string | undefined;
+    statusId!: number;
+    fromExport!: boolean;
+    sorting!: string | undefined;
+    skipCount!: number;
+    maxResultCount!: number;
 
     [key: string]: any;
 
-    constructor(data?: IGetAccountInformationOutputDto) {
+    constructor(data?: IGetAllAppTransactionsInputDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -69952,16 +70684,31 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.accountSSIN = _data["accountSSIN"];
-            this.currencyCode = _data["currencyCode"] ? CurrencyInfoDto.fromJS(_data["currencyCode"]) : <any>undefined;
+            this.withDetails = _data["withDetails"];
+            this.since_Id = _data["since_Id"];
+            this.filter = _data["filter"];
+            this.codeFilter = _data["codeFilter"];
+            this.descriptionFilter = _data["descriptionFilter"];
+            this.entityTypeIdFilter = _data["entityTypeIdFilter"];
+            this.fromCreationDateFilter = _data["fromCreationDateFilter"] ? moment(_data["fromCreationDateFilter"].toString()) : <any>undefined;
+            this.toCreationDateFilter = _data["toCreationDateFilter"] ? moment(_data["toCreationDateFilter"].toString()) : <any>undefined;
+            this.fromCompleteDateFilter = _data["fromCompleteDateFilter"] ? moment(_data["fromCompleteDateFilter"].toString()) : <any>undefined;
+            this.toCompleteDateFilter = _data["toCompleteDateFilter"] ? moment(_data["toCompleteDateFilter"].toString()) : <any>undefined;
+            this.sellerName = _data["sellerName"];
+            this.sellerSSIN = _data["sellerSSIN"];
+            this.buyerName = _data["buyerName"];
+            this.buyerSSIN = _data["buyerSSIN"];
+            this.statusId = _data["statusId"];
+            this.fromExport = _data["fromExport"];
+            this.sorting = _data["sorting"];
+            this.skipCount = _data["skipCount"];
+            this.maxResultCount = _data["maxResultCount"];
         }
     }
 
-    static fromJS(data: any): GetAccountInformationOutputDto {
+    static fromJS(data: any): GetAllAppTransactionsInputDto {
         data = typeof data === 'object' ? data : {};
-        let result = new GetAccountInformationOutputDto();
+        let result = new GetAllAppTransactionsInputDto();
         result.init(data);
         return result;
     }
@@ -69972,83 +70719,49 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["accountSSIN"] = this.accountSSIN;
-        data["currencyCode"] = this.currencyCode ? this.currencyCode.toJSON() : <any>undefined;
+        data["withDetails"] = this.withDetails;
+        data["since_Id"] = this.since_Id;
+        data["filter"] = this.filter;
+        data["codeFilter"] = this.codeFilter;
+        data["descriptionFilter"] = this.descriptionFilter;
+        data["entityTypeIdFilter"] = this.entityTypeIdFilter;
+        data["fromCreationDateFilter"] = this.fromCreationDateFilter ? this.fromCreationDateFilter.toISOString() : <any>undefined;
+        data["toCreationDateFilter"] = this.toCreationDateFilter ? this.toCreationDateFilter.toISOString() : <any>undefined;
+        data["fromCompleteDateFilter"] = this.fromCompleteDateFilter ? this.fromCompleteDateFilter.toISOString() : <any>undefined;
+        data["toCompleteDateFilter"] = this.toCompleteDateFilter ? this.toCompleteDateFilter.toISOString() : <any>undefined;
+        data["sellerName"] = this.sellerName;
+        data["sellerSSIN"] = this.sellerSSIN;
+        data["buyerName"] = this.buyerName;
+        data["buyerSSIN"] = this.buyerSSIN;
+        data["statusId"] = this.statusId;
+        data["fromExport"] = this.fromExport;
+        data["sorting"] = this.sorting;
+        data["skipCount"] = this.skipCount;
+        data["maxResultCount"] = this.maxResultCount;
         return data;
     }
 }
 
-export interface IGetAccountInformationOutputDto {
-    id: number;
-    name: string | undefined;
-    accountSSIN: string | undefined;
-    currencyCode: CurrencyInfoDto;
-
-    [key: string]: any;
-}
-
-export class GetContactInformationDto implements IGetContactInformationDto {
-    id!: number;
-    name!: string | undefined;
-    email!: string | undefined;
-    phone!: string | undefined;
-    ssin!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IGetContactInformationDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.email = _data["email"];
-            this.phone = _data["phone"];
-            this.ssin = _data["ssin"];
-        }
-    }
-
-    static fromJS(data: any): GetContactInformationDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetContactInformationDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["email"] = this.email;
-        data["phone"] = this.phone;
-        data["ssin"] = this.ssin;
-        return data;
-    }
-}
-
-export interface IGetContactInformationDto {
-    id: number;
-    name: string | undefined;
-    email: string | undefined;
-    phone: string | undefined;
-    ssin: string | undefined;
+export interface IGetAllAppTransactionsInputDto {
+    withDetails: boolean;
+    since_Id: number;
+    filter: string | undefined;
+    codeFilter: string | undefined;
+    descriptionFilter: string | undefined;
+    entityTypeIdFilter: number | undefined;
+    fromCreationDateFilter: moment.Moment | undefined;
+    toCreationDateFilter: moment.Moment | undefined;
+    fromCompleteDateFilter: moment.Moment | undefined;
+    toCompleteDateFilter: moment.Moment | undefined;
+    sellerName: string | undefined;
+    sellerSSIN: string | undefined;
+    buyerName: string | undefined;
+    buyerSSIN: string | undefined;
+    statusId: number;
+    fromExport: boolean;
+    sorting: string | undefined;
+    skipCount: number;
+    maxResultCount: number;
 
     [key: string]: any;
 }
@@ -71249,74 +71962,6 @@ export interface IGetOrderDetailsForViewDto {
     [key: string]: any;
 }
 
-export class AccountBranchDto implements IAccountBranchDto {
-    code!: string | undefined;
-    name!: string | undefined;
-    parentId!: number | undefined;
-    subTotal!: number;
-    ssin!: string | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IAccountBranchDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.code = _data["code"];
-            this.name = _data["name"];
-            this.parentId = _data["parentId"];
-            this.subTotal = _data["subTotal"];
-            this.ssin = _data["ssin"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AccountBranchDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AccountBranchDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["code"] = this.code;
-        data["name"] = this.name;
-        data["parentId"] = this.parentId;
-        data["subTotal"] = this.subTotal;
-        data["ssin"] = this.ssin;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IAccountBranchDto {
-    code: string | undefined;
-    name: string | undefined;
-    parentId: number | undefined;
-    subTotal: number;
-    ssin: string | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
 export enum TransactionPosition {
     Current = 0,
     Previous = 1,
@@ -71707,6 +72352,1606 @@ export class GetAppTransactionForEditOutput implements IGetAppTransactionForEdit
 
 export interface IGetAppTransactionForEditOutput {
     appTransaction: CreateOrEditAppTransactionDto;
+
+    [key: string]: any;
+}
+
+export class UserOrganizationUnit implements IUserOrganizationUnit {
+    tenantId!: number | undefined;
+    userId!: number;
+    organizationUnitId!: number;
+    isDeleted!: boolean;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IUserOrganizationUnit) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.userId = _data["userId"];
+            this.organizationUnitId = _data["organizationUnitId"];
+            this.isDeleted = _data["isDeleted"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UserOrganizationUnit {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserOrganizationUnit();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["userId"] = this.userId;
+        data["organizationUnitId"] = this.organizationUnitId;
+        data["isDeleted"] = this.isDeleted;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IUserOrganizationUnit {
+    tenantId: number | undefined;
+    userId: number;
+    organizationUnitId: number;
+    isDeleted: boolean;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class UserToken implements IUserToken {
+    tenantId!: number | undefined;
+    userId!: number;
+    loginProvider!: string | undefined;
+    name!: string | undefined;
+    value!: string | undefined;
+    expireDate!: moment.Moment | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IUserToken) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.userId = _data["userId"];
+            this.loginProvider = _data["loginProvider"];
+            this.name = _data["name"];
+            this.value = _data["value"];
+            this.expireDate = _data["expireDate"] ? moment(_data["expireDate"].toString()) : <any>undefined;
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UserToken {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserToken();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["userId"] = this.userId;
+        data["loginProvider"] = this.loginProvider;
+        data["name"] = this.name;
+        data["value"] = this.value;
+        data["expireDate"] = this.expireDate ? this.expireDate.toISOString() : <any>undefined;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IUserToken {
+    tenantId: number | undefined;
+    userId: number;
+    loginProvider: string | undefined;
+    name: string | undefined;
+    value: string | undefined;
+    expireDate: moment.Moment | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class User implements IUser {
+    profilePictureId!: string | undefined;
+    shouldChangePasswordOnNextLogin!: boolean;
+    signInTokenExpireTimeUtc!: moment.Moment | undefined;
+    signInToken!: string | undefined;
+    googleAuthenticatorKey!: string | undefined;
+    organizationUnits!: UserOrganizationUnit[] | undefined;
+    normalizedUserName!: string;
+    normalizedEmailAddress!: string;
+    concurrencyStamp!: string | undefined;
+    tokens!: UserToken[] | undefined;
+    deleterUser!: User;
+    creatorUser!: User;
+    lastModifierUser!: User;
+    authenticationSource!: string | undefined;
+    userName!: string;
+    tenantId!: number | undefined;
+    emailAddress!: string;
+    name!: string;
+    surname!: string;
+    readonly fullName!: string | undefined;
+    password!: string;
+    emailConfirmationCode!: string | undefined;
+    passwordResetCode!: string | undefined;
+    lockoutEndDateUtc!: moment.Moment | undefined;
+    accessFailedCount!: number;
+    isLockoutEnabled!: boolean;
+    phoneNumber!: string | undefined;
+    isPhoneNumberConfirmed!: boolean;
+    securityStamp!: string | undefined;
+    isTwoFactorEnabled!: boolean;
+    logins!: UserLogin[] | undefined;
+    roles!: UserRole[] | undefined;
+    claims!: UserClaim[] | undefined;
+    permissions!: UserPermissionSetting[] | undefined;
+    settings!: Setting[] | undefined;
+    isEmailConfirmed!: boolean;
+    isActive!: boolean;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IUser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.profilePictureId = _data["profilePictureId"];
+            this.shouldChangePasswordOnNextLogin = _data["shouldChangePasswordOnNextLogin"];
+            this.signInTokenExpireTimeUtc = _data["signInTokenExpireTimeUtc"] ? moment(_data["signInTokenExpireTimeUtc"].toString()) : <any>undefined;
+            this.signInToken = _data["signInToken"];
+            this.googleAuthenticatorKey = _data["googleAuthenticatorKey"];
+            if (Array.isArray(_data["organizationUnits"])) {
+                this.organizationUnits = [] as any;
+                for (let item of _data["organizationUnits"])
+                    this.organizationUnits!.push(UserOrganizationUnit.fromJS(item));
+            }
+            this.normalizedUserName = _data["normalizedUserName"];
+            this.normalizedEmailAddress = _data["normalizedEmailAddress"];
+            this.concurrencyStamp = _data["concurrencyStamp"];
+            if (Array.isArray(_data["tokens"])) {
+                this.tokens = [] as any;
+                for (let item of _data["tokens"])
+                    this.tokens!.push(UserToken.fromJS(item));
+            }
+            this.deleterUser = _data["deleterUser"] ? User.fromJS(_data["deleterUser"]) : <any>undefined;
+            this.creatorUser = _data["creatorUser"] ? User.fromJS(_data["creatorUser"]) : <any>undefined;
+            this.lastModifierUser = _data["lastModifierUser"] ? User.fromJS(_data["lastModifierUser"]) : <any>undefined;
+            this.authenticationSource = _data["authenticationSource"];
+            this.userName = _data["userName"];
+            this.tenantId = _data["tenantId"];
+            this.emailAddress = _data["emailAddress"];
+            this.name = _data["name"];
+            this.surname = _data["surname"];
+            (<any>this).fullName = _data["fullName"];
+            this.password = _data["password"];
+            this.emailConfirmationCode = _data["emailConfirmationCode"];
+            this.passwordResetCode = _data["passwordResetCode"];
+            this.lockoutEndDateUtc = _data["lockoutEndDateUtc"] ? moment(_data["lockoutEndDateUtc"].toString()) : <any>undefined;
+            this.accessFailedCount = _data["accessFailedCount"];
+            this.isLockoutEnabled = _data["isLockoutEnabled"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.isPhoneNumberConfirmed = _data["isPhoneNumberConfirmed"];
+            this.securityStamp = _data["securityStamp"];
+            this.isTwoFactorEnabled = _data["isTwoFactorEnabled"];
+            if (Array.isArray(_data["logins"])) {
+                this.logins = [] as any;
+                for (let item of _data["logins"])
+                    this.logins!.push(UserLogin.fromJS(item));
+            }
+            if (Array.isArray(_data["roles"])) {
+                this.roles = [] as any;
+                for (let item of _data["roles"])
+                    this.roles!.push(UserRole.fromJS(item));
+            }
+            if (Array.isArray(_data["claims"])) {
+                this.claims = [] as any;
+                for (let item of _data["claims"])
+                    this.claims!.push(UserClaim.fromJS(item));
+            }
+            if (Array.isArray(_data["permissions"])) {
+                this.permissions = [] as any;
+                for (let item of _data["permissions"])
+                    this.permissions!.push(UserPermissionSetting.fromJS(item));
+            }
+            if (Array.isArray(_data["settings"])) {
+                this.settings = [] as any;
+                for (let item of _data["settings"])
+                    this.settings!.push(Setting.fromJS(item));
+            }
+            this.isEmailConfirmed = _data["isEmailConfirmed"];
+            this.isActive = _data["isActive"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): User {
+        data = typeof data === 'object' ? data : {};
+        let result = new User();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["profilePictureId"] = this.profilePictureId;
+        data["shouldChangePasswordOnNextLogin"] = this.shouldChangePasswordOnNextLogin;
+        data["signInTokenExpireTimeUtc"] = this.signInTokenExpireTimeUtc ? this.signInTokenExpireTimeUtc.toISOString() : <any>undefined;
+        data["signInToken"] = this.signInToken;
+        data["googleAuthenticatorKey"] = this.googleAuthenticatorKey;
+        if (Array.isArray(this.organizationUnits)) {
+            data["organizationUnits"] = [];
+            for (let item of this.organizationUnits)
+                data["organizationUnits"].push(item.toJSON());
+        }
+        data["normalizedUserName"] = this.normalizedUserName;
+        data["normalizedEmailAddress"] = this.normalizedEmailAddress;
+        data["concurrencyStamp"] = this.concurrencyStamp;
+        if (Array.isArray(this.tokens)) {
+            data["tokens"] = [];
+            for (let item of this.tokens)
+                data["tokens"].push(item.toJSON());
+        }
+        data["deleterUser"] = this.deleterUser ? this.deleterUser.toJSON() : <any>undefined;
+        data["creatorUser"] = this.creatorUser ? this.creatorUser.toJSON() : <any>undefined;
+        data["lastModifierUser"] = this.lastModifierUser ? this.lastModifierUser.toJSON() : <any>undefined;
+        data["authenticationSource"] = this.authenticationSource;
+        data["userName"] = this.userName;
+        data["tenantId"] = this.tenantId;
+        data["emailAddress"] = this.emailAddress;
+        data["name"] = this.name;
+        data["surname"] = this.surname;
+        data["fullName"] = this.fullName;
+        data["password"] = this.password;
+        data["emailConfirmationCode"] = this.emailConfirmationCode;
+        data["passwordResetCode"] = this.passwordResetCode;
+        data["lockoutEndDateUtc"] = this.lockoutEndDateUtc ? this.lockoutEndDateUtc.toISOString() : <any>undefined;
+        data["accessFailedCount"] = this.accessFailedCount;
+        data["isLockoutEnabled"] = this.isLockoutEnabled;
+        data["phoneNumber"] = this.phoneNumber;
+        data["isPhoneNumberConfirmed"] = this.isPhoneNumberConfirmed;
+        data["securityStamp"] = this.securityStamp;
+        data["isTwoFactorEnabled"] = this.isTwoFactorEnabled;
+        if (Array.isArray(this.logins)) {
+            data["logins"] = [];
+            for (let item of this.logins)
+                data["logins"].push(item.toJSON());
+        }
+        if (Array.isArray(this.roles)) {
+            data["roles"] = [];
+            for (let item of this.roles)
+                data["roles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.claims)) {
+            data["claims"] = [];
+            for (let item of this.claims)
+                data["claims"].push(item.toJSON());
+        }
+        if (Array.isArray(this.permissions)) {
+            data["permissions"] = [];
+            for (let item of this.permissions)
+                data["permissions"].push(item.toJSON());
+        }
+        if (Array.isArray(this.settings)) {
+            data["settings"] = [];
+            for (let item of this.settings)
+                data["settings"].push(item.toJSON());
+        }
+        data["isEmailConfirmed"] = this.isEmailConfirmed;
+        data["isActive"] = this.isActive;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IUser {
+    profilePictureId: string | undefined;
+    shouldChangePasswordOnNextLogin: boolean;
+    signInTokenExpireTimeUtc: moment.Moment | undefined;
+    signInToken: string | undefined;
+    googleAuthenticatorKey: string | undefined;
+    organizationUnits: UserOrganizationUnit[] | undefined;
+    normalizedUserName: string;
+    normalizedEmailAddress: string;
+    concurrencyStamp: string | undefined;
+    tokens: UserToken[] | undefined;
+    deleterUser: User;
+    creatorUser: User;
+    lastModifierUser: User;
+    authenticationSource: string | undefined;
+    userName: string;
+    tenantId: number | undefined;
+    emailAddress: string;
+    name: string;
+    surname: string;
+    fullName: string | undefined;
+    password: string;
+    emailConfirmationCode: string | undefined;
+    passwordResetCode: string | undefined;
+    lockoutEndDateUtc: moment.Moment | undefined;
+    accessFailedCount: number;
+    isLockoutEnabled: boolean;
+    phoneNumber: string | undefined;
+    isPhoneNumberConfirmed: boolean;
+    securityStamp: string | undefined;
+    isTwoFactorEnabled: boolean;
+    logins: UserLogin[] | undefined;
+    roles: UserRole[] | undefined;
+    claims: UserClaim[] | undefined;
+    permissions: UserPermissionSetting[] | undefined;
+    settings: Setting[] | undefined;
+    isEmailConfirmed: boolean;
+    isActive: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppItemSharing implements IAppItemSharing {
+    itemId!: number | undefined;
+    itemFk!: AppItem;
+    itemListId!: number | undefined;
+    itemListFk!: AppItemsList;
+    sharedTenantId!: number | undefined;
+    sharedUserId!: number | undefined;
+    userFk!: User;
+    sharedUserEMail!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppItemSharing) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.itemId = _data["itemId"];
+            this.itemFk = _data["itemFk"] ? AppItem.fromJS(_data["itemFk"]) : <any>undefined;
+            this.itemListId = _data["itemListId"];
+            this.itemListFk = _data["itemListFk"] ? AppItemsList.fromJS(_data["itemListFk"]) : <any>undefined;
+            this.sharedTenantId = _data["sharedTenantId"];
+            this.sharedUserId = _data["sharedUserId"];
+            this.userFk = _data["userFk"] ? User.fromJS(_data["userFk"]) : <any>undefined;
+            this.sharedUserEMail = _data["sharedUserEMail"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppItemSharing {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppItemSharing();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["itemId"] = this.itemId;
+        data["itemFk"] = this.itemFk ? this.itemFk.toJSON() : <any>undefined;
+        data["itemListId"] = this.itemListId;
+        data["itemListFk"] = this.itemListFk ? this.itemListFk.toJSON() : <any>undefined;
+        data["sharedTenantId"] = this.sharedTenantId;
+        data["sharedUserId"] = this.sharedUserId;
+        data["userFk"] = this.userFk ? this.userFk.toJSON() : <any>undefined;
+        data["sharedUserEMail"] = this.sharedUserEMail;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppItemSharing {
+    itemId: number | undefined;
+    itemFk: AppItem;
+    itemListId: number | undefined;
+    itemListFk: AppItemsList;
+    sharedTenantId: number | undefined;
+    sharedUserId: number | undefined;
+    userFk: User;
+    sharedUserEMail: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppItemPrices implements IAppItemPrices {
+    tenantId!: number | undefined;
+    code!: string | undefined;
+    price!: number;
+    appItemId!: number;
+    appItemCode!: string | undefined;
+    currencyId!: number | undefined;
+    currencyCode!: string | undefined;
+    currencyFk!: AppEntity;
+    appItemFk!: AppItem;
+    isDefault!: boolean;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppItemPrices) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.code = _data["code"];
+            this.price = _data["price"];
+            this.appItemId = _data["appItemId"];
+            this.appItemCode = _data["appItemCode"];
+            this.currencyId = _data["currencyId"];
+            this.currencyCode = _data["currencyCode"];
+            this.currencyFk = _data["currencyFk"] ? AppEntity.fromJS(_data["currencyFk"]) : <any>undefined;
+            this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
+            this.isDefault = _data["isDefault"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppItemPrices {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppItemPrices();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["code"] = this.code;
+        data["price"] = this.price;
+        data["appItemId"] = this.appItemId;
+        data["appItemCode"] = this.appItemCode;
+        data["currencyId"] = this.currencyId;
+        data["currencyCode"] = this.currencyCode;
+        data["currencyFk"] = this.currencyFk ? this.currencyFk.toJSON() : <any>undefined;
+        data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
+        data["isDefault"] = this.isDefault;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppItemPrices {
+    tenantId: number | undefined;
+    code: string | undefined;
+    price: number;
+    appItemId: number;
+    appItemCode: string | undefined;
+    currencyId: number | undefined;
+    currencyCode: string | undefined;
+    currencyFk: AppEntity;
+    appItemFk: AppItem;
+    isDefault: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppSizeScalesDetail implements IAppSizeScalesDetail {
+    tenantId!: number | undefined;
+    sizeScaleId!: number;
+    sizeCode!: string | undefined;
+    sizeRatio!: number;
+    d1Position!: string | undefined;
+    d2Position!: string | undefined;
+    d3Position!: string | undefined;
+    sizeId!: number | undefined;
+    dimensionName!: string | undefined;
+    sizeFk!: AppEntity;
+    appSizeScalesHeaderFk!: AppSizeScalesHeader;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppSizeScalesDetail) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.sizeScaleId = _data["sizeScaleId"];
+            this.sizeCode = _data["sizeCode"];
+            this.sizeRatio = _data["sizeRatio"];
+            this.d1Position = _data["d1Position"];
+            this.d2Position = _data["d2Position"];
+            this.d3Position = _data["d3Position"];
+            this.sizeId = _data["sizeId"];
+            this.dimensionName = _data["dimensionName"];
+            this.sizeFk = _data["sizeFk"] ? AppEntity.fromJS(_data["sizeFk"]) : <any>undefined;
+            this.appSizeScalesHeaderFk = _data["appSizeScalesHeaderFk"] ? AppSizeScalesHeader.fromJS(_data["appSizeScalesHeaderFk"]) : <any>undefined;
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppSizeScalesDetail {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppSizeScalesDetail();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["sizeScaleId"] = this.sizeScaleId;
+        data["sizeCode"] = this.sizeCode;
+        data["sizeRatio"] = this.sizeRatio;
+        data["d1Position"] = this.d1Position;
+        data["d2Position"] = this.d2Position;
+        data["d3Position"] = this.d3Position;
+        data["sizeId"] = this.sizeId;
+        data["dimensionName"] = this.dimensionName;
+        data["sizeFk"] = this.sizeFk ? this.sizeFk.toJSON() : <any>undefined;
+        data["appSizeScalesHeaderFk"] = this.appSizeScalesHeaderFk ? this.appSizeScalesHeaderFk.toJSON() : <any>undefined;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppSizeScalesDetail {
+    tenantId: number | undefined;
+    sizeScaleId: number;
+    sizeCode: string | undefined;
+    sizeRatio: number;
+    d1Position: string | undefined;
+    d2Position: string | undefined;
+    d3Position: string | undefined;
+    sizeId: number | undefined;
+    dimensionName: string | undefined;
+    sizeFk: AppEntity;
+    appSizeScalesHeaderFk: AppSizeScalesHeader;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppSizeScalesHeader implements IAppSizeScalesHeader {
+    tenantId!: number | undefined;
+    entityId!: number;
+    parentId!: number | undefined;
+    code!: string | undefined;
+    noOfDimensions!: number;
+    isDefault!: boolean;
+    name!: string | undefined;
+    dimesion1Name!: string | undefined;
+    dimesion2Name!: string | undefined;
+    dimesion3Name!: string | undefined;
+    entityFk!: AppEntity;
+    appSizeScalesHeaderFk!: AppSizeScalesHeader;
+    appSizeScalesDetails!: AppSizeScalesDetail[] | undefined;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppSizeScalesHeader) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.entityId = _data["entityId"];
+            this.parentId = _data["parentId"];
+            this.code = _data["code"];
+            this.noOfDimensions = _data["noOfDimensions"];
+            this.isDefault = _data["isDefault"];
+            this.name = _data["name"];
+            this.dimesion1Name = _data["dimesion1Name"];
+            this.dimesion2Name = _data["dimesion2Name"];
+            this.dimesion3Name = _data["dimesion3Name"];
+            this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
+            this.appSizeScalesHeaderFk = _data["appSizeScalesHeaderFk"] ? AppSizeScalesHeader.fromJS(_data["appSizeScalesHeaderFk"]) : <any>undefined;
+            if (Array.isArray(_data["appSizeScalesDetails"])) {
+                this.appSizeScalesDetails = [] as any;
+                for (let item of _data["appSizeScalesDetails"])
+                    this.appSizeScalesDetails!.push(AppSizeScalesDetail.fromJS(item));
+            }
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppSizeScalesHeader {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppSizeScalesHeader();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["entityId"] = this.entityId;
+        data["parentId"] = this.parentId;
+        data["code"] = this.code;
+        data["noOfDimensions"] = this.noOfDimensions;
+        data["isDefault"] = this.isDefault;
+        data["name"] = this.name;
+        data["dimesion1Name"] = this.dimesion1Name;
+        data["dimesion2Name"] = this.dimesion2Name;
+        data["dimesion3Name"] = this.dimesion3Name;
+        data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
+        data["appSizeScalesHeaderFk"] = this.appSizeScalesHeaderFk ? this.appSizeScalesHeaderFk.toJSON() : <any>undefined;
+        if (Array.isArray(this.appSizeScalesDetails)) {
+            data["appSizeScalesDetails"] = [];
+            for (let item of this.appSizeScalesDetails)
+                data["appSizeScalesDetails"].push(item.toJSON());
+        }
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppSizeScalesHeader {
+    tenantId: number | undefined;
+    entityId: number;
+    parentId: number | undefined;
+    code: string | undefined;
+    noOfDimensions: number;
+    isDefault: boolean;
+    name: string | undefined;
+    dimesion1Name: string | undefined;
+    dimesion2Name: string | undefined;
+    dimesion3Name: string | undefined;
+    entityFk: AppEntity;
+    appSizeScalesHeaderFk: AppSizeScalesHeader;
+    appSizeScalesDetails: AppSizeScalesDetail[] | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppItemSizeScalesDetails implements IAppItemSizeScalesDetails {
+    tenantId!: number | undefined;
+    sizeCode!: string | undefined;
+    sizeScaleId!: number;
+    sizeRatio!: number;
+    d1Position!: string | undefined;
+    d2Position!: string | undefined;
+    d3Position!: string | undefined;
+    sizeId!: number | undefined;
+    dimensionName!: string | undefined;
+    sizeFk!: AppEntity;
+    sizeScaleFK!: AppItemSizeScalesHeader;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppItemSizeScalesDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.sizeCode = _data["sizeCode"];
+            this.sizeScaleId = _data["sizeScaleId"];
+            this.sizeRatio = _data["sizeRatio"];
+            this.d1Position = _data["d1Position"];
+            this.d2Position = _data["d2Position"];
+            this.d3Position = _data["d3Position"];
+            this.sizeId = _data["sizeId"];
+            this.dimensionName = _data["dimensionName"];
+            this.sizeFk = _data["sizeFk"] ? AppEntity.fromJS(_data["sizeFk"]) : <any>undefined;
+            this.sizeScaleFK = _data["sizeScaleFK"] ? AppItemSizeScalesHeader.fromJS(_data["sizeScaleFK"]) : <any>undefined;
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppItemSizeScalesDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppItemSizeScalesDetails();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["sizeCode"] = this.sizeCode;
+        data["sizeScaleId"] = this.sizeScaleId;
+        data["sizeRatio"] = this.sizeRatio;
+        data["d1Position"] = this.d1Position;
+        data["d2Position"] = this.d2Position;
+        data["d3Position"] = this.d3Position;
+        data["sizeId"] = this.sizeId;
+        data["dimensionName"] = this.dimensionName;
+        data["sizeFk"] = this.sizeFk ? this.sizeFk.toJSON() : <any>undefined;
+        data["sizeScaleFK"] = this.sizeScaleFK ? this.sizeScaleFK.toJSON() : <any>undefined;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppItemSizeScalesDetails {
+    tenantId: number | undefined;
+    sizeCode: string | undefined;
+    sizeScaleId: number;
+    sizeRatio: number;
+    d1Position: string | undefined;
+    d2Position: string | undefined;
+    d3Position: string | undefined;
+    sizeId: number | undefined;
+    dimensionName: string | undefined;
+    sizeFk: AppEntity;
+    sizeScaleFK: AppItemSizeScalesHeader;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppItemSizeScalesHeader implements IAppItemSizeScalesHeader {
+    sizeScaleCode!: string | undefined;
+    noOfDimensions!: number;
+    tenantId!: number | undefined;
+    appItemId!: number;
+    sizeScaleName!: string | undefined;
+    sizeScaleId!: number | undefined;
+    name!: string | undefined;
+    dimesion1Name!: string | undefined;
+    dimesion2Name!: string | undefined;
+    dimesion3Name!: string | undefined;
+    parentId!: number | undefined;
+    appItemFk!: AppItem;
+    sizeScaleFK!: AppSizeScalesHeader;
+    itemSizeScaleFK!: AppItemSizeScalesHeader;
+    appItemSizeScalesDetails!: AppItemSizeScalesDetails[] | undefined;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppItemSizeScalesHeader) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.sizeScaleCode = _data["sizeScaleCode"];
+            this.noOfDimensions = _data["noOfDimensions"];
+            this.tenantId = _data["tenantId"];
+            this.appItemId = _data["appItemId"];
+            this.sizeScaleName = _data["sizeScaleName"];
+            this.sizeScaleId = _data["sizeScaleId"];
+            this.name = _data["name"];
+            this.dimesion1Name = _data["dimesion1Name"];
+            this.dimesion2Name = _data["dimesion2Name"];
+            this.dimesion3Name = _data["dimesion3Name"];
+            this.parentId = _data["parentId"];
+            this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
+            this.sizeScaleFK = _data["sizeScaleFK"] ? AppSizeScalesHeader.fromJS(_data["sizeScaleFK"]) : <any>undefined;
+            this.itemSizeScaleFK = _data["itemSizeScaleFK"] ? AppItemSizeScalesHeader.fromJS(_data["itemSizeScaleFK"]) : <any>undefined;
+            if (Array.isArray(_data["appItemSizeScalesDetails"])) {
+                this.appItemSizeScalesDetails = [] as any;
+                for (let item of _data["appItemSizeScalesDetails"])
+                    this.appItemSizeScalesDetails!.push(AppItemSizeScalesDetails.fromJS(item));
+            }
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppItemSizeScalesHeader {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppItemSizeScalesHeader();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["sizeScaleCode"] = this.sizeScaleCode;
+        data["noOfDimensions"] = this.noOfDimensions;
+        data["tenantId"] = this.tenantId;
+        data["appItemId"] = this.appItemId;
+        data["sizeScaleName"] = this.sizeScaleName;
+        data["sizeScaleId"] = this.sizeScaleId;
+        data["name"] = this.name;
+        data["dimesion1Name"] = this.dimesion1Name;
+        data["dimesion2Name"] = this.dimesion2Name;
+        data["dimesion3Name"] = this.dimesion3Name;
+        data["parentId"] = this.parentId;
+        data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
+        data["sizeScaleFK"] = this.sizeScaleFK ? this.sizeScaleFK.toJSON() : <any>undefined;
+        data["itemSizeScaleFK"] = this.itemSizeScaleFK ? this.itemSizeScaleFK.toJSON() : <any>undefined;
+        if (Array.isArray(this.appItemSizeScalesDetails)) {
+            data["appItemSizeScalesDetails"] = [];
+            for (let item of this.appItemSizeScalesDetails)
+                data["appItemSizeScalesDetails"].push(item.toJSON());
+        }
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppItemSizeScalesHeader {
+    sizeScaleCode: string | undefined;
+    noOfDimensions: number;
+    tenantId: number | undefined;
+    appItemId: number;
+    sizeScaleName: string | undefined;
+    sizeScaleId: number | undefined;
+    name: string | undefined;
+    dimesion1Name: string | undefined;
+    dimesion2Name: string | undefined;
+    dimesion3Name: string | undefined;
+    parentId: number | undefined;
+    appItemFk: AppItem;
+    sizeScaleFK: AppSizeScalesHeader;
+    itemSizeScaleFK: AppItemSizeScalesHeader;
+    appItemSizeScalesDetails: AppItemSizeScalesDetails[] | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppItem implements IAppItem {
+    tenantId!: number | undefined;
+    code!: string | undefined;
+    name!: string | undefined;
+    description!: string | undefined;
+    variations!: string | undefined;
+    entityId!: number;
+    price!: number;
+    stockAvailability!: number;
+    parentId!: number | undefined;
+    entityFk!: AppEntity;
+    parentFk!: AppItem;
+    parentEntityId!: number | undefined;
+    parentEntityFk!: AppEntity;
+    listingItemId!: number | undefined;
+    listingItemFk!: AppItem;
+    publishedListingItemId!: number | undefined;
+    publishedListingItemFk!: AppItem;
+    itemType!: number;
+    sharingLevel!: number;
+    parentFkList!: AppItem[] | undefined;
+    listingItemFkList!: AppItem[] | undefined;
+    publishedListingItemFkList!: AppItem[] | undefined;
+    itemSharingFkList!: AppItemSharing[] | undefined;
+    itemPricesFkList!: AppItemPrices[] | undefined;
+    itemSizeScaleHeadersFkList!: AppItemSizeScalesHeader[] | undefined;
+    timeStamp!: moment.Moment;
+    tenantOwner!: number;
+    ssin!: string | undefined;
+    sycIdentifierId!: number | undefined;
+    sycIdentifierIdFk!: SycIdentifierDefinition;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.variations = _data["variations"];
+            this.entityId = _data["entityId"];
+            this.price = _data["price"];
+            this.stockAvailability = _data["stockAvailability"];
+            this.parentId = _data["parentId"];
+            this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
+            this.parentFk = _data["parentFk"] ? AppItem.fromJS(_data["parentFk"]) : <any>undefined;
+            this.parentEntityId = _data["parentEntityId"];
+            this.parentEntityFk = _data["parentEntityFk"] ? AppEntity.fromJS(_data["parentEntityFk"]) : <any>undefined;
+            this.listingItemId = _data["listingItemId"];
+            this.listingItemFk = _data["listingItemFk"] ? AppItem.fromJS(_data["listingItemFk"]) : <any>undefined;
+            this.publishedListingItemId = _data["publishedListingItemId"];
+            this.publishedListingItemFk = _data["publishedListingItemFk"] ? AppItem.fromJS(_data["publishedListingItemFk"]) : <any>undefined;
+            this.itemType = _data["itemType"];
+            this.sharingLevel = _data["sharingLevel"];
+            if (Array.isArray(_data["parentFkList"])) {
+                this.parentFkList = [] as any;
+                for (let item of _data["parentFkList"])
+                    this.parentFkList!.push(AppItem.fromJS(item));
+            }
+            if (Array.isArray(_data["listingItemFkList"])) {
+                this.listingItemFkList = [] as any;
+                for (let item of _data["listingItemFkList"])
+                    this.listingItemFkList!.push(AppItem.fromJS(item));
+            }
+            if (Array.isArray(_data["publishedListingItemFkList"])) {
+                this.publishedListingItemFkList = [] as any;
+                for (let item of _data["publishedListingItemFkList"])
+                    this.publishedListingItemFkList!.push(AppItem.fromJS(item));
+            }
+            if (Array.isArray(_data["itemSharingFkList"])) {
+                this.itemSharingFkList = [] as any;
+                for (let item of _data["itemSharingFkList"])
+                    this.itemSharingFkList!.push(AppItemSharing.fromJS(item));
+            }
+            if (Array.isArray(_data["itemPricesFkList"])) {
+                this.itemPricesFkList = [] as any;
+                for (let item of _data["itemPricesFkList"])
+                    this.itemPricesFkList!.push(AppItemPrices.fromJS(item));
+            }
+            if (Array.isArray(_data["itemSizeScaleHeadersFkList"])) {
+                this.itemSizeScaleHeadersFkList = [] as any;
+                for (let item of _data["itemSizeScaleHeadersFkList"])
+                    this.itemSizeScaleHeadersFkList!.push(AppItemSizeScalesHeader.fromJS(item));
+            }
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.tenantOwner = _data["tenantOwner"];
+            this.ssin = _data["ssin"];
+            this.sycIdentifierId = _data["sycIdentifierId"];
+            this.sycIdentifierIdFk = _data["sycIdentifierIdFk"] ? SycIdentifierDefinition.fromJS(_data["sycIdentifierIdFk"]) : <any>undefined;
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["variations"] = this.variations;
+        data["entityId"] = this.entityId;
+        data["price"] = this.price;
+        data["stockAvailability"] = this.stockAvailability;
+        data["parentId"] = this.parentId;
+        data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
+        data["parentFk"] = this.parentFk ? this.parentFk.toJSON() : <any>undefined;
+        data["parentEntityId"] = this.parentEntityId;
+        data["parentEntityFk"] = this.parentEntityFk ? this.parentEntityFk.toJSON() : <any>undefined;
+        data["listingItemId"] = this.listingItemId;
+        data["listingItemFk"] = this.listingItemFk ? this.listingItemFk.toJSON() : <any>undefined;
+        data["publishedListingItemId"] = this.publishedListingItemId;
+        data["publishedListingItemFk"] = this.publishedListingItemFk ? this.publishedListingItemFk.toJSON() : <any>undefined;
+        data["itemType"] = this.itemType;
+        data["sharingLevel"] = this.sharingLevel;
+        if (Array.isArray(this.parentFkList)) {
+            data["parentFkList"] = [];
+            for (let item of this.parentFkList)
+                data["parentFkList"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listingItemFkList)) {
+            data["listingItemFkList"] = [];
+            for (let item of this.listingItemFkList)
+                data["listingItemFkList"].push(item.toJSON());
+        }
+        if (Array.isArray(this.publishedListingItemFkList)) {
+            data["publishedListingItemFkList"] = [];
+            for (let item of this.publishedListingItemFkList)
+                data["publishedListingItemFkList"].push(item.toJSON());
+        }
+        if (Array.isArray(this.itemSharingFkList)) {
+            data["itemSharingFkList"] = [];
+            for (let item of this.itemSharingFkList)
+                data["itemSharingFkList"].push(item.toJSON());
+        }
+        if (Array.isArray(this.itemPricesFkList)) {
+            data["itemPricesFkList"] = [];
+            for (let item of this.itemPricesFkList)
+                data["itemPricesFkList"].push(item.toJSON());
+        }
+        if (Array.isArray(this.itemSizeScaleHeadersFkList)) {
+            data["itemSizeScaleHeadersFkList"] = [];
+            for (let item of this.itemSizeScaleHeadersFkList)
+                data["itemSizeScaleHeadersFkList"].push(item.toJSON());
+        }
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["tenantOwner"] = this.tenantOwner;
+        data["ssin"] = this.ssin;
+        data["sycIdentifierId"] = this.sycIdentifierId;
+        data["sycIdentifierIdFk"] = this.sycIdentifierIdFk ? this.sycIdentifierIdFk.toJSON() : <any>undefined;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppItem {
+    tenantId: number | undefined;
+    code: string | undefined;
+    name: string | undefined;
+    description: string | undefined;
+    variations: string | undefined;
+    entityId: number;
+    price: number;
+    stockAvailability: number;
+    parentId: number | undefined;
+    entityFk: AppEntity;
+    parentFk: AppItem;
+    parentEntityId: number | undefined;
+    parentEntityFk: AppEntity;
+    listingItemId: number | undefined;
+    listingItemFk: AppItem;
+    publishedListingItemId: number | undefined;
+    publishedListingItemFk: AppItem;
+    itemType: number;
+    sharingLevel: number;
+    parentFkList: AppItem[] | undefined;
+    listingItemFkList: AppItem[] | undefined;
+    publishedListingItemFkList: AppItem[] | undefined;
+    itemSharingFkList: AppItemSharing[] | undefined;
+    itemPricesFkList: AppItemPrices[] | undefined;
+    itemSizeScaleHeadersFkList: AppItemSizeScalesHeader[] | undefined;
+    timeStamp: moment.Moment;
+    tenantOwner: number;
+    ssin: string | undefined;
+    sycIdentifierId: number | undefined;
+    sycIdentifierIdFk: SycIdentifierDefinition;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppItemsListDetail implements IAppItemsListDetail {
+    itemsListId!: number;
+    itemsListFK!: AppItemsList;
+    itemsListCode!: string | undefined;
+    itemId!: number;
+    itemFK!: AppItem;
+    itemCode!: string | undefined;
+    state!: string | undefined;
+    itemSSIN!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppItemsListDetail) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.itemsListId = _data["itemsListId"];
+            this.itemsListFK = _data["itemsListFK"] ? AppItemsList.fromJS(_data["itemsListFK"]) : <any>undefined;
+            this.itemsListCode = _data["itemsListCode"];
+            this.itemId = _data["itemId"];
+            this.itemFK = _data["itemFK"] ? AppItem.fromJS(_data["itemFK"]) : <any>undefined;
+            this.itemCode = _data["itemCode"];
+            this.state = _data["state"];
+            this.itemSSIN = _data["itemSSIN"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppItemsListDetail {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppItemsListDetail();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["itemsListId"] = this.itemsListId;
+        data["itemsListFK"] = this.itemsListFK ? this.itemsListFK.toJSON() : <any>undefined;
+        data["itemsListCode"] = this.itemsListCode;
+        data["itemId"] = this.itemId;
+        data["itemFK"] = this.itemFK ? this.itemFK.toJSON() : <any>undefined;
+        data["itemCode"] = this.itemCode;
+        data["state"] = this.state;
+        data["itemSSIN"] = this.itemSSIN;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppItemsListDetail {
+    itemsListId: number;
+    itemsListFK: AppItemsList;
+    itemsListCode: string | undefined;
+    itemId: number;
+    itemFK: AppItem;
+    itemCode: string | undefined;
+    state: string | undefined;
+    itemSSIN: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class AppItemsList implements IAppItemsList {
+    tenantId!: number | undefined;
+    code!: string;
+    name!: string | undefined;
+    description!: string | undefined;
+    sharingLevel!: number;
+    entityId!: number;
+    entityFk!: AppEntity;
+    appItemsListDetails!: AppItemsListDetail[] | undefined;
+    itemSharingFkList!: AppItemSharing[] | undefined;
+    timeStamp!: moment.Moment;
+    ssin!: string | undefined;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppItemsList) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.sharingLevel = _data["sharingLevel"];
+            this.entityId = _data["entityId"];
+            this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
+            if (Array.isArray(_data["appItemsListDetails"])) {
+                this.appItemsListDetails = [] as any;
+                for (let item of _data["appItemsListDetails"])
+                    this.appItemsListDetails!.push(AppItemsListDetail.fromJS(item));
+            }
+            if (Array.isArray(_data["itemSharingFkList"])) {
+                this.itemSharingFkList = [] as any;
+                for (let item of _data["itemSharingFkList"])
+                    this.itemSharingFkList!.push(AppItemSharing.fromJS(item));
+            }
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.ssin = _data["ssin"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppItemsList {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppItemsList();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["sharingLevel"] = this.sharingLevel;
+        data["entityId"] = this.entityId;
+        data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
+        if (Array.isArray(this.appItemsListDetails)) {
+            data["appItemsListDetails"] = [];
+            for (let item of this.appItemsListDetails)
+                data["appItemsListDetails"].push(item.toJSON());
+        }
+        if (Array.isArray(this.itemSharingFkList)) {
+            data["itemSharingFkList"] = [];
+            for (let item of this.itemSharingFkList)
+                data["itemSharingFkList"].push(item.toJSON());
+        }
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["ssin"] = this.ssin;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppItemsList {
+    tenantId: number | undefined;
+    code: string;
+    name: string | undefined;
+    description: string | undefined;
+    sharingLevel: number;
+    entityId: number;
+    entityFk: AppEntity;
+    appItemsListDetails: AppItemsListDetail[] | undefined;
+    itemSharingFkList: AppItemSharing[] | undefined;
+    timeStamp: moment.Moment;
+    ssin: string | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
 
     [key: string]: any;
 }

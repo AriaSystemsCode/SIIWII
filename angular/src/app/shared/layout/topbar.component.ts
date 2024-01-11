@@ -25,6 +25,8 @@ import {
     ICreateOrEditAppTransactionsDto,
     ShoppingCartSummary,
     TransactionType,
+    AppEntitiesServiceProxy,
+    CurrencyInfoDto,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -156,7 +158,7 @@ export class TopBarComponent
     _TransactionType = TransactionType;
     transactionType: string = "";
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
-
+    currencySymbol: string = "";
 
     constructor(
         injector: Injector,
@@ -175,7 +177,8 @@ export class TopBarComponent
         private updateLogoService: UpdateLogoService,
         private fb: FormBuilder,
         private datePipe: DatePipe,
-        private _AppTransactionServiceProxy: AppTransactionServiceProxy
+        private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   
     ) {
         super(injector);
 
@@ -508,7 +511,14 @@ export class TopBarComponent
                 if (openShoppingCart)
                     this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
 
+                     //Currency
+            this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+            .subscribe((res: CurrencyInfoDto) => {
+                this.currencySymbol = res.symbol ? res.symbol : res.code  ;
             });
+
+            });
+            
     }
 
 }

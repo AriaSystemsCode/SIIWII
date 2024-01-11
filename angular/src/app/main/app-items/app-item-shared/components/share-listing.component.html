@@ -54,8 +54,8 @@
                 <div class="d-flex flex-grow-1  pl-3">
                     <img class="mr-3 rounded-circle" height="30px" src="../../../../../assets/icons/user-icon.jpg" alt="user-icon.jpg">
                     <div class="flex-grow-1">
-                        <h5 class="mb-1" *ngIf="!user.sharedUserEMail">{{user?.sharedUserName}} {{user?.sharedUserSureName}} @ {{user?.sharedUserTenantName}}</h5>
-                        <h5 class="mb-1 text-black-50" *ngIf="user.sharedUserEMail">{{user?.sharedUserEMail}}</h5>
+                        <h5 class="mb-1" *ngIf="user.sharedUserName">{{user?.sharedUserName}} {{user?.sharedUserSureName}} @ {{user?.sharedUserTenantName}}</h5>
+                        <h5 class="mb-1 text-black-50" *ngIf="!user.sharedUserName">{{user?.sharedUserEMail}}</h5>
                     </div>
                 </div>
                 <div class="align-self-center ">
@@ -67,7 +67,7 @@
         </div>
         <div class="d-flex flex-column border-dashed-bottom pb-3 pt-3">
             <label for="notify" >
-                <input type="checkbox" [disabled]="publishItemOptions.sharingLevel === 1" name="notify" id="notify" [(ngModel)]="_notify" (change)="triggerMessage($event)"> {{"NotifyPeople" | localize}}
+                <input type="checkbox" [disabled]="publishItemOptions.sharingLevel === 1||publishItemOptions.itemSharing.length==0" name="notify" id="notify" [(ngModel)]="_notify" (change)="triggerMessage($event)"> {{"NotifyPeople" | localize}}
             </label>
             <textarea aria-placeholder="Message" [placeholder]="'Message' | localize" class="bg-light border-0 p-2" rows="4" [(ngModel)]="publishItemOptions.message" *ngIf="_notify">
             </textarea>
@@ -76,7 +76,7 @@
     </div>
     <div  class="subscribers" *ngIf="PublishAppItemListingService.sharingStatus !== 0" >You have {{PublishAppItemListingService.subscribersNumber}} Subscribers to this Product </div>
     <div class="modal-footer">
-        <button type="button"  class="btn btn-outline-primary" [disabled]="!showCloseText && _notify && publishItemOptions.itemSharing.length === 0" (click)="publishListing()" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
+        <button type="button"  class="btn btn-outline-primary" [disabled]="!showCloseText && _notify && publishItemOptions.itemSharing.length === 0||publishItemOptions.sharingLevel === 2&&publishItemOptions.itemSharing.length==0" (click)="publishListing()" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
             <!-- <span *ngIf="!_notify">{{"ShareAndPublish" | localize}}</span> -->
             <!-- <span *ngIf="_notify">{{"NotifyAndPublish" | localize}}</span> -->
             <span *ngIf="PublishAppItemListingService.sharingStatus === 0  ||  PublishAppItemListingService.sharingStatus === 3">Share</span>

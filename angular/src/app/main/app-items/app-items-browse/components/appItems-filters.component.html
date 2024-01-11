@@ -13,6 +13,19 @@
         </app-tree-single-selection-filter>
     </div>
 
+    <!--  T-SII-20231103.0007  -->
+    <div class="mb-4" *ngIf="filtersFlags?.appItemSizeScale">
+        <app-tree-multi-selection-filter
+            #SizeScaleFilter
+            [filterMetaData]="sizeScaleFilterMetaData"
+            [formContol]="filterForm.controls.appItemSizeScale"
+            [title]="'Size Scale' | localize"
+            (onLoadData)="getSizeScaleList(SizeScaleFilter)"
+        >
+        </app-tree-multi-selection-filter>
+    </div> 
+
+
     <div class="mb-4" *ngIf="filtersFlags?.categories">
         <app-tree-multi-selection-filter
             #CategoryFilter
@@ -65,7 +78,7 @@
 
 
 
-    <div class="mb-4" *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyListing  && filtersFlags?.publishStatus" >
+    <div class="mb-4" *ngIf="filtersFlags?.publishStatus" >
         <app-single-selection-filter
             #publishStatusFilter
             [filterMetaData]="publishStatusFilterMetaData"

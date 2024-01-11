@@ -1,1 +1,75 @@
-<p>view-billing-info works!</p>
+<div class="tab-cont thin-scroll">
+<div class="container-fluid pt-1 mb-3 ">
+    <div class="header p-2 my-2 d-flex  justify-content-between">
+        <h6><span  class="headertxt"> {{l("APContact")}} : </span></h6>   
+        <div >
+            <button
+            (click)="showEditMode()"
+            class="previewbtn text-center btn float-right"
+        >
+            Change
+            <i class="pi pi-pencil"></i>
+        </button>
+        </div>
+    </div>
+    <hr class="my-2" />
+    <div class="InfoForm pr-3 thin-scroll">
+        <div class="row ml-1"> 
+            <app-contact 
+            class="w-100"  
+             [shipInfoIndex]="1"
+            [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                ></app-contact>
+        </div>
+    </div>
+    <hr class="my-2" />
+    <app-address 
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [isCreateOredit]="createOrEditBillingInfo"
+    [contactId]="contactIdApContact"
+    [selectedAddressDetails]="selectedAddressDetailsAp"
+    ></app-address>
+    
+</div>
+<div class="container-fluid pt-1 mb-3">
+    <div class="header p-2 my-2 d-flex align-items-center">
+        <h6><span  class="headertxt"> {{l("ARContact")}} : </span></h6>   
+    </div>
+    <hr class="my-2" />
+    <div class="InfoForm pr-3 thin-scroll">
+        <div class="row ml-1"> 
+            <app-contact 
+            class="w-100"  
+             [shipInfoIndex]="2"
+            [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                ></app-contact>
+        </div>
+    </div>
+    <hr class="my-2" />
+    <app-address 
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [isCreateOredit]="createOrEditBillingInfo"
+    [contactId]="contactIdARContact"
+    [selectedAddressDetails]="selectedAddressDetailsAr"
+    ></app-address>
+
+</div>
+<div class="container-fluid pt-1 mb-3 mt-3">
+    <div class="header p-2 my-2 d-flex  justify-content-between">
+        <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
+    </div>
+    <div class="row view-mode mt-2 mb-2">
+        <div class="col-6">
+            <label class="label mt-1 mb-1  w-50">{{l("PaymentTerms")}}</label>
+            <label class="label mt-1 mb-1 w-50"></label>
+    
+        </div>
+
+    </div>
+    </div>
+</div>
+

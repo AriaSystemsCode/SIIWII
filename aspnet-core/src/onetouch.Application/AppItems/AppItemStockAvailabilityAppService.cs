@@ -223,13 +223,22 @@ namespace onetouch.AppItems
                 #region Excel validation rules only.
                 List<string> RecordsCodes = result.Select(r => r.Code).ToList();
                 List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
+                //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
+                var resJoin1 = from r in result
+                               join i in _appItemRepository.GetAll().AsNoTracking().Include(x => x.ParentFk).Where(x => x.ItemType == 0)
+                               on r.Code.Replace(" ", string.Empty) equals i.Code.Replace(" ", string.Empty) into j1
+                               from j in j1
+                               select new { item = j, code = j.Code.Replace(" ", string.Empty), parentCode = j.ParentFk.Code };
+
+
+                var resJoin = resJoin1.ToList().OrderBy(z => z.code);
+                //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[End]
                 foreach (AppItemStockAvailabilityExcelDto itemExcelDto in result)
                 {
                     if (itemExcelDto.Code  == "Code")
                     {
                         continue;
                     }
-
                     AppItemStockAvailabilityExcelRecordDTO itemExcelRecordErrorDTO = new AppItemStockAvailabilityExcelRecordDTO();
                     itemExcelRecordErrorDTO.ParentCode = itemExcelDto.ParentCode;
                     itemExcelRecordErrorDTO.Code = itemExcelDto.Code;
@@ -244,12 +253,19 @@ namespace onetouch.AppItems
                     itemExcelDto.rowNumber = rowNumber;
                     if (!string.IsNullOrEmpty(itemExcelDto.ParentCode))
                     {
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ParentId != null && x.ListingItemId == null);
+                        //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
+                        //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace (" ",string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId != null && x.ListingItemId == null);
+                        var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId != null && x.item.ItemType == 0).FirstOrDefault();
+                        var itemExists = itemExisting == null ? null : itemExisting.item;
+                        //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[End]
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
-                            var itemParentObj = _appItemRepository.GetAll().FirstOrDefault(x => x.Id == itemExists.ParentId);
-                            if (itemParentObj != null && itemParentObj.Code != itemExcelDto.ParentCode)
+                            //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
+                            //var itemParentObj = _appItemRepository.GetAll().FirstOrDefault(x => x.Id == itemExists.ParentId);
+                            //if (itemParentObj != null && itemParentObj.Code != itemExcelDto.ParentCode)
+                            if (itemExisting.parentCode != null && itemExisting.parentCode != itemExcelDto.ParentCode)
+                            //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[End]
                             {
                                 itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " Parent code does not match application item parent code.");
                                 recordErrorMEssage = "Code :" + itemExcelDto.Code + " Parent code does not match application item parent code.";
@@ -265,7 +281,11 @@ namespace onetouch.AppItems
                     }
                     else
                     {
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ParentId == null && x.ListingItemId == null);
+                        //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
+                        //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ParentId == null && x.ListingItemId == null);
+                        var itemExisting = resJoin.Where(x => x.code == itemExcelDto.Code.Replace(" ", string.Empty) && x.item.ParentId == null && x.item.ItemType == 0).FirstOrDefault();
+                        var itemExists = itemExisting == null ? null : itemExisting.item;
+                        //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[End]
                         if (itemExists != null)
                         {
                             itemExcelDto.Id = itemExists.Id;
@@ -354,12 +374,19 @@ namespace onetouch.AppItems
                 foreach (AppItemStockAvailabilityExcelRecordDTO logRecord in itemExcelResultsDTO.ExcelRecords)
                 {
                     rowNumber++;
-                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
-                   // {
-                        if (rowNumber > 2)
-                        { itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
+                    if (rowNumber == 2)
+                    {
                         itemExcelResultsDTO.FromList.Add(rowNumber);
                         itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("A" + rowNumber.ToString()).Value.ToString());
+                    }
+                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
+                    // {
+                    if (rowNumber > 2 && (int.DivRem(rowNumber, 100).Remainder == 0))
+                        { itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
+                    else { continue; }
+
+                    itemExcelResultsDTO.FromList.Add(rowNumber);
+                    itemExcelResultsDTO.CodesFromList.Add(Sheet.Cell("A" + rowNumber.ToString()).Value.ToString());
                     //}
                     //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
                     //Sheet.Cell("AA" + rowNumber.ToString()).Value = logRecord.Status;

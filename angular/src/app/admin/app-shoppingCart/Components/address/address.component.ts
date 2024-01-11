@@ -1,6 +1,6 @@
 import { Component, Injector,OnInit ,Input,ViewChild,Output,EventEmitter} from "@angular/core";
 import { AccountsServiceProxy, AppAddressDto, AppEntitiesServiceProxy,  LookupLabelDto,AppTransactionServiceProxy, GetAppTransactionsForViewDto,ContactRoleEnum } from "@shared/service-proxies/service-proxies";
-
+import Swal from 'sweetalert2';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs/operators';
 import { NgForm } from '@angular/forms';
@@ -63,9 +63,11 @@ export class AddressComponent extends AppComponentBase implements OnInit {
             if(this.savedAddressesList.length==0){
                 this.openAddNewAddForm=true;
                 this.showAddList=false;
+                this.selectedAddress=null;
 
             }else{
                 this.openAddNewAddForm=false;
+                this.selectedAddress?this.selectedAddress.countryName=this.countries.filter(item=>item.value === this.selectedAddress['countryId'])[0].label:'';
                 this.selectedAddress?this.showAddList=false:this.showAddList=true;
             }
             this.hideMainSpinner()
@@ -102,19 +104,42 @@ export class AddressComponent extends AppComponentBase implements OnInit {
         this.openAddNewAddForm=true;
     }
     deleteAddress(addressId:number){
-        this._accountsServiceProxy.deleteAddress(addressId)
-        .subscribe((item)=>{
-            const index = this.savedAddressesList.findIndex(item=>item.id === addressId)
-            this.savedAddressesList.splice(index,1)
-            this.notify.success(this.l("DeletedSuccessfully"));
-            if(this.savedAddressesList.length==0){
-                this.openAddAddressForm();
-                this.showAddList=false;
-
+        Swal.fire({
+            title: "",
+            text: "Are you sure that you want to delete this address?",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+            customClass: {
+              popup: 'popup-class',
+              icon: 'icon-class',
+              content: 'content-class',
+              actions: 'actions-class',
+              confirmButton: 'confirm-button-class2',
+      
+            },
+          }).then((result) => {
+            if (result.isConfirmed) {
+                this._accountsServiceProxy.deleteAddress(addressId)
+                .subscribe((item)=>{
+                    const index = this.savedAddressesList.findIndex(item=>item.id === addressId)
+                    this.savedAddressesList.splice(index,1)
+                    this.notify.success(this.l("DeletedSuccessfully"));
+                    if(this.savedAddressesList.length==0){
+                        this.openAddAddressForm();
+                        this.showAddList=false;
+                        this.selectedAddress=null;
+                    }
+                },(err:HttpErrorResponse)=>{
+                    this.notify.error(err.message)
+                })
             }
-        },(err:HttpErrorResponse)=>{
-            this.notify.error(err.message)
-        })
+          })
+
     }
     saveAddress(addressForm:NgForm) {
         this.saving = true;
@@ -166,8 +191,9 @@ export class AddressComponent extends AppComponentBase implements OnInit {
 selectAddress(addId){
 const currentAddress = this.savedAddressesList.filter(item=>item.id === addId);
 this.selectedAddress=currentAddress[0];
+this.selectedAddress.countryName=this.countries.filter(item=>item.value === currentAddress[0]['countryId'])[0].label;
 this.showAddList=false;
-this.updateSelectedAddress.emit({id:addId,code:currentAddress[0].code,typeId:this.addType});
+this.updateSelectedAddress.emit({id:addId,code:currentAddress[0].code,selectedAddressObj:this.selectedAddress});
 }
 showAddressList(){
     this.showAddList=true;

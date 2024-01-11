@@ -424,13 +424,15 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
     isContactsValid: boolean = false;
     isContactFormValid(value) {
+        if(this.activeTab==this.shoppingCartoccordionTabs.orderInfo)
+        {
         this.isContactsValid = value;
         if (value) {
             this.isContactsValid = true;
             if (this.isSalesOrderValidForm())
                 this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
         }
-
+    }
     }
 
     showEditMode() {

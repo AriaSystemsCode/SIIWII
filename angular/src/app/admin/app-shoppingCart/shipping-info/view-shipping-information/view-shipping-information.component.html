@@ -1,40 +1,65 @@
 
-    <div class="container-fluid pt-1 mb-3">
-        <div class="header my-2 d-flex align-items-center justify-content-between">
+    <div class="container-fluid pt-1 mb-3 tab-cont thin-scroll">
+        <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>   
+            <div >
+                <button
+                (click)="showEditMode()"
+                class="previewbtn text-center btn float-right"
+            >
+                Change
+                <i class="pi pi-pencil"></i>
+            </button>
+            </div>
         </div>
         <hr class="my-2" />
         <div class="InfoForm pr-3 thin-scroll">
             <div class="row ml-1"> 
                 <app-contact 
-                class="w-100" [isCreateOrEdit]="createOrEditSalesRepInfo" [activeTab]="activeTab" [shipInfoIndex]="1"
+                class="w-100"  
+                 [shipInfoIndex]="1"
+                [isCreateOrEdit]="createOrEditshippingInfO" [activeTab]="activeTab"
                     [appTransactionsForViewDto]="appTransactionsForViewDto"
-                    [showDepartment]="activeTab ==shoppingCartoccordionTabs.ShippingInfo"></app-contact>
+                    (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                   ></app-contact>
             </div>
         </div>
         <hr class="my-2" />
-        <app-address></app-address>
+        <app-address 
+        [appTransactionsForViewDto]="appTransactionsForViewDto"
+        [isCreateOredit]="createOrEditshippingInfO"
+        [contactId]="contactIdFrom"
+        [selectedAddressDetails]="selectedAddressDetailsFrom"
+        ></app-address>
+        
     </div>
-    <div class="container-fluid pt-1">
-        <div class="header my-2 d-flex align-items-center justify-content-between">
-            <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
+    <div class="container-fluid pt-1 mb-3">
+        <div class="header p-2 my-2 d-flex  justify-content-between">
+            <h6><span  class="headertxt"> {{l("ShipTo")}} : </span></h6>   
         </div>
         <hr class="my-2" />
         <div class="InfoForm pr-3 thin-scroll">
             <div class="row ml-1"> 
-
-            <app-contact 
-            class="w-100" [isCreateOrEdit]="createOrEditSalesRepInfo" [activeTab]="activeTab" [shipInfoIndex]="2"
-                [appTransactionsForViewDto]="appTransactionsForViewDto"
-                [showDepartment]="activeTab ==shoppingCartoccordionTabs.ShippingInfo"></app-contact>
+                <app-contact 
+                class="w-100"  
+                 [shipInfoIndex]="2"
+                [isCreateOrEdit]="createOrEditshippingInfO" [activeTab]="activeTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                    (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                  ></app-contact>
             </div>
         </div>
         <hr class="my-2" />
-        <app-address></app-address>
+        <app-address 
+        [appTransactionsForViewDto]="appTransactionsForViewDto"
+        [isCreateOredit]="createOrEditshippingInfO"
+        [contactId]="contactIdTo"
+        [selectedAddressDetails]="selectedAddressDetailsTo"
+        ></app-address>
         <div class="row view-mode mt-2 mb-2">
             <div class="col-6">
                 <label class="label mt-1 mb-1  w-50">{{l("Store")}}</label>
-                <label class="label mt-1 mb-1 w-50">{{l("Store")}}</label>
+                <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto.buyerStor}}</label>
         
             </div>
             <div class="col-6">

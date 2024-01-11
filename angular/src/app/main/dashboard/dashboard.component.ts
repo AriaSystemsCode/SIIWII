@@ -25,10 +25,10 @@ export class DashboardComponent extends AppComponentBase {
 
     async redirectTo() {
         debugger;
+      this.router.navigate(['/app/main/Home'])
+        
         if (this.appSession.tenantId && !this.appSession.user.accountId)
             await this.askForCompleteProfile();
-        if (this.appSession.tenantId && this.appSession.user.accountId)
-            this.router.navigate(['/app/main/Home'])
     }
 
     async askForCompleteProfile() {
@@ -65,8 +65,6 @@ export class DashboardComponent extends AppComponentBase {
         }).then((result) => {
             if (result.isConfirmed)
             this.router.navigate(['/app/main/account'])
-        else
-            this.router.navigate(['/app/main/Home'])
         });
     }
 }

@@ -12,7 +12,7 @@ namespace onetouch.AppItemsLists.Dtos
 
         public string Description { get; set; }
 
-        public byte SharingLevel { get; set; }
+        public byte? SharingLevel { get; set; }
 
         public bool Published { get; set; }
 
