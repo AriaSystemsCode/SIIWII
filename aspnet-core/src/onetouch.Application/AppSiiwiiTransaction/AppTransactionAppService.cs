@@ -3134,7 +3134,8 @@ namespace onetouch.AppSiiwiiTransaction
                     viewTrans.EnteredByUserRole= FilteredAppTransaction.EnteredUserByRole;
                     if (viewTrans.EntityAttachments != null && viewTrans.EntityAttachments.Count > 0)
                     {
-                        string filePath = viewTrans.EntityAttachments[0].FileName ;
+                        string filePath = _appConfiguration[$"Attachment:Path"] + @"\" +  (viewTrans.TenantId == null ? "-1" : viewTrans.TenantId.ToString()) + @"\" +viewTrans.EntityAttachments[0].FileName ;
+                        if (System.IO.File.Exists(filePath))
                         viewTrans.OrderConfirmationFile = System.IO.File.ReadAllBytes(filePath);
                     }
                     if (FilteredAppTransaction != null)
