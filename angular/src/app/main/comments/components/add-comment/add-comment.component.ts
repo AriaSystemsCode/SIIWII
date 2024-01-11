@@ -43,12 +43,12 @@ export class AddCommentComponent extends AppComponentBase {
     }
     focusCommentTextArea(){
         setTimeout(()=>this.CommentTextArea.nativeElement.focus(), 0);
-    }
+    } 
     saveComment(){
         this.saving = true
         if(!this.comment.subject)this.comment.subject = `${MesasgeObjectType[MesasgeObjectType.Comment]} on ${this.comment.body.slice(0,10)}...`
         this.comment.bodyFormat = this.comment.body
-      //  this.comment.messageCategory="UPDATEMESSAGE";
+        this.comment.messageCategory="UPDATEMESSAGE" ;
         this._messageServiceProxy.createMessage(this.comment)
         .pipe(
             finalize( ()=> this.saving = false )
