@@ -15,6 +15,7 @@ import { UserClickService } from '@shared/utils/user-click.service';
 import { finalize } from 'rxjs';
 import { ShoppingCartoccordionTabs } from './ShoppingCartoccordionTabs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
+import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
