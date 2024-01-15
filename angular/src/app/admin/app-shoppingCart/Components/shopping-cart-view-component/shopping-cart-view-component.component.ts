@@ -691,6 +691,9 @@ export class ShoppingCartViewComponentComponent
   onChangeAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
   }
+  offShareTransaction(){
+    this.onshare=false;
+  }
   onGeneratOrderReport($event){
     if($event){
       this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
