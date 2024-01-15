@@ -3154,7 +3154,7 @@ namespace onetouch.AppSiiwiiTransaction
                         if (System.IO.File.Exists(filePath))
                         {
                             viewTrans.OrderConfirmationFile = System.IO.File.ReadAllBytes(filePath);
-                            viewTrans.EntityAttachments[0].Url = filePath;
+                            viewTrans.EntityAttachments[0].Url = @"attachments/" + (viewTrans.TenantId == null ? -1 : viewTrans.TenantId) + @"/" + +viewTrans.EntityAttachments[0].FileName;
                         }
                     }
                     if (FilteredAppTransaction != null)
