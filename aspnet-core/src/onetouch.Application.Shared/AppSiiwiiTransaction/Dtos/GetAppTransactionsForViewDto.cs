@@ -4,6 +4,7 @@ using Castle.MicroKernel.Registration;
 using Newtonsoft.Json.Linq;
 using onetouch.AppContacts;
 using onetouch.AppEntities.Dtos;
+using onetouch.AppItems.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -157,5 +158,30 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
        public string Name { set; get; } 
        public long UserId{ set; get; }
         public Guid? UserImage { set; get; }
+    }
+    public class SharingTransactionOptions
+    {
+        public virtual long TransactionId { get; set; }
+
+        public virtual string Message { get; set; }
+
+        public IList<TransactionSharingDto> TransactionSharing { get; set; }
+
+    }
+    public class TransactionSharingDto : EntityDto<long>
+    {
+
+        public virtual long? SharedTenantId { get; set; }
+
+        public virtual long? SharedUserId { get; set; }
+
+        public virtual string SharedUserEMail { get; set; }
+
+        public virtual string SharedUserName { get; set; }
+
+        public virtual string SharedUserSureName { get; set; }
+
+        public virtual string SharedUserTenantName { get; set; }
+
     }
 }
