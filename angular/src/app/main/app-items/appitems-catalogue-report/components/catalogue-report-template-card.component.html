@@ -1,7 +1,7 @@
-<label class="catalogue-template-card pb-1 pl-4 pr-4 pt-4" [ngClass]="{ 'selected' : printInfoParam.productsCatalogTemplate == template.sycReport.name }" for="template_{{index}}">
+<label class="catalogue-template-card pb-1 pl-4 pr-4 pt-4" [ngClass]="{ 'selected' : printInfoParam.reportTemplateName == template.sycReport.name }" for="template_{{index}}">
     <img class="catalogue-template-card-image mb-2" [src]="attachmentBaseUrl + '/' + template?.sycReport?.imgUrl" alt="" >
     <div class="align-items-baseline d-flex justify-content-center p-2">
-        <input type="radio" class="mr-1" [value]="template.sycReport.name" [(ngModel)]="printInfoParam.productsCatalogTemplate" name="template" id="template_{{index}}">
+        <input type="radio" class="mr-1" [value]="template.sycReport.name" [(ngModel)]="printInfoParam.reportTemplateName" name="template" id="template_{{index}}">
         <div class="font-weight-bolder text-black" style="word-wrap: break-word;">{{template.sycReport.description}}</div>
     </div>
 </label>

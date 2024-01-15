@@ -87,8 +87,8 @@
 }
 .composeBtn {
     background-color: #700066 !important;
-    margin: 10px !important;
-    width: 120px !important;
+   // margin: 10px !important;
+    width:  164px !important;
     border: none !important;
 }
 
@@ -147,6 +147,7 @@
     color: black !important;
     // margin-left: 40px;
     padding: 19px;
+    padding-left: 5%;
     // margin-right: 165px;
     // margin-right: 25px;
    // margin-right: 164px;
@@ -507,4 +508,16 @@ body .btn.btn-action:after {
 
 .messageType a {
     color: #595959 !important;
+}
+
+
+.clickBtn {
+    background-color: white !important;
+}
+.clickBtn:focus {
+    background-color: #f5e9ff !important;
+}
+
+.clickBtn:hover {
+    background-color: transparent !important;
 }

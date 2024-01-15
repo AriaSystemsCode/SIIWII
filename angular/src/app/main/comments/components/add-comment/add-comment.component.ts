@@ -76,6 +76,7 @@ export class AddCommentComponent extends AppComponentBase {
         this.saving = true
         if(!this.comment.subject)this.comment.subject = `${MesasgeObjectType[MesasgeObjectType.Comment]} on ${this.comment.body.slice(0,10)}...`
         this.comment.bodyFormat = this.comment.body
+        this.comment.messageCategory="UPDATEMESSAGE" ;
         this._messageServiceProxy.createMessage(this.comment)
         .pipe(
             finalize( ()=> this.saving = false )

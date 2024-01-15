@@ -2416,5 +2416,14 @@
 		<text name="ARContact">AR Contact</text>
 		<text name="PaymentInformation">Payment Information</text>
 		<text name="PaymentTerms">Payment Terms</text>
-	</texts>  
+  <text name="ShareTransaction">Share Transaction</text>
+    <text name="ManageTransactionToSiiwiiUsers">Manage Transaction To Siiwii Users</text>
+    <text name="SelectedUsersList">Selected Users List</text>
+    <text name="EmailTransactionToNonSiiwiiUsers">Email Transaction To Non Siiwii Users</text>
+    <text name="TypeEmailAddress">Type Email Address</text>
+    <text name="Addamessagehere">Add a message here</text>
+    <text name="Add2">Add</text>
+    <text name="Done">Done</text>
+    <text name="InvalidEmailFormate">Invalid email formate</text>
+  </texts>  
 </localizationDictionary>

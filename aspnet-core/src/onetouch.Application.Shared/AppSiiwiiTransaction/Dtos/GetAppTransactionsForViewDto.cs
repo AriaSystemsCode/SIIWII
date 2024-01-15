@@ -4,6 +4,7 @@ using Castle.MicroKernel.Registration;
 using Newtonsoft.Json.Linq;
 using onetouch.AppContacts;
 using onetouch.AppEntities.Dtos;
+using onetouch.AppItems.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +23,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual bool FirstRecord { set; get; } = false;
         public virtual DateTime EnteredDate { set; get; }
         public long CreatorUserId { set; get; }
+        public byte[] OrderConfirmationFile { set; get; }
     }
 
     //xx
@@ -148,5 +150,38 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     public class ContactAddressDto : AppAddressDto
     { 
         public bool IsSelected { get; set; }
+    }
+    public class ContactInformationOutputDto
+    {
+       public long Id { set; get; }
+       public string Email { set; get; }
+       public string Name { set; get; } 
+       public long UserId{ set; get; }
+        public Guid? UserImage { set; get; }
+    }
+    public class SharingTransactionOptions
+    {
+        public virtual long TransactionId { get; set; }
+
+        public virtual string Message { get; set; }
+
+        public IList<TransactionSharingDto> TransactionSharing { get; set; }
+
+    }
+    public class TransactionSharingDto : EntityDto<long>
+    {
+
+        public virtual long? SharedTenantId { get; set; }
+
+        public virtual long? SharedUserId { get; set; }
+
+        public virtual string SharedUserEMail { get; set; }
+
+        public virtual string SharedUserName { get; set; }
+
+        public virtual string SharedUserSureName { get; set; }
+
+        public virtual string SharedUserTenantName { get; set; }
+
     }
 }

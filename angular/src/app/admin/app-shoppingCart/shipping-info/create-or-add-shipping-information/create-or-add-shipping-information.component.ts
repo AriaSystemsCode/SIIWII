@@ -35,6 +35,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   addressSelectedShipTo:boolean=false;
   shipFromSelectedAdd:any;
   shipToSelectedAdd:any;
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   shipingTabVaild:boolean=true;
 
   constructor(
@@ -117,7 +118,7 @@ createOrEditTransaction() {
   this.showMainSpinner()
   this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
   this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-    .pipe(finalize(() => this.hideMainSpinner()))
+    .pipe(finalize(() => {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
     .subscribe((res) => {
       if (res) {
         this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
