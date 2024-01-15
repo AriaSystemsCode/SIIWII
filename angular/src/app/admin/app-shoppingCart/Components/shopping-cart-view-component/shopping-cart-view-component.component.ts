@@ -66,8 +66,12 @@ export class ShoppingCartViewComponentComponent
   activeIndex = 0;
   showSaveBtn: boolean = false;
   currencySymbol: string = "";
+  transactionFormPath:string="";
+  onshare:boolean=false;
+  printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
+  reportUrl:string="";
   invokeAction = '/DXXRDV';
-
+  
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -685,5 +689,17 @@ export class ShoppingCartViewComponentComponent
 
   onChangeAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
+  }
+  onGeneratOrderReport($event){
+    if($event){
+      this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
+      this.printInfoParam.TransactionId=this.orderId.toString();
+    //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+      this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+      this.printInfoParam.saveToPDF=true;
+      this.printInfoParam.tenantId = this.appSession?.tenantId
+      this.printInfoParam.userId = this.appSession?.userId
+      this.reportUrl = this.printInfoParam.getReportUrl()
+    }
   }
 }
