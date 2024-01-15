@@ -66,6 +66,7 @@ export class ShoppingCartViewComponentComponent
   activeIndex = 0;
   showSaveBtn: boolean = false;
   currencySymbol: string = "";
+  invokeAction = '/DXXRDV';
 
   constructor(
     injector: Injector,
