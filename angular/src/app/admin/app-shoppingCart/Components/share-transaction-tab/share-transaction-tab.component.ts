@@ -40,7 +40,7 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
 
   }
   ngOnInit(): void {
-    this.sharingList=[{
+    /*this.sharingList=[{
       id:1,
       name:'test',
       image:'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png'
@@ -57,12 +57,12 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
     }];
     this.sharingList.forEach(function(contact){
       contact.removed=false;
-    })
+    })*/
   this.sharingListForSave=this.sharingList;
   this.loadContactList();
   }
   loadContactList(){
-    this._AppTransactionServiceProxy.getTransactionContacts(this.orderId,'').subscribe(result=>{
+    this._AppTransactionServiceProxy.getTransactionContacts(this.orderId,'m').subscribe(result=>{
       for (let i =0; i<result.length;i++){
         if(result[i].userImage){
           result.filter(item=>{
@@ -79,22 +79,23 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   validateSelectedContact(){
     let isValidContacts=true;
     let currentsharingList=JSON.parse(JSON.stringify(this.sharingList));
+    let searchArray=JSON.parse(JSON.stringify(this.searchContact));
     let indexInsideArray;
     let arrindex ;
 
-    this.searchContact.forEach(function(item){
+    searchArray.forEach(function(item){
       indexInsideArray=currentsharingList.findIndex(a => a.id === item.id);
-      if(indexInsideArray>0){
+      if(indexInsideArray>=0){
         arrindex= currentsharingList.findIndex(a => a.id === item.id)
-        currentsharingList.splice(arrindex, 1);
+        searchArray.splice(arrindex, 1);
 
       }
     })
-    if(currentsharingList.length==0){
+    if(searchArray.length==0){
       isValidContacts=false;
 
     }
-    this.sharingList=currentsharingList;
+    this.searchContact=searchArray;
     return isValidContacts;
   } 
   selectContact(value){

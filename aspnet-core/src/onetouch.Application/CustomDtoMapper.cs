@@ -849,6 +849,12 @@ namespace onetouch
                 .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityAttachments))
                 .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityExtraData));
             configuration.CreateMap<AppAddress, ContactAddressDto>();
+
+            configuration.CreateMap<AppEntity, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionHeaders>();
+            configuration.CreateMap <onetouch.AppSiiwiiTransaction.AppTransactionHeaders,onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionHeaders>();
+            configuration.CreateMap<AppEntity, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionDetails>();
+            configuration.CreateMap<onetouch.AppSiiwiiTransaction.AppTransactionDetails, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionDetails>();
+           configuration.CreateMap<AppTransactionContacts, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionContacts>();
         }
     }
 }

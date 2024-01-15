@@ -49,6 +49,8 @@ using onetouch.AppMarketplaceItems;
 using onetouch.AppMarketplaceItemLists;
 using onetouch.SycCurrencyExchangeRates;
 using onetouch.AppMarketplaceAccountsPriceLevels;
+using onetouch.AppMarketplaceTransactions;
+
 namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
@@ -130,8 +132,13 @@ namespace onetouch.EntityFrameworkCore
         public virtual DbSet<AppMarketplaceItemsListDetails> AppMarketplaceItemsListDetails { set; get; }
         public virtual DbSet<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates> SycCurrencyExchanges { set; get; }
         public virtual DbSet<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels> AppMarketplaceAccountsPriceLevels { set; get; }
-        
+
         //MMT33-2
+        //MMT37[Start]
+        public virtual DbSet<AppMarketplaceTransactionHeaders> AppMarketplaceTransactionHeaders { set; get; }
+        public virtual DbSet<AppMarketplaceTransactionDetails> AppMarketplaceTransactionDetails { set; get; }
+        public virtual DbSet<AppMarketplaceTransactionContacts> AppMarketplaceTransactionContacts { set; get; }
+        //MMT37[End]
         //public virtual DbSet<SysPropertyType> SysPropertyTypes { get; set; }
         //public virtual DbSet<SydObjectProperty> SydObjectProperties { get; set; }
         //public virtual DbSet<SydObjectRevision> SydObjectRevisions { get; set; }

@@ -49,6 +49,10 @@ using System.Linq.Expressions;
 using onetouch.Message.Dto;
 using onetouch.Message;
 using Abp.Authorization.Users;
+using onetouch.AppItems.Dtos;
+using onetouch.AppMarketplaceTransactions;
+using AutoMapper.Internal.Mappers;
+
 //using NUglify.Helpers;
 //using NUglify.Helpers;
 //using Abp.Collections.Extensions;
@@ -79,21 +83,28 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IRepository<AppMarketplaceItemPrices, long> _appMarketplaceItemPricesRepository;
         private readonly IRepository<AppTransactionContacts, long> _appTransactionContactsRepository;
         private readonly IRepository<AppMessage, long> _MessagesRepository;
+        //MMT37[Start]
+        private readonly IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionHeaders, long> _appMarketplaceTransactionHeadersRepository;
+        private readonly IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionDetails, long> _appMarketplaceTransctionDetailsRepository;
+        private readonly IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionContacts, long> _appMarketplaceTransctionContactsRepository;
+        //MMT37[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             IRepository<SycCounter, long> sycCounter, IRepository<AppContact, long> appContactRepository, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepository,
             IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, Helper helper,
             IRepository<AppActiveTransaction, long> appShoppingCartRepository,
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem,
-            IAppConfigurationAccessor appConfigurationAccessor,
+            IAppConfigurationAccessor appConfigurationAccessor    ,  
             IRepository<AppTransactionDetails, long> appTransactionDetails, IRepository<AppItem, long> appItems, IRepository<AppItemPrices, long> appItemPricesRepository,
             IRepository<AppEntity, long> appEntity, IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository,
             IRepository<AppMarketplaceItemSizeScaleHeaders, long> appMarketplaceItemSizeScaleHeadersRepository,
              IRepository<onetouch.AppItems.AppItemSizeScalesHeader, long> appItemSizeScaleHeadersRepository,
              IRepository<AppTransactionContacts, long> appTransactionContactsRepository,
              IRepository<AppEntityClassification, long> appEntityClassificationRepository, IRepository<AppEntityCategory, long> appEntityCategoryRepository,
-             IRepository<AppAddress, long> appAddressRepository, IRepository<AppMessage, long> messagesRepository
-             )
+             IRepository<AppAddress, long> appAddressRepository, IRepository<AppMessage, long> messagesRepository, 
+             IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeadersRepository,
+             IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionDetails, long> appMarketplaceTransctionDetailsRepository,
+             IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionContacts, long> appMarketplaceTransctionContactsRepository)
         {
             _MessagesRepository = messagesRepository;
             _appAddressRepository = appAddressRepository;
@@ -118,6 +129,11 @@ namespace onetouch.AppSiiwiiTransaction
             _appShoppingCartRepository = appShoppingCartRepository;
             _appTransactionDetails = appTransactionDetails;
             _appConfiguration = appConfigurationAccessor.Configuration;
+            //MMT37[Start]
+            _appMarketplaceTransactionHeadersRepository = appMarketplaceTransactionHeadersRepository;
+            _appMarketplaceTransctionDetailsRepository =  appMarketplaceTransctionDetailsRepository;
+            _appMarketplaceTransctionContactsRepository = appMarketplaceTransctionContactsRepository;
+            //MMT37[End]
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -3136,7 +3152,10 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         string filePath = _appConfiguration[$"Attachment:Path"] + @"\" +  (viewTrans.TenantId == null ? "-1" : viewTrans.TenantId.ToString()) + @"\" +viewTrans.EntityAttachments[0].FileName ;
                         if (System.IO.File.Exists(filePath))
-                        viewTrans.OrderConfirmationFile = System.IO.File.ReadAllBytes(filePath);
+                        {
+                            viewTrans.OrderConfirmationFile = System.IO.File.ReadAllBytes(filePath);
+                            viewTrans.EntityAttachments[0].Url = filePath;
+                        }
                     }
                     if (FilteredAppTransaction != null)
                     {
@@ -3301,9 +3320,56 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return output;
         }
-        //public async Task ShareTransaction(long TransactionId, List<> ShareWithUsers)
-        //{ }
-        //MMT37[End]
-    }
+        
+        public async Task ShareTransaction(SharingTransactionOptions input)
+        {
+            var transaction =await _appTransactionsHeaderRepository.GetAll().Include(z=>z.AppTransactionDetails)
+                .Include(z=>z.AppTransactionContacts).Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
+            if (transaction != null)
+            {
+                var marketplaceTransaction =await _appMarketplaceTransactionHeadersRepository.GetAll().Where(z => z.SSIN == transaction.SSIN && z.TenantId==null).FirstOrDefaultAsync();
+                if (marketplaceTransaction==null)
+                {
+                    marketplaceTransaction = new AppMarketplaceTransactionHeaders();
+                    marketplaceTransaction = ObjectMapper.Map<AppMarketplaceTransactionHeaders>(transaction);
+                    marketplaceTransaction.TenantOwner = int.Parse(transaction.TenantId.ToString());
+                    marketplaceTransaction.TenantId = null;
+                    marketplaceTransaction.Id = 0;
+                    //marketplaceTransaction.Code = transaction.SSIN;
+                    if (transaction.AppTransactionDetails != null && transaction.AppTransactionDetails.Count > 0)
+                    {
+                        marketplaceTransaction.AppMarketplaceTransactionDetails = new List<AppMarketplaceTransactionDetails>();
+                        foreach (var det in transaction.AppTransactionDetails)
+                        {
+                            AppMarketplaceTransactionDetails detail = new AppMarketplaceTransactionDetails();
+                            detail = ObjectMapper.Map<AppMarketplaceTransactionDetails>(det);
+                            detail.Id = 0;
+                            detail.TenantOwner = int.Parse(detail.TenantId.ToString());
+                            detail.TenantId = null;
+                            detail.TransactionId = 0;
+                            detail.TransactionIdFk = null;
+                            marketplaceTransaction.AppMarketplaceTransactionDetails.Add(detail);
+                        }
+                    }
+                    if (transaction.AppTransactionContacts != null && transaction.AppTransactionContacts.Count > 0)
+                    {
+                        marketplaceTransaction.AppMarketplaceTransactionContacts = new List<AppMarketplaceTransactionContacts>();
+                        foreach (var cont in transaction.AppTransactionContacts)
+                        {
+                            AppMarketplaceTransactionContacts contact = new AppMarketplaceTransactionContacts();
+                            contact = ObjectMapper.Map<AppMarketplaceTransactionContacts>(cont);
+                            contact.Id = 0;
+                            contact.TransactionId = 0;
+                            contact.TransactionIdFK = null;
+                            marketplaceTransaction.AppMarketplaceTransactionContacts.Add(contact);
+                        }
+                    }
+                    _appMarketplaceTransactionHeadersRepository.Insert(marketplaceTransaction);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                }
+            }
+        }
+            //MMT37[End]
+        }
 
 }
