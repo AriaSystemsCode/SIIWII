@@ -31,3 +31,11 @@ button.send-comment-icon {
 button.send-comment-icon[disabled]{
     color:#f8ab64;
 }
+.suggstions-contact-list{
+    background-color: #fff;
+    width:300px;
+    height:300px;
+    position: absolute;
+    border-radius: 5px;
+    box-shadow: 0px 1px 5px rgb(0 0 0 / 57%);
+}

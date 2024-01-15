@@ -14,8 +14,10 @@ export class AddCommentComponent extends AppComponentBase {
     @Output() saveDone : EventEmitter<GetMessagesForViewDto>  = new EventEmitter<GetMessagesForViewDto>();
     commentObject : CreateMessageInput
     active : boolean
+    showContactSuggstions:boolean=false;
     @Input() cartStyle: boolean;
-
+    suggListContLeft:any=0;
+    suggListTop:any=0;
     constructor(
         private injector: Injector,
         private _messageServiceProxy: MessageServiceProxy,
@@ -43,6 +45,32 @@ export class AddCommentComponent extends AppComponentBase {
     }
     focusCommentTextArea(){
         setTimeout(()=>this.CommentTextArea.nativeElement.focus(), 0);
+    }
+    mentionContact(event){
+        debugger
+        let enterdValue=String.fromCharCode(event.target.value.charCodeAt(event.target.selectionStart- 1));
+        if(enterdValue=='@'){
+            // Input String 
+            let searchInputVal = event.target.value;
+            // Getting last character using char at
+            let lastCharachter = searchInputVal.charAt(searchInputVal.length - 1);
+            this.suggListContLeft=(event.target.offsetLeft*1.5)+event.target.selectionStart;
+            this.suggListTop=event.target.offsetTop+10;
+
+            let previosCharachter:string;
+            if(enterdValue==lastCharachter){
+                previosCharachter= searchInputVal.charAt(searchInputVal.length - 1);
+                if(previosCharachter==' '||previosCharachter==undefined||searchInputVal.length==1){
+                  this.showContactSuggstions=true;
+                }
+            }else{
+                let charachterIndex=searchInputVal.indexOf(enterdValue);
+                previosCharachter= searchInputVal.charAt(searchInputVal.length - (searchInputVal.length-(charachterIndex-1)));
+                if(previosCharachter==' '||previosCharachter==undefined){
+                    this.showContactSuggstions=true;
+                }
+            }
+        }
     }
     saveComment(){
         this.saving = true

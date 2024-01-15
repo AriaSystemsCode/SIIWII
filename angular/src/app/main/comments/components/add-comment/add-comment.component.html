@@ -21,12 +21,17 @@
                             cols="20"
                             rows="1"
                             (input)="extendTextAreaHandler($event)"
+                            (keyup)="mentionContact($event)"
                             [placeholder]="(comment.parentId ? 'AddReply' : 'AddComment') | localize"
                             [(ngModel)]="comment.body"
                             #CommentTextArea
                             [required]="true"
                             [maxlength]="maxAcceptedChars"
                         ></textarea>
+                        <div [ngStyle]="{'left':suggListContLeft+'px','top':suggListTop+'px'}"
+                         class="suggstions-contact-list" *ngIf="showContactSuggstions">
+
+                        </div>
                         <ng-container *ngIf="cartStyle;">
 
                         <button
