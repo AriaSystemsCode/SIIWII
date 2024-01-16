@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, ElementRef, Injector,HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppPostsServiceProxy, CreateMessageInput, GetMessagesForViewDto, MesasgeObjectType, MessageServiceProxy, ProfileServiceProxy } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
@@ -21,7 +21,8 @@ export class AddCommentComponent extends AppComponentBase {
     constructor(
         private injector: Injector,
         private _messageServiceProxy: MessageServiceProxy,
-        private _profileService : ProfileServiceProxy
+        private _profileService : ProfileServiceProxy,
+        private eRef: ElementRef
     ) {
         super(injector)
     }
@@ -46,6 +47,16 @@ export class AddCommentComponent extends AppComponentBase {
     focusCommentTextArea(){
         setTimeout(()=>this.CommentTextArea.nativeElement.focus(), 0);
     }
+
+    @HostListener('document:click', ['$event'])
+    clickout(event) {
+      if(!event.target.className.includes("suggstions-contact-list")&&!event.target.className.includes("contact")&&!event.target.className.includes("contact-list-cont")) {
+        this.showContactSuggstions=false;
+      }
+    }
+    addContact(contact){
+
+    }
     mentionContact(event){
         debugger
         let enterdValue=String.fromCharCode(event.target.value.charCodeAt(event.target.selectionStart- 1));
@@ -54,7 +65,7 @@ export class AddCommentComponent extends AppComponentBase {
             let searchInputVal = event.target.value;
             // Getting last character using char at
             let lastCharachter = searchInputVal.charAt(searchInputVal.length - 1);
-            this.suggListContLeft=(event.target.offsetLeft*1.5)+event.target.selectionStart;
+            this.suggListContLeft=(event.target.offsetLeft*1.5)//+event.target.selectionStart;
             this.suggListTop=event.target.offsetTop+10;
 
             let previosCharachter:string;
