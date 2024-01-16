@@ -691,6 +691,14 @@ export class ShoppingCartViewComponentComponent
   onChangeAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
   }
+  printTransaction(){
+    var page = window.open(this.transactionFormPath);
+    page.print();
+  }
+
+  onShareTransaction(){
+    this.onshare=true;
+  }
   offShareTransaction(){
     this.onshare=false;
   }

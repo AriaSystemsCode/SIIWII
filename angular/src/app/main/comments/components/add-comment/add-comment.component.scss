@@ -38,4 +38,27 @@ button.send-comment-icon[disabled]{
     position: absolute;
     border-radius: 5px;
     box-shadow: 0px 1px 5px rgb(0 0 0 / 57%);
+    max-height: 300px;
+    overflow-y: auto;
+    .contact-list-cont{
+        width:100%;
+        list-style-type: none;
+       padding: 5px;
+        .contact{
+            width:100%;
+            height: 35px;
+            padding: 5px;
+            color: #333333;
+            background: transparent;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            border-radius: 0;
+            font-size:14px;
+            cursor: pointer;
+            &:hover{
+                color: #333333;
+                background: #eaeaea;
+            }
+        }
+    }
+
 }
