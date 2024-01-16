@@ -657,7 +657,7 @@ export class CreateEditAppItemVariationsComponent
         this.variationMatrices.forEach((variation) => {
             //  if(!variation.appItemPriceInfos || variation.appItemPriceInfos.length == 0)
             if (this.updateVariation) {
-                variation.appItemPriceInfos = this.getParentProductPrices();
+               if(!variation.appItemPriceInfos ) variation.appItemPriceInfos = this.getParentProductPrices();
             }
         });
     }
