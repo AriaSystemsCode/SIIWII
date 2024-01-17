@@ -11,6 +11,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("orderConfirmationFile") orderConfirmationFile;
     @Input("transactionFormPath") transactionFormPath;
+    loadingError: boolean = false;
 
     constructor(
         injector: Injector
@@ -24,11 +25,15 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         this.loadPdf();
     }
     loadPdf() {
+        this.loadingError = true;
         var base64String = this.orderConfirmationFile
         var pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
-        
-        if (pdfViewer)
-            pdfViewer.src = 'data:application/pdf;base64,' + base64String;
 
+        if (base64String && pdfViewer) {
+            pdfViewer.src = 'data:application/pdf;base64,' + base64String;
+            this.loadingError = false;
+        }
     }
+
 }
+

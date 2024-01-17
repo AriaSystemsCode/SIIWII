@@ -177,7 +177,7 @@ export class ShoppingCartViewComponentComponent
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
         if (res?.entityAttachments?.length > 0)
-          this.transactionFormPath = this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url;
+          this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
 
         this.orderConfirmationFile = res.orderConfirmationFile;
         this.loadCommentsList()
