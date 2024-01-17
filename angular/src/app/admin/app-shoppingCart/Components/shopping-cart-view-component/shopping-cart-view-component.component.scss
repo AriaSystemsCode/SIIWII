@@ -168,6 +168,9 @@ button[disabled] {
 
 .topheader {
     background-color: #700066;
+    position: sticky;
+    top: 0px;
+    z-index: 999999;
 }
 
 .inputs {
