@@ -158,14 +158,28 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
        public string Name { set; get; } 
        public long UserId{ set; get; }
         public Guid? UserImage { set; get; }
+        public string UserName { set; get; }
+        public int TenantId { set; get; }
     }
     public class SharingTransactionOptions
     {
         public virtual long TransactionId { get; set; }
 
         public virtual string Message { get; set; }
+        public virtual string Subject { get; set; }
 
         public IList<TransactionSharingDto> TransactionSharing { get; set; }
+
+    }
+    public class SharingTransactionEmail
+    {
+        public virtual long TransactionId { get; set; }
+
+        public virtual string Message { get; set; }
+        public virtual string Subject { get; set; }
+
+        public IList<string> EmailAddresses { get; set; }
+        public virtual bool IsBodyHtml { set; get; }
 
     }
     public class TransactionSharingDto : EntityDto<long>
