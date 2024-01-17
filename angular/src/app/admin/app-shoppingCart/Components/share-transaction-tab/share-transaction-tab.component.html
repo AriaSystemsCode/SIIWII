@@ -28,7 +28,7 @@
                         <img  class="userImage"
                          [src]="contact?.userImage?contact.userImage:'assets/common/images/default-profile-picture.png'"  
                         />
-                        <div>{{ contact.email }}</div>
+                        <div>{{ contact.name }}</div>
                     </div>
                 </ng-template>
                 <ng-template let-contact pTemplate="selectedItem">
@@ -36,7 +36,7 @@
                         <img   class="userImage" 
                         [src]="contact?.userImage?contact?.userImage:'assets/common/images/default-profile-picture.png'"  
                         />
-                        <div>{{ contact.email }}</div>
+                        <div>{{ contact.name }}</div>
                     </div>
                 </ng-template>
 
