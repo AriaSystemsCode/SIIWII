@@ -18,6 +18,7 @@ export class AddCommentComponent extends AppComponentBase {
     @Input() cartStyle: boolean;
     suggListContLeft:any=0;
     suggListTop:any=0;
+
     constructor(
         private injector: Injector,
         private _messageServiceProxy: MessageServiceProxy,
@@ -33,16 +34,16 @@ export class AddCommentComponent extends AppComponentBase {
     writtenChars:number = 0
     emptyText:string='emptyText';
     extendTextAreaHandler($event){
-        var textarea = $event.target
+      /*  var textarea = $event.target
         const text:string = textarea.value
         this.hasText = Boolean(text.trim())
         var heightLimit = 100; /* Maximum height: 200px */
-        textarea.style.height = ""; /* Reset the height*/
-        textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
+        /*textarea.style.height = ""; /* Reset the height*/
+       /* textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
         this.writtenChars = text.length
         if(this.writtenChars > this.maxAcceptedChars) {
             textarea.value = text.slice(0,this.maxAcceptedChars)
-        }
+        }*/
     }
     focusCommentTextArea(){
         setTimeout(()=>this.CommentTextArea.nativeElement.focus(), 0);
@@ -55,28 +56,64 @@ export class AddCommentComponent extends AppComponentBase {
       }
     }
     addContact(contact){
+      let spanHtml = document.createElement('span');
+      spanHtml.innerHTML=contact.name;
+      spanHtml.className='selectedContact'; 
+      spanHtml.setAttribute("contenteditable", "false");
+      let pattern;
+      let inputValueWithoutMentions=this.CommentTextArea.nativeElement.innerHTML;
+      if(this.CommentTextArea.nativeElement.childNodes.length>1){
+        inputValueWithoutMentions='';
+        this.CommentTextArea.nativeElement.childNodes.forEach(function(node){
+          // Text nodes are nodeType: 3
+          if(node.nodeType === 3 && node.nodeValue !== ""){
+              inputValueWithoutMentions+=node.nodeValue.trim(); 
+          }
+        });    
+      }
+      if(this.CommentTextArea.nativeElement.innerText.length>1){
+     pattern =String.fromCharCode(inputValueWithoutMentions.charCodeAt(window.getSelection().anchorOffset- 1));
+
+      }else{
+        pattern =String.fromCharCode(inputValueWithoutMentions.charCodeAt(0));
+
+      }
+      this.CommentTextArea.nativeElement.innerHTML = this.CommentTextArea.nativeElement.innerHTML.replace('@', spanHtml.outerHTML);
+      this.showContactSuggstions=false;
 
     }
+
     mentionContact(event){
         debugger
-        let enterdValue=String.fromCharCode(event.target.value.charCodeAt(event.target.selectionStart- 1));
+        this.comment.body=event.target.innerHTML;
+        let inputValueWithoutMentions=event.target.innerHTML;
+        if(event.target.childNodes.length>1){
+            inputValueWithoutMentions='';
+         event.target.childNodes.forEach(function(node){
+            // Text nodes are nodeType: 3
+            if(node.nodeType === 3 && node.nodeValue !== ""){
+                inputValueWithoutMentions+=node.nodeValue; 
+            }
+          });    
+        }
+
+        let enterdValue=event.key=='@'?event.key:String.fromCharCode(inputValueWithoutMentions.charCodeAt(window.getSelection().anchorOffset- 1));
         if(enterdValue=='@'){
-            // Input String 
-            let searchInputVal = event.target.value;
             // Getting last character using char at
-            let lastCharachter = searchInputVal.charAt(searchInputVal.length - 1);
+            let lastCharachter = inputValueWithoutMentions.charAt(inputValueWithoutMentions.length - 1);
             this.suggListContLeft=(event.target.offsetLeft*1.5)//+event.target.selectionStart;
             this.suggListTop=event.target.offsetTop+10;
+            let charachterIndex=inputValueWithoutMentions.indexOf(enterdValue);
 
             let previosCharachter:string;
             if(enterdValue==lastCharachter){
-                previosCharachter= searchInputVal.charAt(searchInputVal.length - 1);
-                if(previosCharachter==' '||previosCharachter==undefined||searchInputVal.length==1){
+                previosCharachter= inputValueWithoutMentions.charAt(charachterIndex-1);
+                if(previosCharachter==' '||previosCharachter==undefined||inputValueWithoutMentions.length==1){
                   this.showContactSuggstions=true;
                 }
             }else{
-                let charachterIndex=searchInputVal.indexOf(enterdValue);
-                previosCharachter= searchInputVal.charAt(searchInputVal.length - (searchInputVal.length-(charachterIndex-1)));
+
+                previosCharachter= inputValueWithoutMentions.charAt(charachterIndex-1);
                 if(previosCharachter==' '||previosCharachter==undefined){
                     this.showContactSuggstions=true;
                 }
