@@ -68,10 +68,11 @@ export class ShoppingCartViewComponentComponent
   transactionPosition = TransactionPosition;
   activeIndex = 0;
   showSaveBtn: boolean = false;
-  transactionFormPath:string="";
-  onshare:boolean=false;
+  transactionFormPath: string = "";
+  orderConfirmationFile;
+  onshare: boolean = false;
   printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
-  reportUrl:string="";
+  reportUrl: string = "";
   invokeAction = '/DXXRDV';
 
   constructor(
@@ -155,7 +156,7 @@ export class ShoppingCartViewComponentComponent
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
-    this.onshare=false;
+    this.onshare = false;
   }
 
   getColumns() {
@@ -175,7 +176,10 @@ export class ShoppingCartViewComponentComponent
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
+        if (res?.entityAttachments?.length > 0)
+          this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
 
+        this.orderConfirmationFile = res.orderConfirmationFile;
         this.loadCommentsList()
 
         //lines
@@ -189,8 +193,6 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
-       this.transactionFormPath =res?.entityAttachments[0]?.url;
-    //this.transactionFormPath =this.attachmentBaseUrl+"/attachments/2154/OrderConfirmation_361667.pdf";
 
 
             this.resetTabValidation();
@@ -431,7 +433,7 @@ export class ShoppingCartViewComponentComponent
   }
   onEditQty(rowNode) {
     rowNode.node.data.invalidUpdatedQty = "";
-  
+
     switch (rowNode.level) {
       case 0:
       case 2:
@@ -490,7 +492,7 @@ export class ShoppingCartViewComponentComponent
       default:
         break;
 
-         
+
     }
   }
   hide() {
@@ -697,24 +699,24 @@ export class ShoppingCartViewComponentComponent
     this.appTransactionsForViewDto = $event;
   }
 
-  printTransaction(){
+  printTransaction() {
     var page = window.open(this.transactionFormPath);
     page.print();
   }
 
-  onShareTransaction(){
-    this.onshare=true;
+  onShareTransaction() {
+    this.onshare = true;
   }
- offShareTransaction(){
-    this.onshare=false;
+  offShareTransaction() {
+    this.onshare = false;
   }
-  onGeneratOrderReport($event){
-    if($event){
-      this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
-      this.printInfoParam.TransactionId=this.orderId.toString();
-    //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
-      this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
-      this.printInfoParam.saveToPDF=true;
+  onGeneratOrderReport($event) {
+    if ($event) {
+      this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+      this.printInfoParam.TransactionId = this.orderId.toString();
+      //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+      this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+      this.printInfoParam.saveToPDF = true;
       this.printInfoParam.tenantId = this.appSession?.tenantId
       this.printInfoParam.userId = this.appSession?.userId
       this.reportUrl = this.printInfoParam.getReportUrl()
