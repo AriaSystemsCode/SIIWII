@@ -175,15 +175,15 @@ export class CreateEditAppItemVariationsComponent
         var count = 0;
         this.selectedExtraAttributes?.forEach((extraAttr) => {
             let extraAttrSelectedValues: number;
-            if (
-                this.sizeExtraAttrCode ==
-                extraAttr.entityObjectTypeCode?.toUpperCase()
-            ) {
-                extraAttrSelectedValues =
-                    this.appSizeRatios?.appSizeScalesDetails?.length;
-            } else {
+            // if (
+            //     this.sizeExtraAttrCode ==
+            //     extraAttr.entityObjectTypeCode?.toUpperCase()
+            // ) {
+            //     extraAttrSelectedValues =
+            //         this.appSizeRatios?.appSizeScalesDetails?.length;
+            // } else {
                 extraAttrSelectedValues = extraAttr.selectedValues?.length;
-            }
+            // }
             if (count == 0 && extraAttrSelectedValues > 0) count = 1;
             if (extraAttrSelectedValues) count *= extraAttrSelectedValues;
         });
@@ -250,6 +250,7 @@ export class CreateEditAppItemVariationsComponent
         };
     }
     ngOnChanges(changes: SimpleChanges) {
+        debugger
         this.getallAtrributes();
 
         if (this.appItem && this.selectedItemTypeData) {
@@ -420,6 +421,7 @@ export class CreateEditAppItemVariationsComponent
                     extraAttr.lookupData = lookupData;
                     extraAttr.displayedLookupData = extraAttr.lookupData;
                 });
+                this.tempAddNewAttributes()
                 resolve(true);
             } else {
                 reject(false);
@@ -427,7 +429,33 @@ export class CreateEditAppItemVariationsComponent
             }
         });
     }
-
+    getUniqueId = function(uniqueTempIds : Set<number>) : number { 
+        var r = Math.floor(Math.random() * 1e10) + 1e11;
+        if(uniqueTempIds.has(r)) this.getUniqueId()
+        else {
+            uniqueTempIds.add(r);
+            return r
+        }
+    }
+    tempAddNewAttributes(){
+        var uniqueTempIds = new Set<number>();
+        this.appItem.variationItems.forEach(variation=>{
+            variation.entityExtraData.forEach(entityExtraData=>{
+                const extraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == entityExtraData?.entityObjectTypeCode)[0]
+                const isExist = extraAttr?.lookupData.filter(item=>item.code == entityExtraData?.attributeCode)[0] 
+                if(!isExist) {
+                    const tempAtt = new LookupLabelDto({
+                        code:entityExtraData?.attributeCode,
+                        value:this.getUniqueId(uniqueTempIds),
+                        label:entityExtraData?.attributeValue,
+                        stockAvailability:0,
+                        isHostRecord:false,
+                    })
+                    extraAttr?.lookupData?.push(tempAtt)
+                }
+            })
+        })
+    }
     removeExtraAttribute(extraAttr: IsVariationExtraAttribute, index: number) {
         // this.selectedExtaAttrCtrl.removeControl(name)
         if (extraAttr.entityObjectTypeCode == this.sizeExtraAttrCode) {
@@ -485,13 +513,18 @@ export class CreateEditAppItemVariationsComponent
         // this.primengTableHelper.records = this.variationMatrices;
 
         console.log(">> list variation", this.variationMatrices);
-
+        const variationMatricesWithoutValuesIds = this.variationMatrices.map(item=>{
+            const var_ = new VariationItemDto()
+            var_.init(item)
+            var_.entityExtraData.forEach(item=>item.attributeValueId = undefined)
+            return var_
+        })
         this._appItemsServiceProxy
             .getVariationsCodes(
                 this.attributeID  ?     this.attributeID  : this.appItem?.sycIdentifierId,
                 this.productCode,
                 this.productTypeId,
-                this.variationMatrices
+                variationMatricesWithoutValuesIds
             )
             .subscribe((response: any) => {
                 console.log(">>", response, this.variationMatrices);
@@ -665,20 +698,34 @@ export class CreateEditAppItemVariationsComponent
         const valuesAttachmentObject =
             defaultImageExtraAttr.selectedValuesAttachments;
 
-        const selectedValues: number[] = defaultImageExtraAttr.selectedValues;
+        const selectedValues: any[] = defaultImageExtraAttr.selectedValues;
 
         // build attachment data for each value of the default selected attibute
+       
         defaultImageExtraAttr.lookupData.forEach((elem: SelectItem) => {
-            let optionId = elem.value;
-            let isSelected = selectedValues.includes(optionId);
-            if (isSelected) {
-                valuesAttachmentObject[optionId] = {
-                    entityAttachments: [],
-                    attachmentSrcs: [""],
-                    lookupData: elem,
-                    defaultImageIndex: -1,
-                };
-            }
+            // if(defaultImageExtraAttr.entityObjectTypeCode == this.sizeExtraAttrCode){
+            //     let optionCode : string = (elem as any).code;
+            //     let isSelected = selectedValues.includes(optionCode);
+            //     if (isSelected) {
+            //         valuesAttachmentObject[optionCode] = {
+            //             entityAttachments: [],
+            //             attachmentSrcs: [""],
+            //             lookupData: elem,
+            //             defaultImageIndex: -1,
+            //         };
+            //     }
+            // } else {
+                let optionId = elem.value;
+                let isSelected = selectedValues.includes(optionId);
+                if (isSelected) {
+                    valuesAttachmentObject[optionId] = {
+                        entityAttachments: [],
+                        attachmentSrcs: [""],
+                        lookupData: elem,
+                        defaultImageIndex: -1,
+                    };
+                }
+            // }
         });
 
         // set first option value as active
@@ -909,7 +956,7 @@ export class CreateEditAppItemVariationsComponent
                 this.variationMatrices.push(newVariation);
             }
         };
-            if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
+            // if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
                 currentExtraAttr.selectedValues.forEach((attrId) => {
                     // if(attrId || attrId>=0){
                     let attrOptionData: any = currentExtraAttr.lookupData.filter(
@@ -922,48 +969,19 @@ export class CreateEditAppItemVariationsComponent
                     );
                   //  }
                 });
-            } else {
-                // size condition
-                console.log(">>", this.appSizeRatios.appSizeScalesDetails);
-    
-                // if (this.appSizeRatios.appSizeScalesDetails.length < 2) {
-                // let sizeData = this.appSizeRatios.appSizeScalesDetails[0];
-                // this.siwiSizes.forEach((size) => {
-                this.appSizeRatios.appSizeScalesDetails.forEach(
-                    (sizeScale: any) => {
-                        let arr = this.siwiSizes.filter(
-                            (size) => size.code === sizeScale.sizeCode
-                        );
-                        console.log(">>", arr);
-    
-                        if (arr.length !== 0) {
-                            createNewVariation(
-                                sizeScale.sizeCode,
-                                sizeScale.sizeCode,
-                                arr[0].value
-                            );
-                        } else {
-                            createNewVariation(
-                                sizeScale.sizeCode,
-                                sizeScale.sizeCode
-                            );
-                            // }
-                        }
-                    }
-                );
-    
-                // });
-                // } else {
-                //     this.appSizeRatios.appSizeScalesDetails.forEach(
-                //         (sizeDetailDto) => {
-                //             createNewVariation(
-                //                 sizeDetailDto.sizeCode,
-                //                 sizeDetailDto.sizeCode
-                //             );
-                //         }
-                //     );
-                // }
-            }
+            // } else {
+            //     // size condition
+            //     console.log(">>", this.appSizeRatios.appSizeScalesDetails);
+                
+            //     const sizeExtraAttr = this.selectedExtraAttributes.filter(extraAttr=>extraAttr.entityObjectTypeCode == this.sizeExtraAttrCode)
+            //     sizeExtraAttr[0]?.selectedValues?.forEach(code=>{
+            //         createNewVariation(
+            //             code,
+            //             code
+            //         );
+            //     })
+              
+            // }
     }
 
     setPrice(price: any, dropdown: BsDropdownDirective) {
@@ -1062,9 +1080,10 @@ export class CreateEditAppItemVariationsComponent
 
             if(extraAttrValue.attributeValueId){
              optionValue =
-                extraAttrValue.entityObjectTypeCode == this.sizeExtraAttrCode
-                    ? extraAttrValue.attributeCode
-                    : extraAttrValue.attributeValueId;
+                //extraAttrValue.entityObjectTypeCode == this.sizeExtraAttrCode
+                    //? extraAttrValue.attributeCode
+                    //: 
+                    extraAttrValue.attributeValueId;
 
              currentOptionAttachments =
                 this.defaultExtraAttrForAttachments.selectedValuesAttachments[
@@ -1197,20 +1216,22 @@ export class CreateEditAppItemVariationsComponent
                 let extraAttrId = item.attributeId;
                 let currentExtraDataIndex =
                     selectedExtraAttrIds.indexOf(extraAttrId);
-                let isSizeExtraAttr: boolean =
-                    item.entityObjectTypeCode == this.sizeExtraAttrCode;
+                // let isSizeExtraAttr: boolean =
+                //     item.entityObjectTypeCode == this.sizeExtraAttrCode;
                 let optionValueId = item.attributeValueId;
                 let optionValueCode = item.attributeCode;
-                if (!isSizeExtraAttr && !optionValueId) {
+                // if (!isSizeExtraAttr && !optionValueId) {
                     optionValueId = selectedExtraAttr[
                         currentExtraDataIndex
                     ].lookupData.filter(
                         (item) => item.code == optionValueCode
                     )[0]?.value;
-                }
-                let attOptionValue = isSizeExtraAttr
-                    ? optionValueCode
-                    : optionValueId;
+                // }
+                let attOptionValue = 
+                    //isSizeExtraAttr
+                    //? optionValueCode
+                    //: 
+                    optionValueId;
                 let alreadySelectedValues: any[] =
                     selectedExtraAttr[currentExtraDataIndex].selectedValues;
                 if (!alreadySelectedValues.includes(attOptionValue as unknown))
@@ -1226,7 +1247,7 @@ export class CreateEditAppItemVariationsComponent
                 // this.defaultExtraAttrForAttachments = selectedExtraAttr[currentExtraDataIndex]
                 if (!attachmentObj[attOptionValue]) {
                     let selectedValue: SelectItem;
-                    if (!isSizeExtraAttr)
+                    // if (!isSizeExtraAttr)
                         selectedValue = selectedExtraAttr[
                             currentExtraDataIndex
                         ].lookupData.filter(
@@ -1247,12 +1268,14 @@ export class CreateEditAppItemVariationsComponent
                 let currentExtraDataIndex = selectedExtraAttrIds.indexOf(
                     Number(extraAttrId)
                 );
-                let isSizeExtraAttr: boolean =
-                    selectedExtraAttr[currentExtraDataIndex]
-                        .entityObjectTypeCode == this.sizeExtraAttrCode;
-                let optionvalue = isSizeExtraAttr
-                    ? attributes[1]
-                    : Number(attributes[1]);
+                // let isSizeExtraAttr: boolean =
+                //     selectedExtraAttr[currentExtraDataIndex]
+                //         .entityObjectTypeCode == this.sizeExtraAttrCode;
+                let optionvalue = 
+                    //isSizeExtraAttr
+                    //? attributes[1]
+                    //: 
+                    Number(attributes[1]);
                 let attachmentObj: { [key: number]: IVaritaionAttachment } =
                     selectedExtraAttr[currentExtraDataIndex]
                         .selectedValuesAttachments
@@ -1264,7 +1287,7 @@ export class CreateEditAppItemVariationsComponent
                 // this.defaultExtraAttrForAttachments = selectedExtraAttr[currentExtraDataIndex]
                 if (!attachmentObj[optionvalue]) {
                     let selectedValue: SelectItem;
-                    if (!isSizeExtraAttr)
+                    //if (!isSizeExtraAttr)
                         selectedValue = selectedExtraAttr[
                             currentExtraDataIndex
                         ].lookupData.filter(
@@ -1620,11 +1643,27 @@ export class CreateEditAppItemVariationsComponent
     sizeRatioChanged($event: AppItemSizesScaleInfo, formIsValid: boolean) {
         this.sizeRatioFormIsValid = formIsValid;
         this.appSizeRatios = $event;
-        this.selectedExtraAttributes[
-            this.activeExtraAttributeIndex
-        ].selectedValues = this.appSizeRatios.appSizeScalesDetails.map(
+        const selectedValuesCodes = this.appSizeRatios.appSizeScalesDetails.map(
             (item) => item.sizeCode
         );
+        const selectedValuesIds : number[] = []
+        const uniqueTempIds = new Set<number>();
+        const sizeExtraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == this.sizeExtraAttrCode)[0]
+        selectedValuesCodes.forEach(code=>{
+            const isExist = sizeExtraAttr?.lookupData.filter(item=>item.code == code)[0] 
+            if(!isExist) {
+                const tempAtt = new LookupLabelDto({
+                    code,
+                    value:this.getUniqueId(uniqueTempIds),
+                    label:code,
+                    stockAvailability:0,
+                    isHostRecord:false,
+                })
+                sizeExtraAttr?.lookupData?.push(tempAtt)
+                selectedValuesIds.push(tempAtt.value)
+            }    
+        })
+        sizeExtraAttr.selectedValues = selectedValuesIds
     }
     // extraAttributeOnChange($event:Event,extraAttr:IsVariationExtraAttribute){
 

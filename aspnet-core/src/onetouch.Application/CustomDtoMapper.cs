@@ -851,10 +851,13 @@ namespace onetouch
             configuration.CreateMap<AppAddress, ContactAddressDto>();
 
             configuration.CreateMap<AppEntity, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionHeaders>();
-            configuration.CreateMap <onetouch.AppSiiwiiTransaction.AppTransactionHeaders,onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionHeaders>();
+            configuration.CreateMap <onetouch.AppSiiwiiTransaction.AppTransactionHeaders,onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionHeaders>().ReverseMap();
             configuration.CreateMap<AppEntity, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionDetails>();
-            configuration.CreateMap<onetouch.AppSiiwiiTransaction.AppTransactionDetails, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionDetails>();
-           configuration.CreateMap<AppTransactionContacts, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionContacts>();
+            configuration.CreateMap<onetouch.AppSiiwiiTransaction.AppTransactionDetails, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionDetails>().ReverseMap();
+           configuration.CreateMap<AppTransactionContacts, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionContacts>().ReverseMap();
+            configuration.CreateMap<AppEntity,AppTransactionHeaders>();
+            configuration.CreateMap<AppEntity, AppTransactionDetails>();
+
         }
     }
 }
