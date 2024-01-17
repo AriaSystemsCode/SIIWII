@@ -19830,6 +19830,58 @@ export class AppTransactionServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    shareTransaction(body: SharingTransactionOptions | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransaction";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareTransaction(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareTransaction(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processShareTransaction(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -72185,6 +72237,142 @@ export interface IContactInformationOutputDto {
     name: string | undefined;
     userId: number;
     userImage: string | undefined;
+
+    [key: string]: any;
+}
+
+export class TransactionSharingDto implements ITransactionSharingDto {
+    sharedTenantId!: number | undefined;
+    sharedUserId!: number | undefined;
+    sharedUserEMail!: string | undefined;
+    sharedUserName!: string | undefined;
+    sharedUserSureName!: string | undefined;
+    sharedUserTenantName!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ITransactionSharingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.sharedTenantId = _data["sharedTenantId"];
+            this.sharedUserId = _data["sharedUserId"];
+            this.sharedUserEMail = _data["sharedUserEMail"];
+            this.sharedUserName = _data["sharedUserName"];
+            this.sharedUserSureName = _data["sharedUserSureName"];
+            this.sharedUserTenantName = _data["sharedUserTenantName"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): TransactionSharingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TransactionSharingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["sharedTenantId"] = this.sharedTenantId;
+        data["sharedUserId"] = this.sharedUserId;
+        data["sharedUserEMail"] = this.sharedUserEMail;
+        data["sharedUserName"] = this.sharedUserName;
+        data["sharedUserSureName"] = this.sharedUserSureName;
+        data["sharedUserTenantName"] = this.sharedUserTenantName;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ITransactionSharingDto {
+    sharedTenantId: number | undefined;
+    sharedUserId: number | undefined;
+    sharedUserEMail: string | undefined;
+    sharedUserName: string | undefined;
+    sharedUserSureName: string | undefined;
+    sharedUserTenantName: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class SharingTransactionOptions implements ISharingTransactionOptions {
+    transactionId!: number;
+    message!: string | undefined;
+    transactionSharing!: TransactionSharingDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ISharingTransactionOptions) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.transactionId = _data["transactionId"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["transactionSharing"])) {
+                this.transactionSharing = [] as any;
+                for (let item of _data["transactionSharing"])
+                    this.transactionSharing!.push(TransactionSharingDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SharingTransactionOptions {
+        data = typeof data === 'object' ? data : {};
+        let result = new SharingTransactionOptions();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["transactionId"] = this.transactionId;
+        data["message"] = this.message;
+        if (Array.isArray(this.transactionSharing)) {
+            data["transactionSharing"] = [];
+            for (let item of this.transactionSharing)
+                data["transactionSharing"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ISharingTransactionOptions {
+    transactionId: number;
+    message: string | undefined;
+    transactionSharing: TransactionSharingDto[] | undefined;
 
     [key: string]: any;
 }
