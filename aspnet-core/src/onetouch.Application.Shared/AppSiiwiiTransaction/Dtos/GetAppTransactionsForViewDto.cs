@@ -161,6 +161,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public Guid? UserImage { set; get; }
         public string UserName { set; get; }
         public int TenantId { set; get; }
+        public string TenantName { set; get; }
     }
     public class SharingTransactionOptions
     {
