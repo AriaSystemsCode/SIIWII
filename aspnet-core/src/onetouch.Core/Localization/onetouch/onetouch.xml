@@ -2425,5 +2425,6 @@
     <text name="Add2">Add</text>
     <text name="Done">Done</text>
     <text name="InvalidEmailFormate">Invalid email formate</text>
+    <text name="TransactionHasBeenSent">Transaction has been sent</text>
   </texts>  
 </localizationDictionary>

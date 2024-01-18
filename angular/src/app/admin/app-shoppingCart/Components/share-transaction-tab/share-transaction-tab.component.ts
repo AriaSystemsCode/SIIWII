@@ -15,7 +15,7 @@ interface AutoCompleteCompleteEvent {
 export class ShareTransactionTabComponent  extends AppComponentBase{
   @Output() offShareTransactionEvent = new EventEmitter<any>();
   @Input("orderId") orderId:number;
-
+  @Input("sharedWithUsers") sharedWithUsers:any;
   emailList:string;
   sharingList:any;
   sharingListForSave:any;
@@ -42,29 +42,14 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
 
   }
   ngOnInit(): void {
-    /*this.sharingList=[{
-      id:1,
-      name:'test',
-      image:'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png'
-    },
-    {
-      id:2,
-      name:'test2',
-      image:'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png'
-    },
-    {
-      id:3,
-      name:'tes2',
-      image:'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png'
-    }];
-    this.sharingList.forEach(function(contact){
-      contact.removed=false;
-    })*/
+if(this.sharedWithUsers)this.editMode=false;
+
   this.sharingListForSave=this.sharingList;
   this.loadContactList();
   }
   shareTransaction(){
     debugger
+
     let contactUser:any={};
     let newsharingArray=[];
     let shareTranOptionsDto:any={
@@ -73,7 +58,7 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
       transactionSharing:[]
     };
 
-    if(this.sharingListForSave){
+    if(this.sharingListForSave&&this.sharingListForSave?.length>0){
       this.sharingListForSave.forEach(function(contact,index){
         contactUser.sharedTenantId=contact.tenantId;
         contactUser.sharedUserId=contact.userId;
@@ -87,24 +72,26 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
       shareTranOptionsDto['transactionId']=this.orderId;
       shareTranOptionsDto['message']=this.messageBody;
       shareTranOptionsDto['transactionSharing']=newsharingArray;
-      shareTranOptionsDto['subject']='';
+      shareTranOptionsDto['subject']=undefined;
+      this.showMainSpinner();
      this._AppTransactionServiceProxy.shareTransactionByMessage(shareTranOptionsDto).subscribe(result=>{
        debugger
+       this.hideMainSpinner();
         }) 
     }
     if(this.emailList){
       shareTranOptionsDto['transactionId']=this.orderId;
       shareTranOptionsDto['message']=this.messageBody;
       shareTranOptionsDto['emailAddresses']=this.emailList.split(/[ ,]+/);
-      debugger
+      this.showMainSpinner();
       this._AppTransactionServiceProxy.shareTransactionByEmail(shareTranOptionsDto).subscribe(result=>{
-        debugger
+        if(result)this.notify.success(this.l("TransactionHasBeenSent"));
+        this.hideMainSpinner();
          }) 
     }
 
   }
   loadContactList(){
-    debugger
     this._AppTransactionServiceProxy.getTransactionContacts(this.orderId,'').subscribe(result=>{
       for (let i =0; i<result.length;i++){
         if(result[i].userImage){

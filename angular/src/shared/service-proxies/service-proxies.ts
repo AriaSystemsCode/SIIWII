@@ -19835,7 +19835,7 @@ export class AppTransactionServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    shareTransactionByEmail(body: SharingTransactionEmail | undefined): Observable<void> {
+    shareTransactionByEmail(body: SharingTransactionEmail | undefined): Observable<boolean> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransactionByEmail";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -19847,6 +19847,7 @@ export class AppTransactionServiceProxy {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
             })
         };
 
@@ -19857,14 +19858,14 @@ export class AppTransactionServiceProxy {
                 try {
                     return this.processShareTransactionByEmail(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<boolean>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<boolean>;
         }));
     }
 
-    protected processShareTransactionByEmail(response: HttpResponseBase): Observable<void> {
+    protected processShareTransactionByEmail(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -19873,7 +19874,11 @@ export class AppTransactionServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -19887,7 +19892,7 @@ export class AppTransactionServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    shareTransactionByMessage(body: SharingTransactionOptions | undefined): Observable<void> {
+    shareTransactionByMessage(body: SharingTransactionOptions | undefined): Observable<boolean> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransactionByMessage";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -19899,6 +19904,7 @@ export class AppTransactionServiceProxy {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
             })
         };
 
@@ -19909,14 +19915,14 @@ export class AppTransactionServiceProxy {
                 try {
                     return this.processShareTransactionByMessage(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<boolean>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<boolean>;
         }));
     }
 
-    protected processShareTransactionByMessage(response: HttpResponseBase): Observable<void> {
+    protected processShareTransactionByMessage(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -19925,7 +19931,11 @@ export class AppTransactionServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
