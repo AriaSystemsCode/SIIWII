@@ -80,6 +80,7 @@
             <div class="col-12 p-3 pl-4 pr-4">
                 <input type="email"   
                 (focusout)="validateEmailFormate()" 
+                (input)="checkSaveAvilabilty()"
                 class="form-control w-100"
                 [(ngModel)]="emailList"/>
 
@@ -91,7 +92,9 @@
             </div>
 
 <div class="col-12 p-3 pl-4 pr-4" *ngIf="editMode">
-    <textarea class="form-control w-100 " [(ngModel)]="messageBody" placeholder="{{'Addamessagehere'| localize}}....."></textarea>
+    <textarea class="form-control w-100 "
+    (input)="checkSaveAvilabilty()"
+     [(ngModel)]="messageBody" placeholder="{{'Addamessagehere'| localize}}....."></textarea>
 </div>
 
         </div>
@@ -99,11 +102,9 @@
             <div class="col-12 p-3 pl-4 pr-4">
                 <button class="text-center btn btn-success float-right ml-2 mr-2"
                  (click)="shareTransaction()" 
-                 [disabled]="!messageBody&&!sharingListForSave&&emailList&&!validEmailFormate||
-                 messageBody&&!sharingListForSave&&!emailList&&!validEmailFormate
-                 ||!messageBody&&!emailList&&sharingListForSave
-                 ||messageBody&&!emailList&&!sharingListForSave"
-                 *ngIf="editMode||readyForSave">
+                 [disabled]="dasableShareBtn"
+                 *ngIf="editMode||readyForSave"
+                 >
                  {{'Save'| localize}}</button>
                 <button class="text-center btn btn-success float-right ml-2 mr-2" *ngIf="sharedBefore&&!editMode&&!readyForSave" (click)="closeShareMode()">{{'Done'| localize}}</button>
             

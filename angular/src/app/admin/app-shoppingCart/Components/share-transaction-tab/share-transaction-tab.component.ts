@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector,Output,Input  } from '@angular/core';
+import { Component, EventEmitter, Injector,Output,Input, OnInit, OnChanges, SimpleChanges  } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppConsts } from '@shared/AppConsts';
 import { AppTransactionServiceProxy, AppPostsServiceProxy, SharingTransactionOptions, TransactionSharingDto} from '@shared/service-proxies/service-proxies';
@@ -12,8 +12,9 @@ interface AutoCompleteCompleteEvent {
   templateUrl: './share-transaction-tab.component.html',
   styleUrls: ['./share-transaction-tab.component.scss']
 })
-export class ShareTransactionTabComponent  extends AppComponentBase{
+export class ShareTransactionTabComponent  extends AppComponentBase {
   @Output() offShareTransactionEvent = new EventEmitter<any>();
+  @Output() closeTranScreenEvent = new EventEmitter<any>();
   @Input("orderId") orderId:number;
   @Input("sharedWithUsers") sharedWithUsers:any;
   emailList:string;
@@ -32,6 +33,7 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   shareTranOptions:SharingTransactionOptions;
   messageBody:string;
   contactsToBeSharedWith:TransactionSharingDto[];
+  dasableShareBtn:boolean=true;
   constructor(
     injector: Injector,
     private _postService: AppPostsServiceProxy,
@@ -41,15 +43,39 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
     super(injector);
 
   }
+  ngOnChanges(changes: SimpleChanges) {
+    this.checkSaveAvilabilty();
+  }
   ngOnInit(): void {
-if(this.sharedWithUsers)this.editMode=false;
+if(this.sharedWithUsers){
+  this.editMode=false;
+  this.sharingListForSave=this.sharedWithUsers;
+  this.sharingList=this.sharedWithUsers;
+  for (let i =0; i<this.sharingList.length;i++){
+    if(this.sharingList[i].userImage){
+      this.sharingList.filter(item=>{
+        if(item.id==this.sharingList[i].id) this.sharingList[i].isLoading=true;
+      })
+      this.getProfilePictureById(this.sharingList[i].userImage,this.sharingList[i],'sharingList');
+    }
+
+  }
+}else{
+  this.loadContactList();
+
+}
 
   this.sharingListForSave=this.sharingList;
-  this.loadContactList();
+  }
+  checkSaveAvilabilty(){
+    if(this.messageBody=='')this.messageBody=undefined
+    if(!this.sharingListForSave&&this.messageBody&&!this.emailList||this.sharingListForSave&&!this.messageBody&&!this.emailList)this.dasableShareBtn=true;
+    if(!this.emailList&&this.messageBody&&!this.sharingListForSave||this.emailList&&!this.messageBody&&!this.sharingListForSave)this.dasableShareBtn=true;
+    if(this.sharingListForSave&&this.messageBody)this.dasableShareBtn=false;
+    if(this.emailList&&this.messageBody)this.dasableShareBtn=false;
+    if(this.readyForSave&&this.sharingListForSave)this.dasableShareBtn=false;
   }
   shareTransaction(){
-    debugger
-
     let contactUser:any={};
     let newsharingArray=[];
     let shareTranOptionsDto:any={
@@ -75,7 +101,11 @@ if(this.sharedWithUsers)this.editMode=false;
       shareTranOptionsDto['subject']=undefined;
       this.showMainSpinner();
      this._AppTransactionServiceProxy.shareTransactionByMessage(shareTranOptionsDto).subscribe(result=>{
-       debugger
+      if(result){
+        this.notify.success(this.l("TransactionHasBeenSent"));
+        this.closeTransPopup();
+
+      }
        this.hideMainSpinner();
         }) 
     }
@@ -85,11 +115,17 @@ if(this.sharedWithUsers)this.editMode=false;
       shareTranOptionsDto['emailAddresses']=this.emailList.split(/[ ,]+/);
       this.showMainSpinner();
       this._AppTransactionServiceProxy.shareTransactionByEmail(shareTranOptionsDto).subscribe(result=>{
-        if(result)this.notify.success(this.l("TransactionHasBeenSent"));
+        if(result){
+          this.notify.success(this.l("TransactionHasBeenSent"));
+          this.closeTransPopup();
+        }
         this.hideMainSpinner();
          }) 
     }
 
+  }
+  closeTransPopup(){
+    this.closeTranScreenEvent.emit();
   }
   loadContactList(){
     this._AppTransactionServiceProxy.getTransactionContacts(this.orderId,'').subscribe(result=>{
@@ -145,6 +181,7 @@ if(this.sharedWithUsers)this.editMode=false;
     this.sharingList=newsharingList; 
     this.sharingListForSave=newsharingList;
     this.searchContact=[];
+    this.checkSaveAvilabilty();
 
     }
 
@@ -164,7 +201,7 @@ if(this.sharedWithUsers)this.editMode=false;
                 this[objectName].filter(item=>{
                   if(item.id==contact.id) currentObject[indexInsideArray].userImage=contactImage;
                 })
-                this.suggestionsContacts=currentObject;  
+                this[objectName]=currentObject;  
                 }
 
 
@@ -198,12 +235,16 @@ this._AppTransactionServiceProxy.getAccountConnectedContacts(query).subscribe(re
       if(contact.id==id){ contact.removed=true;}
     })
 this.readyForSave=true;
+this.checkSaveAvilabilty();
+
   }
   reloadContact(id){
     this.sharingList.forEach(function(contact){
       if(contact.id==id){ contact.removed=false;}
     })
     this.sharingListForSave = this.sharingList;
+    this.checkSaveAvilabilty();
+
   }
   closeShareMode(){
     this.offShareTransactionEvent.emit();
