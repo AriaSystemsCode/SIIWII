@@ -19835,8 +19835,8 @@ export class AppTransactionServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    shareTransaction(body: SharingTransactionOptions | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransaction";
+    shareTransactionByEmail(body: SharingTransactionEmail | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransactionByEmail";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -19851,11 +19851,11 @@ export class AppTransactionServiceProxy {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processShareTransaction(response_);
+            return this.processShareTransactionByEmail(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processShareTransaction(response_ as any);
+                    return this.processShareTransactionByEmail(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<void>;
                 }
@@ -19864,7 +19864,7 @@ export class AppTransactionServiceProxy {
         }));
     }
 
-    protected processShareTransaction(response: HttpResponseBase): Observable<void> {
+    protected processShareTransactionByEmail(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -19874,6 +19874,242 @@ export class AppTransactionServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    shareTransactionByMessage(body: SharingTransactionOptions | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransactionByMessage";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareTransactionByMessage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareTransactionByMessage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processShareTransactionByMessage(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param marketplaceTransactionId (optional) 
+     * @param tenantId (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    shareTransactionWithTenant(marketplaceTransactionId: number | undefined, tenantId: number | undefined, body: TransactionType | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransactionWithTenant?";
+        if (marketplaceTransactionId === null)
+            throw new Error("The parameter 'marketplaceTransactionId' cannot be null.");
+        else if (marketplaceTransactionId !== undefined)
+            url_ += "marketplaceTransactionId=" + encodeURIComponent("" + marketplaceTransactionId) + "&";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareTransactionWithTenant(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareTransactionWithTenant(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processShareTransactionWithTenant(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param input (optional) 
+     * @return Success
+     */
+    shareTransactionOnMarketplace(input: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransactionOnMarketplace?";
+        if (input === null)
+            throw new Error("The parameter 'input' cannot be null.");
+        else if (input !== undefined)
+            url_ += "input=" + encodeURIComponent("" + input) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareTransactionOnMarketplace(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareTransactionOnMarketplace(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processShareTransactionOnMarketplace(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tranType (optional) 
+     * @param tenantId (optional) 
+     * @return Success
+     */
+    getTenantNextOrderNumber(tranType: string | null | undefined, tenantId: number | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetTenantNextOrderNumber?";
+        if (tranType !== undefined && tranType !== null)
+            url_ += "tranType=" + encodeURIComponent("" + tranType) + "&";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantNextOrderNumber(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantNextOrderNumber(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetTenantNextOrderNumber(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -69370,6 +69606,82 @@ export interface IAppTenantsActivitiesLogTenantLookupTableDto {
     [key: string]: any;
 }
 
+export class ContactInformationOutputDto implements IContactInformationOutputDto {
+    id!: number;
+    email!: string | undefined;
+    name!: string | undefined;
+    userId!: number;
+    userImage!: string | undefined;
+    userName!: string | undefined;
+    tenantId!: number;
+    tenantName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IContactInformationOutputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.email = _data["email"];
+            this.name = _data["name"];
+            this.userId = _data["userId"];
+            this.userImage = _data["userImage"];
+            this.userName = _data["userName"];
+            this.tenantId = _data["tenantId"];
+            this.tenantName = _data["tenantName"];
+        }
+    }
+
+    static fromJS(data: any): ContactInformationOutputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactInformationOutputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["email"] = this.email;
+        data["name"] = this.name;
+        data["userId"] = this.userId;
+        data["userImage"] = this.userImage;
+        data["userName"] = this.userName;
+        data["tenantId"] = this.tenantId;
+        data["tenantName"] = this.tenantName;
+        return data;
+    }
+}
+
+export interface IContactInformationOutputDto {
+    id: number;
+    email: string | undefined;
+    name: string | undefined;
+    userId: number;
+    userImage: string | undefined;
+    userName: string | undefined;
+    tenantId: number;
+    tenantName: string | undefined;
+
+    [key: string]: any;
+}
+
 export enum TransactionType {
     SalesOrder = 0,
     PurchaseOrder = 1,
@@ -70029,6 +70341,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     enteredDate!: moment.Moment;
     creatorUserId!: number;
     orderConfirmationFile!: string | undefined;
+    sharedWithUsers!: ContactInformationOutputDto[] | undefined;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -70111,6 +70424,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
             this.orderConfirmationFile = _data["orderConfirmationFile"];
+            if (Array.isArray(_data["sharedWithUsers"])) {
+                this.sharedWithUsers = [] as any;
+                for (let item of _data["sharedWithUsers"])
+                    this.sharedWithUsers!.push(ContactInformationOutputDto.fromJS(item));
+            }
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -70227,6 +70545,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
         data["orderConfirmationFile"] = this.orderConfirmationFile;
+        if (Array.isArray(this.sharedWithUsers)) {
+            data["sharedWithUsers"] = [];
+            for (let item of this.sharedWithUsers)
+                data["sharedWithUsers"].push(item.toJSON());
+        }
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -70332,6 +70655,7 @@ export interface IGetAppTransactionsForViewDto {
     enteredDate: moment.Moment;
     creatorUserId: number;
     orderConfirmationFile: string | undefined;
+    sharedWithUsers: ContactInformationOutputDto[] | undefined;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -70942,6 +71266,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     enteredDate!: moment.Moment;
     creatorUserId!: number;
     orderConfirmationFile!: string | undefined;
+    sharedWithUsers!: ContactInformationOutputDto[] | undefined;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -71033,6 +71358,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
             this.orderConfirmationFile = _data["orderConfirmationFile"];
+            if (Array.isArray(_data["sharedWithUsers"])) {
+                this.sharedWithUsers = [] as any;
+                for (let item of _data["sharedWithUsers"])
+                    this.sharedWithUsers!.push(ContactInformationOutputDto.fromJS(item));
+            }
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -71158,6 +71488,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
         data["orderConfirmationFile"] = this.orderConfirmationFile;
+        if (Array.isArray(this.sharedWithUsers)) {
+            data["sharedWithUsers"] = [];
+            for (let item of this.sharedWithUsers)
+                data["sharedWithUsers"].push(item.toJSON());
+        }
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -71272,6 +71607,7 @@ export interface IGetAllAppTransactionsForViewDto {
     enteredDate: moment.Moment;
     creatorUserId: number;
     orderConfirmationFile: string | undefined;
+    sharedWithUsers: ContactInformationOutputDto[] | undefined;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -72177,16 +72513,16 @@ export interface IContactAddressDto {
     [key: string]: any;
 }
 
-export class ContactInformationOutputDto implements IContactInformationOutputDto {
-    id!: number;
-    email!: string | undefined;
-    name!: string | undefined;
-    userId!: number;
-    userImage!: string | undefined;
+export class SharingTransactionEmail implements ISharingTransactionEmail {
+    transactionId!: number;
+    message!: string | undefined;
+    subject!: string | undefined;
+    emailAddresses!: string[] | undefined;
+    isBodyHtml!: boolean;
 
     [key: string]: any;
 
-    constructor(data?: IContactInformationOutputDto) {
+    constructor(data?: ISharingTransactionEmail) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -72201,17 +72537,21 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            this.id = _data["id"];
-            this.email = _data["email"];
-            this.name = _data["name"];
-            this.userId = _data["userId"];
-            this.userImage = _data["userImage"];
+            this.transactionId = _data["transactionId"];
+            this.message = _data["message"];
+            this.subject = _data["subject"];
+            if (Array.isArray(_data["emailAddresses"])) {
+                this.emailAddresses = [] as any;
+                for (let item of _data["emailAddresses"])
+                    this.emailAddresses!.push(item);
+            }
+            this.isBodyHtml = _data["isBodyHtml"];
         }
     }
 
-    static fromJS(data: any): ContactInformationOutputDto {
+    static fromJS(data: any): SharingTransactionEmail {
         data = typeof data === 'object' ? data : {};
-        let result = new ContactInformationOutputDto();
+        let result = new SharingTransactionEmail();
         result.init(data);
         return result;
     }
@@ -72222,21 +72562,25 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        data["id"] = this.id;
-        data["email"] = this.email;
-        data["name"] = this.name;
-        data["userId"] = this.userId;
-        data["userImage"] = this.userImage;
+        data["transactionId"] = this.transactionId;
+        data["message"] = this.message;
+        data["subject"] = this.subject;
+        if (Array.isArray(this.emailAddresses)) {
+            data["emailAddresses"] = [];
+            for (let item of this.emailAddresses)
+                data["emailAddresses"].push(item);
+        }
+        data["isBodyHtml"] = this.isBodyHtml;
         return data;
     }
 }
 
-export interface IContactInformationOutputDto {
-    id: number;
-    email: string | undefined;
-    name: string | undefined;
-    userId: number;
-    userImage: string | undefined;
+export interface ISharingTransactionEmail {
+    transactionId: number;
+    message: string | undefined;
+    subject: string | undefined;
+    emailAddresses: string[] | undefined;
+    isBodyHtml: boolean;
 
     [key: string]: any;
 }
@@ -72316,6 +72660,7 @@ export interface ITransactionSharingDto {
 export class SharingTransactionOptions implements ISharingTransactionOptions {
     transactionId!: number;
     message!: string | undefined;
+    subject!: string | undefined;
     transactionSharing!: TransactionSharingDto[] | undefined;
 
     [key: string]: any;
@@ -72337,6 +72682,7 @@ export class SharingTransactionOptions implements ISharingTransactionOptions {
             }
             this.transactionId = _data["transactionId"];
             this.message = _data["message"];
+            this.subject = _data["subject"];
             if (Array.isArray(_data["transactionSharing"])) {
                 this.transactionSharing = [] as any;
                 for (let item of _data["transactionSharing"])
@@ -72360,6 +72706,7 @@ export class SharingTransactionOptions implements ISharingTransactionOptions {
         }
         data["transactionId"] = this.transactionId;
         data["message"] = this.message;
+        data["subject"] = this.subject;
         if (Array.isArray(this.transactionSharing)) {
             data["transactionSharing"] = [];
             for (let item of this.transactionSharing)
@@ -72372,6 +72719,7 @@ export class SharingTransactionOptions implements ISharingTransactionOptions {
 export interface ISharingTransactionOptions {
     transactionId: number;
     message: string | undefined;
+    subject: string | undefined;
     transactionSharing: TransactionSharingDto[] | undefined;
 
     [key: string]: any;
