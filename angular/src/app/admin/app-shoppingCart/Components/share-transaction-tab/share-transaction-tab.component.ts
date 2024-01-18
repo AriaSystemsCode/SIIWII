@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Injector,Output,Input  } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppConsts } from '@shared/AppConsts';
-import { AppTransactionServiceProxy, AppPostsServiceProxy} from '@shared/service-proxies/service-proxies';
+import { AppTransactionServiceProxy, AppPostsServiceProxy, SharingTransactionOptions, TransactionSharingDto} from '@shared/service-proxies/service-proxies';
 import { filter } from 'lodash';
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
@@ -29,7 +29,9 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   editMode:boolean=true;
   readyForSave:boolean=false;
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
-
+  shareTranOptions:SharingTransactionOptions;
+  messageBody:string;
+  contactsToBeSharedWith:TransactionSharingDto[];
   constructor(
     injector: Injector,
     private _postService: AppPostsServiceProxy,
@@ -61,8 +63,34 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
   this.sharingListForSave=this.sharingList;
   this.loadContactList();
   }
+  shareTransaction(){
+    debugger
+    let contactUser:any={};
+    let newsharingArray=[];
+    let shareTranOptionsDto:any={
+      transactionId:undefined,
+      message:'',
+      transactionSharing:[]
+    };
+    this.sharingListForSave.forEach(function(contact,index){
+      contactUser.sharedTenantId=undefined;
+      contactUser.sharedUserId=contact.userId;
+      contactUser.sharedUserEMail=contact.email;
+      contactUser.sharedUserName=contact.name;
+      contactUser.sharedUserSureName=contact.name;
+      contactUser.sharedUserTenantName=contact.name;
+      contactUser.id=contact.id;
+      newsharingArray.push(contactUser);
+    })
+    shareTranOptionsDto['transactionId']=this.orderId;
+    shareTranOptionsDto['message']=this.messageBody;
+    shareTranOptionsDto['transactionSharing']=newsharingArray;
+this._AppTransactionServiceProxy.shareTransaction(shareTranOptionsDto).subscribe(result=>{
+  debugger
+})
+  }
   loadContactList(){
-    this._AppTransactionServiceProxy.getTransactionContacts(this.orderId,'m').subscribe(result=>{
+    this._AppTransactionServiceProxy.getTransactionContacts(this.orderId,'').subscribe(result=>{
       for (let i =0; i<result.length;i++){
         if(result[i].userImage){
           result.filter(item=>{
@@ -113,6 +141,7 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
 
     })
     this.sharingList=newsharingList; 
+    this.sharingListForSave=newsharingList;
     this.searchContact=[];
 
     }
