@@ -72,24 +72,39 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
       message:'',
       transactionSharing:[]
     };
-    this.sharingListForSave.forEach(function(contact,index){
-      contactUser.sharedTenantId=undefined;
-      contactUser.sharedUserId=contact.userId;
-      contactUser.sharedUserEMail=contact.email;
-      contactUser.sharedUserName=contact.name;
-      contactUser.sharedUserSureName=contact.name;
-      contactUser.sharedUserTenantName=contact.name;
-      contactUser.id=contact.id;
-      newsharingArray.push(contactUser);
-    })
-    shareTranOptionsDto['transactionId']=this.orderId;
-    shareTranOptionsDto['message']=this.messageBody;
-    shareTranOptionsDto['transactionSharing']=newsharingArray;
-this._AppTransactionServiceProxy.shareTransaction(shareTranOptionsDto).subscribe(result=>{
-  debugger
-})
+
+    if(this.sharingListForSave){
+      this.sharingListForSave.forEach(function(contact,index){
+        contactUser.sharedTenantId=contact.tenantId;
+        contactUser.sharedUserId=contact.userId;
+        contactUser.sharedUserEMail=contact.email;
+        contactUser.sharedUserName=contact.name;
+        contactUser.sharedUserSureName=contact.name;
+        contactUser.sharedUserTenantName=contact.tenantName;
+        contactUser.id=contact.id;
+        newsharingArray.push(contactUser);
+      })
+      shareTranOptionsDto['transactionId']=this.orderId;
+      shareTranOptionsDto['message']=this.messageBody;
+      shareTranOptionsDto['transactionSharing']=newsharingArray;
+      shareTranOptionsDto['subject']='';
+     this._AppTransactionServiceProxy.shareTransactionByMessage(shareTranOptionsDto).subscribe(result=>{
+       debugger
+        }) 
+    }
+    if(this.emailList){
+      shareTranOptionsDto['transactionId']=this.orderId;
+      shareTranOptionsDto['message']=this.messageBody;
+      shareTranOptionsDto['emailAddresses']=this.emailList.split(/[ ,]+/);
+      debugger
+      this._AppTransactionServiceProxy.shareTransactionByEmail(shareTranOptionsDto).subscribe(result=>{
+        debugger
+         }) 
+    }
+
   }
   loadContactList(){
+    debugger
     this._AppTransactionServiceProxy.getTransactionContacts(this.orderId,'').subscribe(result=>{
       for (let i =0; i<result.length;i++){
         if(result[i].userImage){
