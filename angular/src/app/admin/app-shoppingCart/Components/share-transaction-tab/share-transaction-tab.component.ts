@@ -144,6 +144,7 @@ export class ShareTransactionTabComponent  extends AppComponentBase{
     let filtered: any[] = [];
     let query = event.query;
 this._AppTransactionServiceProxy.getAccountConnectedContacts(query).subscribe(result=>{
+  this.suggestionsContacts=[];
   for (let i =0; i<result.length;i++){
     if(result[i].userImage){
       result.filter(item=>{
