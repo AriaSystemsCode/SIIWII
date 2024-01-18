@@ -1140,7 +1140,7 @@ export class CreateOrEditAppItemComponent
         // }
         // else {
             this.appItem?.variationItems?.forEach((variation) => {
-                variation.appItemPriceInfos = this.getParentProductPrices();
+                if(!variation.appItemPriceInfos)variation.appItemPriceInfos = this.getParentProductPrices();
             });
     // }
 
