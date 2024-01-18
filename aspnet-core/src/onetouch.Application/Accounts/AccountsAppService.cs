@@ -3248,11 +3248,24 @@ namespace onetouch.Accounts
                 entity.EntityExtraData.Add(appEntityExtraTitleDto);
             }
             entity.Notes = input.Notes;
+            //MMT37
+            if (string.IsNullOrEmpty(entity.SSIN))
+            {
+
+                entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
+                entity.SSIN = await
+                    _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
+               
+            }
+            //MMT37
             //Mariam[End]
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
             var contact = ObjectMapper.Map<AppContact>(input);
             contact.EntityId = savedEntity;
             contact.IsProfileData = true;
+            //MMT37
+            contact.SSIN = entity.SSIN;
+            //MMT37
             //contact.TenantId = AbpSession.TenantId;
             if (input.UseDTOTenant)
             { contact.TenantId = input.TenantId; }
@@ -3519,7 +3532,15 @@ namespace onetouch.Accounts
                     await UserManager.UpdateAsync(user);
                 }
             }
-
+            //MMT37
+            if (string.IsNullOrEmpty(entity.SSIN))
+            {
+                entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
+                entity.SSIN = await
+                    _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
+                contact.SSIN = entity.SSIN;
+            }
+            //MMT37
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
             //
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
@@ -3690,7 +3711,16 @@ namespace onetouch.Accounts
                 entity.TenantId = AbpSession.TenantId;
             }
             entity.Code = input.Code;
+            //MMT37
+            if (string.IsNullOrEmpty(entity.SSIN))
+            {
+                entity.EntityObjectTypeCode= entityParent.EntityObjectTypeCode;
+                var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+                entity.SSIN = await
+                    _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
 
+            }
+            //MMT37
             entity = await _appEntityRepository.InsertAsync(entity);
             //await CurrentUnitOfWork.SaveChangesAsync();
             try
@@ -3707,6 +3737,9 @@ namespace onetouch.Accounts
             var contact = ObjectMapper.Map<AppContact>(input);
             contact.EntityId = entity.Id;
             contact.IsProfileData = true;
+            //MMT37
+            contact.SSIN = entity.SSIN;
+            //MMT37
             //contact.TenantId = AbpSession.TenantId;
             if (input.UseDTOTenant)
             { contact.TenantId = input.TenantId; }
