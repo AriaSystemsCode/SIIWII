@@ -3378,7 +3378,7 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return output;
         }
-        public async Task ShareTransactionByEmail(SharingTransactionEmail input)
+        public async Task<bool> ShareTransactionByEmail(SharingTransactionEmail input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -3386,7 +3386,12 @@ namespace onetouch.AppSiiwiiTransaction
                 var marketplacetrans = await _appMarketplaceTransactionHeadersRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(x=>x.AttachmentFk).Where(z => z.Id == sharedtransactionId).FirstOrDefaultAsync();
                 if (marketplacetrans != null)
                 {
-                    string filePath = _appConfiguration[$"Attachment:Path"] + @"\" + (marketplacetrans.TenantId == null ? "-1" : marketplacetrans.TenantId.ToString()) + @"\" + marketplacetrans.EntityAttachments[0].AttachmentFk.Attachment;
+                    string filePath = "";
+                    if (marketplacetrans.EntityAttachments != null && marketplacetrans.EntityAttachments.Count > 0 && marketplacetrans.EntityAttachments[0] != null &&
+                        !string.IsNullOrEmpty(marketplacetrans.EntityAttachments[0].AttachmentFk.Attachment))
+                    {
+                        filePath = _appConfiguration[$"Attachment:Path"] + @"\" + (marketplacetrans.TenantId == null ? "-1" : marketplacetrans.TenantId.ToString()) + @"\" + marketplacetrans.EntityAttachments[0].AttachmentFk.Attachment;
+                    }
                     //if (System.IO.File.Exists(filePath))
                     //{
                     //    viewTrans.OrderConfirmationFile = System.IO.File.ReadAllBytes(filePath);
@@ -3401,15 +3406,20 @@ namespace onetouch.AppSiiwiiTransaction
                         mail.Body = input.Message.ToString();
                         mail.IsBodyHtml = input.IsBodyHtml;
                         //mail.Attachments = new AttachmentCollection();
-                        Attachment at = new Attachment(filePath);
-                        mail.Attachments.Add(at);
+                        if (!string.IsNullOrEmpty(filePath))
+                        {
+                            Attachment at = new Attachment(filePath);
+                            mail.Attachments.Add(at);
+                        }
                         await _emailSender.SendAsync(mail);
                         
-                    } 
+                    }
+                    return true;
                 }
+                return false;
             }
         }
-        public async Task ShareTransactionByMessage(SharingTransactionOptions input)
+        public async Task<bool> ShareTransactionByMessage(SharingTransactionOptions input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -3532,15 +3542,16 @@ namespace onetouch.AppSiiwiiTransaction
                                     BodyFormat = "",
                                     SendDate = DateTime.Now.Date,
                                     ReceiveDate = DateTime.Now.Date,
-                                    Subject = input.Subject,
+                                    Subject = subject,
                                     SenderId = AbpSession.UserId,
-                                    Code = Guid.NewGuid().ToString()
+                                    Code = null
                                 });
                             }
                         }
                     }
                 }
             }
+            return true;
         }
         public async Task<string> ShareTransactionWithTenant(long marketplaceTransactionId, int tenantId, TransactionType? transactionType)
         {
