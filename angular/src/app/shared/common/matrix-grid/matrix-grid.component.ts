@@ -73,6 +73,10 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
       else
       this.canAddRows=false;
   }
+  convertTodecimal(value){
+    let inputvalue=value % 1 ==0?Math.round(value * 100 / 100).toFixed(2):value;
+    return inputvalue;
+  }
   addNewRows(rows:MatrixGridRows[]){
     rows.forEach(row=>{
       if(!this.rows) this.rows = []

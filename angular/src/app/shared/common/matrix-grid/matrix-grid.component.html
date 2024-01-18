@@ -79,7 +79,7 @@
                                         type="number" 
                                         [ngModel]='rowData.rowValues[i].value|currency:" "' 
                                         [ngModelOptions]="{updateOn:'blur'}"
-                                        (ngModelChange)="rowData.rowValues[i].value=$event" 
+                                        (ngModelChange)="rowData.rowValues[i].value=convertTodecimal($event)" 
                                         [ngClass]="cellSelectionFormInput.customClass"
                                         [ngStyle]="cellSelectionFormInput.customStyle"
                                         [name]="cellSelectionFormInput.name+'rowData-'+index+'-'+i" 
