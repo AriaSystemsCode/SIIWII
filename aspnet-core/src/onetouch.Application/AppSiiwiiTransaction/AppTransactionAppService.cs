@@ -3297,6 +3297,8 @@ namespace onetouch.AppSiiwiiTransaction
                             {
                                 var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
                                 if (user != null)
+                                {
+                                    var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
                                     output.Add(new ContactInformationOutputDto
                                     {
                                         Id = con.Id,
@@ -3305,8 +3307,10 @@ namespace onetouch.AppSiiwiiTransaction
                                         UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
                                         UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
                                         UserName = user.UserName,
-                                        TenantId = int.Parse(user.TenantId.ToString())
+                                        TenantId = int.Parse(user.TenantId.ToString()),
+                                        TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
                                     });
+                                }
                             }
                         }
                         catch(Exception ex)
@@ -3357,12 +3361,14 @@ namespace onetouch.AppSiiwiiTransaction
                             var user = UserManager.GetUserById(long.Parse(con.contact.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
                             if (user != null)
                             {
+                                var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
                                 output.Add(new ContactInformationOutputDto
                                 { Id = con.contact.Id, Email = con.contact.EMailAddress, 
                                     Name = con.contact.Name, UserId = long.Parse(con.contact.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue) ,
                                     UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
                                     UserName = user.UserName,
-                                    TenantId = int.Parse(user.TenantId.ToString())
+                                    TenantId = int.Parse(user.TenantId.ToString()),
+                                    TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
                                 });
                             }
                         }
@@ -3482,37 +3488,63 @@ namespace onetouch.AppSiiwiiTransaction
                                 
                             }
                         }
+                        List<string> tenantTrans = new List<string>();
                         foreach (var item in tenantsRoles)
                         {
+                            string tranCode = "";
                             if (!string.IsNullOrEmpty(item.Split(",")[0].ToString()))
-                                await ShareTransactionWithTenant(sharedtransactionId, int.Parse(item.Split(",")[1].ToString()), (TransactionType)Enum.Parse(typeof(TransactionType), item.Split(",")[0].ToString()));
+                                tranCode = await ShareTransactionWithTenant(sharedtransactionId, int.Parse(item.Split(",")[1].ToString()), (TransactionType)Enum.Parse(typeof(TransactionType), item.Split(",")[0].ToString()));
                             else
-                               await ShareTransactionWithTenant(sharedtransactionId, int.Parse(item.Split(",")[1].ToString()), null);
+                                tranCode = await ShareTransactionWithTenant(sharedtransactionId, int.Parse(item.Split(",")[1].ToString()), null);
+
+                            string newItem = item + "," + tranCode;
+                            tenantTrans.Add(newItem);
                         }
                         await CurrentUnitOfWork.SaveChangesAsync();
                         if (!string.IsNullOrEmpty(toUserList))
                         {
-                            await _messageAppService.CreateMessage(new CreateMessageInput
+                            foreach (var shar in input.TransactionSharing)
                             {
-                                To = toUserList,
-                                Body = input.Message,
-                                MessageCategory = MessageCategory.UPDATEMESSAGE.ToString(),
-                                MesasgeObjectType = MesasgeObjectType.Message,
-                                RelatedEntityId = sharedtransactionId,
-                                BodyFormat = "",
-                                SendDate = DateTime.Now.Date,
-                                ReceiveDate = DateTime.Now.Date,
-                                Subject = input.Subject,
-                                SenderId = AbpSession.UserId,
-                                Code = Guid.NewGuid().ToString()
-                            });
+                                string subject = "";
+                                var userTenantInfo  = tenantTrans.FirstOrDefault(z=>z.Contains(shar.SharedTenantId.ToString()));
+                                
+                                if (userTenantInfo != null)
+                                {
+                                    var info = userTenantInfo.Split(',');
+                                    var tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == info[2] && z.TenantId == shar.SharedTenantId).FirstOrDefaultAsync();
+                                    if (tran!=null)
+                                    subject = info[0] == "SO" ? ("Sales Order: " + info[2] + "("+tran.BuyerCompanyName+")") : ("Purchase Order" + info[2] +"("+tran.SellerCompanyName+")");
+                                }
+                                else
+                                {
+                                   // var info = userTenantInfo.Split(',');
+                                    var tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
+                                    if (tran != null)
+                                        subject = tran.EntityObjectTypeCode.ToUpper() == "SALESORDER" ? ("Sales Order: " + tran.Code + "(" + tran.BuyerCompanyName + ")") : ("Purchase Order" + tran.Code + "(" + tran.SellerCompanyName + ")");
+                                }
+                                await _messageAppService.CreateMessage(new CreateMessageInput
+                                {
+                                    To = shar.SharedUserId.ToString() ,
+                                    Body = input.Message,
+                                    MessageCategory = MessageCategory.UPDATEMESSAGE.ToString(),
+                                    MesasgeObjectType = MesasgeObjectType.Message,
+                                    RelatedEntityId = sharedtransactionId,
+                                    BodyFormat = "",
+                                    SendDate = DateTime.Now.Date,
+                                    ReceiveDate = DateTime.Now.Date,
+                                    Subject = input.Subject,
+                                    SenderId = AbpSession.UserId,
+                                    Code = Guid.NewGuid().ToString()
+                                });
+                            }
                         }
                     }
                 }
             }
         }
-        public async Task ShareTransactionWithTenant(long marketplaceTransactionId, int tenantId, TransactionType? transactionType)
+        public async Task<string> ShareTransactionWithTenant(long marketplaceTransactionId, int tenantId, TransactionType? transactionType)
         {
+            string returnTran = "";
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var objectId = await _helper.SystemTables.GetObjectTransactionId();
@@ -3559,6 +3591,9 @@ namespace onetouch.AppSiiwiiTransaction
                             tenantTransaction.Name = "Purchase Order#" + tenantTransaction.Code.TrimEnd();
                             tenantTransaction.EntityObjectTypeId = poType;
                         }
+
+                        returnTran = tenantTransaction.Code;
+
                         var existingTrand =await _appTransactionsHeaderRepository.GetAll().Where(z => z.TenantId == tenantId && z.Code == tenantTransaction.Code && z.EntityObjectStatusId == null).FirstOrDefaultAsync();
                         if (existingTrand != null)
                         {
@@ -3791,7 +3826,7 @@ namespace onetouch.AppSiiwiiTransaction
                         tenantTransactionObj.EntityClassifications = null;
                         tenantTransactionObj.EntityExtraData = null;
                         tenantTransactionObj.EntityAttachments = null;
-
+                        returnTran = tenantTransactionObj.Code;
                         await _appEntityAttachment.DeleteAsync(z => z.EntityId == id);
                         await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == id);
                         await _appEntityClassificationRepository.DeleteAsync(z => z.EntityId == id);
@@ -4002,6 +4037,7 @@ namespace onetouch.AppSiiwiiTransaction
                     }
                 }
             }
+            return returnTran ;
         }
         public async Task<long> ShareTransactionOnMarketplace(long input)
         {
