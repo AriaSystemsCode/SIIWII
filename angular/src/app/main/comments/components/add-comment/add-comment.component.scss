@@ -13,13 +13,7 @@
         box-shadow: 0 0 3px #464444;
     }
 }
-span.selectedContact {
-    border: 1px solid #92bfed;
-    padding: 0px 5px;
-    border-radius: 14px;
-    background-color: #f7fbff;
-    cursor: pointer;
-}
+
 .wrapper {
     gap: 20px;
 }
@@ -68,4 +62,11 @@ button.send-comment-icon[disabled]{
         }
     }
 
+}
+span.selectedContact {
+    border: 1px solid #92bfed;
+    padding: 0px 5px;
+    border-radius: 14px;
+    background-color: #f7fbff;
+    cursor: pointer;
 }
