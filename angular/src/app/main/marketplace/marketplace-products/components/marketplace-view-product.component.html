@@ -299,7 +299,7 @@
                                             [showButtons]="true"
                                             inputId="minmax-buttons"
                                             [min]="0"
-                                            [max]="100"
+                                            [max]="size?.stockAvailability"
                                             (ngModelChange)="
                                                 onNumberChange(
                                                     $event,
@@ -447,7 +447,7 @@
                                                     inputId="minmax-buttons"
                                                     [min]="0"
                                                     [disabled]="true"
-                                                    [max]="100"
+                                                    [max]="size?.stockAvailability"
                                                     (ngModelChange)="
                                                         onNumberChange(
                                                             $event,
