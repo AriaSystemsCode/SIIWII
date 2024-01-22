@@ -272,6 +272,8 @@ export class MarketplaceViewProductComponent
                     qty = qty + multiby;
                     price = price + priceMultibly;
                 } else {
+                    if (!size.orderedQty)
+                      size.orderedQty = 0
                     let priceMultibly = size.orderedQty * size.price;
                     qty = qty + size.orderedQty;
                     price = price + priceMultibly;
