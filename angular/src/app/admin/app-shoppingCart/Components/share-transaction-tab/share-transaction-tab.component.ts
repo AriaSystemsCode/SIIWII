@@ -65,15 +65,15 @@ if(this.sharedWithUsers){
 
 }
 
-  this.sharingListForSave=this.sharingList;
   }
   checkSaveAvilabilty(){
     if(this.messageBody=='')this.messageBody=undefined
     if(!this.sharingListForSave&&this.messageBody&&!this.emailList||this.sharingListForSave&&!this.messageBody&&!this.emailList)this.dasableShareBtn=true;
     if(!this.emailList&&this.messageBody&&!this.sharingListForSave||this.emailList&&!this.messageBody&&!this.sharingListForSave)this.dasableShareBtn=true;
+    if(this.sharingListForSave?.length==0&&!this.editMode)this.dasableShareBtn=true;
     if(this.sharingListForSave&&this.messageBody)this.dasableShareBtn=false;
     if(this.emailList&&this.messageBody)this.dasableShareBtn=false;
-    if(this.readyForSave&&this.sharingListForSave)this.dasableShareBtn=false;
+    if(this.readyForSave&&this.sharingListForSave?.length>0)this.dasableShareBtn=false;
   }
   shareTransaction(){
     let contactUser:any={};
@@ -165,8 +165,9 @@ if(this.sharedWithUsers){
     return isValidContacts;
   } 
   selectContact(value){
-    debugger
     this.editMode=true;
+    this.checkSaveAvilabilty();
+
   }
 
   updateSelectedContacts(){
@@ -179,8 +180,10 @@ if(this.sharedWithUsers){
 
     })
     this.sharingList=newsharingList; 
-    this.sharingListForSave=newsharingList;
-    this.searchContact=[];
+    this.sharingListForSave = this.sharingList.filter(contact => {
+      return contact.removed !== true;
+    });   
+     this.searchContact=[];
     this.checkSaveAvilabilty();
 
     }
@@ -242,7 +245,9 @@ this.checkSaveAvilabilty();
     this.sharingList.forEach(function(contact){
       if(contact.id==id){ contact.removed=false;}
     })
-    this.sharingListForSave = this.sharingList;
+    this.sharingListForSave = this.sharingList.filter(contact => {
+      return contact.removed !== true;
+    });
     this.checkSaveAvilabilty();
 
   }

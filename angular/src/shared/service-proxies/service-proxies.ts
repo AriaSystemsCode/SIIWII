@@ -69625,6 +69625,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
     userName!: string | undefined;
     tenantId!: number;
     tenantName!: string | undefined;
+    canBeRemoved!: boolean;
 
     [key: string]: any;
 
@@ -69651,6 +69652,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
             this.userName = _data["userName"];
             this.tenantId = _data["tenantId"];
             this.tenantName = _data["tenantName"];
+            this.canBeRemoved = _data["canBeRemoved"];
         }
     }
 
@@ -69675,6 +69677,7 @@ export class ContactInformationOutputDto implements IContactInformationOutputDto
         data["userName"] = this.userName;
         data["tenantId"] = this.tenantId;
         data["tenantName"] = this.tenantName;
+        data["canBeRemoved"] = this.canBeRemoved;
         return data;
     }
 }
@@ -69688,6 +69691,7 @@ export interface IContactInformationOutputDto {
     userName: string | undefined;
     tenantId: number;
     tenantName: string | undefined;
+    canBeRemoved: boolean;
 
     [key: string]: any;
 }

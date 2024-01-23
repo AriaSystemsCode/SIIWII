@@ -1856,6 +1856,7 @@
 		<text name="SaveChanges" >Save changes</text>
 		<text name="ThisListSharedWith" >This list shared with</text>
 		<text name="PublicList's" >Public list's</text>
+    <text name="Share" >Share</text>
 		<text name="SharedWithMe" >Shared with me</text>
 		<text name="Location" >Location</text>
 		<text name="CreateNewProductList" >Create new product list</text>

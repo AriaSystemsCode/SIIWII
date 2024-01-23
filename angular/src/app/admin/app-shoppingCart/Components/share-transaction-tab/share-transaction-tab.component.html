@@ -59,7 +59,8 @@
             
             <img *ngIf="item?.userImage" [src]="item?.userImage" />
             <img *ngIf="!item?.userImage"  [src]="'assets/common/images/default-profile-picture.png'"  style="width: 18px;margin-right:10px;"/>            
-            <span class="ml-2 font-medium"  [ngClass]="item.removed ? 'removedContact' : ''">{{item.name}} @ {{item.tenantName}}</span>
+            <span class="ml-2 font-medium" *ngIf="!item.userName" [ngClass]="item.removed ? 'removedContact' : ''">{{item.name}} @ {{item.tenantName}}</span>
+            <span class="ml-2 font-medium" *ngIf="item.userName" [ngClass]="item.removed ? 'removedContact' : ''">{{item.userName}}</span>
             <i *ngIf="!item.removed" class="fas fa-times-circle ml-auto p-2 removeShare" (click)="removefromShareList(item.id)"></i>
             <i *ngIf="item.removed" class="fas fa-redo-alt reloadContact" (click)="reloadContact(item.id)"></i>
         </p-chip>
@@ -105,8 +106,10 @@
                  [disabled]="dasableShareBtn"
                  *ngIf="editMode||readyForSave"
                  >
-                 {{'Save'| localize}}</button>
-                <button class="text-center btn btn-success float-right ml-2 mr-2" *ngIf="sharedBefore&&!editMode&&!readyForSave" (click)="closeShareMode()">{{'Done'| localize}}</button>
+                 {{'Share'| localize}}</button>
+                <button class="text-center btn btn-success float-right ml-2 mr-2"
+                [disabled]="!sharingListForSave||sharingListForSave?.length==0"
+                 *ngIf="sharedBefore&&!editMode&&!readyForSave" (click)="closeShareMode()">{{'Done'| localize}}</button>
             
                 <button class="text-center btn btn-danger float-right ml-2 mr-2"  *ngIf="editMode" (click)="closeShareMode()">{{'Cancel'| localize}}</button>
             
