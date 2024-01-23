@@ -1663,7 +1663,14 @@ export class CreateEditAppItemVariationsComponent
                 selectedValuesIds.push(tempAtt.value)
             }    
         })
+        
+
+        const sizeSeletedExtraAttr = this.selectedExtraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == this.sizeExtraAttrCode)[0]
+        if(selectedValuesIds.length>0){
+            sizeSeletedExtraAttr.selectedValues = selectedValuesIds
         sizeExtraAttr.selectedValues = selectedValuesIds
+    }
+
     }
     // extraAttributeOnChange($event:Event,extraAttr:IsVariationExtraAttribute){
 
