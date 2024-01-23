@@ -39,13 +39,22 @@ export class SizeRatioComponent extends AppComponentBase implements OnChanges,Af
       this.calculateQtySum()
     }
   }
-  ngAfterViewInit(){
+  ngOnInit(){
+    console.log('on init')
     this.sizeRatioForm.statusChanges.subscribe(status=>{
       this.statusChanged.emit('VALID' == status)
     })
+  }
+  ngAfterViewInit(){
+    /*this.sizeRatioForm.statusChanges.subscribe(status=>{
+      console.log('after init')
+      this.statusChanged.emit('VALID' == status)
+    })*/
     
   }
   ngOnDestroy() {
+    console.log('destroy')
+
     this.statusChanged.emit(true)
   }
   sizeRatioNameChanges($event){
