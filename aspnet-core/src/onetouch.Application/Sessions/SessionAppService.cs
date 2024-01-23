@@ -91,6 +91,7 @@ namespace onetouch.Sessions
                 if (contactEntityExtraData != null)
                 {
                     var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
+                    if(contact!=null)
                     output.User.MemberId = contact.Id;
                 }
                 var contactAccount = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId  && x.ParentId==null && x.PartnerId ==null);//&& x.AccountId == null
