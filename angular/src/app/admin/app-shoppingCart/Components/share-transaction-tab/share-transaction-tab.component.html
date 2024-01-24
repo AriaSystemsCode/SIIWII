@@ -61,7 +61,7 @@
             <img *ngIf="!item?.userImage"  [src]="'assets/common/images/default-profile-picture.png'"  style="width: 18px;margin-right:10px;"/>            
             <span class="ml-2 font-medium" *ngIf="!item.userName" [ngClass]="item.removed ? 'removedContact' : ''">{{item.name}} @ {{item.tenantName}}</span>
             <span class="ml-2 font-medium" *ngIf="item.userName" [ngClass]="item.removed ? 'removedContact' : ''">{{item.userName}}</span>
-            <i *ngIf="!item.removed" class="fas fa-times-circle ml-auto p-2 removeShare" (click)="removefromShareList(item.id)"></i>
+            <i *ngIf="!item.removed&&item.canBeRemoved" class="fas fa-times-circle ml-auto p-2 removeShare" (click)="removefromShareList(item.id)"></i>
             <i *ngIf="item.removed" class="fas fa-redo-alt reloadContact" (click)="reloadContact(item.id)"></i>
         </p-chip>
     </div>
