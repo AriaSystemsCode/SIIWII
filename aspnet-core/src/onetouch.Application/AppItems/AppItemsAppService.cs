@@ -5519,8 +5519,36 @@ namespace onetouch.AppItems
                             appChildItem.Description = excelDto.ProductDescription;
                             appChildItem.Price = decimal.Parse(excelDto.Price);
                             appChildItem.Name = excelDto.Name;
+                            appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
                         }
-                        appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+                        else
+                        {
+
+                            appChildItem = ObjectMapper.Map<AppItem>(item);
+                            appChildItem.ListingItemId = null;
+                            appChildItem.Id = 0;
+
+                            appChildItem.EntityFk = new AppEntity
+                            {
+                                Id = 0,
+                                Code = item.Code,
+                                ObjectId = itemObjectId,
+                                TenantId = AbpSession.TenantId,
+                                EntityObjectStatusId = itemStatusId,
+                                Notes = _helper.HtmlToPlainText(item.ProductDescription),
+
+                                Name = item.Name,
+                                EntityObjectTypeId = productTypeId.Id,
+                                CreatorUserId = AbpSession.UserId,
+                                EntityObjectStatusCode = "ACTIVE",
+                                EntityObjectTypeCode = "",
+                                ObjectCode = "ITEM"
+
+
+                            };
+                            appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+                        }
+
                     }
                     else
                     {
