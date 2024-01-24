@@ -129,7 +129,7 @@ export class SizeRatioComponent extends AppComponentBase implements OnChanges,Af
     this._appSizeScaleServiceProxy.getSizeScaleForEdit(id).subscribe((res)=>{
       this.appSizeRatios.sizeScaleId = res.id
       this.appSizeRatios.name = res.name
-      this.appSizeRatios.appSizeScalesDetails.forEach((appSizeRatioItem)=>{
+      this.appSizeRatios?.appSizeScalesDetails?.forEach((appSizeRatioItem)=>{
         const item = res.appSizeScalesDetails.filter(item=> item.sizeCode == appSizeRatioItem.sizeCode)[0]
         if(item) appSizeRatioItem.sizeRatio = item.sizeRatio
       })
