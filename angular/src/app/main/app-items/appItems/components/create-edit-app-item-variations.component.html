@@ -502,13 +502,16 @@
                                                                  (change)="handleColorChange($event.target.value,record.entityExtraData, i, index)"
                                                                  >
                                                                     <!-- <option selected>Color</option> -->
-                                                                    <option
-                                                                    *ngFor="let extraAttribute of siwiMarketPlaceColor[0]"
-                                                                     [value]="extraAttribute.value"
-                                                                     [disabled]="entityExtraData.attributeValueId === extraAttribute.value"
-                                                                     [selected]="entityExtraData.attributeValueId === extraAttribute.value" >
-                                                                        {{extraAttribute.code|localize}}
-                                                                    </option>
+                                                                    <ng-template *ngIf="siwiMarketPlaceColor[0]">
+                                                                        <option
+                                                                        *ngFor="let extraAttribute of siwiMarketPlaceColor[0]"
+                                                                         [value]="extraAttribute.value"
+                                                                         [disabled]="entityExtraData.attributeValueId === extraAttribute.value"
+                                                                         [selected]="entityExtraData.attributeValueId === extraAttribute.value" >
+                                                                            {{extraAttribute.code|localize}}
+                                                                        </option>
+                                                                    </ng-template>
+
                                                                 </select>
                                                             </div>
                                                         </div>

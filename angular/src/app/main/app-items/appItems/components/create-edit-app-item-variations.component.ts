@@ -438,7 +438,7 @@ export class CreateEditAppItemVariationsComponent
     }
     tempAddNewAttributes(){
         var uniqueTempIds = new Set<number>();
-        this.appItem.variationItems.forEach(variation=>{
+        this.appItem?.variationItems?.forEach(variation=>{
             variation.entityExtraData.forEach(entityExtraData=>{
                 const extraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == entityExtraData?.entityObjectTypeCode)[0]
                 const isExist = extraAttr?.lookupData.filter(item=>item.code == entityExtraData?.attributeCode)[0] 
