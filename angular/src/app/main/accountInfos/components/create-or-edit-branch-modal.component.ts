@@ -109,6 +109,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     }
 
     show(accountId?:number,branchId?: number,parentId?:number): void {
+        this.branchCode=""
         this.address1 = this.clearAddress();
         this.address2 = this.clearAddress();
         this.address3 = this.clearAddress();

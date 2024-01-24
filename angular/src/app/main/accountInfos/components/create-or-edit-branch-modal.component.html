@@ -244,7 +244,7 @@
         <div class="modal-footer">
           <button [disabled]="saving" type="button" class="bbtn btn-default btn-gray"
             (click)="close()">{{l("Cancel")}}</button>
-          <button type="submit" class="btn btn-primary blue  btn-blue" [disabled]="!branchForm.form.valid"
+          <button type="submit" class="btn btn-primary blue  btn-blue" [disabled]="!branchForm.form.valid  || !branchCode || branchCode?.toString()?.trim()==''"
             [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
         </div>
         <selectAddressModal #selectAddressModal (addressSelected)="addressSelected($event)"></selectAddressModal>
