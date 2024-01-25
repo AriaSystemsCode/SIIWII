@@ -1709,6 +1709,7 @@
 		<text name="ProductDetails">Product Details</text>
 		<text name="doesnottHaveExtraAttributes.">Doesn't Have Extra Attributes.</text>
 		<text name="PleaseChooseAProductTypeFirst">Please Choose A Product Type First</text>
+    <text name="PleaseAddAProductCode">Please Add A Product code First</text>
 		<text name="fields">fields</text>
 		<text name="CompleteAllTheRequired">Complete All The Required</text>
 		<text name="AreYouSureYouWantToDeleteAllTheAttachments?">Are you sure you want to delete all the attachments?</text>
