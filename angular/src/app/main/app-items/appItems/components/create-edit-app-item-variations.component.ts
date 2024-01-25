@@ -432,6 +432,7 @@ export class CreateEditAppItemVariationsComponent
         });
     }
     getUniqueId = function(uniqueTempIds : Set<number>) : number { 
+        debugger
         var r = Math.floor(Math.random() * 1e10) + 1e11;
         if(uniqueTempIds.has(r)) this.getUniqueId()
         else {
@@ -441,6 +442,7 @@ export class CreateEditAppItemVariationsComponent
     }
     tempAddNewAttributes(){
         var uniqueTempIds = new Set<number>();
+        const currentComponent=this;
         this.appItem?.variationItems?.forEach(variation=>{
             variation.entityExtraData.forEach(entityExtraData=>{
                 const extraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == entityExtraData?.entityObjectTypeCode)[0]
@@ -448,7 +450,7 @@ export class CreateEditAppItemVariationsComponent
                 if(!isExist) {
                     const tempAtt = new LookupLabelDto({
                         code:entityExtraData?.attributeCode,
-                        value:this.getUniqueId(uniqueTempIds),
+                        value:currentComponent.getUniqueId(uniqueTempIds),
                         label:entityExtraData?.attributeValue,
                         stockAvailability:0,
                         isHostRecord:false,
@@ -1657,13 +1659,15 @@ export class CreateEditAppItemVariationsComponent
         );
         const selectedValuesIds : number[] = []
         const uniqueTempIds = new Set<number>();
+        const currentComponent=this;
+
         const sizeExtraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == this.sizeExtraAttrCode)[0]
         selectedValuesCodes.forEach(function(code,index){
             const isExist = sizeExtraAttr?.lookupData.filter(item=>item.code == code)[0] 
             if(!isExist) {
                 const tempAtt = new LookupLabelDto({
                     code,
-                    value:this.getUniqueId(uniqueTempIds),
+                    value:currentComponent.getUniqueId(uniqueTempIds),
                     label:code,
                     stockAvailability:0,
                     isHostRecord:false,
