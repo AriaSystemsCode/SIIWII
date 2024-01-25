@@ -4,7 +4,7 @@
     <div class="container-fluid pt-1 mb-3 ">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
-            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
+            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
                  {{l("Continue")}}
             </button>
         </div>
