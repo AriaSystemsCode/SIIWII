@@ -69,7 +69,7 @@ if(this.sharedWithUsers){
   checkSaveAvilabilty(){
     if(this.messageBody=='')this.messageBody=undefined
     if(!this.sharingListForSave&&this.messageBody&&!this.emailList||this.sharingListForSave&&!this.messageBody&&!this.emailList)this.dasableShareBtn=true;
-    if(!this.emailList&&this.messageBody&&!this.sharingListForSave||this.emailList&&!this.messageBody&&!this.sharingListForSave)this.dasableShareBtn=true;
+    if(!this.emailList&&this.messageBody&&!this.sharingListForSave||this.emailList&&!this.messageBody&&!this.sharingListForSave||this.emailList&&!this.messageBody&&this.sharingListForSave)this.dasableShareBtn=true;
     if(this.sharingListForSave?.length==0&&!this.editMode)this.dasableShareBtn=true;
     if(this.sharingListForSave&&this.messageBody)this.dasableShareBtn=false;
     if(this.emailList&&this.messageBody)this.dasableShareBtn=false;
