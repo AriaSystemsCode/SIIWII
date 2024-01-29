@@ -13,10 +13,10 @@ import { AddressComponent } from '../../address/address.component';
 export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
   @Input("activeTab") activeTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-  @Output("shippingInfOValid") shippingInfOValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
+  @Output("BillingInfoValid") BillingInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
-  isContactsValid: boolean = false;
+  isContactsValid: boolean = true;
   @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
   loadAddresComponentShipFrom:boolean=false;
   loadAddresComponentShipTo:boolean=false;
@@ -67,14 +67,27 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
       this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode=addObj.code;
       this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId=addObj.id;
       this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId=addObj.typeId;
-  
+
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole=contactRole;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode=addObj.code;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId=addObj.id;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId=addObj.typeId;
+      
    
     }
-    if(this.apContactSelectedAdd&&this.arContactSelectedAdd&&this.isArContactsValid&&this.isApContactsValid){
-    this.enableSAveApcontact=true;
-    }else{
-      this.enableSAveArcontact=false;
+    if (this.isContactsValid){
+      let apContactObj=this.oldappTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+      let arContactObj=this.oldappTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+      apContactObj[0]?.contactAddressDetail?this.enableSAveApcontact = true:apContactObj[0]?.contactAddressId?this.enableSAveApcontact = true:this.enableSAveApcontact = false;
+      arContactObj[0]?.contactAddressDetail?this.enableSAveArcontact = true:arContactObj[0]?.contactAddressId?this.enableSAveArcontact = true:this.enableSAveArcontact = false;
+  
+      if(this.enableSAveArcontact&&this.enableSAveApcontact){
+        this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
+  
+      }
     }
+  
+
 
   if(contactRole==ContactRoleEnum.APContact){
   this.apContactSelectedAdd=addObj.selectedAddressObj
@@ -84,34 +97,37 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
   }
 
    }
-   
+
   isContactFormValid(value,sectionIndex) {
+    let apContactObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+    let arContactObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
 
   if(this.activeTab==this.shoppingCartoccordionTabs.BillingInfo)
   {
   this.isContactsValid = value;
   if (this.isContactsValid){
     if(sectionIndex==1){
-            this.apContactSelectedAdd?this.enableSAveApcontact = true:this.enableSAveApcontact = false;
+      apContactObj[0]?.contactAddressDetail?this.enableSAveApcontact = true:apContactObj[0]?.contactAddressId?this.enableSAveApcontact = true:this.enableSAveApcontact = false;
     }else{
-      this.arContactSelectedAdd?this.enableSAveArcontact = true:this.enableSAveArcontact = false;     
+      arContactObj[0]?.contactAddressDetail?this.enableSAveArcontact = true:arContactObj[0]?.contactAddressId?this.enableSAveArcontact = true:this.enableSAveArcontact = false;
     }
+    if(this.enableSAveArcontact&&this.enableSAveApcontact){
+      this.isContactsValid=true;
+      this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 
+    }else{
+        this.isContactsValid=false;
+      }
   }else{
     if(sectionIndex==1){
     this.enableSAveApcontact = false;
     }else{
       this.enableSAveArcontact = false;
     }
+    this.enableSAveArcontact&&this.enableSAveApcontact?this.isContactsValid=true:this.isContactsValid=false;
 
   }
-  if(this.apContactSelectedAdd&&this.arContactSelectedAdd&&this.enableSAveApcontact&&this.enableSAveArcontact){
-    this.isContactsValid=true;
-    this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
-    }else{
-      this.isContactsValid=false;
-    }
 }
 
   }
@@ -153,11 +169,13 @@ this.apContactSelectedAdd=null;
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
-          if (!this.showSaveBtn)
-            this.ontabChange.emit(ShoppingCartoccordionTabs.ShippingInfo);
-  
-          else
+          if (!this.showSaveBtn){
+            this.ontabChange.emit(ShoppingCartoccordionTabs.BillingInfo);
+          }
+          else{
             this.showSaveBtn = false;
+
+          }
         }
       });
   }
