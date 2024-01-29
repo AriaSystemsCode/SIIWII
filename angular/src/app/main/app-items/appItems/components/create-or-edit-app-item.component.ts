@@ -1270,7 +1270,10 @@ export class CreateOrEditAppItemComponent
     showCreateOrEditVariationPage() {
         if (!this.appItem.entityObjectTypeId) {
             return this.notify.error(this.l("PleaseChooseAProductTypeFirst"));
-        } else if (
+        }else if(!this.appItem?.code){
+            return this.notify.error(this.l("PleaseAddAProductCode"));
+        }
+         else if (
             !this.selectedItemTypeData.extraAttributes ||
             !this.selectedItemTypeData.extraAttributes.extraAttributes ||
             !this.selectedItemTypeData.extraAttributes.extraAttributes.length

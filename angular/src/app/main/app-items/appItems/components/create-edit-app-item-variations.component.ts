@@ -66,6 +66,7 @@ export class CreateEditAppItemVariationsComponent
     siwiMarketPlaceColor: any[];
     sizes: any[];
     siwiSizes: any[];
+    removeSizeExtraAttr:boolean=false;
     // @ViewChild('appSelectionModal', { static: true }) appSelectionModal: SelectionModalComponent<LookupLabelDto>
     // @ViewChild('appFormModal', { static: true }) appFormModal: GenericFormModalComponent
 
@@ -170,6 +171,8 @@ export class CreateEditAppItemVariationsComponent
                 }
             });
         });
+        (document.getElementsByClassName('sizeAttrsDDl')[0] as HTMLSelectElement).selectedIndex=0;
+
     }
     get variationPossibilities() {
         var count = 0;
@@ -429,6 +432,7 @@ export class CreateEditAppItemVariationsComponent
         });
     }
     getUniqueId = function(uniqueTempIds : Set<number>) : number { 
+        debugger
         var r = Math.floor(Math.random() * 1e10) + 1e11;
         if(uniqueTempIds.has(r)) this.getUniqueId()
         else {
@@ -438,14 +442,15 @@ export class CreateEditAppItemVariationsComponent
     }
     tempAddNewAttributes(){
         var uniqueTempIds = new Set<number>();
-        this.appItem.variationItems.forEach(variation=>{
+        const currentComponent=this;
+        this.appItem?.variationItems?.forEach(variation=>{
             variation.entityExtraData.forEach(entityExtraData=>{
                 const extraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == entityExtraData?.entityObjectTypeCode)[0]
                 const isExist = extraAttr?.lookupData.filter(item=>item.code == entityExtraData?.attributeCode)[0] 
                 if(!isExist) {
                     const tempAtt = new LookupLabelDto({
                         code:entityExtraData?.attributeCode,
-                        value:this.getUniqueId(uniqueTempIds),
+                        value:currentComponent.getUniqueId(uniqueTempIds),
                         label:entityExtraData?.attributeValue,
                         stockAvailability:0,
                         isHostRecord:false,
@@ -456,6 +461,7 @@ export class CreateEditAppItemVariationsComponent
         })
     }
     removeExtraAttribute(extraAttr: IsVariationExtraAttribute, index: number) {
+        debugger
         // this.selectedExtaAttrCtrl.removeControl(name)
         if (extraAttr.entityObjectTypeCode == this.sizeExtraAttrCode) {
             this.appSizeRatios = new AppItemSizesScaleInfo({
@@ -464,6 +470,7 @@ export class CreateEditAppItemVariationsComponent
             this.appSizeScales = new AppItemSizesScaleInfo({
                 appSizeScalesDetails: [],
             } as IAppItemSizesScaleInfo);
+            this.removeSizeExtraAttr=true;
         }
         extraAttr.selected = false;
         extraAttr.selectedValues = [];
@@ -1004,7 +1011,7 @@ export class CreateEditAppItemVariationsComponent
     this.primengTableHelper.records[tableRecordIndex].entityExtraData[extraDaraIndex].attributeValueId = Number(value)
     }
     handleColorChange(value, extraDara, extraDaraIndex, tableRecordIndex){
-        this.primengTableHelper.records[tableRecordIndex].entityExtraData[extraDaraIndex].attributeValueId = Number(value)
+        this.primengTableHelper.records[tableRecordIndex].entityExtraData[extraDaraIndex].attributeValueId = Number(value);
     }
 
     deleteSelectedVariations(dropdown: BsDropdownDirective) {
@@ -1594,7 +1601,7 @@ export class CreateEditAppItemVariationsComponent
         const colValues: AppSizeScalesDetailDto[] = [];
         const cellValues: AppSizeScalesDetailDto[] = [];
         let result: AppSizeScalesDetailDto[] = [];
-        this.appSizeScales.appSizeScalesDetails.forEach((sizeScaleItem) => {
+        this.appSizeScales?.appSizeScalesDetails?.forEach((sizeScaleItem) => {
             const isColValue: boolean =
                 Boolean(sizeScaleItem.sizeCode) &&
                 Boolean(sizeScaleItem.sizeId) &&
@@ -1605,7 +1612,7 @@ export class CreateEditAppItemVariationsComponent
                 !Boolean(sizeScaleItem.sizeId) &&
                 !Boolean(sizeScaleItem.dimensionName);
             let isAlreadyExistAsRatio: AppSizeScalesDetailDto =
-                this.appSizeRatios.appSizeScalesDetails.filter(
+                this.appSizeRatios?.appSizeScalesDetails?.filter(
                     (sizeRaioItem) =>
                         sizeRaioItem.sizeCode == sizeScaleItem.sizeCode
                 )[0];
@@ -1641,25 +1648,35 @@ export class CreateEditAppItemVariationsComponent
     // sizeRatioisValid :boolean = false
     sizeRatioChanged($event: AppItemSizesScaleInfo, formIsValid: boolean) {
         this.sizeRatioFormIsValid = formIsValid;
-        this.appSizeRatios = $event;
+        if(!this.removeSizeExtraAttr)this.appSizeRatios = $event;
+        this.removeSizeExtraAttr=false;
         const selectedValuesCodes = this.appSizeRatios.appSizeScalesDetails.map(
             (item) => item.sizeCode
         );
+        
+        const sizeIdsArray=this.appSizeRatios?.appSizeScalesDetails?.map(
+            (item) => item.sizeId
+        );
         const selectedValuesIds : number[] = []
         const uniqueTempIds = new Set<number>();
+        const currentComponent=this;
+
         const sizeExtraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == this.sizeExtraAttrCode)[0]
-        selectedValuesCodes.forEach(code=>{
+        selectedValuesCodes.forEach(function(code,index){
             const isExist = sizeExtraAttr?.lookupData.filter(item=>item.code == code)[0] 
             if(!isExist) {
                 const tempAtt = new LookupLabelDto({
                     code,
-                    value:this.getUniqueId(uniqueTempIds),
+                    value:currentComponent.getUniqueId(uniqueTempIds),
                     label:code,
                     stockAvailability:0,
                     isHostRecord:false,
                 })
                 sizeExtraAttr?.lookupData?.push(tempAtt)
                 selectedValuesIds.push(tempAtt.value)
+            }else{
+
+                selectedValuesIds.push(sizeIdsArray[index])
             }    
         })
         

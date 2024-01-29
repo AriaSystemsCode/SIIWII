@@ -62,7 +62,7 @@
                                         <span class="mr-1">+</span> {{ "AddAttribute" | localize }}
                                     </button> -->
                                     <!-- attribute DropDown -->
-                                    <select class="form-select form-control"   (change)="handleAttrChange($event)" aria-label="Default select example">
+                                    <select class="form-select form-control sizeAttrsDDl"   (change)="handleAttrChange($event)" aria-label="Default select example">
                                         <option selected>{{ "AddVariationAttribute" | localize }}</option>
                                         <option *ngFor="let extraAttribute of extraVariations"
                                                [selected]="extraAttribute.id == selectedAttrID && variationPossibilities > 0"
@@ -497,18 +497,21 @@
                                                         <div *ngFor="let entityExtraData of record.entityExtraData, let i = index" >
                                                             <div *ngIf="entityExtraData.entityObjectTypeCode === 'COLOR-SCHEME'">
                                                                 <select
-                                                                 class="form-select form-control"
+                                                                 class="form-select form-control "
                                                                  aria-label="Default select example"
                                                                  (change)="handleColorChange($event.target.value,record.entityExtraData, i, index)"
                                                                  >
                                                                     <!-- <option selected>Color</option> -->
-                                                                    <option
-                                                                    *ngFor="let extraAttribute of siwiMarketPlaceColor[0]"
-                                                                     [value]="extraAttribute.value"
-                                                                     [disabled]="entityExtraData.attributeValueId === extraAttribute.value"
-                                                                     [selected]="entityExtraData.attributeValueId === extraAttribute.value" >
-                                                                        {{extraAttribute.code|localize}}
-                                                                    </option>
+                                                                    <ng-template *ngIf="siwiMarketPlaceColor[0]">
+                                                                        <option
+                                                                        *ngFor="let extraAttribute of siwiMarketPlaceColor[0]"
+                                                                         [value]="extraAttribute.value"
+                                                                         [disabled]="entityExtraData.attributeValueId === extraAttribute.value"
+                                                                         [selected]="entityExtraData.attributeValueId === extraAttribute.value" >
+                                                                            {{extraAttribute.code|localize}}
+                                                                        </option>
+                                                                    </ng-template>
+
                                                                 </select>
                                                             </div>
                                                         </div>
