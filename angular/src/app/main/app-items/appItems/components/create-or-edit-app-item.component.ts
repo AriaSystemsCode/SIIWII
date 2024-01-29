@@ -1455,8 +1455,15 @@ export class CreateOrEditAppItemComponent
             );
             let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
+                
+              if(extraAttr?.paginationSetting?.skipCount)
+               extraAttr.paginationSetting.skipCount = 0; 
+            
+               this.loadExtraDataLookupList(extraAttr);
+
             if (modalRefData.selectionDone)
                 extraAttr.selectedValues = modalRefData.selectedRecords;
+
             // if(extraAttr.acceptMultipleValues){ // multi selection
             //     const selectedValues : number[] =  extraAttr.selectedValues
             //     selectedValues.forEach(selectedValue => {
