@@ -66,6 +66,7 @@ export class ShoppingCartViewComponentComponent
   activeIndex = 0;
   showSaveBtn: boolean = false;
   currencySymbol: string = "";
+  transactionCode:string="";
 
   constructor(
     injector: Injector,
@@ -182,6 +183,7 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
+           this.transactionCode= res.code
             this.resetTabValidation();
 
             this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
@@ -613,7 +615,7 @@ export class ShoppingCartViewComponentComponent
             if (res) {
               Swal.fire({
                 title: "",
-                text: "Order #" + res + " has been placed successfully",
+                text: "Order #" + this.transactionCode + " has been placed successfully",
                 icon: "success",
                 showCancelButton: false,
                 confirmButtonText: "OK",
