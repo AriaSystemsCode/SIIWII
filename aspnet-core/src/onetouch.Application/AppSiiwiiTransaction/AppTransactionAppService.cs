@@ -3411,8 +3411,9 @@ namespace onetouch.AppSiiwiiTransaction
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var sharedtransactionId = await ShareTransactionOnMarketplace(input.TransactionId);
-                var marketplacetrans = await _appMarketplaceTransactionHeadersRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(x=>x.AttachmentFk).Where(z => z.Id == sharedtransactionId).FirstOrDefaultAsync();
+                // var sharedtransactionId = await ShareTransactionOnMarketplace(input.TransactionId);
+                var sharedtransactionId = input.TransactionId;
+                var marketplacetrans = await _appTransactionsHeaderRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(x=>x.AttachmentFk).Where(z => z.Id == sharedtransactionId).FirstOrDefaultAsync();
                 if (marketplacetrans != null)
                 {
                     string filePath = "";
@@ -3436,7 +3437,7 @@ namespace onetouch.AppSiiwiiTransaction
                         mail.Body = input.Message.ToString();
                         mail.IsBodyHtml = input.IsBodyHtml;
                         //mail.Attachments = new AttachmentCollection();
-                        if (!string.IsNullOrEmpty(filePath))
+                        if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
                         {
                             Attachment at = new Attachment(filePath);
                             mail.Attachments.Add(at);
@@ -3592,7 +3593,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     MessageCategory = MessageCategory.UPDATEMESSAGE.ToString(),
                                     MesasgeObjectType = MesasgeObjectType.Message,
                                     RelatedEntityId = sharedtransactionId,
-                                    BodyFormat = "",
+                                    BodyFormat = input.Message,
                                     SendDate = DateTime.Now.Date,
                                     ReceiveDate = DateTime.Now.Date,
                                     Subject = subject,
@@ -3675,8 +3676,8 @@ namespace onetouch.AppSiiwiiTransaction
                             {
                                 var newExt = new AppEntityAttachment();
                                 newExt = ObjectMapper.Map<AppEntityAttachment>(ext);
-                                newExt.EntityId = 0;
-                                newExt.Id = tenantTransaction.Id;
+                                newExt.EntityId = tenantTransaction.Id;
+                                newExt.Id =0;
                                 newExt.EntityFk = tenantTransaction;
                                 newExt.AttachmentFk.TenantId = tenantId;
                                 MoveFile(newExt.AttachmentFk.Attachment, -1, tenantId);
@@ -3782,7 +3783,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         var catg = new AppEntityCategory();
                                         catg = ObjectMapper.Map<AppEntityCategory>(cat);
                                         catg.Id = 0;
-                                        catg.EntityId = 0;
+                                        catg.EntityId =0;
                                         catg.EntityFk = null;
                                         catg.EntityCode = detail.Code;
                                         detail.EntityCategories.Add(catg);
@@ -3984,6 +3985,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         newExt = ObjectMapper.Map<AppEntityExtraData>(ext);
                                         newExt.EntityId = 0;
                                         newExt.EntityFk = null;
+                                        newExt.Id = 0;
                                         detail.EntityExtraData.Add(newExt);
                                     }
                                 }
@@ -4431,6 +4433,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     var newExt = new AppEntityExtraData();
                                     newExt = ObjectMapper.Map<AppEntityExtraData>(ext);
                                     newExt.EntityId = 0;
+                                    newExt.Id = 0;
                                     newExt.EntityFk = null;
                                     detail.EntityExtraData.Add(newExt);
                                 } 
