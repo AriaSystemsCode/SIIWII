@@ -68,7 +68,7 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
       // this.dropDownLists.push()
     }
 
-    if(this.cols?.columns?.length>0)
+    if(this.cols?.columns?.length>0 && this.canAddCols)
       this.canAddRows=true;
       else
       this.canAddRows=false;
