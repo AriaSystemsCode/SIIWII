@@ -242,7 +242,7 @@
                                     <div class="col-12 item-photos-body pt-4 pb-5" >
                                         <div>
                                             <a
-                                            class="mr-4"
+                                            class="mr-4 aria-tag p-2"
                                             *ngFor="let attachmentObj of defaultExtraAttrForAttachments.selectedValuesAttachments | keyvalue"
                                             (click)="activeAttachmentOption = attachmentObj.value"
                                             [ngClass]="{'active':activeAttachmentOption == attachmentObj.value}"
