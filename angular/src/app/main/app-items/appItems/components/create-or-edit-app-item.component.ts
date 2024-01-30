@@ -1312,14 +1312,11 @@ export class CreateOrEditAppItemComponent
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
         this.hideVariations(true);
         this.updateProductAvailableQuantity();
-
         if (
             this.appItem.appItemPriceInfos.length ==
             this.appItem?.variationItems[0]?.appItemPriceInfos.length &&
-            Object.values(this.appItem.appItemPriceInfos) !=
-            Object.values(
-                this.appItem?.variationItems[0]?.appItemPriceInfos
-            )
+          this.appItem.appItemPriceInfos['currencyId']!==this.appItem?.variationItems[0]?.appItemPriceInfos['currencyId']
+          &&this.appItem.appItemPriceInfos['price']!==this.appItem?.variationItems[0]?.appItemPriceInfos['price']           
         ) {
             this.message.confirm(
                 "",

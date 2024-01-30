@@ -67,6 +67,7 @@ export class CreateEditAppItemVariationsComponent
     sizes: any[];
     siwiSizes: any[];
     removeSizeExtraAttr:boolean=false;
+    editVariationsOpend:boolean=false;
     // @ViewChild('appSelectionModal', { static: true }) appSelectionModal: SelectionModalComponent<LookupLabelDto>
     // @ViewChild('appFormModal', { static: true }) appFormModal: GenericFormModalComponent
 
@@ -220,6 +221,8 @@ export class CreateEditAppItemVariationsComponent
             });
 
           this.selectedAttrID = this.appItem?.sycIdentifierId?.toString()
+          this.selectedAttrID?null:this.editVariationsOpend=true;
+
     }
 
     async getSiwiiMarketPlaceColor() {
@@ -278,6 +281,7 @@ export class CreateEditAppItemVariationsComponent
             this.selectedItemTypeData = GetAllEntityObjectTypeOutput.fromJS(
                 this.selectedItemTypeData
             );
+
         }
     }
 
@@ -325,6 +329,7 @@ export class CreateEditAppItemVariationsComponent
                 .subscribe((res: any) => {
                     this.sizes = res;
                 });
+                debugger
             this.primengTableHelper.records = this.variationMatrices;
             this.showVariationSelectionMetaData = true;
             this.showVariationValues = false;
@@ -395,6 +400,8 @@ export class CreateEditAppItemVariationsComponent
         this.showVariationSelectionMetaData = true;
         this.showVariationPhotos = true;
         this.showVariations = true;
+        this.editVariationsOpend=false;
+
     }
     async getItemTypeDataAndExtraAttributes() {
         return new Promise(async (resolve, reject) => {
@@ -432,7 +439,6 @@ export class CreateEditAppItemVariationsComponent
         });
     }
     getUniqueId = function(uniqueTempIds : Set<number>) : number { 
-        debugger
         var r = Math.floor(Math.random() * 1e10) + 1e11;
         if(uniqueTempIds.has(r)) this.getUniqueId()
         else {
@@ -443,6 +449,7 @@ export class CreateEditAppItemVariationsComponent
     tempAddNewAttributes(){
         var uniqueTempIds = new Set<number>();
         const currentComponent=this;
+        //this.appItem?.variationItems?null:this.editVariationsOpend=true;
         this.appItem?.variationItems?.forEach(variation=>{
             variation.entityExtraData.forEach(entityExtraData=>{
                 const extraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == entityExtraData?.entityObjectTypeCode)[0]
@@ -488,8 +495,8 @@ export class CreateEditAppItemVariationsComponent
     }
 
     saveExtraAtrributeSelection() {
-        debugger
         const oldVariations = this.variationMatrices;
+        this.editVariationsOpend=false;
         this.variationMatrices = [];
         if (this.selectedExtraAttributes.length === 0)
             return this.notify.error(this.l("PleaseSelectVariationsFirst"));
@@ -535,6 +542,7 @@ export class CreateEditAppItemVariationsComponent
             )
             .subscribe((response: any) => {
                 console.log(">>", response, this.variationMatrices);
+                debugger
                 this.primengTableHelper.records = response;
                 this.variationMatrices = response;
             });
@@ -661,7 +669,7 @@ export class CreateEditAppItemVariationsComponent
         );
     }
     initializePricesObjects() {
-        this.variationMatrices.forEach((variation) => {
+        this.variationMatrices?.forEach((variation) => {
             //  if(!variation.appItemPriceInfos || variation.appItemPriceInfos.length == 0)
             if (this.updateVariation) {
                if(!variation.appItemPriceInfos ) variation.appItemPriceInfos = this.getParentProductPrices();
@@ -1048,7 +1056,7 @@ export class CreateEditAppItemVariationsComponent
                 this.l("PleaseCompletePricingAllVariationsFirst")
             );
         }
-        this.variationMatrices.forEach((variation) => {
+        this.variationMatrices?.forEach((variation) => {
             variation.appItemPriceInfos = variation.appItemPriceInfos.filter(
                 (priceDto) => priceDto.code == "MSRP" || priceDto?.price > 0
             );
@@ -1218,8 +1226,8 @@ export class CreateEditAppItemVariationsComponent
         if (defaultExtraAttrForAttachmentsIndex)
             this.defaultExtraAttrForAttachments =
                 selectedExtraAttr[defaultExtraAttrForAttachmentsIndex];
-        this.variationMatrices.forEach((variation) => {
-            variation.entityExtraData.forEach((item) => {
+        this.variationMatrices?.forEach((variation) => {
+            variation.entityExtraData?.forEach((item) => {
                 let extraAttrId = item.attributeId;
                 let currentExtraDataIndex =
                     selectedExtraAttrIds.indexOf(extraAttrId);
@@ -1230,7 +1238,7 @@ export class CreateEditAppItemVariationsComponent
                 // if (!isSizeExtraAttr && !optionValueId) {
                     optionValueId = selectedExtraAttr[
                         currentExtraDataIndex
-                    ].lookupData.filter(
+                    ]?.lookupData?.filter(
                         (item) => item.code == optionValueCode
                     )[0]?.value;
                 // }
@@ -1240,19 +1248,20 @@ export class CreateEditAppItemVariationsComponent
                     //: 
                     optionValueId;
                 let alreadySelectedValues: any[] =
-                    selectedExtraAttr[currentExtraDataIndex].selectedValues;
-                if (!alreadySelectedValues.includes(attOptionValue as unknown))
-                    alreadySelectedValues.push(attOptionValue);
+                    selectedExtraAttr[currentExtraDataIndex]?.selectedValues;
+                if (!alreadySelectedValues?.includes(attOptionValue as unknown))
+                    alreadySelectedValues?.push(attOptionValue);
                 let attachmentObj: { [key: number]: IVaritaionAttachment } =
                     selectedExtraAttr[currentExtraDataIndex]
-                        .selectedValuesAttachments
+                        ?.selectedValuesAttachments
                         ? selectedExtraAttr[currentExtraDataIndex]
-                              .selectedValuesAttachments
-                        : (selectedExtraAttr[
+                              ?.selectedValuesAttachments
+                        : selectedExtraAttr[currentExtraDataIndex]?(selectedExtraAttr[
                               currentExtraDataIndex
-                          ].selectedValuesAttachments = {});
+                          ].selectedValuesAttachments = {}):null;
                 // this.defaultExtraAttrForAttachments = selectedExtraAttr[currentExtraDataIndex]
-                if (!attachmentObj[attOptionValue]) {
+                if(attachmentObj){
+                 if (!attachmentObj[attOptionValue]) {
                     let selectedValue: SelectItem;
                     // if (!isSizeExtraAttr)
                         selectedValue = selectedExtraAttr[
@@ -1267,6 +1276,8 @@ export class CreateEditAppItemVariationsComponent
                         lookupData: selectedValue,
                     };
                 }
+                }
+
             });
 
             variation.entityAttachments.forEach((entityAttachment) => {
@@ -1356,8 +1367,8 @@ export class CreateEditAppItemVariationsComponent
     }
     sortVaritaionCombination() {
         let selectedExtraAttributesOrder: number[] =
-            this.selectedExtraAttributes.map((item) => item.attributeId);
-        this.variationMatrices.forEach((variation) => {
+            this.selectedExtraAttributes?.map((item) => item.attributeId);
+        this.variationMatrices?.forEach((variation) => {
             variation.entityExtraData.sort((item, nextItem) => {
                 let currentExtraDataIndex =
                     selectedExtraAttributesOrder.findIndex(
@@ -1572,6 +1583,7 @@ export class CreateEditAppItemVariationsComponent
         this.variationMatrices.push(...this.parentProductUnselectedVariations);
     }
     editExtraAtrributeSelection() {
+        this.editVariationsOpend=true;
         this.oldExtraAttributesData = [];
         this.extraAttributes.forEach((elem) => {
             this.oldExtraAttributesData.push(cloneDeep(elem));
@@ -1597,6 +1609,7 @@ export class CreateEditAppItemVariationsComponent
         this.appSizeScales = $event;
         this.sizeScaleFormIsValid = formIsValid;
         this.showSizeRatio();
+        this.editVariationsOpend=true;
     }
     showSizeRatio() {
         const colValues: AppSizeScalesDetailDto[] = [];
@@ -1638,20 +1651,21 @@ export class CreateEditAppItemVariationsComponent
         else result = colValues;
         this.appSizeRatios = new AppItemSizesScaleInfo({
             ...this.appSizeScales,
-            id: this.appSizeRatios.id || 0,
-            sizeScaleId: this.appSizeRatios.sizeScaleId || 0,
-            parentId: this.appSizeScales.sizeScaleId || 0,
-            name: this.appSizeRatios.name,
+            id: this.appSizeRatios?.id || 0,
+            sizeScaleId: this.appSizeRatios?.sizeScaleId || 0,
+            parentId: this.appSizeScales?.sizeScaleId || 0,
+            name: this.appSizeRatios?.name,
             appSizeScalesDetails: result,
-            code: this.appSizeRatios.code,
+            code: this.appSizeRatios?.code,
         });
     }
     // sizeRatioisValid :boolean = false
     sizeRatioChanged($event: AppItemSizesScaleInfo, formIsValid: boolean) {
         this.sizeRatioFormIsValid = formIsValid;
+        //this.editVariationsOpend=true;
         if(!this.removeSizeExtraAttr)this.appSizeRatios = $event;
         this.removeSizeExtraAttr=false;
-        const selectedValuesCodes = this.appSizeRatios.appSizeScalesDetails.map(
+        const selectedValuesCodes = this.appSizeRatios?.appSizeScalesDetails.map(
             (item) => item.sizeCode
         );
         
@@ -1679,6 +1693,7 @@ export class CreateEditAppItemVariationsComponent
 
                 selectedValuesIds.push(sizeIdsArray[index])
             }    
+            
         })
         
 

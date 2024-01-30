@@ -271,6 +271,7 @@ export class AppItemsViewComponent
     }
 
     setVaraitionExtraDataValues(secondAttributeindex: number) {
+        debugger
         if (
             !this.appItemForViewDto.variations[0].selectedValues[
                 this.varitaionSelectedIndex
@@ -294,6 +295,7 @@ export class AppItemsViewComponent
                     undefined
                 )
                 .subscribe((res) => {
+                    debugger
                     this.appItemForViewDto.variations[0].selectedValues[
                         this.varitaionSelectedIndex
                     ].edRestAttributes[secondAttributeindex].values = res.items;
