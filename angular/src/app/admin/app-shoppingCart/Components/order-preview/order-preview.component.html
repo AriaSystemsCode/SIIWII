@@ -1,0 +1,22 @@
+<div class="orderForm  position-relative">
+    <div class="container-fluid orderInfoForm thin-scroll">
+
+        <div class="row">
+            <iframe id="pdfViewer" class="w-100 pt-4" [ngStyle]="{
+                'height':
+                !loadingError ?
+                '800px':
+                '0px'
+            }" frameborder="0" (error)="loadingError=true">
+            </iframe>
+            <div *ngIf="loadingError">
+                <p>
+                    Unable to display PDF file.
+                    <span *ngIf="transactionFormPath">
+                        <a [href]="transactionFormPath" target="_blank">Download</a> instead.
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -24,6 +24,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   @Input("createOrEditSellerContactInfo") createOrEditSellerContactInfo: boolean = true;
   @Input("showSaveBtn") showSaveBtn: boolean = false;
   oldappTransactionsForViewDto;
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   constructor(
     injector: Injector,
@@ -61,7 +62,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   createOrEditTransaction() {
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => this.hideMainSpinner()))
+      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);

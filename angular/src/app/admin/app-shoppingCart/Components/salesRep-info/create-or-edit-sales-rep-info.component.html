@@ -9,7 +9,7 @@
                             *ngIf="salesRepIndex==0 &&!showSaveBtn " class="continuebtn text-center btn float-right">
                             Continue
                         </button>
-                        <button *ngIf="salesRepIndex==0 &&showSaveBtn" (click)="save()"
+                        <button *ngIf="salesRepIndex==0 &&showSaveBtn" (click)="save()"  [disabled]="!(isContactsValid)"
                             class="previewbtn text-center btn float-right">
                             Save
                             <i class="pi pi-check"></i>

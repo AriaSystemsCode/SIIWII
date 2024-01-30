@@ -21,6 +21,7 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
   @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
   salesRepIndex = 1;
   salesReps: any[];
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   constructor(
     injector: Injector,
@@ -69,7 +70,7 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
   createOrEditTransaction() {
     this.showMainSpinner();
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => this.hideMainSpinner()))
+      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
       .subscribe((res) => {
         if (res) {
           this.onshowSaveBtn.emit(false);

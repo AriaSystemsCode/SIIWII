@@ -24,6 +24,7 @@
             </button>
             <button
             *ngIf="showSaveBtn"
+            [disabled]="!(isContactsValid && isSalesOrderValidForm())"
             (click)="save()"
             class="previewbtn text-center btn float-right"
         >
