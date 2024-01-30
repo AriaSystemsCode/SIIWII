@@ -65,7 +65,7 @@
                                     <select class="form-select form-control sizeAttrsDDl"   (change)="handleAttrChange($event)" aria-label="Default select example">
                                         <option selected>{{ "AddVariationAttribute" | localize }}</option>
                                         <option *ngFor="let extraAttribute of extraVariations"
-                                               [selected]="extraAttribute.id == selectedAttrID"
+                                               [selected]="extraAttribute.id == selectedAttrID && variationPossibilities > 0"
                                                [value]="extraAttribute.id">
                                             {{extraAttribute.name|localize}}
                                         </option>

@@ -18,6 +18,7 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
     shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
     @Output("showBuyer_sellerEditMode") showBuyer_sellerEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
     @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   constructor(
     injector: Injector,
@@ -48,7 +49,7 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
   createOrEditTransaction() {
     this.showMainSpinner();
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => this.hideMainSpinner()))
+      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
       .subscribe((res) => {
         if (res) {
           this.onshowSaveBtn.emit(false);

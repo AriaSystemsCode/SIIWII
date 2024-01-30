@@ -1680,6 +1680,8 @@ export class CreateEditAppItemVariationsComponent
                 selectedValuesIds.push(sizeIdsArray[index])
             }    
         })
+        
+
         const sizeSeletedExtraAttr = this.selectedExtraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == this.sizeExtraAttrCode)[0]
         if(selectedValuesIds.length>0){
             sizeSeletedExtraAttr.selectedValues = selectedValuesIds
