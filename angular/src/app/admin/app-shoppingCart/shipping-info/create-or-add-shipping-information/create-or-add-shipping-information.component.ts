@@ -130,8 +130,11 @@ createOrEditTransaction() {
     });
 }
 selectShipVia(){
-    this.oldappTransactionsForViewDto.shipViaId=this.shipViaValue;
-    this.oldappTransactionsForViewDto.shipViaCode=this.shipViaValue;
+ var index= this.shipViaList.findIndex(x=>x.value==this.shipViaValue)
+  if(index>=0){
+    this.oldappTransactionsForViewDto.shipViaId=this.shipViaList[index]?.value;
+    this.oldappTransactionsForViewDto.shipViaCode=this.shipViaList[index]?.code;
+  }
 
 }
 enterStore(){

@@ -84,6 +84,8 @@
                 styleClass="form-control aria-select"
                 [required]="true"
                 [placeholder]="'PleaseSelect' | localize"
+                (onChange)="onchangePayment($event)"
+                [(ngModel)]="this.appTransactionsForViewDto.paymentTermsId"
             >
             </p-dropdown>
             </div>
