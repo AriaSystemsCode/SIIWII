@@ -40,13 +40,14 @@ export class SizeRatioComponent extends AppComponentBase implements OnChanges,Af
     }
   }
   ngOnInit(){
+    console.log('on init')
     this.sizeRatioForm.statusChanges.subscribe(status=>{
       this.statusChanged.emit('VALID' == status)
     })
   }
   ngAfterViewInit(){
-    //comented by mai cause calling function here cause function firing many times
- /*   this.sizeRatioForm.statusChanges.subscribe(status=>{
+    /*this.sizeRatioForm.statusChanges.subscribe(status=>{
+      console.log('after init')
       this.statusChanged.emit('VALID' == status)
     })*/
     

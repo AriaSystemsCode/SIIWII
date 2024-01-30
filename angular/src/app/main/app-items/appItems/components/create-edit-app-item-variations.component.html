@@ -19,7 +19,7 @@
                   </div>
                   <div class="kt-subheader__toolbar">
                     <div class="kt-subheader__wrapper">
-                        <button class="btn btn-primary text-capitalize" type="button"  (click)="saveVariations()">
+                        <button class="btn btn-primary text-capitalize" type="button" [disabled]="editVariationsOpend"  (click)="saveVariations()">
                             {{ "ApplyVariations" | localize }}
                         </button>
                         <button type="button" (click)="cancelVariations()" class="btn btn-light cancel text-capitalize" type="button">
@@ -321,7 +321,7 @@
                                     </div>
                                 </ng-template>
                                 <form #varitationsForm="ngForm" *ngIf="showVariations">
-                                    <div class="mt-5 primeng-datatable-container table-transparent-header table-transparent-rows variation-table  pt-5 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
+                                    <div class="mt-1 primeng-datatable-container table-transparent-header table-transparent-rows variation-table  pt-1 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
                                         <div class="mb-3 d-flex flex-row" *ngIf="selectedVaritaions.length > 0">
                                             <a class="text-primary mr-4">{{ "SelectionActions" | localize }}:</a>
                                             <div class="dropdown mr-4" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
@@ -502,7 +502,9 @@
                                                                  (change)="handleColorChange($event.target.value,record.entityExtraData, i, index)"
                                                                  >
                                                                     <!-- <option selected>Color</option> -->
-                                                                    <ng-template *ngIf="siwiMarketPlaceColor[0]">
+                                                                    <ng-template *ngIf="siwiMarketPlaceColor">
+                                                                        <ng-template *ngIf="siwiMarketPlaceColor[0]">
+
                                                                         <option
                                                                         *ngFor="let extraAttribute of siwiMarketPlaceColor[0]"
                                                                          [value]="extraAttribute.value"
@@ -510,6 +512,7 @@
                                                                          [selected]="entityExtraData.attributeValueId === extraAttribute.value" >
                                                                             {{extraAttribute.code|localize}}
                                                                         </option>
+                                                                        </ng-template>
                                                                     </ng-template>
 
                                                                 </select>
