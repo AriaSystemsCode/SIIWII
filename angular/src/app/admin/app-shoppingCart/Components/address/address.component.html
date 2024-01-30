@@ -1,6 +1,6 @@
 <div class="selected-addr-comp mb-3"  *ngIf="selectedAddress&&isCreateOredit">
     <div class="selected-add-edit row">
-        <div class="col-md-12 mb-3">
+        <div class="col-md-12 mb-3" *ngIf="showAddressType">
             <label class="label mt-2 mb-2">{{l("AddressType")}}</label>
             <div class="w-50 d-inline-block ml-2 ">
              <p-dropdown
