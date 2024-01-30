@@ -551,10 +551,16 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
                 appTrans.EnteredUserByRole = input.EnteredByUserRole;
+
                 if (input.lFromPlaceOrder)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                //MMT-Fix Status
                 else
+                {
+                    if (appTrans.EntityObjectStatusId == null)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+                }
+                //MMT - Fix Status 
                 //XX
                 if (appTrans.AppTransactionContacts.Count() == 0)
                 {
