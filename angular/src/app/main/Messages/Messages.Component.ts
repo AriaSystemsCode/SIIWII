@@ -50,6 +50,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     messages: MessagesDto[] = [];
     messagesDetails: GetMessagesForViewDto[] = null;
     selectedMessage: number = 0;
+    selectedMessageIndx:number=0;
     filterText: string = "";
     bodyFilter: string = "";
     subjectFilter: string = "";
@@ -61,12 +62,15 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     itemsToLoad: number = 5;
     itemsToShow;
     totalUnread: number;
+    totalPrimaryUnread: number;
+    totalUpdatesUnread: number;
     isFullListDisplayed: boolean = false;
     messageId: any;
     entityAttachments = [];
     RecipientsName = [];
     highlightFirstMsg: boolean;
-    displayMessageDetails:boolean=false;
+    displayMessageDetails: boolean = false;
+    messageCategoryFilter: string = "PRIMARYMESSAGE";
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -82,8 +86,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     ngOnInit(): void {
         this.messages = [];
         this.highlightFirstMsg = true;
-        this.displayMessageDetails=false;
-       this.selectMessagetype(1, this.l("Inbox"));
+        this.displayMessageDetails = false;
+        this.selectMessagetype(1, this.l("Inbox"));
+        this.messageCategoryFilter = "PRIMARYMESSAGE";
         this._sycEntityObjectClassificationsServiceProxy
             .getAllChildsForLables()
             .subscribe((result) => {
@@ -111,10 +116,14 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.noOfItemsToShowInitially = 5;
         this.messagesDetails = null;
         this.selectedMessage = 0;
+        this.selectedMessageIndx=0;
         this.getMesssage();
     }
 
     getMesssage(search?: boolean): void {
+        if (this.messageTypeIndex != 1)
+            this.messageCategoryFilter = null;
+
         this._MessageServiceProxy
             .getAll(
                 this.filterText,
@@ -123,7 +132,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.messageTypeIndex,
                 0,
                 undefined,
-                undefined,
+                undefined, this.messageCategoryFilter,
                 "",
                 this.skipCount,
                 this.maxResultCount
@@ -142,8 +151,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                             .subscribe((result) => {
                                 if (result && result.profilePicture) {
                                     message.profilePictureUrl =
-                                    "data:image/jpeg;base64," +
-                                    result.profilePicture;
+                                        "data:image/jpeg;base64," +
+                                        result.profilePicture;
                                 }
                             });
                         /*   if(this.messageTypeIndex==2)
@@ -184,10 +193,18 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                                 });
                         } */
                     }
-                  
+
 
                     this.totalCount = result.totalCount;
-                    this.totalUnread = result.totalUnread;
+
+                    // this.totalUnread = result.totalUnread
+                    this._MessageServiceProxy.getUnreadCounts('PRIMARYMESSAGE').subscribe((result) => {
+                        this.totalPrimaryUnread = result;
+                    });
+
+                    this._MessageServiceProxy.getUnreadCounts('UPDATEMESSAGE').subscribe((result) => {
+                        this.totalUpdatesUnread = result;
+                    });
 
                     this.itemsToShow = this.messages.slice(
                         0,
@@ -196,9 +213,29 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                     this.isFullListDisplayed = false;
                 }
 
-               if ((window.innerWidth > 767 ) && (this.messages.length > 0))
-                this.selectMessage(this.messages[0]);
+                if ((window.innerWidth > 767) && (this.messages.length > 0))
+                    this.selectMessage(this.messages[0]);
             });
+    }
+    showSideBar: boolean = false;
+    showHideSideBarTitle: string = !this.showSideBar ? "Show details" : "Hide details";
+    onShowSideBar(showSideBar: boolean) {
+        this.showSideBar = showSideBar;
+        this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
+    }
+
+    getPrimaryMessage() {
+        this.messageCategoryFilter = "PRIMARYMESSAGE";
+        this.messages = [];
+        this.messagesDetails = null;
+        this.getMesssage();
+    }
+
+    getUpdatesMessage() {
+        this.messageCategoryFilter = "UPDATEMESSAGE";
+        this.messages = [];
+        this.messagesDetails = null;
+        this.getMesssage();
     }
 
     onScroll(): void {
@@ -221,12 +258,13 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.showMainSpinner();
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
+        this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);
 
         this._MessageServiceProxy
             .getMessagesForView(message.id)
-            .pipe(finalize(() => { this.displayMessageDetails = true;  this.hideMainSpinner();}))
+            .pipe(finalize(() => { this.displayMessageDetails = true; this.hideMainSpinner(); }))
             .subscribe((result) => {
-                this.messagesDetails=result;
+                this.messagesDetails = result;
                 for (var i = 0; i < result.length; i++) {
 
                     const message = result[i].messages
@@ -248,6 +286,10 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 if (message.entityObjectStatusCode == "UNREAD") {
                     this._MessageServiceProxy.read(message.id).subscribe(() => {
                         this.totalUnread = this.totalUnread - 1;
+                        if (this.messageCategoryFilter == "PRIMARYMESSAGE")
+                            this.totalPrimaryUnread = this.totalPrimaryUnread - 1;
+                        else if (this.messageCategoryFilter == "UPDATEMESSAGE")
+                            this.totalUpdatesUnread = this.totalUpdatesUnread - 1;
                         this.readMessage(true);
                     });
                     //xxx
@@ -257,8 +299,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    messageDetailsGoback(){
-        this.displayMessageDetails=false;
+    messageDetailsGoback() {
+        this.displayMessageDetails = false;
     }
 
     readMessage(target) {

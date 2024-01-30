@@ -83,7 +83,10 @@ namespace onetouch.AppSiiwiiTransaction
         public virtual DateTime StartDate { set; get; }
         public virtual DateTime AvailableDate { set; get; }
         public virtual long? ShipViaId { get; set; }
-
+        //MMT - Iteration37[Start]
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { get; set; }
+        //MMT - Iteration37[End]
         [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
         public virtual string ShipViaCode { get; set; }
         [ForeignKey("ShipViaId")]
