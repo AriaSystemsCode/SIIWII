@@ -1,6 +1,6 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter,ViewChild,ViewChildren } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren } from '@angular/core';
 import { ShoppingCartoccordionTabs } from "../../shopping-cart-view-component/ShoppingCartoccordionTabs";
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto,ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../address/address.component';
@@ -10,7 +10,7 @@ import { AddressComponent } from '../../address/address.component';
   templateUrl: './create-or-edit-billing-info.component.html',
   styleUrls: ['./create-or-edit-billing-info.component.scss']
 })
-export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
+export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   @Input("activeTab") activeTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("BillingInfoValid") BillingInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
@@ -18,161 +18,160 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  {
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   isContactsValid: boolean = true;
   @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
-  loadAddresComponentShipFrom:boolean=false;
-  loadAddresComponentShipTo:boolean=false;
-  contactIdARContact:string='';
-  contactIdApContact:string='';
-  addressSelected:boolean=false;
-  payTermsListList:any=[];
-  isArContactsValid:boolean=false;
-  enableSAveApcontact:boolean=false;
-  oldappTransactionsForViewDto:any;
+  loadAddresComponentShipFrom: boolean = false;
+  loadAddresComponentShipTo: boolean = false;
+  contactIdARContact: string = '';
+  contactIdApContact: string = '';
+  addressSelected: boolean = false;
+  payTermsListList: any = [];
+  isArContactsValid: boolean = false;
+  enableSAveApcontact: boolean = false;
+  oldappTransactionsForViewDto: any;
   @Input("showSaveBtn") showSaveBtn: boolean = false;
-  isApContactsValid:boolean=false;
-  enableSAveArcontact:boolean=false;
-  apContactSelectedAdd:any;
-  arContactSelectedAdd:any
-  @Input("createOrEditBillingInfo") createOrEditBillingInfo: boolean=true;
+  isApContactsValid: boolean = false;
+  enableSAveArcontact: boolean = false;
+  apContactSelectedAdd: any;
+  arContactSelectedAdd: any
+  @Input("createOrEditBillingInfo") createOrEditBillingInfo: boolean = true;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
-  
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-    ) {
+  ) {
     super(injector);
 
   }
   ngOnInit() {
-    this.oldappTransactionsForViewDto =JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-    let apContactObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
-    apContactObj[0]?.companySSIN?this.apContactSelectedAdd=apContactObj[0]?.contactAddressDetail:null;
-    let arContactObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
-    arContactObj[0]?.companySSIN?this.arContactSelectedAdd=arContactObj[0]?.contactAddressDetail:null;
+    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+    let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+    apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+    let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+    arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
     this.loadpayTermsListListist();
   }
-  updateTabInfo(addObj,contactRole){ 
-    let contactIndex= this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
-    if(contactIndex<0||contactIndex==this.oldappTransactionsForViewDto?.appTransactionContacts?.length){
+  updateTabInfo(addObj, contactRole) {
+    let contactIndex = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
+    if (contactIndex < 0 || contactIndex == this.oldappTransactionsForViewDto?.appTransactionContacts?.length) {
       var appTransactionContactDto: AppTransactionContactDto = new AppTransactionContactDto();
-      appTransactionContactDto.contactRole=contactRole;
-      appTransactionContactDto.contactAddressCode=addObj.code;
-      appTransactionContactDto.contactAddressId=addObj.id;
-      appTransactionContactDto.contactAddressTypyId=addObj.typeId;
-  
+      appTransactionContactDto.contactRole = contactRole;
+      appTransactionContactDto.contactAddressCode = addObj.code;
+      appTransactionContactDto.contactAddressId = addObj.id;
+      appTransactionContactDto.contactAddressTypyId = addObj.typeId;
+
       this.oldappTransactionsForViewDto?.appTransactionContacts.push(appTransactionContactDto);
-    }else{
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole=contactRole;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode=addObj.code;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId=addObj.id;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId=addObj.typeId;
+    } else {
+      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
+      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
+      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
+      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
 
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole=contactRole;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode=addObj.code;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId=addObj.id;
-      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId=addObj.typeId;
-      
-   
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
+
+
     }
-    if (this.isContactsValid){
-      let apContactObj=this.oldappTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
-      let arContactObj=this.oldappTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
-      apContactObj[0]?.contactAddressDetail?this.enableSAveApcontact = true:apContactObj[0]?.contactAddressId?this.enableSAveApcontact = true:this.enableSAveApcontact = false;
-      arContactObj[0]?.contactAddressDetail?this.enableSAveArcontact = true:arContactObj[0]?.contactAddressId?this.enableSAveArcontact = true:this.enableSAveArcontact = false;
-  
-      if(this.enableSAveArcontact&&this.enableSAveApcontact){
+    if (this.isContactsValid) {
+      let apContactObj = this.oldappTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+      let arContactObj = this.oldappTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+      apContactObj[0]?.contactAddressDetail ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
+      arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
+
+      if (this.enableSAveArcontact && this.enableSAveApcontact) {
         this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
-  
+
       }
     }
-  
 
 
-  if(contactRole==ContactRoleEnum.APContact){
-  this.apContactSelectedAdd=addObj.selectedAddressObj
-  }else{
-    this.arContactSelectedAdd=addObj.selectedAddressObj
-  
+
+    if (contactRole == ContactRoleEnum.APContact) {
+      this.apContactSelectedAdd = addObj.selectedAddressObj
+    } else {
+      this.arContactSelectedAdd = addObj.selectedAddressObj
+
+    }
+
   }
 
-   }
+  isContactFormValid(value, sectionIndex) {
+    let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+    let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
 
-  isContactFormValid(value,sectionIndex) {
-    let apContactObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
-    let arContactObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+    if (this.activeTab == this.shoppingCartoccordionTabs.BillingInfo) {
+      this.isContactsValid = value;
+      if (this.isContactsValid) {
+        if (sectionIndex == 1) {
+          apContactObj[0]?.contactAddressDetail ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
+        } else {
+          arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
+        }
+        if (this.enableSAveArcontact && this.enableSAveApcontact) {
+          this.isContactsValid = true;
+          this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 
-  if(this.activeTab==this.shoppingCartoccordionTabs.BillingInfo)
-  {
-  this.isContactsValid = value;
-  if (this.isContactsValid){
-    if(sectionIndex==1){
-      apContactObj[0]?.contactAddressDetail?this.enableSAveApcontact = true:apContactObj[0]?.contactAddressId?this.enableSAveApcontact = true:this.enableSAveApcontact = false;
-    }else{
-      arContactObj[0]?.contactAddressDetail?this.enableSAveArcontact = true:arContactObj[0]?.contactAddressId?this.enableSAveArcontact = true:this.enableSAveArcontact = false;
-    }
-    if(this.enableSAveArcontact&&this.enableSAveApcontact){
-      this.isContactsValid=true;
-      this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
+        } else {
+          this.isContactsValid = false;
+        }
+      } else {
+        if (sectionIndex == 1) {
+          this.enableSAveApcontact = false;
+        } else {
+          this.enableSAveArcontact = false;
+        }
+        this.enableSAveArcontact && this.enableSAveApcontact ? this.isContactsValid = true : this.isContactsValid = false;
 
-    }else{
-        this.isContactsValid=false;
       }
-  }else{
-    if(sectionIndex==1){
-    this.enableSAveApcontact = false;
-    }else{
-      this.enableSAveArcontact = false;
+
     }
-    this.enableSAveArcontact&&this.enableSAveApcontact?this.isContactsValid=true:this.isContactsValid=false;
 
   }
-
-}
-
-  }
-  loadpayTermsListListist(){
+  loadpayTermsListListist() {
     this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('PAYMENT-TERMS')
-    .subscribe((res)=>{
-      debugger
-      this.payTermsListList=res;
-    })
-    }
+      .subscribe((res) => {
+        debugger
+        this.payTermsListList = res;
+      })
+  }
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
   }
-  reloadAddresscomponentAPContact(data){
-    this.loadAddresComponentShipFrom=true;
-   this.contactIdApContact=data.compId;
-this.apContactSelectedAdd=null;
+  reloadAddresscomponentAPContact(data) {
+    this.loadAddresComponentShipFrom = true;
+    this.contactIdApContact = data.compId;
+    this.apContactSelectedAdd = null;
     //if(data.compssin){
-   this.AddressComponentChild['first']?.getAddressList(data.compssin);
+    this.AddressComponentChild['first']?.getAddressList(data.compssin);
 
     //}
 
   }
-  reloadAddresscomponentARContact(data){
+  reloadAddresscomponentARContact(data) {
     //if(data.compssin){
-   this.contactIdARContact=data.compId;
-   this.loadAddresComponentShipTo=true;
-   this.arContactSelectedAdd=null;
-   this.AddressComponentChild['second']? this.AddressComponentChild['second'].getAddressList(data.compssin):this.AddressComponentChild['last'].getAddressList(data.compssin);
+    this.contactIdARContact = data.compId;
+    this.loadAddresComponentShipTo = true;
+    this.arContactSelectedAdd = null;
+    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
 
-   // }
+    // }
 
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-    this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+    this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
+      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
         if (res) {
-          this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
-          if (!this.showSaveBtn){
+          this.oldappTransactionsForViewDto = JSON.stringify(this.appTransactionsForViewDto);
+          if (!this.showSaveBtn) {
             this.ontabChange.emit(ShoppingCartoccordionTabs.BillingInfo);
           }
-          else{
+          else {
             this.showSaveBtn = false;
 
           }
@@ -187,11 +186,21 @@ this.apContactSelectedAdd=null;
       this.createOrEditBillingInfo = true;
     }
   }
-  
-updateApContact(addObj){
-  this.updateTabInfo(addObj,ContactRoleEnum.APContact);
-}
-updateArContact(addObj){
-this.updateTabInfo(addObj,ContactRoleEnum.ARContact);
-}
+
+  updateApContact(addObj) {
+    this.updateTabInfo(addObj, ContactRoleEnum.APContact);
+  }
+  updateArContact(addObj) {
+    this.updateTabInfo(addObj, ContactRoleEnum.ARContact);
+  }
+
+  onchangePayment($event) {
+    var indx = this.payTermsListList?.findIndex(x => x.value == $event?.value);
+    if (indx >= 0) {
+      this.appTransactionsForViewDto.paymentTermsCode = this.payTermsListList[indx].code;
+      this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
+      this.oldappTransactionsForViewDto.paymentTermsCode = this.payTermsListList[indx].code;
+      this.oldappTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
+    }
+  }
 }
