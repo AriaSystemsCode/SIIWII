@@ -129,8 +129,8 @@ createOrEditTransaction() {
       }
     });
 }
-selectShipVia(){
- var index= this.shipViaList.findIndex(x=>x.value==this.shipViaValue)
+selectShipVia($event){
+ var index= this.shipViaList.findIndex(x=>x.value=$event?.value)
   if(index>=0){
     this.oldappTransactionsForViewDto.shipViaId=this.shipViaList[index]?.value;
     this.oldappTransactionsForViewDto.shipViaCode=this.shipViaList[index]?.code;
