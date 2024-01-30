@@ -28,6 +28,6 @@ export class ReportDesignerComponent extends AppComponentBase {
 
     super(injector);
     this.appSession = injector.get(AppSessionService);
-    this.reportUrl = "ProductsCatalogTemplate1?itemsListId=" + "10073" + "&reportTitle=Test Title Passed From Front-End&userId=1&preparedForContactId=14&tenantId=" + (this.appSession==null?"":this.appSession.tenantId.toString()) ;
+    this.reportUrl = "reportTemplateName?itemsListId=" + "10073" + "&reportTitle=Test Title Passed From Front-End&userId=1&preparedForContactId=14&tenantId=" + (this.appSession==null?"":this.appSession.tenantId.toString()) ;
   }
 }

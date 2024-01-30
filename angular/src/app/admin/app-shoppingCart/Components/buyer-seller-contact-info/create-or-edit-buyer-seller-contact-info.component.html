@@ -8,7 +8,7 @@
                         *ngIf="!showSaveBtn " class="continuebtn text-center btn float-right">
                         Continue
                     </button>
-                    <button *ngIf="showSaveBtn" (click)="save()"
+                    <button *ngIf="showSaveBtn"  [disabled]="!(isContactsValid)" (click)="save()"
                         class="previewbtn text-center btn float-right">
                         Save
                         <i class="pi pi-check"></i>

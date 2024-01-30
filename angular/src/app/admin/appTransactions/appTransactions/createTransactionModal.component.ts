@@ -38,6 +38,8 @@ import { AppComponentBase } from "@shared/common/app-component-base";
 import { throws } from "assert";
 import { UserClickService } from "@shared/utils/user-click.service";
 import { AppConsts } from "@shared/AppConsts";
+import { get } from "http";
+import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 
 @Component({
     templateUrl: "./createTransactionModal.component.html",
@@ -90,6 +92,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
 
     body: any;
     setCurrentUserActiveTransaction: boolean = false;
+    invokeAction = '/DXXRDV';
+    reportUrl="";
+    printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
+
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -604,10 +610,21 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                                 this.addNew = true;
                                 this.userClickService.userClicked("refreshShoppingInfoInTopbar");
                                 this.display = false;
-                                this.hideMainSpinner();
+                            this.hideMainSpinner();
                             });
                     }
                     this.hideMainSpinner();
+
+                    //////
+                    this.printInfoParam.reportTemplateName=this.transactionReportTemplateName;
+                    this.printInfoParam.TransactionId=response;
+                //  this.printInfoParam.orderType=this.formType.toUpperCase();
+                    this.printInfoParam.orderConfirmationRole=this.getTransactionRole(this.body.enteredByUserRole);
+                    this.printInfoParam.saveToPDF=true;
+                    this.printInfoParam.tenantId = this.appSession?.tenantId
+                    this.printInfoParam.userId = this.appSession?.userId
+                    this.reportUrl = this.printInfoParam.getReportUrl()
+                    ///////
                     console.log(response);
                     this.display = false;
                     this.modalClose.emit(false);

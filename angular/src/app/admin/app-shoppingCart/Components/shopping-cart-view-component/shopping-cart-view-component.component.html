@@ -63,10 +63,20 @@
                 </div>
 
                 <div class="p-4 text-right border-left row">
-                    <button type="button" class="btn btn-primary bgPurple border-0 mr-4 pl-4 pr-4 shareBtn disabled"
-                        style="height: 37px;">
-                        <img src="../../../../../assets/shoppingCart/share.svg" /> {{l("Share")}}
+                    <button type="button" class="btn btn-primary bgPurple border-0 mr-4 pl-4 pr-4 shareBtn"
+                        [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
+                        [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                        style="height: 37px;" (click)="onShareTransaction()">
+                        <img src="../../../../../assets/shoppingCart/share.svg" />
+                        {{l("Share")}}
                     </button>
+                    <button type="button" [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
+                        [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                        class="btn btn-primary bgPurple border-0" (click)="printTransaction()" style="width: 85px;
+                    height: 37px;
+                    border-radius: 4px;">
+                        <img src="../../../../../assets/shoppingCart/print.svg" />
+                        {{"Print" | localize}}</button>
 
 
 
@@ -101,7 +111,7 @@
                     </button>
                 </div>
             </div>
-            <div class="row h-100 m-3">
+            <div class="row h-100 m-3" *ngIf="!onshare">
                 <div class="col-8 p-0">
                     <h1 class="mb-4 purpleColor"> {{shoppingCartDetails?.name}} </h1>
                     <p-accordion class="shoppingCartAccordionTabBG mt-4" [(activeIndex)]="activeIndex">
@@ -122,7 +132,9 @@
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     (orderInfoValid)="ontabInfoValid($event)"
                                     [createOrEditorderInfo]="createOrEditorderInfo"
-                                    (ontabChange)="ontabChange($event)"></app-sales-order>
+                                    [oldCreateOrEditorderInfo]="createOrEditorderInfo"
+                                    (ontabChange)="ontabChange($event)"
+                                    (generatOrderReport)="onGeneratOrderReport($event)"></app-sales-order>
                             </ng-template>
                         </p-accordionTab>
                         <!-- order information tab -->
@@ -132,7 +144,7 @@
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="buyerContactInfoValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
+                                    <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!buyerContactInfoValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
                                 </div>
@@ -144,7 +156,8 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)"
-                                        [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"></app-create-or-edit-buyer-seller-contact-info>
+                                        [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"
+                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -154,9 +167,9 @@
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="SellerContactInfoValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
+                                    <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!SellerContactInfoValid"></i>
-                                        <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Sellercontactinfo")}}</h6>
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Sellercontactinfo")}}</h6>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="content">
@@ -166,7 +179,8 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)" [showSaveBtn]="showSaveBtn"
-                                        [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"></app-create-or-edit-buyer-seller-contact-info>
+                                        [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"
+                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -176,9 +190,9 @@
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="SalesRepInfoValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
+                                    <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!SalesRepInfoValid"></i>
-                                        <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("SalesRepInformation")}}
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("SalesRepInformation")}}
                                     </h6>
                                 </div>
                             </ng-template>
@@ -189,7 +203,8 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [showSaveBtn]="showSaveBtn"
-                                        [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"></app-create-or-edit-sales-rep-info>
+                                        [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"
+                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-sales-rep-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -199,9 +214,9 @@
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="shippingInfOValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
+                                    <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!shippingInfOValid"></i>
-                                        <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                     </h6>
                                 </div>
                             </ng-template>
@@ -210,7 +225,8 @@
                                     <app-create-or-add-shipping-information [activeTab]="activeIndex ?  activeIndex :4"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
-                                        [createOrEditshippingInfO]="createOrEditshippingInfO">
+                                        [createOrEditshippingInfO]="createOrEditshippingInfO"
+                                        (generatOrderReport)="onGeneratOrderReport($event)">
                                     </app-create-or-add-shipping-information>
                                 </div>
                             </ng-template>
@@ -220,9 +236,9 @@
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="BillingInfoValid" />
-                                        <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
+                                    <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!BillingInfoValid"></i>
-                                        <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="content">
@@ -230,7 +246,8 @@
                                     <app-create-or-edit-billing-info [activeTab]="activeIndex ?  activeIndex :5"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
-                                        [createOrEditBillingInfo]="createOrEditBillingInfo">
+                                        [createOrEditBillingInfo]="createOrEditBillingInfo"
+                                        (generatOrderReport)="onGeneratOrderReport($event)">
                                     </app-create-or-edit-billing-info>
                                 </div>
                             </ng-template>
@@ -405,6 +422,22 @@
                                 </div>
                             </div>
                         </p-accordionTab>
+                        <!-- order Preview tab -->
+                        <p-accordionTab class="shoppingCartAccordionTabBG"
+                            *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'">
+                            <ng-template pTemplate="header">
+                                <div class="d-inline-block custom-header d-flex">
+                                    <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content">
+                                <app-order-preview 
+                                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                                    [transactionFormPath]="transactionFormPath"
+                                    [orderConfirmationFile]="orderConfirmationFile"></app-order-preview>
+                            </ng-template>
+                        </p-accordionTab>
+                        <!-- order Preview tab -->
                     </p-accordion>
 
 
@@ -479,6 +512,12 @@
                 </div>
 
             </div>
+            <div class="col-12 h-100 " *ngIf="onshare">
+                <app-share-transaction-tab [orderId]="orderId" 
+                [sharedWithUsers]="appTransactionsForViewDto.sharedWithUsers"
+                (closeTranScreenEvent)="hide()"
+                    (offShareTransactionEvent)="offShareTransaction()"></app-share-transaction-tab>
+            </div>
         </div>
     </div>
 
@@ -491,3 +530,6 @@
         </button>
     </div>
 </div>
+
+<report-viewer class="w-100 d-none" [reportUrl]="reportUrl" [invokeAction]="invokeAction">
+</report-viewer>

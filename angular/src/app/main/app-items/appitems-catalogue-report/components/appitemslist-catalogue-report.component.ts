@@ -122,12 +122,12 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
         )
             .subscribe((res) => {
                 this.templates = res.items
-                this.printInfoParam.productsCatalogTemplate = res?.items[0]?.sycReport?.name
+                this.printInfoParam.reportTemplateName = res?.items[0]?.sycReport?.name
             })
     }
 
     chooseTemplateDone(selectedTemplate: GetSycReportForViewDto) {
-        this.printInfoParam.productsCatalogTemplate = selectedTemplate.sycReport.name
+        this.printInfoParam.reportTemplateName = selectedTemplate.sycReport.name
         this.changeStep(PrintCatalogueStepsEnum.DetailInfo)
     }
 

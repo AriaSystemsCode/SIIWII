@@ -20,7 +20,7 @@ export class CatalogueReportChooseTemplateStepComponent extends AppComponentBase
     @Output() previous : EventEmitter<boolean> = new EventEmitter<boolean>()
 
     continueToNextStep(){
-        const selectedTemplate : GetSycReportForViewDto = this.templates.filter(item=>item.sycReport.name == this.printInfoParam.productsCatalogTemplate)[0]
+        const selectedTemplate : GetSycReportForViewDto = this.templates.filter(item=>item.sycReport.name == this.printInfoParam.reportTemplateName)[0]
         if(!selectedTemplate) return this.notify.info("PleaseChooseATemplateFirst")
         this.continue.emit(selectedTemplate)
     }
