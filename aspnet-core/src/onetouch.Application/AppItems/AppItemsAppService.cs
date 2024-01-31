@@ -982,7 +982,7 @@ namespace onetouch.AppItems
                                     secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
                                     foreach (var t in zz)
                                     {
-                                        if (!ss.Contains(t.ToString()))
+                                        if (!ss.Contains(t.Split(',')[0].ToString()+','))
                                             secondAttributeValuesFor1st.Remove(t.ToString());
                                     }
                                     //secondAttributeValuesFor1st = zz;
