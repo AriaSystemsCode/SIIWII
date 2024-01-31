@@ -632,6 +632,11 @@ namespace onetouch.AppSiiwiiTransaction
                                         appCont.ContactAddressPostalCode = addObj.PostalCode;
                                         appCont.ContactAddressState = addObj.State;
                                     }
+                                    else
+                                    {
+                                        appCont.ContactAddressId = null;
+                                        appCont.ContactAddressCountryId = null;
+                                    }
                                 }
                                 else
                                 {
@@ -704,6 +709,11 @@ namespace onetouch.AppSiiwiiTransaction
                                     shipFromContact.ContactAddressPostalCode = addObj.PostalCode;
                                     shipFromContact.ContactAddressState = addObj.State;
                                 }
+                                else
+                                {
+                                    shipFromContact.ContactAddressId = null;
+                                    shipFromContact.ContactAddressCountryId = null;
+                                }
                             }
                             else
                             {
@@ -769,7 +779,13 @@ namespace onetouch.AppSiiwiiTransaction
                                     arContact.ContactAddressLine2 = addObj.AddressLine2;
                                     arContact.ContactAddressName = addObj.Name;
                                     arContact.ContactAddressPostalCode = addObj.PostalCode;
-                                    arContact.ContactAddressState = addObj.State; }
+                                    arContact.ContactAddressState = addObj.State; 
+                                }
+                                else
+                                {
+                                    arContact.ContactAddressId = null;
+                                    arContact.ContactAddressCountryId = null;
+                                }
                             }
                             else
                             {
@@ -846,6 +862,11 @@ namespace onetouch.AppSiiwiiTransaction
                                     shiToContact.ContactAddressPostalCode = addObj.PostalCode;
                                     shiToContact.ContactAddressState = addObj.State;
                                 }
+                                else
+                                {
+                                    shiToContact.ContactAddressId = null;
+                                    shiToContact.ContactAddressCountryId = null;
+                                }
                             }
                             else
                             {
@@ -915,6 +936,11 @@ namespace onetouch.AppSiiwiiTransaction
                                     apContact.ContactAddressPostalCode = addObj.PostalCode;
                                     apContact.ContactAddressState = addObj.State;
                                 }
+                                else
+                                {
+                                    apContact.ContactAddressId = null;
+                                    apContact.ContactAddressCountryId = null;
+                                }
                             }
                             else
                             {
@@ -974,6 +1000,10 @@ namespace onetouch.AppSiiwiiTransaction
                 if (input.lFromPlaceOrder)
                     await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == appTrans.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
 
+                foreach (var con in appTrans.AppTransactionContacts)
+                {
+                    if (con.ContactAddressId == null) con.ContactAddressCountryId = null;
+                }
 
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
                 await CurrentUnitOfWork.SaveChangesAsync();
@@ -3278,7 +3308,7 @@ namespace onetouch.AppSiiwiiTransaction
                 var account = await _appContactRepository.GetAll().Where(s => s.SSIN == companySSIN && s.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
                 if (account != null)
                 {
-                    var addressList = await _appAddressRepository.GetAll().Where(x => x.AccountId == account.Id)
+                    var addressList = await _appAddressRepository.GetAll().Where(x => x.AccountId == account.Id && x.TenantId == AbpSession.TenantId)
                         .WhereIf (!string.IsNullOrEmpty(filter),s=> s.AddressLine1 .Contains(filter) ||
                         s.AddressLine2.Contains(filter) || s.City.Contains(filter) || s.CountryCode.Contains(filter)
                         || s.State.Contains(filter)|| s.PostalCode.Contains(filter) || s.Code.Contains(filter))

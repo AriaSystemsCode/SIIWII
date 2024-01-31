@@ -40,18 +40,21 @@ export class SizeRatioComponent extends AppComponentBase implements OnChanges,Af
     }
   }
   ngOnInit(){
+    console.log('on init')
     this.sizeRatioForm.statusChanges.subscribe(status=>{
       this.statusChanged.emit('VALID' == status)
     })
   }
   ngAfterViewInit(){
-    //comented by mai cause calling function here cause function firing many times
- /*   this.sizeRatioForm.statusChanges.subscribe(status=>{
+    /*this.sizeRatioForm.statusChanges.subscribe(status=>{
+      console.log('after init')
       this.statusChanged.emit('VALID' == status)
     })*/
     
   }
   ngOnDestroy() {
+    console.log('destroy')
+
     this.statusChanged.emit(true)
   }
   sizeRatioNameChanges($event){
@@ -126,7 +129,7 @@ export class SizeRatioComponent extends AppComponentBase implements OnChanges,Af
     this._appSizeScaleServiceProxy.getSizeScaleForEdit(id).subscribe((res)=>{
       this.appSizeRatios.sizeScaleId = res.id
       this.appSizeRatios.name = res.name
-      this.appSizeRatios.appSizeScalesDetails.forEach((appSizeRatioItem)=>{
+      this.appSizeRatios?.appSizeScalesDetails?.forEach((appSizeRatioItem)=>{
         const item = res.appSizeScalesDetails.filter(item=> item.sizeCode == appSizeRatioItem.sizeCode)[0]
         if(item) appSizeRatioItem.sizeRatio = item.sizeRatio
       })

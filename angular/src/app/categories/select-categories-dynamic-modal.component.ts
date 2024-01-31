@@ -124,7 +124,7 @@ export class SelectCategoriesDynamicModalComponent
         }, 500);
         if (data.changesApplied) {
             // add or edit done
-            this.resetList();
+            this.resetList(true);
         }
     }
 
@@ -219,7 +219,7 @@ export class SelectCategoriesDynamicModalComponent
     stopPropagation($event) {
         $event.stopPropagation(); // stop click event bubbling
     }
-    getCategoriesList() {
+    getCategoriesList(Changed?:Boolean) {
         this.loading = true;
         let apiMethod = `getAllWithChildsFor${this.entityObjectName}WithPaging`;
         const subs = this._sycEntityObjectCategoriesServiceProxy[apiMethod](
@@ -292,7 +292,7 @@ export class SelectCategoriesDynamicModalComponent
 
                         const isCached: boolean = !!cachedItem;
 
-                        if (isCached) {
+                        if (isCached && !Changed) {
                             record.children = cachedItem.children;
                             record.expanded = cachedItem.expanded;
                             record.totalChildrenCount =
@@ -429,8 +429,8 @@ export class SelectCategoriesDynamicModalComponent
     onFilter() {
         this.searchSubj.next(this.searchQuery);
     }
-    resetList() {
+    resetList(Changed?:boolean) {
         this.skipCount = 0;
-        this.getCategoriesList();
+        this.getCategoriesList(Changed);
     }
 }
