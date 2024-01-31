@@ -34,7 +34,7 @@
 </div>
 <div class="selected-addr-comp view-mode mb-3"  *ngIf="!isCreateOredit">
     <div class="selected-add-view row">
-        <div class="col-md-12">
+        <div class="col-md-12" *ngIf="showAddressType">
             <label class="label mt-2 mb-2">{{l("AddressType")}} :</label>
             <label class="label mt-2 mb-2 add-type ml-3" *ngIf="selectedAddressDetails"></label>
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
