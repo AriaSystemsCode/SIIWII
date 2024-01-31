@@ -43,6 +43,7 @@
         [contactId]="contactIdShipFrom"
         (updateSelectedAddress)="updateShipFromAddress($event)"
         [selectedAddressDetails]="shipFromSelectedAdd"
+        [showAddressType]="false"
         ></app-address>
         
     </div>
@@ -76,6 +77,7 @@
         [contactId]="contactIdShipTo"
         (updateSelectedAddress)="updateShipToAddress($event)"
         [selectedAddressDetails]="shipToSelectedAdd"
+        [showAddressType]="false"
         ></app-address>
 <div class="row edit-mode ">
     <div class="col-6 mb-4">

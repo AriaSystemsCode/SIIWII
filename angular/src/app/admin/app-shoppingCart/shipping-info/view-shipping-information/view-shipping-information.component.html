@@ -30,6 +30,7 @@
         [isCreateOredit]="createOrEditshippingInfO"
         [contactId]="contactIdFrom"
         [selectedAddressDetails]="selectedAddressDetailsFrom"
+        [showAddressType]="false"
         ></app-address>
         
     </div>
@@ -55,11 +56,12 @@
         [isCreateOredit]="createOrEditshippingInfO"
         [contactId]="contactIdTo"
         [selectedAddressDetails]="selectedAddressDetailsTo"
+        [showAddressType]="false"
         ></app-address>
         <div class="row view-mode mt-2 mb-2">
             <div class="col-6">
                 <label class="label mt-1 mb-1  w-50">{{l("Store")}}</label>
-                <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto.buyerStor}}</label>
+                <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto.buyerStore}}</label>
         
             </div>
             <div class="col-6">
