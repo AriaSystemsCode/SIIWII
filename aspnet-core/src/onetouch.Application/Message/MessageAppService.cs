@@ -211,7 +211,7 @@ namespace onetouch.Message
                     { 
                         message.Messages.ProfilePictureId = (Guid)profilePictureId;
                     }
-                    message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
+                    message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER6+") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
                 }
                 
                 return new MessagePagedResultDto(
