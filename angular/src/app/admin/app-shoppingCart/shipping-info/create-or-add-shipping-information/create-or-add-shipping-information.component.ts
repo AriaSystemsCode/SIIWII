@@ -106,7 +106,20 @@ cancel(){
 }
 save() {
   this.createOrEditshippingInfO = false;
-  this.createOrEditTransaction();
+ 
+ if(!this.shipFromSelectedAdd){
+   this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+  let shipFromObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+  shipFromObj[0]?.companySSIN?this.shipFromSelectedAdd=shipFromObj[0]?.contactAddressDetail:null;
+ }
+ 
+ if(!this.shipToSelectedAdd){
+  let shipToObj=this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
+  shipToObj[0]?.companySSIN?this.shipToSelectedAdd=shipToObj[0]?.contactAddressDetail:null;
+  this.storeVal=this.appTransactionsForViewDto?.buyerStore;
+  this.shipViaValue=this.appTransactionsForViewDto?.shipViaId;
+ }
+ this.createOrEditTransaction();
 }
 updateShipToAddress(addObj){
   this.updateTabInfo(addObj,ContactRoleEnum.ShipToContact);

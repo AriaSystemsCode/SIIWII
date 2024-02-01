@@ -52,6 +52,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
     arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
     this.loadpayTermsListListist();
   }
+
+  
   updateTabInfo(addObj, contactRole) {
     let contactIndex = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
     if (contactIndex < 0 || contactIndex == this.oldappTransactionsForViewDto?.appTransactionContacts?.length) {
@@ -202,5 +204,24 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
       this.oldappTransactionsForViewDto.paymentTermsCode = this.payTermsListList[indx].code;
       this.oldappTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
     }
+  }
+  save() {
+    this.createOrEditBillingInfo = false;
+    this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+    if(!this.apContactSelectedAdd){
+    let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+    apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+  }
+    if(!this.arContactSelectedAdd){
+    let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+    arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
+    }
+
+    this.createOrEditTransaction();
+  }
+  cancel(){
+    this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
+    this.createOrEditBillingInfo = false;
+    this.showSaveBtn = false;
   }
 }

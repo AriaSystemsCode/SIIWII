@@ -4,9 +4,22 @@
     <div class="container-fluid pt-1 mb-3 ">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
-            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
+            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"  *ngIf="!showSaveBtn " class="continuebtn text-center btn float-right">
                  {{l("Continue")}}
             </button>
+               <button *ngIf="showSaveBtn" (click)="save()"
+               class="previewbtn text-center btn float-right">
+               Save
+               <i class="pi pi-check"></i>
+           </button>
+           <button
+           *ngIf="showSaveBtn"
+           (click)="cancel()"
+           class="cancelbtn text-center btn float-right"
+       >
+           Cancel
+           <i class="pi pi-times"></i>
+       </button>
         </div>
         <hr class="my-2" />
         <div class="InfoForm pr-3 thin-scroll">
@@ -36,10 +49,6 @@
     <div class="container-fluid pt-1">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">  {{l("ARContact")}} : </span></h6>
-            <button [disabled]="!(isContactsValid)&&!(addressSelected)" (click)="createOrEditTransaction()"
-             class="continuebtn text-center btn float-right">
-                 {{l("Continue")}}
-            </button>
         </div>
         <hr class="my-2" />
         <div class="InfoForm pr-3 thin-scroll">
@@ -69,12 +78,10 @@
 
     </div>
     <div class="container-fluid pt-1 mb-3 mt-3">
-        <div class="header p-2 my-2 d-flex justify-content-between">
-            <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
-            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right">
-                 {{l("Continue")}}
-            </button>
+        <div class="header p-2 my-2 d-flex  justify-content-between">
+            <h6><span  class="headertxt"> {{l("PaymentInformation")}} : </span></h6>
         </div>
+
         <div class="row edit-mode ">
             <div class="col-6 mb-4">
                 <label class="label mt-1 mb-1">{{l("PaymentTerms")}}:</label>
