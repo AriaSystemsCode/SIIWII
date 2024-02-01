@@ -159,7 +159,7 @@ if(this.sharedWithUsers){
     })
     if(searchArray.length==0){
       isValidContacts=false;
-
+ 
     }
     this.searchContact=searchArray;
     return isValidContacts;
