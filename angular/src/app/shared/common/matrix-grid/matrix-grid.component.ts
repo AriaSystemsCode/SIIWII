@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { LookupLabelDto } from '@shared/service-proxies/service-proxies';
+import { FlatFeatureSelectDto, LookupLabelDto } from '@shared/service-proxies/service-proxies';
 import { SelectItem } from 'primeng/api';
 import { FormInputs } from '../generic-forms/modals/FormInputs';
 import { FormInputType } from '../generic-forms/modals/FormInputType';
@@ -41,6 +41,7 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
   @Input() disableAddCols:boolean
   @Input() disableAddRows:boolean
   @Input() cellLabelField:string = 'value'
+  @Input() readOnly:boolean=false;
   
   
   @Output() _newRow : EventEmitter<any> = new EventEmitter()
@@ -68,7 +69,7 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
       // this.dropDownLists.push()
     }
 
-    if(this.cols?.columns?.length>0 && this.canAddCols)
+    if(this.cols?.columns?.length>0 && !this.readOnly)
       this.canAddRows=true;
       else
       this.canAddRows=false;
