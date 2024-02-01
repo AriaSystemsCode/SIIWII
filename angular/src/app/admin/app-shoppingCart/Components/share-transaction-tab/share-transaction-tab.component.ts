@@ -74,9 +74,8 @@ if(this.sharedWithUsers){
     if(this.sharingListForSave&&this.messageBody)this.dasableShareBtn=false;
     if(this.emailList&&this.messageBody)this.dasableShareBtn=false;
     if(this.readyForSave&&this.sharingListForSave?.length>0)this.dasableShareBtn=false;
-  }
+  } 
   shareTransaction(){
-    let contactUser:any={};
     let newsharingArray=[];
     let shareTranOptionsDto:any={
       transactionId:undefined,
@@ -86,6 +85,7 @@ if(this.sharedWithUsers){
 
     if(this.sharingListForSave&&this.sharingListForSave?.length>0){
       this.sharingListForSave.forEach(function(contact,index){
+        let contactUser:any={};
         contactUser.sharedTenantId=contact.tenantId;
         contactUser.sharedUserId=contact.userId;
         contactUser.sharedUserEMail=contact.email;
@@ -237,7 +237,7 @@ this._AppTransactionServiceProxy.getAccountConnectedContacts(query).subscribe(re
     this.sharingList.forEach(function(contact){
       if(contact.id==id){ contact.removed=true;}
     })
-this.readyForSave=true;
+    this.readyForSave=true;
 this.checkSaveAvilabilty();
 
   }
