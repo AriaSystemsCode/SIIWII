@@ -1104,7 +1104,7 @@ appRootUrl() +
 
 
             <div class="col p-2 m-5 m-md-0" style="padding: 0;border-left: 4px solid #e7e8ef;" *ngIf="showSideBar">
-                <app-app-side-bar [entityTypeName]="messages[selectedMessageIndx]?.RelatedEntityTypeCode" [id]="messages[selectedMessageIndx]?.relatedEntityId" (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
+                <app-app-side-bar [entityTypeName]="messages[selectedMessageIndx]?.relatedEntityObjectTypeCode" [id]="messages[selectedMessageIndx]?.relatedEntityId" (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
             </div>
         </div>
     </div>
