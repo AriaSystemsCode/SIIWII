@@ -150,9 +150,9 @@ if(this.sharedWithUsers){
     let arrindex ;
 
     searchArray.forEach(function(item){
-      indexInsideArray=currentsharingList.findIndex(a => a.id === item.id);
+      indexInsideArray=currentsharingList.findIndex(a => a.userId === item.userId);
       if(indexInsideArray>=0){
-        arrindex= currentsharingList.findIndex(a => a.id === item.id)
+        arrindex= currentsharingList.findIndex(a => a.userId === item.userId)
         searchArray.splice(arrindex, 1);
 
       }
@@ -163,7 +163,7 @@ if(this.sharedWithUsers){
     }
     this.searchContact=searchArray;
     return isValidContacts;
-  } 
+  }  
   selectContact(value){
     this.editMode=true;
     this.checkSaveAvilabilty();
