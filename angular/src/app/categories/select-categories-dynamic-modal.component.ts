@@ -203,6 +203,11 @@ export class SelectCategoriesDynamicModalComponent
                                     item.data.sycEntityObjectCategory.id !=
                                     node.data.sycEntityObjectCategory.id
                             );
+
+                            if ((node as any).parent.children.length === 0) {
+                                (node as any).parent.children = null; // or parentNode.children = [];
+                                (node as any).parent.leaf = true;
+                            }
                         } else {
                             this.displayedRecords =
                                 this.displayedRecords.filter(
