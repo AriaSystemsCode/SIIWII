@@ -106,6 +106,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.tableCell4 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("tableCell4");
             this.tableCell5 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("tableCell5");
             this.tableCell6 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("tableCell6");
+            this.richText1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRRichText>("richText1");
             this.label33 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label33");
             this.label32 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label32");
 
@@ -214,6 +215,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.XRTableCell tableCell4;
         private DevExpress.XtraReports.UI.XRTableCell tableCell5;
         private DevExpress.XtraReports.UI.XRTableCell tableCell6;
+        private DevExpress.XtraReports.UI.XRRichText richText1;
         private DevExpress.XtraReports.UI.XRLabel label33;
         private DevExpress.XtraReports.UI.XRLabel label32;
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
