@@ -86,8 +86,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     invalidSellerPhoneNumber = "";
     invalidBuyerContactEMailAddress = "";
     invalidSellerContactEMailAddress = "";
-    sellerPhoneLabel: string = "Seller Phone Number";
-    buyerPhoneLabel: string = "Buyer Phone Number";
+    sellerPhoneLabel: string = "Phone Number";
+    buyerPhoneLabel: string = "Phone Number";
 
 
     body: any;
@@ -338,7 +338,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             .setValue(event.value.phone);
 
         this.invalidBuyerPhoneNumber = "";
-        this.buyerPhoneLabel = event?.value?.phoneTypeName ? "Buyer " + event?.value?.phoneTypeName + " Number" : this.buyerPhoneLabel;
+        this.buyerPhoneLabel = event?.value?.phoneTypeName ?   event?.value?.phoneTypeName + " Number" : this.buyerPhoneLabel;
+
     }
     handleSellerNameChange(event: any) {
         console.log(">>", event.value);
@@ -351,7 +352,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             .get("sellerContactPhoneNumber")
             .setValue(event.value.phone);
 
-        this.sellerPhoneLabel = event?.value?.phoneTypeName ? "Seller " + event?.value?.phoneTypeName + " Number" : this.sellerPhoneLabel;
+        this.sellerPhoneLabel = event?.value?.phoneTypeName ?  event?.value?.phoneTypeName + " Number" : this.sellerPhoneLabel;
 
     }
 

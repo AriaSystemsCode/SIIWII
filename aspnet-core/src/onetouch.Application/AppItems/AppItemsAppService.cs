@@ -977,12 +977,12 @@ namespace onetouch.AppItems
                                 if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
                                 {
                                     var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
-                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode + "," + a.SizeId.ToString()).ToList();
+                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
                                     var ss = secondAttributeValuesFor1st1.Distinct().ToList();
-                                    secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode + "," + a.SizeId.ToString()).ToList();
+                                    secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
                                     foreach (var t in zz)
                                     {
-                                        if (!ss.Contains(t.ToString()))
+                                        if (!ss.Contains(t.Split(',')[0].ToString()+','))
                                             secondAttributeValuesFor1st.Remove(t.ToString());
                                     }
                                     //secondAttributeValuesFor1st = zz;
@@ -5254,11 +5254,18 @@ namespace onetouch.AppItems
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
+                        appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = appItemSizeScalesHeader.Id);
                         if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
                         {
                             var sizeScaleH = itemScaleData.FirstOrDefault(x => x.ParentId == null);
                             if (sizeScaleH != null)
                             {
+                                var cnt = itemScaleData.Count(x => x.ParentId == null);
+                                if (cnt > 1)
+                                {
+                                    await _appItemSizeScalesHeaderRepository.DeleteAsync(x => x.AppItemId == appItem.Id && x.Id != sizeScaleH.Id && x.ParentId == null);
+                                }
+
                                 if (sizeScaleH.AppItemSizeScalesDetails != null && sizeScaleH.AppItemSizeScalesDetails.Count > 0)
                                 {
                                     foreach (var size in sizeScaleH.AppItemSizeScalesDetails)
@@ -5273,6 +5280,14 @@ namespace onetouch.AppItems
                                             size.IsDeleted = true;
                                             appItemSizeScalesHeader.AppItemSizeScalesDetails.Add(size);
                                         }
+                                    }
+                                }
+                                else 
+                                {
+                                    foreach (var size in appItemSizeScalesHeader.AppItemSizeScalesDetails)
+                                    {
+                                        size.SizeScaleId = appItemSizeScalesHeader.Id;
+                                        await _appItemSizeScalesDetailRepository.InsertAsync(size);
                                     }
                                 }
                             }
@@ -5341,11 +5356,19 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
+                                appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = appItemSizeScalesHeaderRatio.Id);
                                 if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
                                 {
+                                    
                                     var sizeScaleH = itemScaleData.FirstOrDefault(x => x.ParentId != null);
                                     if (sizeScaleH != null)
                                     {
+                                        var cnt = itemScaleData.Count(x => x.ParentId != null);
+                                        if (cnt > 1)
+                                        {
+                                            await _appItemSizeScalesHeaderRepository.DeleteAsync(x=> x.AppItemId == appItem.Id && x.Id != sizeScaleH.Id && x.ParentId != null);
+                                        }
+
                                         if (sizeScaleH.AppItemSizeScalesDetails != null && sizeScaleH.AppItemSizeScalesDetails.Count > 0)
                                         {
                                             foreach (var size in sizeScaleH.AppItemSizeScalesDetails)
@@ -5360,6 +5383,14 @@ namespace onetouch.AppItems
                                                     size.IsDeleted = true;
                                                     appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.Add(size);
                                                 }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foreach (var size in appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails)
+                                            {
+                                                size.SizeScaleId = appItemSizeScalesHeaderRatio.Id;
+                                                await _appItemSizeScalesDetailRepository.InsertAsync(size);
                                             }
                                         }
                                     }

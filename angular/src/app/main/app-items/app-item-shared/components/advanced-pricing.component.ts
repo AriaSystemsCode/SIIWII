@@ -97,9 +97,13 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
         if(this.tenantDefaultCurrency.value == item.currencyId){
           newRow.canotBeRemoved = true
           newRow.canotBeRemovedMsg = this.l('CannotDeleteTheBaseCurrencyRow')
+          this.rows.unshift(newRow)
+          currencyRowIndex = 0
         }
+        else{
         this.rows.push(newRow)
         currencyRowIndex = this.rows.length - 1
+        }
       }
       const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell=>cell.label == item.code)
       if(matrixCellIndex > -1) this.rows[currencyRowIndex].rowValues[matrixCellIndex].value = item.price

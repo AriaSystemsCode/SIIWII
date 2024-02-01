@@ -589,10 +589,16 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
                 appTrans.EnteredUserByRole = input.EnteredByUserRole;
+
                 if (input.lFromPlaceOrder)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                //MMT-Fix Status
                 else
+                {
+                    if (appTrans.EntityObjectStatusId == null)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+                }
+                //MMT - Fix Status 
                 //XX
                 if (appTrans.AppTransactionContacts.Count() == 0)
                 {
@@ -625,6 +631,11 @@ namespace onetouch.AppSiiwiiTransaction
                                         appCont.ContactAddressName = addObj.Name;
                                         appCont.ContactAddressPostalCode = addObj.PostalCode;
                                         appCont.ContactAddressState = addObj.State;
+                                    }
+                                    else
+                                    {
+                                        appCont.ContactAddressId = null;
+                                        appCont.ContactAddressCountryId = null;
                                     }
                                 }
                                 else
@@ -698,6 +709,11 @@ namespace onetouch.AppSiiwiiTransaction
                                     shipFromContact.ContactAddressPostalCode = addObj.PostalCode;
                                     shipFromContact.ContactAddressState = addObj.State;
                                 }
+                                else
+                                {
+                                    shipFromContact.ContactAddressId = null;
+                                    shipFromContact.ContactAddressCountryId = null;
+                                }
                             }
                             else
                             {
@@ -763,7 +779,13 @@ namespace onetouch.AppSiiwiiTransaction
                                     arContact.ContactAddressLine2 = addObj.AddressLine2;
                                     arContact.ContactAddressName = addObj.Name;
                                     arContact.ContactAddressPostalCode = addObj.PostalCode;
-                                    arContact.ContactAddressState = addObj.State; }
+                                    arContact.ContactAddressState = addObj.State; 
+                                }
+                                else
+                                {
+                                    arContact.ContactAddressId = null;
+                                    arContact.ContactAddressCountryId = null;
+                                }
                             }
                             else
                             {
@@ -840,6 +862,11 @@ namespace onetouch.AppSiiwiiTransaction
                                     shiToContact.ContactAddressPostalCode = addObj.PostalCode;
                                     shiToContact.ContactAddressState = addObj.State;
                                 }
+                                else
+                                {
+                                    shiToContact.ContactAddressId = null;
+                                    shiToContact.ContactAddressCountryId = null;
+                                }
                             }
                             else
                             {
@@ -909,6 +936,11 @@ namespace onetouch.AppSiiwiiTransaction
                                     apContact.ContactAddressPostalCode = addObj.PostalCode;
                                     apContact.ContactAddressState = addObj.State;
                                 }
+                                else
+                                {
+                                    apContact.ContactAddressId = null;
+                                    apContact.ContactAddressCountryId = null;
+                                }
                             }
                             else
                             {
@@ -968,6 +1000,10 @@ namespace onetouch.AppSiiwiiTransaction
                 if (input.lFromPlaceOrder)
                     await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == appTrans.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
 
+                foreach (var con in appTrans.AppTransactionContacts)
+                {
+                    if (con.ContactAddressId == null) con.ContactAddressCountryId = null;
+                }
 
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
                 await CurrentUnitOfWork.SaveChangesAsync();
@@ -3272,7 +3308,7 @@ namespace onetouch.AppSiiwiiTransaction
                 var account = await _appContactRepository.GetAll().Where(s => s.SSIN == companySSIN && s.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
                 if (account != null)
                 {
-                    var addressList = await _appAddressRepository.GetAll().Where(x => x.AccountId == account.Id)
+                    var addressList = await _appAddressRepository.GetAll().Where(x => x.AccountId == account.Id && x.TenantId == AbpSession.TenantId)
                         .WhereIf (!string.IsNullOrEmpty(filter),s=> s.AddressLine1 .Contains(filter) ||
                         s.AddressLine2.Contains(filter) || s.City.Contains(filter) || s.CountryCode.Contains(filter)
                         || s.State.Contains(filter)|| s.PostalCode.Contains(filter) || s.Code.Contains(filter))
@@ -3562,11 +3598,11 @@ namespace onetouch.AppSiiwiiTransaction
                             {
                                 string subject = "";
                                 var userTenantInfo  = tenantTrans.FirstOrDefault(z=>z.Contains(shar.SharedTenantId.ToString()));
-                                
+                                AppTransactionHeaders tran = null;
                                 if (userTenantInfo != null)
                                 {
                                     var info = userTenantInfo.Split(',');
-                                    var tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == info[2] && z.TenantId == shar.SharedTenantId).FirstOrDefaultAsync();
+                                    tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == info[2] && z.TenantId == shar.SharedTenantId).FirstOrDefaultAsync();
                                     if (tran != null)
                                     {
                                         if (!string.IsNullOrEmpty(info[0]))
@@ -3582,7 +3618,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 else
                                 {
                                    // var info = userTenantInfo.Split(',');
-                                    var tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
+                                    tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
                                     if (tran != null)
                                         subject = tran.EntityObjectTypeCode.ToUpper() == "SALESORDER" ? ("Sales Order: " + tran.Code + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + tran.Code + " (" + tran.SellerCompanyName + ")");
                                 }
@@ -3592,7 +3628,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     Body = input.Message,
                                     MessageCategory = MessageCategory.UPDATEMESSAGE.ToString(),
                                     MesasgeObjectType = MesasgeObjectType.Message,
-                                    RelatedEntityId = sharedtransactionId,
+                                    RelatedEntityId = tran!=null? tran.Id : sharedtransactionId,
                                     BodyFormat = input.Message,
                                     SendDate = DateTime.Now.Date,
                                     ReceiveDate = DateTime.Now.Date,

@@ -69,6 +69,7 @@ export class ShoppingCartViewComponentComponent
   activeIndex = 0;
   showSaveBtn: boolean = false;
   currencySymbol: string = "";
+  transactionCode:string="";
   transactionFormPath: string = "";
   orderConfirmationFile;
   onshare: boolean = false;
@@ -195,6 +196,7 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
+           this.transactionCode= res.code
 
 
             this.resetTabValidation();
@@ -635,7 +637,7 @@ export class ShoppingCartViewComponentComponent
             if (res) {
               Swal.fire({
                 title: "",
-                text: "Order #" + res + " has been placed successfully",
+                text: "Order #" + this.transactionCode + " has been placed successfully",
                 icon: "success",
                 showCancelButton: false,
                 confirmButtonText: "OK",

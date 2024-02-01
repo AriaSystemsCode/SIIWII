@@ -1270,7 +1270,10 @@ export class CreateOrEditAppItemComponent
     showCreateOrEditVariationPage() {
         if (!this.appItem.entityObjectTypeId) {
             return this.notify.error(this.l("PleaseChooseAProductTypeFirst"));
-        } else if (
+        }else if(!this.appItem?.code){
+            return this.notify.error(this.l("PleaseAddAProductCode"));
+        }
+         else if (
             !this.selectedItemTypeData.extraAttributes ||
             !this.selectedItemTypeData.extraAttributes.extraAttributes ||
             !this.selectedItemTypeData.extraAttributes.extraAttributes.length
@@ -1309,14 +1312,11 @@ export class CreateOrEditAppItemComponent
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
         this.hideVariations(true);
         this.updateProductAvailableQuantity();
-
         if (
             this.appItem.appItemPriceInfos.length ==
             this.appItem?.variationItems[0]?.appItemPriceInfos.length &&
-            Object.values(this.appItem.appItemPriceInfos) !=
-            Object.values(
-                this.appItem?.variationItems[0]?.appItemPriceInfos
-            )
+          this.appItem.appItemPriceInfos['currencyId']!==this.appItem?.variationItems[0]?.appItemPriceInfos['currencyId']
+          &&this.appItem.appItemPriceInfos['price']!==this.appItem?.variationItems[0]?.appItemPriceInfos['price']           
         ) {
             this.message.confirm(
                 "",
@@ -1452,8 +1452,15 @@ export class CreateOrEditAppItemComponent
             );
             let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
+                
+              if(extraAttr?.paginationSetting?.skipCount)
+               extraAttr.paginationSetting.skipCount = 0; 
+            
+               this.loadExtraDataLookupList(extraAttr);
+
             if (modalRefData.selectionDone)
                 extraAttr.selectedValues = modalRefData.selectedRecords;
+
             // if(extraAttr.acceptMultipleValues){ // multi selection
             //     const selectedValues : number[] =  extraAttr.selectedValues
             //     selectedValues.forEach(selectedValue => {
