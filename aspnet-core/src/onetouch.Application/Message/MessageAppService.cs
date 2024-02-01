@@ -184,7 +184,9 @@ namespace onetouch.Message
                                        MesasgeObjectType = o.EntityFk.EntityObjectTypeId == entityObjectTypeComment ? MesasgeObjectType.Comment :  MesasgeObjectType.Message,
                                        //RelatedEntityId = o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId | o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().RelatedEntityId
                                        RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
-                                          ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                          ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0),
+                                       RelatedEntityObjectTypeCode = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityTypeCode   :
+                                          ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().RelatedEntityTypeCode : "")
                                    },
                                };
 
@@ -209,6 +211,7 @@ namespace onetouch.Message
                     { 
                         message.Messages.ProfilePictureId = (Guid)profilePictureId;
                     }
+                    message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER6+") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
                 }
                 
                 return new MessagePagedResultDto(

@@ -3598,11 +3598,11 @@ namespace onetouch.AppSiiwiiTransaction
                             {
                                 string subject = "";
                                 var userTenantInfo  = tenantTrans.FirstOrDefault(z=>z.Contains(shar.SharedTenantId.ToString()));
-                                
+                                AppTransactionHeaders tran = null;
                                 if (userTenantInfo != null)
                                 {
                                     var info = userTenantInfo.Split(',');
-                                    var tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == info[2] && z.TenantId == shar.SharedTenantId).FirstOrDefaultAsync();
+                                    tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == info[2] && z.TenantId == shar.SharedTenantId).FirstOrDefaultAsync();
                                     if (tran != null)
                                     {
                                         if (!string.IsNullOrEmpty(info[0]))
@@ -3618,7 +3618,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 else
                                 {
                                    // var info = userTenantInfo.Split(',');
-                                    var tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
+                                    tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
                                     if (tran != null)
                                         subject = tran.EntityObjectTypeCode.ToUpper() == "SALESORDER" ? ("Sales Order: " + tran.Code + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + tran.Code + " (" + tran.SellerCompanyName + ")");
                                 }
@@ -3628,7 +3628,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     Body = input.Message,
                                     MessageCategory = MessageCategory.UPDATEMESSAGE.ToString(),
                                     MesasgeObjectType = MesasgeObjectType.Message,
-                                    RelatedEntityId = sharedtransactionId,
+                                    RelatedEntityId = tran!=null? tran.Id : sharedtransactionId,
                                     BodyFormat = input.Message,
                                     SendDate = DateTime.Now.Date,
                                     ReceiveDate = DateTime.Now.Date,
