@@ -256,7 +256,7 @@ namespace onetouch.AppItems
                         }            
                      }
                     foreach(var d in listDept)
-                        depts.Add(d);
+                        depts.AddIfNotContains(d);
                 }
                 //MMT
                 var allCategories = input.CategoryFilters.ToList();
