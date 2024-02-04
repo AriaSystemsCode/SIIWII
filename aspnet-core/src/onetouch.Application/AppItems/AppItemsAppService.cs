@@ -178,6 +178,38 @@ namespace onetouch.AppItems
 
         }
         //mmt
+        //MMT2024
+        private async Task<List<long>> LoadDepartmentChildern(long deptId)
+        {
+            //MMT
+
+            //if (input.departmentFilters != null && input.departmentFilters.Count() > 0)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                
+                List<long> listDept = new List<long>();
+                //foreach (var dept in input.departmentFilters)
+                //{
+                    var depts = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.ParentId == deptId && (z.TenantId==null || z.TenantId==AbpSession.TenantId)).Select(z => z.Id).ToListAsync();
+                    if (depts != null && depts.Count() > 0)
+                    {
+                        listDept.AddRange(depts);
+                        foreach (var d in depts)
+                        {
+                           var children =await LoadDepartmentChildern(d);
+                    if (children != null && children.Count() > 0)
+                    {
+                        listDept.AddRange(children);
+
+                    }
+                        }
+                    }
+               
+            return listDept;
+            }
+            //MMT
+        }
+        //MMT2024
         public async Task<PagedResultDto<GetAppItemForViewDto>> GetAll(GetAllAppItemsInput input)
         {
             var stopwatch = new System.Diagnostics.Stopwatch();
@@ -210,8 +242,25 @@ namespace onetouch.AppItems
 
                 var allScales = input.ScalesFilters.ToList();
                 //xx
+                //MMT
+                var depts = input.departmentFilters.ToList();
+                if (input.departmentFilters != null && input.departmentFilters.Count() > 0)
+                {
+                    List<long> listDept = new List<long>();
+                    foreach (var dept in input.departmentFilters)
+                    {
+                        var children = await LoadDepartmentChildern(dept);
+                        if (children != null && children.Count>0)
+                        {
+                            listDept.AddRange(children);
+                        }            
+                     }
+                    foreach(var d in listDept)
+                        depts.Add(d);
+                }
+                //MMT
                 var allCategories = input.CategoryFilters.ToList();
-                allCategories.AddRange(input.departmentFilters.ToList());
+                allCategories.AddRange(depts.ToList());
                 input.CategoryFilters = allCategories.ToArray();
                 #endregion merge categories and departments
                 List<long> SelectedItems = new List<long>();
