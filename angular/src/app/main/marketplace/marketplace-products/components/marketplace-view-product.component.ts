@@ -199,7 +199,7 @@ export class MarketplaceViewProductComponent
     isColorView: boolean = false
     setSizes(index: number) {
         this.currentIndex = index;
-        this.isColorView = true
+        this.isColorView = false
         this.colorAttachmentForMainIamge = this.colorsData[index].colorImg;
         this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex].entityAttachments;
         console.log(this.colorsData[index]);
