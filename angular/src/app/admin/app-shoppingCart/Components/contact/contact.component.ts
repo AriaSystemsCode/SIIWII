@@ -61,11 +61,13 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
     }
     resetSelectedData() {
+        if(this.appTransactionContactsIndex>=0){
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = null;
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch = null;
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = null;
+        }
         this.__selectedPhoneTypeValue = 0;
         this.companyFilterValue = "";
         this.companyNamePlaceholder = "Select Company Name";

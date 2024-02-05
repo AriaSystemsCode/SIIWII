@@ -162,7 +162,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-    this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+  //  this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
@@ -197,10 +197,21 @@ save() {
     this.createOrEditTransaction();
 }
 cancel() {
+  this.setAddress();
     this.appTransactionsForViewDto = JSON.parse(this.oldappTransactionsForViewDto);
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.createOrEditBillingInfo = false;
     this.showSaveBtn = false;
+}
+setAddress(){
+  if(!this.apContactSelectedAdd){
+    let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+    apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+    }
+    if(!this.arContactSelectedAdd){
+    let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+    arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
+    }
 }
 
   updateApContact(addObj) {
