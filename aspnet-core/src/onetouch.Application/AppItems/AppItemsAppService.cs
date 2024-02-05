@@ -4821,10 +4821,33 @@ namespace onetouch.AppItems
                 AppItem itemOrg = new AppItem();
                 if (excelDto.Id != 0)
                 {
+                    //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
+                    bool lNewVariation = false;
+                    var xx = result.Where(x => x.ParentCode == excelDto.Code && x.Id == 0).Count();
+                    if (xx > 0)
+                        lNewVariation = true;
+                    //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
                     switch (excelResultsDTO.RepreateHandler)
                     {
                         case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
-                            continue;
+                            //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
+                            if (lNewVariation == true)
+                            {
+                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .FirstOrDefault();
+                                break;
+                            }
+                            else
+                            //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
+                                continue;
                         case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                                                                  //createOrEditAccountInfoDto.Id = account.Id
 
