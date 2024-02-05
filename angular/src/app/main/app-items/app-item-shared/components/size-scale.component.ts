@@ -467,4 +467,7 @@ selectedRecords=modalRefData.selectedRecords;
 
     this.matrixGrid.canAddRows= this.canAddRows;
   }
+  updateRows(comesrows){
+    this.rows=comesrows;
+   }
 }
