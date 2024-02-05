@@ -186,6 +186,22 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
       this.createOrEditBillingInfo = true;
     }
   }
+  showEditMode() {
+    this.createOrEditBillingInfo = true;
+    this.showSaveBtn = true;
+    this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
+}
+
+save() {
+    this.createOrEditBillingInfo = false;
+    this.createOrEditTransaction();
+}
+cancel() {
+    this.appTransactionsForViewDto = JSON.parse(this.oldappTransactionsForViewDto);
+    this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
+    this.createOrEditBillingInfo = false;
+    this.showSaveBtn = false;
+}
 
   updateApContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.APContact);
