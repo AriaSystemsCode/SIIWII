@@ -43,6 +43,7 @@
         [contactId]="contactIdShipFrom"
         (updateSelectedAddress)="updateShipFromAddress($event)"
         [selectedAddressDetails]="shipFromSelectedAdd"
+        [showAddressType]="false"
         ></app-address>
         
     </div>
@@ -76,6 +77,7 @@
         [contactId]="contactIdShipTo"
         (updateSelectedAddress)="updateShipToAddress($event)"
         [selectedAddressDetails]="shipToSelectedAdd"
+        [showAddressType]="false"
         ></app-address>
 <div class="row edit-mode ">
     <div class="col-6 mb-4">
@@ -85,9 +87,9 @@
     <div class="col-6 mb-4">
         <label class="label mt-1 mb-1">{{l("ShipVia")}}</label>
         <p-dropdown
-        (onChange)="selectShipVia()"
+        (onChange)="selectShipVia($event)"
         id="shipVia"
-        [(ngModel)]="shipViaValue"
+        [(ngModel)]="this.oldappTransactionsForViewDto.shipViaId"
         [options]="shipViaList"
         name="shipVia"
         styleClass="form-control aria-select"

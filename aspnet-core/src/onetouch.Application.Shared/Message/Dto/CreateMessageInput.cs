@@ -35,7 +35,7 @@ namespace onetouch.Message.Dto
         public MesasgeObjectType? MesasgeObjectType { get; set;}
 
         public virtual IList<AppEntityAttachmentDto> EntityAttachments { get; set; }
-
+        public string? MessageCategory { get; set; }
     }
 
     public enum MesasgeObjectType

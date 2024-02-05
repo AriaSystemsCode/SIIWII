@@ -1,7 +1,7 @@
 <form #MatrixGridForm="ngForm" >
     
     <div *ngIf="active" class="matrix-grid-table">
-        <p-table [value]="rows" [columns]="cols.columns" [scrollable]="true" [rowHover]="rowHover"
+        <p-table [value]="rows" [columns]="cols.columns" (onRowReorder)="onRowReorder($event)" [scrollable]="true" [rowHover]="rowHover"
             [reorderableColumns]="reorderableColumns" [className]="'text-center'">
             <ng-template pTemplate="header" let-columns>
                 <tr>
@@ -49,7 +49,6 @@
                                         [appendTo]="'body'"
                                         [baseZIndex]="1051"
                                         [disabled]="rowData.rowHeader.disabled"
-                                        (ngModelChange)="rowHeaderSelectionChange($event,index)"
                                     >
                                         <!-- <ng-template let-item pTemplate="selectedItem">
                                             <span style="vertical-align:middle">{{item.label}}</span>
@@ -70,16 +69,17 @@
                     </td>
                     <td *ngFor="let col of columns;index as i">
                         <div *ngIf="!cellSelectionIsEditable || (cellSelectionIsEditable && !cellSelectionFormInput)else elseCellSelectionTemp">
-                            <span *ngIf="rowData?.rowValues[i]">{{rowData?.rowValues[i][cellLabelField]| currency:' '}}</span>
+                            <span *ngIf="rowData?.rowValues[i]">{{rowData?.rowValues[i][cellLabelField]}}</span>
                         </div>
                         <ng-template #elseCellSelectionTemp>
                             <div [ngSwitch]="cellSelectionFormInput.type">
                                 <span *ngSwitchCase="FormInputType.Number">
                                     <input 
                                         type="number" 
+                                        [id]="rowData.rowHeader.value+index"
                                         [ngModel]='rowData.rowValues[i].value|currency:" "' 
                                         [ngModelOptions]="{updateOn:'blur'}"
-                                        (ngModelChange)="rowData.rowValues[i].value=$event" 
+                                        (ngModelChange)="rowData.rowValues[i].value=convertTodecimal($event)" 
                                         [ngClass]="cellSelectionFormInput.customClass"
                                         [ngStyle]="cellSelectionFormInput.customStyle"
                                         [name]="cellSelectionFormInput.name+'rowData-'+index+'-'+i" 

@@ -25,8 +25,10 @@ label.checkbox {
     font-size: .8rem;
 }
 
-.aria-tag.active {
-    border-color: $green-1!important;
+.aria-tag.active  {
+  border-color: $purple!important;
+  background-color: $purple!important;
+  border-radius: 5px !important;
     .remove-tag {
         display: block;
         color:$grey-4;
@@ -43,6 +45,8 @@ label.checkbox {
 
 .extra-attribute-options-wrapper {
     background-color: $off-white;
+    max-height: 350px;
+    overflow: auto;
 }
 
 
@@ -165,7 +169,7 @@ label.checkbox {
 
 
 .primeng-datatable-container {
-    max-height: 700px;
+    max-height: 540px;
     overflow-x: scroll;
     .row-item {
         background-color: $white !important;;

@@ -44,6 +44,7 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
   
   
   @Output() _newRow : EventEmitter<any> = new EventEmitter()
+  @Output() _updateRows : EventEmitter<any> = new EventEmitter()
   @Output() _cellChange : EventEmitter<any> = new EventEmitter()
   @Output() _newColumn : EventEmitter<any> = new EventEmitter()
   @Output() _rowHeaderSelectionChanged : EventEmitter<{id:number,index:number}> = new EventEmitter()
@@ -57,9 +58,17 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
     super(injector)
   }
   dropDownLists :LookupLabelDto [][]
+  onRowReorder(event){
+    let oldRows=this.rows;
+    this.rows=[];
+    setTimeout(function () {
+      this.rows=oldRows;
+      this.rows=oldRows;
+      this._updateRows.emit(oldRows)
+    }.bind(this), 1);
+  }
   ngOnChanges(changes: SimpleChanges): void {
     this.active = Boolean(this.cols)
-    
     this.matrixGridForm.statusChanges.subscribe(status=>{
       if(!this.colIsEditable && !this.rowHeaderIsEditable && !this.rowHeaderColIsEditable && !this.cellSelectionIsEditable) return
       this._formStatusChange.emit(status)
@@ -68,10 +77,14 @@ export class MatrixGridComponent extends AppComponentBase implements OnChanges {
       // this.dropDownLists.push()
     }
 
-    if(this.cols?.columns?.length>0)
+    if(this.cols?.columns?.length>0 && this.canAddCols)
       this.canAddRows=true;
       else
       this.canAddRows=false;
+  }
+  convertTodecimal(value){
+    let inputvalue=value % 1 ==0?Math.round(value * 100 / 100).toFixed(2):value;
+    return inputvalue;
   }
   addNewRows(rows:MatrixGridRows[]){
     rows.forEach(row=>{

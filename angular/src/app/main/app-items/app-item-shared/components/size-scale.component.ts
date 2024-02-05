@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter,OnInit, Injector, Input, OnChanges, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AppEntityListDynamicModalComponent } from '@app/app-entity-dynamic-modal/app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component';
 import { GenericFormModalComponent } from '@app/shared/common/generic-forms/generic-form-modal.component';
@@ -23,7 +23,7 @@ import { ExtraAttributeDataService } from '../services/extra-attribute-data.serv
   templateUrl: './size-scale.component.html',
   styleUrls: ['./size-scale.component.scss']
 })
-export class SizeScaleComponent extends AppComponentBase implements OnChanges, AfterViewInit,OnDestroy {
+export class SizeScaleComponent extends AppComponentBase implements OnChanges, OnInit,OnDestroy {
   @ViewChild('matrixGrid', { static: true }) matrixGrid: MatrixGridComponent
   @ViewChild('appSelectionModal', { static: true }) appSelectionModal: SelectionModalComponent<GetAppSizeScaleForViewDto>
   @ViewChild('sizeScaleForm', { static: true }) sizeScaleForm: NgForm
@@ -50,7 +50,7 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, A
   ) {
     super(injector);
   }
-  ngAfterViewInit(){
+  ngOnInit(){
     if(this.oldAppSizeScaleDto){
       this.cellSelectionFormInput = new FormInputs<string,LookupLabelDto[]>({ 
         type: FormInputType.Checkbox,
@@ -467,4 +467,7 @@ selectedRecords=modalRefData.selectedRecords;
 
     this.matrixGrid.canAddRows= this.canAddRows;
   }
+  updateRows(comesrows){
+    this.rows=comesrows;
+   }
 }

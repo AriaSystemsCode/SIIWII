@@ -452,7 +452,7 @@ namespace onetouch
             configuration.CreateMap<AppMessage, MessagesDto>()
                 .ForMember(d => d.SendDate, s => s.MapFrom(ss => ss.CreationTime))
                 .ForMember(d => d.ReceiveDate, s => s.MapFrom(ss => ss.CreationTime))
-                .ForMember(d => d.EntityObjectTypeCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeCode))
+                .ForMember(d => d.EntityObjectTypeCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeFk.Code))//.EntityObjectTypeCode
                 .ForMember(d => d.EntityObjectStatusCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectStatusCode));
             configuration.CreateMap<CreateMessageInput, AppMessage>().ReverseMap();
             configuration.CreateMap<CreateMessageInput, AppEntityDto>().ReverseMap();
@@ -850,6 +850,15 @@ namespace onetouch
                 .ForMember(d => d.EntityAttachments, s => s.MapFrom(ss => ss.EntityAttachments))
                 .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityExtraData));
             configuration.CreateMap<AppAddress, ContactAddressDto>();
+
+            configuration.CreateMap<AppEntity, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionHeaders>();
+            configuration.CreateMap <onetouch.AppSiiwiiTransaction.AppTransactionHeaders,onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionHeaders>().ReverseMap();
+            configuration.CreateMap<AppEntity, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionDetails>();
+            configuration.CreateMap<onetouch.AppSiiwiiTransaction.AppTransactionDetails, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionDetails>().ReverseMap();
+           configuration.CreateMap<AppTransactionContacts, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionContacts>().ReverseMap();
+            configuration.CreateMap<AppEntity,AppTransactionHeaders>();
+            configuration.CreateMap<AppEntity, AppTransactionDetails>();
+
         }
     }
 }

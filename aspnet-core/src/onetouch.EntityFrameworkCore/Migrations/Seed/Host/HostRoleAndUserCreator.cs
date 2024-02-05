@@ -38,6 +38,10 @@ namespace onetouch.Migrations.Seed.Host
             CreateHostFileExt();
             CreateHostSystemData();
             CreateHostObjectEntityStatus();
+            CreateHostReportSystemData();
+            //MMT-Iteration37[Start]
+            CreateMessagesCategories();
+            //MMT-Iteration37[End]
         }
 
         private void CreateHostRoleAndUsers()
@@ -177,7 +181,7 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Listing);
                 _context.SaveChanges();
             }
-            
+
 
             //Iteration#29,1 MMT News Digest changes[Start]
             var sycIdentifierDefinitionsObj = _context.SycIdentifierDefinitions.FirstOrDefault(
@@ -568,6 +572,142 @@ namespace onetouch.Migrations.Seed.Host
             #endregion SycEntityObjectTypes
 
         }
+
+        private void CreateHostReportSystemData()
+        {
+            #region Add sydReports
+            var keyList = _context.LanguageTexts.Select(e => e.Key).ToList();
+
+            var sycEntityObjectTypes = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "OrderConfirmationForm1").ToList();
+            if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "OrderConfirmationForm1";
+
+                sycReport.Code = "7";
+                sycReport.Name = "OrderConfirmationForm1";
+                sycReport.Description = "Order confirmation form 1";
+                sycReport.Thumbnail = "Order confirmation form 1";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            var sycReports = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate8").ToList();
+            if (sycReports == null || sycReports.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate8";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate8";
+                sycReport.Description = "(8 Products Per Page) Layout - Landscape Orientation";
+                sycReport.Thumbnail = "ProductsCatalogTemplate8";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            var sycReports9 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate9").ToList();
+            if (sycReports9 == null || sycReports9.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate9";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate9";
+                sycReport.Description = "(6 Products Per Page) Layout - Portrait Orientation";
+                sycReport.Thumbnail = "ProductsCatalogTemplate9";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            var sycReports10 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate10").ToList();
+            if (sycReports10 == null || sycReports10.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate10";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate10";
+                sycReport.Description = "(1 Product Per Page) Layout - Landscape Orientation - Available Quantities per Size";
+                sycReport.Thumbnail = "ProductsCatalogTemplate10";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            var sycReports11 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate11").ToList();
+            if (sycReports11 == null || sycReports10.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate11";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate11";
+                sycReport.Description = "Products Catalog Template 11 Products";
+                sycReport.Thumbnail = "ProductsCatalogTemplate11";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+            #endregion SycEntityObjectTypes
+
+        }
+        //MMT-Iteration37[Start]
+        private void CreateMessagesCategories()
+        {
+            var messageObject =  _context.SydObjects.Where(z => z.Code == "MESSAGE" && z.IsDeleted == false).FirstOrDefault();
+            if (messageObject != null)
+            {
+                var primaryObject = _context.SycEntityObjectCategories.Where(z => z.Code == "PRIMARY-MESSAGE" && z.ObjectId == messageObject.Id).FirstOrDefault();
+                if (primaryObject == null)
+                {
+                    primaryObject = new SycEntityObjectCategory();
+                    primaryObject.ObjectId = messageObject.Id;
+                    primaryObject.ParentId = null;
+                    primaryObject.TenantId = null;
+                    primaryObject.Name = "Primary Message";
+                    primaryObject.ObjectCode = messageObject.Code;
+                    primaryObject.Code = "PRIMARY-MESSAGE";
+                    primaryObject.IsDefault = false;
+                    _context.SycEntityObjectCategories.Add(primaryObject);
+                    _context.SaveChanges();
+                }
+                var updateCategory = _context.SycEntityObjectCategories.Where(z => z.Code == "UPDATE-MESSAGE" && z.ObjectId == messageObject.Id).FirstOrDefault();
+                if (updateCategory == null)
+                {
+                    updateCategory = new SycEntityObjectCategory();
+                    updateCategory.ObjectId = messageObject.Id;
+                    updateCategory.ParentId = null;
+                    updateCategory.TenantId = null;
+                    updateCategory.Name = "Update Message";
+                    updateCategory.ObjectCode = messageObject.Code;
+                    updateCategory.Code = "UPDATE-MESSAGE";
+                    updateCategory.IsDefault = false;
+                    _context.SycEntityObjectCategories.Add(updateCategory);
+                    _context.SaveChanges();
+                }
+
+            }
+        }
+        //MMT-Iteration37[End]
 
     }
 }

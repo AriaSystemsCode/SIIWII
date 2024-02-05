@@ -1709,6 +1709,7 @@
 		<text name="ProductDetails">Product Details</text>
 		<text name="doesnottHaveExtraAttributes.">Doesn't Have Extra Attributes.</text>
 		<text name="PleaseChooseAProductTypeFirst">Please Choose A Product Type First</text>
+    <text name="PleaseAddAProductCode">Please Add A Product code First</text>
 		<text name="fields">fields</text>
 		<text name="CompleteAllTheRequired">Complete All The Required</text>
 		<text name="AreYouSureYouWantToDeleteAllTheAttachments?">Are you sure you want to delete all the attachments?</text>
@@ -1856,6 +1857,7 @@
 		<text name="SaveChanges" >Save changes</text>
 		<text name="ThisListSharedWith" >This list shared with</text>
 		<text name="PublicList's" >Public list's</text>
+    <text name="Share" >Share</text>
 		<text name="SharedWithMe" >Shared with me</text>
 		<text name="Location" >Location</text>
 		<text name="CreateNewProductList" >Create new product list</text>
@@ -2416,5 +2418,15 @@
 		<text name="ARContact">AR Contact</text>
 		<text name="PaymentInformation">Payment Information</text>
 		<text name="PaymentTerms">Payment Terms</text>
-	</texts>  
+  <text name="ShareTransaction">Share Transaction</text>
+    <text name="ManageTransactionToSiiwiiUsers">Manage Transaction To Siiwii Users</text>
+    <text name="SelectedUsersList">Selected Users List</text>
+    <text name="EmailTransactionToNonSiiwiiUsers">Email Transaction To Non Siiwii Users</text>
+    <text name="TypeEmailAddress">Type Email Address</text>
+    <text name="Addamessagehere">Add a message here</text>
+    <text name="Add2">Add</text>
+    <text name="Done">Done</text>
+    <text name="InvalidEmailFormate">Invalid email formate</text>
+    <text name="TransactionHasBeenSent">Transaction has been sent</text>
+  </texts>  
 </localizationDictionary>

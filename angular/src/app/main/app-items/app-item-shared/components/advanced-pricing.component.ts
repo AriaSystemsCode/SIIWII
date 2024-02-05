@@ -97,9 +97,13 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
         if(this.tenantDefaultCurrency.value == item.currencyId){
           newRow.canotBeRemoved = true
           newRow.canotBeRemovedMsg = this.l('CannotDeleteTheBaseCurrencyRow')
+          this.rows.unshift(newRow)
+          currencyRowIndex = 0
         }
+        else{
         this.rows.push(newRow)
         currencyRowIndex = this.rows.length - 1
+        }
       }
       const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell=>cell.label == item.code)
       if(matrixCellIndex > -1) this.rows[currencyRowIndex].rowValues[matrixCellIndex].value = item.price
@@ -108,6 +112,7 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   addNewCurrency() {
     this.matrixGrid.addNewRows([{ rowHeader: { label: '', value: '' }, rowValues: this.pricingHelpersService.setRowValues() }])
   }
+
   submit(){
     debugger
     if(!this.isValid) return this.notify.error(this.l('FormIsInvalid'))
@@ -174,5 +179,8 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   statusChanged(status:string){
     this.isValid = status == 'VALID'
     console.log('statusChanged adv pric',this.isValid)
+  }
+  updateRows(comesrows){
+   this.rows=comesrows;
   }
 }

@@ -74,6 +74,8 @@ import { ActiveDelegatedUsersComboComponent } from "./shared/layout/active-deleg
 import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { MenuModule } from "primeng/menu"; // add this import
 import { DialogModule } from "primeng/dialog";
+import { ChipModule } from 'primeng/chip';
+
 // Metronic
 import {
     PerfectScrollbarModule,
@@ -106,6 +108,7 @@ import { ShoppingCartViewComponentComponent } from "./admin/app-shoppingCart/Com
 import { AccordionModule } from "primeng/accordion";
 import { TreeTableModule } from 'primeng/treetable';
 import { SalesOrderComponent } from "./admin/app-shoppingCart/Components/sales-order/sales-order.component";
+import {OrderPreviewComponent} from "./admin/app-shoppingCart/Components/order-preview/order-preview.component";
 import { ContactComponent } from "./admin/app-shoppingCart/Components/contact/contact.component";
 import { TreeSelectModule } from "primeng/treeselect";
 import { CalendarModule } from 'primeng/calendar';
@@ -120,6 +123,8 @@ import { ViewShippingInformationComponent } from "./admin/app-shoppingCart/shipp
 import { CreateOrAddShippingInformationComponent } from "./admin/app-shoppingCart/shipping-info/create-or-add-shipping-information/create-or-add-shipping-information.component";
 import { CreateOrEditBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/create-or-edit-billing-info/create-or-edit-billing-info.component";
 import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/view-billing-info/view-billing-info.component";
+import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
+import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Components/share-transaction-tab/share-transaction-tab.component";
 
 @NgModule({
     declarations: [
@@ -178,6 +183,7 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
         AppTransactionsBrowseComponent,
         ShoppingCartViewComponentComponent,
         SalesOrderComponent,
+        OrderPreviewComponent,
         CreateOrEditBuyerSellerContactInfoComponent,
         ViewBuyerSellerContactInfoComponent,
         ContactComponent,
@@ -188,7 +194,8 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
         ViewShippingInformationComponent,
         CreateOrAddShippingInformationComponent,
         CreateOrEditBillingInfoComponent,
-        ViewBillingInfoComponent
+        ViewBillingInfoComponent,
+        ShareTransactionTabComponent
     ],
     imports: [
         BrowserAnimationsModule,
@@ -230,7 +237,8 @@ import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/bi
         AccordionModule,
         TreeTableModule,
         TreeSelectModule,
-        CalendarModule, TooltipModule
+        CalendarModule, TooltipModule,DevExpressDemoModule,
+        ChipModule
     ],
     providers: [
         ImpersonationService,

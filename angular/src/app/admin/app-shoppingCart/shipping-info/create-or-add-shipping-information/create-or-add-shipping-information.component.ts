@@ -36,6 +36,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   shipFromSelectedAdd:any;
   shipToSelectedAdd:any;
   shipingTabVaild:boolean=true;
+  @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   constructor(
     injector: Injector,
@@ -117,7 +118,7 @@ createOrEditTransaction() {
   this.showMainSpinner()
   this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
   this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-    .pipe(finalize(() => this.hideMainSpinner()))
+    .pipe(finalize(() => {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
     .subscribe((res) => {
       if (res) {
         this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
@@ -129,9 +130,12 @@ createOrEditTransaction() {
       }
     });
 }
-selectShipVia(){
-    this.oldappTransactionsForViewDto.shipViaId=this.shipViaValue;
-    this.oldappTransactionsForViewDto.shipViaCode=this.shipViaValue;
+selectShipVia($event){
+ var index= this.shipViaList.findIndex(x=>x.value=$event?.value)
+  if(index>=0){
+    this.oldappTransactionsForViewDto.shipViaId=this.shipViaList[index]?.value;
+    this.oldappTransactionsForViewDto.shipViaCode=this.shipViaList[index]?.code;
+  }
 
 }
 enterStore(){

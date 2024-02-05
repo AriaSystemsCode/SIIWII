@@ -93,7 +93,7 @@ export class AppItemsComponent extends AppComponentBase {
     ImportProductsModal: MainImportComponent;
 
     AppItemBrowseEvents = AppItemBrowseEvents
-    loading: boolean = false;
+    loading: boolean = true;
     isModal:boolean = false
     priceListId:number
 

@@ -14,6 +14,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class AddressComponent extends AppComponentBase implements OnInit {
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("selectedAddressDetails") selectedAddressDetails;
+    @Input("showAddressType") showAddressType:boolean=true;
     showAddList:boolean=false;
     addressCode: string;
     addressName: string;

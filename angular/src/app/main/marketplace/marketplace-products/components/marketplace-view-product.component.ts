@@ -156,8 +156,6 @@ export class MarketplaceViewProductComponent
                         this.productDetails = res.appItem;
                         this.productDetails?.minMSRP % 1 ==0?this.productDetails.minMSRP=Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2):null; 
                         this.productDetails?.maxMSRP % 1 ==0?this.productDetails.maxMSRP=Math.round(this.productDetails.maxMSRP * 100 / 100).toFixed(2):null; 
-
-                        console.log(">> res", res);
                         this.productImages = res.appItem.entityAttachments;
                         this.productVarImages = res?.appItem?.variations;
                         let colorVariation: any[] = res.appItem.variations.filter(
@@ -201,7 +199,7 @@ export class MarketplaceViewProductComponent
     isColorView: boolean = false
     setSizes(index: number) {
         this.currentIndex = index;
-        this.isColorView = true
+        this.isColorView = false
         this.colorAttachmentForMainIamge = this.colorsData[index].colorImg;
         this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex].entityAttachments;
         console.log(this.colorsData[index]);
@@ -268,12 +266,16 @@ export class MarketplaceViewProductComponent
         orders.map((order: any) => {
             order.color.sizes.map((size) => {
                 if (this.productDetails.orderByPrePack) {
+                    
                     let multiby =
                         size.sizeRatio * order.color.sizes[0].orderedPrePacks;
                     let priceMultibly = multiby * size.price;
                     qty = qty + multiby;
                     price = price + priceMultibly;
+                    debugger
                 } else {
+                    if (!size.orderedQty)
+                      size.orderedQty = 0
                     let priceMultibly = size.orderedQty * size.price;
                     qty = qty + size.orderedQty;
                     price = price + priceMultibly;
@@ -347,7 +349,7 @@ export class MarketplaceViewProductComponent
 
     // total ordered Price in order by size
     calculatePriceSum(sizes): number {
-        let sum = 0;
+        let sum:any = 0;
         sizes.forEach((item) => {
             let multiby = item.price * item.orderedQty;
             sum = sum + multiby;
@@ -357,10 +359,13 @@ export class MarketplaceViewProductComponent
 
     // totla ratios in order by prepack
     getTotlaPrepackSum() {
-        let sum = 0;
+        let sum:any = 0;
         this.colorsData[this.currentIndex].sizes.forEach((item) => {
             sum = sum + item.sizeRatio;
         });
+        console.log('first pack ' , sum)
+        sum=Math.round(sum * 100 / 100).toFixed(2);
+        console.log('second pack ' , sum)
 
         return sum;
     }
@@ -374,6 +379,7 @@ export class MarketplaceViewProductComponent
                 this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
             sum = sum + multiby;
         });
+
         return sum;
     }
 

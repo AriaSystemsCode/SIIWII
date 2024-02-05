@@ -2,7 +2,7 @@ import { AppConsts } from "@shared/AppConsts"
 import { NameValueOfString } from "@shared/service-proxies/service-proxies"
 
 export class ProductCatalogueReportParamsI {
-    productsCatalogTemplate : string
+    reportTemplateName : string
     itemsListId:number=null;
     reportTitle:string
     userId:number
@@ -29,7 +29,7 @@ export class ProductCatalogueReportParamsI {
 }
 
 export class ProductCatalogueReportParams implements ProductCatalogueReportParamsI {
-    productsCatalogTemplate : string
+    reportTemplateName : string
     itemsListId:number=null;
     reportTitle:string
     userId:number
@@ -59,6 +59,9 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     DetailPageGroupByName: string="";
     DetailPageShowCategory:boolean= false
     ColorPageShowCategory:boolean= false
+    TransactionId: string="";
+    orderConfirmationRole: string="";
+    saveToPDF:boolean= false;
 
 
     private attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
@@ -96,7 +99,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
         else
         bccUsers += this.bccUsers[i].value;
     }
-       url += this.productsCatalogTemplate + "?"
+       url += this.reportTemplateName + "?"
        url += 'itemsListId=' + this.itemsListId
        url += '&reportTitle=' + this.reportTitle
        url += '&userId=' + this.userId
@@ -126,7 +129,9 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&DetailPageGroupByName=" + this.DetailPageGroupByName
        url += "&DetailPageShowCategory=" + this.DetailPageShowCategory
        url += "&ColorPageShowCategory=" + this.ColorPageShowCategory
-       url += "&orderBy=" + this.orderBy
+       url += "&TransactionId=" + this.TransactionId
+       url += "&orderConfirmationRole=" + this.orderConfirmationRole
+       url += "&saveToPDF=" + this.saveToPDF
               return url
     }
 }

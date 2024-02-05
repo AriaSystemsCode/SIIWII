@@ -15,6 +15,9 @@ import { UserClickService } from '@shared/utils/user-click.service';
 import { finalize } from 'rxjs';
 import { ShoppingCartoccordionTabs } from './ShoppingCartoccordionTabs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
+import { request } from 'https';
+import { URL } from 'url';
+import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -66,6 +69,13 @@ export class ShoppingCartViewComponentComponent
   activeIndex = 0;
   showSaveBtn: boolean = false;
   currencySymbol: string = "";
+  transactionCode:string="";
+  transactionFormPath: string = "";
+  orderConfirmationFile;
+  onshare: boolean = false;
+  printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
+  reportUrl: string = "";
+  invokeAction = '/DXXRDV';
 
   constructor(
     injector: Injector,
@@ -149,6 +159,7 @@ export class ShoppingCartViewComponentComponent
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
+    this.onshare = false;
   }
 
   getColumns() {
@@ -168,7 +179,10 @@ export class ShoppingCartViewComponentComponent
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
+        if (res?.entityAttachments?.length > 0)
+          this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
 
+        this.orderConfirmationFile = res.orderConfirmationFile;
         this.loadCommentsList()
 
         //lines
@@ -182,6 +196,9 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
+           this.transactionCode= res.code
+
+
             this.resetTabValidation();
 
             this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
@@ -427,6 +444,7 @@ export class ShoppingCartViewComponentComponent
   }
   onEditQty(rowNode) {
     rowNode.node.data.invalidUpdatedQty = "";
+
     switch (rowNode.level) {
       case 0:
       case 2:
@@ -442,6 +460,7 @@ export class ShoppingCartViewComponentComponent
             this.getShoppingCartData();
             rowNode.node.data.showEditQty = false;
             this.hideMainSpinner();
+            this.onGeneratOrderReport(true)
           });
         break;
 
@@ -467,6 +486,7 @@ export class ShoppingCartViewComponentComponent
               this.getShoppingCartData();
               rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
+              this.onGeneratOrderReport(true)
             });
         } else {
           rowNode.node.data.invalidUpdatedQty =
@@ -474,12 +494,16 @@ export class ShoppingCartViewComponentComponent
             rowNode.node.data.noOfPrePacks +
             ")";
           this.hideMainSpinner();
+          this.onGeneratOrderReport(true)
         }
+
 
         break;
 
       default:
         break;
+
+
     }
   }
   hide() {
@@ -613,7 +637,7 @@ export class ShoppingCartViewComponentComponent
             if (res) {
               Swal.fire({
                 title: "",
-                text: "Order #" + res + " has been placed successfully",
+                text: "Order #" + this.transactionCode + " has been placed successfully",
                 icon: "success",
                 showCancelButton: false,
                 confirmButtonText: "OK",
@@ -684,5 +708,29 @@ export class ShoppingCartViewComponentComponent
 
   onChangeAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
+  }
+
+  printTransaction() {
+    var page = window.open(this.transactionFormPath);
+    page.print();
+  }
+
+  onShareTransaction() {
+    this.onshare = true;
+  }
+  offShareTransaction() {
+    this.onshare = false;
+  }
+  onGeneratOrderReport($event) {
+    if ($event) {
+      this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+      this.printInfoParam.TransactionId = this.orderId.toString();
+      //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+      this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+      this.printInfoParam.saveToPDF = true;
+      this.printInfoParam.tenantId = this.appSession?.tenantId
+      this.printInfoParam.userId = this.appSession?.userId
+      this.reportUrl = this.printInfoParam.getReportUrl()
+    }
   }
 }

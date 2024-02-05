@@ -9,7 +9,7 @@
 		public const int MinNameLength = 2;
 		public const int MaxNameLength = 250;
 
-		public const int MinStateLength = 20;
+		public const int MinStateLength = 2;
 		public const int MaxStateLength = 20;
 
 	}
