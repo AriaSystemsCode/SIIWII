@@ -384,7 +384,7 @@ namespace onetouch.AppItems
                     {
                         // var appItemsJoin 
                         //var appItemsJoin
-                        appItems = from d in filteredOrderedAppItems
+                        appItems = from d in filteredOrderedAppItems.Where(z => (!_appMarketplaceItem.GetAll().Any(f => f.SSIN == z.SSIN && f.TenantOwner == AbpSession.TenantId)) || (_appMarketplaceItem.GetAll().Any(f => f.SSIN == z.SSIN && f.TenantOwner == AbpSession.TenantId && f.SharingLevel == 3)))
                                    join
                                          m in _appMarketplaceItem.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId && a.SharingLevel == 3)
                                          on d.SSIN equals m.Code into j1
