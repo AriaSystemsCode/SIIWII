@@ -84,8 +84,7 @@ export class AddCommentComponent extends AppComponentBase {
     }
 
     mentionContact(event){
-        debugger
-        this.comment.body=event.target.innerHTML;
+      /*  this.comment.body=event.target.innerHTML;
         let inputValueWithoutMentions=event.target.innerHTML;
         if(event.target.childNodes.length>1){
             inputValueWithoutMentions='';
@@ -118,7 +117,7 @@ export class AddCommentComponent extends AppComponentBase {
                     this.showContactSuggstions=true;
                 }
             }
-        }
+        }*/
     }
     saveComment(){
         this.saving = true

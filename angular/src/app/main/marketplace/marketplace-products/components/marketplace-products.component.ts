@@ -4,6 +4,8 @@ import {
     Injector,
     OnDestroy,
     ViewChild,
+    OnInit,
+   SimpleChanges, OnChanges, ViewChildren, ElementRef
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
@@ -31,7 +33,7 @@ import { DatePipe } from "@angular/common";
 import { finalize } from "rxjs";
 import { BreakpointObserver, BreakpointState } from "@angular/cdk/layout";
 import { Paginator } from "primeng/paginator";
-
+import { ProdcutCardComponent } from "./prodcut-card/prodcut-card.component";
 @Component({
     selector: "app-marketplace-products",
     templateUrl: "./marketplace-products.component.html",
@@ -41,9 +43,10 @@ import { Paginator } from "primeng/paginator";
 })
 export class MarketplaceProductsComponent
     extends AppComponentBase
-    implements OnDestroy {
+    implements OnDestroy , OnChanges  {
     @ViewChild("AppItemsBrowseComponent")
     appItemsBrowseComponent: AppItemsComponent;
+    @ViewChildren(ProdcutCardComponent) ProdcutCardComponent: ProdcutCardComponent;
     isFilterHidden: boolean = false;
     sellerData: any;
     isSellerIdExists: boolean = false;
@@ -79,7 +82,8 @@ export class MarketplaceProductsComponent
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _pricingHelperService: PricingHelpersService,
         public datepipe: DatePipe,
-        public breakpointObserver: BreakpointObserver
+        public breakpointObserver: BreakpointObserver,
+        private eleRef: ElementRef
     ) {
         super(injector);
 
@@ -170,7 +174,16 @@ export class MarketplaceProductsComponent
 
         this.checkMediaQuery();
     }
+    ngAfterViewInit() {
+        document.getElementById("_searchInput").focus();
 
+    }
+    
+    ngOnChanges(changes: SimpleChanges) {
+        debugger
+        alert("change")
+        document.getElementById("_searchInput").focus();
+      }
     checkMediaQuery() {
         this.breakpointObserver
             .observe(["(max-width: 900px)"])
@@ -254,6 +267,11 @@ export class MarketplaceProductsComponent
             .subscribe((result) => {
                 this.items = result.items;
                 this.pagesNumber = result.totalCount;
+                if(result.items.length==1){
+                setTimeout(function() {
+                    this.ProdcutCardComponent.first.viewProduct(this.ProdcutCardComponent.first.product.id)
+                }.bind(this), 500);
+                }
             });
     }
 
@@ -275,6 +293,8 @@ export class MarketplaceProductsComponent
         this.skipCount = value.first;
         this.maxResultCount = value.rows;
         this.getAllProducts();
+        document.getElementById("_searchInput").focus();
+
     }
 
     timeOut: any;
