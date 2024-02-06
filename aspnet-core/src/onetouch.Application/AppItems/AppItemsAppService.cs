@@ -5095,6 +5095,7 @@ namespace onetouch.AppItems
                 }
                 //if (excelDto.Id == 0 || !reserAtt)
                 //{
+                if (excelDto.Id == 0)
                 appItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
 
                 //}
@@ -5550,7 +5551,7 @@ namespace onetouch.AppItems
                             appChildItem.Description = excelDto.ProductDescription;
                             appChildItem.Price = decimal.Parse(excelDto.Price);
                             appChildItem.Name = excelDto.Name;
-                            appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+                            //appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
                         }
                         else
                         {
