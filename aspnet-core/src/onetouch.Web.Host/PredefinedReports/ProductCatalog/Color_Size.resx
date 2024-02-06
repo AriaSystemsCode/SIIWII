@@ -128,7 +128,14 @@ private void tableCell52_BeforePrint(object sender, System.ComponentModel.Cancel
 }
 
 private void Color_Size_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
+<<<<<<< HEAD
 Color_Size.Width = 1000;    
+=======
+<<<<<<< HEAD
+=======
+    
+>>>>>>> origin/Iteration37_Esraa
+>>>>>>> Itration-x-521
 }
 
 private void Detail_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -145,7 +152,14 @@ private void Detail_BeforePrint_1(object sender, System.ComponentModel.CancelEve
 }
 
 private void table2_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
+<<<<<<< HEAD
     table2.WidthF=1200;
+=======
+<<<<<<< HEAD
+ 
+=======
+>>>>>>> origin/Iteration37_Esraa
+>>>>>>> Itration-x-521
     
 }
 </value>

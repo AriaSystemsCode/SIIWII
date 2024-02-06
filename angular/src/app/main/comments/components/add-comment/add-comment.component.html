@@ -14,23 +14,30 @@
             <div class="w-80 pt-1">
                 <div class="d-flex flex-column">
                     <div>
-                        <textarea
+                        <div
                             class="w-100"
                             name="commentBody"
                             id="commentBody"
                             cols="20"
                             rows="1"
                             (input)="extendTextAreaHandler($event)"
-                            [placeholder]="(comment.parentId ? 'AddReply' : 'AddComment') | localize"
+                            (keyup)="mentionContact($event)"
                             [(ngModel)]="comment.body"
                             #CommentTextArea
                             [required]="true"
                             [maxlength]="maxAcceptedChars"
-                        ></textarea>
+                            contenteditable="true"
+                        ></div>
+                        <div [ngStyle]="{'left':suggListContLeft+'px','top':suggListTop+'px'}"
+                         class="suggstions-contact-list" *ngIf="showContactSuggstions">
+                             <ul class="contact-list-cont">
+                                <li class="contact" (click)="addContact({name:'Omar Ramadan',company:'SIWII'})">Omar Ramadan @SIWII</li>
+                             </ul>
+                        </div>
                         <ng-container *ngIf="cartStyle;">
 
                         <button
-                        [disabled]="loginForm.invalid"
+                        [disabled]="!comment.body"
                         [buttonBusy]="saving"
                         [busyText]="emptyText"
                         class="send-comment-icon">
