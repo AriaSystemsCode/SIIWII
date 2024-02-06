@@ -384,7 +384,7 @@ namespace onetouch.AppItems
                     {
                         // var appItemsJoin 
                         //var appItemsJoin
-                        appItems = from d in filteredOrderedAppItems
+                        appItems = from d in filteredOrderedAppItems.Where(z => (!_appMarketplaceItem.GetAll().Any(f => f.SSIN == z.SSIN && f.TenantOwner == AbpSession.TenantId)) || (_appMarketplaceItem.GetAll().Any(f => f.SSIN == z.SSIN && f.TenantOwner == AbpSession.TenantId && f.SharingLevel == 3)))
                                    join
                                          m in _appMarketplaceItem.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId && a.SharingLevel == 3)
                                          on d.SSIN equals m.Code into j1
@@ -5118,6 +5118,7 @@ namespace onetouch.AppItems
                 }
                 //if (excelDto.Id == 0 || !reserAtt)
                 //{
+                if (excelDto.Id == 0)
                 appItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
 
                 //}
@@ -5573,7 +5574,7 @@ namespace onetouch.AppItems
                             appChildItem.Description = excelDto.ProductDescription;
                             appChildItem.Price = decimal.Parse(excelDto.Price);
                             appChildItem.Name = excelDto.Name;
-                            appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+                            //appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
                         }
                         else
                         {
