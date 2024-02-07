@@ -319,7 +319,7 @@
             this.xrLabel3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "?ColorPageShowCategory==TRUE AND Upper(?ColorPageSort)==\'MATERIALCONTENT\'"),
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(IsNullOrEmpty([MeterialContent]),\'None\' ,[MeterialContent] )")});
-            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(49.24586F, 38.54167F);
+            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(61.2134F, 39.58333F);
             this.xrLabel3.Multiline = true;
             this.xrLabel3.Name = "xrLabel3";
             this.xrLabel3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
