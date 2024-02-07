@@ -153,7 +153,12 @@ if(this.sharedWithUsers){
       indexInsideArray=currentsharingList.findIndex(a => a.userId === item.userId);
       if(indexInsideArray>=0){
         arrindex= currentsharingList.findIndex(a => a.userId === item.userId)
-        searchArray.splice(arrindex, 1);
+        if(searchArray.length>arrindex){
+                  searchArray.splice(arrindex, 1);
+
+        }else if (searchArray.length==1){
+          searchArray=[];
+        }
 
       }
     })
