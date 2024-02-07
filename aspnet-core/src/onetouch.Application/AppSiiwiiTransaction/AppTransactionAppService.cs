@@ -4392,6 +4392,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;
                     marketplaceTransaction.EntityClassifications = null;
+                    marketplaceTransaction.Code = marketplaceTransaction.TenantOwner.ToString().Trim() + "-" + marketplaceTransaction.Code.Trim();
                     await _appEntityAttachment.DeleteAsync(z => z.EntityId == id);
                     await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == id);
                     await _appEntityClassificationRepository.DeleteAsync(z => z.EntityId == id);
