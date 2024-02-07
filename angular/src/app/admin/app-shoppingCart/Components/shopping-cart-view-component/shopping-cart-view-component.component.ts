@@ -15,8 +15,6 @@ import { UserClickService } from '@shared/utils/user-click.service';
 import { finalize } from 'rxjs';
 import { ShoppingCartoccordionTabs } from './ShoppingCartoccordionTabs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
-import { request } from 'https';
-import { URL } from 'url';
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 
 @Component({
@@ -70,13 +68,13 @@ export class ShoppingCartViewComponentComponent
   showSaveBtn: boolean = false;
   currencySymbol: string = "";
   transactionCode:string="";
-  transactionFormPath: string = "";
+  transactionFormPath:string="";
+  onshare:boolean=false;
   orderConfirmationFile;
-  onshare: boolean = false;
   printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
   reportUrl: string = "";
   invokeAction = '/DXXRDV';
-
+  
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -159,7 +157,6 @@ export class ShoppingCartViewComponentComponent
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
-    this.onshare = false;
   }
 
   getColumns() {
@@ -196,9 +193,6 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
-           this.transactionCode= res.code
-
-
             this.resetTabValidation();
 
             this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
@@ -460,7 +454,6 @@ export class ShoppingCartViewComponentComponent
             this.getShoppingCartData();
             rowNode.node.data.showEditQty = false;
             this.hideMainSpinner();
-            this.onGeneratOrderReport(true)
           });
         break;
 
@@ -486,7 +479,6 @@ export class ShoppingCartViewComponentComponent
               this.getShoppingCartData();
               rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
-              this.onGeneratOrderReport(true)
             });
         } else {
           rowNode.node.data.invalidUpdatedQty =
@@ -494,9 +486,7 @@ export class ShoppingCartViewComponentComponent
             rowNode.node.data.noOfPrePacks +
             ")";
           this.hideMainSpinner();
-          this.onGeneratOrderReport(true)
         }
-
 
         break;
 

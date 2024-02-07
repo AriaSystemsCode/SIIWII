@@ -67,7 +67,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpEditions", t =>
+                    b.ToTable("AbpEditions", null, t =>
                         {
                             t.HasTrigger("AbpEditions_Trigger");
                         });
@@ -110,7 +110,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpFeatures", t =>
+                    b.ToTable("AbpFeatures", null, t =>
                         {
                             t.HasTrigger("AbpFeatures_Trigger");
                         });
@@ -193,7 +193,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpAuditLogs", t =>
+                    b.ToTable("AbpAuditLogs", null, t =>
                         {
                             t.HasTrigger("AbpAuditLogs_Trigger");
                         });
@@ -232,7 +232,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "Name");
 
-                    b.ToTable("AbpPermissions", t =>
+                    b.ToTable("AbpPermissions", null, t =>
                         {
                             t.HasTrigger("AbpPermissions_Trigger");
                         });
@@ -275,7 +275,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "ClaimType");
 
-                    b.ToTable("AbpRoleClaims", t =>
+                    b.ToTable("AbpRoleClaims", null, t =>
                         {
                             t.HasTrigger("AbpRoleClaims_Trigger");
                         });
@@ -385,7 +385,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpUsers", t =>
+                    b.ToTable("AbpUsers", null, t =>
                         {
                             t.HasTrigger("AbpUsers_Trigger");
                         });
@@ -453,7 +453,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "UserName");
 
-                    b.ToTable("AbpUserAccounts", t =>
+                    b.ToTable("AbpUserAccounts", null, t =>
                         {
                             t.HasTrigger("AbpUserAccounts_Trigger");
                         });
@@ -492,7 +492,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "ClaimType");
 
-                    b.ToTable("AbpUserClaims", t =>
+                    b.ToTable("AbpUserClaims", null, t =>
                         {
                             t.HasTrigger("AbpUserClaims_Trigger");
                         });
@@ -534,7 +534,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "LoginProvider", "ProviderKey");
 
-                    b.ToTable("AbpUserLogins", t =>
+                    b.ToTable("AbpUserLogins", null, t =>
                         {
                             t.HasTrigger("AbpUserLogins_Trigger");
                         });
@@ -586,7 +586,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenancyName", "UserNameOrEmailAddress", "Result");
 
-                    b.ToTable("AbpUserLoginAttempts", t =>
+                    b.ToTable("AbpUserLoginAttempts", null, t =>
                         {
                             t.HasTrigger("AbpUserLoginAttempts_Trigger");
                         });
@@ -626,7 +626,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpUserOrganizationUnits", t =>
+                    b.ToTable("AbpUserOrganizationUnits", null, t =>
                         {
                             t.HasTrigger("AbpUserOrganizationUnits_Trigger");
                         });
@@ -663,7 +663,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpUserRoles", t =>
+                    b.ToTable("AbpUserRoles", null, t =>
                         {
                             t.HasTrigger("AbpUserRoles_Trigger");
                         });
@@ -704,7 +704,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpUserTokens", t =>
+                    b.ToTable("AbpUserTokens", null, t =>
                         {
                             t.HasTrigger("AbpUserTokens_Trigger");
                         });
@@ -753,7 +753,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("IsAbandoned", "NextTryTime");
 
-                    b.ToTable("AbpBackgroundJobs", t =>
+                    b.ToTable("AbpBackgroundJobs", null, t =>
                         {
                             t.HasTrigger("AbpBackgroundJobs_Trigger");
                         });
@@ -800,7 +800,7 @@ namespace onetouch.Migrations
                     b.HasIndex("TenantId", "Name", "UserId")
                         .IsUnique();
 
-                    b.ToTable("AbpSettings", t =>
+                    b.ToTable("AbpSettings", null, t =>
                         {
                             t.HasTrigger("AbpSettings_Trigger");
                         });
@@ -832,7 +832,7 @@ namespace onetouch.Migrations
                         .IsUnique()
                         .HasFilter("[EntityFullName] IS NOT NULL AND [TenantId] IS NOT NULL");
 
-                    b.ToTable("AbpDynamicEntityProperties", t =>
+                    b.ToTable("AbpDynamicEntityProperties", null, t =>
                         {
                             t.HasTrigger("AbpDynamicEntityProperties_Trigger");
                         });
@@ -863,7 +863,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("DynamicEntityPropertyId");
 
-                    b.ToTable("AbpDynamicEntityPropertyValues", t =>
+                    b.ToTable("AbpDynamicEntityPropertyValues", null, t =>
                         {
                             t.HasTrigger("AbpDynamicEntityPropertyValues_Trigger");
                         });
@@ -899,7 +899,7 @@ namespace onetouch.Migrations
                         .IsUnique()
                         .HasFilter("[PropertyName] IS NOT NULL AND [TenantId] IS NOT NULL");
 
-                    b.ToTable("AbpDynamicProperties", t =>
+                    b.ToTable("AbpDynamicProperties", null, t =>
                         {
                             t.HasTrigger("AbpDynamicProperties_Trigger");
                         });
@@ -927,7 +927,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("DynamicPropertyId");
 
-                    b.ToTable("AbpDynamicPropertyValues", t =>
+                    b.ToTable("AbpDynamicPropertyValues", null, t =>
                         {
                             t.HasTrigger("AbpDynamicPropertyValues_Trigger");
                         });
@@ -967,7 +967,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityTypeFullName", "EntityId");
 
-                    b.ToTable("AbpEntityChanges", t =>
+                    b.ToTable("AbpEntityChanges", null, t =>
                         {
                             t.HasTrigger("AbpEntityChanges_Trigger");
                         });
@@ -1023,7 +1023,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpEntityChangeSets", t =>
+                    b.ToTable("AbpEntityChangeSets", null, t =>
                         {
                             t.HasTrigger("AbpEntityChangeSets_Trigger");
                         });
@@ -1069,7 +1069,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityChangeId");
 
-                    b.ToTable("AbpEntityPropertyChanges", t =>
+                    b.ToTable("AbpEntityPropertyChanges", null, t =>
                         {
                             t.HasTrigger("AbpEntityPropertyChanges_Trigger");
                         });
@@ -1184,7 +1184,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "Name");
 
-                    b.ToTable("AbpLanguages", t =>
+                    b.ToTable("AbpLanguages", null, t =>
                         {
                             t.HasTrigger("AbpLanguages_Trigger");
                         });
@@ -1237,7 +1237,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "Source", "LanguageName", "Key");
 
-                    b.ToTable("AbpLanguageTexts", t =>
+                    b.ToTable("AbpLanguageTexts", null, t =>
                         {
                             t.HasTrigger("AbpLanguageTexts_Trigger");
                         });
@@ -1301,7 +1301,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpNotifications", t =>
+                    b.ToTable("AbpNotifications", null, t =>
                         {
                             t.HasTrigger("AbpNotifications_Trigger");
                         });
@@ -1347,7 +1347,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "NotificationName", "EntityTypeName", "EntityId", "UserId");
 
-                    b.ToTable("AbpNotificationSubscriptions", t =>
+                    b.ToTable("AbpNotificationSubscriptions", null, t =>
                         {
                             t.HasTrigger("AbpNotificationSubscriptions_Trigger");
                         });
@@ -1400,7 +1400,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AbpTenantNotifications", t =>
+                    b.ToTable("AbpTenantNotifications", null, t =>
                         {
                             t.HasTrigger("AbpTenantNotifications_Trigger");
                         });
@@ -1435,7 +1435,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("UserId", "State", "CreationTime");
 
-                    b.ToTable("AbpUserNotifications", t =>
+                    b.ToTable("AbpUserNotifications", null, t =>
                         {
                             t.HasTrigger("AbpUserNotifications_Trigger");
                         });
@@ -1492,7 +1492,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "Code");
 
-                    b.ToTable("AbpOrganizationUnits", t =>
+                    b.ToTable("AbpOrganizationUnits", null, t =>
                         {
                             t.HasTrigger("AbpOrganizationUnits_Trigger");
                         });
@@ -1530,7 +1530,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "RoleId");
 
-                    b.ToTable("AbpOrganizationUnitRoles", t =>
+                    b.ToTable("AbpOrganizationUnitRoles", null, t =>
                         {
                             t.HasTrigger("AbpOrganizationUnitRoles_Trigger");
                         });
@@ -1563,7 +1563,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpWebhookEvents", t =>
+                    b.ToTable("AbpWebhookEvents", null, t =>
                         {
                             t.HasTrigger("AbpWebhookEvents_Trigger");
                         });
@@ -1600,7 +1600,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("WebhookEventId");
 
-                    b.ToTable("AbpWebhookSendAttempts", t =>
+                    b.ToTable("AbpWebhookSendAttempts", null, t =>
                         {
                             t.HasTrigger("AbpWebhookSendAttempts_Trigger");
                         });
@@ -1640,7 +1640,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpWebhookSubscriptions", t =>
+                    b.ToTable("AbpWebhookSubscriptions", null, t =>
                         {
                             t.HasTrigger("AbpWebhookSubscriptions_Trigger");
                         });
@@ -1749,7 +1749,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AppAdvertisements", t =>
+                    b.ToTable("AppAdvertisements", null, t =>
                         {
                             t.HasTrigger("AppAdvertisements_Trigger");
                         });
@@ -1829,7 +1829,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("AppAddresses", t =>
+                    b.ToTable("AppAddresses", null, t =>
                         {
                             t.HasTrigger("AppAddresses_Trigger");
                         });
@@ -2021,7 +2021,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppContacts", t =>
+                    b.ToTable("AppContacts", null, t =>
                         {
                             t.HasTrigger("AppContacts_Trigger");
                         });
@@ -2064,7 +2064,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ContactId");
 
-                    b.ToTable("AppContactAddresses", t =>
+                    b.ToTable("AppContactAddresses", null, t =>
                         {
                             t.HasTrigger("AppContactAddresses_Trigger");
                         });
@@ -2147,7 +2147,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ContactId");
 
-                    b.ToTable("AppContactPaymentMethods", t =>
+                    b.ToTable("AppContactPaymentMethods", null, t =>
                         {
                             t.HasTrigger("AppContactPaymentMethods_Trigger");
                         });
@@ -2213,7 +2213,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("RelatedEntityId");
 
-                    b.ToTable("AppEntitiesRelationships", t =>
+                    b.ToTable("AppEntitiesRelationships", null, t =>
                         {
                             t.HasTrigger("AppEntitiesRelationships_Trigger");
                         });
@@ -2299,7 +2299,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ObjectId");
 
-                    b.ToTable("AppEntities", t =>
+                    b.ToTable("AppEntities", null, t =>
                         {
                             t.HasTrigger("AppEntities_Trigger");
                         });
@@ -2344,7 +2344,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityId");
 
-                    b.ToTable("AppEntityAddresses", t =>
+                    b.ToTable("AppEntityAddresses", null, t =>
                         {
                             t.HasTrigger("AppEntityAddresses_Trigger");
                         });
@@ -2393,7 +2393,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityId");
 
-                    b.ToTable("AppEntityAttachments", t =>
+                    b.ToTable("AppEntityAttachments", null, t =>
                         {
                             t.HasTrigger("AppEntityAttachments_Trigger");
                         });
@@ -2427,7 +2427,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityObjectCategoryId");
 
-                    b.ToTable("AppEntityCategories", t =>
+                    b.ToTable("AppEntityCategories", null, t =>
                         {
                             t.HasTrigger("AppEntityCategories_Trigger");
                         });
@@ -2461,7 +2461,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityObjectClassificationId");
 
-                    b.ToTable("AppEntityClassifications", t =>
+                    b.ToTable("AppEntityClassifications", null, t =>
                         {
                             t.HasTrigger("AppEntityClassifications_Trigger");
                         });
@@ -2515,7 +2515,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityObjectTypeId");
 
-                    b.ToTable("AppEntityExtraData", t =>
+                    b.ToTable("AppEntityExtraData", null, t =>
                         {
                             t.HasTrigger("AppEntityExtraData_Trigger");
                         });
@@ -2582,7 +2582,7 @@ namespace onetouch.Migrations
                     b.HasIndex("EntityId")
                         .IsUnique();
 
-                    b.ToTable("AppEntityInteractions", t =>
+                    b.ToTable("AppEntityInteractions", null, t =>
                         {
                             t.HasTrigger("AppEntityInteractions_Trigger");
                         });
@@ -2615,7 +2615,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SharedUserId");
 
-                    b.ToTable("AppEntitySharings", t =>
+                    b.ToTable("AppEntitySharings", null, t =>
                         {
                             t.HasTrigger("AppEntitySharings_Trigger");
                         });
@@ -2643,7 +2643,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityId");
 
-                    b.ToTable("AppEntityStates", t =>
+                    b.ToTable("AppEntityStates", null, t =>
                         {
                             t.HasTrigger("AppEntityStates_Trigger");
                         });
@@ -2705,7 +2705,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AppEntityUserReactions", t =>
+                    b.ToTable("AppEntityUserReactions", null, t =>
                         {
                             t.HasTrigger("AppEntityUserReactions_Trigger");
                         });
@@ -2764,7 +2764,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppEventGuests", t =>
+                    b.ToTable("AppEventGuests", null, t =>
                         {
                             t.HasTrigger("AppEventGuests_Trigger");
                         });
@@ -2860,7 +2860,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppEvents", t =>
+                    b.ToTable("AppEvents", null, t =>
                         {
                             t.HasTrigger("AppEvents_Trigger");
                         });
@@ -2908,7 +2908,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppItemSelectors", t =>
+                    b.ToTable("AppItemSelectors", null, t =>
                         {
                             t.HasTrigger("AppItemSelectors_Trigger");
                         });
@@ -3020,7 +3020,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppItems", t =>
+                    b.ToTable("AppItems", null, t =>
                         {
                             t.HasTrigger("AppItems_Trigger");
                         });
@@ -3086,7 +3086,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("AppItemId", "Code", "CurrencyCode");
 
-                    b.ToTable("AppItemPrices", t =>
+                    b.ToTable("AppItemPrices", null, t =>
                         {
                             t.HasTrigger("AppItemPrices_Trigger");
                         });
@@ -3124,7 +3124,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SharedUserId");
 
-                    b.ToTable("AppItemSharing", t =>
+                    b.ToTable("AppItemSharing", null, t =>
                         {
                             t.HasTrigger("AppItemSharing_Trigger");
                         });
@@ -3192,7 +3192,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SizeScaleId");
 
-                    b.ToTable("AppItemSizeScalesDetails", t =>
+                    b.ToTable("AppItemSizeScalesDetails", null, t =>
                         {
                             t.HasTrigger("AppItemSizeScalesDetails_Trigger");
                         });
@@ -3268,7 +3268,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SizeScaleId");
 
-                    b.ToTable("AppItemSizeScalesHeader", t =>
+                    b.ToTable("AppItemSizeScalesHeader", null, t =>
                         {
                             t.HasTrigger("AppItemSizeScalesHeader_Trigger");
                         });
@@ -3336,7 +3336,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SizeScaleId");
 
-                    b.ToTable("AppSizeScalesDetail", t =>
+                    b.ToTable("AppSizeScalesDetail", null, t =>
                         {
                             t.HasTrigger("AppSizeScalesDetail_Trigger");
                         });
@@ -3410,7 +3410,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityId");
 
-                    b.ToTable("AppSizeScalesHeader", t =>
+                    b.ToTable("AppSizeScalesHeader", null, t =>
                         {
                             t.HasTrigger("AppSizeScalesHeader_Trigger");
                         });
@@ -3478,7 +3478,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppItemsLists", t =>
+                    b.ToTable("AppItemsLists", null, t =>
                         {
                             t.HasTrigger("AppItemsLists_Trigger");
                         });
@@ -3520,7 +3520,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ItemsListId");
 
-                    b.ToTable("AppItemsListDetails", t =>
+                    b.ToTable("AppItemsListDetails", null, t =>
                         {
                             t.HasTrigger("AppItemsListDetails_Trigger");
                         });
@@ -3566,7 +3566,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppMarketplaceAccountsPriceLevels", t =>
+                    b.ToTable("AppMarketplaceAccountsPriceLevels", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceAccountsPriceLevels_Trigger");
                         });
@@ -3608,7 +3608,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("AppMarketplaceItemsListId");
 
-                    b.ToTable("AppMarketplaceItemsListDetails", t =>
+                    b.ToTable("AppMarketplaceItemsListDetails", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceItemsListDetails_Trigger");
                         });
@@ -3671,7 +3671,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("CurrencyId");
 
-                    b.ToTable("AppMarketplaceItemPrices", t =>
+                    b.ToTable("AppMarketplaceItemPrices", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceItemPrices_Trigger");
                         });
@@ -3714,7 +3714,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppMarketplaceItemSelectors", t =>
+                    b.ToTable("AppMarketplaceItemSelectors", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceItemSelectors_Trigger");
                         });
@@ -3752,7 +3752,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SharedUserId");
 
-                    b.ToTable("AppMarketplaceItemSharings", t =>
+                    b.ToTable("AppMarketplaceItemSharings", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceItemSharings_Trigger");
                         });
@@ -3817,7 +3817,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SizeScaleId");
 
-                    b.ToTable("AppMarketplaceItemSizeScaleDetails", t =>
+                    b.ToTable("AppMarketplaceItemSizeScaleDetails", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceItemSizeScaleDetails_Trigger");
                         });
@@ -3893,7 +3893,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SizeScaleId");
 
-                    b.ToTable("AppMarketplaceItemSizeScaleHeaders", t =>
+                    b.ToTable("AppMarketplaceItemSizeScaleHeaders", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceItemSizeScaleHeaders_Trigger");
                         });
@@ -4011,7 +4011,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("AppMarketplaceTransactionContacts", t =>
+                    b.ToTable("AppMarketplaceTransactionContacts", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceTransactionContacts_Trigger");
                         });
@@ -4074,7 +4074,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppPosts", t =>
+                    b.ToTable("AppPosts", null, t =>
                         {
                             t.HasTrigger("AppPosts_Trigger");
                         });
@@ -4117,7 +4117,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppActiveTransaction", t =>
+                    b.ToTable("AppActiveTransaction", null, t =>
                         {
                             t.HasTrigger("AppActiveTransaction_Trigger");
                         });
@@ -4245,7 +4245,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("AppTransactionContacts", t =>
+                    b.ToTable("AppTransactionContacts", null, t =>
                         {
                             t.HasTrigger("AppTransactionContacts_Trigger");
                         });
@@ -4280,7 +4280,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppTenantPlans", t =>
+                    b.ToTable("AppTenantPlans", null, t =>
                         {
                             t.HasTrigger("AppTenantPlans_Trigger");
                         });
@@ -4349,7 +4349,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("AppTenantsActivitiesLogs", t =>
+                    b.ToTable("AppTenantsActivitiesLogs", null, t =>
                         {
                             t.HasTrigger("AppTenantsActivitiesLogs_Trigger");
                         });
@@ -4384,7 +4384,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppTransactions", t =>
+                    b.ToTable("AppTransactions", null, t =>
                         {
                             t.HasTrigger("AppTransactions_Trigger");
                         });
@@ -4417,7 +4417,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppAttachments", t =>
+                    b.ToTable("AppAttachments", null, t =>
                         {
                             t.HasTrigger("AppAttachments_Trigger");
                         });
@@ -4473,7 +4473,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "TargetUserId");
 
-                    b.ToTable("AppUserDelegations", t =>
+                    b.ToTable("AppUserDelegations", null, t =>
                         {
                             t.HasTrigger("AppUserDelegations_Trigger");
                         });
@@ -4547,7 +4547,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "NormalizedName");
 
-                    b.ToTable("AbpRoles", t =>
+                    b.ToTable("AbpRoles", null, t =>
                         {
                             t.HasTrigger("AbpRoles_Trigger");
                         });
@@ -4627,7 +4627,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TicketNoteId");
 
-                    b.ToTable("AttachmentInfo", t =>
+                    b.ToTable("AttachmentInfo", null, t =>
                         {
                             t.HasTrigger("AttachmentInfo_Trigger");
                         });
@@ -4711,7 +4711,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("TicketNotes", t =>
+                    b.ToTable("TicketNotes", null, t =>
                         {
                             t.HasTrigger("TicketNotes_Trigger");
                         });
@@ -4980,7 +4980,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("Tickets", t =>
+                    b.ToTable("Tickets", null, t =>
                         {
                             t.HasTrigger("Tickets_Trigger");
                         });
@@ -5007,7 +5007,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AutotaskQueues", t =>
+                    b.ToTable("AutotaskQueues", null, t =>
                         {
                             t.HasTrigger("AutotaskQueues_Trigger");
                         });
@@ -5063,7 +5063,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "UserId", "ReadState");
 
-                    b.ToTable("AppChatMessages", t =>
+                    b.ToTable("AppChatMessages", null, t =>
                         {
                             t.HasTrigger("AppChatMessages_Trigger");
                         });
@@ -5116,7 +5116,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AppFriendships", t =>
+                    b.ToTable("AppFriendships", null, t =>
                         {
                             t.HasTrigger("AppFriendships_Trigger");
                         });
@@ -5173,7 +5173,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Maintainances", t =>
+                    b.ToTable("Maintainances", null, t =>
                         {
                             t.HasTrigger("Maintainances_Trigger");
                         });
@@ -5274,7 +5274,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AppMessages", t =>
+                    b.ToTable("AppMessages", null, t =>
                         {
                             t.HasTrigger("AppMessages_Trigger");
                         });
@@ -5305,7 +5305,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppInvoices", t =>
+                    b.ToTable("AppInvoices", null, t =>
                         {
                             t.HasTrigger("AppInvoices_Trigger");
                         });
@@ -5390,7 +5390,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("Status", "CreationTime");
 
-                    b.ToTable("AppSubscriptionPayments", t =>
+                    b.ToTable("AppSubscriptionPayments", null, t =>
                         {
                             t.HasTrigger("AppSubscriptionPayments_Trigger");
                         });
@@ -5422,7 +5422,7 @@ namespace onetouch.Migrations
                         .IsUnique()
                         .HasFilter("[Key] IS NOT NULL");
 
-                    b.ToTable("AppSubscriptionPaymentsExtensionData", t =>
+                    b.ToTable("AppSubscriptionPaymentsExtensionData", null, t =>
                         {
                             t.HasTrigger("AppSubscriptionPaymentsExtensionData_Trigger");
                         });
@@ -5512,7 +5512,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenancyName");
 
-                    b.ToTable("AbpTenants", t =>
+                    b.ToTable("AbpTenants", null, t =>
                         {
                             t.HasTrigger("AbpTenants_Trigger");
                         });
@@ -5535,7 +5535,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AppBinaryObjects", t =>
+                    b.ToTable("AppBinaryObjects", null, t =>
                         {
                             t.HasTrigger("AppBinaryObjects_Trigger");
                         });
@@ -5563,7 +5563,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SycApplications", t =>
+                    b.ToTable("SycApplications", null, t =>
                         {
                             t.HasTrigger("SycApplications_Trigger");
                         });
@@ -5613,7 +5613,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("SycCounters", t =>
+                    b.ToTable("SycCounters", null, t =>
                         {
                             t.HasTrigger("SycCounters_Trigger");
                         });
@@ -5665,7 +5665,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SycCurrencyExchangeRates", t =>
+                    b.ToTable("SycCurrencyExchangeRates", null, t =>
                         {
                             t.HasTrigger("SycCurrencyExchangeRates_Trigger");
                         });
@@ -5726,7 +5726,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("SycIdentifierDefinitions", t =>
+                    b.ToTable("SycIdentifierDefinitions", null, t =>
                         {
                             t.HasTrigger("SycIdentifierDefinitions_Trigger");
                         });
@@ -5774,7 +5774,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("SycPlanServices", t =>
+                    b.ToTable("SycPlanServices", null, t =>
                         {
                             t.HasTrigger("SycPlanServices_Trigger");
                         });
@@ -5807,7 +5807,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ApplicationId");
 
-                    b.ToTable("SycPlans", t =>
+                    b.ToTable("SycPlans", null, t =>
                         {
                             t.HasTrigger("SycPlans_Trigger");
                         });
@@ -5895,7 +5895,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("SycSegmentIdentifierDefinitions", t =>
+                    b.ToTable("SycSegmentIdentifierDefinitions", null, t =>
                         {
                             t.HasTrigger("SycSegmentIdentifierDefinitions_Trigger");
                         });
@@ -5929,7 +5929,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SycServices", t =>
+                    b.ToTable("SycServices", null, t =>
                         {
                             t.HasTrigger("SycServices_Trigger");
                         });
@@ -5970,7 +5970,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SuiIcons", t =>
+                    b.ToTable("SuiIcons", null, t =>
                         {
                             t.HasTrigger("SuiIcons_Trigger");
                         });
@@ -6052,7 +6052,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("SycAttachmentCategories", t =>
+                    b.ToTable("SycAttachmentCategories", null, t =>
                         {
                             t.HasTrigger("SycAttachmentCategories_Trigger");
                         });
@@ -6102,7 +6102,7 @@ namespace onetouch.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SycAttachmentTypes", t =>
+                    b.ToTable("SycAttachmentTypes", null, t =>
                         {
                             t.HasTrigger("SycAttachmentTypes_Trigger");
                         });
@@ -6135,7 +6135,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ObjectTypeId");
 
-                    b.ToTable("SycEntityLocalization", t =>
+                    b.ToTable("SycEntityLocalization", null, t =>
                         {
                             t.HasTrigger("SycEntityLocalization_Trigger");
                         });
@@ -6211,7 +6211,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SycEntityObjectCategories", t =>
+                    b.ToTable("SycEntityObjectCategories", null, t =>
                         {
                             t.HasTrigger("SycEntityObjectCategories_Trigger");
                         });
@@ -6287,7 +6287,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SycEntityObjectClassifications", t =>
+                    b.ToTable("SycEntityObjectClassifications", null, t =>
                         {
                             t.HasTrigger("SycEntityObjectClassifications_Trigger");
                         });
@@ -6353,7 +6353,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SycEntityObjectStatuses", t =>
+                    b.ToTable("SycEntityObjectStatuses", null, t =>
                         {
                             t.HasTrigger("SycEntityObjectStatuses_Trigger");
                         });
@@ -6432,7 +6432,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SycIdentifierDefinitionId");
 
-                    b.ToTable("SycEntityObjectTypes", t =>
+                    b.ToTable("SycEntityObjectTypes", null, t =>
                         {
                             t.HasTrigger("SycEntityObjectTypes_Trigger");
                         });
@@ -6497,7 +6497,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EntityObjectTypeId");
 
-                    b.ToTable("SycReports", t =>
+                    b.ToTable("SycReports", null, t =>
                         {
                             t.HasTrigger("SycReports_Trigger");
                         });
@@ -6578,7 +6578,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("SycDefaultIdentifierId");
 
-                    b.ToTable("SydObjects", t =>
+                    b.ToTable("SydObjects", null, t =>
                         {
                             t.HasTrigger("SydObjects_Trigger");
                         });
@@ -6634,7 +6634,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("SysObjectTypes", t =>
+                    b.ToTable("SysObjectTypes", null, t =>
                         {
                             t.HasTrigger("SysObjectTypes_Trigger");
                         });
@@ -6661,7 +6661,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("SycTenantInvitatios", t =>
+                    b.ToTable("SycTenantInvitatios", null, t =>
                         {
                             t.HasTrigger("SycTenantInvitatios_Trigger");
                         });
@@ -6692,7 +6692,7 @@ namespace onetouch.Migrations
                     b.Property<decimal?>("WeeklyPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.ToTable("AbpEditions", t =>
+                    b.ToTable("AbpEditions", null, t =>
                         {
                             t.HasTrigger("AbpEditions_Trigger");
                         });
@@ -6709,7 +6709,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("EditionId", "Name");
 
-                    b.ToTable("AbpFeatures", t =>
+                    b.ToTable("AbpFeatures", null, t =>
                         {
                             t.HasTrigger("AbpFeatures_Trigger");
                         });
@@ -6723,7 +6723,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "Name");
 
-                    b.ToTable("AbpFeatures", t =>
+                    b.ToTable("AbpFeatures", null, t =>
                         {
                             t.HasTrigger("AbpFeatures_Trigger");
                         });
@@ -6740,7 +6740,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AbpPermissions", t =>
+                    b.ToTable("AbpPermissions", null, t =>
                         {
                             t.HasTrigger("AbpPermissions_Trigger");
                         });
@@ -6757,7 +6757,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AbpPermissions", t =>
+                    b.ToTable("AbpPermissions", null, t =>
                         {
                             t.HasTrigger("AbpPermissions_Trigger");
                         });
@@ -6809,7 +6809,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TenantId", "NormalizedUserName");
 
-                    b.ToTable("AbpUsers", t =>
+                    b.ToTable("AbpUsers", null, t =>
                         {
                             t.HasTrigger("AbpUsers_Trigger");
                         });
@@ -6830,7 +6830,7 @@ namespace onetouch.Migrations
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime2");
 
-                    b.ToTable("AppMarketplaceItemLists", t =>
+                    b.ToTable("AppMarketplaceItemLists", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceItemLists_Trigger");
                         });
@@ -6867,7 +6867,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("AppMarketplaceItems", t =>
+                    b.ToTable("AppMarketplaceItems", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceItems_Trigger");
                         });
@@ -6929,7 +6929,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("AppMarketplaceTransactionDetails", t =>
+                    b.ToTable("AppMarketplaceTransactionDetails", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceTransactionDetails_Trigger");
                         });
@@ -7038,7 +7038,7 @@ namespace onetouch.Migrations
                     b.Property<long>("TotalQuantity")
                         .HasColumnType("bigint");
 
-                    b.ToTable("AppMarketplaceTransactionHeaders", t =>
+                    b.ToTable("AppMarketplaceTransactionHeaders", null, t =>
                         {
                             t.HasTrigger("AppMarketplaceTransactionHeaders_Trigger");
                         });
@@ -7100,7 +7100,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("AppTransactionDetails", t =>
+                    b.ToTable("AppTransactionDetails", null, t =>
                         {
                             t.HasTrigger("AppTransactionDetails_Trigger");
                         });
@@ -7232,7 +7232,7 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ShipViaId");
 
-                    b.ToTable("AppTransactionHeaders", t =>
+                    b.ToTable("AppTransactionHeaders", null, t =>
                         {
                             t.HasTrigger("AppTransactionHeaders_Trigger");
                         });

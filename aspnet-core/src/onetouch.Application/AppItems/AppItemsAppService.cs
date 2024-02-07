@@ -178,6 +178,38 @@ namespace onetouch.AppItems
 
         }
         //mmt
+        //MMT2024
+        private async Task<List<long>> LoadDepartmentChildern(long deptId)
+        {
+            //MMT
+
+            //if (input.departmentFilters != null && input.departmentFilters.Count() > 0)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                
+                List<long> listDept = new List<long>();
+                //foreach (var dept in input.departmentFilters)
+                //{
+                    var depts = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.ParentId == deptId && (z.TenantId==null || z.TenantId==AbpSession.TenantId)).Select(z => z.Id).ToListAsync();
+                    if (depts != null && depts.Count() > 0)
+                    {
+                        listDept.AddRange(depts);
+                        foreach (var d in depts)
+                        {
+                           var children =await LoadDepartmentChildern(d);
+                    if (children != null && children.Count() > 0)
+                    {
+                        listDept.AddRange(children);
+
+                    }
+                        }
+                    }
+               
+            return listDept;
+            }
+            //MMT
+        }
+        //MMT2024
         public async Task<PagedResultDto<GetAppItemForViewDto>> GetAll(GetAllAppItemsInput input)
         {
             var stopwatch = new System.Diagnostics.Stopwatch();
@@ -210,8 +242,25 @@ namespace onetouch.AppItems
 
                 var allScales = input.ScalesFilters.ToList();
                 //xx
+                //MMT
+                var depts = input.departmentFilters.ToList();
+                if (input.departmentFilters != null && input.departmentFilters.Count() > 0)
+                {
+                    List<long> listDept = new List<long>();
+                    foreach (var dept in input.departmentFilters)
+                    {
+                        var children = await LoadDepartmentChildern(dept);
+                        if (children != null && children.Count>0)
+                        {
+                            listDept.AddRange(children);
+                        }            
+                     }
+                    foreach(var d in listDept)
+                        depts.AddIfNotContains(d);
+                }
+                //MMT
                 var allCategories = input.CategoryFilters.ToList();
-                allCategories.AddRange(input.departmentFilters.ToList());
+                allCategories.AddRange(depts.ToList());
                 input.CategoryFilters = allCategories.ToArray();
                 #endregion merge categories and departments
                 List<long> SelectedItems = new List<long>();
@@ -384,7 +433,7 @@ namespace onetouch.AppItems
                     {
                         // var appItemsJoin 
                         //var appItemsJoin
-                        appItems = from d in filteredOrderedAppItems
+                        appItems = from d in filteredOrderedAppItems.Where(z => (!_appMarketplaceItem.GetAll().Any(f => f.SSIN == z.SSIN && f.TenantOwner == AbpSession.TenantId)) || (_appMarketplaceItem.GetAll().Any(f => f.SSIN == z.SSIN && f.TenantOwner == AbpSession.TenantId && f.SharingLevel == 3)))
                                    join
                                          m in _appMarketplaceItem.GetAll().Where(a => a.TenantOwner == AbpSession.TenantId && a.SharingLevel == 3)
                                          on d.SSIN equals m.Code into j1
@@ -1179,13 +1228,34 @@ namespace onetouch.AppItems
                     //mmt
                     if (input.GetAppItemAttributesInputForCategories == null)
                         input.GetAppItemAttributesInputForCategories = new GetAppItemAttributesInput();
-                    output.AppItem.EntityCategoriesNames = await GetAppItemCategoriesNamesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount, Sorting = input.GetAppItemAttributesInputForCategories.Sorting });
-
+                    //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[Start]
+                    //output.AppItem.EntityCategoriesNames = await GetAppItemCategoriesNamesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount, Sorting = input.GetAppItemAttributesInputForCategories.Sorting });
+                    output.AppItem.EntityCategoriesNames = new PagedResultDto<string>
+                    {
+                        Items = (await GetAppItemCategoriesFullNamesWithPaging(new GetAppItemAttributesWithPagingInput
+                        {
+                            ItemEntityId = appItem.EntityId,
+                            MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount,
+                            SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount,
+                            Sorting = input.GetAppItemAttributesInputForCategories.Sorting
+                        })).Items.Select(z => z.EntityObjectCategoryName).ToList()
+                    };
+                    //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
                     if (input.GetAppItemAttributesInputForClassifications == null)
                         input.GetAppItemAttributesInputForClassifications = new GetAppItemAttributesInput();
-                    output.AppItem.EntityClassificationsNames = await GetAppItemClassificationsNamesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount, Sorting = input.GetAppItemAttributesInputForClassifications.Sorting });
-
-
+                    //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[Start]
+                    //output.AppItem.EntityClassificationsNames = await GetAppItemClassificationsNamesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount, Sorting = input.GetAppItemAttributesInputForClassifications.Sorting });
+                    output.AppItem.EntityClassificationsNames = new PagedResultDto<string>
+                    {
+                        Items = (await GetAppItemClassificationsFullNamesWithPaging(new GetAppItemAttributesWithPagingInput
+                        {
+                            ItemEntityId = appItem.EntityId,
+                            MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount,
+                            SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount,
+                            Sorting = input.GetAppItemAttributesInputForClassifications.Sorting
+                        })).Items.Select(z => z.EntityObjectClassificationName).ToList()
+                    };
+                    //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
                     if (input.GetAppItemAttributesInputForDepartments == null)
                         input.GetAppItemAttributesInputForDepartments = new GetAppItemAttributesInput();
                     //MMT30
@@ -1489,11 +1559,28 @@ namespace onetouch.AppItems
             //mmt
             if (input.GetAppItemAttributesInputForCategories == null)
                 input.GetAppItemAttributesInputForCategories = new GetAppItemAttributesInput();
-            output.AppItem.EntityCategories = await GetAppItemCategoriesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount, Sorting = input.GetAppItemAttributesInputForCategories.Sorting });
-
+            //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[Start]
+            //output.AppItem.EntityCategories = await GetAppItemCategoriesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount, Sorting = input.GetAppItemAttributesInputForCategories.Sorting });
+            output.AppItem.EntityCategories = await GetAppItemCategoriesFullNamesWithPaging(new GetAppItemAttributesWithPagingInput
+            {
+                ItemEntityId = appItem.EntityId,
+                MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount,
+                SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount,
+                Sorting = input.GetAppItemAttributesInputForCategories.Sorting
+            });
+            //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
             if (input.GetAppItemAttributesInputForClassifications == null)
                 input.GetAppItemAttributesInputForClassifications = new GetAppItemAttributesInput();
-            output.AppItem.EntityClassifications = await GetAppItemClassificationsWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount, Sorting = input.GetAppItemAttributesInputForClassifications.Sorting });
+            //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[Start]
+            //output.AppItem.EntityClassifications = await GetAppItemClassificationsWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount, Sorting = input.GetAppItemAttributesInputForClassifications.Sorting });
+            output.AppItem.EntityClassifications = await GetAppItemClassificationsFullNamesWithPaging(new GetAppItemAttributesWithPagingInput
+            {
+                ItemEntityId = appItem.EntityId,
+                MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount,
+                SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount,
+                Sorting = input.GetAppItemAttributesInputForClassifications.Sorting
+            });
+            //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
 
             if (input.GetAppItemAttributesInputForDepartments == null)
                 input.GetAppItemAttributesInputForDepartments = new GetAppItemAttributesInput();
@@ -4821,10 +4908,33 @@ namespace onetouch.AppItems
                 AppItem itemOrg = new AppItem();
                 if (excelDto.Id != 0)
                 {
+                    //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
+                    bool lNewVariation = false;
+                    var xx = result.Where(x => x.ParentCode == excelDto.Code && x.Id == 0).Count();
+                    if (xx > 0)
+                        lNewVariation = true;
+                    //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
                     switch (excelResultsDTO.RepreateHandler)
                     {
                         case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
-                            continue;
+                            //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
+                            if (lNewVariation == true)
+                            {
+                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .FirstOrDefault();
+                                break;
+                            }
+                            else
+                            //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
+                                continue;
                         case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                                                                  //createOrEditAccountInfoDto.Id = account.Id
 
@@ -5095,6 +5205,7 @@ namespace onetouch.AppItems
                 }
                 //if (excelDto.Id == 0 || !reserAtt)
                 //{
+                if (excelDto.Id == 0)
                 appItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
 
                 //}
@@ -5550,7 +5661,7 @@ namespace onetouch.AppItems
                             appChildItem.Description = excelDto.ProductDescription;
                             appChildItem.Price = decimal.Parse(excelDto.Price);
                             appChildItem.Name = excelDto.Name;
-                            appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+                            //appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
                         }
                         else
                         {
@@ -6710,6 +6821,75 @@ namespace onetouch.AppItems
         }
 
         //MMT30[ENd]
+        //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[Start]
+        private string GetClassName(long classId)
+        {
+            string returnName = "";
+            var classFiltered = _sycEntityObjectClassificationRepository.GetAll().Include(a => a.ParentFk).FirstOrDefault(a => a.Id == classId);
+            if (classFiltered != null)
+            {
+                if (classFiltered.ParentId != null)
+                {
+                    returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + GetClassName(long.Parse(classFiltered.ParentId.ToString()));
+                }
+                //else
+                returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + classFiltered.Name;
+            }
+            return returnName;
+
+        }
+        public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppItemCategoriesFullNamesWithPaging(GetAppItemAttributesWithPagingInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                if (input.ItemEntityId == 0 && input.ItemId != 0)
+                {
+                    var appItem = await _appItemRepository.GetAll().Where(r => r.Id == input.ItemId)
+                    .AsNoTracking().FirstOrDefaultAsync();
+                    input.ItemEntityId = appItem.EntityId;
+                }
+                if (input.ItemEntityId != 0)
+                {
+                    // List<string> returnName = new List<string>();
+                    var returnRes = await _appEntitiesAppService.GetAppEntityCategoriesWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.ItemEntityId });
+                    {
+                        foreach (var cat in returnRes.Items)
+                        {
+                            cat.EntityObjectCategoryName = GetDepartmentName(cat.EntityObjectCategoryId);
+                        }
+                    }
+                    return returnRes;
+                }
+                return new PagedResultDto<AppEntityCategoryDto>();
+            }
+        }
+        private async Task<PagedResultDto<AppEntityClassificationDto>> GetAppItemClassificationsFullNamesWithPaging(GetAppItemAttributesWithPagingInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                if (input.ItemEntityId == 0 && input.ItemId != 0)
+                {
+                    var appItem = await _appItemRepository.GetAll().Where(r => r.Id == input.ItemId)
+                    .AsNoTracking().FirstOrDefaultAsync();
+                    input.ItemEntityId = appItem.EntityId;
+                }
+                if (input.ItemEntityId != 0)
+                {
+                    //return await _appEntitiesAppService.GetAppEntityClassificationsNamesWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.ItemEntityId });
+                    var returnRes = await _appEntitiesAppService.GetAppEntityClassificationsWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.ItemEntityId });
+                    if (returnRes != null && returnRes.Items.Count > 0)
+                    {
+                        foreach (var clss in returnRes.Items)
+                        {
+                            clss.EntityObjectClassificationName = GetClassName(clss.EntityObjectClassificationId);
+                        }
+                    }
+                    return returnRes;
+                }
+                return new PagedResultDto<AppEntityClassificationDto>();
+            }
+        }
+        //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
     }
     //MMT
     public sealed class AppItemExcelDtoProfile : Profile

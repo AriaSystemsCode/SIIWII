@@ -28,7 +28,8 @@
                         <img  class="userImage"
                          [src]="contact?.userImage?contact.userImage:'assets/common/images/default-profile-picture.png'"  
                         />
-                        <div>{{ contact.name }} @ {{contact.tenantName}}</div>
+                        <span class="ml-2 font-medium" *ngIf="!contact.userName">{{contact.name}} @ {{contact.tenantName}}</span>
+                        <span class="ml-2 font-medium" *ngIf="contact.userName">{{contact.userName}}</span>
                     </div>
                 </ng-template>
                 <ng-template let-contact pTemplate="selectedItem">
@@ -36,8 +37,8 @@
                         <img   class="userImage" 
                         [src]="contact?.userImage?contact?.userImage:'assets/common/images/default-profile-picture.png'"  
                         />
-                        <div>{{ contact.name }} @ {{contact.tenantName}}</div>
-                    </div>
+                        <span class="ml-2 font-medium" *ngIf="!contact.userName" >{{contact.name}} @ {{contact.tenantName}}</span>
+                        <span class="ml-2 font-medium" *ngIf="contact.userName" >{{contact.userName}}</span>                    </div>
                 </ng-template>
 
             </p-autoComplete> 
