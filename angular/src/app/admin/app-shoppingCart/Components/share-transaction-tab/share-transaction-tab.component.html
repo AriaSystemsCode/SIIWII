@@ -8,7 +8,7 @@
     <div class="orderForm shareSectionCont  position-relative p-2">
         <div class="container-fluid orderInfoForm thin-scroll">
             <div class="header p-2 my-2 d-flex align-items-center  ">
-                <h6><span class="headertxt">{{'ManageTransactionToSiiwiiUsers' | localize}}</span></h6>
+                <h6><span class="headertxt">{{'MessageTransactionToSiiwiiUsers' | localize}}</span></h6>
             </div>
             <hr class="my-2" />
             </div>
@@ -94,9 +94,12 @@
             </div>
 
 <div class="col-12 p-3 pl-4 pr-4" *ngIf="editMode">
+    <div class="col-12 pt-3 pl-0 pr-4">
+        <label class="label">{{'Addamessagehere'| localize}} <span style="color: red;">*</span></label>
+    </div>
     <textarea class="form-control w-100 "
     (input)="checkSaveAvilabilty()"
-     [(ngModel)]="messageBody" placeholder="{{'Addamessagehere'| localize}}....."></textarea>
+     [(ngModel)]="messageBody" placeholder="{{'MessageBody'| localize}}....."></textarea>
 </div>
 
         </div>
@@ -107,7 +110,9 @@
                  [disabled]="dasableShareBtn"
                  *ngIf="editMode||readyForSave"
                  >
-                 {{'Share'| localize}}</button>
+                 <span *ngIf="!saveText" >{{'Share'| localize}}</span>
+                 <span *ngIf="saveText">{{'Save'| localize}}</span>
+                </button>
                 <button class="text-center btn btn-success float-right ml-2 mr-2"
                 [disabled]="!sharingListForSave||sharingListForSave?.length==0"
                  *ngIf="sharedBefore&&!editMode&&!readyForSave" (click)="closeShareMode()">{{'Done'| localize}}</button>
