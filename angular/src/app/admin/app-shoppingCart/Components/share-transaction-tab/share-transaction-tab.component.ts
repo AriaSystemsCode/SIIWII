@@ -139,6 +139,7 @@ if(this.sharedWithUsers){
     
       }
       this.sharingList=result;
+      this.sharingListForSave=result;
     })
     
   }
