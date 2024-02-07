@@ -48,29 +48,29 @@ namespace onetouch.AppSiiwiiTransaction
         [ForeignKey("TransactionId")]
         public virtual AppTransactionHeaders TransactionIdFK { set; get; }
         [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
-        public virtual string ContactAddressCode { set; get; }
+        public virtual string? ContactAddressCode { set; get; }
         [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
-        public virtual string ContactAddressName { get; set; }
+        public virtual string? ContactAddressName { get; set; }
 
         [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
-        public virtual string ContactAddressLine1 { get; set; }
+        public virtual string? ContactAddressLine1 { get; set; }
 
         [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
-        public virtual string ContactAddressLine2 { get; set; }
+        public virtual string? ContactAddressLine2 { get; set; }
 
         [StringLength(AppAddressConsts.MaxCodeLength, MinimumLength = AppAddressConsts.MinCodeLength)]
-        public virtual string ContactAddressCity { get; set; }
+        public virtual string? ContactAddressCity { get; set; }
 
         [StringLength(AppAddressConsts.MaxStateLength, MinimumLength = AppAddressConsts.MinStateLength)]
-        public virtual string ContactAddressState { get; set; }
+        public virtual string? ContactAddressState { get; set; }
 
         [StringLength(AppAddressConsts.MaxStateLength, MinimumLength = AppAddressConsts.MinStateLength)]
-        public virtual string ContactAddressPostalCode { get; set; }
+        public virtual string? ContactAddressPostalCode { get; set; }
 
         public virtual long? ContactAddressCountryId { get; set; }
 
         [StringLength(AppAddressConsts.MaxCodeLength, MinimumLength = AppAddressConsts.MinCodeLength)]
-        public virtual string ContactAddressCountryCode { get; set; }
+        public virtual string? ContactAddressCountryCode { get; set; }
 
         [ForeignKey("ContactAddressCountryId")]
         public virtual AppEntity ContactAddressCountryFk { get; set; }
