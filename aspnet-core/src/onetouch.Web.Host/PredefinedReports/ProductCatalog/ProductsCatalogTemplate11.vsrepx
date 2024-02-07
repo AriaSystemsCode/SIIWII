@@ -100,7 +100,7 @@
       <HierarchyPrintOptions Ref="65" Indent="50.8" />
       <MultiColumn Ref="66" ColumnWidth="1310" Layout="AcrossThenDown" Mode="UseColumnCount" />
       <Controls>
-        <Item1 Ref="67" ControlType="XRSubreport" Name="subreport1" SizeF="1052.80127,1596.03564" LocationFloat="1067.95728,26.27682" Dpi="254">
+        <Item1 Ref="67" ControlType="XRSubreport" Name="subreport1" SizeF="1052.80127,1035.11877" LocationFloat="1064.39453,200.901825" Dpi="254">
           <Scripts Ref="68" OnBeforePrint="subreport1_BeforePrint" />
         </Item1>
         <Item2 Ref="69" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="2764.8125,1670.28369" LocationFloat="1.18738711,0" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
