@@ -134,7 +134,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
         if (res) {
-          this.oldappTransactionsForViewDto = JSON.stringify(this.appTransactionsForViewDto);
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
           if (!this.showSaveBtn)
             this.ontabChange.emit(ShoppingCartoccordionTabs.ShippingInfo);
 

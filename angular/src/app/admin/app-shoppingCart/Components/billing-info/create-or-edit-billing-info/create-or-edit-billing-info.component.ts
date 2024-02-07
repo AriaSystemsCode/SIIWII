@@ -167,7 +167,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
         if (res) {
-          this.oldappTransactionsForViewDto = JSON.stringify(this.appTransactionsForViewDto);
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
           if (!this.showSaveBtn) {
             this.ontabChange.emit(ShoppingCartoccordionTabs.BillingInfo);
           }
@@ -189,11 +189,12 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   showEditMode() {
     this.createOrEditBillingInfo = true;
     this.showSaveBtn = true;
-    this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
+    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
 }
 
 save() {
     this.createOrEditBillingInfo = false;
+    this.setAddress();
     this.createOrEditTransaction();
 }
 cancel() {
