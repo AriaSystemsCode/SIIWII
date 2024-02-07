@@ -2011,7 +2011,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 .WhereIf(!string.IsNullOrEmpty(colorCodeFilter), e => e.AttributeValue == colorCodeFilter || (e.AttributeValueId != null && e.AttributeValueId.ToString() == colorCodeFilter))
                                 .ToList();
                             var lineColorsList = lineColorExtraData.Select(e => new LookupLabelDto()
-                            { Code = e.EntityObjectTypeCode, Label = e.AttributeValue, Value = (long)e.AttributeValueId }).DistinctBy(e => e.Label).ToList();
+                            { Code = e.EntityObjectTypeCode, Label = e.AttributeValue, Value = (e.AttributeValueId ==null ? 0 : (long)e.AttributeValueId) }).DistinctBy(e => e.Label).ToList();
                             foreach (var color in lineColorsList)
                             {  // add color line
                                 DetailView colorDetailView = new DetailView();
@@ -3400,7 +3400,7 @@ namespace onetouch.AppSiiwiiTransaction
                           select new { contact = e, role = t.ContactRole};
 
             
-            var contacts = await contact.WhereIf(!string.IsNullOrEmpty(filter), z => z.contact.Name.Contains(filter)).Distinct().ToListAsync();
+            var contacts = await contact.WhereIf(!string.IsNullOrEmpty(filter), z => z.contact.Name.Contains(filter)).OrderBy(z=>z.contact.Id).ToListAsync();
             //var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
                  //.WhereIf(!string.IsNullOrEmpty(filter), z => z.Name.Contains(filter))
                 //.Where(z => z.TenantId == AbpSession.TenantId &&
@@ -3412,7 +3412,7 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     foreach (var con in contacts)
                     {
-                        if (con.contact == null)
+                        if (con.contact == null || con.contact.EntityFk.EntityExtraData ==null || con.contact.EntityFk.EntityExtraData.Count==0 || con.contact.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue ==null)
                             continue;
 
                         try
@@ -3422,6 +3422,7 @@ namespace onetouch.AppSiiwiiTransaction
                             {
                                 ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
                                 var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
+                                     if (output.FirstOrDefault(z=>z.UserId == long.Parse(con.contact.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue))==null)
                                 output.Add(new ContactInformationOutputDto
                                 {
                                     Id = con.contact.Id,
@@ -3492,12 +3493,17 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 var transContacts = _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == input.TransactionId);
-                var transTenants = from o in transContacts
-                                   join
-                                   a in _appContactRepository.GetAll().Where(z => z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantId != null && z.PartnerId == null)
-                                   on o.ContactSSIN equals a.SSIN into j
-                                   from s in j.DefaultIfEmpty()
-                                   select new { TenantId = s.TenantId, Role = o.ContactRole };
+                //var transTenants = from o in transContacts
+                //                   join
+                //                   a in _appContactRepository.GetAll().Where(z => z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantId != null && z.PartnerId == null)
+                //                   on o.ContactSSIN equals a.SSIN into j
+                //                   from s in j.DefaultIfEmpty()
+                //                   select new { TenantId = s.TenantId, Role = o.ContactRole };
+                var transTenants = transContacts.Join(
+                    _appContactRepository.GetAll().Where(z => z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantId != null && z.PartnerId == null && z.IsProfileData),
+                                                      x => x.ContactSSIN, z => z.SSIN,
+                                                      (s, sa) => new { TenantId = sa.TenantId, Role = s.ContactRole });
+                                  
                 var transTenantsList = transTenants.ToList();
 
 
@@ -3686,17 +3692,19 @@ namespace onetouch.AppSiiwiiTransaction
                             tenantTransaction.Code =await GetTenantNextOrderNumber("SO", tenantId);
                             tenantTransaction.Name = "Sales Order#" + tenantTransaction.Code.TrimEnd();
                             tenantTransaction.EntityObjectTypeId = soType;
+                            tenantTransaction.EntityObjectTypeCode = "SALESORDER";
                         }
                         else
                         {
                             tenantTransaction.Code =await GetTenantNextOrderNumber("PO", tenantId);
                             tenantTransaction.Name = "Purchase Order#" + tenantTransaction.Code.TrimEnd();
                             tenantTransaction.EntityObjectTypeId = poType;
+                            tenantTransaction.EntityObjectTypeCode = "PURCHASEORDER";
                         }
 
                         returnTran = tenantTransaction.Code;
 
-                        var existingTrand =await _appTransactionsHeaderRepository.GetAll().Where(z => z.TenantId == tenantId && z.Code == tenantTransaction.Code && z.EntityObjectStatusId == null).FirstOrDefaultAsync();
+                        var existingTrand =await _appTransactionsHeaderRepository.GetAll().Where(z => z.TenantId == tenantId && z.Code == tenantTransaction.Code && z.EntityObjectStatusId == null && z.EntityObjectTypeId== tenantTransaction.EntityObjectTypeId).FirstOrDefaultAsync();
                         if (existingTrand != null)
                         {
                             tenantTransaction.Id = existingTrand.Id;

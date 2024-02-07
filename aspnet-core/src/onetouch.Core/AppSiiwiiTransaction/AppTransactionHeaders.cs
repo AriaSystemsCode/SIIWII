@@ -44,7 +44,7 @@ namespace onetouch.AppSiiwiiTransaction
         //public virtual AppContact? SellerFk { get; set; }
 
         [StringLength(AppTransactionConst.MaxEMailLength, MinimumLength = AppTransactionConst.MinEMailLength)]
-        public virtual string BuyerContactEMailAddress { get; set; }
+        public virtual string? BuyerContactEMailAddress { get; set; }
 
         public virtual long? LanguageId { get; set; }
 
@@ -56,7 +56,7 @@ namespace onetouch.AppSiiwiiTransaction
         [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
         public virtual string CurrencyCode { get; set; }
         [StringLength(AppTransactionConst.MaxEMailLength, MinimumLength = AppTransactionConst.MinEMailLength)]
-        public virtual string SellerContactEMailAddress { get; set; }
+        public virtual string? SellerContactEMailAddress { get; set; }
         [StringLength(AppTransactionConst.MaxPhoneNumberLength, MinimumLength = AppTransactionConst.MinPhoneNumberLength)]
         public virtual string BuyerContactPhoneNumber { get; set; }
 
