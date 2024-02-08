@@ -18,13 +18,13 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.TopMargin = reportInitializer.GetControl<DevExpress.XtraReports.UI.TopMarginBand>("TopMargin");
             this.BottomMargin = reportInitializer.GetControl<DevExpress.XtraReports.UI.BottomMarginBand>("BottomMargin");
             this.Detail = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailBand>("Detail");
+            this.xrLabel1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("xrLabel1");
             this.xrPictureBox1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("xrPictureBox1");
             this.table2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTable>("table2");
             this.tableRow2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableRow>("tableRow2");
             this.tableCell25 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("tableCell25");
             this.tableCell26 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("tableCell26");
             this.tableCell34 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("tableCell34");
-            this.xrLabel1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("xrLabel1");
 
             // Parameters
             this.ItemId = reportInitializer.GetParameter("ItemId");
@@ -46,6 +46,7 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.TopMarginBand TopMargin;
         private DevExpress.XtraReports.UI.BottomMarginBand BottomMargin;
         private DevExpress.XtraReports.UI.DetailBand Detail;
+        private DevExpress.XtraReports.UI.XRLabel xrLabel1;
         private DevExpress.XtraReports.UI.XRPictureBox xrPictureBox1;
         private DevExpress.XtraReports.UI.XRTable table2;
         private DevExpress.XtraReports.UI.XRTableRow tableRow2;
@@ -63,6 +64,5 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl2;
         private DevExpress.XtraReports.Parameters.Parameter tenantId2;
         private DevExpress.XtraReports.Parameters.Parameter showNo;
-        private DevExpress.XtraReports.UI.XRLabel xrLabel1;
     }
 }
