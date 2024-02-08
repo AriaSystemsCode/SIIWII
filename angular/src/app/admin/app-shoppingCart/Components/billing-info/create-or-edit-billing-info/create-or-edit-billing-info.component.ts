@@ -162,12 +162,12 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-    this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+  //  this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
         if (res) {
-          this.oldappTransactionsForViewDto = JSON.stringify(this.appTransactionsForViewDto);
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
           if (!this.showSaveBtn) {
             this.ontabChange.emit(ShoppingCartoccordionTabs.BillingInfo);
           }
@@ -186,6 +186,34 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
       this.createOrEditBillingInfo = true;
     }
   }
+  showEditMode() {
+    this.createOrEditBillingInfo = true;
+    this.showSaveBtn = true;
+    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+}
+
+save() {
+    this.createOrEditBillingInfo = false;
+    this.setAddress();
+    this.createOrEditTransaction();
+}
+cancel() {
+  this.setAddress();
+    this.appTransactionsForViewDto = JSON.parse(this.oldappTransactionsForViewDto);
+    this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
+    this.createOrEditBillingInfo = false;
+    this.showSaveBtn = false;
+}
+setAddress(){
+  if(!this.apContactSelectedAdd){
+    let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+    apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+    }
+    if(!this.arContactSelectedAdd){
+    let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+    arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
+    }
+}
 
   updateApContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.APContact);
