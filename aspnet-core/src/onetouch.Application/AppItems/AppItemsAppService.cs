@@ -4469,8 +4469,18 @@ namespace onetouch.AppItems
                     //MMT
                     if (itemExcelDto.RecordType == "Item")
                     {
-                        if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & string.IsNullOrEmpty(itemExcelDto.ScaleSizesOrder))
-                            itemExcelRecordErrorDTO.FieldsErrors.Add("Size Scale order cannot be empty if size scale name is not empty");
+                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+                        //if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & string.IsNullOrEmpty(itemExcelDto.ScaleSizesOrder))
+                        //    itemExcelRecordErrorDTO.FieldsErrors.Add("Size Scale order cannot be empty if size scale name is not empty");
+                        if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 1 & string.IsNullOrEmpty(itemExcelDto.D1Name))
+                            itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name cannot be empty if size scale number of dimesions is 1");
+                        if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 2 &
+                            (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name)))
+                            itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name and Dimension 2 name cannot be empty if size scale number of dimesions is 2");
+                        if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) & int.Parse(itemExcelDto.NoOfDim) == 3 &
+                            (string.IsNullOrEmpty(itemExcelDto.D1Name) | string.IsNullOrEmpty(itemExcelDto.D2Name) | string.IsNullOrEmpty(itemExcelDto.D3Name)))
+                            itemExcelRecordErrorDTO.FieldsErrors.Add("Dimension 1 name, Dimension 2 name, and Dimension 3 name cannot be empty if size scale number of dimesions is 3");
+                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
                         if (!string.IsNullOrEmpty(itemExcelDto.SizeRatioName) & string.IsNullOrEmpty(itemExcelDto.SizeRatioValue))
                             itemExcelRecordErrorDTO.FieldsErrors.Add("Size ratio value cannot be empty if size ratio name is not empty");
 
@@ -5271,9 +5281,15 @@ namespace onetouch.AppItems
                     if (scaleHeader == null || ratioHeader == null || (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.CreateACopy) ||
                         (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords))
                     {
-                        var sizesArray = excelDto.ScaleSizesOrder.Split('|');
+                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+                        //var sizesArray = excelDto.ScaleSizesOrder.Split('|');
+                        var d1sizesArray = excelDto.D1Sizes.Split('|');
+                        var d2sizesArray = excelDto.D2Sizes.Split('|');
+                        var d3sizesArray = excelDto.D3Sizes.Split('|');
+                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
                         List<AppSizeScalesDetailDto> appSizeScalesDetailDtoList = new List<AppSizeScalesDetailDto>();
-                        for (int pos = 0; pos < sizesArray.Length; pos++)
+                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+                        /*for (int pos = 0; pos < sizesArray.Length; pos++)
                         {
                             appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
                             {
@@ -5284,11 +5300,79 @@ namespace onetouch.AppItems
                                 D2Position = null,
                                 SizeRatio = 0
                             });
+                        }*/
+                        for (int pos = 0; pos < d1sizesArray.Length; pos++)
+                        {
+                            appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                            {
+                                SizeCode = d1sizesArray[pos].TrimEnd(),
+                                D1Position = pos.ToString(),
+                                DimensionName = excelDto.D1Name,
+                                SizeId = null,
+                                D3Position = null,
+                                D2Position = null,
+                                SizeRatio = 0
+                            });
                         }
+                        if (d2sizesArray.Length > 0 && !string.IsNullOrEmpty(d2sizesArray[0]))
+                        {
+                            for (int pos = 0; pos < d2sizesArray.Length; pos++)
+                            {
+                                appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                                {
+                                    SizeCode = d2sizesArray[pos].TrimEnd(),
+                                    D2Position = pos.ToString(),
+                                    DimensionName = excelDto.D2Name,
+                                    SizeId = null,
+                                    D3Position = null,
+                                    D1Position = null,
+                                    SizeRatio = 0
+                                });
+                            }
+                        }
+                        if (d3sizesArray.Length > 0 && !string.IsNullOrEmpty(d3sizesArray[0]))
+                        {
+                            for (int pos = 0; pos < d3sizesArray.Length; pos++)
+                            {
+                                appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                                {
+                                    SizeCode = d3sizesArray[pos].TrimEnd(),
+                                    D3Position = pos.ToString(),
+                                    SizeId = null,
+                                    D1Position = null,
+                                    D2Position = null,
+                                    SizeRatio = 0,
+                                    DimensionName = excelDto.D3Name,
+                                });
+                            }
+                        }
+                        var sizes = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+                        if (sizes != null)
+                        {
+                            foreach (var sz in sizes)
+                            {
+                                appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                                {
+                                    SizeCode = sz.SizeCode.TrimEnd(),
+                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+                                    SizeId = null,
+                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
+                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
+                                    SizeRatio = 0
+                                });
+                            }
+                        }
+                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
                         //var sizeList = sizesArray.Select(array => new AppSizeScalesDetailDto { SizeCode = array[0].ToString (), SizeId = null,D1Position = sizesArray.  }).ToList()
                         AppSizeScaleForEditDto appSizeScaleForEditDto = new AppSizeScaleForEditDto();
                         appSizeScaleForEditDto.AppSizeScalesDetails = appSizeScalesDetailDtoList;
-                        appSizeScaleForEditDto.NoOfDimensions = 1;
+                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+                        //appSizeScaleForEditDto.NoOfDimensions = 1;
+                        appSizeScaleForEditDto.NoOfDimensions = int.Parse(excelDto.NoOfDim);
+                        appSizeScaleForEditDto.Dimesion1Name = excelDto.D1Name;
+                        appSizeScaleForEditDto.Dimesion2Name = excelDto.D2Name;
+                        appSizeScaleForEditDto.Dimesion3Name = excelDto.D3Name;
+                        //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
                         appSizeScaleForEditDto.ParentId = null;
 
                         if (scaleHeader != null)
@@ -5364,8 +5448,7 @@ namespace onetouch.AppItems
                         appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(sizescale.Result.AppSizeScalesDetails);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
-                        appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
-                        appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = appItemSizeScalesHeader.Id);
+                        //appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
                         if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
                         {
                             var sizeScaleH = itemScaleData.FirstOrDefault(x => x.ParentId == null);
@@ -5439,19 +5522,42 @@ namespace onetouch.AppItems
                                     arraySizeRatio = arrayRatio.Split('-');
                                 }
                                 List<AppSizeScalesDetailDto> appSizeScalesRatioDetailDtoList = new List<AppSizeScalesDetailDto>();
-                                for (int pos = 0; pos < sizesArray.Length; pos++)
+                                //for (int pos = 0; pos < sizesArray.Length; pos++)
+                                //{
+                                //    appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                //    {
+                                //        SizeCode = sizesArray[pos],
+                                //        D1Position = pos.ToString(),
+                                //        SizeId = null,
+                                //        D3Position = null,
+                                //        D2Position = null,
+                                //        SizeRatio = int.Parse(arraySizeRatio[pos])
+                                //    });
+                                //}
+                                var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
+                                var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
+                                var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+                                if (sizesRatio != null)
                                 {
-                                    appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                    foreach (var sz in sizesRatio)
                                     {
-                                        SizeCode = sizesArray[pos],
-
-                                        D1Position = pos.ToString(),
-                                        SizeId = null,
-                                        D3Position = null,
-                                        D2Position = null,
-                                        SizeRatio = int.Parse(arraySizeRatio[pos])
-                                    });
+                                        var posinArr = sizesList.IndexOf(sz.SizeCode);
+                                        if (posinArr >= 0)
+                                        {
+                                            appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                            {
+                                                SizeCode = sz.SizeCode.TrimEnd(),
+                                                D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+                                                SizeId = null,
+                                                D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
+                                                D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
+                                                SizeRatio = int.Parse(sizesRatios[posinArr])
+                                            });
+                                        }
+                                    }
+                                    appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
                                 }
+
                                 var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
 
                                 AppItemSizeScalesHeader appItemSizeScalesHeaderRatio = new AppItemSizeScalesHeader();
@@ -5512,17 +5618,11 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
                                 appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
                             }
-                            //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[Start]
-                            //appItemSizeScalesHeader.AppItemId = appItem.Id;
-
-                            //appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
-                            //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[End]
+                           
                         }
-                        //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[Start]
                         appItemSizeScalesHeader.AppItemId = appItem.Id;
 
                         appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
-                        //T-SII-20231117.0004,1 MMT 01/10/2024 Size scale of the imported item is not saved if no ratio assigned in the Excel[End]
                         // string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("SIZE-SCALE");
                         // scaleHeader.SizeScaleCode = (scaleHeader.ParentId == null ? "SizeScale-" : "SizeRatio-") + seq;
 
@@ -6917,7 +7017,9 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.ImageType, act => act.MapFrom(src => src["ImageType"].ToString()));
             mappingExpression.ForMember(dest => dest.ImageFolderName, act => act.MapFrom(src => src["ImageFolderName"].ToString()));
             mappingExpression.ForMember(dest => dest.SizeScaleName, act => act.MapFrom(src => src["SizeScaleName"].ToString()));
-            mappingExpression.ForMember(dest => dest.ScaleSizesOrder, act => act.MapFrom(src => src["ScaleSizesOrder"].ToString()));
+            //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+            //mappingExpression.ForMember(dest => dest.ScaleSizesOrder, act => act.MapFrom(src => src["ScaleSizesOrder"].ToString()));
+            //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
             mappingExpression.ForMember(dest => dest.SizeRatioName, act => act.MapFrom(src => src["SizeRatioName"].ToString()));
             mappingExpression.ForMember(dest => dest.SizeRatioValue, act => act.MapFrom(src => src["SizeRatioValue"].ToString()));
             mappingExpression.ForMember(dest => dest.ExtraAttributes, opt => opt.MapFrom<List<ExtraAttribute>>(src => extraAttributes));
@@ -6925,6 +7027,19 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.ParentId, act => act.MapFrom(src => 0));
             //mappingExpression.ForMember(dest => dest.ExtraAttributesValues, opt => opt.MapFrom<List<AppItemImpExtrAttributes>>(src => extraAttributes));
             mappingExpression.ForMember(dest => dest.ExtraAttributesValues, opt => opt.MapFrom(new BmiValueResolver()));
+            //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
+            mappingExpression.ForMember(dest => dest.NoOfDim, act => act.MapFrom(src => src["NoOfDimensions"].ToString()));
+            mappingExpression.ForMember(dest => dest.D1Name, act => act.MapFrom(src => src["Dimension1Name"].ToString()));
+            mappingExpression.ForMember(dest => dest.D2Name, act => act.MapFrom(src => src["Dimension2Name"].ToString()));
+            mappingExpression.ForMember(dest => dest.D3Name, act => act.MapFrom(src => src["Dimension3Name"].ToString()));
+            mappingExpression.ForMember(dest => dest.D1Sizes, act => act.MapFrom(src => src["Dimension1Sizes"].ToString()));
+            mappingExpression.ForMember(dest => dest.D2Sizes, act => act.MapFrom(src => src["Dimension2Sizes"].ToString()));
+            mappingExpression.ForMember(dest => dest.D3Sizes, act => act.MapFrom(src => src["Dimension3Sizes"].ToString()));
+            mappingExpression.ForMember(dest => dest.D1Pos, act => act.MapFrom(src => src["Dimension1Position"].ToString()));
+            mappingExpression.ForMember(dest => dest.D2Pos, act => act.MapFrom(src => src["Dimension2Position"].ToString()));
+            mappingExpression.ForMember(dest => dest.D3Pos, act => act.MapFrom(src => src["Dimension3Position"].ToString()));
+            mappingExpression.ForMember(dest => dest.SizeCode, act => act.MapFrom(src => src["SIZEcode"].ToString()));
+            //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
 
             //if (extraAttributes != null && extraAttributes.Count > 0)
             //{
