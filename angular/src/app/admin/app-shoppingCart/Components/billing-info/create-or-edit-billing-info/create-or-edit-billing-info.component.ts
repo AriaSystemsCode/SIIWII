@@ -162,7 +162,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-  //  this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+    //  this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
@@ -190,30 +190,52 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
     this.createOrEditBillingInfo = true;
     this.showSaveBtn = true;
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-}
+  }
 
-save() {
+  save() {
     this.createOrEditBillingInfo = false;
     this.setAddress();
     this.createOrEditTransaction();
-}
-cancel() {
-  this.setAddress();
+  }
+  cancel() {
+    this.setAddress();
     this.appTransactionsForViewDto = JSON.parse(this.oldappTransactionsForViewDto);
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.createOrEditBillingInfo = false;
     this.showSaveBtn = false;
-}
-setAddress(){
-  if(!this.apContactSelectedAdd){
-    let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
-    apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+  }
+  setAddress() {
+    let apContactIndx = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == ContactRoleEnum.APContact);
+    let arContactIndx = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == ContactRoleEnum.ARContact);
+
+    if (!this.apContactSelectedAdd) {
+      let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+      apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+
+      if (apContactIndx >= 0)
+        this.appTransactionsForViewDto.appTransactionContacts[apContactIndx].contactAddressId = this.apContactSelectedAdd?.id;
+
     }
-    if(!this.arContactSelectedAdd){
-    let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
-    arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
+    else {
+      if (apContactIndx >= 0) {
+        this.appTransactionsForViewDto.appTransactionContacts[apContactIndx].contactAddressDetail = this.apContactSelectedAdd;
+        this.appTransactionsForViewDto.appTransactionContacts[apContactIndx].contactAddressId = this.apContactSelectedAdd?.id;
+      }
     }
-}
+    if (!this.arContactSelectedAdd) {
+      let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+      arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
+      if (arContactIndx >= 0)
+        this.appTransactionsForViewDto.appTransactionContacts[arContactIndx].contactAddressId = this.arContactSelectedAdd?.id;
+
+    }
+    else {
+      if (arContactIndx >= 0) {
+        this.appTransactionsForViewDto.appTransactionContacts[arContactIndx].contactAddressDetail = this.arContactSelectedAdd;
+        this.appTransactionsForViewDto.appTransactionContacts[arContactIndx].contactAddressId = this.arContactSelectedAdd?.id;
+      }
+    }
+  }
 
   updateApContact(addObj) {
     this.updateTabInfo(addObj, ContactRoleEnum.APContact);

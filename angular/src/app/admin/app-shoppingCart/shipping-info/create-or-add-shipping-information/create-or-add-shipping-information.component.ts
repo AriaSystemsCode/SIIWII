@@ -111,14 +111,35 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   }
 
   setAddress() {
+    let shipFromIndx = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+    let shipToIndx = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == ContactRoleEnum.ShipToContact);
+
+
     if (!this.shipFromSelectedAdd) {
       let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
       shipFromObj[0]?.companySSIN ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
+
+      if (shipFromIndx >= 0)
+        this.appTransactionsForViewDto.appTransactionContacts[shipFromIndx].contactAddressId = this.shipFromSelectedAdd?.id;
+    }
+    else {
+      if (shipFromIndx >= 0) {
+        this.appTransactionsForViewDto.appTransactionContacts[shipFromIndx].contactAddressDetail = this.shipFromSelectedAdd;
+        this.appTransactionsForViewDto.appTransactionContacts[shipFromIndx].contactAddressId = this.shipFromSelectedAdd?.id;
+      }
     }
 
     if (!this.shipToSelectedAdd) {
       let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
       shipToObj[0]?.companySSIN ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
+      if (shipToIndx >= 0)
+        this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressId = this.shipToSelectedAdd?.id;
+    }
+    else {
+      if (shipToIndx >= 0) {
+        this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressDetail = this.shipToSelectedAdd;
+        this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressId = this.shipToSelectedAdd?.id;
+      }
     }
   }
   updateShipToAddress(addObj) {
@@ -129,7 +150,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-    this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+    //this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
