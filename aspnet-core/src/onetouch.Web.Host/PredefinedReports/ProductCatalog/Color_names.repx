@@ -13,20 +13,20 @@
   <Bands>
     <Item1 Ref="11" ControlType="TopMarginBand" Name="TopMargin" HeightF="3" Dpi="254" />
     <Item2 Ref="12" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="1.80584908" Dpi="254" />
-    <Item3 Ref="13" ControlType="DetailBand" Name="Detail" HeightF="331.39917" Dpi="254">
+    <Item3 Ref="13" ControlType="DetailBand" Name="Detail" HeightF="306.39917" Dpi="254">
       <HierarchyPrintOptions Ref="14" Indent="50.8" />
       <MultiColumn Ref="15" ColumnCount="5" Layout="AcrossThenDown" Mode="UseColumnCount" />
       <Scripts Ref="16" OnBeforePrint="Detail_BeforePrint_1" />
       <Controls>
-        <Item1 Ref="17" ControlType="XRPanel" Name="xrPanel1" CanGrow="false" SizeF="303.2,331.39917" LocationFloat="0,0" Dpi="254">
+        <Item1 Ref="17" ControlType="XRPanel" Name="xrPanel1" CanGrow="false" SizeF="289.400024,306.39917" LocationFloat="0,0" Dpi="254">
           <Controls>
-            <Item1 Ref="18" ControlType="XRLabel" Name="label1" CanShrink="true" TextAlignment="MiddleCenter" SizeF="303.2,46.9545" LocationFloat="0,276.9545" Dpi="254" Font="Arial, 8pt" ForeColor="Black" Padding="15,15,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item1 Ref="18" ControlType="XRLabel" Name="label1" CanShrink="true" TextAlignment="MiddleCenter" SizeF="289.4,46.9545" LocationFloat="0,256.954529" Dpi="254" Font="Arial, 8pt" ForeColor="Black" Padding="15,15,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
                 <Item1 Ref="19" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeValue]" />
               </ExpressionBindings>
               <StylePriority Ref="20" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item1>
-            <Item2 Ref="21" ControlType="XRLabel" Name="label3" CanShrink="true" TextAlignment="MiddleCenter" SizeF="303.2,46.9545" LocationFloat="0,230" Dpi="254" Font="Arial, 8pt" ForeColor="Black" Padding="15,15,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item2 Ref="21" ControlType="XRLabel" Name="label3" CanShrink="true" TextAlignment="MiddleCenter" SizeF="289.4,46.9545135" LocationFloat="0,210.000015" Dpi="254" Font="Arial, 8pt" ForeColor="Black" Padding="15,15,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
                 <Item1 Ref="22" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeCode]" />
                 <Item2 Ref="23" EventName="BeforePrint" PropertyName="Visible" Expression="[AttributeValue]!='More'&#xA;" />
@@ -35,9 +35,9 @@
             </Item2>
           </Controls>
         </Item1>
-        <Item2 Ref="25" ControlType="XRPictureBox" Name="pictureBox1" Sizing="ZoomImage" KeepTogether="false" SizeF="240,230" LocationFloat="25,0" Dpi="254" BackColor="Transparent" Borders="None">
+        <Item2 Ref="25" ControlType="XRPictureBox" Name="pictureBox1" Sizing="ZoomImage" KeepTogether="false" SizeF="220,210" LocationFloat="25,0" Dpi="254" BackColor="Transparent" Borders="None">
           <ExpressionBindings>
-            <Item1 Ref="26" EventName="BeforePrint" PropertyName="ImageUrl" Expression="'https://localhost:44301/attachments/-1/f9d3484a-a2d5-46e1-4f99-5623d19bedc0.jpg'" />
+            <Item1 Ref="26" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[Attachment]&#xA;" />
           </ExpressionBindings>
           <StylePriority Ref="27" UseBackColor="false" UseBorders="false" />
         </Item2>
