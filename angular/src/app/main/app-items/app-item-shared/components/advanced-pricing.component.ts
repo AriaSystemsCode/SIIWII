@@ -112,6 +112,7 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   addNewCurrency() {
     this.matrixGrid.addNewRows([{ rowHeader: { label: '', value: '' }, rowValues: this.pricingHelpersService.setRowValues() }])
   }
+
   submit(){
     debugger
     if(!this.isValid) return this.notify.error(this.l('FormIsInvalid'))
@@ -178,5 +179,8 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   statusChanged(status:string){
     this.isValid = status == 'VALID'
     console.log('statusChanged adv pric',this.isValid)
+  }
+  updateRows(comesrows){
+   this.rows=comesrows;
   }
 }

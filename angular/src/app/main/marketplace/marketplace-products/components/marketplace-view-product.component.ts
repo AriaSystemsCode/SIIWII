@@ -199,7 +199,7 @@ export class MarketplaceViewProductComponent
     isColorView: boolean = false
     setSizes(index: number) {
         this.currentIndex = index;
-        this.isColorView = true
+        this.isColorView = false
         this.colorAttachmentForMainIamge = this.colorsData[index].colorImg;
         this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex].entityAttachments;
         console.log(this.colorsData[index]);
@@ -266,11 +266,13 @@ export class MarketplaceViewProductComponent
         orders.map((order: any) => {
             order.color.sizes.map((size) => {
                 if (this.productDetails.orderByPrePack) {
+                    
                     let multiby =
                         size.sizeRatio * order.color.sizes[0].orderedPrePacks;
                     let priceMultibly = multiby * size.price;
                     qty = qty + multiby;
                     price = price + priceMultibly;
+                    debugger
                 } else {
                     if (!size.orderedQty)
                       size.orderedQty = 0
@@ -377,6 +379,7 @@ export class MarketplaceViewProductComponent
                 this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
             sum = sum + multiby;
         });
+
         return sum;
     }
 

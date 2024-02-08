@@ -607,7 +607,10 @@
                                         </tr>
                                     </tbody>
                                     <tbody
-                                        *ngIf="productDetails?.orderByPrePack"
+                                        *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
+                                            order.color.sizes,
+                                            orderIndex
+                                        )"
                                     >
                                         <ng-container
                                             *ngFor="
