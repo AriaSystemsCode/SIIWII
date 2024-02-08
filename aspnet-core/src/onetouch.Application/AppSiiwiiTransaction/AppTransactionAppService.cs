@@ -3666,7 +3666,9 @@ namespace onetouch.AppSiiwiiTransaction
                 .Include(z => z.EntityExtraData).Where(z => z.Id == marketplaceTransactionId && z.TenantId == null).FirstOrDefaultAsync();
                 if (marketplaceTransaction!=null)
                 {
-                    var tenantTransactionObj = await _appTransactionsHeaderRepository.GetAll().AsNoTracking().Where(z => z.TenantId == tenantId && z.SSIN == marketplaceTransaction.SSIN && z.ObjectId== objectId).FirstOrDefaultAsync();
+                    var tenantTransactionObj = await _appTransactionsHeaderRepository.GetAll().AsNoTracking()
+                        .Where(z => z.TenantId == tenantId && z.SSIN == marketplaceTransaction.SSIN && z.ObjectId== objectId && 
+                        z.EntityObjectTypeCode== (transactionType!=null?(transactionType==TransactionType.SalesOrder?"SALESORDER":"PURCHASEORDER"):marketplaceTransaction.EntityObjectTypeCode)).FirstOrDefaultAsync();
                     if (tenantTransactionObj == null)
                     {
                         AppTransactionHeaders tenantTransaction = new AppTransactionHeaders();
@@ -3927,6 +3929,7 @@ namespace onetouch.AppSiiwiiTransaction
                         string code = tenantTransactionObj.Code;
                         string name= tenantTransactionObj.Name;
                         long tranType = tenantTransactionObj.EntityObjectTypeId;
+                        string tranTypeCode = tenantTransactionObj.EntityObjectTypeCode;
                         tenantTransactionObj = ObjectMapper.Map<AppTransactionHeaders>(marketplaceTransaction);
                         tenantTransactionObj.TenantOwner = int.Parse(marketplaceTransaction.TenantOwner.ToString());
                         tenantTransactionObj.TenantId = tenantId;
@@ -3934,6 +3937,7 @@ namespace onetouch.AppSiiwiiTransaction
                         tenantTransactionObj.Code = code;
                         tenantTransactionObj.Name = name;
                         tenantTransactionObj.EntityObjectTypeId = tranType;
+                        tenantTransactionObj.EntityObjectTypeCode = tranTypeCode;
                         tenantTransactionObj.AppTransactionDetails = null;
                         tenantTransactionObj.AppTransactionContacts = null;
                         tenantTransactionObj.EntityCategories = null;
