@@ -459,6 +459,7 @@
                             </div>
                             <div class=" row w-100 mt-4 ml-1">
                                 <button type="button"
+                                [disabled]="shoppingCartDetails?.totalAmount<=0"
                                     class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
                                     style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
                                     {{l("Proceedtocheckout")}}
