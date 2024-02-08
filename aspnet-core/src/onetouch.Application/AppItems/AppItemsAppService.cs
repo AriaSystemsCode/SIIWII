@@ -5514,7 +5514,7 @@ namespace onetouch.AppItems
 
                                 appSizeScaleRatioForEditDto.Dimesion1Name = sizescale.Result.Dimesion1Name;
                                 appSizeScaleRatioForEditDto.Name = (!string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Result.Name.TrimEnd() + " Ratio");
-                                string[] arraySizeRatio = new string[sizesArray.Length];
+                                string[] arraySizeRatio = new string[sizes.Count];
                                 Array.Fill(arraySizeRatio, "0");
                                 if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
                                 {
