@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-<div class="card" (click)="viewProduct(product.id)" >
-=======
+
 <div class="card w-100" (click)="viewProduct(product.id)" >
->>>>>>> Jan-W1-Testing
     <img
         class="img"
         [src]="attachmentBaseUrl + '/' + product?.imageUrl"
@@ -14,22 +11,14 @@
         <div class="ssin">
             {{ product?.manufacturerCode }}
         </div>
-<<<<<<< HEAD
-        <p class="card-text desc fw-bold">
-=======
         <p class="card-text desc fw-bold" [title]="product?.name">
->>>>>>> Jan-W1-Testing
             {{ product?.name }}
         </p>
 
         <div class="d-flex name-price">
             <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
              <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
-<<<<<<< HEAD
-            <h5 class="price">{{ currency }} {{ product?.price }}</h5>
-=======
             <h5 class="price">MSRP :{{ product?.price  | currency:currency:true}}</h5>
->>>>>>> Jan-W1-Testing
         </div>
     </div>
 </div>

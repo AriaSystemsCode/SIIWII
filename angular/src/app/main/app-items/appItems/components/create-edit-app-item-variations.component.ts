@@ -449,7 +449,7 @@ export class CreateEditAppItemVariationsComponent
     tempAddNewAttributes(){
         var uniqueTempIds = new Set<number>();
         const currentComponent=this;
-        //this.appItem?.variationItems?null:this.editVariationsOpend=true;
+        this.appItem?.variationItems?this.editVariationsOpend=false:this.editVariationsOpend=true;
         this.appItem?.variationItems?.forEach(variation=>{
             variation.entityExtraData.forEach(entityExtraData=>{
                 const extraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == entityExtraData?.entityObjectTypeCode)[0]
