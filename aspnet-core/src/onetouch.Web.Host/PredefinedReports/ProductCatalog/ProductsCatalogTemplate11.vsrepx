@@ -166,7 +166,7 @@
               </ExpressionBindings>
               <StylePriority Ref="100" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item10>
-            <Item11 Ref="101" ControlType="XRBarCode" Name="barCode1" Module="5.08" AutoModule="true" Alignment="TopCenter" TextAlignment="BottomCenter" ShowText="false" SizeF="386.291443,397.04126" LocationFloat="377.03183,2043.07422" Dpi="254" Padding="26,26,0,0,254">
+            <Item11 Ref="101" ControlType="XRBarCode" Name="barCode1" Module="5.08" AutoModule="true" Alignment="TopCenter" TextAlignment="BottomCenter" ShowText="false" SizeF="370.416351,365.29126" LocationFloat="377.03183,2074.82422" Dpi="254" Padding="26,26,0,0,254">
               <Symbology Ref="102" Name="QRCode" ErrorCorrectionLevel="H" Version="Version5" />
               <ExpressionBindings>
                 <Item1 Ref="103" EventName="BeforePrint" PropertyName="Text" Expression="[ssin]" />
