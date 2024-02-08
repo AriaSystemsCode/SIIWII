@@ -176,6 +176,7 @@ export class ShoppingCartViewComponentComponent
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
+        this.transactionCode=res?.code;
         if (res?.entityAttachments?.length > 0)
           this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
 
