@@ -64581,9 +64581,19 @@ export class AppItemExcelDto implements IAppItemExcelDto {
     entityObjectClassificaionID!: number | undefined;
     entityObjectCategoryID!: number | undefined;
     sizeScaleName!: string | undefined;
-    scaleSizesOrder!: string | undefined;
     sizeRatioName!: string | undefined;
     sizeRatioValue!: string | undefined;
+    noOfDim!: string | undefined;
+    d1Name!: string | undefined;
+    d2Name!: string | undefined;
+    d3Name!: string | undefined;
+    d1Sizes!: string | undefined;
+    d2Sizes!: string | undefined;
+    d3Sizes!: string | undefined;
+    d1Pos!: string | undefined;
+    d2Pos!: string | undefined;
+    d3Pos!: string | undefined;
+    sizeCode!: string | undefined;
 
     [key: string]: any;
 
@@ -64637,9 +64647,19 @@ export class AppItemExcelDto implements IAppItemExcelDto {
             this.entityObjectClassificaionID = _data["entityObjectClassificaionID"];
             this.entityObjectCategoryID = _data["entityObjectCategoryID"];
             this.sizeScaleName = _data["sizeScaleName"];
-            this.scaleSizesOrder = _data["scaleSizesOrder"];
             this.sizeRatioName = _data["sizeRatioName"];
             this.sizeRatioValue = _data["sizeRatioValue"];
+            this.noOfDim = _data["noOfDim"];
+            this.d1Name = _data["d1Name"];
+            this.d2Name = _data["d2Name"];
+            this.d3Name = _data["d3Name"];
+            this.d1Sizes = _data["d1Sizes"];
+            this.d2Sizes = _data["d2Sizes"];
+            this.d3Sizes = _data["d3Sizes"];
+            this.d1Pos = _data["d1Pos"];
+            this.d2Pos = _data["d2Pos"];
+            this.d3Pos = _data["d3Pos"];
+            this.sizeCode = _data["sizeCode"];
         }
     }
 
@@ -64691,9 +64711,19 @@ export class AppItemExcelDto implements IAppItemExcelDto {
         data["entityObjectClassificaionID"] = this.entityObjectClassificaionID;
         data["entityObjectCategoryID"] = this.entityObjectCategoryID;
         data["sizeScaleName"] = this.sizeScaleName;
-        data["scaleSizesOrder"] = this.scaleSizesOrder;
         data["sizeRatioName"] = this.sizeRatioName;
         data["sizeRatioValue"] = this.sizeRatioValue;
+        data["noOfDim"] = this.noOfDim;
+        data["d1Name"] = this.d1Name;
+        data["d2Name"] = this.d2Name;
+        data["d3Name"] = this.d3Name;
+        data["d1Sizes"] = this.d1Sizes;
+        data["d2Sizes"] = this.d2Sizes;
+        data["d3Sizes"] = this.d3Sizes;
+        data["d1Pos"] = this.d1Pos;
+        data["d2Pos"] = this.d2Pos;
+        data["d3Pos"] = this.d3Pos;
+        data["sizeCode"] = this.sizeCode;
         return data;
     }
 }
@@ -64722,9 +64752,19 @@ export interface IAppItemExcelDto {
     entityObjectClassificaionID: number | undefined;
     entityObjectCategoryID: number | undefined;
     sizeScaleName: string | undefined;
-    scaleSizesOrder: string | undefined;
     sizeRatioName: string | undefined;
     sizeRatioValue: string | undefined;
+    noOfDim: string | undefined;
+    d1Name: string | undefined;
+    d2Name: string | undefined;
+    d3Name: string | undefined;
+    d1Sizes: string | undefined;
+    d2Sizes: string | undefined;
+    d3Sizes: string | undefined;
+    d1Pos: string | undefined;
+    d2Pos: string | undefined;
+    d3Pos: string | undefined;
+    sizeCode: string | undefined;
 
     [key: string]: any;
 }
