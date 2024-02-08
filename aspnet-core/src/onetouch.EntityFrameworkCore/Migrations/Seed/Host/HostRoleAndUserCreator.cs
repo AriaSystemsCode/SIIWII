@@ -640,7 +640,7 @@ namespace onetouch.Migrations.Seed.Host
 
                 sycReport.Code = "7";
                 sycReport.Name = "ProductsCatalogTemplate10";
-                sycReport.Description = "(1 Product Per Page) Layout - Landscape Orientation - Available Quantities per Size";
+                sycReport.Description = "1 Product per page - Without ATS";
                 sycReport.Thumbnail = "ProductsCatalogTemplate10";
                 sycReport.EntityObjectTypeId = 97;
 
@@ -658,7 +658,7 @@ namespace onetouch.Migrations.Seed.Host
 
                 sycReport.Code = "7";
                 sycReport.Name = "ProductsCatalogTemplate11";
-                sycReport.Description = "Products Catalog Template 11 Products";
+                sycReport.Description = "1 Product per page - With ATS";
                 sycReport.Thumbnail = "ProductsCatalogTemplate11";
                 sycReport.EntityObjectTypeId = 97;
 

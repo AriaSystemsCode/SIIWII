@@ -38,6 +38,9 @@
   <ItemGroup>
     <None Remove="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.repx" />
     <None Remove="PredefinedReports\ProductCatalog\Colorsportrait.repx" />
+    <None Remove="PredefinedReports\ProductCatalog\Colors_port.repx" />
+    <None Remove="PredefinedReports\ProductCatalog\Color_names.repx" />
+    <None Remove="PredefinedReports\ProductCatalog\Color_Size11.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.vsrepx" />
@@ -89,6 +92,9 @@
   <ItemGroup>
     <EmbeddedResource Include="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\Colorsportrait.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\Colors_port.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\Color_names.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\Color_Size11.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.vsrepx" />
@@ -122,7 +128,25 @@
     <Compile Update="PredefinedReports\ProductCatalog\Colorsportrait.Designer.cs">
       <DependentUpon>Colorsportrait.repx</DependentUpon>
     </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Colors_port.cs">
+      <DependentUpon>Colors_port.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Colors_port.Designer.cs">
+      <DependentUpon>Colors_port.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Color_names.cs">
+      <DependentUpon>Color_names.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Color_names.Designer.cs">
+      <DependentUpon>Color_names.repx</DependentUpon>
+    </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\Color_Size1.cs" />
+    <Compile Update="PredefinedReports\ProductCatalog\Color_Size11.cs">
+      <DependentUpon>Color_Size11.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Color_Size11.Designer.cs">
+      <DependentUpon>Color_Size11.repx</DependentUpon>
+    </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.cs">
       <DependentUpon>ProductsCatalogTemplate1.vsrepx</DependentUpon>
     </Compile>
