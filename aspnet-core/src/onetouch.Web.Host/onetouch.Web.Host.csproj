@@ -38,6 +38,7 @@
   <ItemGroup>
     <None Remove="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.repx" />
     <None Remove="PredefinedReports\ProductCatalog\Colorsportrait.repx" />
+    <None Remove="PredefinedReports\ProductCatalog\Colors_port.repx" />
     <None Remove="PredefinedReports\ProductCatalog\Color_names.repx" />
     <None Remove="PredefinedReports\ProductCatalog\Color_Size11.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
@@ -91,6 +92,7 @@
   <ItemGroup>
     <EmbeddedResource Include="PredefinedReports\OrderConfirmation\OrderConfirmationForm1.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\Colorsportrait.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\Colors_port.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\Color_names.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\Color_Size11.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
@@ -125,6 +127,12 @@
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\Colorsportrait.Designer.cs">
       <DependentUpon>Colorsportrait.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Colors_port.cs">
+      <DependentUpon>Colors_port.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Colors_port.Designer.cs">
+      <DependentUpon>Colors_port.repx</DependentUpon>
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\Color_names.cs">
       <DependentUpon>Color_names.repx</DependentUpon>

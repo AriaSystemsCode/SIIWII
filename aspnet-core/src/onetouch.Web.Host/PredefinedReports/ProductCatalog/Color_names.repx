@@ -23,13 +23,13 @@
             <Item1 Ref="18" ControlType="XRLabel" Name="label1" CanShrink="true" TextAlignment="MiddleCenter" SizeF="303.2,46.9545" LocationFloat="0,276.9545" Dpi="254" Font="Arial, 8pt" ForeColor="Black" Padding="15,15,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
                 <Item1 Ref="19" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeValue]" />
-                <Item2 Ref="20" EventName="BeforePrint" PropertyName="Visible" Expression="[AttributeValue]!='More'" />
               </ExpressionBindings>
-              <StylePriority Ref="21" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
+              <StylePriority Ref="20" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item1>
-            <Item2 Ref="22" ControlType="XRLabel" Name="label3" CanShrink="true" TextAlignment="MiddleCenter" SizeF="303.2,46.9545" LocationFloat="0,230" Dpi="254" Font="Arial, 8pt" ForeColor="Black" Padding="15,15,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item2 Ref="21" ControlType="XRLabel" Name="label3" CanShrink="true" TextAlignment="MiddleCenter" SizeF="303.2,46.9545" LocationFloat="0,230" Dpi="254" Font="Arial, 8pt" ForeColor="Black" Padding="15,15,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="23" EventName="BeforePrint" PropertyName="Text" Expression="'123456789012'" />
+                <Item1 Ref="22" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeCode]" />
+                <Item2 Ref="23" EventName="BeforePrint" PropertyName="Visible" Expression="[AttributeValue]!='More'&#xA;" />
               </ExpressionBindings>
               <StylePriority Ref="24" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item2>

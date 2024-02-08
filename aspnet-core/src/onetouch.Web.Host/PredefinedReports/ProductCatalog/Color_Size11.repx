@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<XtraReportsLayoutSerializer SerializerVersion="22.2.4.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Color_Size1" ScriptsSource="&#xD;&#xA;private void tableCell24_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void tableCell52_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;&#xD;&#xA;      //Color_Size.SuspendLayout();&#xD;&#xA;      //Color_Size.PerformLayout();&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Color_Size_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;    &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Detail_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA; &#xD;&#xA;&#xD;&#xA;        &#xD;&#xA;                &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Detail_BeforePrint_1(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA; &#xD;&#xA;&#xD;&#xA;    &#xD;&#xA;}&#xD;&#xA;" SnapGridSize="25" ReportUnit="TenthsOfAMillimeter" Landscape="true" Margins="0, 1688, 3, 0" PageWidth="2794" PageHeight="2159" Version="22.2" DataMember="Color_Sizes" DataSource="#Ref-0" Dpi="254" Font="Arial, 9.75pt">
+<XtraReportsLayoutSerializer SerializerVersion="22.2.4.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Color_Size1" ScriptsSource="&#xD;&#xA;private void tableCell24_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void tableCell52_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;&#xD;&#xA;      //Color_Size.SuspendLayout();&#xD;&#xA;      //Color_Size.PerformLayout();&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Color_Size_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;    &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Detail_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA; &#xD;&#xA;&#xD;&#xA;        &#xD;&#xA;                &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Detail_BeforePrint_1(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA; &#xD;&#xA;&#xD;&#xA;    &#xD;&#xA;}&#xD;&#xA;" SnapGridSize="25" ReportUnit="TenthsOfAMillimeter" Landscape="true" Margins="0, 1712, 3, 0" PageWidth="2794" PageHeight="2159" Version="22.2" DataMember="Color_Sizes" DataSource="#Ref-0" Dpi="254" Font="Arial, 9.75pt">
   <Extensions>
     <Item1 Ref="2" Key="VSReportExtInfo" Value=".repx" />
   </Extensions>
@@ -17,20 +17,20 @@
       <HierarchyPrintOptions Ref="14" Indent="50.8" />
       <Scripts Ref="15" OnBeforePrint="Detail_BeforePrint_1" />
       <Controls>
-        <Item1 Ref="16" ControlType="XRLabel" Name="xrLabel1" Multiline="true" Text="xrLabel1" TextAlignment="MiddleCenter" SizeF="71.30896,84.23249" LocationFloat="0,0" Dpi="254" Font="Arial, 6pt" Padding="5,5,0,0,254">
+        <Item1 Ref="16" ControlType="XRLabel" Name="xrLabel1" Multiline="true" Text="xrLabel1" TextAlignment="MiddleCenter" SizeF="100.413124,84.23249" LocationFloat="0,1.335144E-05" Dpi="254" Font="Arial, 6pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="17" EventName="BeforePrint" PropertyName="Text" Expression="[Attachment]" />
             <Item2 Ref="18" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] =0&#xA;" />
           </ExpressionBindings>
           <StylePriority Ref="19" UseFont="false" UseTextAlignment="false" />
         </Item1>
-        <Item2 Ref="20" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="63.5,84.23249" LocationFloat="0,0" Dpi="254">
+        <Item2 Ref="20" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="100.413124,84.23249" LocationFloat="0,0" Dpi="254">
           <ExpressionBindings>
             <Item1 Ref="21" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[Attachment]" />
             <Item2 Ref="22" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] &gt;0 and [DataSource.CurrentRowIndex] &lt;20&#xA;" />
           </ExpressionBindings>
         </Item2>
-        <Item3 Ref="23" ControlType="XRTable" Name="table2" SizeF="1024.085,84.23249" LocationFloat="71.30895,0" Dpi="254" OddStyleName="DetailData3_Odd">
+        <Item3 Ref="23" ControlType="XRTable" Name="table2" SizeF="979.105652,84.23249" LocationFloat="100.413124,0" Dpi="254" OddStyleName="DetailData3_Odd">
           <Rows>
             <Item1 Ref="24" ControlType="XRTableRow" Name="tableRow2" Weight="11.683999633789062" Dpi="254">
               <Cells>
@@ -46,7 +46,7 @@
                   </ExpressionBindings>
                   <StylePriority Ref="30" UseFont="false" UsePadding="false" />
                 </Item2>
-                <Item3 Ref="31" ControlType="XRTableCell" Name="tableCell34" Weight="0.063437132492914911" CanGrow="false" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 9pt" Padding="1,1,0,0,254">
+                <Item3 Ref="31" ControlType="XRTableCell" Name="tableCell34" Weight="0.059310470403890744" CanGrow="false" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 9pt" Padding="1,1,0,0,254">
                   <ExpressionBindings>
                     <Item1 Ref="32" EventName="BeforePrint" PropertyName="Text" Expression="[Total]" />
                   </ExpressionBindings>
