@@ -315,7 +315,7 @@
                                         <td style="width:150px">
                                             <span class="p-column-title"> {{l('TransactionType')}}</span>
                                             <span *ngIf="record.entityObjectTypeCode">
-                                                {{record.entityObjectTypeCode}}
+                                                {{record?.entityObjectTypeCode == 'SALESORDER' ? 'Sales Order' : 'Purchase Order'}}
                                             </span>
                                         </td>
                                         <td style="width:150px">
