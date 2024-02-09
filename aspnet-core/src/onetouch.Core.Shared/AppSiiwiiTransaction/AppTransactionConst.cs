@@ -14,7 +14,7 @@ namespace onetouch.AppSiiwiiTransaction
         public const int MinSellerNameLength = 1;
         public const int MaxEnteredByUserRoleLength = 50;
         public const int MinEnteredByUserRoleLength = 1;
-        public const int MinEMailLength = 5;
+        public const int MinEMailLength = 0;
         public const int MaxEMailLength = 100;
         public const int MinCodeLength = 1;
         public const int MaxCodeLength = 50;

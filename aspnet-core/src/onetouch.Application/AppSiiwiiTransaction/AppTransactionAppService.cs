@@ -559,13 +559,16 @@ namespace onetouch.AppSiiwiiTransaction
                 appTrans.TotalAmount = double.Parse( appTrans.AppTransactionDetails.Where(s => s.ParentId != null).Sum(s => s.Amount).ToString());
 
                 AppTransactionHeaders obj = new AppTransactionHeaders();
-                var header = await _appTransactionsHeaderRepository.GetAll().AsNoTracking().Where(s => s.Code == input.Code && s.TenantId == AbpSession.TenantId 
+                var header = await _appTransactionsHeaderRepository.GetAll().AsNoTracking().Include (z=>z.AppTransactionDetails).Where(s => s.Code == input.Code && s.TenantId == AbpSession.TenantId 
                 && s.EntityObjectStatusId == null && s.EntityObjectTypeId == input.EntityObjectTypeId).FirstOrDefaultAsync();
                 if (header != null)
                 {
                     if (input.lFromPlaceOrder)
+                    {
                         await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == header.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
-
+                        foreach (var det in header.AppTransactionDetails.Where(z=>z.ParentId==null))
+                            await GetProductFromMarketplace(det.SSIN);
+                    }
                     appTrans.Id = header.Id;
                     if (header.EntityObjectStatusId == null)
                         appTrans.CreatorUserId = AbpSession.UserId;
@@ -998,8 +1001,12 @@ namespace onetouch.AppSiiwiiTransaction
                 }
                 //XX
                 if (input.lFromPlaceOrder)
+                {
                     await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == appTrans.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
-
+                    appTrans.AppTransactionDetails = _appTransactionDetails.GetAll().AsNoTracking().Where(z=>z.TransactionId==appTrans.Id && z.ParentId==null).ToList();
+                    foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
+                    await GetProductFromMarketplace(det.SSIN);
+                }
                 foreach (var con in appTrans.AppTransactionContacts)
                 {
                     if (con.ContactAddressId == null) con.ContactAddressCountryId = null;
@@ -2236,7 +2243,9 @@ namespace onetouch.AppSiiwiiTransaction
 
                         if (marketplaceItemMain != null)
                         {
-                            await GetProductFromMarketplace(marketplaceItemMain.SSIN);
+                            //MMT-F
+                            //await GetProductFromMarketplace(marketplaceItemMain.SSIN);
+                            //MMT-F
                             detParent = new AppTransactionDetails();
                             detParent = ObjectMapper.Map<AppTransactionDetails>(marketplaceItemMain);
                             detParent.Amount = decimal.Parse(orderAmt.ToString());
