@@ -1026,9 +1026,10 @@ namespace onetouch.AppItems
                                 if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
                                 {
                                     var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
-                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
+                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position)).OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
                                     var ss = secondAttributeValuesFor1st1.Distinct().ToList();
-                                    secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
+                                    secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position))
+                                        .OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
                                     foreach (var t in zz)
                                     {
                                         if (!ss.Contains(t.Split(',')[0].ToString()+','))
@@ -1225,7 +1226,7 @@ namespace onetouch.AppItems
                     output.AppItem.EntityObjectTypeName = appItem.EntityFk.EntityObjectTypeFk.Name;
                     //mmt
                     //output.AppItem.Description = _helper.HtmlToPlainText(output.AppItem.Description);
-                    //mmt
+                    //mmt/7
                     if (input.GetAppItemAttributesInputForCategories == null)
                         input.GetAppItemAttributesInputForCategories = new GetAppItemAttributesInput();
                     //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[Start]
@@ -5351,13 +5352,18 @@ namespace onetouch.AppItems
                         {
                             foreach (var sz in sizes)
                             {
+                                var exist = appSizeScalesDetailDtoList.FirstOrDefault(z => z.SizeCode == sz.SizeCode &&
+                                   z.D1Position == (sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
+                                   z.D2Position == (sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
+                                   z.D3Position == (sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
+                                if (exist ==null)
                                 appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
                                 {
                                     SizeCode = sz.SizeCode.TrimEnd(),
-                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : null,
                                     SizeId = null,
-                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
-                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
+                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : null,
+                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : null,
                                     SizeRatio = 0
                                 });
                             }
