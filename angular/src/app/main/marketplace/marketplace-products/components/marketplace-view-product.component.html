@@ -299,7 +299,6 @@
                                             [showButtons]="true"
                                             inputId="minmax-buttons"
                                             [min]="0"
-                                            [max]="size?.stockAvailability"
                                             (ngModelChange)="
                                                 onNumberChange(
                                                     $event,
@@ -389,11 +388,6 @@
                                                     [showButtons]="true"
                                                     inputId="minmax-buttons"
                                                     [min]="0"
-                                                    [max]="
-                                                        colorsData[currentIndex]
-                                                            ?.sizes[0]
-                                                            .noOfAvailablePrepacks
-                                                    "
                                                     (ngModelChange)="
                                                         onNumberChange(
                                                             $event,
@@ -447,7 +441,6 @@
                                                     inputId="minmax-buttons"
                                                     [min]="0"
                                                     [disabled]="true"
-                                                    [max]="size?.stockAvailability"
                                                     (ngModelChange)="
                                                         onNumberChange(
                                                             $event,
