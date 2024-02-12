@@ -727,7 +727,7 @@ namespace onetouch.AppItems
                     .Where(x => x.ParentId == appItemId).ToListAsync();
                 if (appItems != null && appItems.Count > 0)
                 {
-                    var filteredItems = appItems.Where(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == attributeId && z.AttributeValue == attributeCode).Count() > 0).ToList();
+                    var filteredItems = appItems.Where(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == attributeId && z.AttributeValue.ToUpper()== attributeCode.ToUpper()).Count() > 0).ToList();
                     foreach (var item in filteredItems)
                     {
                         // item.ItemPricesFkList = await  _appItemPricesRepository.GetAll()
@@ -764,7 +764,8 @@ namespace onetouch.AppItems
                 {
                     List<AppItemAttributePriceDto> appRetItemAttributePriceDto = new List<AppItemAttributePriceDto>();
                     var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
-                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode).ToList();
+                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position))
+                        .OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode).ToList();
                     var ss = appItemAttributePriceDto;
                     //secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode).ToList();
                     foreach (var t in zz)
@@ -831,7 +832,8 @@ namespace onetouch.AppItems
                 var output = new GetAppItemDetailForViewDto { AppItem = ObjectMapper.Map<AppItemForViewDto>(appItem) };
                 //
                 output.AppItem.AppItemSizesScaleInfo
-                    .ForEach(a => a.AppSizeScalesDetails = a.AppSizeScalesDetails.OrderBy(d => d.D1Position).OrderBy(d => d.D2Position).OrderBy(d => d.D3Position).ToList());
+                    .ForEach(a => a.AppSizeScalesDetails = a.AppSizeScalesDetails.OrderBy(d => Convert.ToInt32(d.D1Position))
+                    .OrderBy(d => Convert.ToInt32(d.D2Position)).OrderBy(d => Convert.ToInt32(d.D3Position)).ToList());
                 //
                 if (appItem != null)
                 {
@@ -5563,6 +5565,28 @@ namespace onetouch.AppItems
                                     }
                                     appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
                                 }
+                               
+                                if (string.IsNullOrEmpty(excelDto.SizeRatioName) && (appSizeScaleRatioForEditDto.AppSizeScalesDetails==null || appSizeScaleRatioForEditDto.AppSizeScalesDetails.Count==0))
+                                {
+                                    foreach (var sz in appSizeScaleForEditDto.AppSizeScalesDetails)
+                                    {
+                                        //var posinArr = sizesList.IndexOf(sz.SizeCode);
+                                        //if (posinArr >= 0)
+                                        {
+                                            appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                            {
+                                                SizeCode = sz.SizeCode.TrimEnd(),
+                                                D3Position = sz.D3Position,
+                                                SizeId = null,
+                                                D1Position =sz.D1Position,
+                                                D2Position = sz.D2Position,
+                                                SizeRatio = 0
+                                            });
+                                        }
+                                    }
+                                    appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
+
+                                }
 
                                 var sizescaleRatio = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
 
@@ -5847,6 +5871,7 @@ namespace onetouch.AppItems
                         });
                     }
                     //XX
+                    if (appChildItem.Id==0)
                     appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
                     var entityExtraData = new List<AppEntityExtraData>();
                     if (item.ExtraAttributesValues != null)
@@ -5876,8 +5901,26 @@ namespace onetouch.AppItems
 
                             });
                             try
-                            {
-                                appChildItem.EntityFk.EntityExtraData.Add(entityExtraData[etx]);
+                            {   if (appChildItem.Id == 0)
+                                    appChildItem.EntityFk.EntityExtraData.Add(entityExtraData[etx]);
+                                else
+                                {
+                                    var ext = appChildItem.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == item.ExtraAttributes[etx].AttributeId);
+                                    if (ext == null)
+                                        appChildItem.EntityFk.EntityExtraData.Add(entityExtraData[etx]);
+                                    else
+                                    {
+                                        ext.AttributeCode = item.ExtraAttributesValues[etx].Code;
+                                        ext.AttributeValue = item.ExtraAttributesValues[etx].Value;
+                                        ext.AttributeValueId = null;
+                                        ext.EntityObjectTypeName = item.ExtraAttributes[etx].Name;
+                                        //AttributeId = item.ExtraAttributes[etx].AttributeId,
+                                        ext.EntityObjectTypeId = AttributeInfoObj.Key.Id;
+                                        ext.EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode;
+                                        ext.EntityCode = appChildItem.Code;
+                                    }
+
+                                }
                             }
                             catch
                             { }
