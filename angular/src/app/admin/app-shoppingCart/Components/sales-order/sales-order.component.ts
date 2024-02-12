@@ -452,13 +452,12 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.createOrEditTransaction();
     }
     cancel() {
-        this.appTransactionsForViewDto = JSON.parse(this.oldappTransactionsForViewDto);
+        this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
         this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
         this.createOrEditorderInfo = false;
         this.showSaveBtn = false;
     }
     onUpdateAppTransactionsForViewDto($event) {
-        this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
         this.appTransactionsForViewDto = $event;
     }
 }

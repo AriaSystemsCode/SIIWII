@@ -61,19 +61,19 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   updateTabInfo(addObj, contactRole) {
     let contactIndex = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
 
-    if (contactIndex < 0 || contactIndex == this.oldappTransactionsForViewDto?.appTransactionContacts?.length) {
+    if (contactIndex < 0 || contactIndex == this.appTransactionsForViewDto?.appTransactionContacts?.length) {
       var appTransactionContactDto: AppTransactionContactDto = new AppTransactionContactDto();
       appTransactionContactDto.contactRole = contactRole;
       appTransactionContactDto.contactAddressCode = addObj.code;
       appTransactionContactDto.contactAddressId = addObj.id;
       appTransactionContactDto.contactAddressTypyId = addObj.typeId;
 
-      this.oldappTransactionsForViewDto?.appTransactionContacts.push(appTransactionContactDto);
+      this.appTransactionsForViewDto?.appTransactionContacts.push(appTransactionContactDto);
     } else {
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
@@ -99,6 +99,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
     }
   }
   cancel() {
+    this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+    this.shipFromSelectedAdd=null;
+    this.shipToSelectedAdd=null;
     this.setAddress();
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.createOrEditshippingInfO = false;
@@ -150,7 +153,6 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-    //this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
@@ -167,13 +169,13 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   selectShipVia($event) {
     var index = this.shipViaList.findIndex(x => x.value = $event?.value)
     if (index >= 0) {
-      this.oldappTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
-      this.oldappTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
+      this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
+      this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
     }
 
   }
   enterStore() {
-    this.oldappTransactionsForViewDto.buyerStore = this.storeVal;
+    this.appTransactionsForViewDto.buyerStore = this.storeVal;
   }
   isContactFormValid(value, sectionIndex) {
     let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
@@ -222,7 +224,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
     }
   }
   onUpdateAppTransactionsForViewDto($event) {
-    this.oldappTransactionsForViewDto = $event;
+    this.appTransactionsForViewDto = $event;
   }
   reloadAddresscomponentShipFrom(data) {
     this.loadAddresComponentShipFrom = true;

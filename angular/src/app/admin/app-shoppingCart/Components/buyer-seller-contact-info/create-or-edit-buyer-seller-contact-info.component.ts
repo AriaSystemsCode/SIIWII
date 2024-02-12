@@ -53,7 +53,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.createOrEditTransaction();
   }
   cancel() {
-    this.appTransactionsForViewDto =JSON.parse(this.oldappTransactionsForViewDto);
+    this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
     this.showSaveBtn = false;
@@ -81,7 +81,6 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   }
 
   onUpdateAppTransactionsForViewDto($event) {
-    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     this.appTransactionsForViewDto = $event;
   }
 
