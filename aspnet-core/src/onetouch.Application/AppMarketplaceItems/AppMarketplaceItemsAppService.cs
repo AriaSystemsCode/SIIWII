@@ -143,12 +143,15 @@ namespace onetouch.AppMarketplaceItems
                 //get curr tenant id to pass to the sp
                 
                 decimal exchangeRate = 1;
-                
+                //MMT12-20
+                if (!string.IsNullOrWhiteSpace(input.Filter))
+                    input.Filter = input.Filter.TrimEnd().TrimStart();
+                //MMT12-20
                 //if (input.TenantId != null)
-                    // if (!string.IsNullOrEmpty(input.SoldOutFromDate.ToString()))
-                    //   _sycEntityObjectTypeRepository.GetAll().Include(a => a.ExtraAttributes.);
-                    //var currencyTenant = TenantManager.GetTenantCurrency();
-                    //var account = await _appContactRepository.GetAll().Include(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData).FirstOrDefaultAsync(x => x.TenantId ==null && x.IsProfileData==false && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
+                // if (!string.IsNullOrEmpty(input.SoldOutFromDate.ToString()))
+                //   _sycEntityObjectTypeRepository.GetAll().Include(a => a.ExtraAttributes.);
+                //var currencyTenant = TenantManager.GetTenantCurrency();
+                //var account = await _appContactRepository.GetAll().Include(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData).FirstOrDefaultAsync(x => x.TenantId ==null && x.IsProfileData==false && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
                  if (input.CurrencyCode != null)
                  exchangeRate = _helper.SystemTables.GetExchangeRate("USD",input.CurrencyCode);
 
