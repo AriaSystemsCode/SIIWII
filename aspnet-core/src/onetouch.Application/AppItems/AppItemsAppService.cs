@@ -3876,13 +3876,20 @@ namespace onetouch.AppItems
                     await _appItemPricesRepository.DeleteAsync(a => a.AppItemId == child.Id);
                     //XX
                 }
-
+                //T-SII-20240125.0003,1 MMT 02/14/2024 - Seller showroom - Deleted products still showing in the marketplace seller showroom[Start]
+                var marketplaceItem = await _appMarketplaceItem.GetAll().AsNoTracking().Where(a => a.Code == item.SSIN).FirstOrDefaultAsync();
+                if (marketplaceItem != null)
+                {
+                    await HideProduct(item.Id);
+                }
+                //T-SII-20240125.0003,1 MMT 02/14/2024 - Seller showroom - Deleted products still showing in the marketplace seller showroom[End]
                 await _appEntityRepository.DeleteAsync(item.EntityId);
                 await _appItemRepository.DeleteAsync(item.Id);
                 //XX
                 await _appItemPricesRepository.DeleteAsync(a => a.AppItemId == item.Id);
                 await _appItemSizeScalesHeaderRepository.DeleteAsync(a => a.AppItemId == item.Id);
                 //XX
+                
             }
         }
 
