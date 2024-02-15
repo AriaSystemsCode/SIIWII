@@ -182,6 +182,7 @@ export class EditItemListingListComponent
         body.name = this.list.appItemsList.name;
         body.code = this.list.appItemsList.code;
         body.description = this.list.appItemsList.description;
+        body.creationTime=this.list.appItemsList.creationTime;
         return body;
     }
     createOrEditAppItemList(form: NgForm): void {
