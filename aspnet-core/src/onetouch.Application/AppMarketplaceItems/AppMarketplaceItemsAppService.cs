@@ -510,8 +510,11 @@ namespace onetouch.AppMarketplaceItems
                     var brandId = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108) != null ?
                         appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108).AttributeValueId : 0;
                     if (brandId != 0)
-                        output.AppItem.Brand = (await _appEntityRepository.GetAll().FirstOrDefaultAsync(a => a.Id == brandId)).Name;
-
+                    {
+                        var brandObj = await _appEntityRepository.GetAll().FirstOrDefaultAsync(a => a.Id == brandId);
+                        if (brandObj!=null)
+                            output.AppItem.Brand = brandObj.Name;
+                    }
                     output.AppItem.MaterialContent = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662) != null ?
                         appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662).AttributeValue : "";
 

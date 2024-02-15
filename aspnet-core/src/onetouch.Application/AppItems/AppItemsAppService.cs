@@ -5370,7 +5370,17 @@ namespace onetouch.AppItems
 
                 if (excelDto.Id == 0)
                     appItem.ParentFkList = new List<AppItem>();
-
+                //MMT30[Start]
+                DateTime timeStamp = DateTime.Now;
+                appItem.TimeStamp = timeStamp;
+                appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                if (string.IsNullOrEmpty(appItem.SSIN))
+                {
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.EntityFk.SSIN = appItem.SSIN;
+                }
+                appItem.EntityFk.TenantOwner = appItem.TenantOwner;
+                //MMT30[End]
                 //mmt
                 if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
                 {
@@ -5966,6 +5976,16 @@ namespace onetouch.AppItems
                         });
                     }
                     //XX
+                    //MMT30[End]
+                    appChildItem.TimeStamp = timeStamp;
+                    appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                    if (string.IsNullOrEmpty(appChildItem.SSIN))
+                    {
+                        appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        appChildItem.EntityFk.SSIN = appItem.SSIN;
+                    }
+                    appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;
+                    //MMT30[End]
                     if (appChildItem.Id==0)
                     appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
                     var entityExtraData = new List<AppEntityExtraData>();
