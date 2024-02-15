@@ -285,9 +285,8 @@ namespace onetouch.AppMarketplaceItems
                                    Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false
 
                                };
-                var orderedItems = appItems.Where(x=> x.AppItem.ShowItem && x.AppItem.Price !=null)
-                    .OrderBy(input.Sorting ?? "AppItem.id asc")
-                  .PageBy(input);
+                var orderedItemsFilter = appItems.Where(x => x.AppItem.ShowItem && x.AppItem.Price != null).OrderBy(input.Sorting ?? "AppItem.id asc");
+                var orderedItems = orderedItemsFilter.PageBy(input);
 
                 //var appItemsList = await appItems.ToListAs ync();
                 var appItemsList = await orderedItems.ToListAsync();
@@ -296,7 +295,7 @@ namespace onetouch.AppMarketplaceItems
                 {
                     appItemsList = appItemsList.Where(e => e.Selected).ToList();
                 }
-                var totalCount = await appItems.CountAsync(x => x.AppItem.ShowItem);
+                var totalCount = await orderedItemsFilter.CountAsync(x => x.AppItem.ShowItem);
 
                 stopwatch.Stop();
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
