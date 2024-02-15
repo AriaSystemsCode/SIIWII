@@ -1023,7 +1023,7 @@ namespace onetouch.AppItems
                             //    (a.FirstOrDefault().AttributeCode.ToString() == null ? a.FirstOrDefault().AttributeValueId.ToString() : a.FirstOrDefault().AttributeCode.ToString()))
                             //    .ToList().Distinct().ToList().Distinct().ToList();
                             var secondAttributeValuesFor1st1 =
-                            secondAttributeValuesFor1st11.Select(a => a.AttributeValue.ToString() + "," + a.AttributeValueId.ToString()).ToList();
+                            secondAttributeValuesFor1st11.Select(a =>a.AttributeCode).ToList();
                             //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
                             //.ToList();
                             if (secondAttributeValuesFor1st1 != null && secondAttributeValuesFor1st1.Count > 0)
@@ -1032,13 +1032,13 @@ namespace onetouch.AppItems
                                 if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
                                 {
                                     var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
-                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position)).OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
+                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position)).OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode.TrimEnd()).ToList();
                                     var ss = secondAttributeValuesFor1st1.Distinct().ToList();
                                     secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position))
                                         .OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
                                     foreach (var t in zz)
                                     {
-                                        if (!ss.Contains(t.Split(',')[0].ToString()+','))
+                                        if (!ss.Contains(t.ToString()))
                                             secondAttributeValuesFor1st.Remove(t.ToString());
                                     }
                                     //secondAttributeValuesFor1st = zz;
