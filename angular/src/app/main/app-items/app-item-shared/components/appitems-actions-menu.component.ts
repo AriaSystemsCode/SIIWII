@@ -257,7 +257,7 @@ export class AppitemsActionsMenuComponent extends AppComponentBase  {
         let toBeChanged : AppItemsListItemVariationDto[]=[]
         let toBeAdded : AppItemsListItemVariationDto[]=[]
         this.allVariations.forEach(variation=>{
-            const previousSelectionIndex : number = this.appItemListProductListing.appItemsListItemVariations.findIndex(item=>item.itemId = variation.itemId)
+            const previousSelectionIndex : number = this.appItemListProductListing.appItemsListItemVariations.findIndex(item=>item.itemId === variation.itemId)
             const selected = selectedVariationsIds.includes(variation.itemId)
             const record : AppItemsListItemVariationDto = new AppItemsListItemVariationDto()
             if(previousSelectionIndex == -1) { // not exist before
@@ -274,6 +274,11 @@ export class AppitemsActionsMenuComponent extends AppComponentBase  {
                 }
                 else {
                     record.state = StateEnum.ActiveOrEmpty
+                    
+                    record.id = this.appItemListProductListing.appItemsListItemVariations[previousSelectionIndex].id;
+                    record.itemsListId = this.selectedList.id
+                    record.itemId = variation.itemId
+                    
                     toBeChanged.push(record)
                 }
             }
