@@ -402,7 +402,7 @@
           <Controls>
             <Item1 Ref="209" ControlType="XRPictureBox" Name="pictureBox1" Sizing="ZoomImage" SizeF="171.979126,171.979172" LocationFloat="1408.64587,4.932677" Dpi="254" BackColor="LightGray">
               <ExpressionBindings>
-                <Item1 Ref="210" EventName="BeforePrint" PropertyName="ImageUrl" Expression="?attachmentBaseUrl+ [Attachment]&#xA;" />
+                <Item1 Ref="210" EventName="BeforePrint" PropertyName="ImageUrl" Expression="?attachmentBaseUrl+'/attachments/'+ToStr(?tenantId)+'/'+ [Attachment]" />
               </ExpressionBindings>
               <StylePriority Ref="211" UseBackColor="false" />
             </Item1>
