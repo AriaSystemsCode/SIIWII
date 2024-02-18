@@ -53,6 +53,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     salesOrderControls: ICreateOrEditAppTransactionsDto;
     selectedCar: number;
     buyerCompanies: any[];
+    buyerBranches: any[];
+    sellerBranches: any[];
     sellerCompanies: any[];
     buyerContacts: any[];
     sellerContacts: any[];
@@ -71,7 +73,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     isRoleExist: boolean = false;
     btnLoader: boolean = false;
     currencyCode: any = null;
-
+    byerBranchAutoselectFirst:boolean=false;
     @Input() orderNo: string;
     @Input() fullName: string;
     @Input() display: boolean = false;
@@ -106,6 +108,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     ) {
         super(injector);
         this.orderForm = this.fb.group({
+            startDate: [ Date, [Validators.required]],
+            completeDate: ["", [Validators.required]],
+            availableDate: ["", [Validators.required]],
             sellerCompanyName: ["", [Validators.required]],
             sellerContactName: [""],
             sellerContactEMailAddress: ["", [Validators.email]],
@@ -114,11 +119,30 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             buyerContactName: [""],
             buyerContactEMailAddress: ["", [Validators.email]],
             buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyBranch:["", [Validators.required]],
+            sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
         });
         this.getAllCompanies();
     }
 
+    getBranches(accountSSIN,objectToChangeName) {
+            this._AppTransactionServiceProxy.getAccountBranches(accountSSIN).subscribe(result => {
+                if(objectToChangeName=='buyer'){
+                  this.buyerBranches=result;
+                   if(result.length==1){
+                    this.orderForm.controls['buyerCompanyBranch'].setValue(result[0]);
+
+                   }
+                }else{
+                    this.sellerBranches;
+                    if(result.length==1){
+                        this.orderForm.controls['sellerCompanyBranch'].setValue(result[0]);
+    
+                       }
+                }
+            }); 
+    }
     getAllCompanies() {
         this._AppTransactionServiceProxy
             .getRelatedAccounts(
@@ -187,6 +211,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     this.orderForm.get("buyerCompanyName").reset();
                     this.orderForm.get("buyerContactEMailAddress").reset();
                     this.orderForm.get("buyerContactPhoneNumber").reset();
+                    this.orderForm.get("sellerCompanyBranch").reset();
+                    this.orderForm.get("buyerCompanyBranch").reset();
+                    this.sellerBranches=[];
+                    this.getBranches(this.sellerCompanySSIN ,'seller')
                 });
         } else if (data.value.code === 2) {
             // i'm a buyer
@@ -210,6 +238,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     this.orderForm.get("sellerCompanyName").reset();
                     this.orderForm.get("sellerContactEMailAddress").reset();
                     this.orderForm.get("sellerContactPhoneNumber").reset();
+                    this.orderForm.get("sellerCompanyBranch").reset();
+                    this.orderForm.get("buyerCompanyBranch").reset();
+                    this.buyerBranches=[];
+                    this.getBranches(this.buyerCompanySSIN ,'buyer')
+
                 });
         } else {
             // i'm a sales rep
@@ -296,6 +329,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         this.currencyCode = event.value.currencyCode;
         this.areSame = false
         this.handleBuyerNameSearch("");
+        this.buyerBranches=[];
+        this.getBranches(event.value.accountSSIN,'buyer')
     }
 
     handleSellerCompanyChange(event: any) {
@@ -303,6 +338,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         this.sellerCompanySSIN = event.value.accountSSIN;
         this.areSame = false
         this.handleSellerNameSearch("");
+        this.sellerBranches=[];
+        this.getBranches(event.value.accountSSIN,'seller')
     }
 
     handleBuyerNameSearch(event: any) {
