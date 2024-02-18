@@ -52,6 +52,7 @@ import { DropdownSelection } from "@shared/components/shared-forms-components/dr
 import { AppEntityDtoWithActions } from "../models/app-entity-dto-with-actions";
 import { PricingHelpersService } from "../../app-item-shared/services/pricing-helpers.service";
 import { ApplyVariationOutput } from "./create-edit-app-item-variations.component";
+import Swal from "sweetalert2";
 
 @Component({
     selector: "app-create-or-edit-app-item",
@@ -75,7 +76,7 @@ export class CreateOrEditAppItemComponent
     descriptionExportedHtml: string;
     saving = false;
     activeDescriptionIndex = 0;
-
+    extraVariationsTypes:any;
     appItemTypeId: number;
     selectedItemTypeData: GetAllEntityObjectTypeOutput =
         new GetAllEntityObjectTypeOutput();
@@ -374,9 +375,44 @@ export class CreateOrEditAppItemComponent
     selectTab(tabId: number) {
         this.staticTabs.tabs[tabId].active = true;
     }
+    getallAtrributes(id,oninit) {
+        this._appItemsServiceProxy
+            .getProductVariationsTypes(id)
+            .subscribe((res: any) => {
+                if(JSON.stringify(this.extraVariationsTypes)==JSON.stringify(res)||! this.extraVariationsTypes){
+                    this.extraVariationsTypes = res;
+                    this.getAppItemTypeExtraAttributesByIdFun(id);
 
-    // item type methods
-    onItemTypeChange(id: number) {
+                }else{
+
+                    Swal.fire({
+                        title: "",
+                        text: "The original product type has attributes that don't exist in the selected product type , data in those attributes will be lost ?",
+                        icon: "info",
+                        showCancelButton: true,
+                        confirmButtonText:
+                            "Continue",
+                        cancelButtonText: "Cancel",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        backdrop: true,
+                        customClass: {
+                            popup: "popup-class",
+                            icon: "icon-class",
+                            content: "content-class",
+                            actions: "actions-class",
+                            confirmButton: "confirm-button-class2",
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.getAppItemTypeExtraAttributesByIdFun(id);
+                        }
+                    }
+                    )
+                }
+            });
+    }
+    getAppItemTypeExtraAttributesByIdFun(id){
         if (!isNaN(id)) {
             this.getAppItemTypeExtraAttributesById(id).subscribe(
                 (result) => {
@@ -413,6 +449,11 @@ export class CreateOrEditAppItemComponent
             this.selectedItemTypeData = new GetAllEntityObjectTypeOutput();
             this.resetExtraData();
         }
+
+    }
+    // item type methods
+    onItemTypeChange(id: number) {
+        this.getallAtrributes(id,false);
     }
 
     loadRecommendedAndAdditionalExtraDataLookupLists() {

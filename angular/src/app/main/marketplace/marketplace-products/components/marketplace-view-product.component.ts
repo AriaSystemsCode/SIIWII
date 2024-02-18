@@ -272,7 +272,6 @@ export class MarketplaceViewProductComponent
                     let priceMultibly = multiby * size.price;
                     qty = qty + multiby;
                     price = price + priceMultibly;
-                    debugger
                 } else {
                     if (!size.orderedQty)
                       size.orderedQty = 0

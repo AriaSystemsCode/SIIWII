@@ -54,19 +54,19 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   }
   updateTabInfo(addObj, contactRole) {
     let contactIndex = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
-    if (contactIndex < 0 || contactIndex == this.oldappTransactionsForViewDto?.appTransactionContacts?.length) {
+    if (contactIndex < 0 || contactIndex == this.appTransactionsForViewDto?.appTransactionContacts?.length) {
       var appTransactionContactDto: AppTransactionContactDto = new AppTransactionContactDto();
       appTransactionContactDto.contactRole = contactRole;
       appTransactionContactDto.contactAddressCode = addObj.code;
       appTransactionContactDto.contactAddressId = addObj.id;
       appTransactionContactDto.contactAddressTypyId = addObj.typeId;
 
-      this.oldappTransactionsForViewDto?.appTransactionContacts.push(appTransactionContactDto);
+      this.appTransactionsForViewDto?.appTransactionContacts.push(appTransactionContactDto);
     } else {
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
-      this.oldappTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
 
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactRole = contactRole;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
@@ -76,8 +76,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
 
     }
     if (this.isContactsValid) {
-      let apContactObj = this.oldappTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
-      let arContactObj = this.oldappTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
+      let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
+      let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
       apContactObj[0]?.contactAddressDetail ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
       arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
 
@@ -162,7 +162,6 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   }
   createOrEditTransaction() {
     this.showMainSpinner()
-    //  this.appTransactionsForViewDto = JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
@@ -198,8 +197,10 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
     this.createOrEditTransaction();
   }
   cancel() {
-    this.setAddress();
-    this.appTransactionsForViewDto = JSON.parse(this.oldappTransactionsForViewDto);
+  this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
+  this.apContactSelectedAdd=null;
+  this.arContactSelectedAdd=null;
+   this.setAddress();
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.createOrEditBillingInfo = false;
     this.showSaveBtn = false;
@@ -249,8 +250,6 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
     if (indx >= 0) {
       this.appTransactionsForViewDto.paymentTermsCode = this.payTermsListList[indx].code;
       this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
-      this.oldappTransactionsForViewDto.paymentTermsCode = this.payTermsListList[indx].code;
-      this.oldappTransactionsForViewDto.paymentTermsId = this.payTermsListList[indx].value;
     }
   }
 }
