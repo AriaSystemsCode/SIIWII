@@ -61,6 +61,7 @@ export class CreateEditAppItemVariationsComponent
     @Input() updateVariation: boolean = true;
     @Input() productTypeId: number;
     @Input() productCode: any;
+    @Input() extraVariationsTypes:any
     @ViewChild("variationCombinationTap") variationCombinationTap: AccordionTab;
     extraVariations: any[];
     siwiMarketPlaceColor: any[];
@@ -256,7 +257,14 @@ export class CreateEditAppItemVariationsComponent
         };
     }
     ngOnChanges(changes: SimpleChanges) {
-        this.getallAtrributes();
+        if(!this.extraVariationsTypes){
+           this.getallAtrributes();
+
+        }else{
+          if(!this.extraVariations){
+            this.extraVariations=this.extraVariationsTypes;
+          }
+        }
 
         if (this.appItem && this.selectedItemTypeData) {
             // get sizescale and size ratios data if exists
