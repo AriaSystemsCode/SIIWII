@@ -2,7 +2,7 @@
     <h4>{{"SuccessfullyRegistered" | localize}}</h4>
 
     <ul>
-        <li><span class="text-muted">{{"WorkspaceName" | localize}}:</span> {{model.tenancyName}}</li>
+        <li><span class="text-muted"> {{model.accountType?.split(' ')[0]}} {{ "WorkspaceName" | localize}}:</span> {{model.tenancyName}}</li>
         <li><span class="text-muted">{{"Account Type" | localize}}:</span> {{model.accountType}}</li>
         <li><span class="text-muted">{{"AccountName" | localize}}:</span> {{model.name}}</li>
         <li><span class="text-muted">{{"FirstName" | localize}}:</span> {{model.firstName}}</li>

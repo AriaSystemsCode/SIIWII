@@ -5,7 +5,7 @@
         </h3>
 
         <h4 *ngIf="model.edition" class="text-center">
-            {{ "Edition" | localize }}: {{ model.edition.displayName }}
+            {{ "Edition" | localize }}: {{ accountTypeLabel }}
         </h4>
         <div class="kt-separator kt-separator--border-dashed"></div>
 
@@ -57,7 +57,7 @@
                     }}</span>
                 </div>
             </div>
-            <div class="form-group col-9 col-lg-12 col-md-10 col-sm-7 m-0">
+          <!--   <div class="form-group col-9 col-lg-12 col-md-10 col-sm-7 m-0">
                 <p-dropdown
                 #accountTypeInput="ngModel"
               placeholder="{{ 'Account Type' | localize }} *"
@@ -74,7 +74,7 @@
                     [formCtrl]="accountTypeInput"
                 ></validation-messages>
             </div>
-
+ -->
 
             <div class="form-group col-9 col-lg-12 col-md-10 col-sm-7 m-0">
                 <input
@@ -142,7 +142,7 @@
                     #adminEmailAddressInput="ngModel"
                     class="form-control"
                     type="email"
-                    [placeholder]=" !accountTypeLabel.includes('PERSONAL')?  'admin email*'    :  'personal email*'"
+                    [placeholder]=" !accountTypeLabel.includes('PERSONAL')?  'Admin Email*'    :  'Personal Email*'"
                     [(ngModel)]="model.adminEmailAddress"
                     name="adminEmailAddress"
                     required

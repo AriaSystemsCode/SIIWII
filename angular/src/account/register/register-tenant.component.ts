@@ -38,9 +38,10 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
 
     saving = false;
     domainPattern = Patterns.domainName
-   accountType;
+    accountType;
    accountTypeLabel:string="";
-   accountTypes:SelectItem[] = [];
+ //  accountTypes:SelectItem[] = [];
+
     constructor(
         injector: Injector,
         private _tenantRegistrationService: TenantRegistrationServiceProxy,
@@ -79,6 +80,9 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
         this._profileService.getPasswordComplexitySetting().subscribe(result => {
             this.passwordComplexitySetting = result.setting;
         });
+
+        this.accountType=this._activatedRoute.snapshot.queryParams['accountType'];
+        this.accountTypeLabel=this._activatedRoute.snapshot.queryParams['accountTypeLabel'];
     }
 
     ngAfterViewInit() {
@@ -89,23 +93,20 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
                 });
         }
 
-     this.getAccountTypes();
+   //  this.getAccountTypes();
     }
 
-    getAccountTypes(){
-       /* this.accountTypes.push({ label :'Personal' ,value:1});
-        this.accountTypes.push({ label :'Business' ,value:2});
-        this.accountTypes.push({ label :'Group' ,value: 3});*/
+    // getAccountTypes(){
 
-        this._tenantRegistrationService.getEditionsForSelect()
-    .subscribe((result) => {
-        for (let i = 0; i < result.editionsWithFeatures.length; i++) {
-            const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
-            const accountTypeValue = result.editionsWithFeatures[i].edition.id;
-            this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
-    }
-    }); 
-    } 
+    //     this._tenantRegistrationService.getEditionsForSelect()
+    // .subscribe((result) => {
+    //     for (let i = 0; i < result.editionsWithFeatures.length; i++) {
+    //         const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
+    //         const accountTypeValue = result.editionsWithFeatures[i].edition.id;
+    //         this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
+    // }
+    // }); 
+    // } 
     get useCaptcha(): boolean {
         return this.setting.getBoolean('App.TenantManagement.UseCaptchaOnRegistration');
     }
@@ -151,14 +152,14 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
         }
     }
 
-    changeAccountType($event){
-        debugger ;
-         let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
+    // changeAccountType($event){
+    //     debugger ;
+    //      let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
 
-         if(indx>=0)
-         this.accountTypeLabel= this.accountTypes[indx].label.toString().toUpperCase();
-         else
-         this.accountTypeLabel='';
+    //      if(indx>=0)
+    //      this.accountTypeLabel= this.accountTypes[indx].label.toString().toUpperCase();
+    //      else
+    //      this.accountTypeLabel='';
 
-    }
+    // }
 }

@@ -35,9 +35,28 @@
                                    {{editionWithFeatures.edition.displayName}}
                                 </h2> -->
 
-                                <h2 class="kt-pricing-1__subtitle pl-4 editionName" *ngIf="isFree(editionWithFeatures.edition)">
+                                <!-- <h2 class="kt-pricing-1__subtitle pl-4 editionName" *ngIf="isFree(editionWithFeatures.edition)">
                                     {{"FREE EDITION" | localize}}
-                                </h2>
+                                </h2> -->
+                      <div class="row" *ngIf="isFree(editionWithFeatures.edition)">
+                                <h2 class="kt-pricing-1__subtitle pl-4 editionName">
+                                    {{"Account Edition" | localize}}
+                                </h2> 
+                                <div class="form-group col-5 m-0">
+                                    <p-dropdown
+                                    #accountTypeInput="ngModel"
+                                  placeholder="{{ 'Account Type' | localize }} *"
+                                  [options]="accountTypes"
+                                   styleClass="ticket-dropdown form-control aria-select text-left"
+                                    [filter]="false"
+                                   name="accountType"
+                                   (onChange)="changeAccountType($event)"
+                                   [(ngModel)]="accountType">
+                                   </p-dropdown>
+                                </div>
+                            </div>
+
+
 
                                 <h2 class="kt-pricing-1__subtitle pl-4" *ngIf="!isFree(editionWithFeatures.edition)">
                                     <span *ngIf="editionWithFeatures.edition.dailyPrice > 0" class="kt-pricing-1__label">{{appSession.application.currencySign}} {{editionWithFeatures.edition.dailyPrice}}
@@ -89,7 +108,8 @@
                                     <button
                                         class="_btn btn mt-4 startBtn"
                                         [routerLink]="['/account/register-tenant']"
-                                        [queryParams]="{editionId: editionWithFeatures.edition.id, subscriptionStartType: subscriptionStartType.Free,tenantid:tenantid}"
+                                        [queryParams]="{editionId: editionWithFeatures.edition.id, subscriptionStartType: subscriptionStartType.Free,tenantid:tenantid,accountTypeLabel:accountTypeLabel,
+                                            accountType:accountType}"
                                         href="#" *ngIf="!isUserLoggedIn && isFree(editionWithFeatures.edition)">
                                         {{"Start" | localize}}
                                     </button>

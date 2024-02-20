@@ -13,6 +13,7 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import * as _ from 'lodash';
 import { EditionHelperService } from '@account/payment/edition-helper.service';
+import { SelectItem } from 'primeng/api';
 
 @Component({
     templateUrl: './select-edition.component.html',
@@ -31,7 +32,9 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
     /*you can change your edition icons order within editionIcons variable */
     editionIcons: string[] = ['flaticon-open-box', 'flaticon-rocket', 'flaticon-gift', 'flaticon-confetti', 'flaticon-cogwheel-2', 'flaticon-app', 'flaticon-coins', 'flaticon-piggy-bank', 'flaticon-bag', 'flaticon-lifebuoy', 'flaticon-technology-1', 'flaticon-cogwheel-1', 'flaticon-infinity', 'flaticon-interface-5', 'flaticon-squares-3', 'flaticon-interface-6', 'flaticon-mark', 'flaticon-business', 'flaticon-interface-7', 'flaticon-list-2', 'flaticon-bell', 'flaticon-technology', 'flaticon-squares-2', 'flaticon-notes', 'flaticon-profile', 'flaticon-layers', 'flaticon-interface-4', 'flaticon-signs', 'flaticon-menu-1', 'flaticon-symbol'];
     tenantid:number;
-
+    accountType;
+    accountTypeLabel:string="";
+    accountTypes:SelectItem[] = [];
     constructor(
         injector: Injector,
         private _tenantRegistrationService: TenantRegistrationServiceProxy,
@@ -57,6 +60,38 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
                     this._router.navigate(['/account/register-tenant']);
                 }
             });
+
+            this.getAccountTypes();
+    }
+
+    getAccountTypes(){
+        this._tenantRegistrationService.getEditionsForSelect()
+    .subscribe((result) => {
+        for (let i = 0; i < result.editionsWithFeatures.length; i++) {
+            const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
+            const accountTypeValue = result.editionsWithFeatures[i].edition.id;
+            this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
+
+            if(accountTypeLabel.toUpperCase().includes('PERSONAL'))
+             this.changeAccountType(this.accountTypes[i]) 
+    }
+    });
+    }
+
+      changeAccountType($event){
+        debugger ;
+         let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
+
+         if(indx>=0){
+         this.accountTypeLabel= this.accountTypes[indx].label.toString();
+         this.accountType=this.accountTypes[indx].value;
+         }
+         else
+         this.accountTypeLabel='';
+
+
+
+         //I40-Set Editions according to select accountType
     }
 
     isFree(edition: EditionSelectDto): boolean {
