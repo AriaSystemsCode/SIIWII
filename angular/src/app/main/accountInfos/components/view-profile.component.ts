@@ -65,7 +65,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
-    
+    btnLoader: boolean = false;
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -303,6 +303,18 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             });
 
         
+    }
+
+
+    shareAccount(){
+//I40-shareAccount
+    }
+
+    syncAccount(){
+//I40-syncAccount
+this.btnLoader = true;
+// .pipe(finalize(() => (this.btnLoader = false)))
+
     }
 
 }
