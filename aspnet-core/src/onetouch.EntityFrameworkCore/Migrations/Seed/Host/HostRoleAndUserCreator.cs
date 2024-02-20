@@ -651,7 +651,7 @@ namespace onetouch.Migrations.Seed.Host
             }
 
             var sycReports11 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate11").ToList();
-            if (sycReports11 == null || sycReports10.Count < 1)
+            if (sycReports11 == null || sycReports11.Count < 1)
             {
                 SycReport sycReport = new SycReport();
                 sycReport.Name = "ProductsCatalogTemplate11";
@@ -667,6 +667,42 @@ namespace onetouch.Migrations.Seed.Host
 
                 _context.SaveChanges();
             }
+
+            var sycReports12 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate12").ToList();
+            if (sycReports12== null || sycReports12.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate12";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate12";
+                sycReport.Description = "Product Per Page - Landscape - Available Quantities per Size";
+                sycReport.Thumbnail = "ProductsCatalogTemplate12";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            //var sycReports13 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate13").ToList();
+            //if (sycReports13 == null || sycReports13.Count < 1)
+            //{
+            //    SycReport sycReport = new SycReport();
+            //    sycReport.Name = "ProductsCatalogTemplate13";
+
+            //    sycReport.Code = "7";
+            //    sycReport.Name = "ProductsCatalogTemplate13";
+            //    sycReport.Description = "Product Per Page - Landscape - 2 images for product Suggested Layout";
+            //    sycReport.Thumbnail = "ProductsCatalogTemplate12";
+            //    sycReport.EntityObjectTypeId = 97;
+
+            //    _context.SycReports.Add(sycReport);
+
+
+            //    _context.SaveChanges();
+            //}
             #endregion SycEntityObjectTypes
 
         }

@@ -9,25 +9,17 @@
                             {{ "MyProductsList" | localize }}
                         </h6>
                     </label>
-                    <div class="col-6" >
-                        <div class="wide-drop-down" >
-                            <p-autoComplete
-                                [styleClass]="'w-100'"
-                                [inputStyleClass]="'w-100 form-control pl-3 bg-white'"
-                                name="itemList"
-                                [inputId]="'itemList'"
-                                [suggestions]="appItemsLists"
+                    <div class="col-6">
+                        <div class="wide-drop-down">
+                            <p-autoComplete [styleClass]="'w-100'"
+                                [inputStyleClass]="'w-100 form-control pl-3 bg-white'" name="itemList"
+                                [inputId]="'itemList'" [suggestions]="appItemsLists"
                                 [placeholder]="'EnterProductList' | localize"
-                                (completeMethod)="searchAppItemLists($event?.query)"
-                                [(ngModel)]="selectedAppItemList"
-                                (onSelect)="onSelectItem($event)"
-                                [field]="'name'"
-                                [dataKey]="'id'"
-                                [forceSelection]="true"
-                                [disabled]="disableAppItemsList"
-                            >
+                                (completeMethod)="searchAppItemLists($event?.query)" [(ngModel)]="selectedAppItemList"
+                                (onSelect)="onSelectItem($event)" [field]="'name'" [dataKey]="'id'"
+                                [forceSelection]="true" [disabled]="disableAppItemsList">
                                 <ng-template let-itemList pTemplate="selectedItem">
-                                    <span >{{itemList.appItemsList.name}}</span>
+                                    <span>{{itemList.appItemsList.name}}</span>
                                 </ng-template>
                             </p-autoComplete>
                         </div>
@@ -50,39 +42,61 @@
                     </div>
 
                     <div class="col-1 text-right">
-                        <button class="p-0" [disabled]="printInfoParam.itemsListId && !isValid" (click)="showProductsModal()" style="border: none;"
-                        [ngStyle]="{
+                        <button class="p-0" [disabled]="printInfoParam.itemsListId && !isValid"
+                            (click)="showProductsModal()" style="border: none;" [ngStyle]="{
                             'cursor': printInfoParam.itemsListId && !isValid ? 'not-allowed': 'pointer'
-                        }" >
-                            <img src="../../../../../assets/catalogueReport/ReportModal.png"  />
+                        }">
+                            <img src="../../../../../assets/catalogueReport/ReportModal.png" />
                         </button>
 
 
                     </div>
 
                 </div>
-                <div class="align-items-baseline mt-4 row">
-                    <label class="mt-4" for="reportTitle">
-                        <h6 style="color: #3699FF;">
-                            {{ "Numberofselectedproducts" | localize }} ({{numberofselectedproducts}})
-                        </h6>
-                    </label>
+                <div class="align-items-baseline mt-12 row">
+                    <div class="col-6">
+                        <div class="align-items-baseline mt-8 row">
+                            <div class="col-4">
+                                {{ "OnlyInStockColors" | localize }}
+                            </div>
+                            <div class="col-2">
+                                <p-inputSwitch [(ngModel)]="onlyInStockColors" name="showCode"></p-inputSwitch>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="align-items-baseline mt-4 row">
+                            <div class="col-5">
+                                {{ "MinimumInStock" | localize }}
+                            </div>
+                            <div class="ng-tns-c377-45 ng-star-inserted">
+                                <input type="number" step="any" placeholder="Price"
+                                    class="form-control rounded-lg pt-3 pb-3 row-item ng-tns-c377-45 ng-pristine ng-valid ng-touched"
+                                    ng-reflect-name="price_2019" ng-reflect-model="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <label class="mt-4" for="reportTitle">
+                            <h6 style="color: #3699FF;">
+                                {{ "Numberofselectedproducts" | localize }} ({{numberofselectedproducts}})
+                            </h6>
+                        </label>
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
 
 
     <div class="text-right pr-5 w-100 mt-3">
- 
-        <button class="btn btn-primary" (click)="continueToNextStep()" [disabled]="!isValid" 
-        [ngStyle]="{
+
+        <button class="btn btn-primary" (click)="continueToNextStep()" [disabled]="!isValid" [ngStyle]="{
             'cursor': !isValid ? 'not-allowed': 'pointer'
         }">
             {{ "Continue" | localize }}
             <i class="fa-arrow-right fas ml-3"></i>
-            
+
         </button>
     </div>
 

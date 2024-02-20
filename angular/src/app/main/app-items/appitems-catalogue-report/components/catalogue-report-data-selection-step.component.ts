@@ -24,6 +24,8 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
   myProductsName: string = '';
   numberofselectedproducts: number = 0;
   numOfDisplayedItem: number = 4;
+  onlyInStockColors:boolean=false;
+  mimimumInStockQty:number=0;
 
   isValid:boolean=false;
   
