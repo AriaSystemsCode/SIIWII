@@ -66,6 +66,8 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
           if(!this.appItemsLists?.length){
             this.appItemsLists = [new AppItemsListDto(res.appItemsList as any)]
             this.selectedAppItemList = this.appItemsLists[0]
+            if(!this.printInfoParam.reportTitle)
+            this.printInfoParam.reportTitle=this.appItemsLists[0]?.name
           }
         });
   }
