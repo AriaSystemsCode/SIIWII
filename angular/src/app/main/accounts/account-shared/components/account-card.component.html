@@ -46,9 +46,8 @@ padding: 10px;">
                         border-radius: 4px;
                         color: #F88011 !important;
                         font-weight: bold;
-                        width: 90px;
                         display: inline-block;
-                        text-align: center;">
+                        text-align: center;padding: 5px;">
                         {{ account.account.accountType }}
                     </span>
                     
@@ -85,7 +84,7 @@ padding: 10px;">
                                 style="    background-color: #6259CE !important;
                                 border: none !important;
                                 color: white !important;
-                                width: 115px;"
+                                width: 115px;padding: 5px;"
                                 >
                                 {{ "Connect" | localize }}
                                 <i class="fa fa-user-plus pl-2"> </i>
@@ -104,21 +103,26 @@ padding: 10px;">
                                         class=" pl-2 success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
                                     ></i>
                             </span>
-                            <span class="text-muted" *ngIf="account.account.status == false && !account.account.isManual && !isHost && false">
-                                <span class="mr-1">
-                                    <i
-                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
-                                    ></i>
-                                </span>
+                            <span  style="background-color: red !important;
+                            border: none !important;
+                            color: white !important;
+                            width: 115px;
+                            display: inline-block;
+                            padding: 5px;" class="text-muted" *ngIf="account.account.status == false && !account.account.isManual && !isHost && false">
+                              
                                 {{'NotConnected'| localize }}
+                                <i
+                                class=" pl-2 bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                            ></i>
                             </span>
-                            <span class="text-muted" *ngIf="account.account.isManual == true ">
-                                <span class="mr-1">
-                                    <i
-                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
-                                    ></i>
-                                </span>
+                            <span  style="    background-color: #6259CE !important;
+                            border: none !important;
+                            color: white !important;padding: 5px;" class="text-muted" *ngIf="account.account.isManual == true ">
+                                   
                                 {{ isHost ? ('ExternalAccount'| localize ) : ('ManualAccount' | localize ) }}
+                                <i
+                                class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                            ></i>
                             </span>
                         </div>
                     </div>
@@ -160,35 +164,49 @@ padding: 10px;">
                 <div class="single-row-mode-status">
                     <div *ngIf="singleItemPerRowMode" >
                         <div *ngIf="account.account.status !== null" class="mr-3">
-                            <span class="connected text-success" *ngIf="account.account.status == true && !account.account.isManual && !isHost && !isRecordOwner">
-                                <span class="mr-1">
-                                    <i
-                                        class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
-                                    ></i>
-                                </span>
+                            <span style="background-color: #16B455 !important;
+                            border: none !important;
+                            color: white !important;
+                            width: 115px;
+                            display: inline-block;
+                            padding: 5px;" styleclass="connected text-success"  
+                             class="connected text-success" *ngIf="account.account.status == true && !account.account.isManual && !isHost && !isRecordOwner">
+                               
                                 {{'Connected' | localize }}
+                                <i
+                                class="pl-2 success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
+                            ></i>
                             </span>
-                            <span class="text-muted" *ngIf="account.account.status == false && !isHost && false">
-                                <span class="mr-1">
-                                    <i
-                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
-                                    ></i>
-                                </span>
+                            <span style="background-color: red !important;
+                            border: none !important;
+                            color: white !important;
+                            width: 115px;
+                            display: inline-block;
+                            padding: 5px;"  styleclass="connected text-success"  class="text-muted" *ngIf="account.account.status == false && !isHost && false">
+                                
                                 {{'NotConnected'| localize }}
-                            </span>
-                            <span class="text-muted" *ngIf="account.account.isManual == true">
-                                <span class="mr-1">
-                                    <i
-                                        class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                                <i
+                                        class="pl-2 bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
                                     ></i>
-                                </span>
+                            </span>
+                            <span style="    background-color: #6259CE !important;
+                            border: none !important;
+                            color: white !important;padding: 5px;" class="text-muted" *ngIf="account.account.isManual == true">
+                                
                                 {{ isHost ? ('ExternalAccount'| localize ) : ('ManualAccount' | localize ) }}
+                                <i
+                                class="bg-warning bg-warn d-inline-flex flaticon2-information rounded-circle text-white"
+                            ></i>
                             </span>
                         </div>
                         <span >
                             <button *ngIf="account.account.status == false && !isHost && !isRecordOwner"
                                 class="btn btn-outline-primary mt-4"
                                 (click)="connect()"
+                                 style="    background-color: #6259CE !important;
+                                border: none !important;
+                                color: white !important;
+                                width: 115px;padding: 5px;"
                                 >
                                 {{ "Connect" | localize }}
                             </button>

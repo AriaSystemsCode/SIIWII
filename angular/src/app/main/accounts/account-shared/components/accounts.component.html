@@ -113,8 +113,7 @@
                                         class="list-toolbar-divider"
                                         *ngIf="showAddButton"
                                     ></div>
-                                    <div class="mb-4 mb-md-0 text-center" 
-                                    style="background-color: #6259CE !important;">
+                                    <div class="mb-4 mb-md-0 text-center" >
                                         <a
                                             class="btn btn-hover-primary font-weight-normal toolbar-btn"
                                             (click)="showSendMail()"
@@ -128,6 +127,7 @@
                                                 style="
                                                     padding-right: 3px;
                                                     padding-left: 9px;
+                                                    background-color: #6259CE !important;
                                                 "
                                                 *ngIf="!this.isHost"
                                                 [title]="
@@ -141,12 +141,14 @@
                                             >
                                                 <i
                                                     class="d-inline-block w-100 fas fa-user-plus icon-center"
+                                                    style="color: white !important;"
                                                 ></i>
                                             </a>
                                             <a
                                                 style="
                                                     padding-right: 3px;
                                                     padding-left: 9px;
+                                                    background-color: #6259CE !important;
                                                 "
                                                 *ngIf="this.isHost"
                                                 [title]="
@@ -160,6 +162,7 @@
                                             >
                                                 <i
                                                     class="d-inline-block w-100 fas fa-user-plus icon-center"
+                                                    style="color: white !important;"
                                                 ></i>
                                             </a>
                                             <!-- Iteration-8 -->
@@ -168,6 +171,7 @@
                                                 style="
                                                     padding-right: 3px;
                                                     padding-left: 9px;
+                                                    background-color: #6259CE !important;
                                                 "
                                                 [title]="
                                                     'Import Accounts' | localize
@@ -176,6 +180,7 @@
                                             >
                                                 <i
                                                     class="d-inline-block w-100 fa-file-import fas icon-center"
+                                                    style="color: white !important;"
                                                 ></i>
                                             </a>
                                             <!-- Iteration-8 -->
