@@ -74,7 +74,7 @@ export class ShoppingCartViewComponentComponent
   printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
   reportUrl: string = "";
   invokeAction = '/DXXRDV';
-  
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -714,6 +714,8 @@ export class ShoppingCartViewComponentComponent
   }
   onGeneratOrderReport($event) {
     if ($event) {
+      this.reportUrl="";
+      this.printInfoParam= new ProductCatalogueReportParams();
       this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
       this.printInfoParam.TransactionId = this.orderId.toString();
       //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
