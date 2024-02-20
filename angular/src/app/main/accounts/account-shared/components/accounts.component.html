@@ -103,7 +103,7 @@
                                             >
                                                 <span
                                                     ><i
-                                                        class="flaticon2-search-1 icon-md text-primary"
+                                                        class="flaticon2-search-1 icon-md text-primary" style="color: #6259CE !important;"
                                                     ></i
                                                 ></span>
                                             </span>
@@ -113,13 +113,15 @@
                                         class="list-toolbar-divider"
                                         *ngIf="showAddButton"
                                     ></div>
-                                    <div class="mb-4 mb-md-0 text-center">
+                                    <div class="mb-4 mb-md-0 text-center" 
+                                    style="background-color: #6259CE !important;">
                                         <a
                                             class="btn btn-hover-primary font-weight-normal toolbar-btn"
                                             (click)="showSendMail()"
+                                            style="background-color: #6259CE !important; color: white !important;border: none !important;"
                                         >
                                             {{ "InvitePartner" | localize }}
-                                            <i class="fas fa-share-alt"></i>
+                                            <i class="fas fa-share-alt" style="color: white !important;"></i>
                                         </a>
                                         <ng-container *ngIf="showAddButton">
                                             <a
@@ -186,6 +188,8 @@
                                             style="
                                                 padding-right: 4px;
                                                 padding-left: 10px;
+                                                background-color: transparent !important;
+    border: none !important;
                                             "
                                             [title]="'ResetData' | localize"
                                             class="btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn"
@@ -200,6 +204,7 @@
                                             [title]="'ToggleView' | localize"
                                             (click)="triggerListView()"
                                             class="btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn"
+                                            style="background-color: #F88011 !important; border: none !important;"
                                         >
                                             <i
                                                 class="d-inline-block w-100"

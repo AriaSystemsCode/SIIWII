@@ -1,4 +1,5 @@
-<div class="single-item mr-1 row" >
+<div class="single-item mr-1 row w-80 p-4" style="background-color: #F4F6F9 !important;
+padding: 10px;">
     <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
         'background-image':
         account.account.logoUrl ?
@@ -12,7 +13,7 @@
     <div class="single-item-body col " [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
         <div class="row">
             <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-11'" >
-                <h3 (click)="clickCardHandler()" class="text-capitalize text-primary card-name" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0 text-dark'">{{account?.account?.name}}</h3>
+                <h3 (click)="clickCardHandler()" class="text-capitalize  card-name" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">{{account?.account?.name}}</h3>
                 <p  class="text-primary m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
                     {{ account?.account.description  | textSubstring : 60 }}
                 </p>
@@ -40,7 +41,14 @@
                     <!-- <span *ngFor="let accountType of account.account.accountType;let last = last">
                         {{ accountType }}{{ last ? '' : ', ' }}
                     </span> -->
-                    <span>
+                    <span style="
+                        background-color: #FFE2C7 !important;
+                        border-radius: 4px;
+                        color: #F88011 !important;
+                        font-weight: bold;
+                        width: 90px;
+                        display: inline-block;
+                        text-align: center;">
                         {{ account.account.accountType }}
                     </span>
                     
@@ -69,23 +77,32 @@
                              {{ account.account.zipCode ? account.account.zipCode  : "NotSpecified" | localize }}
                         </span>
                     </span>
-                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex" >
+                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex mt-3 pt-3" style="border-top: 1px solid #84818A;" >
                         <span >
                             <button *ngIf="account.account.status == false && !isHost && !isRecordOwner"
                                 class="btn btn-outline-primary mr-2 action-button"
                                 (click)="connect()"
+                                style="    background-color: #6259CE !important;
+                                border: none !important;
+                                color: white !important;
+                                width: 115px;"
                                 >
                                 {{ "Connect" | localize }}
+                                <i class="fa fa-user-plus pl-2"> </i>
                             </button>
                         </span>
                         <div  *ngIf="account.account.status !== null ">
-                            <span class="connected text-success" *ngIf="account.account.status == true && !account.account.isManual && !isHost && !isRecordOwner">
-                                <span class="mr-1">
-                                    <i
-                                        class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
-                                    ></i>
-                                </span>
+                            <span style="background-color: #16B455 !important;
+                            border: none !important;
+                            color: white !important;
+                            width: 115px;
+                            display: inline-block;
+                            padding: 5px;" styleclass="connected text-success" *ngIf="account.account.status == true && !account.account.isManual && !isHost && !isRecordOwner">
+                               
                                 {{'Connected' | localize }}
+                                <i
+                                        class=" pl-2 success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
+                                    ></i>
                             </span>
                             <span class="text-muted" *ngIf="account.account.status == false && !account.account.isManual && !isHost && false">
                                 <span class="mr-1">
