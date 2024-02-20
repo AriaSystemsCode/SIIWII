@@ -74,6 +74,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     btnLoader: boolean = false;
     currencyCode: any = null;
     byerBranchAutoselectFirst:boolean=false;
+    minDate:Date;
     @Input() orderNo: string;
     @Input() fullName: string;
     @Input() display: boolean = false;
@@ -135,7 +136,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
 
                    }
                 }else{
-                    this.sellerBranches;
+                    this.sellerBranches=result;
                     if(result.length==1){
                         this.orderForm.controls['sellerCompanyBranch'].setValue(result[0]);
     
@@ -543,7 +544,24 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             this.areSame = true
         }
     }
+    changeStartDate(date){
+        let newDate = date.value;
+        let month = newDate.getMonth();
+        let year = newDate.getFullYear();
 
+        let monthVal = (month === 11) ? 0 : month +1;
+        let yearVal = (monthVal === 0) ? year + 1 : year;
+        this.minDate = date.value;
+        this.minDate.setMonth(monthVal);
+        this.minDate.setFullYear(yearVal);
+        this.orderForm.controls['completeDate'].setValue(this.minDate);
+       this.orderForm.controls['availableDate'].setValue(this.minDate);
+       newDate.setMonth(month);
+       newDate.setFullYear(year);
+
+       this.orderForm.controls['startDate'].setValue(newDate)
+
+    }
     async validateShoppingCart() {
         this.showMainSpinner();
         var transactionType: TransactionType;
@@ -761,5 +779,15 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
 
     ngOnInit(): void {
         console.log(">> oninit", this.orderNo);
+        let today = new Date();
+        let month = today.getMonth();
+        let year = today.getFullYear();
+        let prevMonth = (month === 0) ? 11 : month -1;
+        let prevYear = (prevMonth === 11) ? year - 1 : year;
+        let nextMonth = (month === 11) ? 0 : month + 1;
+        let nextYear = (nextMonth === 0) ? year + 1 : year;
+        this.minDate = new Date();
+        this.minDate.setMonth(prevMonth);
+        this.minDate.setFullYear(prevYear);
     }
 }

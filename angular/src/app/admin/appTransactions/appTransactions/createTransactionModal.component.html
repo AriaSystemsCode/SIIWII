@@ -55,6 +55,8 @@
                     <p-calendar
                     formControlName="startDate"
                     [showIcon]="true"
+                    (onSelect)="changeStartDate(orderForm.get('startDate'))"
+                    [readonlyInput]="true"
                 ></p-calendar>
                 </div>     
 
@@ -67,7 +69,8 @@
                     <p-calendar
                     formControlName="completeDate"
                     [showIcon]="true"
-                    [minDate]="orderForm.get('startDates')"
+                    [minDate]="minDate"
+                    [readonlyInput]="true"
                 ></p-calendar>
                 </div>     
 
@@ -80,6 +83,9 @@
                     <p-calendar
                     formControlName="availableDate"
                     [showIcon]="true"
+                    [readonlyInput]="true"
+                    [minDate]="minDate"
+
                 ></p-calendar>
                 </div>     
 
