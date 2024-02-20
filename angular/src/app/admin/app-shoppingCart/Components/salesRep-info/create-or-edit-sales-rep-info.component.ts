@@ -87,7 +87,6 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
 
 
   onUpdateAppTransactionsForViewDto($event) {
-    this.oldappTransactionsForViewDto =JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     this.appTransactionsForViewDto = $event;
   }
 

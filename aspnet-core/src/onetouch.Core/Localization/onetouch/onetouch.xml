@@ -1893,6 +1893,7 @@
 		<text name="UnpublishList">Unpublish List</text>
 		<text name="AreYouSureYouWantToCancelPrintingThisProductListCatalogue?">Are You Sure You Want To Cancel Printing This Product List Catalogue ?</text>
 		<text name="PrintProductsList">Print product List</text>
+    
 		<text name="CatalogueReport">Catalogue Report</text>
 		<text name="ProductsCatalogInfo/Print">Products Catalog Info / Print</text>
 		<text name="ChooseTemplate">Choose Template</text>

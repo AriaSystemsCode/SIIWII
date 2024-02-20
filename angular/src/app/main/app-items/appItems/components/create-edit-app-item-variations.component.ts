@@ -61,6 +61,7 @@ export class CreateEditAppItemVariationsComponent
     @Input() updateVariation: boolean = true;
     @Input() productTypeId: number;
     @Input() productCode: any;
+    @Input() extraVariationsTypes:any
     @ViewChild("variationCombinationTap") variationCombinationTap: AccordionTab;
     extraVariations: any[];
     siwiMarketPlaceColor: any[];
@@ -256,7 +257,14 @@ export class CreateEditAppItemVariationsComponent
         };
     }
     ngOnChanges(changes: SimpleChanges) {
-        this.getallAtrributes();
+        if(!this.extraVariationsTypes){
+           this.getallAtrributes();
+
+        }else{
+          if(!this.extraVariations){
+            this.extraVariations=this.extraVariationsTypes;
+          }
+        }
 
         if (this.appItem && this.selectedItemTypeData) {
             // get sizescale and size ratios data if exists
@@ -645,6 +653,7 @@ export class CreateEditAppItemVariationsComponent
         extraAttr: IsVariationExtraAttribute,
         generatePhotos: boolean = true
     ) {
+        debugger
         const sameSelection: boolean =
             this.defaultExtraAttrForAttachments == extraAttr;
 
@@ -1063,6 +1072,7 @@ export class CreateEditAppItemVariationsComponent
         });
         this.isListing ? this.selectedVaritaions : this.variationMatrices;
         let appItemSizesScaleInfo: AppItemSizesScaleInfo[] = undefined;
+        debugger
         const sizeIsSelected = this.selectedExtraAttributes.filter(
             (item) => item.entityObjectTypeCode == this.sizeExtraAttrCode
         )[0];
@@ -1189,7 +1199,7 @@ export class CreateEditAppItemVariationsComponent
             this.extraAttributes[currentExtraDataIndex].selected = true;
             this.extraAttributes[currentExtraDataIndex].selectedValues = [];
         });
-
+debugger
         let selectedExtraAttrIds = this.selectedExtraAttributes.map(
             (row) => row.attributeId
         );
@@ -1366,6 +1376,7 @@ export class CreateEditAppItemVariationsComponent
         this.sortVaritaionCombination();
     }
     sortVaritaionCombination() {
+        debugger
         let selectedExtraAttributesOrder: number[] =
             this.selectedExtraAttributes?.map((item) => item.attributeId);
         this.variationMatrices?.forEach((variation) => {
@@ -1500,6 +1511,7 @@ export class CreateEditAppItemVariationsComponent
     // }
 
     openCreateNewAppEntityModal() {
+        debugger
         let extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
         let config: ModalOptions = new ModalOptions();
@@ -1532,6 +1544,7 @@ export class CreateEditAppItemVariationsComponent
     }
     filterLookup($event) {
         const search = $event.target.value;
+        debugger
         const extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
         extraAttr.displayedLookupData = extraAttr.lookupData.filter((item) =>
@@ -1598,6 +1611,7 @@ export class CreateEditAppItemVariationsComponent
         this.oldActiveAttachmentOption = this.activeAttachmentOption;
     }
     mapExtraAttrSelectionDataFromVariationMatrices() {
+        debugger
         // this.variationMatrices
         this.activeExtraAttributeIndex = this.selectedExtraAttributes.findIndex(
             (item) => item.selected
@@ -1618,12 +1632,12 @@ export class CreateEditAppItemVariationsComponent
         this.appSizeScales?.appSizeScalesDetails?.forEach((sizeScaleItem) => {
             const isColValue: boolean =
                 Boolean(sizeScaleItem.sizeCode) &&
-                Boolean(sizeScaleItem.sizeId) &&
+                //Boolean(sizeScaleItem.sizeId) &&
                 Boolean(sizeScaleItem.dimensionName) &&
                 Boolean(sizeScaleItem.d1Position);
             const isCellValue: boolean =
                 Boolean(sizeScaleItem.sizeCode) &&
-                !Boolean(sizeScaleItem.sizeId) &&
+                //!Boolean(sizeScaleItem.sizeId) &&
                 !Boolean(sizeScaleItem.dimensionName);
             let isAlreadyExistAsRatio: AppSizeScalesDetailDto =
                 this.appSizeRatios?.appSizeScalesDetails?.filter(
@@ -1662,6 +1676,9 @@ export class CreateEditAppItemVariationsComponent
     // sizeRatioisValid :boolean = false
     sizeRatioChanged($event: AppItemSizesScaleInfo, formIsValid: boolean) {
         this.sizeRatioFormIsValid = formIsValid;
+        const uniqueTempIds = new Set<number>();
+        const currentComponent=this;
+
         //this.editVariationsOpend=true;
         if(!this.removeSizeExtraAttr)this.appSizeRatios = $event;
         this.removeSizeExtraAttr=false;
@@ -1673,13 +1690,11 @@ export class CreateEditAppItemVariationsComponent
             (item) => item.sizeId
         );
         const selectedValuesIds : number[] = []
-        const uniqueTempIds = new Set<number>();
-        const currentComponent=this;
 
         const sizeExtraAttr = this.extraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == this.sizeExtraAttrCode)[0]
         selectedValuesCodes.forEach(function(code,index){
             const isExist = sizeExtraAttr?.lookupData.filter(item=>item.code == code)[0] 
-            if(!isExist) {
+            if(!isExist||!sizeIdsArray[index]) {
                 const tempAtt = new LookupLabelDto({
                     code,
                     value:currentComponent.getUniqueId(uniqueTempIds),
@@ -1695,7 +1710,7 @@ export class CreateEditAppItemVariationsComponent
             }    
             
         })
-        
+        debugger
 
         const sizeSeletedExtraAttr = this.selectedExtraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == this.sizeExtraAttrCode)[0]
         if(selectedValuesIds.length>0){

@@ -285,9 +285,8 @@ namespace onetouch.AppMarketplaceItems
                                    Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false
 
                                };
-                var orderedItems = appItems.Where(x=> x.AppItem.ShowItem && x.AppItem.Price !=null)
-                    .OrderBy(input.Sorting ?? "AppItem.id asc")
-                  .PageBy(input);
+                var orderedItemsFilter = appItems.Where(x => x.AppItem.ShowItem && x.AppItem.Price != null).OrderBy(input.Sorting ?? "AppItem.id asc");
+                var orderedItems = orderedItemsFilter.PageBy(input);
 
                 //var appItemsList = await appItems.ToListAs ync();
                 var appItemsList = await orderedItems.ToListAsync();
@@ -296,7 +295,7 @@ namespace onetouch.AppMarketplaceItems
                 {
                     appItemsList = appItemsList.Where(e => e.Selected).ToList();
                 }
-                var totalCount = await appItems.CountAsync(x => x.AppItem.ShowItem);
+                var totalCount = await orderedItemsFilter.CountAsync(x => x.AppItem.ShowItem);
 
                 stopwatch.Stop();
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
@@ -510,8 +509,11 @@ namespace onetouch.AppMarketplaceItems
                     var brandId = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108) != null ?
                         appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108).AttributeValueId : 0;
                     if (brandId != 0)
-                        output.AppItem.Brand = (await _appEntityRepository.GetAll().FirstOrDefaultAsync(a => a.Id == brandId)).Name;
-
+                    {
+                        var brandObj = await _appEntityRepository.GetAll().FirstOrDefaultAsync(a => a.Id == brandId);
+                        if (brandObj!=null)
+                            output.AppItem.Brand = brandObj.Name;
+                    }
                     output.AppItem.MaterialContent = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662) != null ?
                         appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662).AttributeValue : "";
 

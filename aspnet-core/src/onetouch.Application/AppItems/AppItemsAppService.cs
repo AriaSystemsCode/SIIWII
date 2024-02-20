@@ -1023,7 +1023,7 @@ namespace onetouch.AppItems
                             //    (a.FirstOrDefault().AttributeCode.ToString() == null ? a.FirstOrDefault().AttributeValueId.ToString() : a.FirstOrDefault().AttributeCode.ToString()))
                             //    .ToList().Distinct().ToList().Distinct().ToList();
                             var secondAttributeValuesFor1st1 =
-                            secondAttributeValuesFor1st11.Select(a => a.AttributeValue.ToString() + "," + a.AttributeValueId.ToString()).ToList();
+                            secondAttributeValuesFor1st11.Select(a =>a.AttributeCode).ToList();
                             //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
                             //.ToList();
                             if (secondAttributeValuesFor1st1 != null && secondAttributeValuesFor1st1.Count > 0)
@@ -1032,13 +1032,13 @@ namespace onetouch.AppItems
                                 if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
                                 {
                                     var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
-                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position)).OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
+                                    var zz = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position)).OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode.TrimEnd()).ToList();
                                     var ss = secondAttributeValuesFor1st1.Distinct().ToList();
                                     secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => Convert.ToInt32(s.D1Position))
                                         .OrderBy(s => Convert.ToInt32(s.D2Position)).OrderBy(s => Convert.ToInt32(s.D3Position)).Select(a => a.SizeCode.TrimEnd() + "," + a.SizeId.ToString()).ToList();
                                     foreach (var t in zz)
                                     {
-                                        if (!ss.Contains(t.Split(',')[0].ToString()+','))
+                                        if (!ss.Contains(t.ToString()))
                                             secondAttributeValuesFor1st.Remove(t.ToString());
                                     }
                                     //secondAttributeValuesFor1st = zz;
@@ -3876,13 +3876,20 @@ namespace onetouch.AppItems
                     await _appItemPricesRepository.DeleteAsync(a => a.AppItemId == child.Id);
                     //XX
                 }
-
+                //T-SII-20240125.0003,1 MMT 02/14/2024 - Seller showroom - Deleted products still showing in the marketplace seller showroom[Start]
+                var marketplaceItem = await _appMarketplaceItem.GetAll().AsNoTracking().Where(a => a.Code == item.SSIN).FirstOrDefaultAsync();
+                if (marketplaceItem != null)
+                {
+                    await HideProduct(item.Id);
+                }
+                //T-SII-20240125.0003,1 MMT 02/14/2024 - Seller showroom - Deleted products still showing in the marketplace seller showroom[End]
                 await _appEntityRepository.DeleteAsync(item.EntityId);
                 await _appItemRepository.DeleteAsync(item.Id);
                 //XX
                 await _appItemPricesRepository.DeleteAsync(a => a.AppItemId == item.Id);
                 await _appItemSizeScalesHeaderRepository.DeleteAsync(a => a.AppItemId == item.Id);
                 //XX
+                
             }
         }
 
@@ -5363,7 +5370,17 @@ namespace onetouch.AppItems
 
                 if (excelDto.Id == 0)
                     appItem.ParentFkList = new List<AppItem>();
-
+                //MMT30[Start]
+                DateTime timeStamp = DateTime.Now;
+                appItem.TimeStamp = timeStamp;
+                appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                if (string.IsNullOrEmpty(appItem.SSIN))
+                {
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.EntityFk.SSIN = appItem.SSIN;
+                }
+                appItem.EntityFk.TenantOwner = appItem.TenantOwner;
+                //MMT30[End]
                 //mmt
                 if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
                 {
@@ -5959,6 +5976,16 @@ namespace onetouch.AppItems
                         });
                     }
                     //XX
+                    //MMT30[End]
+                    appChildItem.TimeStamp = timeStamp;
+                    appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                    if (string.IsNullOrEmpty(appChildItem.SSIN))
+                    {
+                        appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        appChildItem.EntityFk.SSIN = appItem.SSIN;
+                    }
+                    appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;
+                    //MMT30[End]
                     if (appChildItem.Id==0)
                     appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
                     var entityExtraData = new List<AppEntityExtraData>();
