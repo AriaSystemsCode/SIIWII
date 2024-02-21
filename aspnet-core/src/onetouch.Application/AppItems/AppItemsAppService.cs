@@ -1143,7 +1143,7 @@ namespace onetouch.AppItems
                                         foreach (var attlook in eDRestAttributes.Values)
                                         {
                                             var codeItems = varAppItems.Where(x => x.EntityFk.EntityExtraData
-                                                                                   .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                   .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                    a.AttributeId == firstAttributeIdLong
                                                                                    ).Any()).ToList();
                                             var itemVarSum = codeItems.Where(x =>
@@ -1188,7 +1188,7 @@ namespace onetouch.AppItems
                                         foreach (var attlook in eDRestAttributes.Values)
                                         {
                                             var codeItems = varAppItems.Where(x => x.EntityFk.EntityExtraData
-                                                                                   .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                   .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                    a.AttributeId == long.Parse(secondAttId)
                                                                                    ).Any()).ToList();
                                             var itemVarSum = codeItems.Where(x =>
