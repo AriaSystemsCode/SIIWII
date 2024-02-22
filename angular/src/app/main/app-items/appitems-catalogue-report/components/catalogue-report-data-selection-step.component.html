@@ -60,7 +60,7 @@
                                 {{ "OnlyInStockColors" | localize }}
                             </div>
                             <div class="col-2">
-                                <p-inputSwitch [(ngModel)]="onlyInStockColors" name="showCode"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="printInfoParam.onlyInStockColors" name="showCode"></p-inputSwitch>
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,8 @@
                                 {{ "MinimumInStock" | localize }}
                             </div>
                             <div class="ng-tns-c377-45 ng-star-inserted">
-                                <input type="number" step="any" placeholder="Price"
+                                <input type="number" step="any" placeholder="0"
+                                    [(ngModel)]="printInfoParam.mimimumInStockQty"
                                     class="form-control rounded-lg pt-3 pb-3 row-item ng-tns-c377-45 ng-pristine ng-valid ng-touched"
                                     ng-reflect-name="price_2019" ng-reflect-model="0">
                             </div>

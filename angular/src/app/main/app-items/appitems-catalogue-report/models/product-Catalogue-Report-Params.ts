@@ -62,6 +62,8 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     TransactionId: string="";
     orderConfirmationRole: string="";
     saveToPDF:boolean= false;
+    onlyInStockColors:boolean=false;
+    mimimumInStockQty:number=0;
 
 
     private attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
@@ -132,6 +134,8 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&TransactionId=" + this.TransactionId
        url += "&orderConfirmationRole=" + this.orderConfirmationRole
        url += "&saveToPDF=" + this.saveToPDF
+       url += "&onlyInStockColors=" + this.onlyInStockColors
+       url += "&mimimumInStockQty=" + this.mimimumInStockQty
               return url
     }
 }

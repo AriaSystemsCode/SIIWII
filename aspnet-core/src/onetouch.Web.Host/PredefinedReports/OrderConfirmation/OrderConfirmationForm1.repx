@@ -440,7 +440,7 @@
                     </Item1>
                     <Item2 Ref="230" ControlType="XRTableCell" Name="tableCell3" Weight="2.0366281270768831" Multiline="true" Text="tableCell3" TextAlignment="MiddleCenter" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="Transparent">
                       <ExpressionBindings>
-                        <Item1 Ref="231" EventName="BeforePrint" PropertyName="Text" Expression="[Name]" />
+                        <Item1 Ref="231" EventName="BeforePrint" PropertyName="Text" Expression="[ItemDescription]" />
                       </ExpressionBindings>
                       <StylePriority Ref="232" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item2>
