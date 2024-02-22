@@ -3536,7 +3536,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         string toUserList = "";
                         List<string> tenantsRoles = new List<string>();
-
+                        List<long> userToShare = new List<long>();
                         foreach (var shar in input.TransactionSharing)
                         {
 
@@ -3588,9 +3588,10 @@ namespace onetouch.AppSiiwiiTransaction
                                 shareWith.SharedUserEMail = shar.SharedUserEMail;
                                 await _appEntitySharingsRepository.InsertAsync(shareWith);
                                 toUserList += (string.IsNullOrEmpty(toUserList) ? "" : ",") + shar.SharedUserId.ToString();
-                                
+                                userToShare.Add(long.Parse(shar.SharedUserId.ToString()));
 
-                                
+
+
                             }
                         }
                        
@@ -3637,6 +3638,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     if (tran != null)
                                         subject = tran.EntityObjectTypeCode.ToUpper() == "SALESORDER" ? ("Sales Order: " + tran.Code + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + tran.Code + " (" + tran.SellerCompanyName + ")");
                                 }
+                                if (userToShare.Exists(z=> z==long.Parse(shar.SharedUserId.ToString())))
                                 await _messageAppService.CreateMessage(new CreateMessageInput
                                 {
                                     To = shar.SharedUserId.ToString() ,
