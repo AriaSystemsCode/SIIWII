@@ -541,6 +541,7 @@ export class CreateEditAppItemVariationsComponent
             var_.entityExtraData.forEach(item=>item.attributeValueId = undefined)
             return var_
         })
+        debugger
         this._appItemsServiceProxy
             .getVariationsCodes(
                 this.attributeID  ?     this.attributeID  : this.appItem?.sycIdentifierId,
@@ -551,6 +552,12 @@ export class CreateEditAppItemVariationsComponent
             .subscribe((response: any) => {
                 console.log(">>", response, this.variationMatrices);
                 debugger
+                /*response.forEach((record)=>{
+                    let curentItem=this.primengTableHelper.records.filter((item)=>item.code==record.code);
+                    if(curentItem[0]['stockAvailability']>0){
+                        record.stockAvailability=curentItem['stockAvailability'];
+                    }
+                })*/
                 this.primengTableHelper.records = response;
                 this.variationMatrices = response;
             });
