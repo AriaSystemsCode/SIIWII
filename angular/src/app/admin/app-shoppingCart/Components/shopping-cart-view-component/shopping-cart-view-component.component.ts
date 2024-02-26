@@ -257,7 +257,10 @@ export class ShoppingCartViewComponentComponent
         "SellerSSIN",
         JSON.stringify(this.shoppingCartDetails.sellerCompanySSIN)
       );
-
+      localStorage.setItem(
+        "contactSSIN",
+        JSON.stringify(this.shoppingCartDetails.buyerContactSSIN)
+      );
       localStorage.setItem(
         "currencyCode",
         JSON.stringify(this.appTransactionsForViewDto.currencyCode)

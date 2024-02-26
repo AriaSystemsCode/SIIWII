@@ -224,7 +224,7 @@ namespace onetouch.AppMarketplaceItems
                 ((input.SharingLevel == SharingLevels.Public && x.SharingLevel == 1) ||
                  (input.SharingLevel == SharingLevels.SharedWithMe && x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0) ||
                 (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 || (x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)))) ||
-                (userId != null && x.ItemSharingFkList.Count(c => c.SharedUserId == userId) > 0));
+                (userId != null && x.ItemSharingFkList.Count(c => c.SharedUserId == userId) > 0) || (input.AccountSSIN == null ? x.TenantOwner==AbpSession.TenantId :false));
                 /*     )
                || ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
                      && (x.SharingLevel == 2 || x.SharingLevel == 1)  
