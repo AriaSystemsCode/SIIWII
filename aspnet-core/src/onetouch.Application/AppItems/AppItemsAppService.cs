@@ -1118,7 +1118,22 @@ namespace onetouch.AppItems
                                         extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (tenantIdvar == null ? "-1" : tenantIdvar.ToString()) + @"/" + imgObj.Attachment.ToString();
                                     }
                                 }
-
+                                //xx2024
+                                var item = varAppItems.Where(x => x.EntityFk.EntityExtraData
+                                                                                  .Where(a => (a.AttributeValue == varItem || a.AttributeCode == varItem) &&
+                                                                                  a.AttributeId == firstAttributeIdLong).Any()).FirstOrDefault();
+                                if (item != null)
+                                {
+                                    var varColorImage = item.EntityFk.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
+                                    if (varColorImage != null)
+                                    {
+                                        string tenantId = null;
+                                        if (item.EntityFk != null)
+                                            tenantId = item.EntityFk.TenantId.ToString();
+                                        extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (tenantId == null ? "-1" : tenantId.ToString()) + @"/" + varColorImage.AttributeValue;
+                                    }
+                                }
+                                //xx2024
                                 imageLoopCounter = imageLoopCounter + 1;
                                 // if (firstAttributeRelatedAdded == false)
                                 if (true)
