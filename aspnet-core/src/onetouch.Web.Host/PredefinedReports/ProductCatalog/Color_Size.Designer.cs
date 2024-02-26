@@ -34,6 +34,8 @@
             DevExpress.DataAccess.Sql.QueryParameter queryParameter2 = new DevExpress.DataAccess.Sql.QueryParameter();
             DevExpress.DataAccess.Sql.QueryParameter queryParameter3 = new DevExpress.DataAccess.Sql.QueryParameter();
             DevExpress.DataAccess.Sql.QueryParameter queryParameter4 = new DevExpress.DataAccess.Sql.QueryParameter();
+            DevExpress.DataAccess.Sql.QueryParameter queryParameter5 = new DevExpress.DataAccess.Sql.QueryParameter();
+            DevExpress.DataAccess.Sql.QueryParameter queryParameter6 = new DevExpress.DataAccess.Sql.QueryParameter();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Color_Size));
             this.ItemId = new DevExpress.XtraReports.Parameters.Parameter();
             this.attachmentBaseUrl2 = new DevExpress.XtraReports.Parameters.Parameter();
@@ -65,6 +67,8 @@
             this.PageInfo = new DevExpress.XtraReports.UI.XRControlStyle();
             this.productListId = new DevExpress.XtraReports.Parameters.Parameter();
             this.itemlistid = new DevExpress.XtraReports.Parameters.Parameter();
+            this.mimimumInStockQty = new DevExpress.XtraReports.Parameters.Parameter();
+            this.onlyInStockColors = new DevExpress.XtraReports.Parameters.Parameter();
             ((System.ComponentModel.ISupportInitialize)(this.table2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
@@ -403,12 +407,20 @@
             queryParameter4.Name = "@productListId";
             queryParameter4.Type = typeof(global::DevExpress.DataAccess.Expression);
             queryParameter4.Value = new DevExpress.DataAccess.Expression("?itemlistid", typeof(long));
+            queryParameter5.Name = "@onlyInStockColors";
+            queryParameter5.Type = typeof(global::DevExpress.DataAccess.Expression);
+            queryParameter5.Value = new DevExpress.DataAccess.Expression("?onlyInStockColors", typeof(bool));
+            queryParameter6.Name = "@mimimumInStockQty";
+            queryParameter6.Type = typeof(global::DevExpress.DataAccess.Expression);
+            queryParameter6.Value = new DevExpress.DataAccess.Expression("?mimimumInStockQty", typeof(long));
             storedProcQuery1.Parameters.AddRange(new DevExpress.DataAccess.Sql.QueryParameter[] {
             queryParameter1,
             queryParameter2,
             queryParameter3,
-            queryParameter4});
-            storedProcQuery1.StoredProcName = "Color_Sizes";
+            queryParameter4,
+            queryParameter5,
+            queryParameter6});
+            storedProcQuery1.StoredProcName = "Color_Sizes2";
             this.sqlDataSource1.Queries.AddRange(new DevExpress.DataAccess.Sql.SqlQuery[] {
             storedProcQuery1});
             this.sqlDataSource1.ResultSchemaSerializable = "PERhdGFTZXQgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxWaWV3IE5hbWU9IkNvbG9yX1NpemVzIiAvPjwvR" +
@@ -480,6 +492,20 @@
             this.itemlistid.Type = typeof(long);
             this.itemlistid.ValueInfo = "0";
             // 
+            // mimimumInStockQty
+            // 
+            this.mimimumInStockQty.Description = "mimimumInStockQty";
+            this.mimimumInStockQty.Name = "mimimumInStockQty";
+            this.mimimumInStockQty.Type = typeof(int);
+            this.mimimumInStockQty.ValueInfo = "0";
+            // 
+            // onlyInStockColors
+            // 
+            this.onlyInStockColors.Description = "onlyInStockColors";
+            this.onlyInStockColors.Name = "onlyInStockColors";
+            this.onlyInStockColors.Type = typeof(bool);
+            this.onlyInStockColors.ValueInfo = "False";
+            // 
             // Color_Size
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -503,14 +529,18 @@
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.attachmentBaseUrl2, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.tenantId2, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.showNo, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
-            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.itemlistid, DevExpress.XtraReports.Parameters.Orientation.Horizontal)});
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.itemlistid, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.mimimumInStockQty, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.onlyInStockColors, DevExpress.XtraReports.Parameters.Orientation.Horizontal)});
             this.Parameters.AddRange(new DevExpress.XtraReports.Parameters.Parameter[] {
             this.ItemId,
             this.productListId,
             this.attachmentBaseUrl2,
             this.tenantId2,
             this.showNo,
-            this.itemlistid});
+            this.itemlistid,
+            this.mimimumInStockQty,
+            this.onlyInStockColors});
             this.ReportPrintOptions.PrintOnEmptyDataSource = false;
             this.ReportUnit = DevExpress.XtraReports.UI.ReportUnit.TenthsOfAMillimeter;
             this.Scripts.OnBeforePrint = "Color_Size_BeforePrint";
@@ -560,5 +590,7 @@
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell2;
         private DevExpress.XtraReports.Parameters.Parameter productListId;
         private DevExpress.XtraReports.Parameters.Parameter itemlistid;
+        private DevExpress.XtraReports.Parameters.Parameter mimimumInStockQty;
+        private DevExpress.XtraReports.Parameters.Parameter onlyInStockColors;
     }
 }
