@@ -74,6 +74,61 @@ namespace onetouch.Web.Startup
         {
             _hostingEnvironment = env;
             _appConfiguration = env.GetAppConfiguration();
+            CopyAssets();
+        }
+        public void CopyAssets()
+        {
+            try
+            {
+                string fileName = System.IO.Directory.GetCurrentDirectory() + "\\assets\\catalogueReportTemp8.png";
+                string newFilePath = _appConfiguration[$"Attachment:Path"] + "\\-1\\" + "catalogueReportTemp8.png";
+                if (!System.IO.File.Exists(newFilePath))
+                {
+                    System.IO.File.Copy(fileName, newFilePath);
+                }
+            }
+            catch (Exception ex) { }
+            try
+            {
+                string fileName = System.IO.Directory.GetCurrentDirectory() + "\\assets\\catalogueReportTemp9.png";
+                string newFilePath = _appConfiguration[$"Attachment:Path"] + "\\-1\\" + "catalogueReportTemp9.png";
+                if (!System.IO.File.Exists(newFilePath))
+                {
+                    System.IO.File.Copy(fileName, newFilePath);
+                }
+            }
+            catch (Exception ex) { }
+            try
+            {
+                string fileName = System.IO.Directory.GetCurrentDirectory() + "\\assets\\catalogueReportTemp10.png";
+                string newFilePath = _appConfiguration[$"Attachment:Path"] + "\\-1\\" + "catalogueReportTemp10.png";
+                if (!System.IO.File.Exists(newFilePath))
+                {
+                    System.IO.File.Copy(fileName, newFilePath);
+                }
+            }
+            catch (Exception ex) { }
+            try
+            {
+                string fileName = System.IO.Directory.GetCurrentDirectory() + "\\assets\\catalogueReportTemp11.png";
+                string newFilePath = _appConfiguration[$"Attachment:Path"] + "\\-1\\" + "catalogueReportTemp11.png";
+                if (!System.IO.File.Exists(newFilePath))
+                {
+                    System.IO.File.Copy(fileName, newFilePath);
+                }
+            }
+            catch (Exception ex) { }
+            try
+            {
+                string fileName = System.IO.Directory.GetCurrentDirectory() + "\\assets\\catalogueReportTemp12.png";
+                string newFilePath = _appConfiguration[$"Attachment:Path"] + "\\-1\\" + "catalogueReportTemp12.png";
+                if (!System.IO.File.Exists(newFilePath))
+                {
+                    System.IO.File.Copy(fileName, newFilePath);
+                }
+            }
+            catch (Exception ex) { }
+
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
