@@ -539,7 +539,7 @@ export class CreateEditAppItemVariationsComponent
         const variationMatricesWithoutValuesIds = this.variationMatrices.map(item=>{
             debugger
             let curentItem=this.primengTableHelper?.records?.filter((record)=>record.code==item.code)[0];
-            const var_ = new VariationItemDto()
+            const var_ = new VariationItemDto();
             var_.init(item)
             var_.entityExtraData.forEach(item=>item.attributeValueId = undefined)
             if(curentItem?.stockAvailability>0){
