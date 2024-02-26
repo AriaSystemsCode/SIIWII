@@ -337,7 +337,7 @@ export class CreateEditAppItemVariationsComponent
                 .subscribe((res: any) => {
                     this.sizes = res;
                 });
-                debugger
+                
             this.primengTableHelper.records = this.variationMatrices;
             this.showVariationSelectionMetaData = true;
             this.showVariationValues = false;
@@ -476,7 +476,7 @@ export class CreateEditAppItemVariationsComponent
         })
     }
     removeExtraAttribute(extraAttr: IsVariationExtraAttribute, index: number) {
-        debugger
+        
         // this.selectedExtaAttrCtrl.removeControl(name)
         if (extraAttr.entityObjectTypeCode == this.sizeExtraAttrCode) {
             this.appSizeRatios = new AppItemSizesScaleInfo({
@@ -503,6 +503,7 @@ export class CreateEditAppItemVariationsComponent
     }
 
     saveExtraAtrributeSelection() {
+        
         const oldVariations = this.variationMatrices;
         this.editVariationsOpend=false;
         this.variationMatrices = [];
@@ -527,7 +528,7 @@ export class CreateEditAppItemVariationsComponent
             } as IAppItemSizesScaleInfo);
         }
 
-        this.createAllPossibleVariationsCombination();
+        this.createAllPossibleVariationsCombination(oldVariations);
         this.initializePricesObjects();
         this.checkAndAddDefaultPriceObjects();
         this.checkIfVariationsAlreadyExists(oldVariations);
@@ -536,12 +537,17 @@ export class CreateEditAppItemVariationsComponent
 
         console.log(">> list variation", this.variationMatrices);
         const variationMatricesWithoutValuesIds = this.variationMatrices.map(item=>{
+            debugger
+            let curentItem=this.primengTableHelper.records.filter((record)=>record.code==item.code)[0];
             const var_ = new VariationItemDto()
             var_.init(item)
             var_.entityExtraData.forEach(item=>item.attributeValueId = undefined)
+            if(curentItem?.stockAvailability>0){
+                var_.stockAvailability=curentItem.stockAvailability;
+            }
             return var_
         })
-        debugger
+        
         this._appItemsServiceProxy
             .getVariationsCodes(
                 this.attributeID  ?     this.attributeID  : this.appItem?.sycIdentifierId,
@@ -551,7 +557,7 @@ export class CreateEditAppItemVariationsComponent
             )
             .subscribe((response: any) => {
                 console.log(">>", response, this.variationMatrices);
-                debugger
+                
                 /*response.forEach((record)=>{
                     let curentItem=this.primengTableHelper.records.filter((item)=>item.code==record.code);
                     if(curentItem[0]['stockAvailability']>0){
@@ -660,7 +666,7 @@ export class CreateEditAppItemVariationsComponent
         extraAttr: IsVariationExtraAttribute,
         generatePhotos: boolean = true
     ) {
-        debugger
+        
         const sameSelection: boolean =
             this.defaultExtraAttrForAttachments == extraAttr;
 
@@ -911,15 +917,144 @@ export class CreateEditAppItemVariationsComponent
         this.activeAttachmentOption = optionObject;
     }
 
-    createAllPossibleVariationsCombination() {
+    createAllPossibleVariationsCombination(oldVariations) {
         // needs validation on the data before generate combintaion
-
-        this.combine(0, new VariationItemDto());
+ 
+        this.combine(0, new VariationItemDto(),oldVariations);
 
         // this.setDefaultExtraAttributeForVariationAttachment(this.selectedExtraAttributes[0])
     }
 
-    combine(index: number, _variation: VariationItemDto) {
+    /*combine(index: number, _variation: VariationItemDto) {
+        
+        let currentExtraAttr = this.selectedExtraAttributes[index];
+        let totalSelectedExtraAttributes = this.selectedExtraAttributes.length;
+        const createNewVariation = (
+            attrLabel: string,
+            attrCode: string,
+            attrId?: number
+        ) => {
+            let ___varitation = VariationItemDto.fromJS(_variation);
+
+            if (!___varitation.entityExtraData)
+                ___varitation.entityExtraData = [];
+            if (!___varitation.appItemPriceInfos)
+                ___varitation.appItemPriceInfos = this.getParentProductPrices();
+            if (
+                ___varitation.entityExtraData.length ==
+                totalSelectedExtraAttributes
+            ) {
+                ___varitation = new VariationItemDto();
+                ___varitation.entityExtraData = [];
+            }
+
+            let entityExtraData = new AppEntityExtraDataDto({
+                attributeId: currentExtraAttr.attributeId,
+                attributeValue: attrLabel,
+                attributeValueId: attrId,
+                id: 0,
+                entityId: 0,
+                entityObjectTypeCode: currentExtraAttr.entityObjectTypeCode?currentExtraAttr.entityObjectTypeCode:currentExtraAttr.name.toLocaleLowerCase().includes('color')?'COLOR':'SIZE',
+                attributeValueFkName: undefined,
+                entityObjectTypeName: undefined,
+                entityObjectTypeId: undefined,
+                attributeValueFkCode: attrCode,
+                attributeCode: attrCode,
+            });
+            ___varitation.entityExtraData.push(entityExtraData);
+            if (index < totalSelectedExtraAttributes - 1) {
+                this.combine(index + 1, ___varitation); //complete comibinig
+            } else {
+                //comibining done, now lets create a new variation row
+                ___varitation.price = this.appItem.price;
+                ___varitation.stockAvailability = 0;
+                ___varitation.id = 0;
+                ___varitation.entityAttachments = [];
+                ___varitation.position = this.variationMatrices.length;
+
+                for (
+                    var i = 0;
+                    i < ___varitation?.entityExtraData?.length;
+                    i++
+                ) {
+                    if (i == 0) {
+                        if (this.appItem.code)
+                            ___varitation.code = this.appItem?.code;
+                        else ___varitation.code = "";
+                    }
+
+                    ___varitation.code +=
+                        "-" +
+                        (___varitation?.entityExtraData[i]?.attributeCode ||
+                            ___varitation?.entityExtraData[i]
+                                ?.attributeValueFkCode);
+                }
+                let newVariation: VariationItemDto =
+                    VariationItemDto.fromJS(___varitation);
+                this.variationMatrices.push(newVariation);
+            }
+        };
+        //currentExtraAttr.entityObjectTypeCode?currentExtraAttr.entityObjectTypeCode=currentExtraAttr.entityObjectTypeCode:currentExtraAttr.name.toLocaleLowerCase().includes('color')?currentExtraAttr.entityObjectTypeCode='COLOR':currentExtraAttr.entityObjectTypeCode='SIZE',
+//if(currentExtraAttr?.entityObjectTypeCode){
+               if (currentExtraAttr?.entityObjectTypeCode !== this.sizeExtraAttrCode) {
+                currentExtraAttr.selectedValues.forEach((attrId) => {
+                    if(attrId || attrId>=0){
+                    let attrOptionData: any = currentExtraAttr.lookupData.filter(
+                        (item) => item.value == attrId
+                    )[0];
+                    createNewVariation(
+                        attrOptionData?.label,
+                        attrOptionData?.code,
+                        attrId
+                    );
+                   }
+                });
+            } else {
+                // size condition
+                console.log(">>", this.appSizeRatios.appSizeScalesDetails);
+    
+                // if (this.appSizeRatios.appSizeScalesDetails.length < 2) {
+                // let sizeData = this.appSizeRatios.appSizeScalesDetails[0];
+                // this.siwiSizes.forEach((size) => {
+                this.appSizeRatios.appSizeScalesDetails.forEach(
+                    (sizeScale: any) => {
+                        let arr = this.siwiSizes.filter(
+                            (size) => size.code === sizeScale.sizeCode
+                        );
+                        console.log(">>", arr);
+    
+                        if (arr.length !== 0) {
+                            createNewVariation(
+                                sizeScale.sizeCode,
+                                sizeScale.sizeCode,
+                                arr[0].value
+                            );
+                        } else {
+                            createNewVariation(
+                                sizeScale.sizeCode,
+                                sizeScale.sizeCode
+                            );
+                            // }
+                        }
+                    }
+                );
+    
+                // });
+                // } else {
+                //     this.appSizeRatios.appSizeScalesDetails.forEach(
+                //         (sizeDetailDto) => {
+                //             createNewVariation(
+                //                 sizeDetailDto.sizeCode,
+                //                 sizeDetailDto.sizeCode
+                //             );
+                //         }
+                //     );
+                // }
+            } 
+//}
+
+    }*/
+    combine(index: number, _variation: VariationItemDto,oldAttributes) {
         let currentExtraAttr = this.selectedExtraAttributes[index];
         let totalSelectedExtraAttributes = this.selectedExtraAttributes.length;
         const createNewVariation = (
@@ -956,9 +1091,11 @@ export class CreateEditAppItemVariationsComponent
             });
             ___varitation.entityExtraData.push(entityExtraData);
             if (index < totalSelectedExtraAttributes - 1) {
-                this.combine(index + 1, ___varitation); //complete comibinig
+
+                this.combine(index + 1, ___varitation,oldAttributes); //complete comibinig
             } else {
                 //comibining done, now lets create a new variation row
+                debugger
                 ___varitation.price = this.appItem.price;
                 ___varitation.stockAvailability = 0;
                 ___varitation.id = 0;
@@ -984,6 +1121,11 @@ export class CreateEditAppItemVariationsComponent
                 }
                 let newVariation: VariationItemDto =
                     VariationItemDto.fromJS(___varitation);
+                    debugger
+             const curentItem=oldAttributes.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0];
+             if(curentItem?.stockAvailability>0){
+                newVariation.stockAvailability=curentItem.stockAvailability;
+            }
                 this.variationMatrices.push(newVariation);
             }
         };
@@ -1036,6 +1178,7 @@ export class CreateEditAppItemVariationsComponent
     this.primengTableHelper.records[tableRecordIndex].entityExtraData[extraDaraIndex].attributeValueId = Number(value)
     }
     handleColorChange(value, extraDara, extraDaraIndex, tableRecordIndex){
+        
         this.primengTableHelper.records[tableRecordIndex].entityExtraData[extraDaraIndex].attributeValueId = Number(value);
     }
 
@@ -1079,7 +1222,7 @@ export class CreateEditAppItemVariationsComponent
         });
         this.isListing ? this.selectedVaritaions : this.variationMatrices;
         let appItemSizesScaleInfo: AppItemSizesScaleInfo[] = undefined;
-        debugger
+        
         const sizeIsSelected = this.selectedExtraAttributes.filter(
             (item) => item.entityObjectTypeCode == this.sizeExtraAttrCode
         )[0];
@@ -1206,7 +1349,7 @@ export class CreateEditAppItemVariationsComponent
             this.extraAttributes[currentExtraDataIndex].selected = true;
             this.extraAttributes[currentExtraDataIndex].selectedValues = [];
         });
-debugger
+
         let selectedExtraAttrIds = this.selectedExtraAttributes.map(
             (row) => row.attributeId
         );
@@ -1383,7 +1526,7 @@ debugger
         this.sortVaritaionCombination();
     }
     sortVaritaionCombination() {
-        debugger
+        
         let selectedExtraAttributesOrder: number[] =
             this.selectedExtraAttributes?.map((item) => item.attributeId);
         this.variationMatrices?.forEach((variation) => {
@@ -1518,7 +1661,7 @@ debugger
     // }
 
     openCreateNewAppEntityModal() {
-        debugger
+        
         let extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
         let config: ModalOptions = new ModalOptions();
@@ -1551,7 +1694,7 @@ debugger
     }
     filterLookup($event) {
         const search = $event.target.value;
-        debugger
+        
         const extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
         extraAttr.displayedLookupData = extraAttr.lookupData.filter((item) =>
@@ -1618,7 +1761,7 @@ debugger
         this.oldActiveAttachmentOption = this.activeAttachmentOption;
     }
     mapExtraAttrSelectionDataFromVariationMatrices() {
-        debugger
+        
         // this.variationMatrices
         this.activeExtraAttributeIndex = this.selectedExtraAttributes.findIndex(
             (item) => item.selected
@@ -1717,7 +1860,7 @@ debugger
             }    
             
         })
-        debugger
+        
 
         const sizeSeletedExtraAttr = this.selectedExtraAttributes?.filter(extraAtt=>extraAtt?.entityObjectTypeCode == this.sizeExtraAttrCode)[0]
         if(selectedValuesIds.length>0){
