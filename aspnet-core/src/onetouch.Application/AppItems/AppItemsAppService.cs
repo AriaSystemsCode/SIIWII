@@ -741,7 +741,7 @@ namespace onetouch.AppItems
                         {
                             foreach (var extr in extraAttributes)
                             {
-                                if (extr.AttributeValue == null)
+                                if (extr.AttributeValue == null || extr.AttributeCode == null)
                                     continue;
                                 appItemAttributePriceDto.Add(new AppItemAttributePriceDto
                                 {
@@ -774,8 +774,8 @@ namespace onetouch.AppItems
                     //secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode).ToList();
                     foreach (var t in zz)
                     {
-                        if (ss.FirstOrDefault(z => z.AttributeValue == t) != null)
-                            appRetItemAttributePriceDto.Add(ss.FirstOrDefault(z => z.AttributeValue == t));
+                        if (ss.FirstOrDefault(z => z.AttributeValue == t || z.AttibuteCode == t) != null)
+                            appRetItemAttributePriceDto.Add(ss.FirstOrDefault(z => z.AttributeValue == t || z.AttibuteCode == t));
                     }
                     return appRetItemAttributePriceDto;
 
