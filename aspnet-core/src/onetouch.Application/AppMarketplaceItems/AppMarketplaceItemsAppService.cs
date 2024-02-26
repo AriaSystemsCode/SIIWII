@@ -223,8 +223,9 @@ namespace onetouch.AppMarketplaceItems
                 .Where(x => x.ParentId == null &&
                 ((input.SharingLevel == SharingLevels.Public && x.SharingLevel == 1) ||
                  (input.SharingLevel == SharingLevels.SharedWithMe && x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0) ||
-                (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 || (x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)))) ||
-                (userId != null && x.ItemSharingFkList.Count(c => c.SharedUserId == userId) > 0) || (input.AccountSSIN == null ? x.TenantOwner==AbpSession.TenantId :false));
+                (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 ||
+                (x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))) ||
+                (userId != null && x.ItemSharingFkList.Count(c => c.SharedUserId == userId) > 0) || (input.AccountSSIN == null ? x.TenantOwner == AbpSession.TenantId : false)));
                 /*     )
                || ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
                      && (x.SharingLevel == 2 || x.SharingLevel == 1)  
@@ -606,6 +607,9 @@ namespace onetouch.AppMarketplaceItems
                                 }
                             }
                         }
+                        if(output.AppItem.MinMSRP !=null)
+                            mainItemLevelPrice = decimal.Parse(output.AppItem.MinMSRP.ToString());
+
                         if (output.AppItem.MinSpecialPrice !=null)
                         mainItemLevelPrice =decimal.Parse( output.AppItem.MinSpecialPrice.ToString());
                         //MMT
@@ -924,19 +928,19 @@ namespace onetouch.AppMarketplaceItems
                                             {
 
                                                 var codeItems = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                       .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                        a.AttributeId == firstAttributeIdLong
                                                                                        ).Any()).ToList();
                                                 var itemVarSum = codeItems.Where(x =>
                                                 x.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
-                                                a.AttributeValue == varItem).Any()).Sum(a => a.StockAvailability);
+                                                (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).Sum(a => a.StockAvailability);
                                                 attlook.StockAvailability = itemVarSum;
                                                 //SSIN
                                                 var itemSsin = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString()) 
+                                                                                       .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString())) 
                                                                                        .WhereIf(secondAttId!=null,a=>a.AttributeId == long.Parse(secondAttId))
                                                                                        .Any()).ToList()
-                                                                                       .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && w.AttributeValue == varItem).Any()).FirstOrDefault();
+                                                                                       .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && (w.AttributeValue == varItem || w.AttributeCode == varItem)).Any()).FirstOrDefault();
 
 
                                                 if (!string.IsNullOrEmpty(level))
@@ -1064,19 +1068,19 @@ namespace onetouch.AppMarketplaceItems
                                             foreach (var attlook in eDRestAttributes.Values)
                                             {
                                                 var codeItems = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                       .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                        a.AttributeId == long.Parse(secondAttId)
                                                                                        ).Any()).ToList();
                                                 var itemVarSum = codeItems.Where(x =>
                                                 x.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
-                                                a.AttributeValue == varItem).Any()).Sum(a => a.StockAvailability);
+                                                (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).Sum(a => a.StockAvailability);
                                                 attlook.StockAvailability = itemVarSum;
                                                 //SSIN
                                                 var itemSsin = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                       .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                        a.AttributeId == long.Parse(secondAttId)
                                                                                        ).Any()).ToList()
-                                                                                       .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && w.AttributeValue == varItem).Any()).FirstOrDefault();
+                                                                                       .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && (w.AttributeValue == varItem || w.AttributeCode == varItem)).Any()).FirstOrDefault();
                                                 if(itemSsin!=null)
                                                 attlook.SSIN = itemSsin.SSIN;
 
