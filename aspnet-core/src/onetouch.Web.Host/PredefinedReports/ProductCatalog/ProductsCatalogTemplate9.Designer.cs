@@ -26,7 +26,7 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.SubBand1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.SubBand>("SubBand1");
             this.SubBand2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.SubBand>("SubBand2");
             this.subreport4 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRSubreport>("subreport4");
-            this.subreport4.ReportSource = new onetouch.Web.PredefinedReports.ProductCatalog.CoverPage();
+            this.subreport4.ReportSource = new onetouch.Web.PredefinedReports.ProductCatalog.CoverPage_P();
             this.subreport2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRSubreport>("subreport2");
             this.subreport2.ReportSource = new onetouch.Web.PredefinedReports.ProductCatalog.Colorsportrait();
             this.pictureBox3 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox3");
