@@ -30,9 +30,9 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 
         [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
         public virtual string LanguageCode { get; set; }
-
+        
         public virtual long? CurrencyId { get; set; }
-
+        [Required]
         [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
         public virtual string CurrencyCode { get; set; }
         [StringLength(AppTransactionConst.MaxEMailLength, MinimumLength = AppTransactionConst.MinEMailLength)]
@@ -57,17 +57,20 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual TransactionType TransactionType { set; get; }
         public string EntityStatusCode { set; get; }
         // virtual string? SellerContactName { set; get; }
+        [Required]
         public DateTime CompleteDate { get; set; }
         public virtual string? SellerCompanySSIN { set; get; }
+        [Required]
         public virtual DateTime StartDate { set; get; }
+        [Required]
         public virtual DateTime AvailableDate { set; get; }
         public virtual long? ShipViaId { get; set; }
-
+        [Required]
         [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
         public virtual string ShipViaCode { get; set; }
        
         public virtual long? PaymentTermsId { get; set; }
-
+        [Required]
         [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
         public virtual string PaymentTermsCode { get; set; }
         [StringLength(AppTransactionConst.MaxBuyerDeptLength, MinimumLength = AppTransactionConst.MinBuyerDeptLength)]
@@ -78,6 +81,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual long TotalQuantity { set; get; }
         public virtual double TotalAmount { set; get; }
         public virtual bool lFromPlaceOrder { set; get; } = false;
+        [Required]
         public virtual decimal CurrencyExchangeRate { get; set; }
     }
     public enum OrderCreatorRole
