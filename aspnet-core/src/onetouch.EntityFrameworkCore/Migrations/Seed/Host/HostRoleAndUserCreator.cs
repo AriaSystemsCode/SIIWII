@@ -691,8 +691,8 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SaveChanges();
             }
 
-            var sycReports12 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate12").ToList();
-            if (sycReports12== null || sycReports12.Count < 1)
+            var sycReports123 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate12").ToList();
+            if (sycReports123== null || sycReports123.Count < 1)
             {
                 SycReport sycReport = new SycReport();
                 sycReport.Name = "ProductsCatalogTemplate12";

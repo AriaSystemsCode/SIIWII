@@ -160,7 +160,9 @@ namespace onetouch.AppItemSelectors
         {
             int appItemSelectorCount = 0;
             await _appItemSelectorRepository.HardDeleteAsync(e => e.Key == key);
-            
+            //T-SII-20231218.0001,1 MMT 02/06/2024 -  Product Selector -  the option to select ALL doesn't work correctly[Start]
+            input.SkipCount = 0;
+            //T-SII-20231218.0001,1 MMT 02/06/2024 -  Product Selector -  the option to select ALL doesn't work correctly[End]
             var items = await _appItemAppService.GetAll(input);
             if (items!=null && items.Items != null && items.Items.Count>0)
             {
