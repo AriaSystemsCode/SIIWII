@@ -220,7 +220,7 @@ namespace onetouch.AppMarketplaceItems
                 .WhereIf(input.departmentFilters != null && input.departmentFilters.Count() > 0, e => e.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
                 // .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.ManufacturerCode.Contains(input.Filter) || e.Description.Contains(input.Filter) || e.EntityExtraData.Where(a => a.AttributeValue.Contains(input.Filter)).Count() > 0)
-                .Where(x => x.ParentId == null &&
+                .Where(x => x.ParentId == null && (x.SharingLevel != 3 && x.SharingLevel != 4) &&
                 ((input.SharingLevel == SharingLevels.Public && x.SharingLevel == 1) ||
                  (input.SharingLevel == SharingLevels.SharedWithMe && x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0) ||
                 (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 ||
