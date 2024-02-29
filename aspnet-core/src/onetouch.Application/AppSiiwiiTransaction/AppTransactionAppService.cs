@@ -407,8 +407,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactRole = ContactRoleEnum.Seller.ToString(),
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
-                    BranchName = null,
-                    BranchSSIN = null
+                    BranchName = input.SellerBranchName,
+                    BranchSSIN = input.SellerBranchSSIN
                 });
 
 
@@ -425,8 +425,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactRole = ContactRoleEnum.Buyer.ToString(),
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
-                    BranchName = null,
-                    BranchSSIN = null
+                    BranchName = input.BuyerBranchName,
+                    BranchSSIN = input.BuyerBranchSSIN
                 });
                 //
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
@@ -442,8 +442,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactRole = ContactRoleEnum.ShipToContact.ToString(),
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
-                    BranchName = null,
-                    BranchSSIN = null
+                    BranchName = input.BuyerBranchName,
+                    BranchSSIN = input.BuyerBranchSSIN
                 });
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                 {
@@ -458,8 +458,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactRole = ContactRoleEnum.APContact.ToString(),
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
-                    BranchName = null,
-                    BranchSSIN = null
+                    BranchName = input.BuyerBranchName,
+                    BranchSSIN = input.BuyerBranchSSIN
                 });
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                 {
@@ -474,8 +474,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactRole = ContactRoleEnum.ShipFromContact.ToString(),
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
-                    BranchName = null,
-                    BranchSSIN = null
+                    BranchName = input.SellerBranchName,
+                    BranchSSIN = input.SellerBranchSSIN
                 });
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                 {
@@ -490,8 +490,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactRole = ContactRoleEnum.ARContact.ToString(),
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
-                    BranchName = null,
-                    BranchSSIN = null
+                    BranchName = input.SellerBranchName ,
+                    BranchSSIN = input.SellerBranchSSIN
                 });
                 //
                 if (AbpSession.UserId != null)

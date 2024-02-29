@@ -52,7 +52,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string PriceLevel { get; set; }
         public virtual string? BuyerContactSSIN { set; get; }
         
-        //public virtual string? BuyerContactSSIN { set; get; }
+        public virtual string BuyerBranchSSIN { set; get; }
+        public virtual string BuyerBranchName { set; get; }
+        public virtual string SellerBranchSSIN { set; get; }
+        public virtual string SellerBranchName { set; get; }
         public virtual string? SellerContactSSIN { set; get; }
         public virtual TransactionType TransactionType { set; get; }
         public string EntityStatusCode { set; get; }

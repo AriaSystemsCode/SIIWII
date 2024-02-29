@@ -50,7 +50,6 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinBuyerNameLength)]
         public virtual string ContactName { set; get; }
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinBuyerNameLength)]
-        [Required]
         public virtual string CompanyName { set; get; }
         [StringLength(AppTransactionConst.MaxEMailLength, MinimumLength = AppTransactionConst.MinEMailLength)]
         public virtual string ContactEmail { set; get; }
@@ -60,10 +59,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinBuyerNameLength)]
         public virtual string BranchName { set; get; }
         [StringLength(AppTransactionConst.MaxSSINLength, MinimumLength = AppTransactionConst.MinSSINLength)]
-        [Required]
         public virtual string CompanySSIN { set; get; }
         [StringLength(AppTransactionConst.MaxSSINLength, MinimumLength = AppTransactionConst.MinSSINLength)]
-        [Required]
         public virtual string BranchSSIN { set; get; }
         [StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
         public virtual string ContactPhoneTypeName { get; set; }
