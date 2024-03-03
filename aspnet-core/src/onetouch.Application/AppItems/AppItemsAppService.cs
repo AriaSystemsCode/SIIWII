@@ -109,6 +109,7 @@ namespace onetouch.AppItems
         private readonly IRepository<SycSegmentIdentifierDefinition, long> _sycSegmentIdentifierDefinition;
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
+
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, IAppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
@@ -3030,6 +3031,37 @@ namespace onetouch.AppItems
 
                 }
             }
+        }
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
+        public async Task<long> ShareSelectedProducts(Guid key)
+        { 
+
+            long returnCount=0;
+            var apptemSelector = from o in  _appItemSelectorRepository.GetAll().Where(e => e.Key == key).ToList()
+                                 join i in  _appItemRepository.GetAll().ToList() on o.SelectedId equals i.Id into j
+                                 from j1 in j select new { item= j1 } ;
+
+            var selectedItems =  apptemSelector.ToList(); //3194a542-2d03-13c2-82f3-6914504839dd
+            if (selectedItems != null && selectedItems.Count > 0)
+            {
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+                    foreach (var itm in apptemSelector)
+                    {
+                        var sharedItem = await _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefaultAsync();
+                        if (sharedItem == null)
+                        {
+                            returnCount++;
+                            SharingItemOptions shareOp = new SharingItemOptions();
+                            shareOp.AppItemId = itm.item.Id;
+                            shareOp.SharingLevel = 1;
+                            shareOp.SyncProduct = false;
+                            await ShareProduct(shareOp);
+                        }
+                    }
+                }
+            }
+            return returnCount;
         }
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task ShareProduct(SharingItemOptions input)

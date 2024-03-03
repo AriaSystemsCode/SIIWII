@@ -36,6 +36,6 @@ namespace onetouch.AppItems
         Task<FileDto> GetAppItemsToExcel(GetAllAppItemsForExcelInput input);
         Task ShareProduct(SharingItemOptions input);
 
-
+        Task<long> ShareSelectedProducts(Guid key);
     }
 }
