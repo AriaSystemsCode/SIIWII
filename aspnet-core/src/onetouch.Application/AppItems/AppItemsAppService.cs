@@ -2938,6 +2938,36 @@ namespace onetouch.AppItems
             await ShareProduct(input);
 
         }
+        //MMT0303
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
+        public async Task<long> SyncSelectedProduct(Guid key)//long appItemId)
+        {
+            long returnCount = 0;
+            var apptemSelector = from o in _appItemSelectorRepository.GetAll().Where(e => e.Key == key)
+                                 join i in _appItemRepository.GetAll() on o.SelectedId equals i.Id into j
+                                 from j1 in j
+                                 select new { item = j1 };
+
+            var selectedItems = apptemSelector.ToList(); //3194a542-2d03-13c2-82f3-6914504839dd
+            if (selectedItems != null && selectedItems.Count > 0)
+            {
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+
+                    foreach (var itm in selectedItems)
+                    {
+                        var sharedItem = _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefault();
+                        if (sharedItem != null && sharedItem.TimeStamp < itm.item.TimeStamp)
+                        {
+                            returnCount++;
+                            await SyncProduct(itm.item.Id);
+                        }
+                    }
+                }
+            }
+            return returnCount;
+        }
+        //MMT0303
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task UnHideProduct(long appItemId)
         {
