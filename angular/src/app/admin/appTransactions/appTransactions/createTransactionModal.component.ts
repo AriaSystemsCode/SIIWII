@@ -508,6 +508,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                         buyerContactSSIN: this.buyerContactSSIN,
                         sellerCompanySSIN: this.sellerCompanySSIN,
                         buyerCompanySSIN: this.buyerCompanySSIN,
+                        buyerBranchSSIN: this.orderForm.controls['buyerCompanyBranch'].value.ssin,
+                        buyerBranchName: this.orderForm.controls['buyerCompanyBranch'].value.name,
+                        sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch'].value.ssin,
+                        sellerBranchName: this.orderForm.controls['sellerCompanyBranch'].value.name,
                     };
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,

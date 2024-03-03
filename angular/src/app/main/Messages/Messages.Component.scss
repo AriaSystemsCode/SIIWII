@@ -147,7 +147,7 @@
     color: black !important;
     // margin-left: 40px;
     padding: 19px;
-    padding-left: 5%;
+    border-radius: 12px;
     // margin-right: 165px;
     // margin-right: 25px;
    // margin-right: 164px;
@@ -169,12 +169,15 @@
 .search input {
     top: 268px;
     left: 432px;
-    //width: 284px;
-    height: 32px;
-    border-radius: 6px;
+    height: 44px;
+    border-radius: 12px;
     opacity: 1;
-    margin-bottom: 20px;
-    margin-top: 6px;
+    padding: 10px 8px 10px 37px;
+    border: 1px solid #D9D9D9;
+    background-color: #F8F8F8 !important;
+    background-position: 11px;
+    width: 90%;
+    margin: 6px auto 20px auto;
 }
 
 .Messages {
@@ -190,8 +193,7 @@ li {
 }
 
 .SelectedMessage {
-    background: #f5f5f5 0% 0% no-repeat padding-box;
-    border-left: 3px solid #700066;
+    background: #C6B2C61A 0% 0% no-repeat padding-box;    ;
 }
 
 .ReplyBtn {
