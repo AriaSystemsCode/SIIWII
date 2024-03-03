@@ -32,7 +32,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string LanguageCode { get; set; }
         
         public virtual long? CurrencyId { get; set; }
-        [Required]
+        
         [StringLength(AppTransactionConst.MaxCodeLength, MinimumLength = AppTransactionConst.MinCodeLength)]
         public virtual string CurrencyCode { get; set; }
         [StringLength(AppTransactionConst.MaxEMailLength, MinimumLength = AppTransactionConst.MinEMailLength)]
@@ -68,12 +68,12 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         [Required]
         public virtual DateTime AvailableDate { set; get; }
         public virtual long? ShipViaId { get; set; }
-        [Required]
+        
         [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
         public virtual string ShipViaCode { get; set; }
        
         public virtual long? PaymentTermsId { get; set; }
-        [Required]
+       
         [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
         public virtual string PaymentTermsCode { get; set; }
         [StringLength(AppTransactionConst.MaxBuyerDeptLength, MinimumLength = AppTransactionConst.MinBuyerDeptLength)]
@@ -84,7 +84,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual long TotalQuantity { set; get; }
         public virtual double TotalAmount { set; get; }
         public virtual bool lFromPlaceOrder { set; get; } = false;
-        [Required]
+       
         public virtual decimal CurrencyExchangeRate { get; set; }
     }
     public enum OrderCreatorRole
