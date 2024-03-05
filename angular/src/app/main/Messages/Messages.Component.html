@@ -1,21 +1,23 @@
 <div class="boxes row  mt-md-5 mb-5">
 
 
-    <div class="rightbox col mr-0 mr-md-5">
+    <div class="rightbox col mr-0 mr-md-3 ml-md-5">
         <div class="d-flex flex-row" style="justify-content: space-between;">
             <div class="btn-group dropdown actionDropdown mr-3" dropdown container="body">
-                <h4 style="color: #4A0D4A !important;
+                <h4 style="color: #1B101B !important;
                 font-family: Poppins !important;
-                font-size: 20px !important;
+                font-size: 26px !important;
                 font-style: normal !important;
-                font-weight: 600 !important;
+                font-weight: 700 !important;
                 line-height: normal !important;">Messages</h4>
 
                 <button class="btn btn-primary btn-sm ml-5 ng-tns-c357-9 pb-0" dropdownToggle style="cursor: pointer;
-                    border-radius: 4px;
-                    border: 1px solid #E2E2EA !important;
+                    border-radius: 6px;
+                    padding: 1px 16px 1px 16px;
+                    border: 1px solid #eee !important;
                     background-color: transparent !important;
-                    color: black !important;height: 38px">
+                    box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
+                    color: black !important;height: 44px">
 
                     <img *ngIf="messageTypeIndex==1" [src]="
 appRootUrl() +
@@ -124,16 +126,21 @@ appRootUrl() +
 
                 <div *ngIf="messageTypeIndex==1">
                     <button class="btn btn-primary btn-sm ng-tns-c357-9 pb-0 m-0 ml-3 clickBtn" style="cursor: pointer;
-                    border-radius: 4px;
-                    border: 1px solid #E2E2EA !important;
-                    color:#A461D8 !important;height: 38px">
+                    border-radius: 6px 0px 0px 6px;
+                    padding: 1px 16px 1px 16px;
+                    border: 1px solid #eee !important;
+                    background-color: transparent !important;
+                    box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
+                    color: black !important;
+                    height: 44px;">
+                   <i class="pi pi-comments"  style="font-size:20px;"></i>
 
                         <span class="pr-3" style="
                     font-family: Poppins;
                     font-size: 16px;
                     font-style: normal;
                     font-weight: 600;
-                    line-height: normal;" (click)="getPrimaryMessage()">Primary</span>
+                    line-height: normal;" (click)="getPrimaryMessage()">Direct Message</span>
                         <label style="text-align: center !important" *ngIf="totalPrimaryUnread>0">
                             <span  style="left: 10px">{{
                                 totalPrimaryUnread
@@ -142,22 +149,48 @@ appRootUrl() +
                     </button>
 
                     <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
-                border-radius: 4px;
-                border: 1px solid #E2E2EA !important;
-                color: #F88011 !important;height: 38px" (click)="getUpdatesMessage()">
-
+                    border-radius: 0px;
+                    padding: 1px 16px 1px 16px;
+                    border: 1px solid #eee !important;
+                    background-color: transparent !important;
+                    box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
+                    color: black !important;
+                    height: 44px;" (click)="getUpdatesMessage()">
+                   <i class="pi pi-comments"  style="font-size:20px;"></i>
                         <span class="pr-3" style="
                 font-family: Poppins;
                 font-size: 16px;
                 font-style: normal;
                 font-weight: 600;
-                line-height: normal;">Updates</span>
+                line-height: normal;">Threads</span>
                        <label style="text-align: center !important" *ngIf="totalUpdatesUnread>0">
                         <span  style="left: 10px">{{
                             totalUpdatesUnread
                             }}</span>
                     </label>
                     </button>
+                    <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
+                    border-radius:0px 6px 6px 0px;
+                    padding: 1px 16px 1px 16px;
+                    border: 1px solid #eee !important;
+                    background-color: transparent !important;
+                    box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
+                    color: black !important;
+                    height: 44px;" (click)="getUpdatesMessage()">
+                       <i class="pi pi-comments" style="font-size:20px;"></i>
+
+                            <span class="pr-3" style="
+                    font-family: Poppins;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: normal;">Mentions</span>
+                           <label style="text-align: center !important" *ngIf="totalUpdatesUnread>0">
+                            <span  style="left: 10px">{{
+                                totalUpdatesUnread
+                                }}</span>
+                        </label>
+                        </button>
                 </div>
             </div>
             <div class="d-none d-md-block">
@@ -174,7 +207,7 @@ appRootUrl() +
         </div>
         <hr />
         <div class="row">
-            <div class="col-md-4 pt-2 pl-4">
+            <div class="col-md-4 pt-2 pl-0">
                 <div class="d-none d-md-block">
                     <!-- <h4>{{ messageType }}</h4> -->
                     <div class="search" style="width: 100%; padding-right: 17px">
@@ -189,8 +222,7 @@ appRootUrl() +
                         <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
                             <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 1" [src]="
                             appRootUrl() +
-                            'assets/message/Messaging_Inbox_icon.svg'
-                        " border="0" />
+                            'assets/message/Messaging_Inbox_icon.svg'" border="0" />
                             <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 2" [src]="
                             appRootUrl() +
                             'assets/message/Messaging_SentItems_icon.svg'
