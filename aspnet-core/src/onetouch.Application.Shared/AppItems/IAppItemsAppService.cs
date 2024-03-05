@@ -37,5 +37,6 @@ namespace onetouch.AppItems
         Task ShareProduct(SharingItemOptions input);
 
         Task<long> ShareSelectedProducts(Guid key);
+        Task<long> SyncSelectedProduct(Guid key);
     }
 }
