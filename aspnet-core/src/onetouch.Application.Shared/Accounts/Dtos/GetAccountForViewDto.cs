@@ -1,8 +1,14 @@
-﻿namespace onetouch.Accounts.Dtos
+﻿using System.Security.Policy;
+
+namespace onetouch.Accounts.Dtos
 {
     public class GetAccountForViewDto
     {
 		public AccountDto Account { get; set; }
+
+        public string ConnectionName { get; set; } 
+        
+        public string AvaliableConnectionName { get; set; }
 
 		public string AppEntityName { get; set;}
 

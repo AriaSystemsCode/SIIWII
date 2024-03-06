@@ -273,6 +273,8 @@ namespace onetouch.Accounts
                                             PartnerId = o.PartnerId
                                         },
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
+                                        AvaliableConnectionName="Follow",
+                                        ConnectionName=""
                                     };
 
                     var accountsList = await _accounts.ToListAsync();
