@@ -306,7 +306,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
 
-    shareAccount(){
+    openShareAccountsModal(){
 //I40-shareAccount
     }
 
