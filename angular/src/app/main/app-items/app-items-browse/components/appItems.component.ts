@@ -61,7 +61,8 @@ export class AppItemsComponent extends AppComponentBase {
     selectedItemId: number;
     selectedIndex: number;
     filterText = "";
-
+    allSelectedShared:boolean=true;
+    selectedItemsList:any;
     _entityTypeFullName = "onetouch.AppItems.AppItem";
     entityHistoryEnabled = false;
 
@@ -401,11 +402,35 @@ export class AppItemsComponent extends AppComponentBase {
     }
 
     eventHandler(event:ActionsMenuEventEmitter<AppItemBrowseEvents>,index?:number): void {
+      this.selectedItemsList=this.items.filter((item)=>{return item.selected==true});
+        this.allSelectedShared=true;
+        this.selectedItemsList.forEach((item)=>{
+            if(!item?.appItem?.sharingLevel ){
+                this.allSelectedShared=false;
+                return;
+            }
+        })
+        if(this.selectedItemsList.length==0){
+            this.allSelectedShared=true;
+        }
         if(event.event == AppItemBrowseEvents.Delete) this.deleteItemHandler(index)
         this.eventTriggered.emit(event)
     }
 
-
+    bulkShareItems(){
+        this._appItemsServiceProxy
+        .shareSelectedProducts(this.filterText)
+        .subscribe((result) => {
+            debugger
+        });
+    }
+    bulkSyncItems(){
+        this._appItemsServiceProxy
+        .syncSelectedProduct(this.filterText)
+        .subscribe((result) => {
+            debugger
+        });
+    }
     saveUserPreferenceForListView() {
         const key = "appitem-list-view-mode";
         const value = String(Number(this.singleItemPerRowMode));
@@ -467,6 +492,7 @@ export class AppItemsComponent extends AppComponentBase {
         this.eventTriggered.emit({ event:AppItemBrowseEvents.CancelSelection })
     }
     applySelection(){
+        debugger
         this.eventTriggered.emit({ event:AppItemBrowseEvents.ApplySelection })
     }
     onFinishImport($event) {

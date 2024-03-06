@@ -9,7 +9,9 @@
     // min-height: 800px;
 }
 
-
+button{
+    cursor: pointer;
+}
 .thin-scroll::-webkit-scrollbar, .p-table-scrollable-body::-webkit-scrollbar {
     width: 15px;
     height: 15px;

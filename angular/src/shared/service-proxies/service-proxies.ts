@@ -11535,6 +11535,63 @@ export class AppItemsServiceProxy {
     }
 
     /**
+     * @param key (optional) 
+     * @return Success
+     */
+    syncSelectedProduct(key: string | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/SyncSelectedProduct?";
+        if (key === null)
+            throw new Error("The parameter 'key' cannot be null.");
+        else if (key !== undefined)
+            url_ += "key=" + encodeURIComponent("" + key) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSyncSelectedProduct(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSyncSelectedProduct(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processSyncSelectedProduct(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param appItemId (optional) 
      * @return Success
      */
@@ -11629,6 +11686,63 @@ export class AppItemsServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param key (optional) 
+     * @return Success
+     */
+    shareSelectedProducts(key: string | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ShareSelectedProducts?";
+        if (key === null)
+            throw new Error("The parameter 'key' cannot be null.");
+        else if (key !== undefined)
+            url_ += "key=" + encodeURIComponent("" + key) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareSelectedProducts(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareSelectedProducts(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processShareSelectedProducts(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -70490,6 +70604,10 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     sellerContactName!: string | undefined;
     priceLevel!: string | undefined;
     buyerContactSSIN!: string | undefined;
+    buyerBranchSSIN!: string | undefined;
+    buyerBranchName!: string | undefined;
+    sellerBranchSSIN!: string | undefined;
+    sellerBranchName!: string | undefined;
     sellerContactSSIN!: string | undefined;
     transactionType!: TransactionType;
     entityStatusCode!: string | undefined;
@@ -70577,6 +70695,10 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.sellerContactName = _data["sellerContactName"];
             this.priceLevel = _data["priceLevel"];
             this.buyerContactSSIN = _data["buyerContactSSIN"];
+            this.buyerBranchSSIN = _data["buyerBranchSSIN"];
+            this.buyerBranchName = _data["buyerBranchName"];
+            this.sellerBranchSSIN = _data["sellerBranchSSIN"];
+            this.sellerBranchName = _data["sellerBranchName"];
             this.sellerContactSSIN = _data["sellerContactSSIN"];
             this.transactionType = _data["transactionType"];
             this.entityStatusCode = _data["entityStatusCode"];
@@ -70698,6 +70820,10 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["sellerContactName"] = this.sellerContactName;
         data["priceLevel"] = this.priceLevel;
         data["buyerContactSSIN"] = this.buyerContactSSIN;
+        data["buyerBranchSSIN"] = this.buyerBranchSSIN;
+        data["buyerBranchName"] = this.buyerBranchName;
+        data["sellerBranchSSIN"] = this.sellerBranchSSIN;
+        data["sellerBranchName"] = this.sellerBranchName;
         data["sellerContactSSIN"] = this.sellerContactSSIN;
         data["transactionType"] = this.transactionType;
         data["entityStatusCode"] = this.entityStatusCode;
@@ -70804,6 +70930,10 @@ export interface IGetAppTransactionsForViewDto {
     sellerContactName: string | undefined;
     priceLevel: string | undefined;
     buyerContactSSIN: string | undefined;
+    buyerBranchSSIN: string | undefined;
+    buyerBranchName: string | undefined;
+    sellerBranchSSIN: string | undefined;
+    sellerBranchName: string | undefined;
     sellerContactSSIN: string | undefined;
     transactionType: TransactionType;
     entityStatusCode: string | undefined;
@@ -70868,6 +70998,10 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     sellerContactName!: string | undefined;
     priceLevel!: string | undefined;
     buyerContactSSIN!: string | undefined;
+    buyerBranchSSIN!: string | undefined;
+    buyerBranchName!: string | undefined;
+    sellerBranchSSIN!: string | undefined;
+    sellerBranchName!: string | undefined;
     sellerContactSSIN!: string | undefined;
     transactionType!: TransactionType;
     entityStatusCode!: string | undefined;
@@ -70945,6 +71079,10 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             this.sellerContactName = _data["sellerContactName"];
             this.priceLevel = _data["priceLevel"];
             this.buyerContactSSIN = _data["buyerContactSSIN"];
+            this.buyerBranchSSIN = _data["buyerBranchSSIN"];
+            this.buyerBranchName = _data["buyerBranchName"];
+            this.sellerBranchSSIN = _data["sellerBranchSSIN"];
+            this.sellerBranchName = _data["sellerBranchName"];
             this.sellerContactSSIN = _data["sellerContactSSIN"];
             this.transactionType = _data["transactionType"];
             this.entityStatusCode = _data["entityStatusCode"];
@@ -71056,6 +71194,10 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
         data["sellerContactName"] = this.sellerContactName;
         data["priceLevel"] = this.priceLevel;
         data["buyerContactSSIN"] = this.buyerContactSSIN;
+        data["buyerBranchSSIN"] = this.buyerBranchSSIN;
+        data["buyerBranchName"] = this.buyerBranchName;
+        data["sellerBranchSSIN"] = this.sellerBranchSSIN;
+        data["sellerBranchName"] = this.sellerBranchName;
         data["sellerContactSSIN"] = this.sellerContactSSIN;
         data["transactionType"] = this.transactionType;
         data["entityStatusCode"] = this.entityStatusCode;
@@ -71156,6 +71298,10 @@ export interface ICreateOrEditAppTransactionsDto {
     sellerContactName: string | undefined;
     priceLevel: string | undefined;
     buyerContactSSIN: string | undefined;
+    buyerBranchSSIN: string | undefined;
+    buyerBranchName: string | undefined;
+    sellerBranchSSIN: string | undefined;
+    sellerBranchName: string | undefined;
     sellerContactSSIN: string | undefined;
     transactionType: TransactionType;
     entityStatusCode: string | undefined;
@@ -71415,6 +71561,10 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     sellerContactName!: string | undefined;
     priceLevel!: string | undefined;
     buyerContactSSIN!: string | undefined;
+    buyerBranchSSIN!: string | undefined;
+    buyerBranchName!: string | undefined;
+    sellerBranchSSIN!: string | undefined;
+    sellerBranchName!: string | undefined;
     sellerContactSSIN!: string | undefined;
     transactionType!: TransactionType;
     entityStatusCode!: string | undefined;
@@ -71511,6 +71661,10 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.sellerContactName = _data["sellerContactName"];
             this.priceLevel = _data["priceLevel"];
             this.buyerContactSSIN = _data["buyerContactSSIN"];
+            this.buyerBranchSSIN = _data["buyerBranchSSIN"];
+            this.buyerBranchName = _data["buyerBranchName"];
+            this.sellerBranchSSIN = _data["sellerBranchSSIN"];
+            this.sellerBranchName = _data["sellerBranchName"];
             this.sellerContactSSIN = _data["sellerContactSSIN"];
             this.transactionType = _data["transactionType"];
             this.entityStatusCode = _data["entityStatusCode"];
@@ -71641,6 +71795,10 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["sellerContactName"] = this.sellerContactName;
         data["priceLevel"] = this.priceLevel;
         data["buyerContactSSIN"] = this.buyerContactSSIN;
+        data["buyerBranchSSIN"] = this.buyerBranchSSIN;
+        data["buyerBranchName"] = this.buyerBranchName;
+        data["sellerBranchSSIN"] = this.sellerBranchSSIN;
+        data["sellerBranchName"] = this.sellerBranchName;
         data["sellerContactSSIN"] = this.sellerContactSSIN;
         data["transactionType"] = this.transactionType;
         data["entityStatusCode"] = this.entityStatusCode;
@@ -71756,6 +71914,10 @@ export interface IGetAllAppTransactionsForViewDto {
     sellerContactName: string | undefined;
     priceLevel: string | undefined;
     buyerContactSSIN: string | undefined;
+    buyerBranchSSIN: string | undefined;
+    buyerBranchName: string | undefined;
+    sellerBranchSSIN: string | undefined;
+    sellerBranchName: string | undefined;
     sellerContactSSIN: string | undefined;
     transactionType: TransactionType;
     entityStatusCode: string | undefined;
@@ -72157,6 +72319,10 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     sellerContactName!: string | undefined;
     priceLevel!: string | undefined;
     buyerContactSSIN!: string | undefined;
+    buyerBranchSSIN!: string | undefined;
+    buyerBranchName!: string | undefined;
+    sellerBranchSSIN!: string | undefined;
+    sellerBranchName!: string | undefined;
     sellerContactSSIN!: string | undefined;
     transactionType!: TransactionType;
     entityStatusCode!: string | undefined;
@@ -72253,6 +72419,10 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             this.sellerContactName = _data["sellerContactName"];
             this.priceLevel = _data["priceLevel"];
             this.buyerContactSSIN = _data["buyerContactSSIN"];
+            this.buyerBranchSSIN = _data["buyerBranchSSIN"];
+            this.buyerBranchName = _data["buyerBranchName"];
+            this.sellerBranchSSIN = _data["sellerBranchSSIN"];
+            this.sellerBranchName = _data["sellerBranchName"];
             this.sellerContactSSIN = _data["sellerContactSSIN"];
             this.transactionType = _data["transactionType"];
             this.entityStatusCode = _data["entityStatusCode"];
@@ -72383,6 +72553,10 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
         data["sellerContactName"] = this.sellerContactName;
         data["priceLevel"] = this.priceLevel;
         data["buyerContactSSIN"] = this.buyerContactSSIN;
+        data["buyerBranchSSIN"] = this.buyerBranchSSIN;
+        data["buyerBranchName"] = this.buyerBranchName;
+        data["sellerBranchSSIN"] = this.sellerBranchSSIN;
+        data["sellerBranchName"] = this.sellerBranchName;
         data["sellerContactSSIN"] = this.sellerContactSSIN;
         data["transactionType"] = this.transactionType;
         data["entityStatusCode"] = this.entityStatusCode;
@@ -72490,6 +72664,10 @@ export interface IGetOrderDetailsForViewDto {
     sellerContactName: string | undefined;
     priceLevel: string | undefined;
     buyerContactSSIN: string | undefined;
+    buyerBranchSSIN: string | undefined;
+    buyerBranchName: string | undefined;
+    sellerBranchSSIN: string | undefined;
+    sellerBranchName: string | undefined;
     sellerContactSSIN: string | undefined;
     transactionType: TransactionType;
     entityStatusCode: string | undefined;
