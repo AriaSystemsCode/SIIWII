@@ -10,9 +10,9 @@
 
 namespace onetouch.Web.PredefinedReports.ProductCatalog {
     
-    public partial class ProductsCatalogTemplate7 : DevExpress.XtraReports.UI.XtraReport {
+    public partial class ProductsCatalogTemplate12 : DevExpress.XtraReports.UI.XtraReport {
         private void InitializeComponent() {
-            DevExpress.XtraReports.ReportInitializer reportInitializer = new DevExpress.XtraReports.ReportInitializer(this, "onetouch.Web.PredefinedReports.ProductCatalog.ProductsCatalogTemplate7.vsrepx");
+            DevExpress.XtraReports.ReportInitializer reportInitializer = new DevExpress.XtraReports.ReportInitializer(this, "onetouch.Web.PredefinedReports.ProductCatalog.ProductsCatalogTemplate12.repx");
 
             // Controls
             this.TopMargin = reportInitializer.GetControl<DevExpress.XtraReports.UI.TopMarginBand>("TopMargin");
@@ -22,7 +22,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.PageFooter = reportInitializer.GetControl<DevExpress.XtraReports.UI.PageFooterBand>("PageFooter");
             this.Detail = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailBand>("Detail");
             this.GroupHeader1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupHeaderBand>("GroupHeader1");
-            this.GroupFooter1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupFooterBand>("GroupFooter1");
             this.SubBand1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.SubBand>("SubBand1");
             this.SubBand2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.SubBand>("SubBand2");
             this.subreport4 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRSubreport>("subreport4");
@@ -34,14 +33,18 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.label13 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label13");
             this.pageInfo3 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPageInfo>("pageInfo3");
             this.pageInfo2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPageInfo>("pageInfo2");
-            this.panel1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPanel>("panel1");
+            this.panel2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPanel>("panel2");
             this.subreport1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRSubreport>("subreport1");
-            this.subreport1.ReportSource = new onetouch.Web.PredefinedReports.ProductCatalog.Color_Size1();
-            this.xrLabel3 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("xrLabel3");
+            this.subreport1.ReportSource = new onetouch.Web.PredefinedReports.ProductCatalog.Color_Size();
+            this.panel1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPanel>("panel1");
+            this.label19 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label19");
+            this.pictureBox2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox2");
             this.label7 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label7");
+            this.label15 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label15");
+            this.label14 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label14");
+            this.barCode1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRBarCode>("barCode1");
             this.label8 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label8");
             this.label1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label1");
-            this.pictureBox1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox1");
             this.label3 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label3");
             this.label2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label2");
             this.label11 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label11");
@@ -55,15 +58,15 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.to = reportInitializer.GetParameter("to");
             this.DetailPageGroupByName = reportInitializer.GetParameter("DetailPageGroupByName");
             this.BKGround = reportInitializer.GetParameter("BKGround");
-            this.ColorPageSort = reportInitializer.GetParameter("ColorPageSort");
-            this.DetailPageSort = reportInitializer.GetParameter("DetailPageSort");
-            this.DetailPageShowCategory = reportInitializer.GetParameter("DetailPageShowCategory");
-            this.ColorPageShowCategory = reportInitializer.GetParameter("ColorPageShowCategory");
             this.cc = reportInitializer.GetParameter("cc");
             this.bcc = reportInitializer.GetParameter("bcc");
             this.subject = reportInitializer.GetParameter("subject");
             this.body = reportInitializer.GetParameter("body");
             this.showCover = reportInitializer.GetParameter("showCover");
+            this.ColorPageSort = reportInitializer.GetParameter("ColorPageSort");
+            this.DetailPageSort = reportInitializer.GetParameter("DetailPageSort");
+            this.DetailPageShowCategory = reportInitializer.GetParameter("DetailPageShowCategory");
+            this.ColorPageShowCategory = reportInitializer.GetParameter("ColorPageShowCategory");
             this.PrintLinesheet = reportInitializer.GetParameter("PrintLinesheet");
             this.EmailLinesheet = reportInitializer.GetParameter("EmailLinesheet");
             this.showColors = reportInitializer.GetParameter("showColors");
@@ -103,7 +106,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.PageFooterBand PageFooter;
         private DevExpress.XtraReports.UI.DetailBand Detail;
         private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader1;
-        private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter1;
         private DevExpress.XtraReports.UI.SubBand SubBand1;
         private DevExpress.XtraReports.UI.SubBand SubBand2;
         private DevExpress.XtraReports.UI.XRSubreport subreport4;
@@ -113,13 +115,17 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.XRLabel label13;
         private DevExpress.XtraReports.UI.XRPageInfo pageInfo3;
         private DevExpress.XtraReports.UI.XRPageInfo pageInfo2;
-        private DevExpress.XtraReports.UI.XRPanel panel1;
+        private DevExpress.XtraReports.UI.XRPanel panel2;
         private DevExpress.XtraReports.UI.XRSubreport subreport1;
-        private DevExpress.XtraReports.UI.XRLabel xrLabel3;
+        private DevExpress.XtraReports.UI.XRPanel panel1;
+        private DevExpress.XtraReports.UI.XRLabel label19;
+        private DevExpress.XtraReports.UI.XRPictureBox pictureBox2;
         private DevExpress.XtraReports.UI.XRLabel label7;
+        private DevExpress.XtraReports.UI.XRLabel label15;
+        private DevExpress.XtraReports.UI.XRLabel label14;
+        private DevExpress.XtraReports.UI.XRBarCode barCode1;
         private DevExpress.XtraReports.UI.XRLabel label8;
         private DevExpress.XtraReports.UI.XRLabel label1;
-        private DevExpress.XtraReports.UI.XRPictureBox pictureBox1;
         private DevExpress.XtraReports.UI.XRLabel label3;
         private DevExpress.XtraReports.UI.XRLabel label2;
         private DevExpress.XtraReports.UI.XRLabel label11;
@@ -137,15 +143,15 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.Parameters.Parameter to;
         private DevExpress.XtraReports.Parameters.Parameter DetailPageGroupByName;
         private DevExpress.XtraReports.Parameters.Parameter BKGround;
-        private DevExpress.XtraReports.Parameters.Parameter ColorPageSort;
-        private DevExpress.XtraReports.Parameters.Parameter DetailPageSort;
-        private DevExpress.XtraReports.Parameters.Parameter DetailPageShowCategory;
-        private DevExpress.XtraReports.Parameters.Parameter ColorPageShowCategory;
         private DevExpress.XtraReports.Parameters.Parameter cc;
         private DevExpress.XtraReports.Parameters.Parameter bcc;
         private DevExpress.XtraReports.Parameters.Parameter subject;
         private DevExpress.XtraReports.Parameters.Parameter body;
         private DevExpress.XtraReports.Parameters.Parameter showCover;
+        private DevExpress.XtraReports.Parameters.Parameter ColorPageSort;
+        private DevExpress.XtraReports.Parameters.Parameter DetailPageSort;
+        private DevExpress.XtraReports.Parameters.Parameter DetailPageShowCategory;
+        private DevExpress.XtraReports.Parameters.Parameter ColorPageShowCategory;
         private DevExpress.XtraReports.Parameters.Parameter PrintLinesheet;
         private DevExpress.XtraReports.Parameters.Parameter EmailLinesheet;
         private DevExpress.XtraReports.Parameters.Parameter showColors;

@@ -54,6 +54,9 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
 
             // Parameters
             this.to = reportInitializer.GetParameter("to");
+            this.parameter1 = reportInitializer.GetParameter("parameter1");
+            this.mimimumInStockQty = reportInitializer.GetParameter("mimimumInStockQty");
+            this.onlyInStockColors = reportInitializer.GetParameter("onlyInStockColors");
             this.DetailPageGroupByName = reportInitializer.GetParameter("DetailPageGroupByName");
             this.BKGround = reportInitializer.GetParameter("BKGround");
             this.cc = reportInitializer.GetParameter("cc");
@@ -135,6 +138,9 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.XRControlStyle DetailData3_Odd;
         private DevExpress.XtraReports.UI.XRControlStyle PageInfo;
         private DevExpress.XtraReports.Parameters.Parameter to;
+        private DevExpress.XtraReports.Parameters.Parameter parameter1;
+        private DevExpress.XtraReports.Parameters.Parameter mimimumInStockQty;
+        private DevExpress.XtraReports.Parameters.Parameter onlyInStockColors;
         private DevExpress.XtraReports.Parameters.Parameter DetailPageGroupByName;
         private DevExpress.XtraReports.Parameters.Parameter BKGround;
         private DevExpress.XtraReports.Parameters.Parameter cc;
