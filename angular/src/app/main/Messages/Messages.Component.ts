@@ -256,6 +256,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
 
     selectMessage(message: MessagesDto): void {
         this.showMainSpinner();
+        this.showSideBar=false;
+        this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
         this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);

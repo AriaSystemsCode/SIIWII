@@ -18,16 +18,20 @@ using Castle.MicroKernel.Registration;
 using onetouch.SystemObjects;
 using PayPalCheckoutSdk.Orders;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Abp.Runtime.Session;
+using onetouch.Configuration;
+ 
 
 namespace onetouch.Migrations.Seed.Host
 {
     public class HostRoleAndUserCreator
     {
         private readonly onetouchDbContext _context;
-
-        public HostRoleAndUserCreator(onetouchDbContext context)
+         
+        public HostRoleAndUserCreator(onetouchDbContext context )
         {
             _context = context;
+           
         }
 
         public void Create()
@@ -578,23 +582,24 @@ namespace onetouch.Migrations.Seed.Host
             #region Add sydReports
             var keyList = _context.LanguageTexts.Select(e => e.Key).ToList();
 
-            var sycEntityObjectTypes = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "OrderConfirmationForm1").ToList();
-            if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count < 1)
-            {
-                SycReport sycReport = new SycReport();
-                sycReport.Name = "OrderConfirmationForm1";
+            //var sycEntityObjectTypes = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "OrderConfirmationForm1").ToList();
+            //if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count < 1)
+            //{
+            //    SycReport sycReport = new SycReport();
+            //    sycReport.Name = "OrderConfirmationForm1";
 
-                sycReport.Code = "7";
-                sycReport.Name = "OrderConfirmationForm1";
-                sycReport.Description = "Order confirmation form 1";
-                sycReport.Thumbnail = "Order confirmation form 1";
-                sycReport.EntityObjectTypeId = 97;
+            //    sycReport.Code = "7";
+            //    sycReport.Name = "OrderConfirmationForm1";
+            //    sycReport.Description = "Order confirmation form 1";
+            //    sycReport.Thumbnail = "Order confirmation form 1";
+            //    sycReport.EntityObjectTypeId = 97;
 
-                _context.SycReports.Add(sycReport);
+            //    _context.SycReports.Add(sycReport);
 
 
-                _context.SaveChanges();
-            }
+            //    _context.SaveChanges();
+            //}
+          
 
             var sycReports = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate8").ToList();
             if (sycReports == null || sycReports.Count < 1)
@@ -602,10 +607,10 @@ namespace onetouch.Migrations.Seed.Host
                 SycReport sycReport = new SycReport();
                 sycReport.Name = "ProductsCatalogTemplate8";
 
-                sycReport.Code = "7";
+                sycReport.Code = "8";
                 sycReport.Name = "ProductsCatalogTemplate8";
                 sycReport.Description = "(8 Products Per Page) Layout - Landscape Orientation";
-                sycReport.Thumbnail = "ProductsCatalogTemplate8";
+                sycReport.Thumbnail = "catalogueReportTemp8.png";
                 sycReport.EntityObjectTypeId = 97;
 
                 _context.SycReports.Add(sycReport);
@@ -620,10 +625,10 @@ namespace onetouch.Migrations.Seed.Host
                 SycReport sycReport = new SycReport();
                 sycReport.Name = "ProductsCatalogTemplate9";
 
-                sycReport.Code = "7";
+                sycReport.Code = "9";
                 sycReport.Name = "ProductsCatalogTemplate9";
                 sycReport.Description = "(6 Products Per Page) Layout - Portrait Orientation";
-                sycReport.Thumbnail = "ProductsCatalogTemplate9";
+                sycReport.Thumbnail = "catalogueReportTemp9.png";
                 sycReport.EntityObjectTypeId = 97;
 
                 _context.SycReports.Add(sycReport);
@@ -638,10 +643,10 @@ namespace onetouch.Migrations.Seed.Host
                 SycReport sycReport = new SycReport();
                 sycReport.Name = "ProductsCatalogTemplate10";
 
-                sycReport.Code = "7";
+                sycReport.Code = "1-";
                 sycReport.Name = "ProductsCatalogTemplate10";
-                sycReport.Description = "(1 Product Per Page) Layout - Landscape Orientation - Available Quantities per Size";
-                sycReport.Thumbnail = "ProductsCatalogTemplate10";
+                sycReport.Description = "1 Product per page - Without ATS";
+                sycReport.Thumbnail = "catalogueReportTemp10.png";
                 sycReport.EntityObjectTypeId = 97;
 
                 _context.SycReports.Add(sycReport);
@@ -651,15 +656,15 @@ namespace onetouch.Migrations.Seed.Host
             }
 
             var sycReports11 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate11").ToList();
-            if (sycReports11 == null || sycReports10.Count < 1)
+            if (sycReports11 == null || sycReports11.Count < 1)
             {
                 SycReport sycReport = new SycReport();
                 sycReport.Name = "ProductsCatalogTemplate11";
 
-                sycReport.Code = "7";
+                sycReport.Code = "11";
                 sycReport.Name = "ProductsCatalogTemplate11";
-                sycReport.Description = "Products Catalog Template 11 Products";
-                sycReport.Thumbnail = "ProductsCatalogTemplate11";
+                sycReport.Description = "1 Product per page - With ATS";
+                sycReport.Thumbnail = "catalogueReportTemp11.png";
                 sycReport.EntityObjectTypeId = 97;
 
                 _context.SycReports.Add(sycReport);
@@ -667,6 +672,60 @@ namespace onetouch.Migrations.Seed.Host
 
                 _context.SaveChanges();
             }
+
+            var sycReports12 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate12").ToList();
+            if (sycReports12 == null || sycReports12.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate12";
+
+                sycReport.Code = "12";
+                sycReport.Name = "ProductsCatalogTemplate12";
+                sycReport.Description = "Product Per Page - Landscape - Available Quantities per Size";
+                sycReport.Thumbnail = "catalogueReportTemp12.png";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            var sycReports123 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate12").ToList();
+            if (sycReports123== null || sycReports123.Count < 1)
+            {
+                SycReport sycReport = new SycReport();
+                sycReport.Name = "ProductsCatalogTemplate12";
+
+                sycReport.Code = "7";
+                sycReport.Name = "ProductsCatalogTemplate12";
+                sycReport.Description = "Product Per Page - Landscape - Available Quantities per Size";
+                sycReport.Thumbnail = "ProductsCatalogTemplate12";
+                sycReport.EntityObjectTypeId = 97;
+
+                _context.SycReports.Add(sycReport);
+
+
+                _context.SaveChanges();
+            }
+
+            //var sycReports13 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate13").ToList();
+            //if (sycReports13 == null || sycReports13.Count < 1)
+            //{
+            //    SycReport sycReport = new SycReport();
+            //    sycReport.Name = "ProductsCatalogTemplate13";
+
+            //    sycReport.Code = "7";
+            //    sycReport.Name = "ProductsCatalogTemplate13";
+            //    sycReport.Description = "Product Per Page - Landscape - 2 images for product Suggested Layout";
+            //    sycReport.Thumbnail = "ProductsCatalogTemplate12";
+            //    sycReport.EntityObjectTypeId = 97;
+
+            //    _context.SycReports.Add(sycReport);
+
+
+            //    _context.SaveChanges();
+            //}
             #endregion SycEntityObjectTypes
 
         }

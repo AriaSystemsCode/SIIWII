@@ -459,6 +459,7 @@
                             </div>
                             <div class=" row w-100 mt-4 ml-1">
                                 <button type="button"
+                                [disabled]="shoppingCartDetails?.totalAmount<=0"
                                     class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
                                     style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
                                     {{l("Proceedtocheckout")}}
@@ -487,7 +488,7 @@
                             <div class="col-12">
 
                                 <!-- app Notes shared component-->
-                                <app-notes [entityId]="orderId"></app-notes>
+                                <app-notes [entityId]="orderId" (outSaveNote)="onGeneratOrderReport(true)"></app-notes>
                             </div>
 
                         </div>
@@ -496,7 +497,7 @@
                     <div class="row mt-4">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                         <div class="w-100 comment-warper summarySection p-4 ml-2 mt-3 purpleColor">
-                            <app-comment-parent [cartStyle]="true" #commentParentComponent>
+                            <app-comment-parent [cartStyle]="true" #commentParentComponent (newCommentAdded)="onGeneratOrderReport(true)">
                             </app-comment-parent>
                         </div>
 
@@ -531,5 +532,6 @@
     </div>
 </div>
 
-<report-viewer class="w-100 d-none" [reportUrl]="reportUrl" [invokeAction]="invokeAction">
-</report-viewer>
+<!-- <report-viewer #reportViewerElement class="w-100 d-none" [reportUrl]="reportUrl" [invokeAction]="invokeAction">
+</report-viewer> -->
+<div #reportViewerContainer class="w-100 d-none"></div>

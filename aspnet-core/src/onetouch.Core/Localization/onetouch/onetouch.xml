@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
+		<text name="MinimumInStock">Minimum (in Stock) Qty</text>
+		<text name="OnlyInStockColors">Only (in Stock) Colors</text>
+		
 	<text name="MaintainanceAlarm">Maintenance will be from {0} to {1}.</text>
 	<text name="OpenMaintainanceAlarm">Another open Maintenance Found, Multiple Open Maintenance, Not Allowed.</text>
 	<text name="DismissIds">Dismiss ids</text>
@@ -1893,6 +1896,7 @@
 		<text name="UnpublishList">Unpublish List</text>
 		<text name="AreYouSureYouWantToCancelPrintingThisProductListCatalogue?">Are You Sure You Want To Cancel Printing This Product List Catalogue ?</text>
 		<text name="PrintProductsList">Print product List</text>
+    
 		<text name="CatalogueReport">Catalogue Report</text>
 		<text name="ProductsCatalogInfo/Print">Products Catalog Info / Print</text>
 		<text name="ChooseTemplate">Choose Template</text>
@@ -2419,13 +2423,14 @@
 		<text name="PaymentInformation">Payment Information</text>
 		<text name="PaymentTerms">Payment Terms</text>
   <text name="ShareTransaction">Share Transaction</text>
-    <text name="ManageTransactionToSiiwiiUsers">Manage Transaction To Siiwii Users</text>
+    <text name="MessageTransactionToSiiwiiUsers">Message Transaction To Siiwii Users</text>
     <text name="SelectedUsersList">Selected Users List</text>
     <text name="EmailTransactionToNonSiiwiiUsers">Email Transaction To Non Siiwii Users</text>
     <text name="TypeEmailAddress">Type Email Address</text>
     <text name="Addamessagehere">Add a message here</text>
     <text name="Add2">Add</text>
     <text name="Done">Done</text>
+    <text name="MessageBody">Message body</text>
     <text name="InvalidEmailFormate">Invalid email formate</text>
     <text name="TransactionHasBeenSent">Transaction has been sent</text>
   </texts>  

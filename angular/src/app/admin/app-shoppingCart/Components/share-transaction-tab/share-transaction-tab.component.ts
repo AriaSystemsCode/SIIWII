@@ -25,6 +25,7 @@ export class ShareTransactionTabComponent  extends AppComponentBase {
   contact: any[] | undefined;
   item:any;
   email: boolean | string	
+  saveText:boolean =false;
   validEmailFormate:boolean=true;
   sharedBefore:boolean=true;
   editMode:boolean=true;
@@ -139,6 +140,7 @@ if(this.sharedWithUsers){
     
       }
       this.sharingList=result;
+      this.sharingListForSave=result;
     })
     
   }
@@ -153,7 +155,12 @@ if(this.sharedWithUsers){
       indexInsideArray=currentsharingList.findIndex(a => a.userId === item.userId);
       if(indexInsideArray>=0){
         arrindex= currentsharingList.findIndex(a => a.userId === item.userId)
-        searchArray.splice(arrindex, 1);
+        if(searchArray.length>arrindex){
+                  searchArray.splice(arrindex, 1);
+
+        }else if (searchArray.length==1){
+          searchArray=[];
+        }
 
       }
     })
@@ -175,6 +182,7 @@ if(this.sharedWithUsers){
    
     if( this.validateSelectedContact()){
       newsharingList=this.sharingList;
+      this.saveText=false;
      this.searchContact.forEach(function(item){
       newsharingList.push(item);
 
@@ -231,6 +239,7 @@ this._AppTransactionServiceProxy.getAccountConnectedContacts(query).subscribe(re
 
 }
   removefromShareList(id){
+    this.saveText=true;
     this.sharingListForSave = this.sharingListForSave.filter(contact => {
       return contact.id !== id;
     });

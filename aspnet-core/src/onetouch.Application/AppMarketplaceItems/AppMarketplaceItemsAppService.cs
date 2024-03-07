@@ -143,12 +143,15 @@ namespace onetouch.AppMarketplaceItems
                 //get curr tenant id to pass to the sp
                 
                 decimal exchangeRate = 1;
-                
+                //MMT12-20
+                if (!string.IsNullOrWhiteSpace(input.Filter))
+                    input.Filter = input.Filter.TrimEnd().TrimStart();
+                //MMT12-20
                 //if (input.TenantId != null)
-                    // if (!string.IsNullOrEmpty(input.SoldOutFromDate.ToString()))
-                    //   _sycEntityObjectTypeRepository.GetAll().Include(a => a.ExtraAttributes.);
-                    //var currencyTenant = TenantManager.GetTenantCurrency();
-                    //var account = await _appContactRepository.GetAll().Include(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData).FirstOrDefaultAsync(x => x.TenantId ==null && x.IsProfileData==false && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
+                // if (!string.IsNullOrEmpty(input.SoldOutFromDate.ToString()))
+                //   _sycEntityObjectTypeRepository.GetAll().Include(a => a.ExtraAttributes.);
+                //var currencyTenant = TenantManager.GetTenantCurrency();
+                //var account = await _appContactRepository.GetAll().Include(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData).FirstOrDefaultAsync(x => x.TenantId ==null && x.IsProfileData==false && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
                  if (input.CurrencyCode != null)
                  exchangeRate = _helper.SystemTables.GetExchangeRate("USD",input.CurrencyCode);
 
@@ -217,11 +220,12 @@ namespace onetouch.AppMarketplaceItems
                 .WhereIf(input.departmentFilters != null && input.departmentFilters.Count() > 0, e => e.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
                 // .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.ManufacturerCode.Contains(input.Filter) || e.Description.Contains(input.Filter) || e.EntityExtraData.Where(a => a.AttributeValue.Contains(input.Filter)).Count() > 0)
-                .Where(x => x.ParentId == null &&
+                .Where(x => x.ParentId == null && (x.SharingLevel != 3 && x.SharingLevel != 4) &&
                 ((input.SharingLevel == SharingLevels.Public && x.SharingLevel == 1) ||
                  (input.SharingLevel == SharingLevels.SharedWithMe && x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0) ||
-                (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 || (x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0)))) ||
-                (userId != null && x.ItemSharingFkList.Count(c => c.SharedUserId == userId) > 0));
+                (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 ||
+                (x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))) ||
+                (userId != null && x.ItemSharingFkList.Count(c => c.SharedUserId == userId) > 0) || (input.AccountSSIN == null ? x.TenantOwner == AbpSession.TenantId : false)));
                 /*     )
                || ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
                      && (x.SharingLevel == 2 || x.SharingLevel == 1)  
@@ -282,9 +286,8 @@ namespace onetouch.AppMarketplaceItems
                                    Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false
 
                                };
-                var orderedItems = appItems.Where(x=> x.AppItem.ShowItem && x.AppItem.Price !=null)
-                    .OrderBy(input.Sorting ?? "AppItem.id asc")
-                  .PageBy(input);
+                var orderedItemsFilter = appItems.Where(x => x.AppItem.ShowItem && x.AppItem.Price != null).OrderBy(input.Sorting ?? "AppItem.id asc");
+                var orderedItems = orderedItemsFilter.PageBy(input);
 
                 //var appItemsList = await appItems.ToListAs ync();
                 var appItemsList = await orderedItems.ToListAsync();
@@ -293,7 +296,7 @@ namespace onetouch.AppMarketplaceItems
                 {
                     appItemsList = appItemsList.Where(e => e.Selected).ToList();
                 }
-                var totalCount = await appItems.CountAsync(x => x.AppItem.ShowItem);
+                var totalCount = await orderedItemsFilter.CountAsync(x => x.AppItem.ShowItem);
 
                 stopwatch.Stop();
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
@@ -507,8 +510,11 @@ namespace onetouch.AppMarketplaceItems
                     var brandId = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108) != null ?
                         appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108).AttributeValueId : 0;
                     if (brandId != 0)
-                        output.AppItem.Brand = (await _appEntityRepository.GetAll().FirstOrDefaultAsync(a => a.Id == brandId)).Name;
-
+                    {
+                        var brandObj = await _appEntityRepository.GetAll().FirstOrDefaultAsync(a => a.Id == brandId);
+                        if (brandObj!=null)
+                            output.AppItem.Brand = brandObj.Name;
+                    }
                     output.AppItem.MaterialContent = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662) != null ?
                         appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662).AttributeValue : "";
 
@@ -601,6 +607,9 @@ namespace onetouch.AppMarketplaceItems
                                 }
                             }
                         }
+                        if(output.AppItem.MinMSRP !=null)
+                            mainItemLevelPrice = decimal.Parse(output.AppItem.MinMSRP.ToString());
+
                         if (output.AppItem.MinSpecialPrice !=null)
                         mainItemLevelPrice =decimal.Parse( output.AppItem.MinSpecialPrice.ToString());
                         //MMT
@@ -769,8 +778,12 @@ namespace onetouch.AppMarketplaceItems
                                 //    secondAttributeValuesFor1st11.Select(a => a..FirstOrDefault ().AttributeValue.ToString() + "," + 
                                 //    (a.FirstOrDefault().AttributeCode.ToString() == null ? a.FirstOrDefault().AttributeValueId.ToString() : a.FirstOrDefault().AttributeCode.ToString()))
                                 //    .ToList().Distinct().ToList().Distinct().ToList();
+                                //MMT202402
+                                //var secondAttributeValuesFor1st1 =
+                                //secondAttributeValuesFor1st11.Where(z=>z.AttributeValue!=null).Select(a => a.AttributeValue.ToString() + "," + (a.AttributeValueId != null ? a.AttributeValueId.ToString():"")).ToList();
                                 var secondAttributeValuesFor1st1 =
-                                secondAttributeValuesFor1st11.Where(z=>z.AttributeValue!=null && z.AttributeValueId != null).Select(a => a.AttributeValue.ToString() + "," + a.AttributeValueId.ToString()).ToList();
+                                                 secondAttributeValuesFor1st11.Where(z => z.AttributeCode != null).Select(a => a.AttributeCode.ToString()).ToList();
+                                //MMT202402
                                 //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
                                 //.ToList();
                                 if (secondAttributeValuesFor1st1 != null && secondAttributeValuesFor1st1.Count > 0)
@@ -779,12 +792,13 @@ namespace onetouch.AppMarketplaceItems
                                     if (attribName == "SIZE" && appItem.ItemSizeScaleHeadersFkList != null && appItem.ItemSizeScaleHeadersFkList.Count() > 0)
                                     {
                                         var xx = appItem.ItemSizeScaleHeadersFkList.FirstOrDefault(a => a.ParentId == null);
-                                        var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode + "," + a.SizeId.ToString()).ToList();
+                                        var zz = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode.TrimEnd()).ToList();
                                         var ss = secondAttributeValuesFor1st1.Distinct().ToList();
                                         secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode + "," + a.SizeId.ToString()).ToList();
                                         foreach (var t in zz)
                                         {
-                                            if (!ss.Contains(t.ToString()) && (!ss.Contains(t.Substring(0,t.IndexOf(',')+1).ToString())))
+                                            // if (!ss.Contains(t.ToString()) && (!ss.Contains(t.Substring(0,t.IndexOf(',')+1).ToString())))
+                                            if (!ss.Contains(t.ToString()))
                                                 secondAttributeValuesFor1st.Remove(t.ToString());
                                         }
                                         //secondAttributeValuesFor1st = zz;
@@ -914,19 +928,19 @@ namespace onetouch.AppMarketplaceItems
                                             {
 
                                                 var codeItems = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                       .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                        a.AttributeId == firstAttributeIdLong
                                                                                        ).Any()).ToList();
                                                 var itemVarSum = codeItems.Where(x =>
                                                 x.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
-                                                a.AttributeValue == varItem).Any()).Sum(a => a.StockAvailability);
+                                                (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).Sum(a => a.StockAvailability);
                                                 attlook.StockAvailability = itemVarSum;
                                                 //SSIN
                                                 var itemSsin = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString()) 
+                                                                                       .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString())) 
                                                                                        .WhereIf(secondAttId!=null,a=>a.AttributeId == long.Parse(secondAttId))
                                                                                        .Any()).ToList()
-                                                                                       .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && w.AttributeValue == varItem).Any()).FirstOrDefault();
+                                                                                       .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && (w.AttributeValue == varItem || w.AttributeCode == varItem)).Any()).FirstOrDefault();
 
 
                                                 if (!string.IsNullOrEmpty(level))
@@ -1054,36 +1068,47 @@ namespace onetouch.AppMarketplaceItems
                                             foreach (var attlook in eDRestAttributes.Values)
                                             {
                                                 var codeItems = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                       .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                        a.AttributeId == long.Parse(secondAttId)
                                                                                        ).Any()).ToList();
                                                 var itemVarSum = codeItems.Where(x =>
                                                 x.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
-                                                a.AttributeValue == varItem).Any()).Sum(a => a.StockAvailability);
+                                                (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).Sum(a => a.StockAvailability);
                                                 attlook.StockAvailability = itemVarSum;
                                                 //SSIN
                                                 var itemSsin = varAppItems.Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                       .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                        a.AttributeId == long.Parse(secondAttId)
                                                                                        ).Any()).ToList()
-                                                                                       .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && w.AttributeValue == varItem).Any()).FirstOrDefault();
+                                                                                       .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && (w.AttributeValue == varItem || w.AttributeCode == varItem)).Any()).FirstOrDefault();
+                                                if(itemSsin!=null)
                                                 attlook.SSIN = itemSsin.SSIN;
+
                                                 if (!string.IsNullOrEmpty(level))
                                                 {
-                                                    attlook.Price = mainItemLevelPrice == null ? 0 : decimal.Parse(mainItemLevelPrice.ToString()); 
-                                                    var priceObnj = itemSsin.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == level);
+                                                    attlook.Price = mainItemLevelPrice == null ? 0 : decimal.Parse(mainItemLevelPrice.ToString());
+                                                    AppMarketplaceItemPrices?  priceObnj = null;
+                                                    if (itemSsin!=null)
+                                                       priceObnj = itemSsin.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == level);
+
                                                     if (priceObnj != null)
                                                         attlook.Price = priceObnj.Price;
                                                     else
                                                     {
-                                                        var msrpObjUsd = itemSsin.ItemPricesFkList.Where(x => x.Code == level && x.CurrencyCode == "USD").FirstOrDefault();
+                                                        AppMarketplaceItemPrices? msrpObjUsd = null;
+                                                        if (itemSsin != null)
+                                                            msrpObjUsd = itemSsin.ItemPricesFkList.Where(x => x.Code == level && x.CurrencyCode == "USD").FirstOrDefault();
+                                                        
                                                         if (msrpObjUsd != null)
                                                         {
                                                             attlook.Price = msrpObjUsd.Price * exchangeRate;
                                                         }
                                                         else
                                                         {
-                                                            var msrpObjDef = itemSsin.ItemPricesFkList.Where(x => x.Code == level && x.IsDefault).FirstOrDefault();
+                                                            AppMarketplaceItemPrices? msrpObjDef = null;
+                                                            if (itemSsin != null)
+                                                                 msrpObjDef = itemSsin.ItemPricesFkList.Where(x => x.Code == level && x.IsDefault).FirstOrDefault();
+
                                                             if (msrpObjDef != null)
                                                             {
                                                                 decimal exchangeRateDef = 1;
@@ -1106,19 +1131,25 @@ namespace onetouch.AppMarketplaceItems
                                                 else
                                                 {
                                                     attlook.Price = mainItemMSRP;
-                                                    var priceObnj = itemSsin.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == "MSRP");
+                                                    AppMarketplaceItemPrices? priceObnj = null;
+                                                    if (itemSsin != null)
+                                                         priceObnj = itemSsin.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == "MSRP");
                                                     if (priceObnj != null)
                                                         attlook.Price = priceObnj.Price;
                                                     else
                                                     {
-                                                        var msrpObjUsd = itemSsin.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.CurrencyCode == "USD").FirstOrDefault();
+                                                        AppMarketplaceItemPrices? msrpObjUsd = null;
+                                                        if (itemSsin != null)
+                                                             msrpObjUsd = itemSsin.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.CurrencyCode == "USD").FirstOrDefault();
                                                         if (msrpObjUsd != null)
                                                         {
                                                             attlook.Price = msrpObjUsd.Price * exchangeRate;
                                                         }
                                                         else
                                                         {
-                                                            var msrpObjDef = itemSsin.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.IsDefault).FirstOrDefault();
+                                                            AppMarketplaceItemPrices? msrpObjDef = null;
+                                                            if (itemSsin != null)
+                                                                 msrpObjDef = itemSsin.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.IsDefault).FirstOrDefault();
                                                             if (msrpObjDef != null)
                                                             {
                                                                 decimal exchangeRateDef = 1;

@@ -207,7 +207,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >Buyer Email*
+                                >Buyer Email
                             </label>
                             <input
                             type="email"
@@ -218,33 +218,17 @@
                                 formControlName="buyerContactEMailAddress"
                                 minlength="5"
                                 maxlength="100"
-                                required
                             />
                             
                             <small
                                 class="text-danger"
                                 *ngIf="invalidBuyerContactEMailAddress &&
-                                !orderForm
-                                    .get('buyerContactEMailAddress')
-                                    ?.hasError('required')  && 
                                    ! orderForm
                                         .get('buyerContactEMailAddress')
                                         ?.hasError('email')"
 
                             >
                                 {{ invalidBuyerContactEMailAddress }}
-                            </small>
-
-                            <small
-                                class="text-danger"
-                                *ngIf="
-                                    submitted &&
-                                    orderForm
-                                        .get('buyerContactEMailAddress')
-                                        ?.hasError('required')
-                                "
-                            >
-                                Email Address is Required
                             </small>
                             <small
                                 class="text-danger"
@@ -408,7 +392,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >Seller Email*</label
+                                >Seller Email</label
                             >
                             <input
                             type="email"
@@ -418,31 +402,16 @@
                                 formControlName="sellerContactEMailAddress"
                                 minlength="5"
                                 maxlength="100"
-                                required
                             />
                             <small
                             class="text-danger"
-                            *ngIf="invalidSellerContactEMailAddress  &&
-                            !orderForm
-                                .get('sellerContactEMailAddress')
-                                ?.hasError('required')  && 
+                            *ngIf="invalidSellerContactEMailAddress  && 
                                 ! orderForm
                                      .get('sellerContactEMailAddress')
                                      ?.hasError('email')"
                         >
                             {{ invalidSellerContactEMailAddress }}
                         </small>
-                            <small
-                                class="text-danger"
-                                *ngIf="
-                                    submitted &&
-                                    orderForm
-                                        .get('sellerContactEMailAddress')
-                                        ?.hasError('required') 
-                                "
-                            >
-                                Email Address is Required
-                            </small>
                             <small
                                 class="text-danger"
                                 *ngIf="

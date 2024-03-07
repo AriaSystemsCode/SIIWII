@@ -36,7 +36,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
+    this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
 
   }
 
@@ -53,7 +53,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.createOrEditTransaction();
   }
   cancel() {
-    this.appTransactionsForViewDto =JSON.parse(this.oldappTransactionsForViewDto);
+    this.appTransactionsForViewDto=JSON.parse(JSON.stringify(this.oldappTransactionsForViewDto));
     this.onUpdateAppTransactionsForViewDto(this.appTransactionsForViewDto);
     this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
     this.showSaveBtn = false;
@@ -65,7 +65,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
       .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
       .subscribe((res) => {
         if (res) {
-          this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
+          this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
           /*  if (this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo)
              this.buyer_seller_contactInfoValid.emit(ShoppingCartoccordionTabs.BuyerContactInfo);
  
@@ -81,7 +81,6 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   }
 
   onUpdateAppTransactionsForViewDto($event) {
-    this.oldappTransactionsForViewDto =JSON.stringify(this.appTransactionsForViewDto);
     this.appTransactionsForViewDto = $event;
   }
 

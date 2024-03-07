@@ -3,11 +3,13 @@
     <div class="container-fluid pt-1 mb-3 " >
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
-            <button [disabled]="(!enableSAveShipFrom)" (click)="createOrEditTransaction()" 
+            <button 
+            [disabled]="!(shippingTabValid)" (click)="createOrEditTransaction()" 
             class="continuebtn text-center btn float-right" [disabled]="(!shipingTabVaild)"  *ngIf="!showSaveBtn ">
                  {{l("Continue")}}
             </button>
             <button *ngIf="showSaveBtn" (click)="save()"
+            [disabled]="!(shippingTabValid)"
             class="previewbtn text-center btn float-right">
             Save
             <i class="pi pi-check"></i>
@@ -89,7 +91,7 @@
         <p-dropdown
         (onChange)="selectShipVia($event)"
         id="shipVia"
-        [(ngModel)]="this.oldappTransactionsForViewDto.shipViaId"
+        [(ngModel)]="appTransactionsForViewDto.shipViaId"
         [options]="shipViaList"
         name="shipVia"
         styleClass="form-control aria-select"

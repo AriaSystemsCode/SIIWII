@@ -83,6 +83,8 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.selectedKey = reportInitializer.GetParameter("selectedKey");
             this.attachmentBaseUrl = reportInitializer.GetParameter("attachmentBaseUrl");
             this.attributeTypeId = reportInitializer.GetParameter("attributeTypeId");
+            this.mimimumInStockQty = reportInitializer.GetParameter("mimimumInStockQty");
+            this.onlyInStockColors = reportInitializer.GetParameter("onlyInStockColors");
 
             // Data Sources
             this.sqlDataSource1 = reportInitializer.GetDataSource<DevExpress.DataAccess.Sql.SqlDataSource>("sqlDataSource1");
@@ -163,5 +165,7 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.Parameters.Parameter selectedKey;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
         private DevExpress.XtraReports.Parameters.Parameter attributeTypeId;
+        private DevExpress.XtraReports.Parameters.Parameter mimimumInStockQty;
+        private DevExpress.XtraReports.Parameters.Parameter onlyInStockColors;
     }
 }
