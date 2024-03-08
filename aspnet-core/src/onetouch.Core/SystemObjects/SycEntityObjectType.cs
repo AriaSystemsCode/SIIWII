@@ -53,5 +53,8 @@ namespace onetouch.SystemObjects
         public bool? Hidden { get; set; }
 
         public int? TenantId { get; set; }
+		//MMT0303
+		public bool IsDefault { get; set; }
+		//MMT0303
 	}
 }

@@ -4354,13 +4354,32 @@ namespace onetouch.AppItems
                 List<SycAttachmentCategorySycAttachmentCategoryLookupTableDto> attachmentsCategories = await _sSycAttachmentCategoriesAppService.GetAllSycAttachmentCategoryForTableDropdown();
 
                 string productType = ds.Tables["Products"].Rows[1].ItemArray[0].ToString();
-                var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
-                var productTypeId = pdtyp.FirstOrDefault();
+                GetAllEntityObjectTypeOutput productTypeId = null;
+                if (!string.IsNullOrEmpty(productType))
+                {
+                    var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
+                    productTypeId = pdtyp.FirstOrDefault();
+                }
+                else {
+                    var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+                    var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z=>z.Code).FirstOrDefault();
+                    if (defaultProductType == null)
+                        throw new UserFriendlyException("No Product type is marked as default.");
+                    else {
+                        var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
+                        productTypeId = pdtyp.FirstOrDefault();
+                        for (int cnt = 1; cnt < ds.Tables["Products"].Rows.Count; cnt++)
+                        {
+                            ds.Tables["Products"].Rows[cnt]["ProductType"] = defaultProductType;
+                        }
+
+                    }
+                }
                 //var productTypeId = productTypes.FirstOrDefault(x => x.DisplayName == productType);
                 //MMT
                 var productColumn = ds.Tables["Products"].Columns["ProductType"];
                 if (productColumn == null)
-                    throw new UserFriendlyException("Product Type columns is missing.");
+                    throw new UserFriendlyException("Product Type column is missing.");
 
                 var colData = ds.Tables["Products"].DefaultView.ToTable(true, new string[] { "ProductType" });
 
@@ -4737,6 +4756,9 @@ namespace onetouch.AppItems
                 foreach (AppItemtExcelRecordDTO logRecord in itemExcelResultsDTO.ExcelRecords)
                 {
                     rowNumber++;
+                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value == null)
+                      //  break;
+
                     if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
                     {
                         if (rowNumber > 2)
