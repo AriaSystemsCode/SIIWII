@@ -345,8 +345,11 @@ namespace onetouch.AppSiiwiiTransaction
                 appTrans.EnteredUserByRole = input.EnteredByUserRole;
                 //XX
                 appTrans.AppTransactionContacts = new List<AppTransactionContacts>();
-                var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
-                appTrans.SSIN = await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                if (string.IsNullOrEmpty(appTrans.SSIN))
+                {
+                    var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder? "SO-":"PO-")+ await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                }
                 long? phoneTypeSeller =null ;
                 string? phoneTypeNameSeller = null;
                 long? sellerAddressId = null;
@@ -557,7 +560,11 @@ namespace onetouch.AppSiiwiiTransaction
                 }
                 appTrans.TotalQuantity = long.Parse(appTrans.AppTransactionDetails.Where(s=> s.ParentId!=null).Sum(s => s.Quantity).ToString());
                 appTrans.TotalAmount = double.Parse( appTrans.AppTransactionDetails.Where(s => s.ParentId != null).Sum(s => s.Amount).ToString());
-
+                if (string.IsNullOrEmpty(appTrans.SSIN))
+                {
+                    var transactionObject = await _helper.SystemTables.GetObjectTransactionId();
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObject, null);
+                }
                 AppTransactionHeaders obj = new AppTransactionHeaders();
                 var header = await _appTransactionsHeaderRepository.GetAll().AsNoTracking().Include (z=>z.AppTransactionDetails).Where(s => s.Code == input.Code && s.TenantId == AbpSession.TenantId 
                 && s.EntityObjectStatusId == null && s.EntityObjectTypeId == input.EntityObjectTypeId).FirstOrDefaultAsync();
@@ -569,6 +576,7 @@ namespace onetouch.AppSiiwiiTransaction
                         foreach (var det in header.AppTransactionDetails.Where(z=>z.ParentId==null))
                             await GetProductFromMarketplace(det.SSIN);
                     }
+                    
                     appTrans.Id = header.Id;
                     if (header.EntityObjectStatusId == null)
                         appTrans.CreatorUserId = AbpSession.UserId;
@@ -1011,7 +1019,11 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     if (con.ContactAddressId == null) con.ContactAddressCountryId = null;
                 }
-
+                if (string.IsNullOrEmpty(appTrans.SSIN))
+                {
+                    var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                }
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 return obj.Id;
@@ -1304,6 +1316,8 @@ namespace onetouch.AppSiiwiiTransaction
                 trans.TenantId = AbpSession.TenantId;
                 trans.EntityObjectStatusId = null;
                 trans.EntityObjectTypeId = objectRec.Id;
+                var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
+                trans.SSIN = await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
                 await _appTransactionsHeaderRepository.InsertAsync(trans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 //XX
