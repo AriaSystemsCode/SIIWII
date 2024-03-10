@@ -34,6 +34,7 @@ import {
     CurrencyInfoDto,
     LookupLabelDto,
     AppEntitiesServiceProxy,
+    
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { TabDirective, TabsetComponent } from "ngx-bootstrap/tabs";
@@ -71,7 +72,6 @@ export class CreateOrEditAppItemComponent
     appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
     submitted: boolean = false;
     updateVariation: boolean = true;
-
     descriptionEditor: string;
     descriptionExportedHtml: string;
     saving = false;
@@ -345,6 +345,7 @@ export class CreateOrEditAppItemComponent
     }
 
     defineExtraAttributes() {
+        
         this.extraAttributes = {
             [EExtraAttributeUsage.Recommended]:
                 new CreateEditAppItemExtraAttribute({
@@ -484,6 +485,19 @@ export class CreateOrEditAppItemComponent
                         extraAttr.paginationSetting.list.length - 1,
                         1
                     );
+                     let isExist=result.items.filter((item)=>{item.value==extraAttr.attributeId});
+                    if(isExist!.length==0||isExist==undefined){
+
+                        const tempAtt = new LookupLabelDto({
+                            code:extraAttr.code,
+                            label:extraAttr.selectedValues,
+                            stockAvailability:undefined,
+                            value:extraAttr.selectedValues,
+                            isHostRecord:false,
+                        })
+                        result.items.push(tempAtt)
+                    }
+
                 extraAttr.paginationSetting.list.push(...result.items);
                 if (
                     extraAttr.paginationSetting.list.length <
