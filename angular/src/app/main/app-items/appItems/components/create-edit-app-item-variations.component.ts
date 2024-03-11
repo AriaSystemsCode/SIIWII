@@ -537,7 +537,7 @@ export class CreateEditAppItemVariationsComponent
 
         console.log(">> list variation", this.variationMatrices);
         const variationMatricesWithoutValuesIds = this.variationMatrices.map(item=>{
-            debugger
+            
             let curentItem=this.primengTableHelper?.records?.filter((record)=>record.code==item.code)[0];
             const var_ = new VariationItemDto();
             var_.init(item)
@@ -545,9 +545,13 @@ export class CreateEditAppItemVariationsComponent
             if(curentItem?.stockAvailability>0){
                 var_.stockAvailability=curentItem.stockAvailability;
             }
+            if(curentItem?.ssin>0){
+                var_.ssin=curentItem.ssin;
+            } 
             return var_
         })
-        
+        this.showMainSpinner();
+
         this._appItemsServiceProxy
             .getVariationsCodes(
                 this.attributeID  ?     this.attributeID  : this.appItem?.sycIdentifierId,
@@ -564,8 +568,11 @@ export class CreateEditAppItemVariationsComponent
                         record.stockAvailability=curentItem['stockAvailability'];
                     }
                 })*/
+                
                 this.primengTableHelper.records = response;
                 this.variationMatrices = response;
+                this.hideMainSpinner();
+
             });
         this.showVariationSelectionMetaData = true;
         this.showVariationPhotos = true;
@@ -1095,7 +1102,7 @@ export class CreateEditAppItemVariationsComponent
                 this.combine(index + 1, ___varitation,oldAttributes); //complete comibinig
             } else {
                 //comibining done, now lets create a new variation row
-                debugger
+                
                 ___varitation.price = this.appItem.price;
                 ___varitation.stockAvailability = 0;
                 ___varitation.id = 0;
@@ -1121,7 +1128,7 @@ export class CreateEditAppItemVariationsComponent
                 }
                 let newVariation: VariationItemDto =
                     VariationItemDto.fromJS(___varitation);
-                    debugger
+                    
              const curentItem=oldAttributes.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0];
              if(curentItem?.stockAvailability>0){
                 newVariation.stockAvailability=curentItem.stockAvailability;

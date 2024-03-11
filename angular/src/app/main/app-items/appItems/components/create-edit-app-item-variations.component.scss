@@ -15,7 +15,12 @@
 }
 
 // to be removed after styling refactor - end
-
+.avoidClick{
+  pointer-events: none;
+  &::after{
+    display: none;
+  }
+}
 
 .dropdown-menu {
     width: 230px;

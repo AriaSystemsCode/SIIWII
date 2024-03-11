@@ -217,7 +217,7 @@
                                         <div class="d-flex flex-wrap justify-content-between">
                                             <div class="p-2 mb-2">
                                                 <div class="btn-group dropdown" dropdown >
-                                                    <button class="dropdown-toggle btn btn-sm font-weight-normal p-0"
+                                                    <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 avoidClick" 
                                                         dropdownToggle> {{defaultExtraAttrForAttachments.name | localize}}
                                                     </button>
                                                     <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
@@ -233,7 +233,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <button  type="button" class="bg-white btn btn-hover-primary p-1 text-center" (click)="removeAllAttachments()" >
+                                           <button  type="button" class="bg-white btn btn-hover-primary p-1 text-center" (click)="removeAllAttachments()" >
                                                     <i class="flaticon-delete m-0 p-0"></i>
                                                 </button>
                                             </div>
