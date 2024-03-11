@@ -1,10 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
+		<text name="WorkspaceName">Workspace Name</text>
 		<text name="MinimumInStock">Minimum (in Stock) Qty</text>
 		<text name="OnlyInStockColors">Only (in Stock) Colors</text>
 		
-	<text name="MaintainanceAlarm">Maintenance will be from {0} to {1}.</text>
+		<text name="MaintainanceAlarm">Maintenance will be from {0} to {1}.</text>
 	<text name="OpenMaintainanceAlarm">Another open Maintenance Found, Multiple Open Maintenance, Not Allowed.</text>
 	<text name="DismissIds">Dismiss ids</text>
     <text name="Maintainances">Maintenances</text>
