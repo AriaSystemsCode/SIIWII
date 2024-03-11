@@ -1675,6 +1675,7 @@ namespace onetouch.Accounts
             if (AbpSession.TenantId != null)
             {
                 var tenantObj = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
+
                 if (tenantObj != null)
                 {
 
@@ -1699,6 +1700,7 @@ namespace onetouch.Accounts
                                     contactDto.UserName = adminUser.UserName;
                                     contactDto.TradeName = "";
                                     contactDto.ParentId = account.Id;
+                                    contactDto.EntityObjectType = tenantObj.Edition.Name;
                                     //temp solution to test 
                                     contactDto.Code = System.Guid.NewGuid().ToString();
                                     ContactDto savedContactDto = await CreateOrEditContact(contactDto);
@@ -3062,6 +3064,11 @@ namespace onetouch.Accounts
         {
             var contactObjectId = await _helper.SystemTables.GetObjectContactId();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            if(input.EntityObjectType!=null)
+            { 
+                    presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeName(input.EntityObjectType);
+            
+            }
 
             //var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
             //var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);

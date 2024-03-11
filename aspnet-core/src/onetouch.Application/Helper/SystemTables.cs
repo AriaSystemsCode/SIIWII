@@ -12,6 +12,7 @@ using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.AppEntities.Dtos;
 using onetouch.SycCurrencyExchangeRates;
 using onetouch.SycIdentifierDefinitions;
+using Castle.MicroKernel.SubSystems.Conversion;
 
 namespace onetouch.Helpers
 {
@@ -129,6 +130,11 @@ namespace onetouch.Helpers
         public async Task<long> GetEntityObjectTypePersonId()
         {
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "PERSONAL");
+            return obj.Id;
+        }
+        public async Task<long> GetEntityObjectTypeName(string TypeName )
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code.ToUpper() == TypeName.ToUpper());
             return obj.Id;
         }
 

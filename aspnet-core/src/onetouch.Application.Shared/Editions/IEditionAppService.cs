@@ -11,7 +11,7 @@ namespace onetouch.Editions
         Task<ListResultDto<EditionListDto>> GetEditions();
 
         Task<GetEditionEditOutput> GetEditionForEdit(NullableIdDto input);
-
+        Task<GetEditionEditOutput> GetEditionForEditNoPermission(NullableIdDto input);
         Task CreateEdition(CreateEditionDto input);
 
         Task UpdateEdition(UpdateEditionDto input);

@@ -93,6 +93,36 @@ namespace onetouch.Editions
             };
         }
 
+        public async Task<GetEditionEditOutput> GetEditionForEditNoPermission(NullableIdDto input)
+        {
+            var features = FeatureManager.GetAll()
+                .Where(f => f.Scope.HasFlag(FeatureScopes.Edition));
+
+            EditionEditDto editionEditDto;
+            List<NameValue> featureValues;
+
+            if (input.Id.HasValue) //Editing existing edition?
+            {
+                var edition = await _editionManager.FindByIdAsync(input.Id.Value);
+                featureValues = (await _editionManager.GetFeatureValuesAsync(input.Id.Value)).ToList();
+                editionEditDto = ObjectMapper.Map<EditionEditDto>(edition);
+            }
+            else
+            {
+                editionEditDto = new EditionEditDto();
+                featureValues = features.Select(f => new NameValue(f.Name, f.DefaultValue)).ToList();
+            }
+
+            var featureDtos = ObjectMapper.Map<List<FlatFeatureDto>>(features).OrderBy(f => f.DisplayName).ToList();
+
+            return new GetEditionEditOutput
+            {
+                Edition = editionEditDto,
+                Features = featureDtos,
+                FeatureValues = featureValues.Select(fv => new NameValueDto(fv)).ToList()
+            };
+        }
+
         [AbpAuthorize(AppPermissions.Pages_Editions_Create)]
         public async Task CreateEdition(CreateEditionDto input)
         {
