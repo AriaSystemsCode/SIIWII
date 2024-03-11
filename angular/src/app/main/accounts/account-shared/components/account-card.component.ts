@@ -17,6 +17,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Output() deleteMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() connectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Input() fromMarketplace;
     constructor(
         injector:Injector,
         private router:Router
@@ -58,6 +59,10 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
         } else {
             this.viewProfile()
         }
+    }
+
+    createRelation(avaliableConnectionName){
+
     }
 
 }
