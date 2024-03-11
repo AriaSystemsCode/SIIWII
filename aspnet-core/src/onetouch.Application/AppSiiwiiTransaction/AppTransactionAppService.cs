@@ -354,9 +354,9 @@ namespace onetouch.AppSiiwiiTransaction
                 string? phoneTypeNameSeller = null;
                 long? sellerAddressId = null;
                 string? sellerAddressCode = null;
-                if (!string.IsNullOrEmpty(input.SellerContactSSIN))
+                if (!string.IsNullOrEmpty(input.SellerBranchSSIN))
                 {
-                    var accountSSIN = await _appContactRepository.GetAll().Include(z=>z.AppContactAddresses).Where(a => a.SSIN == input.SellerContactSSIN).FirstOrDefaultAsync();
+                    var accountSSIN = await _appContactRepository.GetAll().Include(z=>z.AppContactAddresses).Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
                     if (accountSSIN != null)
                     {
                          
@@ -378,9 +378,9 @@ namespace onetouch.AppSiiwiiTransaction
                 string? phoneTypeNameBuyer = null;
                 long? buyerAddressId = null;
                 string? buyerAddressCode = null;
-                if (!string.IsNullOrEmpty(input.BuyerContactSSIN))
+                if (!string.IsNullOrEmpty(input.BuyerBranchSSIN))
                 {
-                    var accountSSIN = await _appContactRepository.GetAll().Include(z=>z.AppContactAddresses).Where(a => a.SSIN == input.BuyerContactSSIN).FirstOrDefaultAsync();
+                    var accountSSIN = await _appContactRepository.GetAll().Include(z=>z.AppContactAddresses).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
                     if (accountSSIN != null)
                     {
                         phoneTypeBuyer = !string.IsNullOrEmpty(accountSSIN.Phone1Number) ? accountSSIN.Phone1TypeId :
@@ -440,8 +440,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactPhoneTypeId = phoneTypeBuyer,
                     ContactPhoneTypeName = phoneTypeNameBuyer,
                     ContactPhoneNumber = input.BuyerContactPhoneNumber,
-                    ContactAddressId = null,
-                    ContactAddressCode = null,
+                    ContactAddressId = buyerAddressId,
+                    ContactAddressCode = buyerAddressCode,
                     ContactRole = ContactRoleEnum.ShipToContact.ToString(),
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
@@ -456,8 +456,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactPhoneTypeId = phoneTypeBuyer,
                     ContactPhoneTypeName = phoneTypeNameBuyer,
                     ContactPhoneNumber = input.BuyerContactPhoneNumber,
-                    ContactAddressId = null,
-                    ContactAddressCode = null,
+                    ContactAddressId = buyerAddressId,
+                    ContactAddressCode = buyerAddressCode,
                     ContactRole = ContactRoleEnum.APContact.ToString(),
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
@@ -472,8 +472,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactPhoneTypeId = phoneTypeSeller,
                     ContactPhoneNumber = input.SellerContactPhoneNumber,
                     ContactPhoneTypeName = phoneTypeNameSeller,
-                    ContactAddressId = null,
-                    ContactAddressCode = null,
+                    ContactAddressId = sellerAddressId,
+                    ContactAddressCode = sellerAddressCode,
                     ContactRole = ContactRoleEnum.ShipFromContact.ToString(),
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
@@ -488,8 +488,8 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactPhoneTypeId = phoneTypeSeller,
                     ContactPhoneNumber = input.SellerContactPhoneNumber,
                     ContactPhoneTypeName = phoneTypeNameSeller,
-                    ContactAddressId = null,
-                    ContactAddressCode = null,
+                    ContactAddressId = sellerAddressId,
+                    ContactAddressCode = sellerAddressCode,
                     ContactRole = ContactRoleEnum.ARContact.ToString(),
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
@@ -674,7 +674,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == shipperBranchSSIN).FirstOrDefaultAsync();
                                 if (accountSSIN != null)
                                 {
-                                    var sellerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault();
+                                    var sellerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault(x=> x.AddressTypeCode== "DIRECT-SHIPPING");
                                     if (sellerAddressObj != null)
                                     {
                                         sellerAddressId = sellerAddressObj.AddressId;
@@ -746,7 +746,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == shipperBranchSSIN).FirstOrDefaultAsync();
                                     if (accountSSIN != null)
                                     {
-                                        var sellerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault();
+                                        var sellerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "BILLING");
                                         if (sellerAddressObj != null)
                                         {
                                             sellerAddressId = sellerAddressObj.AddressId;
@@ -826,7 +826,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == shipToBranchSSIN).FirstOrDefaultAsync();
                                 if (accountSSIN != null)
                                 {
-                                    var buyerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault();
+                                    var buyerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "DIRECT-SHIPPING");
                                     if (buyerAddressObj != null)
                                     {
                                         buyerAddressId = buyerAddressObj.AddressId;
@@ -900,7 +900,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == shipToBranchSSIN).FirstOrDefaultAsync();
                                     if (accountSSIN != null)
                                     {
-                                        var buyerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault();
+                                        var buyerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "BILLING");
                                         if (buyerAddressObj != null)
                                         {
                                             buyerAddressId = buyerAddressObj.AddressId;
