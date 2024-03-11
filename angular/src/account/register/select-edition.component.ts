@@ -89,9 +89,13 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
          else
          this.accountTypeLabel='';
 
-
-
-         //I40-Set Editions according to select accountType
+         //I40 call  GetEditionForEdit
+        /*  this.showMainSpinner()
+         this._tenantRegistrationService.GetEditionForEdit($event.value)
+         .subscribe((result:EditionSelectDto) => {
+            this.editionsSelectOutput.allFeatures = result.
+           this.hideMainSpinner();
+         }); */
     }
 
     isFree(edition: EditionSelectDto): boolean {
