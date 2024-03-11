@@ -51863,6 +51863,8 @@ export interface IAccountDto {
 
 export class GetAccountForViewDto implements IGetAccountForViewDto {
     account!: AccountDto;
+    connectionName!: string | undefined;
+    avaliableConnectionName!: string | undefined;
     appEntityName!: string | undefined;
     isPublished!: boolean;
 
@@ -51884,6 +51886,8 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                     this[property] = _data[property];
             }
             this.account = _data["account"] ? AccountDto.fromJS(_data["account"]) : <any>undefined;
+            this.connectionName = _data["connectionName"];
+            this.avaliableConnectionName = _data["avaliableConnectionName"];
             this.appEntityName = _data["appEntityName"];
             this.isPublished = _data["isPublished"];
         }
@@ -51903,6 +51907,8 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                 data[property] = this[property];
         }
         data["account"] = this.account ? this.account.toJSON() : <any>undefined;
+        data["connectionName"] = this.connectionName;
+        data["avaliableConnectionName"] = this.avaliableConnectionName;
         data["appEntityName"] = this.appEntityName;
         data["isPublished"] = this.isPublished;
         return data;
@@ -51911,6 +51917,8 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
 
 export interface IGetAccountForViewDto {
     account: AccountDto;
+    connectionName: string | undefined;
+    avaliableConnectionName: string | undefined;
     appEntityName: string | undefined;
     isPublished: boolean;
 
@@ -54667,6 +54675,7 @@ export class SycEntityObjectType implements ISycEntityObjectType {
     sycEntityObjectTypes!: SycEntityObjectType[] | undefined;
     hidden!: boolean | undefined;
     tenantId!: number | undefined;
+    isDefault!: boolean;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -54711,6 +54720,7 @@ export class SycEntityObjectType implements ISycEntityObjectType {
             }
             this.hidden = _data["hidden"];
             this.tenantId = _data["tenantId"];
+            this.isDefault = _data["isDefault"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -54753,6 +54763,7 @@ export class SycEntityObjectType implements ISycEntityObjectType {
         }
         data["hidden"] = this.hidden;
         data["tenantId"] = this.tenantId;
+        data["isDefault"] = this.isDefault;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -54780,6 +54791,7 @@ export interface ISycEntityObjectType {
     sycEntityObjectTypes: SycEntityObjectType[] | undefined;
     hidden: boolean | undefined;
     tenantId: number | undefined;
+    isDefault: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

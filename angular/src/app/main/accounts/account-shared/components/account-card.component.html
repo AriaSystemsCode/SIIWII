@@ -94,19 +94,19 @@ padding: 10px;">
                                 {{ "Connect" | localize }}
                                 <i class="fa fa-user-plus pl-2"> </i>
                             </button> -->
-                            <button *ngIf="!account.account.connectionName && fromMarketplace"
+                            <button *ngIf="!account.connectionName && fromMarketplace"
                             class="btn btn-outline-primary mr-2 action-button"
-                            (click)="createRelation(account.account.avaliableConnectionName)"
+                            (click)="createRelation(account.avaliableConnectionName)"
                             style="    background-color: #6259CE !important;
                             border: none !important;
                             color: white !important;
                             width: 115px;padding: 5px;"
                             >
-                            {{account.account.avaliableConnectionName }}
+                            {{account.avaliableConnectionName }}
                             <i class="fa fa-user-plus pl-2"> </i>
                         </button>
                         </span>
-                        <div  *ngIf="account.account.connectionName">
+                        <div  *ngIf="account.connectionName">
                             <span style="background-color: #16B455 !important;
                             border: none !important;
                             color: white !important;
@@ -114,7 +114,7 @@ padding: 10px;">
                             display: inline-block;
                             padding: 5px;" styleclass="connected text-success" *ngIf="account.account.status == true && !account.account.isManual && !isHost && !isRecordOwner">
                                
-                                {{account.account.connectionName }}
+                                {{account.connectionName }}
                                 <i
                                         class=" pl-2 success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
                                     ></i>
@@ -165,24 +165,24 @@ padding: 10px;">
                             width: 115px;
                             display: inline-block;
                             padding: 5px;" styleclass="connected text-success"  
-                             class="connected text-success" *ngIf="account.account.connectionName">
+                             class="connected text-success" *ngIf="account.connectionName">
                                
-                                {{account.account.connectionName}}
+                                {{account.connectionName}}
                                 <i
                                 class="pl-2 success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
                             ></i>
                             </span>
                         </div>
                         <span >
-                            <button *ngIf="!account.account.connectionName && fromMarketplace"
+                            <button *ngIf="!account.connectionName && fromMarketplace"
                                 class="btn btn-outline-primary mt-4"
-                                (click)="createRelation(account.account.avaliableConnectionName)"
+                                (click)="createRelation(account.avaliableConnectionName)"
                                  style="    background-color: #6259CE !important;
                                 border: none !important;
                                 color: white !important;
                                 width: 115px;padding: 5px;"
                                 >
-                                {{ account.account.avaliableConnectionName | localize }}
+                                {{ account.avaliableConnectionName | localize }}
                             </button>
                         </span>
                     </div>

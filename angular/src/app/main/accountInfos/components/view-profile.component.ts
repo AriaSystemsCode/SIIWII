@@ -7,6 +7,7 @@ import { SelectItem } from 'primeng/api';
 import { ImageObject } from '../../accounts/account-shared/models/imageobject';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
+import { PublishAccountService } from '../services/publishAccountService';
 
 @Component({
     selector: 'app-view-profile',
@@ -70,6 +71,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _AccountsServiceProxy: AccountsServiceProxy,
+        private _publishAccountService:PublishAccountService
     ) {
         super(injector)
     }
@@ -308,6 +310,16 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     openShareAccountsModal(){
 //I40-shareAccount
+        const alreadyShared: boolean = true;
+        const successCallBack = () => {
+            this.notify.success(this.l("Shared Successfully"));
+        };
+        this._publishAccountService.openAccountSharingModal(
+            alreadyShared,
+            successCallBack
+        );
+        this._publishAccountService._accountId = this.accountData.id;
+        this._publishAccountService.screen = 1
     }
 
     syncAccount(){
