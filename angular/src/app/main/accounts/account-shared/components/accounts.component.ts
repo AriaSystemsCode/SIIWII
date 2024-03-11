@@ -76,6 +76,8 @@ export class AccountsComponent
     mailsubject: string;
     mailbody: string;
     filterForm: FormGroup;
+    @Input() fromMarketplace;
+    
     get mainFilterCtrl(): AbstractControl {
         return this.filterForm?.get("mainFilterType");
     }
