@@ -136,7 +136,7 @@ namespace onetouch.Authorization.Users
             if (!tenancyName.IsNullOrEmpty())
             {
                 // mailMessage.AppendLine("<b>" + L("TenancyName") + "</b>: " + tenancyName + "<br />");
-                mailMessage.AppendLine("<b>" + "Customer Name" + "</b>: " + tenancyName + "<br />");
+                mailMessage.AppendLine("<b>" + L("WorkspaceName") + "</b>: " + tenancyName + "<br />");
             }
 
             mailMessage.AppendLine("<b>" + L("UserName") + "</b>: " + user.UserName + "<br />");
