@@ -41,6 +41,9 @@ import { ViewOthersProfileComponent } from './components/view-others-profile.com
 import { ViewProfileComponent } from './components/view-profile.component';
 import { MembersListSharedModule } from '../members-list/members-list-shared.module';
 import { MyMembersModule } from '../teamMembers/my-members.module';
+import { PublishAccountService } from './services/publishAccountService';
+import { PublishService } from '../app-items/app-item-shared/services/publish.service';
+import { ShareAccountComponent } from './components/share-account.component';
 
 
 @NgModule({
@@ -55,6 +58,7 @@ import { MyMembersModule } from '../teamMembers/my-members.module';
         BranchDetailsDynamicModalComponent,
         ViewOthersProfileComponent,
         ViewProfileComponent,
+        ShareAccountComponent,
     ],
     imports: [
         CommonModule,
@@ -94,7 +98,8 @@ import { MyMembersModule } from '../teamMembers/my-members.module';
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
-        { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale }
+        { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },
+        PublishAccountService,PublishService
     ]
 })
 export class AccountInfosModule { }
