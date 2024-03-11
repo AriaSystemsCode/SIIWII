@@ -270,7 +270,9 @@ namespace onetouch.Accounts
                                              : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,
                                             Classfications = o.EntityFk.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(5).ToArray(),
                                             Categories = o.EntityFk.EntityCategories.Select(x => x.EntityObjectCategoryFk.Name).Take(5).ToArray(),
-                                            PartnerId = o.PartnerId
+                                            PartnerId = o.PartnerId,
+                                            ShowSync=false
+                                            
                                         },
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
                                         AvaliableConnectionName="Follow",
@@ -3064,11 +3066,8 @@ namespace onetouch.Accounts
         {
             var contactObjectId = await _helper.SystemTables.GetObjectContactId();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-            if(input.EntityObjectType!=null)
-            { 
-                    presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeName(input.EntityObjectType);
-            
-            }
+            if(!string.IsNullOrEmpty(input.EntityObjectType) )
+            { presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeName(input.EntityObjectType); }
 
             //var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
             //var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);

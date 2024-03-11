@@ -8,8 +8,9 @@ namespace onetouch.Accounts.Dtos
     public class AccountDto : EntityDto<long>
     {
 		public string Name { get; set; }
+        public string ShowSync { get; set; }
 
-		public string Description { get; set; }
+        public string Description { get; set; }
 
 		public int Connections { get; set; }
 
