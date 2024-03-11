@@ -271,7 +271,7 @@ namespace onetouch.Accounts
                                             Classfications = o.EntityFk.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(5).ToArray(),
                                             Categories = o.EntityFk.EntityCategories.Select(x => x.EntityObjectCategoryFk.Name).Take(5).ToArray(),
                                             PartnerId = o.PartnerId,
-                                            ShowSync=false
+                                            ShowSync = false
                                             
                                         },
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()

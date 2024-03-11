@@ -1,6 +1,7 @@
 ﻿using Abp.Application.Services.Dto;
 using onetouch.AccountInfos.Dtos;
 using onetouch.Common;
+using System;
 using System.Collections.Generic;
 
 namespace onetouch.Accounts.Dtos
@@ -8,7 +9,7 @@ namespace onetouch.Accounts.Dtos
     public class AccountDto : EntityDto<long>
     {
 		public string Name { get; set; }
-        public string ShowSync { get; set; }
+        public Boolean ShowSync { get; set; }
 
         public string Description { get; set; }
 
