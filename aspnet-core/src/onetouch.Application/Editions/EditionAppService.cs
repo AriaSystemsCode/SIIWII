@@ -112,7 +112,8 @@ namespace onetouch.Editions
                 editionEditDto = new EditionEditDto();
                 featureValues = features.Select(f => new NameValue(f.Name, f.DefaultValue)).ToList();
             }
-
+            //return only features has true values
+            features = features.Where(e => featureValues.Where(x => x.Name == e.Name && x.Value == "true").Count() > 0);
             var featureDtos = ObjectMapper.Map<List<FlatFeatureDto>>(features).OrderBy(f => f.DisplayName).ToList();
 
             return new GetEditionEditOutput
