@@ -3655,7 +3655,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 {
                                     To = shar.SharedUserId.ToString() ,
                                     Body = input.Message,
-                                    MessageCategory = MessageCategory.UPDATEMESSAGE.ToString(),
+                                    //MessageCategory = MessageCategory.UPDATEMESSAGE.ToString(),
                                     MesasgeObjectType = MesasgeObjectType.Message,
                                     RelatedEntityId = tran!=null? tran.Id : sharedtransactionId,
                                     BodyFormat = input.Message,

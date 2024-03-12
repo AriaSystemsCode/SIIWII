@@ -50,6 +50,7 @@ using onetouch.AppMarketplaceItemLists;
 using onetouch.SycCurrencyExchangeRates;
 using onetouch.AppMarketplaceAccountsPriceLevels;
 using onetouch.AppMarketplaceTransactions;
+using onetouch.AppMarketplaceMessages;
 
 namespace onetouch.EntityFrameworkCore
 {
@@ -121,6 +122,7 @@ namespace onetouch.EntityFrameworkCore
         public virtual DbSet<AppItem> AppItems { get; set; }
 
         //MMT33-2
+        public virtual DbSet<AppMarketplaceMessage> AppMarketplaceMessage { set; get; }
         public virtual DbSet<AppEntitySharings> AppEntitySharings { get; set; }
         public virtual DbSet<AppMarketplaceItems.AppMarketplaceItems> AppMarketplaceItems { get; set; }
         public virtual DbSet<AppMarketplaceItemPrices> AppMarketplaceItemPrices { get; set; }
