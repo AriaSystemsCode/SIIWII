@@ -395,7 +395,7 @@ li {
     /* height: 10px; */
     padding: 10px 0;
 }
-actionDropdown:focus{
+.actionDropdown:focus{
     background-color: transparent !important;
 }
 .btn-action:hover {
@@ -514,10 +514,10 @@ body .btn.btn-action:after {
 
 
 .clickBtn {
-    background-color: white !important;
+    background-color: #f5e9ff  !important;
 }
 .clickBtn:focus {
-    background-color: #f5e9ff !important;
+    background-color: #fff !important;
 }
 
 .clickBtn:hover {

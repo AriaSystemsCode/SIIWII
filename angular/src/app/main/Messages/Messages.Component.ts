@@ -89,6 +89,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.displayMessageDetails = false;
         this.selectMessagetype(1, this.l("Inbox"));
         this.messageCategoryFilter = "PRIMARYMESSAGE";
+        document.getElementById('firstTabBtn').focus();
+
         this._sycEntityObjectClassificationsServiceProxy
             .getAllChildsForLables()
             .subscribe((result) => {

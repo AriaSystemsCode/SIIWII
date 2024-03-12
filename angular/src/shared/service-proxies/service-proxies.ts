@@ -9011,6 +9011,72 @@ export class AppEntitiesServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param entityId (optional) 
+     * @param filter (optional) 
+     * @return Success
+     */
+    getContactsToMention(entityId: number | undefined, filter: string | null | undefined): Observable<ContactInformationOutputDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetContactsToMention?";
+        if (entityId === null)
+            throw new Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        if (filter !== undefined && filter !== null)
+            url_ += "filter=" + encodeURIComponent("" + filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetContactsToMention(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetContactsToMention(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ContactInformationOutputDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ContactInformationOutputDto[]>;
+        }));
+    }
+
+    protected processGetContactsToMention(response: HttpResponseBase): Observable<ContactInformationOutputDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ContactInformationOutputDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -60765,6 +60831,86 @@ export interface ITopCompany {
     [key: string]: any;
 }
 
+export class ContactInformationOutputDto implements IContactInformationOutputDto {
+    id!: number;
+    email!: string | undefined;
+    name!: string | undefined;
+    userId!: number;
+    userImage!: string | undefined;
+    userName!: string | undefined;
+    tenantId!: number;
+    tenantName!: string | undefined;
+    canBeRemoved!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IContactInformationOutputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.email = _data["email"];
+            this.name = _data["name"];
+            this.userId = _data["userId"];
+            this.userImage = _data["userImage"];
+            this.userName = _data["userName"];
+            this.tenantId = _data["tenantId"];
+            this.tenantName = _data["tenantName"];
+            this.canBeRemoved = _data["canBeRemoved"];
+        }
+    }
+
+    static fromJS(data: any): ContactInformationOutputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactInformationOutputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["email"] = this.email;
+        data["name"] = this.name;
+        data["userId"] = this.userId;
+        data["userImage"] = this.userImage;
+        data["userName"] = this.userName;
+        data["tenantId"] = this.tenantId;
+        data["tenantName"] = this.tenantName;
+        data["canBeRemoved"] = this.canBeRemoved;
+        return data;
+    }
+}
+
+export interface IContactInformationOutputDto {
+    id: number;
+    email: string | undefined;
+    name: string | undefined;
+    userId: number;
+    userImage: string | undefined;
+    userName: string | undefined;
+    tenantId: number;
+    tenantName: string | undefined;
+    canBeRemoved: boolean;
+
+    [key: string]: any;
+}
+
 export enum ResponceType {
     OTHER = 0,
     INTEREST = 1,
@@ -69843,86 +69989,6 @@ export class AppTenantsActivitiesLogTenantLookupTableDto implements IAppTenantsA
 export interface IAppTenantsActivitiesLogTenantLookupTableDto {
     id: number;
     displayName: string | undefined;
-
-    [key: string]: any;
-}
-
-export class ContactInformationOutputDto implements IContactInformationOutputDto {
-    id!: number;
-    email!: string | undefined;
-    name!: string | undefined;
-    userId!: number;
-    userImage!: string | undefined;
-    userName!: string | undefined;
-    tenantId!: number;
-    tenantName!: string | undefined;
-    canBeRemoved!: boolean;
-
-    [key: string]: any;
-
-    constructor(data?: IContactInformationOutputDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.id = _data["id"];
-            this.email = _data["email"];
-            this.name = _data["name"];
-            this.userId = _data["userId"];
-            this.userImage = _data["userImage"];
-            this.userName = _data["userName"];
-            this.tenantId = _data["tenantId"];
-            this.tenantName = _data["tenantName"];
-            this.canBeRemoved = _data["canBeRemoved"];
-        }
-    }
-
-    static fromJS(data: any): ContactInformationOutputDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ContactInformationOutputDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["id"] = this.id;
-        data["email"] = this.email;
-        data["name"] = this.name;
-        data["userId"] = this.userId;
-        data["userImage"] = this.userImage;
-        data["userName"] = this.userName;
-        data["tenantId"] = this.tenantId;
-        data["tenantName"] = this.tenantName;
-        data["canBeRemoved"] = this.canBeRemoved;
-        return data;
-    }
-}
-
-export interface IContactInformationOutputDto {
-    id: number;
-    email: string | undefined;
-    name: string | undefined;
-    userId: number;
-    userImage: string | undefined;
-    userName: string | undefined;
-    tenantId: number;
-    tenantName: string | undefined;
-    canBeRemoved: boolean;
 
     [key: string]: any;
 }
