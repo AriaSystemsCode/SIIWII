@@ -62,8 +62,8 @@
                                 icon="pi pi-sync"
                                 (click)="syncAccount()"
                                 [loading]="btnLoader"
+                                [disabled]="!accountData?.showSync"
                             ></button>
-                            <!-- I40- [disabled]="!accountData?.showSync"  -->
                         
                                         </div>
 
