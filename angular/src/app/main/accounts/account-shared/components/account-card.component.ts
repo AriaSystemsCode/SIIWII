@@ -63,6 +63,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
 
     createRelation(avaliableConnectionName){
 
+        //I40 -after finish , get account again to update data 
+
     }
 
 }

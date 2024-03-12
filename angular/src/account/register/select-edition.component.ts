@@ -6,10 +6,12 @@ import {
     EditionSelectDto,
     EditionWithFeaturesDto,
     EditionsSelectOutput,
-    FlatFeatureSelectDto,
     TenantRegistrationServiceProxy,
     EditionPaymentType,
-    SubscriptionStartType
+    SubscriptionStartType,
+    EditionServiceProxy,
+    GetEditionEditOutput,
+    FlatFeatureDto
 } from '@shared/service-proxies/service-proxies';
 import * as _ from 'lodash';
 import { EditionHelperService } from '@account/payment/edition-helper.service';
@@ -23,7 +25,7 @@ import { SelectItem } from 'primeng/api';
 })
 export class SelectEditionComponent extends AppComponentBase implements OnInit {
 
-    editionsSelectOutput: EditionsSelectOutput = new EditionsSelectOutput();
+    editionsSelectOutput:any;
     editionWithFeatures :EditionWithFeaturesDto;
     isUserLoggedIn = false;
     isSetted = false;
@@ -40,7 +42,8 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
         private _tenantRegistrationService: TenantRegistrationServiceProxy,
         private _editionHelperService: EditionHelperService,
         private _router: Router,
-        private _activatedRoute: ActivatedRoute
+        private _activatedRoute: ActivatedRoute,
+        private _editionServiceProxy:EditionServiceProxy
     ) {
         super(injector);
     }
@@ -54,12 +57,12 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
         this._tenantRegistrationService.getEditionsForSelect()
             .subscribe((result) => {
                 this.editionsSelectOutput = result;
-                this.editionWithFeatures= this.editionsSelectOutput.editionsWithFeatures[0];
+                 this.editionWithFeatures= this.editionsSelectOutput.editionsWithFeatures[0];
 
-                if (!this.editionsSelectOutput.editionsWithFeatures || this.editionsSelectOutput.editionsWithFeatures.length <= 0) {
+                 if (!this.editionsSelectOutput.editionsWithFeatures || this.editionsSelectOutput.editionsWithFeatures.length <= 0) {
                     this._router.navigate(['/account/register-tenant']);
-                }
-            });
+                 }
+             });
 
             this.getAccountTypes();
     }
@@ -89,24 +92,24 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
          else
          this.accountTypeLabel='';
 
-         //I40 call  GetEditionForEdit
-        /*  this.showMainSpinner()
-         this._tenantRegistrationService.GetEditionForEdit($event.value)
-         .subscribe((result:EditionSelectDto) => {
-            this.editionsSelectOutput.allFeatures = result.
+         
+         this.showMainSpinner()
+         this._editionServiceProxy.getEditionForEditNoPermission($event.value)
+         .subscribe((result:GetEditionEditOutput) => {
+            this.editionsSelectOutput.allFeatures = result.features;
            this.hideMainSpinner();
-         }); */
+         }); 
     }
 
     isFree(edition: EditionSelectDto): boolean {
         return this._editionHelperService.isEditionFree(edition);
     }
 
-    isTrueFalseFeature(feature: FlatFeatureSelectDto): boolean {
+    isTrueFalseFeature(feature:FlatFeatureDto): boolean {
         return feature.inputType.name === 'CHECKBOX';
     }
 
-    featureEnabledForEdition(feature: FlatFeatureSelectDto, edition: EditionWithFeaturesDto): boolean {
+    featureEnabledForEdition(feature: FlatFeatureDto, edition: EditionWithFeaturesDto): boolean {
         const featureValues = _.filter(edition.featureValues, { name: feature.name });
         if (!featureValues || featureValues.length <= 0) {
             return false;
@@ -116,7 +119,7 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
         return featureValue.value.toLowerCase() === 'true';
     }
 
-    getFeatureValueForEdition(feature: FlatFeatureSelectDto, edition: EditionWithFeaturesDto): string {
+    getFeatureValueForEdition(feature: FlatFeatureDto, edition: EditionWithFeaturesDto): string {
         const featureValues = _.filter(edition.featureValues, { name: feature.name });
         if (!featureValues || featureValues.length <= 0) {
             return '';
