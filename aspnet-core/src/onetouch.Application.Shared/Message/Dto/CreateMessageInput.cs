@@ -36,11 +36,17 @@ namespace onetouch.Message.Dto
 
         public virtual IList<AppEntityAttachmentDto> EntityAttachments { get; set; }
         public string? MessageCategory { get; set; }
+        public List<MentionedUserInfo> MentionedUsers { set; get; }
     }
 
     public enum MesasgeObjectType
     {
         Message=0,
         Comment=1,
+    }
+    public class MentionedUserInfo
+    { 
+        public long UserId { set; get; }
+        public long TenantId { set; get; }
     }
 }

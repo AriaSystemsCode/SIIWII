@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace onetouch.AppMarketplaceMessages
 {
     [Table("AppMarketplaceMessages")]
-    public class AppMarketplaceMessages : FullAuditedEntity<long>
+    public class AppMarketplaceMessage : FullAuditedEntity<long>
     {
         public long SenderId { get; set; }
 
@@ -56,17 +56,17 @@ namespace onetouch.AppMarketplaceMessages
         public long? ThreadId { get; set; }
 
         [ForeignKey("ThreadId")]
-        public virtual AppMarketplaceMessages ThreadFk { get; set; }
+        public virtual AppMarketplaceMessage ThreadFk { get; set; }
 
-        public long? UserId { get; set; }
+       // public long? UserId { get; set; }
 
-        [ForeignKey("UserId")]
-        public virtual AbpUserBase UserFk { get; set; }
+       // [ForeignKey("UserId")]
+       // public virtual AbpUserBase UserFk { get; set; }
 
         public long? OriginalMessageId { get; set; }
 
         [ForeignKey("ParentId")]
-        public virtual ICollection<AppMarketplaceMessages> ParentFKList { get; set; }
+        public virtual ICollection<AppMarketplaceMessage> ParentFKList { get; set; }
 
     }
 }

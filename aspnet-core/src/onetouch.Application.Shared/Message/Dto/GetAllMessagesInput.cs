@@ -20,7 +20,8 @@ namespace onetouch.Message.Dto
 	}
 	public enum MessageCategory
 	{
-        PRIMARYMESSAGE,
-		UPDATEMESSAGE
+        MESSAGE,
+		THREAD,
+		MENTION
 	}
 }
