@@ -35,7 +35,7 @@ namespace onetouch.AppItems
 
         Task<FileDto> GetAppItemsToExcel(GetAllAppItemsForExcelInput input);
         Task ShareProduct(SharingItemOptions input);
-
+        Task<bool> IsVariationOrdered(string sSIN);
 
     }
 }
