@@ -1,6 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>
+	<texts>    <text name="AppMarketplaceContact">App marketplace contact</text>
+    <text name="AppMarketplaceAppContact">App marketplace app contact</text>
+    <text name="onetouch.AppMarketplaceContact.AppMarketplaceAppContact">AppMarketplaceAppContact</text>
+    <text name="AppMarketplaceAppContactsHeaderInfo">App marketplace app contacts header info</text>
+    <text name="CreateNewAppMarketplaceAppContact">Create new app marketplace app contact</text>
+    <text name="EditAppMarketplaceAppContact">Edit app marketplace app contact</text>
+    <text name="DeleteAppMarketplaceAppContact">Delete app marketplace app contact</text>
+    <text name="AppMarketplaceAppContacts">App marketplace app contacts</text>
+
 		
 		<text name="MinimumInStock">Minimum (in Stock) Qty</text>
 		<text name="OnlyInStockColors">Only (in Stock) Colors</text>

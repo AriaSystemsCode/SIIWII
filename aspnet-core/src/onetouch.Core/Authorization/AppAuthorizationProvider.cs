@@ -30,6 +30,11 @@ namespace onetouch.Authorization
 
             var pages = context.GetPermissionOrNull(AppPermissions.Pages) ?? context.CreatePermission(AppPermissions.Pages, L("Pages"));
 
+            var appMarketplaceAppContacts = pages.CreateChildPermission(AppPermissions.Pages_AppMarketplaceAppContacts, L("AppMarketplaceAppContacts"), multiTenancySides: MultiTenancySides.Tenant);
+            appMarketplaceAppContacts.CreateChildPermission(AppPermissions.Pages_AppMarketplaceAppContacts_Create, L("CreateNewAppMarketplaceAppContact"), multiTenancySides: MultiTenancySides.Tenant);
+            appMarketplaceAppContacts.CreateChildPermission(AppPermissions.Pages_AppMarketplaceAppContacts_Edit, L("EditAppMarketplaceAppContact"), multiTenancySides: MultiTenancySides.Tenant);
+            appMarketplaceAppContacts.CreateChildPermission(AppPermissions.Pages_AppMarketplaceAppContacts_Delete, L("DeleteAppMarketplaceAppContact"), multiTenancySides: MultiTenancySides.Tenant);
+
             var appItemSelectors = pages.CreateChildPermission(AppPermissions.Pages_AppItemSelectors, L("AppItemSelectors"));
             appItemSelectors.CreateChildPermission(AppPermissions.Pages_AppItemSelectors_Create, L("CreateNewAppItemSelector"));
             appItemSelectors.CreateChildPermission(AppPermissions.Pages_AppItemSelectors_Edit, L("EditAppItemSelector"));
