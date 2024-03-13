@@ -103,7 +103,7 @@ namespace onetouch.Message
                                    .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
 //xx
 //.WhereIf(input.messageTypeIndex == 1 || input.messageTypeIndex == 3, x => x.EntityFk.EntityObjectStatusId == entityObjectStatusID || x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID)
-.WhereIf(input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0, e=> e.EntityFk.RelatedEntitiesRelationships.Where(ee=> ee.EntityId == (long)input.MainComponentEntitlyId).Count()>0)
+.WhereIf(input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0, e => e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
 .WhereIf(input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0, e => e.EntityFk.EntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
 .WhereIf(input.messageTypeIndex == 1,
      x => x.UserId == AbpSession.UserId && (x.EntityFk.EntityObjectStatusId == entityObjectReadID ||
@@ -126,18 +126,19 @@ namespace onetouch.Message
 //.Where(z=> z.EntityObjectCategoryCode.Replace("-",string.Empty) ==input.MessageCategoryFilter).Count()>0)
 //Iteration37-MMT[End]
 // Iteration 39 [Start]
-.WhereIf(input.MessageCategoryFilter.ToUpper() == "MENTION", z=> z.EntityFk.EntityObjectTypeId == entityObjectTypeComment)
-.WhereIf(input.MessageCategoryFilter.ToUpper() == "MESSAGE", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
-.WhereIf(input.MessageCategoryFilter.ToUpper() == "THREAD", z => (z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage || z.EntityFk.EntityObjectTypeId == entityObjectTypeComment) &&
+.WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MENTION", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeComment)
+.WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
+.WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD", z => (z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage || z.EntityFk.EntityObjectTypeId == entityObjectTypeComment) &&
   z.ParentFKList.Count > 0)
 // Iteration 39 [End]
-.WhereIf(input.messageTypeIndex == 3, x => (x.EntityFk.EntityObjectStatusId != ObjectStatusDeleted) && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId) )
+.WhereIf(input.messageTypeIndex == 3, x => (x.EntityFk.EntityObjectStatusId != ObjectStatusDeleted) && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId))
                                     //xx
                                     .WhereIf(input.messageTypeIndex == 3, x => x.EntityFk.EntityClassifications.Count(x => x.EntityObjectClassificationId == entityObjectClassStarred) > 0)
                                     .WhereIf(input.messageTypeIndex == 4, x => x.EntityFk.EntityObjectStatusId == entityObjectArchiveID && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId))
                                     .WhereIf(input.messageTypeIndex == 5, x => x.EntityFk.EntityObjectStatusId == ObjectStatusDeleted && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId))
                                     .Where(e => e.ParentId == null)
-                                    .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
+                                    .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.ToUpper().Contains(input.Filter.ToUpper()) || e.Subject.ToUpper().Contains(input.Filter.ToUpper()) ||
+                                     e.SenderFk.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.UserFk.UserName.ToUpper().Contains(input.Filter.ToUpper()))
                                      .WhereIf(!string.IsNullOrWhiteSpace(input.BodyFilter), e => e.Body == input.BodyFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
                         .Where(
@@ -240,18 +241,18 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllComments(GetAllMessagesInput input)
         {
-            IQueryable<AppMessage> filteredMessages = null;
+            IQueryable<AppMarketplaceMessage> filteredMessages = null;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                filteredMessages = _MessagesRepository.GetAll()
+                filteredMessages = _AppMarketplaceMessagesRepository.GetAll()
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
                                    .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
                             //Iteration37-MMT[Start]
-                            .WhereIf(input.MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
-                            .Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) ==  input.MessageCategoryFilter.ToString()).Count() > 0)
+                            //.WhereIf(input.MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
+                            //.Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) ==  input.MessageCategoryFilter.ToString()).Count() > 0)
                             //Iteration37-MMT[End]
 
                             .WhereIf( input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
@@ -264,8 +265,9 @@ namespace onetouch.Message
                             .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
                             .WhereIf(input.ThreadId != null && input.ThreadId> 0, e => e.ThreadId == input.ThreadId)
                         .Where(
-                                 x =>   x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()
-                                 && x.OriginalMessageId == x.Id  
+                                 x =>
+                                 //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
+                                 x.OriginalMessageId == x.Id  
                              );
 
                 var pagedAndFilteredMessages = filteredMessages
@@ -278,9 +280,9 @@ namespace onetouch.Message
                                       Messages = new MessagesDto
                                       {
                                           SenderId = o.SenderId,
-                                          To = o.To,
-                                          CC = o.CC,
-                                          BCC = o.BCC,
+                                         // To = o.To,
+                                         // CC = o.CC,
+                                         // BCC = o.BCC,
                                           Subject = o.Subject,
                                           Body = o.Body,
                                           BodyFormat = o.BodyFormat,
