@@ -54667,6 +54667,7 @@ export class SycEntityObjectType implements ISycEntityObjectType {
     sycEntityObjectTypes!: SycEntityObjectType[] | undefined;
     hidden!: boolean | undefined;
     tenantId!: number | undefined;
+    isDefault!: boolean;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -54711,6 +54712,7 @@ export class SycEntityObjectType implements ISycEntityObjectType {
             }
             this.hidden = _data["hidden"];
             this.tenantId = _data["tenantId"];
+            this.isDefault = _data["isDefault"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -54753,6 +54755,7 @@ export class SycEntityObjectType implements ISycEntityObjectType {
         }
         data["hidden"] = this.hidden;
         data["tenantId"] = this.tenantId;
+        data["isDefault"] = this.isDefault;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -54780,6 +54783,7 @@ export interface ISycEntityObjectType {
     sycEntityObjectTypes: SycEntityObjectType[] | undefined;
     hidden: boolean | undefined;
     tenantId: number | undefined;
+    isDefault: boolean;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

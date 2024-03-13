@@ -744,6 +744,8 @@ export class ShoppingCartViewComponentComponent
       const instance = componentRef.instance as ReportViewerComponent;
       instance.reportUrl = this.reportUrl;
       instance.invokeAction = this.invokeAction;
+      const componentNativeElement = componentRef.location.nativeElement as HTMLElement;
+       componentNativeElement.classList.add('d-none');
 
     
     }

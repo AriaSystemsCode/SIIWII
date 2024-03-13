@@ -1686,4 +1686,9 @@ export class CreateOrEditAppItemComponent
     onUpdateVariation($event) {
         this.updateVariation = $event;
     }
+
+    convertTodecimal(value){
+        let inputvalue=value % 1 ==0?Math.round(value * 100 / 100).toFixed(2):value;
+        return inputvalue;
+      }
 }
