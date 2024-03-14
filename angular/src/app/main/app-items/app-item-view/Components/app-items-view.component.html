@@ -636,11 +636,11 @@
                                     >
                                         <div *ngIf="prices">
                                             <div
-                                                class="col ratio-container thin-scroll"
+                                                class=" col ratio-container thin-scroll"
                                             >
                                                 <div class="d-flex flex-wrap">
                                                     <div
-                                                        class="ratio-item"
+                                                        class="ratio-item prices-count"
                                                         *ngFor="
                                                             let priceDto of prices;
                                                             let index = index
@@ -653,7 +653,7 @@
                                                                 priceDto.attibuteCode
                                                             }}
                                                         </div>
-                                                        <div class="ratio-qty">
+                                                        <div class="ratio-qty" *ngIf="!priceHasSamePrices">
                                                            <!-- <input
                                                                 type="number"
                                                                 [ngModel]="priceDto.price | currency"                                                          
@@ -666,7 +666,14 @@
                                                             />-->
                                                             <label>{{priceDto.price | currency:' '}}</label>
                                                         </div>
+                                                        <div class="ratio-qty w-100" 
+                                                        [class]="{'w-400':index==0&&!priceHasSamePrices&&prices.length==4}" 
+                                                        *ngIf="priceHasSamePrices&&index==0||priceHasSamePrices&&priceHasSamePrices&&(index/4)==1" >
+                                                             <label>{{prices[0].price | currency:' '}}</label>
+                                                         </div>
                                                     </div>
+
+
                                                 </div>
                                             </div>
                                         </div>

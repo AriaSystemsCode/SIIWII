@@ -153,7 +153,8 @@ export class AppItemsViewComponent
     imageSelectedIndex: number = 0;
     varitaionSelectedIndex: number = 0;
     lastUpdatedDate: string;
-
+    priceHasSamePrices:boolean=true;
+    priceCellesCount:any=0;
     centerImage: AppEntityAttachmentDto = null;
     /*  showProductAttachment: boolean = true; */
     selectedValuesName: string = "";
@@ -182,6 +183,7 @@ export class AppItemsViewComponent
     appSizeRatio: AppItemSizesScaleInfo;
     ngOnChanges(changes: SimpleChanges) {
         if (this.appItemViewInput) {
+            debugger
             this.appItemForViewDto = this.appItemViewInput.appItemForViewDto;
             this.appItemForViewDto?.minPrice % 1 ==0?this.appItemForViewDto.minPrice=parseFloat(Math.round(this.appItemForViewDto.minPrice * 100 / 100).toFixed(2)):null; 
             this.getTimezoneOffset();
@@ -788,6 +790,14 @@ export class AppItemsViewComponent
                 )
                 .subscribe((result) => {
                     this.prices = result;
+                    this.prices?.forEach((item)=>{
+                     if(item.price!==this.prices[0].price)this.priceHasSamePrices=false;
+                    })
+                    if(this.priceCellesCount.length>4){
+                        this.priceCellesCount=Math.ceil(this.priceCellesCount.length/4);
+                    }else{
+                        this.priceCellesCount=1;
+                    }
                 });
         } else {
             this.parentProductPriceIndex =
