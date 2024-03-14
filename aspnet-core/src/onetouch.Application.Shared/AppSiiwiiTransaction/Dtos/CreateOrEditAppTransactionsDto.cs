@@ -37,11 +37,11 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string CurrencyCode { get; set; }
         [StringLength(AppTransactionConst.MaxEMailLength, MinimumLength = AppTransactionConst.MinEMailLength)]
         public virtual string? SellerContactEMailAddress { get; set; }
-        [StringLength(AppTransactionConst.MaxPhoneNumberLength, MinimumLength = AppTransactionConst.MinPhoneNumberLength)]
+        //[StringLength(AppTransactionConst.MaxPhoneNumberLength, MinimumLength = AppTransactionConst.MinPhoneNumberLength)]
         public virtual string? BuyerContactPhoneNumber { get; set; }
 
         
-        [StringLength(AppTransactionConst.MaxPhoneNumberLength, MinimumLength = AppTransactionConst.MinPhoneNumberLength)]
+        //[StringLength(AppTransactionConst.MaxPhoneNumberLength, MinimumLength = AppTransactionConst.MinPhoneNumberLength)]
         public virtual string? SellerContactPhoneNumber { get; set; }
 
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
