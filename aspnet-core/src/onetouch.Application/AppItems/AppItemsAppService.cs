@@ -2956,6 +2956,8 @@ namespace onetouch.AppItems
 
                     foreach (var itm in selectedItems)
                     {
+                        if (itm.item.SSIN == null)
+                            continue;
                         var sharedItem = _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefault();
                         if (sharedItem != null && sharedItem.TimeStamp < itm.item.TimeStamp)
                         {
@@ -3079,7 +3081,9 @@ namespace onetouch.AppItems
                     
                     foreach (var itm in selectedItems)
                     {
-                        var sharedItem =  _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefault();
+                        if (itm.item.SSIN == null)
+                            continue;
+                        var sharedItem =await   _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefaultAsync();
                         if (sharedItem == null)
                         {
                             returnCount++;
