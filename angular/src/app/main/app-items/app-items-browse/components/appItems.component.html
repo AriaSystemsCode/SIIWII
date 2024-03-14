@@ -19,7 +19,7 @@
                             {{'Share' | localize }}</button>
                     </div>
                     <div>
-                        <button class="btn btn-success" (click)="bulkSyncItems()" [disabled]="allSelectedShared"><i class="fa fa-sync"></i>{{'Sync' | localize }}</button>
+                        <button class="btn btn-success" (click)="bulkSyncItems()" [disabled]="!allSelectedShared"><i class="fa fa-sync"></i>{{'Sync' | localize }}</button>
                     </div>
                     <div>
                         <button class="btn btn-primary" [disabled]="!multiSelectionInfo?.totalCount" (click)="applySelection()">{{ applySelectionTitle | localize }}</button>

@@ -405,7 +405,7 @@ export class AppItemsComponent extends AppComponentBase {
       this.selectedItemsList=this.items.filter((item)=>{return item.selected==true});
         this.allSelectedShared=true;
         this.selectedItemsList.forEach((item)=>{
-            if(!item?.appItem?.sharingLevel ){
+            if(!item?.appItem?.sharingLevel){
                 this.allSelectedShared=false;
                 return;
             }
