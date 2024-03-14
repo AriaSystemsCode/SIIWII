@@ -419,14 +419,14 @@ export class AppItemsComponent extends AppComponentBase {
 
     bulkShareItems(){
         this._appItemsServiceProxy
-        .shareSelectedProducts(this.filterText)
+        .shareSelectedProducts(this.filterBody.selectorKey)
         .subscribe((result) => {
             debugger
         });
     }
     bulkSyncItems(){
         this._appItemsServiceProxy
-        .syncSelectedProduct(this.filterText)
+        .syncSelectedProduct(this.filterBody.selectorKey)
         .subscribe((result) => {
             debugger
         });

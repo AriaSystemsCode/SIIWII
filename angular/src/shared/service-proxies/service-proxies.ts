@@ -26524,7 +26524,7 @@ export class MessageServiceProxy {
     getUnreadCounts(messageCategoryFilter: string | null | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Message/GetUnreadCounts?";
         if (messageCategoryFilter !== undefined && messageCategoryFilter !== null)
-            url_ += "MessageCategoryFilter=" + encodeURIComponent("" + messageCategoryFilter) + "&";
+            url_ += "messageCategoryFilter=" + encodeURIComponent("" + messageCategoryFilter) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -26562,6 +26562,69 @@ export class MessageServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getCommentsForView(id: number | undefined): Observable<GetMessagesForViewDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Message/GetCommentsForView?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCommentsForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCommentsForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetMessagesForViewDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetMessagesForViewDto[]>;
+        }));
+    }
+
+    protected processGetCommentsForView(response: HttpResponseBase): Observable<GetMessagesForViewDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(GetMessagesForViewDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -81382,6 +81445,58 @@ export interface IGetUsersForMessageDto {
     [key: string]: any;
 }
 
+export class MentionedUserInfo implements IMentionedUserInfo {
+    userId!: number;
+    tenantId!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IMentionedUserInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.userId = _data["userId"];
+            this.tenantId = _data["tenantId"];
+        }
+    }
+
+    static fromJS(data: any): MentionedUserInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new MentionedUserInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["userId"] = this.userId;
+        data["tenantId"] = this.tenantId;
+        return data;
+    }
+}
+
+export interface IMentionedUserInfo {
+    userId: number;
+    tenantId: number;
+
+    [key: string]: any;
+}
+
 export class CreateMessageInput implements ICreateMessageInput {
     relatedEntityId!: number | undefined;
     code!: string | undefined;
@@ -81399,6 +81514,7 @@ export class CreateMessageInput implements ICreateMessageInput {
     mesasgeObjectType!: MesasgeObjectType;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     messageCategory!: string | undefined;
+    mentionedUsers!: MentionedUserInfo[] | undefined;
 
     [key: string]: any;
 
@@ -81437,6 +81553,11 @@ export class CreateMessageInput implements ICreateMessageInput {
                     this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
             }
             this.messageCategory = _data["messageCategory"];
+            if (Array.isArray(_data["mentionedUsers"])) {
+                this.mentionedUsers = [] as any;
+                for (let item of _data["mentionedUsers"])
+                    this.mentionedUsers!.push(MentionedUserInfo.fromJS(item));
+            }
         }
     }
 
@@ -81473,6 +81594,11 @@ export class CreateMessageInput implements ICreateMessageInput {
                 data["entityAttachments"].push(item.toJSON());
         }
         data["messageCategory"] = this.messageCategory;
+        if (Array.isArray(this.mentionedUsers)) {
+            data["mentionedUsers"] = [];
+            for (let item of this.mentionedUsers)
+                data["mentionedUsers"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -81494,6 +81620,7 @@ export interface ICreateMessageInput {
     mesasgeObjectType: MesasgeObjectType;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     messageCategory: string | undefined;
+    mentionedUsers: MentionedUserInfo[] | undefined;
 
     [key: string]: any;
 }
