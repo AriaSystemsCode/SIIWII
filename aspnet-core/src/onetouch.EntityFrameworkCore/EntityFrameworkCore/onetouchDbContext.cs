@@ -1,4 +1,5 @@
-﻿using onetouch.Maintainances;
+﻿using onetouch.AppMarketplaceContact;
+using onetouch.Maintainances;
 using onetouch.AppItemSelectors;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.SycSegmentIdentifierDefinitions;
@@ -55,9 +56,11 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<AppMarketplaceAppContact> AppMarketplaceAppContacts { get; set; }
+
         public virtual DbSet<Maintainance> Maintainances { get; set; }
 
-        public virtual DbSet<SycEntityLocalization> SycEntityLocalizations { set; get;}
+        public virtual DbSet<SycEntityLocalization> SycEntityLocalizations { set; get; }
         public virtual DbSet<AppItemPrices> AppItemPrices { get; set; }
         public virtual DbSet<AppItemSizeScalesDetails> AppItemSizeScalesDetails { get; set; }
         public virtual DbSet<AppItemSizeScalesHeader> AppItemSizeScalesHeaders { get; set; }
@@ -224,10 +227,14 @@ namespace onetouch.EntityFrameworkCore
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<AppItemSelector>(a =>
+            modelBuilder.Entity<AppMarketplaceAppContact>(a =>
             {
                 a.HasIndex(e => new { e.TenantId });
             });
+            modelBuilder.Entity<AppItemSelector>(a =>
+                       {
+                           a.HasIndex(e => new { e.TenantId });
+                       });
             modelBuilder.Entity<SycSegmentIdentifierDefinition>(s =>
                        {
                            s.HasIndex(e => new { e.TenantId });
