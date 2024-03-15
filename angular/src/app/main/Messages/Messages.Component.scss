@@ -6,10 +6,10 @@
     margin-top: -25px;
 }
 .subject-msg {
-    font-size: 14px;
-    font-weight: bold;
-    color: #464e5f;
-    overflow-wrap: break-word; 
+    font-size: 18px;
+    font-weight: 800;
+    color: #1B101B;
+    overflow-wrap: break-word;
 }
 .subject-msg-fs13 {
     font-weight: bold;
@@ -48,8 +48,9 @@
     min-height: 668px;
 }
 .msg-bodyformat {
-    font-size: 13px;
-    color: #464e5f;
+    font-size: 12px;
+    color: #949494;
+    font-weight: 500;
     img {
         max-width: 100%;
     }
@@ -72,26 +73,40 @@
 }
 .body-msg {
     margin-top: -19px;
+    margin-left: -27px;
+    font-size: 12px;
+    color: #949494;
+    font-weight: 500;
 }
 .wrapper-dev {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 0px;
 }
 .active-msg {
-    padding: 20px;
+    padding: 9px 24px;
 }
 .number-count {
     position: absolute;
     top: -8px;
     left: 4px;
 }
-.composeBtn {
+.composeBtn,.ReplyBtn ,.ForwardBtn {
     background-color: #700066 !important;
-   // margin: 10px !important;
-    width:  164px !important;
+    width: 146px !important;
     border: none !important;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
 }
-
+.ForwardBtn{
+    background-color: #fff !important;
+    color: #700066 !important;
+    border:1px solid #700066 !important;
+}
+.searchBarCont,.messageTitleCont{
+    border-bottom: 1px solid #eee;
+}
 .composeBtn:hover{
     background-color: #700066 !important;
     border: none !important;
@@ -184,21 +199,27 @@
     //  width: 308px;
     height: auto;
     opacity: 1;
-    padding: 15px;
+    padding: 15px 10px 0px 10px;
     margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 14px;
+
 }
 
 li {
     list-style: none;
 }
+.borderdCont,.SelectedMessage,.active-msg,#contentmsg{
+    border: 1px solid #eee;
 
+}
 .SelectedMessage {
-    background: #C6B2C61A 0% 0% no-repeat padding-box;    ;
+    background: #F9F7F9 0% 0% no-repeat padding-box;    
 }
 
 .ReplyBtn {
     //width: 72px;
-    height: 32px;
+   /* height: 32px;
     border: 1px solid #5f6368;
     border-radius: 6px;
     opacity: 1;
@@ -206,16 +227,31 @@ li {
     color: #464e5f;
     background-color: #700066 !important;
     border: none !important;
-    width: 119pt;
+    width: 119pt;*/
 }
 
 .ReplyBtn :hover{
     background-color:transparent !important;
 }
-
+.mentionIcon {
+    border: 1px solid;
+    padding: 13px 2px 13px 3px;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+.tabs-cont{
+    button{
+        background-color: #F8F8F8 !important;
+  
+    }
+}
+.btns-replay {
+    text-align: right;
+    margin-top: 30px;
+}
 .ForwardBtn {
     //width: 97px;
-    height: 32px;
+    /*height: 32px;
     border: 1px solid #5f6368;
     border-radius: 6px;
     opacity: 1;
@@ -223,7 +259,7 @@ li {
     color: #464e5f;
     background-color: #700066 !important;
     border: none !important;
-    width: 119pt;
+    width: 119pt;*/
 }
 .ForwardBtn :hover{
     background-color:transparent !important;
@@ -251,7 +287,19 @@ li {
    // height: 420px;
     height: 70vh;
 }
-
+.messageDetailTitle{
+    font-size: 14px;
+    font-weight: 600;
+    color: #1B101B;
+}
+#contentmsg {
+    overflow-y: scroll;
+    height: 82vh;
+    margin: 10px 0px 10px 10px;
+    width: 98% !important;
+    border-radius: 6px;
+    padding:15px 10px;
+}
 .uploaded-attchments,
 .display-name {
     cursor: pointer;
@@ -263,7 +311,10 @@ li {
     overflow: hidden;
     cursor: pointer;
 }
+.show-detail-btn{
+    padding:11px 10px;
 
+} 
 //////////////////////////
 
 @media (max-width: 960px) {
@@ -303,7 +354,6 @@ li {
     }
     .wrapper-dev {
         overflow-x: auto;
-        margin-bottom: 8px;
     }
     .leftPanel {
         width: max-content;
@@ -340,7 +390,7 @@ li {
     }
     .wrapper-dev {
         overflow-x: auto;
-        margin-bottom: 8px;
+        margin-bottom: 0px;
     }
     .leftPanel {
         width: max-content;
@@ -354,9 +404,11 @@ li {
     padding-left: 35px;
 }
 .to-block {
-    // position: absolute;
-    margin-top: -6px;
-    // top: 16px;
+    display: inline-block;
+    font-weight: 500;
+    color: #949494;
+    font-size: 12px;
+    padding-left: 38px;
 }
 .message-data {
     margin-top: -15px;
@@ -516,8 +568,12 @@ body .btn.btn-action:after {
 .clickBtn {
     background-color: #f5e9ff  !important;
 }
-.clickBtn:focus {
+.clickBtn{
+    color: #9E9E9E !important;
+}
+.clickBtn:focus ,.clickBtn.active-tab{
     background-color: #fff !important;
+    color: #700066 !important;
 }
 
 .clickBtn:hover {

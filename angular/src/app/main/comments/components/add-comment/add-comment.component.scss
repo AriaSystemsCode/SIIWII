@@ -3,7 +3,7 @@
 }
 #commentBody{
     border-radius: 10px;
-    border-color: rgb(158, 158, 158);
+    border:1px solid rgb(158, 158, 158);
     resize: none;
     padding: 10px;
     box-shadow: 0 0 3px transparent;
@@ -11,6 +11,13 @@
     &:focus {
         outline: none !important;
         box-shadow: 0 0 3px #464444;
+    }
+    :host .selectedContact ,:host span{
+        border: 1px solid #92bfed;
+        padding: 0px 5px;
+        border-radius: 14px;
+        background-color: #f7fbff;
+        cursor: pointer;
     }
 }
 
@@ -62,11 +69,4 @@ button.send-comment-icon[disabled]{
         }
     }
 
-}
-span.selectedContact {
-    border: 1px solid #92bfed;
-    padding: 0px 5px;
-    border-radius: 14px;
-    background-color: #f7fbff;
-    cursor: pointer;
 }

@@ -1,6 +1,7 @@
 <div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'' ]" >
     <app-add-comment [cartStyle]="cartStyle"
         (saveDone)="newCommentAddedHandler($event)"
+        [relatedEntityId]="entityId"
         #AddCommentComponent>
     </app-add-comment>
     <div *ngFor="let comment of comments" [ngClass]="cartStyle?'mt-2  comment-inner':'mt-4 ml-3'">
