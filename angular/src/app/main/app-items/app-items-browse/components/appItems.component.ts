@@ -422,6 +422,8 @@ export class AppItemsComponent extends AppComponentBase {
         .shareSelectedProducts(this.filterBody.selectorKey)
         .subscribe((result) => {
             debugger
+            this.notify.success(this.l(result+" Item shared"));
+
         });
     }
     bulkSyncItems(){
@@ -429,6 +431,8 @@ export class AppItemsComponent extends AppComponentBase {
         .syncSelectedProduct(this.filterBody.selectorKey)
         .subscribe((result) => {
             debugger
+            this.notify.success(this.l(result+" Item synced"));
+
         });
     }
     saveUserPreferenceForListView() {
