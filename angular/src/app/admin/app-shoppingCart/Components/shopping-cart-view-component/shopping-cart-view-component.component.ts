@@ -625,6 +625,7 @@ export class ShoppingCartViewComponentComponent
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
+            this.onGeneratOrderReport(true);
             this.hideMainSpinner();
             this.hide();
           }
