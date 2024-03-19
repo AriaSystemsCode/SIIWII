@@ -137,8 +137,7 @@ namespace onetouch.Message
                                     .WhereIf(input.messageTypeIndex == 4, x => x.EntityFk.EntityObjectStatusId == entityObjectArchiveID && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId))
                                     .WhereIf(input.messageTypeIndex == 5, x => x.EntityFk.EntityObjectStatusId == ObjectStatusDeleted && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId))
                                     .Where(e => e.ParentId == null)
-                                    .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false ||
-                                    e.Body.ToUpper().Contains(input.Filter.ToUpper()) || e.Subject.ToUpper().Contains(input.Filter.ToUpper()) ||
+                                    .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.ToUpper().Contains(input.Filter.ToUpper()) || e.Subject.ToUpper().Contains(input.Filter.ToUpper()) ||
                                      e.SenderFk.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.UserFk.UserName.ToUpper().Contains(input.Filter.ToUpper()))
                                      .WhereIf(!string.IsNullOrWhiteSpace(input.BodyFilter), e => e.Body == input.BodyFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
@@ -215,6 +214,10 @@ namespace onetouch.Message
 
 
                 unreadCount = await _MessagesRepository.GetAll()
+                    .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MENTION", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeComment)
+.WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
+.WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD", z => (z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage || z.EntityFk.EntityObjectTypeId == entityObjectTypeComment) &&
+  z.ParentFKList.Count > 0)
                        .Where(x => (x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) || (x.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) > 0))
                        .Where(e => e.ParentId == null)
                        .Where(x => x.TenantId == AbpSession.TenantId && x.UserId == AbpSession.UserId).CountAsync();
@@ -231,6 +234,15 @@ namespace onetouch.Message
                         message.Messages.ProfilePictureId = (Guid)profilePictureId;
                     }
                     message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER6+") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
+                    if (message.Messages.EntityObjectTypeCode == "COMMENT")
+                    {
+                        var comment = await _AppMarketplaceMessagesRepository.GetAll().Where(z => z.Id == message.Messages.ThreadId).FirstOrDefaultAsync();
+                        if (comment != null)
+                        {
+                            message.Messages.Body = comment.Body;
+                            message.Messages.BodyFormat = comment.BodyFormat;
+                        }
+                    }
                 }
                 
                 return new MessagePagedResultDto(
@@ -323,7 +335,7 @@ namespace onetouch.Message
                         {
                             if (ch.ParentFKList != null && ch.ParentFKList.Count > 0)
                             {
-                                ch.ParentFKList.ForEach(z => z.HasChildren = (z.ParentFKList != null && z.ParentFKList.Count > 0) ? true : false);
+                                x.Messages.ParentFKList.ForEach(z => z.HasChildren = (z.ParentFKList != null && z.ParentFKList.Count > 0) ? true : false);
                             }
 
                         }
