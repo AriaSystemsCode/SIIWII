@@ -210,11 +210,14 @@
                 <div class="col-md-6 my-3">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Entered Date</label>
-                        <p-calendar
-                            [(ngModel)]="enteredDate"
-                            [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
-                        ></p-calendar>
+                        <div class="read-only-calendar">
+                            <p-calendar
+                                [(ngModel)]="enteredDate"
+                                [showIcon]="true"
+                                (ngModelChange)="onChangeDate()"
+                            ></p-calendar>
+                            <div class="overlay"></div>
+                        </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
