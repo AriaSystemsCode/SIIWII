@@ -76,6 +76,8 @@ export class ShoppingCartViewComponentComponent
   reportUrl: string = "";
   invokeAction = '/DXXRDV';
   @ViewChild('reportViewerContainer', { read: ViewContainerRef }) reportViewerContainer: ViewContainerRef;
+  isOwnedByMe:boolean=false;
+  canChange:boolean=true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -178,6 +180,9 @@ export class ShoppingCartViewComponentComponent
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
+
+        this.isOwnedByMe= res.isOwnedByMe;
+       this.canChange=! this.isOwnedByMe
         this.transactionCode=res?.code;
         if (res?.entityAttachments?.length > 0)
           this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";

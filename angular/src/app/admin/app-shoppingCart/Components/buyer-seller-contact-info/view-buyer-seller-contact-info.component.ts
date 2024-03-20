@@ -20,6 +20,7 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
     @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
+    @Input("canChange")  canChange:boolean=true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy
