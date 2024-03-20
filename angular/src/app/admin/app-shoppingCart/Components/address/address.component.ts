@@ -39,6 +39,7 @@ export class AddressComponent extends AppComponentBase implements OnInit {
     @Output("updateSelectedAddress") updateSelectedAddress = new EventEmitter<any>();
 
     @ViewChild("addressForm") addressForm: NgForm;
+    @Input("canChange")  canChange:boolean=true;
 
     constructor(injector: Injector,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,

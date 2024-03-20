@@ -4,6 +4,7 @@
         <button
         (click)="showEditMode()"
         class="previewbtn text-center btn float-right"
+        *ngIf="canChange"
     >
         Change
         <i class="pi pi-pencil"></i>

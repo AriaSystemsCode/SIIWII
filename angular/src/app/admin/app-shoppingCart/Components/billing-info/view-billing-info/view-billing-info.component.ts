@@ -19,6 +19,7 @@ export class ViewBillingInfoComponent   extends AppComponentBase{
   @Input() selectedAddressDetailsAr:number;
   @Output("showBillingEditMode") showBillingEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
   @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input("canChange")  canChange:boolean=true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,

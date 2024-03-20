@@ -46,6 +46,7 @@
         (updateSelectedAddress)="updateShipFromAddress($event)"
         [selectedAddressDetails]="shipFromSelectedAdd"
         [showAddressType]="false"
+        [canChange]="canChange"
         ></app-address>
         
     </div>
@@ -80,6 +81,7 @@
         (updateSelectedAddress)="updateShipToAddress($event)"
         [selectedAddressDetails]="shipToSelectedAdd"
         [showAddressType]="false"
+        [canChange]="canChange"
         ></app-address>
 <div class="row edit-mode ">
     <div class="col-6 mb-4">
@@ -116,7 +118,8 @@
     [selectedAddressDetailsFrom]="shipFromSelectedAdd"
     [selectedAddressDetailsTo]="shipToSelectedAdd"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
-    [createOrEditshippingInfO]="createOrEditshippingInfO">
+    [createOrEditshippingInfO]="createOrEditshippingInfO" 
+    [canChange]="canChange">
 </app-view-shipping-information>
 </div>
 </div>
