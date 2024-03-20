@@ -3291,6 +3291,7 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                         }
                         //MMT
+                        viewTrans.IsOwnedByMe = (AbpSession.TenantId== viewTrans.TenantOwner);
                         return viewTrans;
                     }
 
