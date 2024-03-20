@@ -2111,6 +2111,72 @@ namespace onetouch.AppItems
                     //extrData.AddRange(childEntity.EntityExtraData);
                     using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
+                        var sizeNRF = childEntity.EntityExtraData.Where(z => z.AttributeId == 206).FirstOrDefault();
+                        if (sizeNRF == null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "SIZE-NRF",
+                                AttributeId = 206,
+                                EntityId = childEntity.Id,
+                                AttributeValue =null
+                            });
+                        }
+                        var sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
+                        if (sizeMarketplacev == null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "SIZEMARKETPLACECODE",
+                                AttributeId = 205,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
+                        var colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                        if (colorImage == null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "COLOR-IMAGE",
+                                AttributeId = 202,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
+                        var colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                        if (colorHexa ==null )
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "COLOR-HEX",
+                                AttributeId = 201,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
+                        var colorNRF = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
+                        if (colorNRF == null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "COLOR-NRF",
+                                AttributeId = 204,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
+                        var colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
+                        if (colorSchv ==null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "COLOR-SCHEME",
+                                AttributeId = 203,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
                         var sizeExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
                         if (sizeExtraAtt != null)
                         {
@@ -2118,17 +2184,26 @@ namespace onetouch.AppItems
                             && z.EntityObjectTypeCode =="SIZE").FirstOrDefaultAsync();
                             if (sizeExtra != null)
                             {
-                                var sizeNRF = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
-                                if (sizeNRF != null && !string.IsNullOrEmpty(sizeNRF.AttributeValue))
+                                var sizeNRFEnt = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
+                                if (sizeNRFEnt != null && !string.IsNullOrEmpty(sizeNRFEnt.AttributeValue))
                                 {
                                     var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 206).FirstOrDefault();
-                                    if (colorNRFv != null && string.IsNullOrEmpty(colorNRFv.AttributeValue)) colorNRFv.AttributeValue = sizeNRF.AttributeValue;
+                                    if (colorNRFv != null)
+                                    {
+                                        if (string.IsNullOrEmpty(colorNRFv.AttributeValue))
+                                            colorNRFv.AttributeValue = sizeNRFEnt.AttributeValue;
+                                    }
                                 }
+
                                 var sizeMarketplace = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 35).FirstOrDefault();
                                 if (sizeMarketplace != null && !string.IsNullOrEmpty(sizeMarketplace.AttributeValue))
                                 {
-                                    var sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
-                                    if (sizeMarketplacev != null && string.IsNullOrEmpty(sizeMarketplacev.AttributeValue)) sizeMarketplacev.AttributeValue = sizeMarketplace.AttributeValue;
+                                    sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
+                                    if (sizeMarketplacev != null)
+                                    {
+                                        if (string.IsNullOrEmpty(sizeMarketplacev.AttributeValue))
+                                            sizeMarketplacev.AttributeValue = sizeMarketplace.AttributeValue;
+                                    }
                                 }
                             }
                         }
@@ -2142,32 +2217,49 @@ namespace onetouch.AppItems
                             {
                                 if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
                                 {
-                                    var colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
-                                    if (colorImage != null && string.IsNullOrEmpty(colorImage.AttributeValue))
+                                    colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                                    if (colorImage != null)
                                     {
-                                        if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
-                                            MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
-                                        colorImage.AttributeValue = colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+                                        if (string.IsNullOrEmpty(colorImage.AttributeValue))
+                                        {
+                                            if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
+                                                MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
+                                            colorImage.AttributeValue = colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+                                        }
                                     }
                                 }
                                 var colorHex = colorExtra.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
                                 if (colorHex != null && !string.IsNullOrEmpty(colorHex.AttributeValue))
                                 {
-                                    var colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
-                                    if (colorHexa != null && string.IsNullOrEmpty(colorHexa.AttributeValue)) colorHexa.AttributeValue = colorHex.AttributeValue;
+                                    colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                    if (colorHexa != null)
+                                    { 
+                                        if ( string.IsNullOrEmpty(colorHexa.AttributeValue))
+                                            colorHexa.AttributeValue = colorHex.AttributeValue;
+                                    }
+                                       
                                 }
 
-                                var colorNRF = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
-                                if (colorNRF != null && !string.IsNullOrEmpty(colorNRF.AttributeValue))
+                                var colorNRFlook = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
+                                if (colorNRFlook != null && !string.IsNullOrEmpty(colorNRFlook.AttributeValue))
                                 {
-                                    var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
-                                    if (colorNRFv != null && string.IsNullOrEmpty(colorNRFv.AttributeValue)) colorNRFv.AttributeValue = colorNRF.AttributeValue;
+                                    var colorNRFEnt = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
+                                    if (colorNRFEnt != null)
+                                    { 
+                                        if (string.IsNullOrEmpty(colorNRFEnt.AttributeValue))
+                                            colorNRFEnt.AttributeValue = colorNRFlook.AttributeValue;
+                                    }
+                                    
                                 }
                                 var colorSch = colorExtra.EntityExtraData.Where(z => z.AttributeId == 37).FirstOrDefault();
                                 if (colorSch != null && !string.IsNullOrEmpty(colorSch.AttributeValueId.ToString()))
                                 {
-                                    var colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
-                                    if (colorSchv != null && string.IsNullOrEmpty(colorSchv.AttributeValue)) colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
+                                    colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
+                                    if (colorSchv != null) 
+                                    { 
+                                        if(string.IsNullOrEmpty(colorSchv.AttributeValue))
+                                            colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
+                                    }
                                 }
                             }
 

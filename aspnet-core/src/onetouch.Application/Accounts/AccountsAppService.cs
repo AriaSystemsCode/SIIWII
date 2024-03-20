@@ -573,7 +573,7 @@ namespace onetouch.Accounts
                 var mainBranchSubtotal = _appContactRepository.GetAll()
                             .Include(e => e.ParentFk)
                             .Include(e => e.ParentFkList)
-                            .Where(x => x.IsProfileData)
+                          //  .Where(x => x.IsProfileData)
                             .Where(e => e.ParentId != null && e.ParentId == branch.Id && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).Count();
                 branchForViewDto.SubTotal = mainBranchSubtotal;
                 List<TreeNode<BranchForViewDto>> branches = new List<TreeNode<BranchForViewDto>>
@@ -1817,23 +1817,32 @@ namespace onetouch.Accounts
                     {
                         var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
                         AppAddress address = new AppAddress();
-                        AppContactAddressDto existedInPublish = null;
+                        AppAddress existedInPublish = null;
 
-                        if (contactDto.ContactAddresses != null)
-                            existedInPublish = contactDto.ContactAddresses.FirstOrDefault(x => x.Code == contactAddress.AddressFk.Code);
+                        //if (contactDto.ContactAddresses != null)
+                        existedInPublish = await _appAddressRepository.GetAll()
+                            .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId== null && x.AccountId== contactDto.Id).FirstOrDefaultAsync();
 
+                        ObjectMapper.Map(savedAddress, address);
                         if (existedInPublish == null)
                         {
-                            ObjectMapper.Map(savedAddress, address);
+                            //ObjectMapper.Map(savedAddress, address);
                             address.Id = 0;
                             address.AccountId = contactDto.Id;
+                            address.TenantId = null;
                             address = await _appAddressRepository.InsertAsync(address);
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
                         else
                         {
-                            address.Id = existedInPublish.AddressId;
+                            address.TenantId = null;
+                            address.Id = existedInPublish.Id;
                             address.Code = existedInPublish.Code;
+                            address.AccountId = contactDto.Id;
+                            var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                            x.ChangeTracker.Clear();
+                            await _appAddressRepository.UpdateAsync(address);
+                            await CurrentUnitOfWork.SaveChangesAsync();
                         }
 
 
@@ -1942,25 +1951,51 @@ namespace onetouch.Accounts
                 {
                     var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
                     AppAddress address = new AppAddress();
-                    AppContactAddressDto existedInPublish = null;
 
-                    if (contactDto.ContactAddresses != null)
-                        existedInPublish = contactDto.ContactAddresses.FirstOrDefault(x => x.Code == contactAddress.AddressFk.Code);
+                    //AppContactAddressDto existedInPublish = null;
 
+                    //if (contactDto.ContactAddresses != null)
+                    //    existedInPublish = contactDto.ContactAddresses.FirstOrDefault(x => x.Code == contactAddress.AddressFk.Code);
+
+                    //if (existedInPublish == null)
+                    //{
+                    //    ObjectMapper.Map(savedAddress, address);
+                    //    address.Id = 0;
+                    //    address.AccountId = publishedAccount.Id;
+                    //    address = await _appAddressRepository.InsertAsync(address);
+                    //    await CurrentUnitOfWork.SaveChangesAsync();
+                    //}
+                    //else
+                    //{
+                    //    address.Id = existedInPublish.AddressId;
+                    //    address.Code = existedInPublish.Code;
+                    //}
+                    AppAddress existedInPublish = null;
+
+                    existedInPublish = await _appAddressRepository.GetAll()
+                        .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null && x.AccountId == contactDto.Id).FirstOrDefaultAsync();
+
+                    ObjectMapper.Map(savedAddress, address);
                     if (existedInPublish == null)
                     {
-                        ObjectMapper.Map(savedAddress, address);
+                        //ObjectMapper.Map(savedAddress, address);
                         address.Id = 0;
-                        address.AccountId = publishedAccount.Id;
+                        address.AccountId = contactDto.Id;
+                        address.TenantId = null;
                         address = await _appAddressRepository.InsertAsync(address);
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                     else
                     {
-                        address.Id = existedInPublish.AddressId;
+                        address.TenantId = null;
+                        address.Id = existedInPublish.Id;
                         address.Code = existedInPublish.Code;
+                        address.AccountId = contactDto.Id;
+                        var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                        x.ChangeTracker.Clear();
+                        await _appAddressRepository.UpdateAsync(address);
+                        await CurrentUnitOfWork.SaveChangesAsync();
                     }
-
 
                     AppContactAddress newContactAddress = new AppContactAddress();
                     //ObjectMapper.Map(contactAddress, newContactAddress);
@@ -3855,7 +3890,7 @@ namespace onetouch.Accounts
                         .Include(e => e.ParentFkList)                        //MMT
                         .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
                         //MMT
-                        .Where(x => x.IsProfileData)
+                        //.Where(x => x.IsProfileData)
                         .Where(e => e.ParentId != null && e.ParentId == parentId && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId);
             var branches = from o in filteredBranches
                            join o2 in _appContactRepository.GetAll() on o.ParentId equals o2.Id into j2
