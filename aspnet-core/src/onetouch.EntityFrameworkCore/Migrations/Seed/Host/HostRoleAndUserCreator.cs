@@ -40,7 +40,7 @@ namespace onetouch.Migrations.Seed.Host
             CreateHostObjectEntityStatus();
             CreateHostReportSystemData();
             //MMT-Iteration37[Start]
-            CreateMessagesCategories();
+            //CreateMessagesCategories();
             //MMT-Iteration37[End]
         }
 

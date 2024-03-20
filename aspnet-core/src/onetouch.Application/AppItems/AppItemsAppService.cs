@@ -3651,6 +3651,7 @@ namespace onetouch.AppItems
                             //SS
                         }
                         ObjectMapper.Map(child, publishChild);
+                        
                         if (publishChild.EntityExtraData != null)
                         {
                             publishChild.EntityExtraData = null;
@@ -3727,6 +3728,8 @@ namespace onetouch.AppItems
                         publishChild.ParentId = marketplaceItem.Id;
                         publishChild.Notes = child.EntityFk.Notes;
                         publishChild.Name = child.Name;
+                        publishChild.Name = marketplaceItem.Name;
+                        publishChild.Notes = marketplaceItem.Notes;
                         //publishChild.ParentEntityId = publishItem.EntityId;
                         if (!input.SyncProduct)
                             publishChild.SharingLevel = input.SharingLevel;
@@ -5379,6 +5382,13 @@ namespace onetouch.AppItems
                         }
                     }
                 }
+                if (string.IsNullOrEmpty(appItem.SSIN))
+                {
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.EntityFk.SSIN = appItem.SSIN;
+                }
+                appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                appItem.EntityFk.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 //if (excelDto.Id == 0 || !reserAtt)
                 //{
                 if (excelDto.Id == 0)
@@ -6034,6 +6044,13 @@ namespace onetouch.AppItems
                         });
                     }
                     //XX
+                    if (string.IsNullOrEmpty(appChildItem.SSIN))
+                    {
+                        appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        appChildItem.EntityFk.SSIN = appChildItem.SSIN;
+                    }
+                    appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                    appChildItem.EntityFk.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (appChildItem.Id==0)
                     appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
                     var entityExtraData = new List<AppEntityExtraData>();

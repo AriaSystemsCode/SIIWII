@@ -214,6 +214,10 @@ namespace onetouch.Message
 
 
                 unreadCount = await _MessagesRepository.GetAll()
+                    .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MENTION", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeComment)
+.WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
+.WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD", z => (z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage || z.EntityFk.EntityObjectTypeId == entityObjectTypeComment) &&
+  z.ParentFKList.Count > 0)
                        .Where(x => (x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) || (x.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) > 0))
                        .Where(e => e.ParentId == null)
                        .Where(x => x.TenantId == AbpSession.TenantId && x.UserId == AbpSession.UserId).CountAsync();
@@ -230,6 +234,15 @@ namespace onetouch.Message
                         message.Messages.ProfilePictureId = (Guid)profilePictureId;
                     }
                     message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER6+") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
+                    if (message.Messages.EntityObjectTypeCode == "COMMENT")
+                    {
+                        var comment = await _AppMarketplaceMessagesRepository.GetAll().Where(z => z.Id == message.Messages.ThreadId).FirstOrDefaultAsync();
+                        if (comment != null)
+                        {
+                            message.Messages.Body = comment.Body;
+                            message.Messages.BodyFormat = comment.BodyFormat;
+                        }
+                    }
                 }
                 
                 return new MessagePagedResultDto(
@@ -248,6 +261,7 @@ namespace onetouch.Message
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
                                    .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
+                                   .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
                             //Iteration37-MMT[Start]
@@ -296,12 +310,12 @@ namespace onetouch.Message
                                           ThreadId = o.ThreadId,
                                           ParentId = o.ParentId,
                                           EntityId = (int)o.EntityId,
-                                          // ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
+                                          ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
                                           HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
                                           EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
                                           RelatedEntityId = (o.EntityFk.EntitiesRelationships!=null && o.EntityFk.EntitiesRelationships.Count> 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
                                           ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
-                                      },
+                                        },
                                   }
                                 ;
                     
@@ -314,6 +328,19 @@ namespace onetouch.Message
                     var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == x.Messages.SenderId).ProfilePictureId;
                     if (profilePictureId != null)
                     { x.Messages.ProfilePictureId = (Guid)profilePictureId; }
+                    if (x.Messages.ParentFKList != null && x.Messages.ParentFKList.Count > 0)
+                    {
+                        x.Messages.ParentFKList.ForEach(z => z.HasChildren = (z.ParentFKList!=null && z.ParentFKList.Count >0) ?true: false);
+                        foreach (var ch in x.Messages.ParentFKList)
+                        {
+                            if (ch.ParentFKList != null && ch.ParentFKList.Count > 0)
+                            {
+                                x.Messages.ParentFKList.ForEach(z => z.HasChildren = (z.ParentFKList != null && z.ParentFKList.Count > 0) ? true : false);
+                            }
+
+                        }
+                    }
+                    //x.Messages.ParentFKList.ForEach(z=>z.ParentFKList= appComments.Where(a=>a.Messages.Id==z.Id).Select(z => z.Messages.ParentFKList).FirstOrDefault());
                 }
                 return new MessagePagedResultDto(
                     totalCount, unreadCount,
