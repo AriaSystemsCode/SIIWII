@@ -397,10 +397,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
     onChangeDate() {
         //Dates
-        this.appTransactionsForViewDto.enteredDate = moment(this.enteredDate);
-        this.appTransactionsForViewDto.startDate = moment(this.startDate);
-        this.appTransactionsForViewDto.availableDate = moment(this.availableDate);
-        this.appTransactionsForViewDto.completeDate = moment(this.completeDate);
+        this.appTransactionsForViewDto.enteredDate = moment.utc(this.enteredDate);
+        this.appTransactionsForViewDto.startDate = moment.utc(this.startDate);
+        this.appTransactionsForViewDto.availableDate = moment.utc(this.availableDate);
+        this.appTransactionsForViewDto.completeDate = moment.utc(this.completeDate);
     }
 
     createOrEditTransaction() {

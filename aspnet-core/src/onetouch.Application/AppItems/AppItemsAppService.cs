@@ -63,6 +63,7 @@ using Abp.Extensions;
 using onetouch.Attachments;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Org.BouncyCastle.Utilities.Encoders;
+using onetouch.AppSiiwiiTransaction;
 
 namespace onetouch.AppItems
 {
@@ -101,6 +102,7 @@ namespace onetouch.AppItems
         private readonly IRepository<AppMarketplaceItemPrices, long> _appMarketplaceItemPricesRepository;
         //MMT33
         TimeZoneInfoAppService _timeZoneInfoAppService;
+        private readonly IRepository<AppTransactionDetails, long> _appTransactionDetails;
         //MMT
         private readonly IRepository<AppItemSelector, long> _appItemSelectorRepository;
         private readonly Helper _helper;
@@ -132,10 +134,12 @@ namespace onetouch.AppItems
             IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
-            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService
+            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
+            IRepository<AppTransactionDetails, long> appTransactionDetails
             )
         {
             //MMT33-2
+            _appTransactionDetails = appTransactionDetails;
             _timeZoneInfoAppService = timeZoneInfoAppService;
             _appAttachmentRepository = appAttachmentRepository;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
@@ -1671,7 +1675,15 @@ namespace onetouch.AppItems
                 return await Update(input);
             }
         }
-
+        //MMT
+        public async Task<bool> IsVariationOrdered(string sSIN)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                return await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == sSIN).CountAsync() > 0;
+            }
+        }
+        //MmT
         [AbpAuthorize(AppPermissions.Pages_AppItems_Create)]
         protected virtual async Task<long> Create(CreateOrEditAppItemDto input)
         {
