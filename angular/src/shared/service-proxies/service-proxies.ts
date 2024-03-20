@@ -70532,6 +70532,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     creatorUserId!: number;
     orderConfirmationFile!: string | undefined;
     sharedWithUsers!: ContactInformationOutputDto[] | undefined;
+    isOwnedByMe!: boolean;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -70619,6 +70620,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
                 for (let item of _data["sharedWithUsers"])
                     this.sharedWithUsers!.push(ContactInformationOutputDto.fromJS(item));
             }
+            this.isOwnedByMe = _data["isOwnedByMe"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -70740,6 +70742,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             for (let item of this.sharedWithUsers)
                 data["sharedWithUsers"].push(item.toJSON());
         }
+        data["isOwnedByMe"] = this.isOwnedByMe;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -70846,6 +70849,7 @@ export interface IGetAppTransactionsForViewDto {
     creatorUserId: number;
     orderConfirmationFile: string | undefined;
     sharedWithUsers: ContactInformationOutputDto[] | undefined;
+    isOwnedByMe: boolean;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -71457,6 +71461,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     creatorUserId!: number;
     orderConfirmationFile!: string | undefined;
     sharedWithUsers!: ContactInformationOutputDto[] | undefined;
+    isOwnedByMe!: boolean;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -71553,6 +71558,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
                 for (let item of _data["sharedWithUsers"])
                     this.sharedWithUsers!.push(ContactInformationOutputDto.fromJS(item));
             }
+            this.isOwnedByMe = _data["isOwnedByMe"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -71683,6 +71689,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             for (let item of this.sharedWithUsers)
                 data["sharedWithUsers"].push(item.toJSON());
         }
+        data["isOwnedByMe"] = this.isOwnedByMe;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -71798,6 +71805,7 @@ export interface IGetAllAppTransactionsForViewDto {
     creatorUserId: number;
     orderConfirmationFile: string | undefined;
     sharedWithUsers: ContactInformationOutputDto[] | undefined;
+    isOwnedByMe: boolean;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
