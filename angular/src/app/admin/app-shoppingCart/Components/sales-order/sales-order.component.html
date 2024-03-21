@@ -15,7 +15,7 @@
                 Continue
             </button>
             <button
-                *ngIf="!createOrEditorderInfo"
+                *ngIf="!createOrEditorderInfo && canChange"
                 (click)="showEditMode()"
                 class="previewbtn text-center btn float-right"
             >

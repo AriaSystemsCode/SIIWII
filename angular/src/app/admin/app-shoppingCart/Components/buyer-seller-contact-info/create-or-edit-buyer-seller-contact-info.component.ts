@@ -26,6 +26,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   oldappTransactionsForViewDto;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
+  @Input("canChange")  canChange:boolean=true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy

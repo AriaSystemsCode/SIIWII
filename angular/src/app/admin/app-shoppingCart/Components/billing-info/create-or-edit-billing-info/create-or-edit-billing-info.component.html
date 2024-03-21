@@ -8,14 +8,6 @@
                  {{l("Continue")}}
             </button>
             <button
-                *ngIf="!createOrEditBillingInfo" 
-                (click)="showEditMode()"
-                class="previewbtn text-center btn float-right"
-            >
-                Change
-                <i class="pi pi-pencil"></i>
-            </button>
-            <button
             *ngIf="showSaveBtn"
             [disabled]="!(isContactsValid)"
             (click)="save()"
@@ -56,6 +48,7 @@
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
         [showAddressType]="false"
+        [canChange]="canChange"
         ></app-address>
         
     </div>
@@ -85,7 +78,7 @@
         (updateSelectedAddress)="updateArContact($event)"
         [selectedAddressDetails]="arContactSelectedAdd"
         [showAddressType]="false"
-
+        [canChange]="canChange"
         ></app-address>
 
 
@@ -124,7 +117,8 @@
     [createOrEditBillingInfo]="createOrEditBillingInfo"
     [selectedAddressDetailsAp]="apContactSelectedAdd"
     [selectedAddressDetailsAr]="arContactSelectedAdd"
-    [appTransactionsForViewDto]="appTransactionsForViewDto">
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [canChange]="canChange">
 </app-view-billing-info>
 </div>
 </div>

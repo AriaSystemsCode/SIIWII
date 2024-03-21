@@ -4,6 +4,7 @@
         <h6><span  class="headertxt"> {{l("APContact")}} : </span></h6>   
         <div >
             <button
+            *ngIf="canChange"
             (click)="showEditMode()"
             class="previewbtn text-center btn float-right"
         >
@@ -31,6 +32,7 @@
     [contactId]="contactIdApContact"
     [selectedAddressDetails]="selectedAddressDetailsAp"
     [showAddressType]="false"
+    [canChange]="canChange"
     ></app-address>
     
 </div>
@@ -57,6 +59,7 @@
     [contactId]="contactIdARContact"
     [selectedAddressDetails]="selectedAddressDetailsAr"
     [showAddressType]="false"
+    [canChange]="canChange"
     ></app-address>
 
 </div>

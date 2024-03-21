@@ -6,6 +6,7 @@
                 <button
                 (click)="showEditMode()"
                 class="previewbtn text-center btn float-right"
+                *ngIf="canChange"
             >
                 Change
                 <i class="pi pi-pencil"></i>
@@ -31,6 +32,7 @@
         [contactId]="contactIdFrom"
         [selectedAddressDetails]="selectedAddressDetailsFrom"
         [showAddressType]="false"
+        [canChange]="canChange"
         ></app-address>
         
     </div>
@@ -57,6 +59,7 @@
         [contactId]="contactIdTo"
         [selectedAddressDetails]="selectedAddressDetailsTo"
         [showAddressType]="false"
+        [canChange]="canChange"
         ></app-address>
         <div class="row view-mode mt-2 mb-2">
             <div class="col-6" *ngIf="appTransactionsForViewDto?.buyerStore">
