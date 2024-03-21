@@ -8,14 +8,6 @@
                  {{l("Continue")}}
             </button>
             <button
-                *ngIf="!createOrEditBillingInfo || canChange" 
-                (click)="showEditMode()"
-                class="previewbtn text-center btn float-right"
-            >
-                Change
-                <i class="pi pi-pencil"></i>
-            </button>
-            <button
             *ngIf="showSaveBtn"
             [disabled]="!(isContactsValid)"
             (click)="save()"
