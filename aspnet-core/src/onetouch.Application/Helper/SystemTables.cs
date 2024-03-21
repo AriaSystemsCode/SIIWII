@@ -458,7 +458,8 @@ namespace onetouch.Helpers
             if (fromCurrencyCode != "USD")
             {
                 sourceCurrency = _sycCurrencyExchangeRate.GetAll().FirstOrDefault(x => x.CurrencyCode == fromCurrencyCode);
-                returnVal = 1 / sourceCurrency.ExchangeRate;
+                if (sourceCurrency!=null)
+                    returnVal = 1 / sourceCurrency.ExchangeRate;
             }
             var toCurrency = _sycCurrencyExchangeRate.GetAll().FirstOrDefault(x => x.CurrencyCode == toCurrencyCode);
             if (toCurrency != null)
