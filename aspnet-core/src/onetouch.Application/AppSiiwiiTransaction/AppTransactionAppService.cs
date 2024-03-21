@@ -3881,6 +3881,8 @@ namespace onetouch.AppSiiwiiTransaction
                                         detailch.TransactionId = tenantTransaction.Id;
                                         detailch.TransactionIdFk = tenantTransaction;
                                         detailch.ParentId = detail.Id;
+                                        detailch.EntityObjectTypeId = tenantTransaction.EntityObjectTypeId;
+                                        detailch.EntityObjectTypeCode = tenantTransaction.EntityObjectTypeCode;
                                         if (ch.EntityExtraData != null && ch.EntityExtraData.Count > 0)
                                         {
                                             detailch.EntityExtraData = new List<AppEntityExtraData>();
@@ -4037,7 +4039,8 @@ namespace onetouch.AppSiiwiiTransaction
                                 detail.TenantId = tenantId;
                                 detail.TransactionId = tenantTransactionObj.Id;
                                 detail.TransactionIdFk = tenantTransactionObj;
-
+                                detail.EntityObjectTypeId = tranType;
+                                detail.EntityObjectTypeCode = tranTypeCode;
                                 if (det.EntityExtraData != null && det.EntityExtraData.Count > 0)
                                 {
                                     detail.EntityExtraData = new List<AppEntityExtraData>();
