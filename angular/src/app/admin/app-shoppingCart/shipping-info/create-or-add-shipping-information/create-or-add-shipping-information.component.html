@@ -99,6 +99,11 @@
         [placeholder]="'PleaseSelect' | localize"
     >
     </p-dropdown>
+    <p class="text-danger" *ngIf="!appTransactionsForViewDto.shipViaId">
+       <small>
+         Please select ship via option
+       </small>
+    </p>
     </div>
 </div>
 

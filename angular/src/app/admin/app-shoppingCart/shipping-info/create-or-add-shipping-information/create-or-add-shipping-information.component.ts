@@ -54,8 +54,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
     let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
     shipToObj[0]?.companySSIN ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
     this.storeVal = this.appTransactionsForViewDto?.buyerStore;
-    this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
+    //this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
     this.loadShipViaList();
+
   }
 
   updateTabInfo(addObj, contactRole) {
@@ -86,7 +87,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
       shipFromObj[0]?.contactAddressDetail ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
       shipToObj[0]?.contactAddressDetail ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
 
-      if (this.enableSAveShipFrom && this.enableSAveShipTo) {
+      if (this.enableSAveShipFrom && this.enableSAveShipTo&&this.appTransactionsForViewDto.shipViaId) {
         this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
       }
@@ -189,7 +190,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
         } else {
           shipToObj[0]?.contactAddressDetail ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
         }
-        if (this.enableSAveShipFrom && this.enableSAveShipTo) {
+        this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId? this.shipingTabVaild = true : this.shipingTabVaild = false;
+
+        if (this.enableSAveShipFrom && this.enableSAveShipTo&&this.appTransactionsForViewDto.shipViaId) {
           this.shipingTabVaild = true;
           this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
@@ -202,7 +205,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
         } else {
           this.enableSAveShipTo = false;
         }
-        this.enableSAveShipFrom && this.enableSAveShipTo ? this.shipingTabVaild = true : this.shipingTabVaild = false;
+
 
       }
 
@@ -213,6 +216,14 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
     this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
       .subscribe((res) => {
         this.shipViaList = res;
+        debugger
+        if(!this.appTransactionsForViewDto.shipViaId&&this.shipViaList.length==1){
+            this.shipViaValue=this.shipViaList[0];
+            this.appTransactionsForViewDto.shipViaId = this.shipViaValue?.value;
+            this.appTransactionsForViewDto.shipViaCode = this.shipViaValue?.code;
+        }else if(this.appTransactionsForViewDto.shipViaId){
+          this.shipViaValue=this.shipViaList.filter(item=>item.value==this.appTransactionsForViewDto.shipViaId);
+        }
       })
   }
   onshowSaveBtn($event) {

@@ -127,7 +127,7 @@
             <div>
                 <label class="label">Department</label>
                 <input type="text" placeholder="Department Name..." class="form-control w-100" name="DepartmentName"
-                    [(ngModel)]="appTransactionsForViewDto.buyerDepartment" #DepartmentName="ngModel" required />
+                    [(ngModel)]="appTransactionsForViewDto.buyerDepartment" #DepartmentName="ngModel"  />
                 <div *ngIf="
                     DepartmentName.invalid &&
                         (DepartmentName.dirty || DepartmentName.touched)

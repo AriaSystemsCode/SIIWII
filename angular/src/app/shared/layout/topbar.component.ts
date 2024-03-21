@@ -313,7 +313,7 @@ export class TopBarComponent
         this.userName = this.appSession.user.userName;
         this.name = this.appSession.user.name;
         this.fullName =
-            this.appSession.user.name + this.appSession.user.surname;
+            this.appSession.user.name +' '+ this.appSession.user.surname;
         console.log(">>", this.appSession.user);
     }
     closeModal(value: boolean) {

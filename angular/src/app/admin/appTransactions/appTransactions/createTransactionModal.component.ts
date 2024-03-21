@@ -3,6 +3,7 @@ import {
     Component,
     OnInit,
     ViewEncapsulation,
+    OnChanges,
     Output,
     EventEmitter,
     Input,
@@ -46,7 +47,7 @@ import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catal
     selector: "createTransactionModal",
     styleUrls: ["./createTransactionModal.component.scss"],
 })
-export class CreateTransactionModal extends AppComponentBase implements OnInit {
+export class CreateTransactionModal extends AppComponentBase implements OnInit,OnChanges {
     dt: string;
     public orderForm: FormGroup;
     submitted: boolean = false;
@@ -125,8 +126,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             istemp: [false],
         });
         this.getAllCompanies();
+        this.orderForm.controls['startDate'].setValue(new Date());
+        this.changeStartDate(this.orderForm.get('startDate'));
     }
-
+    ngOnChanges(){
+        this.orderForm.controls['startDate'].setValue(new Date());
+        this.changeStartDate(this.orderForm.get('startDate'));
+    }
     getBranches(accountSSIN,objectToChangeName) {
             this._AppTransactionServiceProxy.getAccountBranches(accountSSIN).subscribe(result => {
                 if(objectToChangeName=='buyer'){
@@ -549,21 +555,22 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         }
     }
     changeStartDate(date){
-        let newDate = date.value;
-        let month = newDate.getMonth();
-        let year = newDate.getFullYear();
+        debugger
+        let newDate = new Date();
+        let month = date.value.getMonth();
+        let year = date.value.getFullYear();
 
         let monthVal = (month === 11) ? 0 : month +1;
         let yearVal = (monthVal === 0) ? year + 1 : year;
-        this.minDate = date.value;
+        this.minDate = newDate;
         this.minDate.setMonth(monthVal);
         this.minDate.setFullYear(yearVal);
         this.orderForm.controls['completeDate'].setValue(this.minDate);
        this.orderForm.controls['availableDate'].setValue(this.minDate);
-       newDate.setMonth(month);
+      /* newDate.setMonth(month);
        newDate.setFullYear(year);
 
-       this.orderForm.controls['startDate'].setValue(newDate)
+       this.orderForm.controls['startDate'].setValue(newDate)*/
 
     }
     async validateShoppingCart() {
