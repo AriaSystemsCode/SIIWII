@@ -3623,7 +3623,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     if (tran != null)
                                     {
                                         if (!string.IsNullOrEmpty(info[0]))
-                                            subject = info[0] == "SO" ? ("Sales Order: " + info[2] + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + info[2] + " (" + tran.SellerCompanyName + ")");
+                                            subject = info[0] == "SalesOrder" ? ("Sales Order: " + info[2] + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + info[2] + " (" + tran.SellerCompanyName + ")");
                                         else
                                         {
                                             tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
@@ -3802,6 +3802,8 @@ namespace onetouch.AppSiiwiiTransaction
                                 detail.TenantId = tenantId;
                                 detail.TransactionId = tenantTransaction.Id;
                                 detail.TransactionIdFk = tenantTransaction;
+                                detail.EntityObjectTypeId = tenantTransaction.EntityObjectTypeId;
+                                detail.EntityObjectTypeCode = tenantTransaction.EntityObjectTypeCode;
                                 //marketplaceTransaction.AppMarketplaceTransactionDetails.Add(detail);
                                 if (det.EntityExtraData != null && det.EntityExtraData.Count > 0)
                                 {
