@@ -412,6 +412,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
     createOrEditTransaction() {
         this.showMainSpinner();
+        this.onChangeDate();
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
