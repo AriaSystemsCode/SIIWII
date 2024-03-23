@@ -34,6 +34,7 @@ import {
     CurrencyInfoDto,
     LookupLabelDto,
     AppEntitiesServiceProxy,
+    
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { TabDirective, TabsetComponent } from "ngx-bootstrap/tabs";
@@ -52,6 +53,7 @@ import { DropdownSelection } from "@shared/components/shared-forms-components/dr
 import { AppEntityDtoWithActions } from "../models/app-entity-dto-with-actions";
 import { PricingHelpersService } from "../../app-item-shared/services/pricing-helpers.service";
 import { ApplyVariationOutput } from "./create-edit-app-item-variations.component";
+import Swal from "sweetalert2";
 
 @Component({
     selector: "app-create-or-edit-app-item",
@@ -70,12 +72,11 @@ export class CreateOrEditAppItemComponent
     appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
     submitted: boolean = false;
     updateVariation: boolean = true;
-
     descriptionEditor: string;
     descriptionExportedHtml: string;
     saving = false;
     activeDescriptionIndex = 0;
-
+    extraVariationsTypes:any;
     appItemTypeId: number;
     selectedItemTypeData: GetAllEntityObjectTypeOutput =
         new GetAllEntityObjectTypeOutput();
@@ -344,6 +345,7 @@ export class CreateOrEditAppItemComponent
     }
 
     defineExtraAttributes() {
+        
         this.extraAttributes = {
             [EExtraAttributeUsage.Recommended]:
                 new CreateEditAppItemExtraAttribute({
@@ -374,9 +376,44 @@ export class CreateOrEditAppItemComponent
     selectTab(tabId: number) {
         this.staticTabs.tabs[tabId].active = true;
     }
+    getallAtrributes(id,oninit) {
+        this._appItemsServiceProxy
+            .getProductVariationsTypes(id)
+            .subscribe((res: any) => {
+                if(JSON.stringify(this.extraVariationsTypes)==JSON.stringify(res)||! this.extraVariationsTypes){
+                    this.extraVariationsTypes = res;
+                    this.getAppItemTypeExtraAttributesByIdFun(id);
 
-    // item type methods
-    onItemTypeChange(id: number) {
+                }else{
+
+                    Swal.fire({
+                        title: "",
+                        text: "The original product type has attributes that don't exist in the selected product type , data in those attributes will be lost ?",
+                        icon: "info",
+                        showCancelButton: true,
+                        confirmButtonText:
+                            "Continue",
+                        cancelButtonText: "Cancel",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        backdrop: true,
+                        customClass: {
+                            popup: "popup-class",
+                            icon: "icon-class",
+                            content: "content-class",
+                            actions: "actions-class",
+                            confirmButton: "confirm-button-class2",
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.getAppItemTypeExtraAttributesByIdFun(id);
+                        }
+                    }
+                    )
+                }
+            });
+    }
+    getAppItemTypeExtraAttributesByIdFun(id){
         if (!isNaN(id)) {
             this.getAppItemTypeExtraAttributesById(id).subscribe(
                 (result) => {
@@ -413,6 +450,11 @@ export class CreateOrEditAppItemComponent
             this.selectedItemTypeData = new GetAllEntityObjectTypeOutput();
             this.resetExtraData();
         }
+
+    }
+    // item type methods
+    onItemTypeChange(id: number) {
+        this.getallAtrributes(id,false);
     }
 
     loadRecommendedAndAdditionalExtraDataLookupLists() {
@@ -443,6 +485,19 @@ export class CreateOrEditAppItemComponent
                         extraAttr.paginationSetting.list.length - 1,
                         1
                     );
+                     let isExist=result.items.filter((item)=>{item.value==extraAttr.attributeId});
+                    if(isExist!.length==0||isExist==undefined){
+
+                        const tempAtt = new LookupLabelDto({
+                            code:extraAttr.code,
+                            label:extraAttr.selectedValues,
+                            stockAvailability:undefined,
+                            value:extraAttr.selectedValues,
+                            isHostRecord:false,
+                        })
+                        result.items.push(tempAtt)
+                    }
+
                 extraAttr.paginationSetting.list.push(...result.items);
                 if (
                     extraAttr.paginationSetting.list.length <
@@ -1631,4 +1686,9 @@ export class CreateOrEditAppItemComponent
     onUpdateVariation($event) {
         this.updateVariation = $event;
     }
+
+    convertTodecimal(value){
+        let inputvalue=value % 1 ==0?Math.round(value * 100 / 100).toFixed(2):value;
+        return inputvalue;
+      }
 }

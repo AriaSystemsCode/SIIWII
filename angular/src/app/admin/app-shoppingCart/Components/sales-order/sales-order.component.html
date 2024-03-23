@@ -15,7 +15,7 @@
                 Continue
             </button>
             <button
-                *ngIf="!createOrEditorderInfo"
+                *ngIf="!createOrEditorderInfo && canChange"
                 (click)="showEditMode()"
                 class="previewbtn text-center btn float-right"
             >
@@ -210,11 +210,14 @@
                 <div class="col-md-6 my-3">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Entered Date</label>
-                        <p-calendar
-                            [(ngModel)]="enteredDate"
-                            [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
-                        ></p-calendar>
+                        <div class="read-only-calendar">
+                            <p-calendar
+                                [(ngModel)]="enteredDate"
+                                [showIcon]="true"
+                                (ngModelChange)="onChangeDate()"
+                            ></p-calendar>
+                            <div class="overlay"></div>
+                        </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
@@ -222,7 +225,7 @@
                         >
                             <h6 class="previewTitle  m-0 p-0 col-4 my-2">Entered Date :</h6>
                             <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "dd/MM/yy " }}
+                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "MM/dd/yyyy  " }}
                             </p>
                         </div>
                     </div>
@@ -242,7 +245,7 @@
                         >
                             <h6 class="previewTitle  m-0 p-0 col-4 my-2">Start Date :</h6>
                             <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "dd/MM/yy "}}
+                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "MM/dd/yyyy "}}
                             </p>
                         </div>
                     </div>
@@ -264,7 +267,7 @@
                                 Avaialable Date :
                             </h6>
                             <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "dd/MM/yy " }}
+                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "MM/dd/yyyy " }}
                             </p>
                         </div>
                     </div>
@@ -286,7 +289,7 @@
                                 Complete Date :
                             </h6>
                             <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "dd/MM/yy " }}
+                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "MM/dd/yyyy " }}
                             </p>
                         </div>
                     </div>

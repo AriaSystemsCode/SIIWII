@@ -22,6 +22,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   @Input("createOrEditSalesRepInfo") createOrEditSalesRepInfo: boolean = true;
   oldappTransactionsForViewDto;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input("canChange")  canChange:boolean=true;
 
   constructor(
     injector: Injector,

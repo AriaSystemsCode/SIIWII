@@ -37,6 +37,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   shipToSelectedAdd: any;
   shipingTabVaild: boolean = true;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input("canChange")  canChange:boolean=true;
 
   constructor(
     injector: Injector,

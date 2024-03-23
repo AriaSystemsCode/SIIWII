@@ -100,7 +100,7 @@
                 <div class="p-4 text-right border-left">
                     <button type="button" class="btn btn-primary bgPurple border-0  ml-5 pl-4 pr-4"
                         style="height: 37px;" (click)="onContinueShopping()"
-                        [disabled]="!shoppingCartDetails?.detailsView"
+                        [disabled]="!shoppingCartDetails?.detailsView || !isOwnedByMe"
                         [ngClass]="{ disabled:!shoppingCartDetails?.detailsView}">
                         {{l("ContinueShopping")}}
                     </button>
@@ -134,7 +134,8 @@
                                     [createOrEditorderInfo]="createOrEditorderInfo"
                                     [oldCreateOrEditorderInfo]="createOrEditorderInfo"
                                     (ontabChange)="ontabChange($event)"
-                                    (generatOrderReport)="onGeneratOrderReport($event)"></app-sales-order>
+                                    (generatOrderReport)="onGeneratOrderReport($event)"
+                                    [canChange]="canChange"></app-sales-order>
                             </ng-template>
                         </p-accordionTab>
                         <!-- order information tab -->
@@ -157,7 +158,8 @@
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)"
                                         [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-buyer-seller-contact-info>
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -180,7 +182,8 @@
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)" [showSaveBtn]="showSaveBtn"
                                         [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-buyer-seller-contact-info>
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -204,7 +207,8 @@
                                         (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [showSaveBtn]="showSaveBtn"
                                         [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-sales-rep-info>
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange"></app-create-or-edit-sales-rep-info>
                                 </div>
                             </ng-template>
                         </p-accordionTab>
@@ -226,7 +230,8 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [createOrEditshippingInfO]="createOrEditshippingInfO"
-                                        (generatOrderReport)="onGeneratOrderReport($event)">
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange">
                                     </app-create-or-add-shipping-information>
                                 </div>
                             </ng-template>
@@ -247,7 +252,8 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [createOrEditBillingInfo]="createOrEditBillingInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)">
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange">
                                     </app-create-or-edit-billing-info>
                                 </div>
                             </ng-template>
@@ -317,7 +323,7 @@
                                                     <!--  <th> <img
                                                     src="../../../../../assets/shoppingCart/Order-Details-Table-Action_Btn.svg" />
                                             </th> -->
-                                                    <th class="purpleColor">
+                                                    <th class="purpleColor" *ngIf="canChange">
                                                         {{l("Action")}}
                                                     </th>
                                                 </tr>
@@ -378,7 +384,7 @@
                                                         </label>
                                                     </td>
 
-                                                    <td class="p-treeTable">
+                                                    <td class="p-treeTable" *ngIf="canChange">
                                                         <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
                                                     class="imgIcon" (click)="onDelete(rowNode)" />
                                                 <img *ngIf="rowNode?.node?.data?.editQty" src=""
@@ -488,7 +494,7 @@
                             <div class="col-12">
 
                                 <!-- app Notes shared component-->
-                                <app-notes [entityId]="orderId"></app-notes>
+                                <app-notes [entityId]="orderId" (outSaveNote)="onGeneratOrderReport(true)"></app-notes>
                             </div>
 
                         </div>
@@ -497,7 +503,7 @@
                     <div class="row mt-4">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                         <div class="w-100 comment-warper summarySection p-4 ml-2 mt-3 purpleColor">
-                            <app-comment-parent [cartStyle]="true" #commentParentComponent>
+                            <app-comment-parent [cartStyle]="true" #commentParentComponent (newCommentAdded)="onGeneratOrderReport(true)">
                             </app-comment-parent>
                         </div>
 
@@ -532,5 +538,6 @@
     </div>
 </div>
 
-<report-viewer class="w-100 d-none" [reportUrl]="reportUrl" [invokeAction]="invokeAction">
-</report-viewer>
+<!-- <report-viewer #reportViewerElement class="w-100 d-none" [reportUrl]="reportUrl" [invokeAction]="invokeAction">
+</report-viewer> -->
+<div #reportViewerContainer class="w-100 d-none"></div>

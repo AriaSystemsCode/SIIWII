@@ -34,6 +34,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   arContactSelectedAdd: any
   @Input("createOrEditBillingInfo") createOrEditBillingInfo: boolean = true;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input("canChange")  canChange:boolean=true;
 
 
   constructor(

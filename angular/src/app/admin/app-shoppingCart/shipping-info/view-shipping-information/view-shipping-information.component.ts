@@ -21,6 +21,7 @@ export class ViewShippingInformationComponent  extends AppComponentBase{
   @Input("selectedAddressDetailsTo") selectedAddressDetailsTo;
   @Output("showShippingEditMode") showShippingEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
   @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input("canChange")  canChange:boolean=true;
 
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
 

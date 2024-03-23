@@ -1,6 +1,6 @@
 import {
   Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild
-  , AfterViewInit, ViewChildren, QueryList,
+  , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
@@ -16,6 +16,7 @@ import { finalize } from 'rxjs';
 import { ShoppingCartoccordionTabs } from './ShoppingCartoccordionTabs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
+import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -74,12 +75,15 @@ export class ShoppingCartViewComponentComponent
   printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
   reportUrl: string = "";
   invokeAction = '/DXXRDV';
-  
+  @ViewChild('reportViewerContainer', { read: ViewContainerRef }) reportViewerContainer: ViewContainerRef;
+  isOwnedByMe:boolean=true;
+  canChange:boolean=true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     private userClickService: UserClickService,
+    private componentFactoryResolver: ComponentFactoryResolver,
     private router: Router
   ) {
     super(injector);
@@ -176,6 +180,9 @@ export class ShoppingCartViewComponentComponent
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         this.appTransactionsForViewDto = res;
+
+        this.isOwnedByMe= res.isOwnedByMe;
+       this.canChange= this.isOwnedByMe
         this.transactionCode=res?.code;
         if (res?.entityAttachments?.length > 0)
           this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
@@ -255,7 +262,10 @@ export class ShoppingCartViewComponentComponent
         "SellerSSIN",
         JSON.stringify(this.shoppingCartDetails.sellerCompanySSIN)
       );
-
+      localStorage.setItem(
+        "contactSSIN",
+        JSON.stringify(this.shoppingCartDetails.buyerContactSSIN)
+      );
       localStorage.setItem(
         "currencyCode",
         JSON.stringify(this.appTransactionsForViewDto.currencyCode)
@@ -620,6 +630,7 @@ export class ShoppingCartViewComponentComponent
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
+            this.onGeneratOrderReport(true);
             this.hideMainSpinner();
             this.hide();
           }
@@ -714,6 +725,8 @@ export class ShoppingCartViewComponentComponent
   }
   onGeneratOrderReport($event) {
     if ($event) {
+      this.reportUrl="";
+      this.printInfoParam= new ProductCatalogueReportParams();
       this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
       this.printInfoParam.TransactionId = this.orderId.toString();
       //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
@@ -722,6 +735,24 @@ export class ShoppingCartViewComponentComponent
       this.printInfoParam.tenantId = this.appSession?.tenantId
       this.printInfoParam.userId = this.appSession?.userId
       this.reportUrl = this.printInfoParam.getReportUrl()
+      this.createReportViewer();
     }
+
   }
+    createReportViewer(){
+      this.reportViewerContainer.clear();
+
+      // Resolve the factory for ReportViewerComponent
+      const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
+  
+      // Create the component and set input properties
+      const componentRef = this.reportViewerContainer.createComponent(factory);
+      const instance = componentRef.instance as ReportViewerComponent;
+      instance.reportUrl = this.reportUrl;
+      instance.invokeAction = this.invokeAction;
+      const componentNativeElement = componentRef.location.nativeElement as HTMLElement;
+       componentNativeElement.classList.add('d-none');
+
+    
+    }
 }

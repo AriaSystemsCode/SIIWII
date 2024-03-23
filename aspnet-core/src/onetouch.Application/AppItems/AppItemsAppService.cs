@@ -63,6 +63,7 @@ using Abp.Extensions;
 using onetouch.Attachments;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Org.BouncyCastle.Utilities.Encoders;
+using onetouch.AppSiiwiiTransaction;
 
 namespace onetouch.AppItems
 {
@@ -101,6 +102,7 @@ namespace onetouch.AppItems
         private readonly IRepository<AppMarketplaceItemPrices, long> _appMarketplaceItemPricesRepository;
         //MMT33
         TimeZoneInfoAppService _timeZoneInfoAppService;
+        private readonly IRepository<AppTransactionDetails, long> _appTransactionDetails;
         //MMT
         private readonly IRepository<AppItemSelector, long> _appItemSelectorRepository;
         private readonly Helper _helper;
@@ -133,10 +135,12 @@ namespace onetouch.AppItems
             IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
-            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService
+            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
+            IRepository<AppTransactionDetails, long> appTransactionDetails
             )
         {
             //MMT33-2
+            _appTransactionDetails = appTransactionDetails;
             _timeZoneInfoAppService = timeZoneInfoAppService;
             _appAttachmentRepository = appAttachmentRepository;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
@@ -742,7 +746,7 @@ namespace onetouch.AppItems
                         {
                             foreach (var extr in extraAttributes)
                             {
-                                if (extr.AttributeValue == null)
+                                if (extr.AttributeValue == null || extr.AttributeCode == null)
                                     continue;
                                 appItemAttributePriceDto.Add(new AppItemAttributePriceDto
                                 {
@@ -775,8 +779,8 @@ namespace onetouch.AppItems
                     //secondAttributeValuesFor1st = xx.AppItemSizeScalesDetails.OrderBy(s => s.D1Position).OrderBy(s => s.D2Position).OrderBy(s => s.D3Position).Select(a => a.SizeCode).ToList();
                     foreach (var t in zz)
                     {
-                        if (ss.FirstOrDefault(z => z.AttributeValue == t) != null)
-                            appRetItemAttributePriceDto.Add(ss.FirstOrDefault(z => z.AttributeValue == t));
+                        if (ss.FirstOrDefault(z => z.AttributeValue == t || z.AttibuteCode == t) != null)
+                            appRetItemAttributePriceDto.Add(ss.FirstOrDefault(z => z.AttributeValue == t || z.AttibuteCode == t));
                     }
                     return appRetItemAttributePriceDto;
 
@@ -1119,7 +1123,22 @@ namespace onetouch.AppItems
                                         extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (tenantIdvar == null ? "-1" : tenantIdvar.ToString()) + @"/" + imgObj.Attachment.ToString();
                                     }
                                 }
-
+                                //xx2024
+                                var item = varAppItems.Where(x => x.EntityFk.EntityExtraData
+                                                                                  .Where(a => (a.AttributeValue == varItem || a.AttributeCode == varItem) &&
+                                                                                  a.AttributeId == firstAttributeIdLong).Any()).FirstOrDefault();
+                                if (item != null)
+                                {
+                                    var varColorImage = item.EntityFk.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
+                                    if (varColorImage != null)
+                                    {
+                                        string tenantId = null;
+                                        if (item.EntityFk != null)
+                                            tenantId = item.EntityFk.TenantId.ToString();
+                                        extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (tenantId == null ? "-1" : tenantId.ToString()) + @"/" + varColorImage.AttributeValue;
+                                    }
+                                }
+                                //xx2024
                                 imageLoopCounter = imageLoopCounter + 1;
                                 // if (firstAttributeRelatedAdded == false)
                                 if (true)
@@ -1144,7 +1163,7 @@ namespace onetouch.AppItems
                                         foreach (var attlook in eDRestAttributes.Values)
                                         {
                                             var codeItems = varAppItems.Where(x => x.EntityFk.EntityExtraData
-                                                                                   .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                   .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                    a.AttributeId == firstAttributeIdLong
                                                                                    ).Any()).ToList();
                                             var itemVarSum = codeItems.Where(x =>
@@ -1189,7 +1208,7 @@ namespace onetouch.AppItems
                                         foreach (var attlook in eDRestAttributes.Values)
                                         {
                                             var codeItems = varAppItems.Where(x => x.EntityFk.EntityExtraData
-                                                                                   .Where(a => a.AttributeValue == attlook.Label.ToString() &&
+                                                                                   .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                    a.AttributeId == long.Parse(secondAttId)
                                                                                    ).Any()).ToList();
                                             var itemVarSum = codeItems.Where(x =>
@@ -1657,7 +1676,15 @@ namespace onetouch.AppItems
                 return await Update(input);
             }
         }
-
+        //MMT
+        public async Task<bool> IsVariationOrdered(string sSIN)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                return await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == sSIN).CountAsync() > 0;
+            }
+        }
+        //MmT
         [AbpAuthorize(AppPermissions.Pages_AppItems_Create)]
         protected virtual async Task<long> Create(CreateOrEditAppItemDto input)
         {
@@ -2085,6 +2112,72 @@ namespace onetouch.AppItems
                     //extrData.AddRange(childEntity.EntityExtraData);
                     using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
+                        var sizeNRF = childEntity.EntityExtraData.Where(z => z.AttributeId == 206).FirstOrDefault();
+                        if (sizeNRF == null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "SIZE-NRF",
+                                AttributeId = 206,
+                                EntityId = childEntity.Id,
+                                AttributeValue =null
+                            });
+                        }
+                        var sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
+                        if (sizeMarketplacev == null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "SIZEMARKETPLACECODE",
+                                AttributeId = 205,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
+                        var colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                        if (colorImage == null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "COLOR-IMAGE",
+                                AttributeId = 202,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
+                        var colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                        if (colorHexa ==null )
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "COLOR-HEX",
+                                AttributeId = 201,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
+                        var colorNRF = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
+                        if (colorNRF == null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "COLOR-NRF",
+                                AttributeId = 204,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
+                        var colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
+                        if (colorSchv ==null)
+                        {
+                            childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
+                            {
+                                EntityObjectTypeCode = "COLOR-SCHEME",
+                                AttributeId = 203,
+                                EntityId = childEntity.Id,
+                                AttributeValue = null
+                            });
+                        }
                         var sizeExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
                         if (sizeExtraAtt != null)
                         {
@@ -2092,17 +2185,26 @@ namespace onetouch.AppItems
                             && z.EntityObjectTypeCode =="SIZE").FirstOrDefaultAsync();
                             if (sizeExtra != null)
                             {
-                                var sizeNRF = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
-                                if (sizeNRF != null && !string.IsNullOrEmpty(sizeNRF.AttributeValue))
+                                var sizeNRFEnt = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
+                                if (sizeNRFEnt != null && !string.IsNullOrEmpty(sizeNRFEnt.AttributeValue))
                                 {
                                     var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 206).FirstOrDefault();
-                                    if (colorNRFv != null) colorNRFv.AttributeValue = sizeNRF.AttributeValue;
+                                    if (colorNRFv != null)
+                                    {
+                                        if (string.IsNullOrEmpty(colorNRFv.AttributeValue))
+                                            colorNRFv.AttributeValue = sizeNRFEnt.AttributeValue;
+                                    }
                                 }
+
                                 var sizeMarketplace = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 35).FirstOrDefault();
                                 if (sizeMarketplace != null && !string.IsNullOrEmpty(sizeMarketplace.AttributeValue))
                                 {
-                                    var sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
-                                    if (sizeMarketplacev != null) sizeMarketplacev.AttributeValue = sizeMarketplace.AttributeValue;
+                                    sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
+                                    if (sizeMarketplacev != null)
+                                    {
+                                        if (string.IsNullOrEmpty(sizeMarketplacev.AttributeValue))
+                                            sizeMarketplacev.AttributeValue = sizeMarketplace.AttributeValue;
+                                    }
                                 }
                             }
                         }
@@ -2116,32 +2218,49 @@ namespace onetouch.AppItems
                             {
                                 if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
                                 {
-                                    var colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                                    colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
                                     if (colorImage != null)
                                     {
-                                        if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
-                                            MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
-                                        colorImage.AttributeValue = colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+                                        if (string.IsNullOrEmpty(colorImage.AttributeValue))
+                                        {
+                                            if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
+                                                MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
+                                            colorImage.AttributeValue = colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+                                        }
                                     }
                                 }
                                 var colorHex = colorExtra.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
                                 if (colorHex != null && !string.IsNullOrEmpty(colorHex.AttributeValue))
                                 {
-                                    var colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
-                                    if (colorHexa != null) colorHexa.AttributeValue = colorHex.AttributeValue;
+                                    colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                    if (colorHexa != null)
+                                    { 
+                                        if ( string.IsNullOrEmpty(colorHexa.AttributeValue))
+                                            colorHexa.AttributeValue = colorHex.AttributeValue;
+                                    }
+                                       
                                 }
 
-                                var colorNRF = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
-                                if (colorNRF != null && !string.IsNullOrEmpty(colorNRF.AttributeValue))
+                                var colorNRFlook = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
+                                if (colorNRFlook != null && !string.IsNullOrEmpty(colorNRFlook.AttributeValue))
                                 {
-                                    var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
-                                    if (colorNRFv != null) colorNRFv.AttributeValue = colorNRF.AttributeValue;
+                                    var colorNRFEnt = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
+                                    if (colorNRFEnt != null)
+                                    { 
+                                        if (string.IsNullOrEmpty(colorNRFEnt.AttributeValue))
+                                            colorNRFEnt.AttributeValue = colorNRFlook.AttributeValue;
+                                    }
+                                    
                                 }
                                 var colorSch = colorExtra.EntityExtraData.Where(z => z.AttributeId == 37).FirstOrDefault();
                                 if (colorSch != null && !string.IsNullOrEmpty(colorSch.AttributeValueId.ToString()))
                                 {
-                                    var colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
-                                    if (colorSchv != null) colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
+                                    colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
+                                    if (colorSchv != null) 
+                                    { 
+                                        if(string.IsNullOrEmpty(colorSchv.AttributeValue))
+                                            colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
+                                    }
                                 }
                             }
 
@@ -4410,13 +4529,32 @@ namespace onetouch.AppItems
                 List<SycAttachmentCategorySycAttachmentCategoryLookupTableDto> attachmentsCategories = await _sSycAttachmentCategoriesAppService.GetAllSycAttachmentCategoryForTableDropdown();
 
                 string productType = ds.Tables["Products"].Rows[1].ItemArray[0].ToString();
-                var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
-                var productTypeId = pdtyp.FirstOrDefault();
+                GetAllEntityObjectTypeOutput productTypeId = null;
+                if (!string.IsNullOrEmpty(productType))
+                {
+                    var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
+                    productTypeId = pdtyp.FirstOrDefault();
+                }
+                else {
+                    var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+                    var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z=>z.Code).FirstOrDefault();
+                    if (defaultProductType == null)
+                        throw new UserFriendlyException("No Product type is marked as default.");
+                    else {
+                        var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
+                        productTypeId = pdtyp.FirstOrDefault();
+                        for (int cnt = 1; cnt < ds.Tables["Products"].Rows.Count; cnt++)
+                        {
+                            ds.Tables["Products"].Rows[cnt]["ProductType"] = defaultProductType;
+                        }
+
+                    }
+                }
                 //var productTypeId = productTypes.FirstOrDefault(x => x.DisplayName == productType);
                 //MMT
                 var productColumn = ds.Tables["Products"].Columns["ProductType"];
                 if (productColumn == null)
-                    throw new UserFriendlyException("Product Type columns is missing.");
+                    throw new UserFriendlyException("Product Type column is missing.");
 
                 var colData = ds.Tables["Products"].DefaultView.ToTable(true, new string[] { "ProductType" });
 
@@ -4793,6 +4931,9 @@ namespace onetouch.AppItems
                 foreach (AppItemtExcelRecordDTO logRecord in itemExcelResultsDTO.ExcelRecords)
                 {
                     rowNumber++;
+                    //if (Sheet.Cell("B" + rowNumber.ToString()).Value == null)
+                      //  break;
+
                     if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
                     {
                         if (rowNumber > 2)
@@ -5448,7 +5589,17 @@ namespace onetouch.AppItems
 
                 if (excelDto.Id == 0)
                     appItem.ParentFkList = new List<AppItem>();
-
+                //MMT30[Start]
+                DateTime timeStamp = DateTime.Now;
+                appItem.TimeStamp = timeStamp;
+                appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                if (string.IsNullOrEmpty(appItem.SSIN))
+                {
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.EntityFk.SSIN = appItem.SSIN;
+                }
+                appItem.EntityFk.TenantOwner = appItem.TenantOwner;
+                //MMT30[End]
                 //mmt
                 if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
                 {
@@ -6044,13 +6195,16 @@ namespace onetouch.AppItems
                         });
                     }
                     //XX
+                    //MMT30[End]
+                    appChildItem.TimeStamp = timeStamp;
+                    appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appChildItem.SSIN))
                     {
                         appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
-                        appChildItem.EntityFk.SSIN = appChildItem.SSIN;
+                        appChildItem.EntityFk.SSIN = appItem.SSIN;
                     }
-                    appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
-                    appChildItem.EntityFk.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                    appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;
+                    //MMT30[End]
                     if (appChildItem.Id==0)
                     appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
                     var entityExtraData = new List<AppEntityExtraData>();
@@ -6062,32 +6216,45 @@ namespace onetouch.AppItems
 
                             //long? AttributeValueId = null;
                             var AttributeInfoObj = extrattributesLists.FirstOrDefault(x => x.Key.Name.ToUpper() == item.ExtraAttributes[etx].Name.ToUpper());
-                            if (AttributeInfoObj.Key == null) continue;
-                            var AttributeInfo = AttributeInfoObj.Value;
+                            //if (AttributeInfoObj.Key == null) continue;
+
+                            var AttributeInfo = AttributeInfoObj.Key != null? AttributeInfoObj.Value:null;
                             //if (AttributeInfo != null)
                             //{
                             //    AttributeValueId =  AttributeInfo.FirstOrDefault(x => x.Code == item.ExtraAttributesValues[etx].Code) == null ? 0: AttributeInfo.FirstOrDefault(x => x.Code == item.ExtraAttributesValues[etx].Code).Value ;
                             //}
-                            entityExtraData.Add(new AppEntityExtraData
+                            AppEntityExtraData extra = new AppEntityExtraData
                             {
                                 AttributeCode = item.ExtraAttributesValues[etx].Code,
                                 AttributeValue = item.ExtraAttributesValues[etx].Value,
                                 AttributeValueId = null, // AttributeValueId,
                                 EntityObjectTypeName = item.ExtraAttributes[etx].Name,
                                 AttributeId = item.ExtraAttributes[etx].AttributeId,
-                                EntityObjectTypeId = AttributeInfoObj.Key.Id,
-                                EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode,
+                                EntityObjectTypeId = AttributeInfoObj.Key != null ? AttributeInfoObj.Key.Id : null,
+                                EntityObjectTypeCode = AttributeInfoObj.Key != null ? item.ExtraAttributes[etx].EntityObjectTypeCode : item.ExtraAttributes[etx].Name,
                                 EntityCode = appChildItem.Code
 
-                            });
+                            };
+                            //entityExtraData.Add(new AppEntityExtraData
+                            //{
+                            //    AttributeCode = item.ExtraAttributesValues[etx].Code,
+                            //    AttributeValue = item.ExtraAttributesValues[etx].Value,
+                            //    AttributeValueId = null, // AttributeValueId,
+                            //    EntityObjectTypeName = item.ExtraAttributes[etx].Name,
+                            //    AttributeId = item.ExtraAttributes[etx].AttributeId,
+                            //    EntityObjectTypeId = AttributeInfoObj.Key != null ? AttributeInfoObj.Key.Id:null,
+                            //    EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode,
+                            //    EntityCode = appChildItem.Code
+
+                            //});
                             try
                             {   if (appChildItem.Id == 0)
-                                    appChildItem.EntityFk.EntityExtraData.Add(entityExtraData[etx]);
+                                    appChildItem.EntityFk.EntityExtraData.Add(extra);
                                 else
                                 {
                                     var ext = appChildItem.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == item.ExtraAttributes[etx].AttributeId);
                                     if (ext == null)
-                                        appChildItem.EntityFk.EntityExtraData.Add(entityExtraData[etx]);
+                                        appChildItem.EntityFk.EntityExtraData.Add(extra);
                                     else
                                     {
                                         ext.AttributeCode = item.ExtraAttributesValues[etx].Code;
@@ -6095,7 +6262,7 @@ namespace onetouch.AppItems
                                         ext.AttributeValueId = null;
                                         ext.EntityObjectTypeName = item.ExtraAttributes[etx].Name;
                                         //AttributeId = item.ExtraAttributes[etx].AttributeId,
-                                        ext.EntityObjectTypeId = AttributeInfoObj.Key.Id;
+                                        ext.EntityObjectTypeId = AttributeInfoObj.Key != null ? AttributeInfoObj.Key.Id:null;
                                         ext.EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode;
                                         ext.EntityCode = appChildItem.Code;
                                     }
@@ -6216,7 +6383,73 @@ namespace onetouch.AppItems
                     restAttributteValues.Add(secondAttributteValues);
 
                     secondAttributteValues = new List<AppItemExtraDto>();
+                    //Fix Extra
+                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                    {
+                        var childEntity = appChildItem.EntityFk;
+                        var sizeExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
+                        if (sizeExtraAtt != null)
+                        {
+                            var sizeExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == sizeExtraAtt.AttributeCode
+                            && z.EntityObjectTypeCode == "SIZE").FirstOrDefaultAsync();
+                            if (sizeExtra != null)
+                            {
+                                var sizeNRF = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
+                                if (sizeNRF != null && !string.IsNullOrEmpty(sizeNRF.AttributeValue))
+                                {
+                                    var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 206).FirstOrDefault();
+                                    if (colorNRFv != null && string.IsNullOrEmpty(colorNRFv.AttributeValue)) colorNRFv.AttributeValue = sizeNRF.AttributeValue;
+                                }
+                                var sizeMarketplace = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 35).FirstOrDefault();
+                                if (sizeMarketplace != null && !string.IsNullOrEmpty(sizeMarketplace.AttributeValue))
+                                {
+                                    var sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
+                                    if (sizeMarketplacev != null && string.IsNullOrEmpty(sizeMarketplacev.AttributeValue)) sizeMarketplacev.AttributeValue = sizeMarketplace.AttributeValue;
+                                }
+                            }
+                        }
+                        var colorExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 101).FirstOrDefault();
+                        if (colorExtraAtt != null)
+                        {
+                            var colorExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR").FirstOrDefaultAsync();
+                            if (colorExtra != null)
+                            {
+                                if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
+                                {
+                                    var colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                                    if (colorImage != null && string.IsNullOrEmpty(colorImage.AttributeValue))
+                                    {
+                                        if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
+                                            MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
+                                        colorImage.AttributeValue = colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+                                    }
+                                }
+                                var colorHex = colorExtra.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
+                                if (colorHex != null && !string.IsNullOrEmpty(colorHex.AttributeValue))
+                                {
+                                    var colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                    if (colorHexa != null && string.IsNullOrEmpty(colorHexa.AttributeValue)) colorHexa.AttributeValue = colorHex.AttributeValue;
+                                }
 
+                                var colorNRF = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
+                                if (colorNRF != null && !string.IsNullOrEmpty(colorNRF.AttributeValue))
+                                {
+                                    var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
+                                    if (colorNRFv != null && string.IsNullOrEmpty(colorNRFv.AttributeValue)) colorNRFv.AttributeValue = colorNRF.AttributeValue;
+                                }
+                                var colorSch = colorExtra.EntityExtraData.Where(z => z.AttributeId == 37).FirstOrDefault();
+                                if (colorSch != null && !string.IsNullOrEmpty(colorSch.AttributeValueId.ToString()))
+                                {
+                                    var colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
+                                    if (colorSchv != null && string.IsNullOrEmpty(colorSchv.AttributeValue)) colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
+                                }
+                            }
+
+                        }
+                    }
+                    //Fix Extra
                     if (appChildItem.Id == 0)
                         appItem.ParentFkList.Add(appChildItem);
 

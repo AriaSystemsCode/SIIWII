@@ -3305,6 +3305,7 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                         }
                         //MMT
+                        viewTrans.IsOwnedByMe = (AbpSession.TenantId== viewTrans.TenantOwner);
                         return viewTrans;
                     }
 
@@ -3550,7 +3551,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         string toUserList = "";
                         List<string> tenantsRoles = new List<string>();
-
+                        List<long> userToShare = new List<long>();
                         foreach (var shar in input.TransactionSharing)
                         {
 
@@ -3602,9 +3603,10 @@ namespace onetouch.AppSiiwiiTransaction
                                 shareWith.SharedUserEMail = shar.SharedUserEMail;
                                 await _appEntitySharingsRepository.InsertAsync(shareWith);
                                 toUserList += (string.IsNullOrEmpty(toUserList) ? "" : ",") + shar.SharedUserId.ToString();
-                                
+                                userToShare.Add(long.Parse(shar.SharedUserId.ToString()));
 
-                                
+
+
                             }
                         }
                        
@@ -3635,7 +3637,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     if (tran != null)
                                     {
                                         if (!string.IsNullOrEmpty(info[0]))
-                                            subject = info[0] == "SO" ? ("Sales Order: " + info[2] + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + info[2] + " (" + tran.SellerCompanyName + ")");
+                                            subject = info[0] == "SalesOrder" ? ("Sales Order: " + info[2] + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + info[2] + " (" + tran.SellerCompanyName + ")");
                                         else
                                         {
                                             tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
@@ -3651,6 +3653,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     if (tran != null)
                                         subject = tran.EntityObjectTypeCode.ToUpper() == "SALESORDER" ? ("Sales Order: " + tran.Code + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + tran.Code + " (" + tran.SellerCompanyName + ")");
                                 }
+                                if (userToShare.Exists(z=> z==long.Parse(shar.SharedUserId.ToString())))
                                 await _messageAppService.CreateMessage(new CreateMessageInput
                                 {
                                     To = shar.SharedUserId.ToString() ,
@@ -3813,6 +3816,8 @@ namespace onetouch.AppSiiwiiTransaction
                                 detail.TenantId = tenantId;
                                 detail.TransactionId = tenantTransaction.Id;
                                 detail.TransactionIdFk = tenantTransaction;
+                                detail.EntityObjectTypeId = tenantTransaction.EntityObjectTypeId;
+                                detail.EntityObjectTypeCode = tenantTransaction.EntityObjectTypeCode;
                                 //marketplaceTransaction.AppMarketplaceTransactionDetails.Add(detail);
                                 if (det.EntityExtraData != null && det.EntityExtraData.Count > 0)
                                 {
@@ -3890,6 +3895,8 @@ namespace onetouch.AppSiiwiiTransaction
                                         detailch.TransactionId = tenantTransaction.Id;
                                         detailch.TransactionIdFk = tenantTransaction;
                                         detailch.ParentId = detail.Id;
+                                        detailch.EntityObjectTypeId = tenantTransaction.EntityObjectTypeId;
+                                        detailch.EntityObjectTypeCode = tenantTransaction.EntityObjectTypeCode;
                                         if (ch.EntityExtraData != null && ch.EntityExtraData.Count > 0)
                                         {
                                             detailch.EntityExtraData = new List<AppEntityExtraData>();
@@ -4046,7 +4053,8 @@ namespace onetouch.AppSiiwiiTransaction
                                 detail.TenantId = tenantId;
                                 detail.TransactionId = tenantTransactionObj.Id;
                                 detail.TransactionIdFk = tenantTransactionObj;
-
+                                detail.EntityObjectTypeId = tranType;
+                                detail.EntityObjectTypeCode = tranTypeCode;
                                 if (det.EntityExtraData != null && det.EntityExtraData.Count > 0)
                                 {
                                     detail.EntityExtraData = new List<AppEntityExtraData>();

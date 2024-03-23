@@ -22,7 +22,7 @@
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
             <textarea class="form-control w-50  d-inline-block ml-4" readonly>{{selectedAddress.addressLine1+' ,'}}{{selectedAddress.addressLine2+' ,'}}{{selectedAddress.city+' ,'}}{{selectedAddress.state+' ,'}}{{selectedAddress.countryName}}</textarea>
             <div class="pull-right">
-            <button   class="savebtn text-center btn float-right" (click)="showAddressList()">
+            <button *ngIf="canChange"  class="savebtn text-center btn float-right" (click)="showAddressList()">
                 {{l("Change")}}
                 <i class="fas fa-edit ml-1 mr-1"></i>
            </button>      

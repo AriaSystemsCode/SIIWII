@@ -116,3 +116,16 @@
     max-height: 550px;
     overflow: hidden scroll;
 }
+.read-only-calendar {
+    position: relative;
+}
+
+.read-only-calendar .overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    cursor: not-allowed; /* Change cursor to indicate non-interactivity */
+    z-index: 1; /* Ensure it overlays the calendar */
+}

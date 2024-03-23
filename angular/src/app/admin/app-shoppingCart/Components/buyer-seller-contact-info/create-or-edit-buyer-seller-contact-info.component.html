@@ -45,7 +45,8 @@
     [isCreateOrEdit]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo ? createOrEditbuyerContactInfo : createOrEditSellerContactInfo"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
     (showBuyer_sellerEditMode)="onshowBuyer_sellerEditMode($event)"
-    (onshowSaveBtn)="onshowSaveBtn($event)"></app-view-buyer-seller-contact-info>
+    (onshowSaveBtn)="onshowSaveBtn($event)"
+    [canChange]="canChange"></app-view-buyer-seller-contact-info>
     </div>
     </div>
     
