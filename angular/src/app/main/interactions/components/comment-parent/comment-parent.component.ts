@@ -2,6 +2,7 @@ import { Component, EventEmitter, Injector, Output, ViewChild ,Input} from '@ang
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
+import { BlockList } from 'net';
 
 @Component({
     selector: 'app-comment-parent',
@@ -12,8 +13,9 @@ export class CommentParentComponent extends AppComponentBase {
     @ViewChild("AddCommentComponent") addCommentComponent: AddCommentComponent
     @Output() newCommentAdded : EventEmitter<any> = new EventEmitter<any>()
     @Input() cartStyle: boolean;
-
-    active : boolean = true
+    @Input() addNewThread:boolean;
+    active : boolean = true;
+    showCommentToggle:boolean=false;
     comments : GetMessagesForViewDto[] = []
     skipCount : number = 0
     maxResultCount : number = 5
@@ -21,14 +23,20 @@ export class CommentParentComponent extends AppComponentBase {
     entityId : number
     parentId : number
     threadId : number
-    creatorUserId : number
+    creatorUserId : number;
+    displayDeleteMessage:boolean=false;
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
         private _injector : Injector
         ) {
             super(_injector)
         }
+        saveNewDirectMsg(){
 
+        }
+        onEmitButtonSaveYes(event){
+
+        }    
     show(creatorUserId:number,entityId:number,parentId?:number,threadId?:number){
         this.creatorUserId = creatorUserId
         this.entityId = entityId
@@ -49,7 +57,8 @@ export class CommentParentComponent extends AppComponentBase {
         }
         comment.to = this.creatorUserId?.toString()
         comment.senderId = this.appSession?.user?.id
-        comment.mesasgeObjectType = MesasgeObjectType.Comment
+        comment.mesasgeObjectType = MesasgeObjectType.Comment;
+        this.showCommentToggle=true;
         this.addCommentComponent.show(comment)
     }
 
