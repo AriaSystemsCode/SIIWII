@@ -57,7 +57,6 @@
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <a class="text-primary text-underline"
-                                    *ngIf="listingMode === undefined && !(appItem?.id>0)"
                                     (click)="openSelectAppItemTypeModal()">
                                     {{ appItem.entityObjectTypeId ? ('Change'|localize) : ('Select'|localize) }}
                                     {{ 'the product type' | localize}}
@@ -74,7 +73,7 @@
                                     classes="bg-white" [code]="appItem?.code"
                                     placeHolder="{{ 'ProductCode' | localize}}" (getCodeValue)="getCodeValue($event)">
                                 </app-codes>
-                                <app-codes *ngIf="appItem?.id>0" [objectType]="entityObjectType" [readonly]="true"
+                                <app-codes *ngIf="appItem?.id>0" [objectType]="entityObjectType" [readonly]="false"
                                     [editMode]=true classes="bg-white" [code]="appItem?.code"
                                     placeHolder="{{ 'ProductCode' | localize}}"
                                     (getCodeValue)="getCodeValue($event)"></app-codes>
@@ -397,6 +396,8 @@
                                         <input type="number" step="any" name="price" class="form-control"
                                             id="AppItem_Price" #AppItem_Price="ngModel"
                                             [(ngModel)]="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price"
+                                            [ngModelOptions]="{updateOn:'blur'}"
+                                            (ngModelChange)="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price=convertTodecimal($event)" 
                                            >
                                            <!-- required [min]="1"  -->
                                         <!-- <div *ngIf="!appItem?.appItemPriceInfos[defaultCurrencyMSRPPriceIndex]?.price  || appItem?.appItemPriceInfos[defaultCurrencyMSRPPriceIndex]?.price <=0">
@@ -651,7 +652,7 @@
 </div>
 
 <div [@routerTransition] *ngIf="displayVariations">
-    <app-create-edit-app-item-variations [appItem]="appItem" [selectedItemTypeData]="selectedItemTypeData"
+    <app-create-edit-app-item-variations [extraVariationsTypes]="extraVariationsTypes" [appItem]="appItem" [selectedItemTypeData]="selectedItemTypeData"
         (cancel)="hideVariations($event)" [defaultAppItemImage]="this.attachmentsSrcs[this.defaultImageIndex]"
         (applyVariations)="applyVariations($event)" [isListing]="listingMode !== undefined" [listingMode]="listingMode"
         [currencies]="selectedCurrencies" [updateVariation]="updateVariation" [productTypeId]="productTypeId"

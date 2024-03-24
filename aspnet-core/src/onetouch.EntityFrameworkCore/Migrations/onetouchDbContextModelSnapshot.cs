@@ -6470,6 +6470,9 @@ namespace onetouch.Migrations
                     b.Property<bool?>("Hidden")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 

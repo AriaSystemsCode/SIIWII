@@ -38,5 +38,7 @@ namespace onetouch.AppItems
 
         Task<long> ShareSelectedProducts(Guid key);
         Task<long> SyncSelectedProduct(Guid key);
+        Task<bool> IsVariationOrdered(string sSIN);
+
     }
 }

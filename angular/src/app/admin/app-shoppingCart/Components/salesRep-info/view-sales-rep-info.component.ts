@@ -22,6 +22,7 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
   salesRepIndex = 1;
   salesReps: any[];
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input("canChange")  canChange:boolean=true;
 
   constructor(
     injector: Injector,

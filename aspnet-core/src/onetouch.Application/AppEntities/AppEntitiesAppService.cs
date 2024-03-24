@@ -968,7 +968,7 @@ namespace onetouch.AppEntities
                             if (extraData.AttributeValueId != 0 && extraData.AttributeValueId != null)
                             {
                                 var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == extraData.AttributeValueId);
-                                
+                                if (type!=null)
                                     extraData.EntityObjectTypeId = type.EntityObjectTypeId;
 
                             }

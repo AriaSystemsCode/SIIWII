@@ -1,4 +1,4 @@
-import { Component,Input,Injector,OnInit } from '@angular/core';
+import { Component,Input,Injector,OnInit, Output, EventEmitter } from '@angular/core';
 import { AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -15,6 +15,7 @@ modDate:string='';
 emptyText:string='emptyText';
 saving:boolean = false
 @Input() entityId: number;
+@Output("outSaveNote") outSaveNote: EventEmitter<boolean> = new EventEmitter<boolean>()
 
 constructor(
   injector: Injector,
@@ -79,6 +80,7 @@ saveNote(noteVal){
       .subscribe((res) => {
            this.disabledModeOn=true;
            this.savedNoteData=noteValue;
+           this.outSaveNote.emit(true);
       });
 
 }
