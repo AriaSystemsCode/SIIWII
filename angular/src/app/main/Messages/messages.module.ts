@@ -73,6 +73,7 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
     PopoverModule.forRoot(),
     SelectAddressModule
   ],
+  exports:[MessagesComponent,SendMessageModalComponent,niceDateFormatPipe],
   providers: [
     { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
     { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },

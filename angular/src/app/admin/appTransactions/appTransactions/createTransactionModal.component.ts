@@ -41,6 +41,7 @@ import { UserClickService } from "@shared/utils/user-click.service";
 import { AppConsts } from "@shared/AppConsts";
 import { get } from "http";
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
+import * as moment from "moment";
 
 @Component({
     templateUrl: "./createTransactionModal.component.html",
@@ -518,6 +519,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         buyerBranchName: this.orderForm.controls['buyerCompanyBranch'].value.name,
                         sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch'].value.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch'].value.name,
+                        completeDate: this.orderForm.controls['completeDate'].value,
+                        startDate: this.orderForm.controls['startDate'].value,
+                        availableDate: this.orderForm.controls['availableDate'].value
                     };
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,
@@ -567,10 +571,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.minDate.setFullYear(yearVal);
         this.orderForm.controls['completeDate'].setValue(this.minDate);
        this.orderForm.controls['availableDate'].setValue(this.minDate);
-      /* newDate.setMonth(month);
-       newDate.setFullYear(year);
+       //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
 
-       this.orderForm.controls['startDate'].setValue(newDate)*/
 
     }
     async validateShoppingCart() {

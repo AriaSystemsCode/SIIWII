@@ -3,6 +3,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
 import { BlockList } from 'net';
+import { SendMessageModalComponent } from '@app/main/Messages/SendMessage-Modal.Component';
 
 @Component({
     selector: 'app-comment-parent',
@@ -11,6 +12,8 @@ import { BlockList } from 'net';
 })
 export class CommentParentComponent extends AppComponentBase {
     @ViewChild("AddCommentComponent") addCommentComponent: AddCommentComponent
+    @ViewChild("SendMessageModalComponent") SendMessageModalComponent: SendMessageModalComponent
+
     @Output() newCommentAdded : EventEmitter<any> = new EventEmitter<any>()
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
@@ -34,9 +37,7 @@ export class CommentParentComponent extends AppComponentBase {
         saveNewDirectMsg(){
 
         }
-        onEmitButtonSaveYes(event){
 
-        }    
     show(creatorUserId:number,entityId:number,parentId?:number,threadId?:number){
         this.creatorUserId = creatorUserId
         this.entityId = entityId
