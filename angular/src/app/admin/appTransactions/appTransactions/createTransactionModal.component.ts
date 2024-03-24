@@ -519,9 +519,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         buyerBranchName: this.orderForm.controls['buyerCompanyBranch'].value.name,
                         sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch'].value.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch'].value.name,
-                        completeDate: this.orderForm.controls['completeDate'].value,
-                        startDate: this.orderForm.controls['startDate'].value,
-                        availableDate: this.orderForm.controls['availableDate'].value
+                        completeDate: moment.utc(this.orderForm.controls['completeDate'].value.toLocaleString()),
+                        startDate: moment.utc(this.orderForm.controls['startDate'].value.toLocaleString()),
+                        availableDate: moment.utc(this.orderForm.controls['availableDate'].value.toLocaleString())
                     };
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,
@@ -563,10 +563,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         let newDate = new Date();
         let month = date.value.getMonth();
         let year = date.value.getFullYear();
+        let day = date.value.getDate();
 
         let monthVal = (month === 11) ? 0 : month +1;
         let yearVal = (monthVal === 0) ? year + 1 : year;
         this.minDate = newDate;
+        this.minDate.setDate(day);
         this.minDate.setMonth(monthVal);
         this.minDate.setFullYear(yearVal);
         this.orderForm.controls['completeDate'].setValue(this.minDate);
