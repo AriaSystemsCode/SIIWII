@@ -1731,8 +1731,27 @@ namespace onetouch.AppEntities
         [AbpAllowAnonymous]
         public async Task<AppEntityUserReactionsCountDto> GetUsersReactionsCount(long entityId)
         {
+           
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //MMT
+                if (entityId != null && entityId != 0)
+                {
+                    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == entityId).FirstOrDefaultAsync();
+                    if (entity != null && (entity.EntityObjectTypeCode == "SALESORDER" || entity.EntityObjectTypeCode == "PURCHASEORDER"))
+                    {
+                        var transactionSSIN = entity.SSIN;
+                        if (!string.IsNullOrEmpty(transactionSSIN))
+                        {
+                            var entityShared = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                            if (entityShared != null)
+                            {
+                                entityId = entityShared.Id;
+                            }
+                        }
+                    }
+                }
+                //MMT
                 var countReactionObj = await _appEntityReactionsCount.GetAll().FirstOrDefaultAsync(x => x.EntityId == entityId);
                 if (countReactionObj != null)
                 {

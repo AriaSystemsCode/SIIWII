@@ -257,6 +257,24 @@ namespace onetouch.Message
             IQueryable<AppMarketplaceMessage> filteredMessages = null;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //MMT
+                if (input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0)
+                {
+                    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == input.MainComponentEntitlyId).FirstOrDefaultAsync();
+                    if (entity != null && (entity.EntityObjectTypeCode == "SALESORDER" || entity.EntityObjectTypeCode == "PURCHASEORDER"))
+                    {
+                        var transactionSSIN = entity.SSIN;
+                        if (!string.IsNullOrEmpty(transactionSSIN))
+                        {
+                            var entityShared = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                            if (entityShared != null)
+                            {
+                                input.MainComponentEntitlyId = entityShared.Id;
+                            }
+                        }
+                    }
+                }
+                //MMT
                 filteredMessages = _AppMarketplaceMessagesRepository.GetAll()
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
@@ -562,6 +580,13 @@ namespace onetouch.Message
                     if (input.RelatedEntityId != null && input.RelatedEntityId > 0)
                     {
                         await _appEntitiesAppService.UpdateEntityCommentsCount((long)input.RelatedEntityId, false);
+                    }
+                    if (input.ParentId != null && input.ParentId > 0 && input.MesasgeObjectType == MesasgeObjectType.Comment)
+                    {
+
+                        var parentEntityID = _AppMarketplaceMessagesRepository.GetAll()
+                                         .Include(x => x.EntityFk).Where(e => e.Id == (long)input.ParentId).FirstOrDefault();
+                        await _appEntitiesAppService.UpdateEntityCommentsCount((long)parentEntityID.EntityId, false);
                     }
                     input.MentionedUsers = new List<MentionedUserInfo>();
                     if (!string.IsNullOrEmpty(input.To))
