@@ -4725,6 +4725,36 @@ namespace onetouch.AppSiiwiiTransaction
             }
         }
         //MMT37[End]
+        //Iteration39[Start]
+        public async Task<string> GetUserDefaultRole(string transType)
+        {
+            string returnRole = "";
+            if (transType == "SO")
+                returnRole = "I'm a Seller";
+            else
+                returnRole = "I'm a Buyer";
+
+            var cont = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
+                    .Where(z => z.IsProfileData && z.ParentId == null && z.PartnerId == null).FirstOrDefaultAsync();
+            foreach (var clss in cont.EntityFk.EntityClassifications)
+            {
+                if (transType == "SO")
+                {
+                    var rep = cont.EntityFk.EntityClassifications.Where(z => z.EntityObjectClassificationFk.Name == "Independent Sales Rep").FirstOrDefault();
+                    if (rep != null)
+                        returnRole = rep.EntityObjectClassificationFk.Name;
+                }
+                else
+                {
+                    var office = cont.EntityFk.EntityClassifications.Where(z => z.EntityObjectClassificationFk.Name == "Independent Buying Office").FirstOrDefault();
+                    if (office != null)
+                        returnRole = office.EntityObjectClassificationFk.Name;
+                }
+            }
+            return returnRole;
+        
+        }
+        //Iteration39[End]
     }
 
 }
