@@ -630,10 +630,12 @@ export class CreateOrEditAppItemComponent
         let data: SelectAppItemTypeComponent = modalRef.content;
         if (data.selectionDone && data.selectedRecord) {
             // add or edit done
+           if(!(this.appItem?.id>0)) {
             this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false).subscribe((res: any) => {
                 this.appItem.code = res;
                 this.appItem.OriginalCode = res
             })
+              }
             this.productTypeId =
                 data.selectedRecord.data.sycEntityObjectType.id;
             this.addSelectedAppItemType(data.selectedRecord);
