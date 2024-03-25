@@ -175,7 +175,7 @@ appRootUrl() +
                     border: 1px solid #eee !important;
                     box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
                     color: #9E9E9E ;
-                    height: 44px;" (click)="getUpdatesMessage($event)">
+                    height: 44px;" (click)="getMentionsMessage($event)">
                        <i class="fa fa-at mentionIcon" aria-hidden="true"  style="font-size:20px;"></i>
 
                             <span class="pr-3" style="
@@ -184,9 +184,9 @@ appRootUrl() +
                     font-style: normal;
                     font-weight: 600;
                     line-height: normal;">Mentions</span>
-                           <label style="text-align: center !important" *ngIf="totalUpdatesUnread>0">
+                           <label style="text-align: center !important" *ngIf="totalMentionUnRead>0">
                             <span  style="left: 10px">{{
-                                totalUpdatesUnread
+                                totalMentionUnRead
                                 }}</span>
                         </label>
                         </button>
