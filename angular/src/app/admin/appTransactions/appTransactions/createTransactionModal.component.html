@@ -20,6 +20,7 @@
                 optionLabel="name"
                 (onChange)="handleRoleChange($event)"
                 #Role
+                [(ngModel)]="roleDdval"
             ></p-dropdown>
             <small class="text-danger" *ngIf="isRoleExist">
                 Please Select Role

@@ -77,6 +77,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     currencyCode: any = null;
     byerBranchAutoselectFirst:boolean=false;
     minDate:Date;
+    roleDdval:any;
     @Input() orderNo: string;
     @Input() fullName: string;
     @Input() display: boolean = false;
@@ -133,6 +134,33 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     ngOnChanges(){
         this.orderForm.controls['startDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
+        this.getUserDefultRole();
+
+    }
+    getUserDefultRole(){
+       /* var transactionType: TransactionType;
+        if (this.formType.toUpperCase() == "SO")
+            transactionType = TransactionType.SalesOrder;
+        if (this.formType.toUpperCase() == "PO")
+            transactionType = TransactionType.PurchaseOrder;*/
+        this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result=>{
+            if (this.formType.toUpperCase() == "SO"){
+                if(result.toLowerCase().includes('seller')){
+                  this.roleDdval=this.roles.filter(role=>role.code==1)[0];
+
+                }else{
+                    this.roleDdval=this.roles.filter(role=>role.code!==1)[0];
+                }
+            }else if (this.formType.toUpperCase() == "PO"){
+                if(result.toLowerCase().includes('buyer')){
+                    this.roleDdval=this.roles.filter(role=>role.code==2)[0];
+
+                }else{
+                    this.roleDdval=this.roles.filter(role=>role.code!==2)[0];
+                }
+            }
+            this.handleRoleChange({value:this.roleDdval});
+        })
     }
     getBranches(accountSSIN,objectToChangeName) {
             this._AppTransactionServiceProxy.getAccountBranches(accountSSIN).subscribe(result => {
@@ -196,6 +224,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isSellerTempAccount = !this.isSellerTempAccount;
     }
     handleRoleChange(data: any) {
+        debugger
         this.role = data.value.name;
         this.isRoleExist = false;
         if (data.value.code === 1) {
@@ -559,7 +588,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         }
     }
     changeStartDate(date){
-        debugger
         let newDate = new Date();
         let month = date.value.getMonth();
         let year = date.value.getFullYear();
