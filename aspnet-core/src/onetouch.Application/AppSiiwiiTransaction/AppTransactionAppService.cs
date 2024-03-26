@@ -1454,7 +1454,17 @@ namespace onetouch.AppSiiwiiTransaction
                                 o.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ?
                                 o.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
                                 },
-                                AccountSSIN = o.SSIN
+                                AccountSSIN = o.SSIN,
+                                Email = o.EMailAddress,
+                                Phone = !string.IsNullOrEmpty(o.Phone1Number) ? o.Phone1Number :
+                                (!string.IsNullOrEmpty(o.Phone2Number) ? o.Phone2Number :
+                                (!string.IsNullOrEmpty(o.Phone3Number) ? o.Phone3Number : null)),
+                                PhoneTypeId = !string.IsNullOrEmpty(o.Phone1Number) ? o.Phone1TypeId :
+                                (!string.IsNullOrEmpty(o.Phone2Number) ? o.Phone2TypeId :
+                                (!string.IsNullOrEmpty(o.Phone3Number) ? o.Phone3TypeId : null)),
+                                PhoneTypeName = !string.IsNullOrEmpty(o.Phone1Number) ? o.Phone1TypeName :
+                                (!string.IsNullOrEmpty(o.Phone2Number) ? o.Phone2TypeName :
+                                (!string.IsNullOrEmpty(o.Phone3Number) ? o.Phone3TypeName : null))
                             };
             var accounts = await _accounts.ToListAsync();
             var totalCount = await accountsList.CountAsync();

@@ -104,6 +104,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string Name { set; get; }
         public string AccountSSIN { set; get; }
         public CurrencyInfoDto CurrencyCode { set; get; }
+        public string Email { set; get; }
+        public string Phone { set; get; }
+        public long? PhoneTypeId { get; set; }
+        public string PhoneTypeName { set; get; }
     }
     public class GetContactInformationDto
     {
