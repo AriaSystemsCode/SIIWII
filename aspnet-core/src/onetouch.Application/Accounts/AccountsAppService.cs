@@ -797,7 +797,7 @@ namespace onetouch.Accounts
                 if (originalPublishContactFortCurrTenant == null)
                     throw new UserFriendlyException("Ooppps! please publish your account first.");
 
-                originalContact = await _appContactRepository.GetAll()
+                originalContact = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (originalContact != null && originalContact.TenantId != null)
