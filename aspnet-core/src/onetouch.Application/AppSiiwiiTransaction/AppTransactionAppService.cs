@@ -432,6 +432,16 @@ namespace onetouch.AppSiiwiiTransaction
                     BranchSSIN = input.BuyerBranchSSIN
                 });
                 //
+                var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                if (accountSSINBranchBuyer != null)
+                {
+                    var addressObj = accountSSINBranchBuyer.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "DIRECT-SHIPPING");
+                    if (addressObj != null)
+                    {
+                        buyerAddressId = addressObj.AddressId;
+                        buyerAddressCode = addressObj.AddressCode;
+                    }
+                }
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                 {
                     ContactName = input.BuyerContactName,
@@ -448,6 +458,16 @@ namespace onetouch.AppSiiwiiTransaction
                     BranchName = input.BuyerBranchName,
                     BranchSSIN = input.BuyerBranchSSIN
                 });
+                var accountSSINBranchBuy = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                if (accountSSINBranchBuy != null)
+                {
+                    var addressObj = accountSSINBranchBuy.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "BILLING");
+                    if (addressObj != null)
+                    {
+                        buyerAddressId = addressObj.AddressId;
+                        buyerAddressCode = addressObj.AddressCode;
+                    }
+                }
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                 {
                     ContactName = input.BuyerContactName,
@@ -464,6 +484,16 @@ namespace onetouch.AppSiiwiiTransaction
                     BranchName = input.BuyerBranchName,
                     BranchSSIN = input.BuyerBranchSSIN
                 });
+                var accountSSINBranch = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
+                if (accountSSINBranch != null)
+                {
+                    var sellerAddressObj = accountSSINBranch.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "DIRECT-SHIPPING");
+                    if (sellerAddressObj != null)
+                    {
+                        sellerAddressId = sellerAddressObj.AddressId;
+                        sellerAddressCode = sellerAddressObj.AddressCode;
+                    }
+                }
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                 {
                     ContactName = input.SellerContactName,
@@ -480,6 +510,16 @@ namespace onetouch.AppSiiwiiTransaction
                     BranchName = input.SellerBranchName,
                     BranchSSIN = input.SellerBranchSSIN
                 });
+                var accountSSINBranchSeller = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
+                if (accountSSINBranchSeller != null)
+                {
+                    var addressObj = accountSSINBranchSeller.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "BILLING");
+                    if (addressObj != null)
+                    {
+                        sellerAddressId = addressObj.AddressId;
+                        sellerAddressCode = addressObj.AddressCode;
+                    }
+                }
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                 {
                     ContactName = input.SellerContactName,

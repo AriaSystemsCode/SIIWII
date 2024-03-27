@@ -268,6 +268,12 @@ namespace onetouch.SystemObjects
                     }
                 }
             }
+            //MMT2024
+            if (tmpInput.EntityId == 0 && !string.IsNullOrEmpty(tmpInput.Filter))
+            {
+                return await  GetAllDepartmentsByFilterWithChildsForProduct(tmpInput.Filter);
+            }
+            //MMT2024
             PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> allParents = await GetAll(tmpInput);
             return allParents;
          }
@@ -673,5 +679,91 @@ namespace onetouch.SystemObjects
             return allParents;
         }
         //MMT36
+        //MMT24
+      
+        private async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllDepartmentsByFilterWithChildsForProduct(string filter)
+        {
+            GetAllSycEntityObjectCategoriesInput tmpInput = new GetAllSycEntityObjectCategoriesInput
+            {
+                MaxResultCount = 9999,
+                SkipCount = 0,
+                ObjectId = await _helper.SystemTables.GetObjectItemId()
+               // Filter=filter
+            };
+
+            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> allParents = await GetAll(tmpInput);
+            foreach (var item in allParents.Items.Where(z=>!z.Leaf))
+            {
+                if (!item.Leaf)
+                {
+                    await LoadFilteredChilds(item,filter);
+                }
+                item.Expanded = true;
+            }
+
+            return allParents;
+
+        }
+        private async Task LoadFilteredChilds(TreeNode<GetSycEntityObjectCategoryForViewDto> parent, string filter)
+        {
+            parent.Children = await GetAllFilteredChilds(parent.Data.SycEntityObjectCategory.Id, filter);
+           
+            foreach (var item in parent.Children)
+            {
+                if (!item.Leaf)
+                {
+                    await LoadFilteredChilds(item, filter);
+                }
+                item.Expanded = true;
+            }
+            parent.Children = parent.Children.Where(z => z.Leaf || (!z.Leaf && z.Children != null && z.Children.Count > 0)).ToList();
+        }
+        private async Task<IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllFilteredChilds(long parentId,string filter)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var filteredSycEntityObjectCategories = _sycEntityObjectCategoryRepository.GetAll()
+                        .Include(e => e.ObjectFk)
+                        .Include(e => e.ParentFk)
+                        .Include(e => e.SycEntityObjectCategories)
+                        .Where(e => e.ParentId != null && e.ParentId == parentId)
+                        .Where(e => e.TenantId == AbpSession.TenantId || e.TenantId == null);
+
+
+                var sycEntityObjectCategories = from o in filteredSycEntityObjectCategories
+                                                join o1 in _lookup_sydObjectRepository.GetAll() on o.ObjectId equals o1.Id into j1
+                                                from s1 in j1.DefaultIfEmpty()
+
+                                                join o2 in _lookup_sycEntityObjectCategoryRepository.GetAll() on o.ParentId equals o2.Id into j2
+                                                from s2 in j2.DefaultIfEmpty()
+
+                                                select new TreeNode<GetSycEntityObjectCategoryForViewDto>()
+                                                {
+                                                    Data = new GetSycEntityObjectCategoryForViewDto
+                                                    {
+                                                        SycEntityObjectCategory = new SycEntityObjectCategoryDto
+                                                        {
+                                                            Code = o.Code,
+                                                            Name = o.Name,
+                                                            Id = o.Id
+                                                        },
+                                                        SydObjectName = s1 == null ? "" : s1.Name.ToString(),
+                                                        SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
+                                                    },
+                                                    Leaf = o.SycEntityObjectCategories.Count() == 0,
+                                                    totalChildrenCount = o.SycEntityObjectCategories.Count(),
+                                                    label = o.Name,
+                                                    Expanded= true
+                                                };
+
+
+                var totalCount = await filteredSycEntityObjectCategories.CountAsync();
+
+                var y = await sycEntityObjectCategories.Where(z =>!z.Leaf || (z.Leaf && z.Data.SycEntityObjectCategory.Name.Contains(filter))).ToListAsync();
+               // var x = y.Where(z=>z.Leaf || (!z.Leaf &&  z.Children != null && z.Children.Count>0)).ToList();
+                return y;
+            }
+        }
+        //MMT24
     }
 }

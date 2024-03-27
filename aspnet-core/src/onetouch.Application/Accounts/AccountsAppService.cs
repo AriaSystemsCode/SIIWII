@@ -988,8 +988,8 @@ namespace onetouch.Accounts
                                 {
                                     address = addressCon;
                                 }
-                                if (contactDto.ContactAddresses == null)
-                                    contactDto.ContactAddresses = new List<AppContactAddressDto>();
+                                if (contactDto2.ContactAddresses == null)
+                                    contactDto2.ContactAddresses = new List<AppContactAddressDto>();
                                 AppContactAddress newContactAddress = new AppContactAddress();
                                 newContactAddress.Id = 0;
                                 newContactAddress.AddressId = address.Id;
@@ -998,9 +998,18 @@ namespace onetouch.Accounts
                                 newContactAddress.AddressCode = contactAddress.AddressCode;
                                 newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
                                 newContactAddress.ContactCode = contactAddress.ContactCode;
-
                                 
-                               // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto2.Id, ContactId = contactDto2.Id });
+                                contactDto2.ContactAddresses.Add(new AppContactAddressDto
+                                {
+                                    AddressTypeId = contactAddress.AddressTypeId,
+                                    AddressTypeIdName = contactAddress.AddressTypeCode,
+                                    Code = address.Code,
+                                    AddressId = address.Id,
+                                    AccountId = contactDto2.Id,
+                                    ContactId = contactDto2.Id
+                                });
+
+                                // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto2.Id, ContactId = contactDto2.Id });
                                 await _appContactAddressRepository.InsertAsync(newContactAddress);
                                 await CurrentUnitOfWork.SaveChangesAsync();
                             }
