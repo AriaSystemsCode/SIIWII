@@ -5424,6 +5424,84 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
+                //MMT0311
+                if (!string.IsNullOrEmpty(excelDto.PriceA) && decimal.Parse(excelDto.PriceA) > 0)
+                {
+                    long? currId = null;
+                    if (!string.IsNullOrEmpty(excelDto.Currency))
+                    {
+                        var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+                        if (currObj != null)
+                            currId = currObj.Value;
+                    }
+                    appItem.ItemPricesFkList.Add(new AppItemPrices
+                    {
+                        AppItemCode = appItem.Code,
+                        Code = "A",
+                        Price = decimal.Parse(excelDto.PriceA),
+                        CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+                        TenantId = AbpSession.TenantId,
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                    });
+                }
+                if (!string.IsNullOrEmpty(excelDto.PriceB) &&  decimal.Parse(excelDto.PriceB) > 0)
+                {
+                    long? currId = null;
+                    if (!string.IsNullOrEmpty(excelDto.Currency))
+                    {
+                        var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+                        if (currObj != null)
+                            currId = currObj.Value;
+                    }
+                    appItem.ItemPricesFkList.Add(new AppItemPrices
+                    {
+                        AppItemCode = appItem.Code,
+                        Code = "B",
+                        Price = decimal.Parse(excelDto.PriceB),
+                        CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+                        TenantId = AbpSession.TenantId,
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                    });
+                }
+                if (!string.IsNullOrEmpty(excelDto.PriceC) && decimal.Parse(excelDto.PriceC) > 0)
+                {
+                    long? currId = null;
+                    if (!string.IsNullOrEmpty(excelDto.Currency))
+                    {
+                        var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+                        if (currObj != null)
+                            currId = currObj.Value;
+                    }
+                    appItem.ItemPricesFkList.Add(new AppItemPrices
+                    {
+                        AppItemCode = appItem.Code,
+                        Code = "C",
+                        Price = decimal.Parse(excelDto.PriceC),
+                        CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+                        TenantId = AbpSession.TenantId,
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                    });
+                }
+                if (!string.IsNullOrEmpty(excelDto.PriceD) && decimal.Parse(excelDto.PriceD) > 0)
+                {
+                    long? currId = null;
+                    if (!string.IsNullOrEmpty(excelDto.Currency))
+                    {
+                        var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+                        if (currObj != null)
+                            currId = currObj.Value;
+                    }
+                    appItem.ItemPricesFkList.Add(new AppItemPrices
+                    {
+                        AppItemCode = appItem.Code,
+                        Code = "D",
+                        Price = decimal.Parse(excelDto.PriceD),
+                        CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+                        TenantId = AbpSession.TenantId,
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                    });
+                }
+                //MMT0311
                 //XX
                 appItem.Name = excelDto.Name;
 
@@ -6197,6 +6275,84 @@ namespace onetouch.AppItems
                             TenantId = AbpSession.TenantId
                         });
                     }
+                    //MMT0311
+                    if (!string.IsNullOrEmpty(item.PriceA) &&  decimal.Parse(item.PriceA) > 0)
+                    {
+                        long? currId = null;
+                        if (!string.IsNullOrEmpty(item.Currency))
+                        {
+                            var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+                            if (currObj != null)
+                                currId = currObj.Value;
+                        }
+                        appChildItem.ItemPricesFkList.Add(new AppItemPrices
+                        {
+                            AppItemCode = appChildItem.Code,
+                            Code = "A",
+                            Price = decimal.Parse(item.PriceA),
+                            CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+                            TenantId = AbpSession.TenantId,
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                        });
+                    }
+                    if (!string.IsNullOrEmpty(item.PriceB) && decimal.Parse(item.PriceB) > 0)
+                    {
+                        long? currId = null;
+                        if (!string.IsNullOrEmpty(item.Currency))
+                        {
+                            var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+                            if (currObj != null)
+                                currId = currObj.Value;
+                        }
+                        appChildItem.ItemPricesFkList.Add(new AppItemPrices
+                        {
+                            AppItemCode = appChildItem.Code,
+                            Code = "B",
+                            Price = decimal.Parse(item.PriceB),
+                            CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+                            TenantId = AbpSession.TenantId,
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                        });
+                    }
+                    if (!string.IsNullOrEmpty(item.PriceC) && decimal.Parse(item.PriceC) > 0)
+                    {
+                        long? currId = null;
+                        if (!string.IsNullOrEmpty(item.Currency))
+                        {
+                            var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+                            if (currObj != null)
+                                currId = currObj.Value;
+                        }
+                        appChildItem.ItemPricesFkList.Add(new AppItemPrices
+                        {
+                            AppItemCode = appChildItem.Code,
+                            Code = "C",
+                            Price = decimal.Parse(item.PriceC),
+                            CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+                            TenantId = AbpSession.TenantId,
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                        });
+                    }
+                    if (!string.IsNullOrEmpty(item.PriceD) && decimal.Parse(item.PriceD) > 0)
+                    {
+                        long? currId = null;
+                        if (!string.IsNullOrEmpty(item.Currency))
+                        {
+                            var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+                            if (currObj != null)
+                                currId = currObj.Value;
+                        }
+                        appChildItem.ItemPricesFkList.Add(new AppItemPrices
+                        {
+                            AppItemCode = appChildItem.Code,
+                            Code = "D",
+                            Price = decimal.Parse(item.PriceD),
+                            CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+                            TenantId = AbpSession.TenantId,
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                        });
+                    }
+                    //MMT0311
                     //XX
                     //MMT30[End]
                     appChildItem.TimeStamp = timeStamp;
@@ -7509,7 +7665,10 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.D3Pos, act => act.MapFrom(src => src["Dimension3Position"].ToString()));
             mappingExpression.ForMember(dest => dest.SizeCode, act => act.MapFrom(src => src["SIZEcode"].ToString()));
             //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
-
+            mappingExpression.ForMember(dest => dest.PriceA, act => act.MapFrom(src => src["PriceA"].ToString().TrimEnd()));
+            mappingExpression.ForMember(dest => dest.PriceB, act => act.MapFrom(src => src["PriceB"].ToString().TrimEnd()));
+            mappingExpression.ForMember(dest => dest.PriceC, act => act.MapFrom(src => src["PriceC"].ToString().TrimEnd()));
+            mappingExpression.ForMember(dest => dest.PriceD, act => act.MapFrom(src => src["PriceD"].ToString().TrimEnd()));
             //if (extraAttributes != null && extraAttributes.Count > 0)
             //{
             //    //mappingExpression.ForMember(dest => dest.ExtraAttributes, act => act.co
