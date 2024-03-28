@@ -224,7 +224,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isSellerTempAccount = !this.isSellerTempAccount;
     }
     handleRoleChange(data: any) {
-        debugger
+        
         this.role = data.value.name;
         this.isRoleExist = false;
         if (data.value.code === 1) {
@@ -243,6 +243,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     // add seller values
                     this.orderForm.get("sellerContactName").setValue(res.name);
                     this.orderForm.get("sellerCompanyName").setValue(res.name);
+                    this.orderForm.get('sellerContactPhoneNumber').setValue(res.phone)
+                    this.orderForm.get('sellerContactEMailAddress').setValue(res.email)
                     // remove buyer values
                     this.orderForm.get("buyerContactName").reset();
                     this.orderForm.get("buyerCompanyName").reset();
@@ -269,6 +271,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.handleBuyerNameSearch("");
                     this.orderForm.get("buyerContactName").setValue(res.name);
                     this.orderForm.get("buyerCompanyName").setValue(res.name);
+                    this.orderForm.get('buyerContactPhoneNumber').setValue(res.phone)
+                    this.orderForm.get('buyerContactEMailAddress').setValue(res.email)
 
                     // remove seller values
                     this.orderForm.get("sellerContactName").reset();
@@ -323,6 +327,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,true
                 )
                 .subscribe((res: any) => {
+                    
                     this.buyerCompanies = [...res.items];
                     // this.sellerCompanies = [...res.items];
                 });
@@ -355,6 +360,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,true
                 )
                 .subscribe((res: any) => {
+                    
                     this.sellerCompanies = [...res.items];
                 });
         }, 1000);
@@ -365,6 +371,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.buyerCompanySSIN = event.value.accountSSIN;
         this.currencyCode = event.value.currencyCode;
         this.areSame = false
+        this.orderForm.get('buyerContactPhoneNumber').setValue(event.value.phone)
+        this.orderForm.get('buyerContactEMailAddress').setValue(event.value.email)
+
         this.handleBuyerNameSearch("");
         this.buyerBranches=[];
         this.getBranches(event.value.accountSSIN,'buyer')
@@ -374,6 +383,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.sellerCompanyId = event.value.id;
         this.sellerCompanySSIN = event.value.accountSSIN;
         this.areSame = false
+        this.orderForm.get('sellerContactPhoneNumber').setValue(event.value.phone)
+        this.orderForm.get('sellerContactEMailAddress').setValue(event.value.email)
         this.handleSellerNameSearch("");
         this.sellerBranches=[];
         this.getBranches(event.value.accountSSIN,'seller')
