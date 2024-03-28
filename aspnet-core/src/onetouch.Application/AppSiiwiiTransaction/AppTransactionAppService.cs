@@ -1384,6 +1384,17 @@ namespace onetouch.AppSiiwiiTransaction
                         account.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ?
                         account.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
                 };
+                returnObject.Email = account.EMailAddress;
+                                returnObject.Phone = !string.IsNullOrEmpty(account.Phone1Number) ? account.Phone1Number :
+                                (!string.IsNullOrEmpty(account.Phone2Number) ? account.Phone2Number :
+                                (!string.IsNullOrEmpty(account.Phone3Number) ? account.Phone3Number : null));
+
+                returnObject.PhoneTypeId = !string.IsNullOrEmpty(account.Phone1Number) ? account.Phone1TypeId :
+                 (!string.IsNullOrEmpty(account.Phone2Number) ? account.Phone2TypeId :
+                 (!string.IsNullOrEmpty(account.Phone3Number) ? account.Phone3TypeId : null));
+                returnObject.PhoneTypeName = !string.IsNullOrEmpty(account.Phone1Number) ? account.Phone1TypeName :
+                (!string.IsNullOrEmpty(account.Phone2Number) ? account.Phone2TypeName :
+                (!string.IsNullOrEmpty(account.Phone3Number) ? account.Phone3TypeName : null));
             }
             return returnObject;
 

@@ -70400,6 +70400,10 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
     name!: string | undefined;
     accountSSIN!: string | undefined;
     currencyCode!: CurrencyInfoDto;
+    email!: string | undefined;
+    phone!: string | undefined;
+    phoneTypeId!: number | undefined;
+    phoneTypeName!: string | undefined;
 
     [key: string]: any;
 
@@ -70422,6 +70426,10 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
             this.name = _data["name"];
             this.accountSSIN = _data["accountSSIN"];
             this.currencyCode = _data["currencyCode"] ? CurrencyInfoDto.fromJS(_data["currencyCode"]) : <any>undefined;
+            this.email = _data["email"];
+            this.phone = _data["phone"];
+            this.phoneTypeId = _data["phoneTypeId"];
+            this.phoneTypeName = _data["phoneTypeName"];
         }
     }
 
@@ -70442,6 +70450,10 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
         data["name"] = this.name;
         data["accountSSIN"] = this.accountSSIN;
         data["currencyCode"] = this.currencyCode ? this.currencyCode.toJSON() : <any>undefined;
+        data["email"] = this.email;
+        data["phone"] = this.phone;
+        data["phoneTypeId"] = this.phoneTypeId;
+        data["phoneTypeName"] = this.phoneTypeName;
         return data;
     }
 }
@@ -70451,6 +70463,10 @@ export interface IGetAccountInformationOutputDto {
     name: string | undefined;
     accountSSIN: string | undefined;
     currencyCode: CurrencyInfoDto;
+    email: string | undefined;
+    phone: string | undefined;
+    phoneTypeId: number | undefined;
+    phoneTypeName: string | undefined;
 
     [key: string]: any;
 }
