@@ -383,7 +383,7 @@
         </Item9>
         <Item10 Ref="200" ControlType="XRLabel" Name="label1" Multiline="true" Text="label1" SizeF="497.4167,55.5625076" LocationFloat="523.875,0" Dpi="254" Font="Arial, 9.75pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
-            <Item1 Ref="201" EventName="BeforePrint" PropertyName="Text" Expression="iif(?roleType='Independent Sales Rep' or ?roleType='Seller','Sales Order # ','Purchase Order # ')&#xA;+[Code]" />
+            <Item1 Ref="201" EventName="BeforePrint" PropertyName="Text" Expression="iif('SALESORDER'==[EntityObjectTypeCode],'Sales Order # ','Purchase Order # ')&#xA;+[Code]" />
           </ExpressionBindings>
           <StylePriority Ref="202" UseFont="false" />
         </Item10>
