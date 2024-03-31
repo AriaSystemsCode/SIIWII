@@ -93,7 +93,7 @@ export class ShoppingCartViewComponentComponent
   }
   loadCommentsList() {
     // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
-    this.commentParentComponent.first.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+    this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
   }
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
@@ -103,6 +103,7 @@ export class ShoppingCartViewComponentComponent
     this.showCarousel = showCarousel;
     this.validateOrder = validateOrder;
     this.shoppingCartMode = shoppingCartMode;
+    this.onshare = false;
 
     if (shoppingCartMode == ShoppingCartMode.createOrEdit) {
       this.showTabs = false;
@@ -632,8 +633,9 @@ export class ShoppingCartViewComponentComponent
           .pipe(finalize(() => {
             this.onGeneratOrderReport(true);
             this.hideMainSpinner();
-            this.hide();
-          }
+         //   this.hide();
+         this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+        }
           ))
           .subscribe((res) => {
             if (res) {
