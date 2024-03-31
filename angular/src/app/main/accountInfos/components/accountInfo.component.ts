@@ -684,8 +684,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 this.notify.success(this.l('SavedSuccessfully'));
                 // call get account of edit and on the subscribe call the 3 following lines
                 //if(!this.accountInfoTemp.id || this.changeCurrency) return location.reload();
-                this.appSession.tenant.currencyInfoDto = this.allCurrenciesDto.filter(e=> e.value = this.accountInfoTemp.currencyId)[0];
-                this.tenantDefaultCurrency =  this.allCurrenciesDto.filter(e=> e.value = this.accountInfoTemp.currencyId)[0];       
+                this.appSession.tenant.currencyInfoDto = this.allCurrenciesDto.filter(e=> e.value == this.accountInfoTemp.currencyId)[0];
+                this.tenantDefaultCurrency =  this.allCurrenciesDto.filter(e=> e.value == this.accountInfoTemp.currencyId)[0];       
                 this.displaySaveAccount = true;
                 this.canPublish=true;
                 this.getForEditResult.lastChangesIsPublished = false
