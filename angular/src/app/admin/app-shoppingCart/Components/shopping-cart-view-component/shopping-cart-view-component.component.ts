@@ -632,8 +632,9 @@ export class ShoppingCartViewComponentComponent
           .pipe(finalize(() => {
             this.onGeneratOrderReport(true);
             this.hideMainSpinner();
-            this.hide();
-          }
+         //   this.hide();
+         this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+        }
           ))
           .subscribe((res) => {
             if (res) {
