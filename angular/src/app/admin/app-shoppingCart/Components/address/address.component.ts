@@ -207,6 +207,11 @@ showAddressList(){
             this.showAddList=false;
             this.openAddNewAddForm=false;
             this.selectedAddress=this.selectedAddressDetails;
+            this.selectedAddressDetails.addressLine1=  this.selectedAddressDetails.addressLine1 ? this.selectedAddressDetails.addressLine1 : '' ;
+            this.selectedAddressDetails.addressLine2=  this.selectedAddressDetails.addressLine2 ? this.selectedAddressDetails.addressLine2 : '' ;
+            this.selectedAddressDetails.city=  this.selectedAddressDetails.city ? this.selectedAddressDetails.city : '' ;
+            this.selectedAddressDetails.state=  this.selectedAddressDetails.state ? this.selectedAddressDetails.state : '' ;
+            this.selectedAddressDetails.countryName=  this.selectedAddressDetails.countryName ? this.selectedAddressDetails.countryName : '' ;
         }
     }
     selectAddressType(){
