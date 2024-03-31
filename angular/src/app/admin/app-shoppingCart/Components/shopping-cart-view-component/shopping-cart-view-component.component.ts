@@ -103,6 +103,7 @@ export class ShoppingCartViewComponentComponent
     this.showCarousel = showCarousel;
     this.validateOrder = validateOrder;
     this.shoppingCartMode = shoppingCartMode;
+    this.onshare = false;
 
     if (shoppingCartMode == ShoppingCartMode.createOrEdit) {
       this.showTabs = false;
