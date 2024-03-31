@@ -225,9 +225,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
     handleRoleChange(data: any) {
         
-        this.role = data.value.name;
+        this.role = data?.value?.name;
         this.isRoleExist = false;
-        if (data.value.code === 1) {
+        if (data?.value?.code === 1) {
             // i'm a Seller
             this.isSeller = true;
             this.isBuyer = false;
