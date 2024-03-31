@@ -20,7 +20,7 @@
         </div>
         <div class="col-md-12 mb-3" >
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
-            <textarea class="form-control w-50  d-inline-block ml-4" readonly>{{selectedAddress.addressLine1+' ,'}}{{selectedAddress.addressLine2+' ,'}}{{selectedAddress.city+' ,'}}{{selectedAddress.state+' ,'}}{{selectedAddress.countryName+' ,'}}{{selectedAddressDetails.postalCode}}</textarea>
+            <textarea class="form-control w-50  d-inline-block ml-4" readonly>{{selectedAddress?.addressLine1+' ,'}}{{selectedAddress?.addressLine2+' ,'}}{{selectedAddress?.city+' ,'}}{{selectedAddress?.state+' ,'}}{{selectedAddress?.countryName+' ,'}}{{selectedAddress?.postalCode}}</textarea>
             <div class="pull-right">
             <button *ngIf="canChange"  class="savebtn text-center btn float-right" (click)="showAddressList()">
                 {{l("Change")}}
@@ -42,7 +42,7 @@
         <div class="col-md-12">
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}} :</label>
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="selectedAddressDetails">
-                {{selectedAddressDetails.addressLine1+' ,'}}{{selectedAddressDetails.addressLine2+' ,'}}{{selectedAddressDetails.city+' ,'}}{{selectedAddressDetails.state+' ,'}}{{selectedAddressDetails.countryName+' ,'}}{{selectedAddressDetails.postalCode}}
+                {{selectedAddressDetails?.addressLine1+' ,'}}{{selectedAddressDetails?.addressLine2+' ,'}}{{selectedAddressDetails?.city+' ,'}}{{selectedAddressDetails?.state+' ,'}}{{selectedAddressDetails?.countryName+' ,'}}{{selectedAddressDetails?.postalCode}}
             </label>
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
             </div>

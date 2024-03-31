@@ -207,6 +207,14 @@ const currentAddress = this.savedAddressesList.filter(item=>item.id === addId);
 this.selectedAddress=currentAddress[0];
 this.selectedAddress.countryName=this.countries.filter(item=>item.value === currentAddress[0]['countryId'])[0].label;
 this.showAddList=false;
+
+this.selectedAddress.addressLine1=  this.selectedAddress?.addressLine1 ? this.selectedAddress?.addressLine1 : '' ;
+this.selectedAddress.addressLine2=  this.selectedAddress?.addressLine2 ? this.selectedAddress?.addressLine2 : '' ;
+this.selectedAddress.city=  this.selectedAddress?.city ? this.selectedAddress?.city : '' ;
+this.selectedAddress.state=  this.selectedAddress?.state ? this.selectedAddress?.state : '' ;
+this.selectedAddress.countryName=  this.selectedAddress?.countryName ? this.selectedAddress?.countryName : '' ;
+this.selectedAddress.postalCode=  this.selectedAddress?.postalCode ? this.selectedAddress?.postalCode : '' ;
+
 this.updateSelectedAddress.emit({id:addId,code:currentAddress[0].code,selectedAddressObj:this.selectedAddress});
 }
 showAddressList(){
