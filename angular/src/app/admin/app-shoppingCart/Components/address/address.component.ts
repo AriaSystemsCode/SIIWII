@@ -1,4 +1,4 @@
-import { Component, Injector,OnInit ,Input,ViewChild,Output,EventEmitter} from "@angular/core";
+import { Component, Injector,OnInit ,Input,ViewChild,Output,EventEmitter, SimpleChanges, OnChanges} from "@angular/core";
 import { AccountsServiceProxy, AppAddressDto, AppEntitiesServiceProxy,  LookupLabelDto,AppTransactionServiceProxy, GetAppTransactionsForViewDto,ContactRoleEnum } from "@shared/service-proxies/service-proxies";
 import Swal from 'sweetalert2';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -11,7 +11,7 @@ import { HttpErrorResponse } from '@angular/common/http';
     templateUrl: "./address.component.html",
     styleUrls: ["./address.component.scss"],
 })
-export class AddressComponent extends AppComponentBase implements OnInit {
+export class AddressComponent extends AppComponentBase implements OnInit,OnChanges {
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("selectedAddressDetails") selectedAddressDetails;
     @Input("showAddressType") showAddressType:boolean=true;
@@ -50,6 +50,16 @@ export class AddressComponent extends AppComponentBase implements OnInit {
         this.getCountries();
         this.getAddressTypes()
 
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if(this.selectedAddressDetails){
+        this.selectedAddressDetails.addressLine1=  this.selectedAddressDetails?.addressLine1 ? this.selectedAddressDetails?.addressLine1 : '' ;
+        this.selectedAddressDetails.addressLine2=  this.selectedAddressDetails?.addressLine2 ? this.selectedAddressDetails?.addressLine2 : '' ;
+        this.selectedAddressDetails.city=  this.selectedAddressDetails?.city ? this.selectedAddressDetails?.city : '' ;
+        this.selectedAddressDetails.state=  this.selectedAddressDetails?.state ? this.selectedAddressDetails?.state : '' ;
+        this.selectedAddressDetails.countryName=  this.selectedAddressDetails?.countryName ? this.selectedAddressDetails?.countryName : '' ;
+        }
     }
     filterAddressList(filterVal){
         this.savedAddressesList=this.refSavedAddressesList.filter(item=>item.name.includes(filterVal));
