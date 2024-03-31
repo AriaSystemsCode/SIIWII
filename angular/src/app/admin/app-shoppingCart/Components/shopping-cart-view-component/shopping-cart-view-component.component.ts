@@ -3,7 +3,7 @@ import {
   , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -723,9 +723,12 @@ export class ShoppingCartViewComponentComponent
   offShareTransaction() {
     this.onshare = false;
   }
-  onGeneratOrderReport($event) {
+  onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams) {
     if ($event) {
       this.reportUrl="";
+      if(printInfoParam)
+      this.printInfoParam=printInfoParam;
+    else{
       this.printInfoParam= new ProductCatalogueReportParams();
       this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
       this.printInfoParam.TransactionId = this.orderId.toString();
@@ -734,10 +737,26 @@ export class ShoppingCartViewComponentComponent
       this.printInfoParam.saveToPDF = true;
       this.printInfoParam.tenantId = this.appSession?.tenantId
       this.printInfoParam.userId = this.appSession?.userId
+    }
       this.reportUrl = this.printInfoParam.getReportUrl()
       this.createReportViewer();
     }
+  }
 
+  onShareTransactionByMessage($event:TenantTransactionInfo[])
+  {
+    let printInfoParam= new ProductCatalogueReportParams();
+    //printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+    printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+    printInfoParam.saveToPDF = true;
+
+    for (let i = 0; i < $event.length; i++) {
+      printInfoParam.TransactionId = $event[i].transactionId.toString();
+      printInfoParam.orderConfirmationRole = this.getTransactionRole($event[i].enteredByUserRole);
+      printInfoParam.tenantId =$event[i].tenantId;
+      printInfoParam.userId = $event[i].userId
+      this.onGeneratOrderReport(true,printInfoParam);
+    }
   }
     createReportViewer(){
       this.reportViewerContainer.clear();
