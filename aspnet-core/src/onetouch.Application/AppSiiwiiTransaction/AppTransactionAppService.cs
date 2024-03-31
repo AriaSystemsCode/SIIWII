@@ -3572,8 +3572,11 @@ namespace onetouch.AppSiiwiiTransaction
                 return false;
             }
         }
-        public async Task<bool> ShareTransactionByMessage(SharingTransactionOptions input)
+        public async Task<ShareTransactionByMessageResultDto> ShareTransactionByMessage(SharingTransactionOptions input)
         {
+            ShareTransactionByMessageResultDto shareTransactionByMessageResultDto = new ShareTransactionByMessageResultDto();
+            shareTransactionByMessageResultDto.TenantTransactionInfos = new List<TenantTransactionInfo>();
+
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
@@ -3675,11 +3678,43 @@ namespace onetouch.AppSiiwiiTransaction
                         foreach (var item in tenantsRoles)
                         { 
                             string tranCode = "";
-                            if (!string.IsNullOrEmpty(item.Split(",")[0].ToString()))
-                                tranCode = await ShareTransactionWithTenant(sharedtransactionId, int.Parse(item.Split(",")[1].ToString()), (TransactionType)Enum.Parse(typeof(TransactionType), item.Split(",")[0].ToString()));
-                            else
-                                tranCode = await ShareTransactionWithTenant(sharedtransactionId, int.Parse(item.Split(",")[1].ToString()), null);
 
+                            if (!string.IsNullOrEmpty(item.Split(",")[0].ToString()))
+                            {
+                                tranCode = await ShareTransactionWithTenant(sharedtransactionId, int.Parse(item.Split(",")[1].ToString()), (TransactionType)Enum.Parse(typeof(TransactionType), item.Split(",")[0].ToString()));
+                                var tenantId = long.Parse(item.Split(",")[1].ToString());
+                                var tranType = (item.Split(",")[0].ToString() == "SalesOrder" ? "SALESORDER" : "PURCHASEORDER");
+                                var sharedTran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.TenantId == tenantId
+                                && z.Code == tranCode && z.EntityObjectTypeCode == tranType).FirstOrDefaultAsync();
+                                if (sharedTran !=null)
+                                shareTransactionByMessageResultDto.TenantTransactionInfos.Add(new TenantTransactionInfo { 
+                                    TenantId = tenantId,
+                                    Code = tranCode,
+                                    TransactionType = sharedTran.EntityObjectTypeCode,
+                                    TransactionId = sharedTran.Id
+                                });
+                            }
+                            else
+                            {
+                                var marketplaceTransaction = await _appMarketplaceTransactionHeadersRepository.GetAll().AsNoTracking()
+                                    .Where(z => z.Id == sharedtransactionId && z.TenantId == null).FirstOrDefaultAsync();
+                                if (marketplaceTransaction != null)
+                                {
+                                    tranCode = await ShareTransactionWithTenant(sharedtransactionId, int.Parse(item.Split(",")[1].ToString()), null);
+                                    var tenantId = long.Parse(item.Split(",")[1].ToString());
+                                    var tranType = (item.Split(",")[0].ToString() == "SalesOrder" ? "SALESORDER" : "PURCHASEORDER");
+                                    var sharedTran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.TenantId == tenantId
+                                    && z.Code == tranCode && z.EntityObjectTypeCode == tranType).FirstOrDefaultAsync();
+                                    if (sharedTran != null)
+                                        shareTransactionByMessageResultDto.TenantTransactionInfos.Add(new TenantTransactionInfo
+                                        {
+                                            TenantId = tenantId,
+                                            Code = tranCode,
+                                            TransactionType = marketplaceTransaction.EntityObjectTypeCode,
+                                            TransactionId = sharedTran.Id
+                                        });
+                                }
+                            }
                             string newItem = item + "," + tranCode;
                             tenantTrans.Add(newItem);
                         }
@@ -3698,7 +3733,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     if (tran != null)
                                     {
                                         if (!string.IsNullOrEmpty(info[0]))
-                                            subject = info[0] == "SalesOrder" ? ("Sales Order: " + info[2] + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + info[2] + " (" + tran.SellerCompanyName + ")");
+                                            subject = info[0] == "c" ? ("Sales Order: " + info[2] + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + info[2] + " (" + tran.SellerCompanyName + ")");
                                         else
                                         {
                                             tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
@@ -3734,7 +3769,8 @@ namespace onetouch.AppSiiwiiTransaction
                     }
                 }
             }
-            return true;
+            shareTransactionByMessageResultDto.Result = true;
+            return shareTransactionByMessageResultDto;
         }
         public async Task<string> ShareTransactionWithTenant(long marketplaceTransactionId, int tenantId, TransactionType? transactionType)
         {
