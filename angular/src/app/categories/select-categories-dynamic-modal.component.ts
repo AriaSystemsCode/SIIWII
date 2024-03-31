@@ -133,17 +133,38 @@ export class SelectCategoriesDynamicModalComponent
             (item) => item.data.sycEntityObjectCategory.id == id
         )[0];
 
-    checkItemSelection(item: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
-        const itemId = item.data.sycEntityObjectCategory.id;
-        const selected: boolean = this.isSelected(itemId);
-        if (selected) this.selectedRecords.push(item);
-
-        if (item?.children?.length) {
-            item.children.forEach((childItem) => {
-                this.checkItemSelection(childItem);
-            });
+        checkItemSelection(item: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
+            const itemId = item.data.sycEntityObjectCategory.id;
+            const selected: boolean = this.isSelected(itemId);
+            
+            if (!selected) {
+                return; // If the current node is not selected, return without further processing
+            }
+        
+            if (!item.children || item.children.length === 0) {
+                // If the node has no children and is selected, add it directly to the selected records
+                this.selectedRecords.push(item);
+            } else {
+                // If the node has children, recursively check selection for child nodes
+                let allChildrenSelected = true;
+                item.children.forEach((childItem) => {
+                    if (!this.isSelected(childItem.data.sycEntityObjectCategory.id)) {
+                        allChildrenSelected = false;
+                        return; // Exit forEach loop early if any child is not selected
+                    }
+                });
+                
+                if (!allChildrenSelected) {
+                    // If not all children are selected, add the parent node to the selected records
+                    this.selectedRecords.push(item);
+                }
+                
+                // Recursively check selection for child nodes
+                item.children.forEach((childItem) => {
+                    this.checkItemSelection(childItem);
+                });
+            }
         }
-    }
     close() {
         this.currentModalRef.setClass("right-modal slide-right-out");
         this.selectionDone = false;
@@ -171,7 +192,10 @@ export class SelectCategoriesDynamicModalComponent
         if (!item.parent) {
             return item.label;
         }
-        return this.getPath(item.parent) + "-" + item.label;
+    
+        // Recursively build the path including all ancestor nodes
+        const parentPath = this.getPath(item.parent);
+        return parentPath ? parentPath + "-" + item.label : item.label;
     }
 
     editCategory(node) {

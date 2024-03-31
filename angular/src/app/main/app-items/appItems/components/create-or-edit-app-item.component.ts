@@ -727,8 +727,8 @@ export class CreateOrEditAppItemComponent
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
-            if(! (!element?.parent && !element?.leaf)){
-            console.log(element);
+            if (element.leaf) {
+                console.log(element);
             const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
                 new AppEntityDtoWithActions<AppEntityCategoryDto>({
                     entityDto: new AppEntityCategoryDto({
@@ -737,12 +737,12 @@ export class CreateOrEditAppItemComponent
                             element.data.sycEntityObjectCategory.id,
                         entityObjectCategoryCode:
                             element.data.sycEntityObjectCategory.code,
-                            entityObjectCategoryName: this.getPath(element),
+                            entityObjectCategoryName:this.getPath(element),
                     }),
                 });
        
             this.categories.push(newCategory);
-        }
+    }
         });
         this.appItem.entityCategories = selectedCategories;
         this.formTouched = true;
@@ -839,21 +839,18 @@ export class CreateOrEditAppItemComponent
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
-            if(! (!element?.parent && !element?.leaf)){
-            console.log(element);
-            const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
-                new AppEntityDtoWithActions<AppEntityCategoryDto>({
-                    entityDto: new AppEntityCategoryDto({
-                        id: 0,
-                        entityObjectCategoryId:
-                            element.data.sycEntityObjectCategory.id,
-                        entityObjectCategoryCode:
-                            element.data.sycEntityObjectCategory.code,
-                        entityObjectCategoryName: this.getPath(element),
-                    }),
-                });
-            this.departments.push(newCategory);
-            }
+            if (element.leaf) {
+                    const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
+                        new AppEntityDtoWithActions<AppEntityCategoryDto>({
+                            entityDto: new AppEntityCategoryDto({
+                                id: 0,
+                                entityObjectCategoryId: element.data.sycEntityObjectCategory.id,
+                                entityObjectCategoryCode: element.data.sycEntityObjectCategory.code,
+                                entityObjectCategoryName: this.getPath(element),
+                            }),
+                        });
+                    this.departments.push(newCategory);
+                }
         });
     }
 
@@ -861,7 +858,10 @@ export class CreateOrEditAppItemComponent
         if (!item.parent) {
             return item.label;
         }
-        return this.getPath(item.parent) + "-" + item.label;
+    
+        // Recursively build the path including all ancestor nodes
+        const parentPath = this.getPath(item.parent);
+        return parentPath ? parentPath + "-" + item.label : item.label;
     }
 
     seperateNewAndRemovedCategories() {
@@ -957,7 +957,7 @@ export class CreateOrEditAppItemComponent
     ): void {
         this.formTouched = true;
         selected.forEach((element) => {
-            if(! (!element?.parent && !element?.leaf)){
+            if (element.leaf) {
             const newClass: AppEntityDtoWithActions<AppEntityClassificationDto> =
                 new AppEntityDtoWithActions<AppEntityClassificationDto>({
                     entityDto: new AppEntityClassificationDto({
@@ -970,7 +970,7 @@ export class CreateOrEditAppItemComponent
                     }),
                 });
             this.classifications.push(newClass);
-            }
+        }
         });
     }
 
