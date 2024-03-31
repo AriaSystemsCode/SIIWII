@@ -54,6 +54,7 @@
                     >Start Date*</label
                 >
                     <p-calendar
+                    appendTo="body"
                     formControlName="startDate"
                     [showIcon]="true"
                     (onSelect)="changeStartDate(orderForm.get('startDate'))"
@@ -68,6 +69,7 @@
                     >Complete Date*</label
                 >
                     <p-calendar
+                    appendTo="body"
                     formControlName="completeDate"
                     [showIcon]="true"
                     [minDate]="minDate"
@@ -82,6 +84,7 @@
                     >Available Date*</label
                 >
                     <p-calendar
+                    appendTo="body"
                     formControlName="availableDate"
                     [showIcon]="true"
                     [readonlyInput]="true"
