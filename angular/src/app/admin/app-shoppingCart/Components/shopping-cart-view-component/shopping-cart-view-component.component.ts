@@ -751,12 +751,12 @@ export class ShoppingCartViewComponentComponent
     //printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
     printInfoParam.reportTemplateName = this.transactionReportTemplateName;
     printInfoParam.saveToPDF = true;
+    printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+    printInfoParam.userId = this.appSession?.userId
 
     for (let i = 0; i < $event.length; i++) {
       printInfoParam.TransactionId = $event[i].transactionId.toString();
-      printInfoParam.orderConfirmationRole = this.getTransactionRole($event[i].enteredByUserRole);
       printInfoParam.tenantId =$event[i].tenantId;
-      printInfoParam.userId = $event[i].userId
       this.onGeneratOrderReport(true,printInfoParam);
     }
   }
