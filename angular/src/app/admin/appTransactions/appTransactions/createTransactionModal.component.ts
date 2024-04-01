@@ -127,6 +127,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
         });
+        this.orderForm.reset();
         this.getAllCompanies();
         this.orderForm.controls['startDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
@@ -255,7 +256,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.sellerBranches=[];
                     this.getBranches(this.sellerCompanySSIN ,'seller')
                 });
-        } else if (data.value.code === 2) {
+        } else if (data?.value?.code === 2) {
             // i'm a buyer
             this.isSeller = false;
             this.isBuyer = true;
@@ -296,7 +297,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             // this.sellerCompanies = []
             // this.sellerContacts = []
             // this.buyerContacts = []
-            this.orderForm.reset();
+            //this.orderForm.reset();
         }
     }
 
