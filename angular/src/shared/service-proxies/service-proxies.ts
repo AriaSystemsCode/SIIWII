@@ -20204,7 +20204,7 @@ export class AppTransactionServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    shareTransactionByMessage(body: SharingTransactionOptions | undefined): Observable<boolean> {
+    shareTransactionByMessage(body: SharingTransactionOptions | undefined): Observable<ShareTransactionByMessageResultDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/ShareTransactionByMessage";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -20227,14 +20227,14 @@ export class AppTransactionServiceProxy {
                 try {
                     return this.processShareTransactionByMessage(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<boolean>;
+                    return _observableThrow(e) as any as Observable<ShareTransactionByMessageResultDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<boolean>;
+                return _observableThrow(response_) as any as Observable<ShareTransactionByMessageResultDto>;
         }));
     }
 
-    protected processShareTransactionByMessage(response: HttpResponseBase): Observable<boolean> {
+    protected processShareTransactionByMessage(response: HttpResponseBase): Observable<ShareTransactionByMessageResultDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -20245,8 +20245,7 @@ export class AppTransactionServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
+            result200 = ShareTransactionByMessageResultDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -73313,6 +73312,126 @@ export interface ISharingTransactionOptions {
     message: string | undefined;
     subject: string | undefined;
     transactionSharing: TransactionSharingDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class TenantTransactionInfo implements ITenantTransactionInfo {
+    tenantId!: number;
+    transactionId!: number;
+    code!: string | undefined;
+    transactionType!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ITenantTransactionInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.transactionId = _data["transactionId"];
+            this.code = _data["code"];
+            this.transactionType = _data["transactionType"];
+        }
+    }
+
+    static fromJS(data: any): TenantTransactionInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new TenantTransactionInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["transactionId"] = this.transactionId;
+        data["code"] = this.code;
+        data["transactionType"] = this.transactionType;
+        return data;
+    }
+}
+
+export interface ITenantTransactionInfo {
+    tenantId: number;
+    transactionId: number;
+    code: string | undefined;
+    transactionType: string | undefined;
+
+    [key: string]: any;
+}
+
+export class ShareTransactionByMessageResultDto implements IShareTransactionByMessageResultDto {
+    result!: boolean;
+    tenantTransactionInfos!: TenantTransactionInfo[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IShareTransactionByMessageResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.result = _data["result"];
+            if (Array.isArray(_data["tenantTransactionInfos"])) {
+                this.tenantTransactionInfos = [] as any;
+                for (let item of _data["tenantTransactionInfos"])
+                    this.tenantTransactionInfos!.push(TenantTransactionInfo.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ShareTransactionByMessageResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShareTransactionByMessageResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["result"] = this.result;
+        if (Array.isArray(this.tenantTransactionInfos)) {
+            data["tenantTransactionInfos"] = [];
+            for (let item of this.tenantTransactionInfos)
+                data["tenantTransactionInfos"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IShareTransactionByMessageResultDto {
+    result: boolean;
+    tenantTransactionInfos: TenantTransactionInfo[] | undefined;
 
     [key: string]: any;
 }
