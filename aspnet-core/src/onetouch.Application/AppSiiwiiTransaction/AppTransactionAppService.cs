@@ -2344,7 +2344,7 @@ namespace onetouch.AppSiiwiiTransaction
                             detParent.EntityObjectTypeCode = header.EntityObjectTypeCode;
                             detParent.Note = "";
                             detParent.ItemCode = marketplaceItemMain.Code;
-                            detParent.Code = header.Code.TrimEnd() + "-" + detParent.LineNo.ToString() + "-" + detParent.Code.TrimEnd();
+                            detParent.Code = header.TenantId.ToString().TrimEnd() + "-" + header.Code.TrimEnd() + "-" + detParent.LineNo.ToString() + "-" + detParent.Code.TrimEnd();
                             detParent.Notes = string.IsNullOrEmpty(marketplaceItemMain.Notes) ? "" : marketplaceItemMain.Notes;
                             detParent.ParentId = null;
                             if (detParent.EntityExtraData != null)
@@ -2435,7 +2435,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         det.EntityObjectTypeId = header.EntityObjectTypeId;
                                         det.EntityObjectTypeCode = header.EntityObjectTypeCode;
                                         det.Note = "";
-                                        det.Code = header.Code.TrimEnd() + "-" + det.LineNo.ToString() + "-" + det.Code.TrimEnd();
+                                        det.Code = header.TenantId.ToString().TrimEnd() + "-" + header.Code.TrimEnd() + "-" + det.LineNo.ToString() + "-" + det.Code.TrimEnd();
                                         det.Notes = string.IsNullOrEmpty(marketplaceItem.Notes) ? "" : marketplaceItem.Notes;
                                         // det.EntityExtraData.ForEach(d => d.Id = 0);
                                         // det.EntityExtraData.ForEach(d=> d.EntityId = 0);
@@ -3915,6 +3915,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 detail.TransactionIdFk = tenantTransaction;
                                 detail.EntityObjectTypeId = tenantTransaction.EntityObjectTypeId;
                                 detail.EntityObjectTypeCode = tenantTransaction.EntityObjectTypeCode;
+                                detail.Code = tenantTransaction.TenantId.ToString().TrimEnd() + "-" + tenantTransaction.Code.TrimEnd() + "-" + detail.LineNo.ToString() + "-" + detail.SSIN.TrimEnd();
                                 //marketplaceTransaction.AppMarketplaceTransactionDetails.Add(detail);
                                 if (det.EntityExtraData != null && det.EntityExtraData.Count > 0)
                                 {
@@ -3994,6 +3995,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         detailch.ParentId = detail.Id;
                                         detailch.EntityObjectTypeId = tenantTransaction.EntityObjectTypeId;
                                         detailch.EntityObjectTypeCode = tenantTransaction.EntityObjectTypeCode;
+                                        detailch.Code = tenantTransaction.TenantId.ToString().TrimEnd() + "-" + tenantTransaction.Code.TrimEnd() + "-" + detailch.LineNo.ToString() + "-" + detailch.SSIN.TrimEnd();
                                         if (ch.EntityExtraData != null && ch.EntityExtraData.Count > 0)
                                         {
                                             detailch.EntityExtraData = new List<AppEntityExtraData>();
@@ -4152,6 +4154,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 detail.TransactionIdFk = tenantTransactionObj;
                                 detail.EntityObjectTypeId = tranType;
                                 detail.EntityObjectTypeCode = tranTypeCode;
+                                detail.Code = tenantTransactionObj.TenantId.ToString().TrimEnd() + "-" + tenantTransactionObj.Code.TrimEnd() + "-" + detail.LineNo.ToString() + "-" + detail.SSIN.TrimEnd();
                                 if (det.EntityExtraData != null && det.EntityExtraData.Count > 0)
                                 {
                                     detail.EntityExtraData = new List<AppEntityExtraData>();
@@ -4229,7 +4232,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         detailch.TransactionId = tenantTransactionObj.Id;
                                         detailch.TransactionIdFk = tenantTransactionObj;
                                         detailch.ParentId = detail.Id;
-
+                                        detailch.Code = tenantTransactionObj.TenantId.ToString().TrimEnd() + "-" + tenantTransactionObj.Code.TrimEnd() + "-" + detailch.LineNo.ToString() + "-" + detailch.SSIN.TrimEnd();
                                         if (ch.EntityExtraData != null && ch.EntityExtraData.Count > 0)
                                         {
                                             detailch.EntityExtraData = new List<AppEntityExtraData>();
