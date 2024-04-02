@@ -523,7 +523,8 @@
                 <app-share-transaction-tab [orderId]="orderId" 
                 [sharedWithUsers]="appTransactionsForViewDto.sharedWithUsers"
                 (closeTranScreenEvent)="hide()"
-                    (offShareTransactionEvent)="offShareTransaction()"></app-share-transaction-tab>
+                    (offShareTransactionEvent)="offShareTransaction()"
+                    (onShareTransactionByMessage)="onShareTransactionByMessage($event)"></app-share-transaction-tab>
             </div>
         </div>
     </div>

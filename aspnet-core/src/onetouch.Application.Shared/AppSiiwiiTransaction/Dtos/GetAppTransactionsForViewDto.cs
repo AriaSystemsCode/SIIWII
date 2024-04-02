@@ -175,6 +175,17 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public IList<TransactionSharingDto> TransactionSharing { get; set; }
 
     }
+    public class ShareTransactionByMessageResultDto {
+        public bool Result { get; set; }
+        public List<TenantTransactionInfo> TenantTransactionInfos { set; get; }
+    }
+    public class TenantTransactionInfo
+    { 
+        public long TenantId { set; get; }
+        public long TransactionId { set; get; }
+        public string Code { set; get; }
+        public string TransactionType { set; get; }
+    }
     public class SharingTransactionEmail
     {
         public virtual long TransactionId { get; set; }
