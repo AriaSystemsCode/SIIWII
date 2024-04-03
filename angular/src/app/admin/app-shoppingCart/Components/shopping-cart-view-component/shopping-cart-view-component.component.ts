@@ -760,20 +760,30 @@ export class ShoppingCartViewComponentComponent
       this.onGeneratOrderReport(true,printInfoParam);
     }
   }
-    createReportViewer(){
-      this.reportViewerContainer.clear();
+  createReportViewer() {
+    // Resolve the factory for ReportViewerComponent
+    const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
 
-      // Resolve the factory for ReportViewerComponent
-      const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
-  
-      // Create the component and set input properties
-      const componentRef = this.reportViewerContainer.createComponent(factory);
-      const instance = componentRef.instance as ReportViewerComponent;
-      instance.reportUrl = this.reportUrl;
-      instance.invokeAction = this.invokeAction;
-      const componentNativeElement = componentRef.location.nativeElement as HTMLElement;
-       componentNativeElement.classList.add('d-none');
+    // Create a new container for the report viewer
+    const containerRef = this.reportViewerContainer.createComponent(factory);
 
-    
+    // Ensure the containerRef is valid
+    if (!containerRef) {
+        console.error("Failed to create reportViewerContainer.");
+        return;
     }
+
+    // Set input properties for the container
+    const instance = containerRef.instance as ReportViewerComponent;
+    instance.reportUrl = this.reportUrl;
+    instance.invokeAction = this.invokeAction;
+
+    // Add a class to hide the component initially
+    const containerNativeElement = containerRef.location.nativeElement as HTMLElement;
+    if (containerNativeElement) {
+        containerNativeElement.classList.add('d-none');
+    } else {
+        console.error("Native element of reportViewerContainer is not available.");
+    }
+}
 }
