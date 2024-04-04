@@ -3629,19 +3629,22 @@ namespace onetouch.AppSiiwiiTransaction
                                     if (userTenant != null && userTenant.Role != null)
                                     {
                                         ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), userTenant.Role);
-                                        if (role == ContactRoleEnum.Buyer || role == ContactRoleEnum.ShipToContact
+                                        if (role != ContactRoleEnum.Creator && role != ContactRoleEnum.SalesRep1 && role != ContactRoleEnum.SalesRep2)
+                                        {
+                                            if (role == ContactRoleEnum.Buyer || role == ContactRoleEnum.ShipToContact
                                             || role == ContactRoleEnum.APContact)
-                                        {
-                                            tranType = TransactionType.PurchaseOrder;
-                                        }
-                                        else
-                                        {
-                                            tranType = TransactionType.SalesOrder;
-                                        }
-                                        var tenantR = tenantsRoles.FirstOrDefault(z => z==tranType.ToString()+","+user.TenantId.ToString());
-                                        if (tenantR ==null)
-                                        {
-                                            tenantsRoles.Add(tranType.ToString() + "," + user.TenantId.ToString());
+                                            {
+                                                tranType = TransactionType.PurchaseOrder;
+                                            }
+                                            else
+                                            {
+                                                tranType = TransactionType.SalesOrder;
+                                            }
+                                            var tenantR = tenantsRoles.FirstOrDefault(z => z == tranType.ToString() + "," + user.TenantId.ToString());
+                                            if (tenantR == null)
+                                            {
+                                                tenantsRoles.Add(tranType.ToString() + "," + user.TenantId.ToString());
+                                            }
                                         }
                                     }
                                     else {
@@ -3724,16 +3727,16 @@ namespace onetouch.AppSiiwiiTransaction
                             foreach (var shar in input.TransactionSharing)
                             {
                                 string subject = "";
-                                var userTenantInfo  = tenantTrans.FirstOrDefault(z=>z.Contains(shar.SharedTenantId.ToString()));
+                                var userTenantInfo = shareTransactionByMessageResultDto.TenantTransactionInfos.FirstOrDefault(z =>z.TenantId == shar.SharedTenantId);//z.Contains(shar.SharedTenantId.ToString()));
                                 AppTransactionHeaders tran = null;
                                 if (userTenantInfo != null)
                                 {
-                                    var info = userTenantInfo.Split(',');
-                                    tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == info[2] && z.TenantId == shar.SharedTenantId).FirstOrDefaultAsync();
+                                    //var info = userTenantInfo.Split(',');
+                                    tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == userTenantInfo.Code && z.TenantId == shar.SharedTenantId).FirstOrDefaultAsync();
                                     if (tran != null)
                                     {
-                                        if (!string.IsNullOrEmpty(info[0]))
-                                            subject = info[0] == "c" ? ("Sales Order: " + info[2] + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + info[2] + " (" + tran.SellerCompanyName + ")");
+                                        if (!string.IsNullOrEmpty(userTenantInfo.Code))
+                                            subject = userTenantInfo.TransactionType .ToUpper()   == "SALESORDER" ? ("Sales Order: " + userTenantInfo.Code + " (" + tran.BuyerCompanyName + ")") : ("Purchase Order" + userTenantInfo.Code + " (" + tran.SellerCompanyName + ")");
                                         else
                                         {
                                             tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
