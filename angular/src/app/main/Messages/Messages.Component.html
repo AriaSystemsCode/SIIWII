@@ -132,9 +132,9 @@ appRootUrl() +
                     box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
                     color: #9E9E9E ;
                     height: 44px;" id="firstTabBtn">
-                  <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 1" [src]="
+                  <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
                   appRootUrl() +
-                  'assets/message/Messaging_Inbox_icon.svg'" border="0" />
+                  'assets/message/Direct-Message-icon.svg'" border="0" /> 
 
                         <span class="pr-3" style="
                     font-family: Poppins;
@@ -155,9 +155,11 @@ appRootUrl() +
                     border: 1px solid #eee !important;
                     box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
                     color: #9E9E9E ;
-                    height: 44px;" (click)="getUpdatesMessage($event)">
-                   <i class="pi pi-comments"  style="font-size:20px;"></i>
-                        <span class="pr-3" style="
+                    height: 44px;" (click)="getUpdatesMessage($event,'THREAD')">
+                  <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
+                  appRootUrl() +
+                  'assets/message/thread-svg-icon.svg'" border="0" /> 
+                   <span class="pr-3" style="
                 font-family: Poppins;
                 font-size: 16px;
                 font-style: normal;
@@ -175,9 +177,10 @@ appRootUrl() +
                     border: 1px solid #eee !important;
                     box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
                     color: #9E9E9E ;
-                    height: 44px;" (click)="getUpdatesMessage($event)">
-                       <i class="fa fa-at mentionIcon" aria-hidden="true"  style="font-size:20px;"></i>
-
+                    height: 44px;" (click)="getUpdatesMessage($event,'MENTION')">
+                  <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
+                  appRootUrl() +
+                  'assets/message/mention-square-icon.svg'" border="0" /> 
                             <span class="pr-3" style="
                     font-family: Poppins;
                     font-size: 16px;

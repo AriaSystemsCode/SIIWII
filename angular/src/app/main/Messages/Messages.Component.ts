@@ -70,7 +70,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     RecipientsName = [];
     highlightFirstMsg: boolean;
     displayMessageDetails: boolean = false;
-    messageCategoryFilter: string = "PRIMARYMESSAGE";
+    messageCategoryFilter: string = "MESSAGE";
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -88,7 +88,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.highlightFirstMsg = true;
         this.displayMessageDetails = false;
         this.selectMessagetype(1, this.l("Inbox"));
-        this.messageCategoryFilter = "PRIMARYMESSAGE";
+        this.messageCategoryFilter = "MESSAGE";
         document.getElementById('firstTabBtn').focus();
 
         this._sycEntityObjectClassificationsServiceProxy
@@ -125,7 +125,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     getMesssage(search?: boolean): void {
         if (this.messageTypeIndex != 1)
             this.messageCategoryFilter = null;
-
+debugger
         this._MessageServiceProxy
             .getAll(
                 this.filterText,
@@ -227,19 +227,19 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
 
     getPrimaryMessage() {
-        this.messageCategoryFilter = "PRIMARYMESSAGE";
+        this.messageCategoryFilter = "MESSAGE";
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();
     }
 
-    getUpdatesMessage(event) {
+    getUpdatesMessage(event,messageType) {
         Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
             element.classList.remove("active-tab");
 
         });
         event.target.className+=' active-tab'
-        this.messageCategoryFilter = "UPDATEMESSAGE";
+        this.messageCategoryFilter = messageType;
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();
