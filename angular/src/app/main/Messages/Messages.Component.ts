@@ -126,7 +126,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     getMesssage(search?: boolean): void {
         if (this.messageTypeIndex != 1)
             this.messageCategoryFilter = null;
-
+debugger
         this._MessageServiceProxy
             .getAll(
                 this.filterText,
@@ -236,24 +236,13 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.getMesssage();
     }
 
-    getUpdatesMessage(event) {
+    getUpdatesMessage(event,messageType) {
         Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
             element.classList.remove("active-tab");
 
         });
         event.target.className+=' active-tab'
-        this.messageCategoryFilter = "THREAD";
-        this.messages = [];
-        this.messagesDetails = null;
-        this.getMesssage();
-    }
-    getMentionsMessage(event) {
-        Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
-            element.classList.remove("active-tab");
-
-        });
-        event.target.className+=' active-tab'
-        this.messageCategoryFilter = "MENTION";
+        this.messageCategoryFilter = messageType;
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();

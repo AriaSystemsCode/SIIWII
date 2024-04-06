@@ -574,6 +574,10 @@ body .btn.btn-action:after {
 .clickBtn:focus ,.clickBtn.active-tab{
     background-color: #fff !important;
     color: #700066 !important;
+    img{
+        filter: brightness(0.5);
+
+    }
 }
 
 .clickBtn:hover {
