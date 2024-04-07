@@ -214,8 +214,16 @@ namespace onetouch.AppSiiwiiTransaction
         }
         public async Task<long> CreateOrEdit(CreateOrEditAppTransactionsDto input)
         {
-            
-
+            long? buyerTenantId = null;
+            if (!string.IsNullOrEmpty(input.BuyerCompanySSIN))
+            {
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+                    var buyerAccountProfile = await _appContactRepository.GetAll().Where(z => z.TenantId != null && z.IsProfileData == true && z.SSIN == input.BuyerCompanySSIN && z.PartnerId == null).FirstOrDefaultAsync();
+                    if (buyerAccountProfile != null)
+                        buyerTenantId = buyerAccountProfile.TenantId;
+                }
+            }
             if (input.Id == 0)
             { 
             if (input.TransactionType == TransactionType.SalesOrder)
@@ -233,17 +241,16 @@ namespace onetouch.AppSiiwiiTransaction
             input.TenantOwner = long.Parse(AbpSession.TenantId.ToString());
             input.ObjectId = await _helper.SystemTables.GetObjectTransactionId();
 
-          
-           
 
-
-//            var addressType  = await _helper.SystemTables.GetEntityObjectTypeAddressTypeId();
             
-            string sellerCurrency = "";
+            
+                    //            var addressType  = await _helper.SystemTables.GetEntityObjectTypeAddressTypeId();
+
+                    string sellerCurrency = "";
             string buyerCurrency = "";
             bool isBuyerManual = false;
             string buyerPrclvl = "MSRP";
-                if (!string.IsNullOrEmpty(input.BuyerCompanySSIN))
+            if (!string.IsNullOrEmpty(input.BuyerCompanySSIN))
                 {
 
                     var buyerAccount = await _appContactRepository.GetAll().FirstOrDefaultAsync(a => a.SSIN == input.BuyerCompanySSIN);
@@ -254,7 +261,9 @@ namespace onetouch.AppSiiwiiTransaction
                         buyerCurrency = buyerAccount.CurrencyCode;
                         input.CurrencyId = buyerAccount.CurrencyId;
                         input.CurrencyCode = buyerAccount.CurrencyCode;
+                        
                     }
+                   
                 }
                 else 
                 {
@@ -614,7 +623,7 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == header.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
                         foreach (var det in header.AppTransactionDetails.Where(z=>z.ParentId==null))
-                            await GetProductFromMarketplace(det.SSIN);
+                            await GetProductFromMarketplace(det.SSIN,int.Parse( buyerTenantId.ToString()));
                     }
                     
                     appTrans.Id = header.Id;
@@ -1053,7 +1062,7 @@ namespace onetouch.AppSiiwiiTransaction
                     await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == appTrans.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
                     appTrans.AppTransactionDetails = _appTransactionDetails.GetAll().AsNoTracking().Where(z=>z.TransactionId==appTrans.Id && z.ParentId==null).ToList();
                     foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
-                    await GetProductFromMarketplace(det.SSIN);
+                    await GetProductFromMarketplace(det.SSIN,int.Parse( buyerTenantId.ToString()));
                 }
                 foreach (var con in appTrans.AppTransactionContacts)
                 {
@@ -2705,11 +2714,13 @@ namespace onetouch.AppSiiwiiTransaction
 
         }
         //xx
-        public async Task GetProductFromMarketplace(string productSSIN)
+        public async Task GetProductFromMarketplace(string productSSIN, int? tenantId)
         {
+            if (tenantId==null)
+                return;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             { 
-                var appItem = await _appItems.GetAll().FirstOrDefaultAsync(x=> x.TenantId == AbpSession.TenantId && x.SSIN== productSSIN);
+                var appItem = await _appItems.GetAll().FirstOrDefaultAsync(x=> x.TenantId == tenantId && x.SSIN== productSSIN);
                 if (appItem == null)
                 {
                     var marketplaceItem = await _appMarketplaceItem.GetAll()
@@ -2758,7 +2769,7 @@ namespace onetouch.AppSiiwiiTransaction
                     //entityMain.EntityClassifications.ForEach(d => d.Id = 0);
                     entityMain.EntityClassifications = null;
                     entityMain.EntityCategories = null;
-                    entityMain.TenantId = AbpSession.TenantId;
+                    entityMain.TenantId = tenantId;
 
                     //   var entityId = await _appEntity.InsertAsync(entityMain);
                     var itemObjectId = await _helper.SystemTables.GetObjectItemId();
@@ -2774,7 +2785,7 @@ namespace onetouch.AppSiiwiiTransaction
                     item.TenantOwner = marketplaceItem.TenantOwner;
                     item.Id = 0;
                     item.Variations = marketplaceItem.Variations;
-                    item.TenantId = AbpSession.TenantId;
+                    item.TenantId = tenantId;
                     item.Price = marketplaceItem.Price;
                     item.TimeStamp = marketplaceItem.TimeStamp;
                     item.ItemPricesFkList = null;
@@ -2821,7 +2832,7 @@ namespace onetouch.AppSiiwiiTransaction
                         varItem.TenantOwner = variation.TenantOwner;
                         varItem.Id = 0;
                         //item.EntityId = 0;
-                        varItem.TenantId = AbpSession.TenantId;
+                        varItem.TenantId = tenantId;
                         varItem.Price = variation.Price;
                         varItem.TimeStamp = variation.TimeStamp;
                         varItem.ItemPricesFkList = null;
@@ -2835,7 +2846,7 @@ namespace onetouch.AppSiiwiiTransaction
                         entityVar.EntityAttachments = null;
                         entityVar.EntityClassifications = null;
                         entityVar.EntityCategories = null;
-                        entityVar.TenantId = AbpSession.TenantId;
+                        entityVar.TenantId = tenantId;
                         varItem.EntityFk = entityVar;
                         varItem.ParentEntityFk = item.EntityFk;
                         varItem.ItemPricesFkList = new List<AppItemPrices>();
@@ -2845,7 +2856,7 @@ namespace onetouch.AppSiiwiiTransaction
                             price.Id = 0;
                             price.AppItemCode = varItem.Code;
                             price.AppItemId = varItem.Id;
-                            price.TenantId = AbpSession.TenantId;
+                            price.TenantId = tenantId;
                             price.AppItemFk = varItem;
                             price.Code = itemPrice.Code;
                             price.CurrencyCode = itemPrice.CurrencyCode;
@@ -2870,7 +2881,7 @@ namespace onetouch.AppSiiwiiTransaction
                         price.Id = 0;
                         price.AppItemId = item.Id;
                         price.AppItemCode = item.Code;
-                        price.TenantId = AbpSession.TenantId;
+                        price.TenantId = tenantId;
                         price.AppItemFk = item;
                         price.Code = itemPrice.Code;
                         price.CurrencyCode = itemPrice.CurrencyCode;
@@ -3153,7 +3164,7 @@ namespace onetouch.AppSiiwiiTransaction
                             itemSizeScaleHeader.AppItemId = item.Id;
                             itemSizeScaleHeader.AppItemFk = item;
                             itemSizeScaleHeader.SizeScaleId = null;
-                            itemSizeScaleHeader.TenantId = AbpSession.TenantId;
+                            itemSizeScaleHeader.TenantId = tenantId;
                             itemSizeScaleHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<onetouch.AppItems.AppItemSizeScalesDetails>>(sizeScale.AppItemSizeScalesDetails);
                             foreach (var det in itemSizeScaleHeader.AppItemSizeScalesDetails)
                             {
@@ -3171,7 +3182,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 sizeRatio.AppItemId = item.Id;
                                 sizeRatio.AppItemFk = item;
                                 sizeRatio.SizeScaleId = null;
-                                sizeRatio.TenantId = AbpSession.TenantId;
+                                sizeRatio.TenantId = tenantId;
                                 sizeRatio.AppItemSizeScalesDetails = ObjectMapper.Map<List<onetouch.AppItems.AppItemSizeScalesDetails>>(sizeRatio.AppItemSizeScalesDetails);
                                 foreach (var det in sizeRatio.AppItemSizeScalesDetails)
                                 {
