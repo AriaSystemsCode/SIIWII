@@ -320,7 +320,7 @@ namespace onetouch.AppMarketplaceItems
                 var account = await _appContactRepository.GetAll().Include(a => a.EntityFk)
                     .ThenInclude(a => a.EntityAttachments.Where(a => a.AttachmentCategoryId == attPhotoId || a.AttachmentCategoryId == attBannerId))
                     .ThenInclude(a=>a.AttachmentFk)
-                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN);
+                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId==null);
                 GetAccountImagesOutputDto returnDto = new GetAccountImagesOutputDto();
                 if (account != null)
                 {
