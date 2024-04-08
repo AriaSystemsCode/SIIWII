@@ -584,6 +584,9 @@ namespace onetouch.AppSiiwiiTransaction
                             BranchName = null,
                             BranchSSIN = null
                         }) ;
+                        //MMT2024[start]
+                        //MMT2024[End]
+                        if (input.TransactionType== TransactionType.SalesOrder && input.EnteredByUserRole.Contains("Independent Sales Rep"))
                         appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                         {
                             ContactName = contact.Name,
