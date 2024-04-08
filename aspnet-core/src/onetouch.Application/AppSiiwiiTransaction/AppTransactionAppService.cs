@@ -57,6 +57,8 @@ using MathNet.Numerics.LinearAlgebra;
 using Twilio.Rest.Trunking.V1;
 using System.Net.Mail;
 using Abp.Net.Mail;
+using onetouch.EntityFrameworkCore.Repositories;
+
 
 //using NUglify.Helpers;
 //using NUglify.Helpers;
@@ -97,6 +99,7 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IRepository<AppEntityAttachment, long> _appEntityAttachment;
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraData;
         private readonly IEmailSender _emailSender;
+        private readonly IAppItemsAppService _appItemsAppService;
         //MMT37[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -116,7 +119,7 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionDetails, long> appMarketplaceTransctionDetailsRepository,
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionContacts, long> appMarketplaceTransctionContactsRepository,
              IRepository<AppEntitySharings, long> appEntitySharingsRepository, IMessageAppService messageAppService,IRepository<AppEntityAttachment, long> appEntityAttachment,
-             IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender)
+             IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender, IAppItemsAppService appItemsAppService)
         {
             _MessagesRepository = messagesRepository;
             _appAddressRepository = appAddressRepository;
@@ -150,6 +153,7 @@ namespace onetouch.AppSiiwiiTransaction
             _appEntityAttachment = appEntityAttachment;
             _appEntityExtraData = appEntityExtraData;
             _emailSender = emailSender;
+            _appItemsAppService = appItemsAppService;
             //MMT37[End]
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
@@ -2739,8 +2743,36 @@ namespace onetouch.AppSiiwiiTransaction
                         .Where(s => s.AppMarketplaceItemId == marketplaceItem.Id).ToListAsync();
                     marketplaceItem.ItemSizeScaleHeadersFkList = await _appMarketplaceItemSizeScaleHeadersRepository.GetAll()
                         .Include(s => s.AppItemSizeScalesDetails).Where(s => s.AppMarketplaceItemId == marketplaceItem.Id).ToListAsync();
-                   // marketplaceItem.EntityAttachments = (await _appEntity.GetAll().
+                    // marketplaceItem.EntityAttachments = (await _appEntity.GetAll().
                     //    Include(z => z.EntityAttachments).ThenInclude(s => s.AttachmentFk).Where(d => d.Id == marketplaceItem.Id).FirstOrDefaultAsync()).EntityAttachments;
+                    //MMT2024-04
+                    string nextCode = "";
+                    bool llNewCodeFound = false;
+                    while (!llNewCodeFound)
+                    {
+                        nextCode = await _appItemsAppService.GenerateProductCode(int.Parse(marketplaceItem.EntityObjectTypeId.ToString()), true,tenantId);
+                        if (!string.IsNullOrEmpty(nextCode))
+                        {
+                            var appItemExist = await _appItems.GetAll().Where(r => r.Code == nextCode && r.ItemType == 0 && r.TenantId== tenantId).FirstOrDefaultAsync();
+                            if (appItemExist != null)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                llNewCodeFound = true;
+                            }
+                        }
+                        else
+                        {
+                            llNewCodeFound = true;
+                        }
+
+                    }
+                    if (!llNewCodeFound || string.IsNullOrEmpty(nextCode))
+                        nextCode = marketplaceItem.Code ;
+                    //MMT2024-04
+
                     AppEntity entityMain = new AppEntity();
                     entityMain = ObjectMapper.Map<AppEntity>(marketplaceItem);
                     entityMain.Id = 0;
@@ -2770,13 +2802,13 @@ namespace onetouch.AppSiiwiiTransaction
                     entityMain.EntityClassifications = null;
                     entityMain.EntityCategories = null;
                     entityMain.TenantId = tenantId;
-
+                    entityMain.Code = nextCode;
                     //   var entityId = await _appEntity.InsertAsync(entityMain);
                     var itemObjectId = await _helper.SystemTables.GetObjectItemId();
                     entityMain.ObjectId = itemObjectId;
 
                     AppItem item = new AppItem();
-                    item.Code = marketplaceItem.Code;
+                    item.Code = nextCode;
 
                     item.Description = marketplaceItem.Description;
                     item.Name = entityMain.Name;
@@ -2818,13 +2850,21 @@ namespace onetouch.AppSiiwiiTransaction
                     //   // itemSizeScaleHeader.AppItemSizeScalesDetails.ForEach(a=>a.Id=0);
                     //   // itemSizeScaleHeader.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = itemSizeScaleHeader.Id);
                     //    item.ItemSizeScaleHeadersFkList.Add(itemSizeScaleHeader);
-
+                    IList<VariationItemDto> variationListOrg = ObjectMapper.Map<IList<VariationItemDto>>(marketplaceItem.ParentFkList);
+                    foreach (var vari in variationListOrg)
+                        vari.Id = 0;
+                    var orgItem =await _appItems.GetAll().Where(z => z.SSIN == marketplaceItem.SSIN && z.TenantId == z.TenantOwner).FirstOrDefaultAsync();
+                    var variationList = await _appItemsAppService.GetVariationsCodes(long.Parse(orgItem.SycIdentifierId.ToString()), nextCode, variationListOrg, marketplaceItem.EntityObjectTypeId,tenantId);
+                    item.SycIdentifierId = orgItem.SycIdentifierId;
                     //}
+
                     item.EntityFk = entityMain;
                     foreach (var variation in marketplaceItem.ParentFkList)
                     {
+                        var itemVar = variationList.FirstOrDefault(z=>z.SSIN== variation.SSIN);
+
                         AppItem varItem = new AppItem();
-                        varItem.Code = variation.Code;
+                        varItem.Code = itemVar.Code;
                         varItem.Description = variation.Description;
                         varItem.Name = variation.Name;
                         // item.ParentId = null;
@@ -3067,6 +3107,10 @@ namespace onetouch.AppSiiwiiTransaction
                                         extr.Id = 0;
                                         extr.EntityFk = null;
                                         extr.EntityCode = variation.Code;
+
+                                        if (ext.AttributeId == 202 && !string.IsNullOrEmpty(ext.AttributeValue))
+                                            MoveFile(ext.AttributeValue, -1,tenantId);
+
                                         tenantVariation.EntityFk.EntityExtraData.Add(extr);
                                     }
                                 }
