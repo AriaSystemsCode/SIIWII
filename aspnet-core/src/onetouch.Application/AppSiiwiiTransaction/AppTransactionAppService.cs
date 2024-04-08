@@ -2290,6 +2290,8 @@ namespace onetouch.AppSiiwiiTransaction
                }
                 var header = await _appTransactionsHeaderRepository.GetAll().AsNoTracking()
                     .FirstOrDefaultAsync(a => a.Code == transactionId && a.TenantId== AbpSession.TenantId && a.EntityObjectTypeId == tranTypeId);
+                if (header == null)
+                    return;
                 double colorQty = 0;
                 decimal colorAmt = 0;
                 AppTransactionDetails detParent = null;
