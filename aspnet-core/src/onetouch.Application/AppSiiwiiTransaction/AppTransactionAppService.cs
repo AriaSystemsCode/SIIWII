@@ -2952,13 +2952,13 @@ namespace onetouch.AppSiiwiiTransaction
                             appAtt.EntityFk = null;
                             appAtt.AttachmentFk = new Attachments.AppAttachment();
                             appAtt.AttachmentFk.Attachment = attch.AttachmentFk.Attachment;
-                            appAtt.AttachmentFk.TenantId = AbpSession.TenantId;
+                            appAtt.AttachmentFk.TenantId = tenantId;
                             appAtt.AttachmentFk.Id = 0;
                             appAtt.AttachmentFk.Code = attch.AttachmentFk.Code;
                             appAtt.AttachmentFk.Name = attch.AttachmentFk.Name;
                             appAtt.AttachmentFk.Attributes = attch.AttachmentFk.Attributes;
                             
-                            MoveFile(attch.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                            MoveFile(attch.AttachmentFk.Attachment, -1, tenantId);
                             appAtt.AttachmentId = 0;
                             appAtt.IsDefault = attch.IsDefault;
                             entityMain.EntityAttachments.Add(appAtt);
@@ -3116,12 +3116,12 @@ namespace onetouch.AppSiiwiiTransaction
                                         appAtt.EntityCode = tenantVariation.EntityFk.Code;
                                         appAtt.AttachmentFk = new Attachments.AppAttachment();
                                         appAtt.AttachmentFk.Attachment = attch.AttachmentFk.Attachment;
-                                        appAtt.AttachmentFk.TenantId = AbpSession.TenantId;
+                                        appAtt.AttachmentFk.TenantId = tenantId;
                                         appAtt.AttachmentFk.Id = 0;
                                         appAtt.AttachmentFk.Code = attch.AttachmentFk.Code;
                                         appAtt.AttachmentFk.Name = attch.AttachmentFk.Name;
                                         appAtt.AttachmentFk.Attributes = attch.AttachmentFk.Attributes;
-                                        MoveFile(attch.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                        MoveFile(attch.AttachmentFk.Attachment, -1, tenantId);
                                         appAtt.AttachmentId = 0;
                                         appAtt.IsDefault = attch.IsDefault;
                                         tenantVariation.EntityFk.EntityAttachments.Add(appAtt);
