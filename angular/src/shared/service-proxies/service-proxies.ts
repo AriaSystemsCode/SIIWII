@@ -65004,6 +65004,10 @@ export class AppItemExcelDto implements IAppItemExcelDto {
     productCategoryCode!: string | undefined;
     productCategoryDescription!: string | undefined;
     price!: string | undefined;
+    priceA!: string | undefined;
+    priceB!: string | undefined;
+    priceC!: string | undefined;
+    priceD!: string | undefined;
     currency!: string | undefined;
     parentCode!: string | undefined;
     imageType!: string | undefined;
@@ -65058,6 +65062,10 @@ export class AppItemExcelDto implements IAppItemExcelDto {
             this.productCategoryCode = _data["productCategoryCode"];
             this.productCategoryDescription = _data["productCategoryDescription"];
             this.price = _data["price"];
+            this.priceA = _data["priceA"];
+            this.priceB = _data["priceB"];
+            this.priceC = _data["priceC"];
+            this.priceD = _data["priceD"];
             this.currency = _data["currency"];
             this.parentCode = _data["parentCode"];
             this.imageType = _data["imageType"];
@@ -65122,6 +65130,10 @@ export class AppItemExcelDto implements IAppItemExcelDto {
         data["productCategoryCode"] = this.productCategoryCode;
         data["productCategoryDescription"] = this.productCategoryDescription;
         data["price"] = this.price;
+        data["priceA"] = this.priceA;
+        data["priceB"] = this.priceB;
+        data["priceC"] = this.priceC;
+        data["priceD"] = this.priceD;
         data["currency"] = this.currency;
         data["parentCode"] = this.parentCode;
         data["imageType"] = this.imageType;
@@ -65175,6 +65187,10 @@ export interface IAppItemExcelDto {
     productCategoryCode: string | undefined;
     productCategoryDescription: string | undefined;
     price: string | undefined;
+    priceA: string | undefined;
+    priceB: string | undefined;
+    priceC: string | undefined;
+    priceD: string | undefined;
     currency: string | undefined;
     parentCode: string | undefined;
     imageType: string | undefined;

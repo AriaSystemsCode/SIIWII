@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SendMailModalComponent } from '@app/shared/common/Mail/sendMail-modal.component';
 import { MessagesComponent} from '../Messages/Messages.Component';
-import { SendMessageModalComponent} from '../Messages/SendMessage-Modal.Component';
+//import { SendMessageModalComponent} from '../Messages/SendMessage-Modal.Component';
 // import { MomentModule } from 'ngx-moment';
 import {niceDateFormatPipe} from './date-pip/niceDateFormatPipe'
 
@@ -37,7 +37,9 @@ import { TreeviewModule } from 'ngx-treeview';
 import { TreeModule } from 'primeng/tree';
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 @NgModule({
-  declarations: [MessagesComponent,SendMessageModalComponent,niceDateFormatPipe],
+  declarations: [MessagesComponent,
+    //SendMessageModalComponent,
+    niceDateFormatPipe],
   imports: [
     CommonModule,
     MessagesRoutingModule,
@@ -73,7 +75,9 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
     PopoverModule.forRoot(),
     SelectAddressModule
   ],
-  exports:[MessagesComponent,SendMessageModalComponent,niceDateFormatPipe],
+  exports:[MessagesComponent,
+    //SendMessageModalComponent,
+    niceDateFormatPipe],
   providers: [
     { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
     { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },

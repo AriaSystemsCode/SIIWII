@@ -70,6 +70,9 @@ export class SendMessageModalComponent
     demoUiEditor: DemoUiEditorComponent;
     public uploader: FileUploader;
     @Output() modalSave: EventEmitter<any> = new EventEmitter<any>();
+    @Input() modalView:boolean;
+    @Input() parentId:any;
+    @Input() entityId:any;
     active: boolean;
     displayCC: boolean = false;
     displayBCC: boolean = false;
@@ -503,7 +506,8 @@ export class SendMessageModalComponent
         this.messages.subject = this.subject;
         this.messages.bodyFormat = this.htmlEditorInput;
         this.messages.parentId = this.replyMessageId;
-        this.messages.threadId = this.threadId;
+        this.messages.threadId = !this.modalView?this.entityId:this.threadId;
+        this.messages.relatedEntityId =!this.modalView?this.entityId: undefined;
         this.messages.mesasgeObjectType = MesasgeObjectType.Message
         //this.Messages.entityAttachments=[];
         // this.Messages.entityAttachments=this.attachments
@@ -514,7 +518,7 @@ export class SendMessageModalComponent
             .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();}))
             .subscribe(() => {
                 this.notify.info(this.l("SendSuccessfully"));
-                this.SendMessageModal.hide();
+                if(this.SendMessageModal)this.SendMessageModal.hide();
                 this.active = false;
                 this.displayBCC = false;
                 this.displayCC = false;

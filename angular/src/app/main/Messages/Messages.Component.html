@@ -131,7 +131,7 @@ appRootUrl() +
                     border: 1px solid #eee !important;
                     box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
                     color: #9E9E9E ;
-                    height: 44px;" id="firstTabBtn">
+                    height: 44px;" id="firstTabBtn" >
                   <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
                   appRootUrl() +
                   'assets/message/Direct-Message-icon.svg'" border="0" /> 
@@ -648,7 +648,7 @@ margin-right: 6px;"></i>
                     </div>
                     </div>
                     
-                    <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
+                    <div #messageEl id="contentmsg"  class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
                         [scrollTop]="scrolltop" style="position: relative">
                         <div *ngFor="
                                     let messagedetail of messagesDetails;
@@ -714,9 +714,19 @@ margin-right: 6px;"></i>
                                     }}</span>
                             </div>
                             <br />
+                            <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="
+                            'Subject: '+messagedetail.messages.subject | safeHtml
+                        " class="msg-bodyformat pl-4  pt-2" [ngClass]="
+                            longmsgId == messagedetail.messages.id ||
+                            messagesDetails.length == 1
+                                ? ''
+                                : 'long-msg'
+                        ">
+                </span>
+                <br />
                             <span [innerHTML]="
                                         messagedetail.messages.bodyFormat | safeHtml
-                                    " class="msg-bodyformat" [ngClass]="
+                                    " class="msg-bodyformat pl-4" [ngClass]="
                                         longmsgId == messagedetail.messages.id ||
                                         messagesDetails.length == 1
                                             ? ''
@@ -813,9 +823,7 @@ margin-right: 6px;"></i>
                                                 .mesasgeObjectType
                                         )
                                     " class="ReplyBtn btn btn-primary">
-                                <img src="assets/message/replay.svg" style="width: 20px;
-                                color: #fff;
-                                filter: brightness(14);" />
+                                    <i class="fa fa-reply"></i>
                                 <span> {{ "Reply" | localize }}</span>
                             </button>
                             <button (click)="
@@ -825,9 +833,10 @@ margin-right: 6px;"></i>
                                             true
                                         )
                                     " class="ForwardBtn btn btn-primary">
+                                    <img src="assets/message/Forward.svg" style="width: 25px" />
                                 <span style="padding-right: 5px">{{
                                     "Forward" | localize
-                                    }}</span><img src="assets/message/forward.svg" style="width: 13px" />
+                                    }}</span>
                             </button>
                         </div>
                     </div>
@@ -1000,9 +1009,20 @@ margin-right: 6px;"></i>
                                     }}</span>
                             </div>
                             <br />
+                            <span *ngIf="messageCategoryFilter=='MESSAGE'" [innerHTML]="'Subject: '+
+                            messagedetail.messages.subject | safeHtml
+                        " class="msg-bodyformat pl-4 pt-2" [ngClass]="
+                            longmsgId == messagedetail.messages.id ||
+                            messagesDetails.length == 1
+                                ? ''
+                                : 'long-msg'
+                        ">
+                </span>
+                <br />
+
                             <span [innerHTML]="
                                         messagedetail.messages.bodyFormat | safeHtml
-                                    " class="msg-bodyformat" [ngClass]="
+                                    " class="msg-bodyformat pl-4" [ngClass]="
                                         longmsgId == messagedetail.messages.id ||
                                         messagesDetails.length == 1
                                             ? ''
@@ -1099,9 +1119,7 @@ margin-right: 6px;"></i>
                                                 .mesasgeObjectType
                                         )
                                     " class="ReplyBtn btn btn-primary">
-                                <img src="assets/message/replay.svg" style="width: 20px;
-                                color: #fff;
-                                filter: brightness(14);" />
+                                    <i class="fa fa-reply"></i>
                                 <span> {{ "Reply" | localize }}</span>
                             </button>
                             <button (click)="
@@ -1111,9 +1129,10 @@ margin-right: 6px;"></i>
                                             true
                                         )
                                     " class="ForwardBtn btn btn-primary">
+                                    <img src="assets/message/Forward.svg" style="width: 25px" />
                                 <span style="padding-right: 5px">{{
                                     "Forward" | localize
-                                    }}</span><img src="assets/message/forward.svg" style="width: 13px" />
+                                    }}</span>
                             </button>
                         </div>
                     </div>
@@ -1131,7 +1150,7 @@ margin-right: 6px;"></i>
 
 </div>
 
-<SendMessageModal #SendMessageModal (modalSave)="selectMessagetype(1, l('Inbox'))"></SendMessageModal>
+<SendMessageModal [modalView]="true" #SendMessageModal (modalSave)="selectMessagetype(1, l('Inbox'))"></SendMessageModal>
 <confirm-modal [content1]="l('Are you sure?')" [content2]="l('Are you sure to remove this message?')"
     [buttonYes]="l('Yes,Remove')" [buttonNo]="l('CancelAction')" [display]="displayDeleteMessage"
     [type]="'deleteMessage'" (buttonClicked)="onEmitButtonSaveYes($event)"></confirm-modal>

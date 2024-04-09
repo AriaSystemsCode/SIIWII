@@ -1,7 +1,7 @@
 import { Component, EventEmitter, ElementRef, Injector,HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppPostsServiceProxy, CreateMessageInput, GetMessagesForViewDto, MesasgeObjectType,
-     MessageServiceProxy, ProfileServiceProxy,AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
+     MessageServiceProxy, ProfileServiceProxy,AppEntitiesServiceProxy, MentionedUserInfo } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -20,6 +20,7 @@ export class AddCommentComponent extends AppComponentBase {
     @Input() relatedEntityId:any;
     suggListContLeft:any=0;
     suggListTop:any=0;
+    mentionedUsers:Array<any>=[];
 
     constructor(
         private injector: Injector,
@@ -64,7 +65,9 @@ export class AddCommentComponent extends AppComponentBase {
       spanHtml.innerHTML=contact.name;
       spanHtml.className='selectedContact'; 
       spanHtml.setAttribute("contenteditable", "false");
-      spanHtml.setAttribute("style", "border: 1px solid #92bfed;padding: 0px 5px;border-radius: 14px;background-color: #f7fbff;cursor: pointer");
+      spanHtml.setAttribute("userId", contact.userId);
+      spanHtml.setAttribute("tenantId", contact.tenantId);
+      spanHtml.setAttribute("style", "color:rgb(248 128 17);padding: 6px 4px;border-radius: 2px;background-color: rgba(248 ,128, 17,0.15);cursor: pointer;font-weight:700;");
 
       let pattern;
       let inputValueWithoutMentions=this.CommentTextArea.nativeElement.innerHTML;
@@ -84,7 +87,6 @@ export class AddCommentComponent extends AppComponentBase {
         pattern =String.fromCharCode(inputValueWithoutMentions.charCodeAt(0));
 
       }
-debugger
       let sel, range;
       if (window.getSelection) {
         // IE9 and non-IE
@@ -121,10 +123,13 @@ debugger
       this.showContactSuggstions=false;
 
     }
+    debugger
+    this.comment.body=this.CommentTextArea.nativeElement.innerHTML;
+
 }
 
     mentionContact(event){
-        this.comment.body=event.target.innerHTML;
+      this.comment.body=event.target.innerHTML;
         let inputValueWithoutMentions=event.target.innerHTML;
         if(event.target.childNodes.length>1){
             inputValueWithoutMentions='';
@@ -168,10 +173,22 @@ debugger
                  });
               }
         }
+
     }
     saveComment(){
         this.saving = true
         if(!this.comment.subject)this.comment.subject = `${MesasgeObjectType[MesasgeObjectType.Comment]} on ${this.comment.body.slice(0,10)}...`
+        this.mentionedUsers=[];
+        let newMentiondUser:MentionedUserInfo= new MentionedUserInfo();
+        this.CommentTextArea.nativeElement?.childNodes?.forEach((mentionContact)=>{
+         if(mentionContact.localName=='span'){
+        newMentiondUser.userId=parseInt(mentionContact.attributes.userid.value);
+         newMentiondUser.tenantId=parseInt(mentionContact.attributes.tenantid.value);
+         this.mentionedUsers.push(newMentiondUser)
+         }
+
+        })
+        this.comment.mentionedUsers=this.mentionedUsers;
         this.comment.bodyFormat = this.comment.body
         this.comment.messageCategory="UPDATEMESSAGE" ;
         this._messageServiceProxy.createMessage(this.comment)
