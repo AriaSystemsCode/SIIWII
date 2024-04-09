@@ -5005,7 +5005,9 @@ namespace onetouch.Accounts
                     addressDto.City = address.City;
                     addressDto.State = address.State;
                     addressDto.PostalCode = address.PostalCode;
-                    addressDto.CountryId = GetTypeId(address.CountryIdName, countries);
+                    if (string.IsNullOrEmpty(address.CountryIdName)) address.CountryIdName = "USA";
+                    var countryId = GetTypeId(address.CountryIdName, countries);
+                    addressDto.CountryId = countryId == 0 ? null : countryId;
                     addressDto.AccountId = AccountId;
                     var appAddressDtoRet = await CreateOrEditAddress(addressDto);
                     address.AddressId = appAddressDtoRet.Id;
