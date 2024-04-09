@@ -254,6 +254,9 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllComments(GetAllMessagesInput input)
         {
+            var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeComment();
+            var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
+            var orgComponentId = input.MainComponentEntitlyId;
             IQueryable<AppMarketplaceMessage> filteredMessages = null;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -290,6 +293,10 @@ namespace onetouch.Message
                             .WhereIf( input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
                                 e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
                                      e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
+                            .WhereIf(orgComponentId != null && orgComponentId != 0 && orgComponentId != input.MainComponentEntitlyId, 
+                                e => (e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)orgComponentId).Count() > 0 ||
+                                     e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)orgComponentId).Count() > 0) &&
+                                     e.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
                             .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
                             .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
@@ -299,7 +306,7 @@ namespace onetouch.Message
                         .Where(
                                  x =>
                                  //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
-                                 x.OriginalMessageId == x.Id  
+                                 x.OriginalMessageId == x.Id 
                              );
 
                 var pagedAndFilteredMessages = filteredMessages
@@ -764,6 +771,33 @@ namespace onetouch.Message
                 AppEntityDto appEntity = new AppEntityDto();
                 ObjectMapper.Map(input, appEntity);
                 appEntity.Name = "Message";
+                //MMT39
+                string transactionSSIN = "";
+                if (input.CreateMessageInput.RelatedEntityId != null)
+                {
+                    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == input.CreateMessageInput.RelatedEntityId).FirstOrDefaultAsync();
+                    if (entity != null && (entity.EntityObjectTypeCode == "SALESORDER" || entity.EntityObjectTypeCode == "PURCHASEORDER"))
+                    {
+                        transactionSSIN = entity.SSIN;
+                        //if (!string.IsNullOrEmpty(transactionSSIN))
+                        //{
+                        //    var entityShared = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                        //    if (entityShared != null)
+                        //    {
+                        //        input.CreateMessageInput.RelatedEntityId = entityShared.Id;
+                        //    }
+                        //}
+                    }
+                }
+                if (!string.IsNullOrEmpty(transactionSSIN) && tenantId != null)
+                {
+                    var entityTenant = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == tenantId).FirstOrDefaultAsync();
+                    if (entityTenant != null)
+                    {
+                        input.CreateMessageInput.RelatedEntityId = entityTenant.Id;
+                    }
+                }
+                //MMT39
                 //Iteration37,1 [Start]
                 //SycEntityObjectCategory messageCategory = null;
                 //if (input.CreateMessageInput.MessageCategory != null)
