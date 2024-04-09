@@ -293,10 +293,7 @@ namespace onetouch.Message
                             .WhereIf( input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
                                 e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
                                      e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
-                            .WhereIf(orgComponentId != null && orgComponentId != 0 && orgComponentId != input.MainComponentEntitlyId, 
-                                e => (e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)orgComponentId).Count() > 0 ||
-                                     e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)orgComponentId).Count() > 0) &&
-                                     e.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
+                            
                             .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
                             .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
@@ -348,7 +345,75 @@ namespace onetouch.Message
                 var unreadCount = 0;
 
                 var results = await appComments.ToListAsync();
-                foreach(var x in results)
+                //MMT
+                if (orgComponentId != null && orgComponentId != 0 && orgComponentId != input.MainComponentEntitlyId)
+                {
+                    var filteredMessages2 = _MessagesRepository.GetAll()
+                                                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                                                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
+                                                     .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
+                                                     .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
+                                                     .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
+                                                     .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
+                                              .WhereIf(orgComponentId != null && orgComponentId != 0,
+                                                  e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)orgComponentId).Count() > 0 ||
+                                                       e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)orgComponentId).Count() > 0)
+
+                                              .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
+                                              .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
+                                              .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
+                                              .WhereIf(!string.IsNullOrWhiteSpace(input.BodyFilter), e => e.Body == input.BodyFilter)
+                                              .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
+                                              .WhereIf(input.ThreadId != null && input.ThreadId > 0, e => e.ThreadId == input.ThreadId)
+                                          .Where(
+                                                   x =>
+                                                   //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
+                                                   x.OriginalMessageId == x.Id && (x.UserId == AbpSession.UserId || x.SenderId==AbpSession.UserId)
+                                                   && x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage && x.TenantId == AbpSession.TenantId
+                                               );
+
+                    var pagedAndFilteredMessages2 = filteredMessages2
+                        .OrderBy(input.Sorting ?? "id desc")
+                        .PageBy(input);
+                    var appComments2 = from o in pagedAndFilteredMessages2
+                                      select new
+                                       GetMessagesForViewDto()
+                                      {
+                                          Messages = new MessagesDto
+                                          {
+                                              SenderId = o.SenderId,
+                                              // To = o.To,
+                                              // CC = o.CC,
+                                              // BCC = o.BCC,
+                                              Subject = o.Subject,
+                                              Body = o.Body,
+                                              BodyFormat = o.BodyFormat,
+                                              SendDate = o.CreationTime,
+                                              ReceiveDate = o.CreationTime,
+                                              EntityCode = o.EntityCode,
+                                              Id = o.Id,
+                                              SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
+                                           + "." + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString()
+                                            + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
+                                              ThreadId = o.ThreadId,
+                                              ParentId = o.ParentId,
+                                              EntityId = (int)o.EntityId,
+                                              ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
+                                              HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
+                                              EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
+                                              RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                              ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                          },
+                                      }
+                                    ;
+
+                     totalCount += await filteredMessages2.CountAsync();
+
+                    var results2 = await appComments2.ToListAsync();
+                    results.AddRange(results2);
+                    }
+                //MMT
+                foreach (var x in results)
                 {
                     var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == x.Messages.SenderId).ProfilePictureId;
                     if (profilePictureId != null)
