@@ -771,6 +771,33 @@ namespace onetouch.Message
                 AppEntityDto appEntity = new AppEntityDto();
                 ObjectMapper.Map(input, appEntity);
                 appEntity.Name = "Message";
+                //MMT39
+                string transactionSSIN = "";
+                if (input.CreateMessageInput.RelatedEntityId != null)
+                {
+                    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == input.CreateMessageInput.RelatedEntityId).FirstOrDefaultAsync();
+                    if (entity != null && (entity.EntityObjectTypeCode == "SALESORDER" || entity.EntityObjectTypeCode == "PURCHASEORDER"))
+                    {
+                        transactionSSIN = entity.SSIN;
+                        //if (!string.IsNullOrEmpty(transactionSSIN))
+                        //{
+                        //    var entityShared = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                        //    if (entityShared != null)
+                        //    {
+                        //        input.CreateMessageInput.RelatedEntityId = entityShared.Id;
+                        //    }
+                        //}
+                    }
+                }
+                if (!string.IsNullOrEmpty(transactionSSIN) && tenantId != null)
+                {
+                    var entityTenant = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == tenantId).FirstOrDefaultAsync();
+                    if (entityTenant != null)
+                    {
+                        input.CreateMessageInput.RelatedEntityId = entityTenant.Id;
+                    }
+                }
+                //MMT39
                 //Iteration37,1 [Start]
                 //SycEntityObjectCategory messageCategory = null;
                 //if (input.CreateMessageInput.MessageCategory != null)
