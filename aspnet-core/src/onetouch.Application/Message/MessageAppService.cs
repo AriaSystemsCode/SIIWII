@@ -254,6 +254,9 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllComments(GetAllMessagesInput input)
         {
+            var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeComment();
+            var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
+            var orgComponentId = input.MainComponentEntitlyId;
             IQueryable<AppMarketplaceMessage> filteredMessages = null;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -290,6 +293,10 @@ namespace onetouch.Message
                             .WhereIf( input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
                                 e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
                                      e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
+                            .WhereIf(orgComponentId != null && orgComponentId != 0 && orgComponentId != input.MainComponentEntitlyId, 
+                                e => (e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)orgComponentId).Count() > 0 ||
+                                     e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)orgComponentId).Count() > 0) &&
+                                     e.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
                             .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
                             .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
@@ -299,7 +306,7 @@ namespace onetouch.Message
                         .Where(
                                  x =>
                                  //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
-                                 x.OriginalMessageId == x.Id  
+                                 x.OriginalMessageId == x.Id 
                              );
 
                 var pagedAndFilteredMessages = filteredMessages
