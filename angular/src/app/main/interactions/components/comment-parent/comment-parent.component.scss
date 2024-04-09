@@ -5,7 +5,7 @@
  
     app-add-comment:not(.comment-inner app-add-comment) {
         position: absolute;
-        bottom: 0px;
+        bottom: 40px;
         width: 98%;
         background-color: #F2F3F8;
         z-index: 10;
@@ -14,6 +14,11 @@
         padding: 10px 0px;
 
 
+    }
+    .toggle-replay-cont:not(.comment-inner .toggle-replay-cont){
+        position: absolute;
+        bottom: 5px;
+        right: 40px;
     }
 
 }

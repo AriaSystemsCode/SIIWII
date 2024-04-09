@@ -236,13 +236,13 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.getMesssage();
     }
 
-    getUpdatesMessage(event) {
+    getUpdatesMessage(event,messageType) {
         Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
             element.classList.remove("active-tab");
 
         });
         event.target.className+=' active-tab'
-        this.messageCategoryFilter = "THREAD";
+        this.messageCategoryFilter = messageType;
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();

@@ -4,6 +4,7 @@ import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   Messa
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
 import { BlockList } from 'net';
 import { SendMessageModalComponent } from '@app/main/Messages/SendMessage-Modal.Component';
+import * as moment from "moment";
 
 @Component({
     selector: 'app-comment-parent',
@@ -28,14 +29,36 @@ export class CommentParentComponent extends AppComponentBase {
     threadId : number
     creatorUserId : number;
     displayDeleteMessage:boolean=false;
+    showRegularComment:boolean=true;
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
         private _injector : Injector
         ) {
             super(_injector)
-        }
+         }
+         toggleMessageType(type:number){
+            type==1?this.showRegularComment=true:this.showRegularComment=false;
+         }         
         saveNewDirectMsg(){
 
+            this._messageServiceProxy
+            .getAll(
+                '',
+                '',
+                '',
+                1,
+                0,
+                this.entityId,
+                this.parentId,
+                "MESSAGE",
+                "",
+                this.skipCount,
+                this.maxResultCount
+            )
+            .subscribe((result) => {
+
+                 debugger
+            });
         }
 
     show(creatorUserId:number,entityId:number,parentId?:number,threadId?:number){
@@ -74,11 +97,12 @@ export class CommentParentComponent extends AppComponentBase {
             undefined,
             this.entityId,
             this.parentId,
-            undefined,"UPDATEMESSAGE",
+            undefined,"MESSAGE",
             undefined,
             this.skipCount,
             this.maxResultCount)
         .subscribe((res)=>{
+            debugger
             if(!res) return
             this.skipCount += this.maxResultCount
             this.totalCount = res.totalCount

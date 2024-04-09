@@ -18,7 +18,7 @@ import { TableModule } from "primeng/table";
 import { AppAuthService } from "./auth/app-auth.service";
 import { AppRouteGuard } from "./auth/auth-route-guard";
 import { CommonLookupModalComponent } from "./lookup/common-lookup-modal.component";
-import { EntityTypeHistoryModalComponent } from "./entityHistory/entity-type-history-modal.component";
+import { EntityTypeHistoryModalComponent } from "./entityHistory/entity-type-history-modal.component"; 
 import { EntityChangeDetailModalComponent } from "./entityHistory/entity-change-detail-modal.component";
 import { DateRangePickerInitialValueSetterDirective } from "./timing/date-range-picker-initial-value.directive";
 import { DatePickerInitialValueSetterDirective } from "./timing/date-picker-initial-value.directive";
@@ -71,6 +71,8 @@ import { MatrixGridComponent } from "./matrix-grid/matrix-grid.component";
 import { SelectionModalComponent } from "./selection-modals/selection-modal.component";
 import { AppSideBarComponent } from "./app-side-bar/app-side-bar.component";
 import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app-transaction-side-bar/app-transaction-side-bar.component";
+import { SendMessageModalComponent } from "@app/main/Messages/SendMessage-Modal.Component";
+import { EditorModule } from 'primeng/editor';
 
 @NgModule({
     imports: [
@@ -95,7 +97,8 @@ import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app
         AutoCompleteModule,
         ImageCropperModule,
         ScrollingModule,
-        CheckboxModule
+        CheckboxModule,
+        EditorModule
     ],
     declarations: [
         TimeZoneComboComponent,
@@ -136,7 +139,9 @@ import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app
         MatrixGridComponent,
         GenericFormModalComponent,
         SelectionModalComponent,
-        AppSideBarComponent,AppTransactionSideBarComponent
+        AppSideBarComponent,AppTransactionSideBarComponent,
+        SendMessageModalComponent
+
     ],
     exports: [
         TimeZoneComboComponent,
@@ -157,7 +162,8 @@ import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app
         ProgressComponent,
         MatrixGridComponent,
         GenericFormModalComponent,
-        SelectionModalComponent,AppSideBarComponent
+        SelectionModalComponent,AppSideBarComponent,
+        SendMessageModalComponent
     ],
     providers: [
         DateTimeService,
