@@ -5315,9 +5315,9 @@ namespace onetouch.Accounts
                     accountContact.Phone1Ext = createOrEditAccountInfoDto.Phone1Ex;
                     accountContact.Phone2Ext = createOrEditAccountInfoDto.Phone2Ex;
                     accountContact.Phone3Ext = createOrEditAccountInfoDto.Phone3Ex;
-                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId;
-                    accountContact.Phone2TypeId = createOrEditAccountInfoDto.Phone2TypeId;
-                    accountContact.Phone3TypeId = createOrEditAccountInfoDto.Phone3TypeId;
+                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId == 0 ? null : createOrEditAccountInfoDto.Phone1TypeId; 
+                    accountContact.Phone2TypeId = createOrEditAccountInfoDto.Phone2TypeId == 0 ? null : createOrEditAccountInfoDto.Phone2TypeId;
+                    accountContact.Phone3TypeId = createOrEditAccountInfoDto.Phone3TypeId == 0 ? null : createOrEditAccountInfoDto.Phone3TypeId;
                     accountContact.PriceLevel = createOrEditAccountInfoDto.PriceLevel;
                     accountContact.Website = createOrEditAccountInfoDto.Website;
                     accountContact.EntityFk = new AppEntity();
@@ -5496,9 +5496,9 @@ namespace onetouch.Accounts
                             branchContact.Phone1Ext = branchDto.Phone1Ext;
                             branchContact.Phone2Ext = branchDto.Phone2Ext;
                             branchContact.Phone3Ext = branchDto.Phone3Ext;
-                            branchContact.Phone1TypeId = branchDto.Phone1TypeId;
-                            branchContact.Phone2TypeId = branchDto.Phone2TypeId;
-                            branchContact.Phone3TypeId = branchDto.Phone3TypeId;
+                            branchContact.Phone1TypeId = branchDto.Phone1TypeId == 0 ? null : branchDto.Phone1TypeId;
+                            branchContact.Phone2TypeId = branchDto.Phone2TypeId == 0 ? null : branchDto.Phone2TypeId;
+                            branchContact.Phone3TypeId = branchDto.Phone3TypeId == 0 ? null : branchDto.Phone3TypeId;
                             branchContact.PriceLevel = accountContact.PriceLevel;
                             branchContact.Website = branchDto.Website;
                             branchContact.EntityFk = new AppEntity();
@@ -5636,9 +5636,9 @@ namespace onetouch.Accounts
                                     teamContact.Phone1Ext = personDto.Phone1Ext;
                                     teamContact.Phone2Ext = personDto.Phone2Ext;
                                     teamContact.Phone3Ext = personDto.Phone3Ext;
-                                    teamContact.Phone1TypeId = personDto.Phone1TypeId;
-                                    teamContact.Phone2TypeId = personDto.Phone2TypeId;
-                                    teamContact.Phone3TypeId = personDto.Phone3TypeId;
+                                    teamContact.Phone1TypeId = personDto.Phone1TypeId == 0 ? null : personDto.Phone1TypeId;
+                                    teamContact.Phone2TypeId = personDto.Phone2TypeId == 0 ? null : personDto.Phone2TypeId;
+                                    teamContact.Phone3TypeId = personDto.Phone3TypeId == 0 ? null : personDto.Phone3TypeId;
                                     teamContact.PriceLevel = accountContact.PriceLevel;
                                     teamContact.Website = personDto.Website;
                                     teamContact.EntityFk = new AppEntity();
