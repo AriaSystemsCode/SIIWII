@@ -3767,7 +3767,10 @@ namespace onetouch.Accounts
                 var logoAttach = input.EntityAttachments.Where(x => x.AttachmentCategoryId == attPhotoId).FirstOrDefault();
                 if (logoAttach != null && !string.IsNullOrEmpty(logoAttach.FileName))
                 {
+                    if (!string.IsNullOrEmpty(logoAttach.guid))
                     await UpdateProfilePicture(logoAttach.guid + "." + logoAttach.FileName.Split('.')[1], long.Parse(input.UserId.ToString()));
+                    else
+                        await UpdateProfilePicture( logoAttach.FileName, long.Parse(input.UserId.ToString()));
                 }
             }
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
