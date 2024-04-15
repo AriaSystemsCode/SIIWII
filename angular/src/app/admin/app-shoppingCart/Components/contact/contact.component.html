@@ -52,18 +52,12 @@
                                 />
                         </div>
                     </div>
-                    <div *ngIf="
-                            phoneNumberInput.invalid &&
-                            (phoneNumberInput.dirty || phoneNumberInput.touched)
-                        " class="text-danger">
-                        <small *ngIf="phoneNumberInput.errors.required">
-                            Phone number is required with length 5-20
-                        </small>
-                        <small *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber && (appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber?.length <5 || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber?.length>20 )">
-                            Phone number is required with length 5-20
-                        </small>
-                        <small *ngIf="phoneNumberInput.errors.pattern">
+                    <div *ngIf="phoneNumberInput.invalid && (phoneNumberInput.dirty || phoneNumberInput.touched)" class="text-danger">
+                        <small *ngIf="phoneNumberInput.errors?.pattern">
                             Phone number must contain only numbers.
+                        </small>
+                        <small *ngIf="!phoneNumberInput.errors?.pattern && (phoneNumberInput.value.length < 5 || phoneNumberInput.value.length > 20)">
+                            Phone number must be between 5 and 20 characters long.
                         </small>
                     </div>
                 </div>
@@ -105,7 +99,7 @@
             </div>
             <div *ngIf="emailInput.errors &&(emailInput.touched || emailInput.dirty)" class="text-danger">
         <small >
-            Phone number is required with length 5-20
+            Invalid  Email
         </small>
         </div>
         </div>
