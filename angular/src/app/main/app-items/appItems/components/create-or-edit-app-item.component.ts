@@ -631,7 +631,7 @@ export class CreateOrEditAppItemComponent
         if (data.selectionDone && data.selectedRecord) {
             // add or edit done
            if(!(this.appItem?.id>0)) {
-            this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false).subscribe((res: any) => {
+            this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false,undefined).subscribe((res: any) => {
                 this.appItem.code = res;
                 this.appItem.OriginalCode = res
             })
