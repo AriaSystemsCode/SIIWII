@@ -444,6 +444,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
     areSame: boolean = false;
     async getStarted() {
+
+        if(this.isBuyerTempAccount){
+        this.orderForm = this.fb.group({
+            buyerCompanyBranch:["", null]
+        }) 
+    }
+
         if ((!this.sellerCompanyId || !this.buyerComapnyId)  || (this.sellerCompanyId !== this.buyerComapnyId)) {
             this.areSame = false;
             this.submitted = true;
@@ -498,6 +505,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             if (this.invalidSellerPhoneNumber || this.invalidBuyerPhoneNumber || this.invalidBuyerContactEMailAddress || this.invalidSellerContactEMailAddress)
                 return;
             if (this.orderForm.invalid) {
+                Object.keys(this.orderForm.controls).forEach(key => {
+                    const control = this.orderForm.get(key);
+                    if (control.invalid) {
+                        console.log('Invalid control:', key, 'Value:', control.value);
+                    }
+                });
                 return;
             } else {
                 if (this.role === "") {
@@ -556,13 +569,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         buyerContactSSIN: this.buyerContactSSIN,
                         sellerCompanySSIN: this.sellerCompanySSIN,
                         buyerCompanySSIN: this.buyerCompanySSIN,
-                        buyerBranchSSIN: this.orderForm.controls['buyerCompanyBranch'].value.ssin,
-                        buyerBranchName: this.orderForm.controls['buyerCompanyBranch'].value.name,
-                        sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch'].value.ssin,
-                        sellerBranchName: this.orderForm.controls['sellerCompanyBranch'].value.name,
-                        completeDate: moment.utc(this.orderForm.controls['completeDate'].value.toLocaleString()),
-                        startDate: moment.utc(this.orderForm.controls['startDate'].value.toLocaleString()),
-                        availableDate: moment.utc(this.orderForm.controls['availableDate'].value.toLocaleString())
+                        buyerBranchSSIN: this.orderForm.controls['buyerCompanyBranch']?.value?.ssin,
+                        buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
+                        sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
+                        sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
+                        completeDate: moment.utc(this.orderForm.controls['completeDate']?.value?.toLocaleString()),
+                        startDate: moment.utc(this.orderForm.controls['startDate']?.value?.toLocaleString()),
+                        availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString())
                     };
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,

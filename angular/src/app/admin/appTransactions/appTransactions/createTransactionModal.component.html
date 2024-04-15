@@ -306,12 +306,12 @@
                     </div>
                     <!-- buyer email -->
                     <!-- buyer company branch -->
-                <div class="col-md-6">
+                <div class="col-md-6"  *ngIf="!isBuyerTempAccount">
                     <div class="mb-3">
                         <label for="" class="form-label"
                             >Branch*</label
                         >
-                            <div *ngIf="!isBuyerTempAccount">
+                            <div>
                                 <p-dropdown
                                 [virtualScroll]="true" [itemSize]="30"
                                     [options]="buyerBranches"
@@ -319,7 +319,7 @@
                                     [filter]="true"
                                     optionLabel="name"
                                     placeholder="Please Select Branch"
-                                    required
+                                    [required]="!isBuyerTempAccount"
                                 ></p-dropdown>
                             </div>
             
