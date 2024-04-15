@@ -213,6 +213,9 @@ export class ShoppingCartViewComponentComponent
             if (res.transactionType == TransactionType.SalesOrder)
               this.transactionType = "Sales Order";
 
+              this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
+
+
             if (!temp) this.shoppingCartTreeNodes = res.detailsView;
             else this.shoppingCartTreeNodes = temp;
 
