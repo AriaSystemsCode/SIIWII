@@ -19774,12 +19774,15 @@ export class AppTransactionServiceProxy {
 
     /**
      * @param productSSIN (optional) 
+     * @param tenantId (optional) 
      * @return Success
      */
-    getProductFromMarketplace(productSSIN: string | null | undefined): Observable<void> {
+    getProductFromMarketplace(productSSIN: string | null | undefined, tenantId: number | null | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetProductFromMarketplace?";
         if (productSSIN !== undefined && productSSIN !== null)
             url_ += "productSSIN=" + encodeURIComponent("" + productSSIN) + "&";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
