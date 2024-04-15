@@ -53197,7 +53197,7 @@ export class AppAddressDto implements IAppAddressDto {
     city!: string | undefined;
     state!: string | undefined;
     postalCode!: string | undefined;
-    countryId!: number;
+    countryId!: number | undefined;
     countryCode!: string | undefined;
     countryIdName!: string | undefined;
     useDTOTenant!: boolean;
@@ -53278,7 +53278,7 @@ export interface IAppAddressDto {
     city: string | undefined;
     state: string | undefined;
     postalCode: string | undefined;
-    countryId: number;
+    countryId: number | undefined;
     countryCode: string | undefined;
     countryIdName: string | undefined;
     useDTOTenant: boolean;
@@ -70326,7 +70326,7 @@ export class ContactAppAddressDto implements IContactAppAddressDto {
     city!: string | undefined;
     state!: string | undefined;
     postalCode!: string | undefined;
-    countryId!: number;
+    countryId!: number | undefined;
     countryCode!: string | undefined;
     countryIdName!: string | undefined;
     useDTOTenant!: boolean;
@@ -70413,7 +70413,7 @@ export interface IContactAppAddressDto {
     city: string | undefined;
     state: string | undefined;
     postalCode: string | undefined;
-    countryId: number;
+    countryId: number | undefined;
     countryCode: string | undefined;
     countryIdName: string | undefined;
     useDTOTenant: boolean;
@@ -73023,7 +73023,7 @@ export class ContactAddressDto implements IContactAddressDto {
     city!: string | undefined;
     state!: string | undefined;
     postalCode!: string | undefined;
-    countryId!: number;
+    countryId!: number | undefined;
     countryCode!: string | undefined;
     countryIdName!: string | undefined;
     useDTOTenant!: boolean;
@@ -73107,7 +73107,7 @@ export interface IContactAddressDto {
     city: string | undefined;
     state: string | undefined;
     postalCode: string | undefined;
-    countryId: number;
+    countryId: number | undefined;
     countryCode: string | undefined;
     countryIdName: string | undefined;
     useDTOTenant: boolean;

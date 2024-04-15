@@ -557,6 +557,7 @@ export class CreateEditAppItemVariationsComponent
                 this.attributeID  ?     this.attributeID  : this.appItem?.sycIdentifierId,
                 this.productCode,
                 this.productTypeId,
+                this.appSession.tenantId,
                 variationMatricesWithoutValuesIds
             )
             .subscribe((response: any) => {
