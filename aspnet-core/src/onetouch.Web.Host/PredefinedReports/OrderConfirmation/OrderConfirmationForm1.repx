@@ -226,7 +226,7 @@
         </Item6>
         <Item7 Ref="122" ControlType="XRLabel" Name="label13" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="392.66922,38.57625" LocationFloat="18.520874,252.720688" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
-            <Item1 Ref="123" EventName="BeforePrint" PropertyName="Text" Expression="'Contact: '+[SellerContactName]" />
+            <Item1 Ref="123" EventName="BeforePrint" PropertyName="Text" Expression="'Contact: '+[AppTransactionHeadersTenantAddress].[tenantName]&#xA;" />
           </ExpressionBindings>
           <StylePriority Ref="124" UseFont="false" UseTextAlignment="false" />
         </Item7>
