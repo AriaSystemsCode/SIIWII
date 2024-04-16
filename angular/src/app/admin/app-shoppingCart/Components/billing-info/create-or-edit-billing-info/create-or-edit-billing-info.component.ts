@@ -82,7 +82,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
       apContactObj[0]?.contactAddressDetail ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
       arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
 debugger
-      if (this.enableSAveArcontact && this.enableSAveApcontact) {   //&& this.appTransactionsForViewDto.paymentTermsId
+      if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) {   
         this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 
       }
@@ -111,8 +111,8 @@ debugger
         } else {
           arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
         }
-        this.enableSAveArcontact && this.enableSAveApcontact ? this.isContactsValid = true : this.isContactsValid = false;   //&& this.appTransactionsForViewDto.paymentTermsId
-        if (this.enableSAveArcontact && this.enableSAveApcontact) { //&& this.appTransactionsForViewDto.paymentTermsId
+        this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId ? this.isContactsValid = true : this.isContactsValid = false;    
+        if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
           this.isContactsValid = true;
           this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 

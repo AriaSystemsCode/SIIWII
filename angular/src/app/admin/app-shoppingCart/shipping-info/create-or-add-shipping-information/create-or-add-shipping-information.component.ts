@@ -88,7 +88,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
       shipFromObj[0]?.contactAddressDetail ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
       shipToObj[0]?.contactAddressDetail ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
 
-      if (this.enableSAveShipFrom && this.enableSAveShipTo) { //&&this.appTransactionsForViewDto.shipViaId
+      if (this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId) { 
         this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
       }
@@ -191,9 +191,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
         } else {
           shipToObj[0]?.contactAddressDetail ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
         }
-        this.enableSAveShipFrom && this.enableSAveShipTo ? this.shipingTabVaild = true : this.shipingTabVaild = false;  //&&this.appTransactionsForViewDto.shipViaId
+        this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId ? this.shipingTabVaild = true : this.shipingTabVaild = false;  
 
-        if (this.enableSAveShipFrom && this.enableSAveShipTo) {  //&&this.appTransactionsForViewDto.shipViaId
+        if (this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId) {  
           this.shipingTabVaild = true;
           this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
