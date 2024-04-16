@@ -508,6 +508,9 @@ export class TopBarComponent
                     this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
 
 
+                  if(this.shoppingCartSummary?.amount)
+                  this.shoppingCartSummary?.amount % 1 ==0?this.shoppingCartSummary.amount=parseFloat(Math.round(this.shoppingCartSummary.amount * 100 / 100).toFixed(2)):null; 
+
                 if (openShoppingCart)
                     this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);
 

@@ -69,7 +69,7 @@
                     </td>
                     <td *ngFor="let col of columns;index as i">
                         <div *ngIf="!cellSelectionIsEditable || (cellSelectionIsEditable && !cellSelectionFormInput)else elseCellSelectionTemp">
-                            <span *ngIf="rowData?.rowValues[i]">{{rowData?.rowValues[i][cellLabelField]}}</span>
+                            <span *ngIf="rowData?.rowValues[i]"> {{ convertTodecimal(rowData?.rowValues[i][cellLabelField])}}</span>
                         </div>
                         <ng-template #elseCellSelectionTemp>
                             <div [ngSwitch]="cellSelectionFormInput.type">
