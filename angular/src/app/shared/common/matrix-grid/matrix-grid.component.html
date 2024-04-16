@@ -77,7 +77,7 @@
                                     <input 
                                         type="number" 
                                         [id]="rowData.rowHeader.value+index"
-                                        [ngModel]='rowData.rowValues[i].value' 
+                                        [ngModel]="convertTodecimal(rowData.rowValues[i].value)"
                                         [ngModelOptions]="{updateOn:'blur'}"
                                         (ngModelChange)="rowData.rowValues[i].value=convertTodecimal($event)" 
                                         [ngClass]="cellSelectionFormInput.customClass"

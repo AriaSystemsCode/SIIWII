@@ -69,12 +69,12 @@
                             </div>
                             <div class="col mb-4">
 
-                                <app-codes  *ngIf="appItem?.id>0" [objectType]="entityObjectType" [editMode]=true  [readonly]="true"
+                                <app-codes *ngIf="!(appItem?.id>0)" [objectType]="entityObjectType" [editMode]=false
                                     classes="bg-white" [code]="appItem?.code"
                                     placeHolder="{{ 'ProductCode' | localize}}" (getCodeValue)="getCodeValue($event)">
                                 </app-codes>
-                                <app-codes *ngIf="!(appItem?.id>0)"  [objectType]="entityObjectType" [readonly]="false"
-                                    [editMode]=false classes="bg-white" [code]="appItem?.code"
+                                <app-codes *ngIf="appItem?.id>0" [objectType]="entityObjectType" [readonly]="false"
+                                    [editMode]=true classes="bg-white" [code]="appItem?.code"
                                     placeHolder="{{ 'ProductCode' | localize}}"
                                     (getCodeValue)="getCodeValue($event)"></app-codes>
                             </div>
@@ -395,7 +395,7 @@
 
                                         <input type="number" step="any" name="price" class="form-control"
                                             id="AppItem_Price" #AppItem_Price="ngModel"
-                                            [(ngModel)]="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price"
+                                            [ngModel]="convertTodecimal(appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price)"
                                             [ngModelOptions]="{updateOn:'blur'}"
                                             (ngModelChange)="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price=convertTodecimal($event)" 
                                            >
