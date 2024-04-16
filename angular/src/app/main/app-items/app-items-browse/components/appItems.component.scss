@@ -21,6 +21,38 @@ button{
     height: 6px;
 }
 
+
+.selection-btns{
+    border-radius: 6px;
+    background-color: white !important;
+    color: #4A0D4A !important;
+    border: 1px #EEEEEEEE !important;
+    padding:15px !important
+}
+
+.btn-sync{
+    border-radius: 6px;
+    background-color: white !important;
+    color: #F88011 !important;
+    border: 1px #EEEEEEEE !important;
+    padding: 15px !important
+}
+
+.btn-applySelection{
+    border-radius: 6px;
+    background-color: #4A0D4A !important;
+    color: white !important;
+    border: 1px #EEEEEEEE !important;
+    padding: 15px !important
+}
+
+.icon-box{
+    border: 1px solid #D9D9D9 !important;
+    padding: 10px !important;
+    background-color: #D9D9D9 !important;
+    border-radius: 10px !important;
+}
+
 .selection-bar {
     gap: 20px;
     background-color: $purple-dark!important;
