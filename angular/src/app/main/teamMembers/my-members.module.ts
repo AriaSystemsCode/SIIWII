@@ -13,6 +13,8 @@ import { CreateOrEditMemberComponent } from './components/create-or-edit-member/
 import { ViewMemberProfileComponent } from './components/view-member-profile/view-member-profile.component';
 import { SelectBranchModule } from '@app/select-branch/select-branch.module';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { CalendarModule } from 'primeng/calendar';
+
 @NgModule({
     declarations: [
         CreateOrEditMemberComponent,
@@ -29,7 +31,8 @@ import { InputSwitchModule } from 'primeng/inputswitch';
         UtilsModule,
         FormsModule,
         BsDatepickerModule.forRoot(),
-        SelectBranchModule
+        SelectBranchModule,
+        CalendarModule
     ],
     exports: [
         CreateOrEditMemberComponent,
