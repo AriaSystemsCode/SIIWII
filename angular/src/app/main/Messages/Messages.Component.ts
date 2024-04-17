@@ -27,7 +27,7 @@ import { AppConsts } from "@shared/AppConsts";
 import { DomSanitizer } from "@angular/platform-browser";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { finalize } from "rxjs/operators";
-
+import { AddCommentComponent } from "../comments/components/add-comment/add-comment.component";
 @Component({
     templateUrl: "./Messages.component.html",
     styleUrls: ["./Messages.component.scss"],
@@ -108,7 +108,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.containerdetails.nativeElement.scrollHeight;
         } catch (err) {}
     } */
+    newCommentAddedHandler(event){
 
+    }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
         this.messageTypeIndex = messagetypeIndex;
