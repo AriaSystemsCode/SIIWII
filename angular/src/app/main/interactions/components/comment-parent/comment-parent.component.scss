@@ -1,8 +1,11 @@
 .cart-cont {
-    max-height: 306px;
+    max-height: 362px;
     overflow-y: auto;
     padding: 0 !important;
- 
+    &.large-height{
+        max-height: 555px;
+
+    }
     app-add-comment:not(.comment-inner app-add-comment) {
         position: absolute;
         bottom: 40px;
@@ -90,3 +93,11 @@
     :host ::ng-deep .cart-cont .logo {
         width: 35px;
     }    
+    .comment-inner{
+        position: relative;
+    }
+    :host ::ng-deep .comment-inner .reply-w-direct-message{
+        position:initial !important;
+        width: 94%;
+        margin: 0 auto;
+    }

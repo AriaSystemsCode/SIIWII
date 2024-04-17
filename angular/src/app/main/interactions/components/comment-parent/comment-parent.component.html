@@ -1,5 +1,5 @@
-<div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'' ]" >
-    <app-add-comment *ngIf="showRegularComment" [cartStyle]="cartStyle"
+<div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ]" >
+    <app-add-comment [hidden]="!showRegularComment" *ngIf="addNewThread||!addNewThread&&commentType!=='MESSAGE'" [cartStyle]="cartStyle"
         (saveDone)="newCommentAddedHandler($event)"
         [relatedEntityId]="entityId"
         #AddCommentComponent>
@@ -7,7 +7,7 @@
 
 <SendMessageModal [entityId]="entityId" 
 [parentId]="parentId"
-*ngIf="!showRegularComment" 
+*ngIf="!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp"  
 #SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()"></SendMessageModal>
 
 
@@ -32,6 +32,7 @@
                 [threadId]="comment.messages.threadId"
                 [postCreatorUserId]="creatorUserId"
                 (refreshStats)="newCommentAddedHandler()"
+                [commentType]="comment.messages.entityObjectTypeCode"
             ></app-interactions>
         </div>
     </div>

@@ -93,7 +93,9 @@ export class SendMessageModalComponent
     constructor(
         injector: Injector,
         private _tokenService: TokenService,
-        private _MessageServiceProxy: MessageServiceProxy
+        private _MessageServiceProxy: MessageServiceProxy,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
+
     ) {
         super(injector);
     }
@@ -552,4 +554,29 @@ export class SendMessageModalComponent
                 }
             });
     }
+        // get Users related to entity
+        filterUsersFilterByEntity(event): void {
+            this._appEntitiesServiceProxy.
+            getContactsToMention(this.entityId,event.query)
+                .subscribe((Users) => {
+                    this.filteredUsers = [];
+                    for (var i = 0; i < Users.length; i++) {
+                        //xxx
+                        if (
+                            Users[i].users.value.toString() !=
+                            this.appSession.userId.toString()
+                        ) {
+                            //xxx
+                            //I2-9 -  receipt name, last name @ tenant name
+                            Users[i].users.name +=
+                                "." +
+                                Users[i].surname +
+                                " @ " +
+                                Users[i].tenantName;
+                            //  Users[i].users.name += "@" + Users[i].tenantName;
+                            this.filteredUsers.push(Users[i].users);
+                        }
+                    }
+                });
+        }
 }

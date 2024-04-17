@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Output, ViewChild ,Input} from '@angular/core';
+import { Component, EventEmitter, Injector, Output, ViewChild ,Input,AfterViewInit} from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
@@ -11,14 +11,17 @@ import * as moment from "moment";
     templateUrl: './comment-parent.component.html',
     styleUrls: ['./comment-parent.component.scss']
 })
-export class CommentParentComponent extends AppComponentBase {
+export class CommentParentComponent extends AppComponentBase implements AfterViewInit{
     @ViewChild("AddCommentComponent") addCommentComponent: AddCommentComponent
     @ViewChild("SendMessageModalComponent") SendMessageModalComponent: SendMessageModalComponent
 
     @Output() newCommentAdded : EventEmitter<any> = new EventEmitter<any>()
     @Input() cartStyle: boolean;
     @Input() addNewThread:boolean;
+    @Input() commentType:any;
+
     active : boolean = true;
+    showDirectMessageComp:boolean=false;
     showCommentToggle:boolean=false;
     comments : GetMessagesForViewDto[] = []
     skipCount : number = 0
@@ -36,6 +39,11 @@ export class CommentParentComponent extends AppComponentBase {
         ) {
             super(_injector)
          }
+         ngAfterViewInit(): void {
+            this.toggleMessageType(this.commentType=='MESSAGE'?2:1)
+
+        }
+
          toggleMessageType(type:number){
             type==1?this.showRegularComment=true:this.showRegularComment=false;
          }         
@@ -56,8 +64,6 @@ export class CommentParentComponent extends AppComponentBase {
                 this.maxResultCount
             )
             .subscribe((result) => {
-
-                 debugger
             });
         }
 
@@ -83,11 +89,16 @@ export class CommentParentComponent extends AppComponentBase {
         comment.senderId = this.appSession?.user?.id
         comment.mesasgeObjectType = MesasgeObjectType.Comment;
         this.showCommentToggle=true;
-        this.addCommentComponent.show(comment)
+        if(this.commentType!=='MESSAGE')this.addCommentComponent.show(comment)
     }
 
     focusAddComment(){
-        this.addCommentComponent.focusCommentTextArea()
+ 
+        if(this.showRegularComment){
+            this.addCommentComponent.focusCommentTextArea()
+        }else{
+            this.showDirectMessageComp=true;
+        }
     }
     getAllComments(){
         this._messageServiceProxy.getAllComments(
@@ -102,7 +113,6 @@ export class CommentParentComponent extends AppComponentBase {
             this.skipCount,
             this.maxResultCount)
         .subscribe((res)=>{
-            debugger
             if(!res) return
             this.skipCount += this.maxResultCount
             this.totalCount = res.totalCount
@@ -116,5 +126,7 @@ export class CommentParentComponent extends AppComponentBase {
     hide(){
         this.active = false
         this.addCommentComponent.active = false
+        this.showDirectMessageComp=false;
+
     }
 }

@@ -144,14 +144,14 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         if (this.formType.toUpperCase() == "PO")
             transactionType = TransactionType.PurchaseOrder;*/
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result=>{
-            if (this.formType.toUpperCase() == "SO"){
+            if (this.formType?.toUpperCase() == "SO"){
                 if(result.toLowerCase().includes('seller')){
                   this.roleDdval=this.roles.filter(role=>role.code==1)[0];
 
                 }else{
                     this.roleDdval=this.roles.filter(role=>role.code!==1)[0];
                 }
-            }else if (this.formType.toUpperCase() == "PO"){
+            }else if (this.formType?.toUpperCase() == "PO"){
                 if(result.toLowerCase().includes('buyer')){
                     this.roleDdval=this.roles.filter(role=>role.code==2)[0];
 
@@ -225,9 +225,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
     handleRoleChange(data: any) {
         
-        this.role = data.value.name;
+        this.role = data?.value?.name;
         this.isRoleExist = false;
-        if (data.value.code === 1) {
+        if (data?.value?.code === 1) {
             // i'm a Seller
             this.isSeller = true;
             this.isBuyer = false;
@@ -255,7 +255,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.sellerBranches=[];
                     this.getBranches(this.sellerCompanySSIN ,'seller')
                 });
-        } else if (data.value.code === 2) {
+        } else if (data?.value?.code === 2) {
             // i'm a buyer
             this.isSeller = false;
             this.isBuyer = true;
@@ -619,9 +619,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     async validateShoppingCart() {
         this.showMainSpinner();
         var transactionType: TransactionType;
-        if (this.formType.toUpperCase() == "SO")
+        if (this.formType?.toUpperCase() == "SO")
             transactionType = TransactionType.SalesOrder;
-        if (this.formType.toUpperCase() == "PO")
+        if (this.formType?.toUpperCase() == "PO")
             transactionType = TransactionType.PurchaseOrder;
         let sellerCompanySSIN = "";
         if (this.sellerCompanySSIN)
@@ -770,7 +770,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         );
 
                         
-                        if (this.formType.toUpperCase() == "PO")
+                        if (this.formType?.toUpperCase() == "PO")
                             this.currencyCode=  this.appSession.tenant.currencyInfoDto;
                             
                         localStorage.setItem(
