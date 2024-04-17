@@ -2886,8 +2886,7 @@ namespace onetouch.AppSiiwiiTransaction
                         entityVar.Id = 0;
                         entityVar.EntityExtraData = null;
                         entityVar.ObjectId = itemObjectId;
-
-                       
+                        entityVar.Code = itemVar.Code;
                         entityVar.EntityAttachments = null;
                         entityVar.EntityClassifications = null;
                         entityVar.EntityCategories = null;
@@ -3031,6 +3030,8 @@ namespace onetouch.AppSiiwiiTransaction
                             item.EntityFk.EntityExtraData.Add(extr);
 
                         }
+                    }
+                    { 
                         if (marketplaceItem.EntityCategories != null)
                         {
                             item.EntityFk.EntityCategories = new List<AppEntityCategory>();
@@ -3111,7 +3112,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         extr.EntityId = tenantVariation.EntityFk.Id;
                                         extr.Id = 0;
                                         extr.EntityFk = null;
-                                        extr.EntityCode = variation.Code;
+                                        extr.EntityCode = tenantVariation.Code;
 
                                         if (ext.AttributeId == 202 && !string.IsNullOrEmpty(ext.AttributeValue))
                                             MoveFile(ext.AttributeValue, -1,tenantId);
@@ -3126,7 +3127,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     {
                                         AppEntityCategory entCategory = new AppEntityCategory();
                                         entCategory.EntityId = tenantVariation.EntityFk.Id;
-                                        entCategory.EntityCode = variation.Code;
+                                        entCategory.EntityCode = tenantVariation.Code;
                                         entCategory.EntityObjectCategoryCode = cat.EntityObjectCategoryCode;
                                         entCategory.EntityObjectCategoryId = cat.EntityObjectCategoryId;
                                         entCategory.EntityObjectCategoryFk = null;
@@ -3140,7 +3141,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     {
                                         AppEntityClassification entClass = new AppEntityClassification();
                                         entClass.EntityId = tenantVariation.EntityFk.Id;
-                                        entClass.EntityCode = variation.Code;
+                                        entClass.EntityCode = tenantVariation.Code;
                                         entClass.EntityObjectClassificationCode = cal.EntityObjectClassificationCode;
                                         entClass.EntityObjectClassificationId = cal.EntityObjectClassificationId;
                                         entClass.EntityObjectClassificationFk = null;
