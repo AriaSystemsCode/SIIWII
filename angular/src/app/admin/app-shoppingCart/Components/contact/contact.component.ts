@@ -235,7 +235,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 }
                 else {
                     this.tempContact=false;
-
+                    if(this.appTransactionsForViewDto)
                     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = this.allContacts?.find(x => x.ssin == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactSSIN);
 
                     if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact)
@@ -320,6 +320,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 }
                 else {
                     this.tempAccount = false;
+                    if(this.appTransactionsForViewDto)
                     this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN)
 
                     if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
@@ -330,6 +331,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                         }
                     }
                     else
+                    if(this.appTransactionsForViewDto)
                         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = null;
                 }
 

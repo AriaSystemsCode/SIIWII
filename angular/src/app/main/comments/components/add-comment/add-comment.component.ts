@@ -203,6 +203,7 @@ export class AddCommentComponent extends AppComponentBase {
         })
     }
     show(comment:CreateMessageInput){
+      debugger
         this.active = true
         this.commentObject = comment
         this.comment.init(CreateMessageInput.fromJS(this.commentObject))
