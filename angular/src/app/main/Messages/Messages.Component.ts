@@ -141,6 +141,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.maxResultCount
             )
             .subscribe((result) => {
+                debugger
                 if (search == true) {
                     this.messages = [];
                     this.messagesDetails = null;
