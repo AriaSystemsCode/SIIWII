@@ -16,6 +16,8 @@ import {
     ArrtibuteFilter,
     GetAllAppItemsInput,
     AppItemStockAvailabilityServiceProxy,
+    SycAttachmentCategoryDto,
+    AccountsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
@@ -103,12 +105,18 @@ export class AppItemsComponent extends AppComponentBase {
     multiSelectionInfo : MultiSelectionInfo
     applySelectionTitle:string = 'Apply'
     oldValue;
+    coverPhoto: any = ""
+    logoPhoto: any = ""
+sycAttachmentCategoryLogo :SycAttachmentCategoryDto
+    sycAttachmentCategoryBanner :SycAttachmentCategoryDto
+    sycAttachmentCategoryImage :SycAttachmentCategoryDto
     constructor(
         injector: Injector,
         private _importService: MainImportService,
         private _appItemsServiceProxy: AppItemsServiceProxy,
         private _fileDownloadService: FileDownloadService,
         private _appItemsActionService: AppItemsActionsService,
+        private _AccountsServiceProxy: AccountsServiceProxy,
         private _router: Router,
         private _fb : FormBuilder
     ) {
@@ -175,6 +183,30 @@ export class AppItemsComponent extends AppComponentBase {
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
         this.getUserPreferenceForListView();
         this.initFilterForm()
+        this.getAllForAccountInfo()
+    }
+
+   async getAllForAccountInfo() {
+        this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER","IMAGE"]).subscribe((result)=>{
+            result.forEach(item=>{
+                if(item.code == "LOGO") this.sycAttachmentCategoryLogo = item
+                else if(item.code == "BANNER") this.sycAttachmentCategoryBanner = item
+                else if(item.code == "IMAGE") this.sycAttachmentCategoryImage = item
+            })
+        })
+
+        this.showMainSpinner()
+        const result = await this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId,5)
+        .toPromise()
+        .finally(
+            ()=> {
+                this.hideMainSpinner()
+            }
+        )
+        let accountDataForView = result ? result.account : undefined
+        if (accountDataForView?.coverUrl) this.coverPhoto = `${this?.attachmentBaseUrl}/${accountDataForView?.coverUrl}`;
+        if (accountDataForView?.logoUrl) this.logoPhoto = `${this?.attachmentBaseUrl}/${accountDataForView?.logoUrl}`;
+
     }
 
     setMainPageFilter(filter:ItemsFilterTypesEnum){

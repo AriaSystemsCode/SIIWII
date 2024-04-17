@@ -84,3 +84,31 @@ button{
 .importIcons {
     width: 30px;
 }
+
+.view-profile-cover {
+    margin:0;
+    width: 100%;
+    // height: 245px;
+    background-color: #ccc;
+}
+
+.dev-logo{
+    min-height:140px;
+}
+.logo-profile{
+    width: 100%;
+    /* height: 100%; */
+    position: absolute;
+    top: -23px;
+    left: 35px;
+    border-radius: 50%;
+}
+@media (max-width: 768px) {
+    .dev-logo {
+        padding-bottom: 60px;
+        padding-top: 60px;
+    }
+    .logo-profile {
+        top: -52px;
+    }
+}
