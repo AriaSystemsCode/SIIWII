@@ -303,7 +303,7 @@ namespace onetouch.Message
                         .Where(
                                  x =>
                                  //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
-                                 x.OriginalMessageId == x.Id 
+                                 x.OriginalMessageId == x.Id && (x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage ? x.EntityFk.TenantId==AbpSession.TenantId:true)
                              );
 
                 var pagedAndFilteredMessages = filteredMessages
@@ -368,7 +368,7 @@ namespace onetouch.Message
                                           .Where(
                                                    x =>
                                                    //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
-                                                   x.OriginalMessageId == x.Id && (x.UserId == AbpSession.UserId || x.SenderId==AbpSession.UserId)
+                                                   x.OriginalMessageId == x.Id && (x.UserId == AbpSession.UserId || x.SenderId==AbpSession.UserId )
                                                    && x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage && x.TenantId == AbpSession.TenantId
                                                );
 
@@ -407,10 +407,36 @@ namespace onetouch.Message
                                       }
                                     ;
 
-                     totalCount += await filteredMessages2.CountAsync();
+                   //  totalCount += await filteredMessages2.CountAsync();
 
                     var results2 = await appComments2.ToListAsync();
-                    results.AddRange(results2);
+                    foreach (var msg in results2)
+                    {
+                        if (msg.Messages.SenderId == AbpSession.UserId)
+                        {
+                            var messg = results.FirstOrDefault(z => z.Messages.Subject == msg.Messages.Subject &&
+                               z.Messages.SenderId == msg.Messages.SenderId && z.Messages.Body == msg.Messages.Body);
+                            if (messg == null)
+                            {
+                                results.Add(msg);
+                                totalCount += 1;
+                            }
+                            else
+                            {
+                                if (!messg.Messages.To.Contains(msg.Messages.UserId.ToString()))
+                                    messg.Messages.To += "," + msg.Messages.UserId.ToString();
+                            }
+
+                        }
+                        else
+                        {
+                            results.Add(msg);
+                            totalCount += 1;
+                        }
+                    }
+
+                    
+                    //results.AddRange(results2);
                     }
                 //MMT
                 foreach (var x in results)
