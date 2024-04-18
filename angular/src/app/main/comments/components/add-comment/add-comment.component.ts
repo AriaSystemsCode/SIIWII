@@ -119,11 +119,10 @@ export class AddCommentComponent extends AppComponentBase {
         }
 
 
-      this.CommentTextArea.nativeElement.innerHTML = this.CommentTextArea.nativeElement.innerHTML.replace(this.CommentTextArea.nativeElement.innerHTML.match(/@\S+/g), spanHtml.outerHTML);
-      this.showContactSuggstions=false;
+      this.CommentTextArea.nativeElement.innerHTML = this.CommentTextArea.nativeElement.innerHTML.replace(/@/g, spanHtml.outerHTML);
+     this.showContactSuggstions=false;
 
     }
-    debugger
     this.comment.body=this.CommentTextArea.nativeElement.innerHTML;
 
 }
@@ -168,6 +167,9 @@ export class AddCommentComponent extends AppComponentBase {
                .subscribe((res) => {
                     if(res){
                      this.mentionSuggList=res;
+                     this.mentionSuggList.forEach((contact)=>{
+                      contact.userName=contact.userName.replace(/@/g, "-");
+                     })
                    }
                });
             }
