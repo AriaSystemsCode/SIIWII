@@ -35,12 +35,15 @@ import { Ng2TelInputModule } from 'ng2-tel-input';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { TreeviewModule } from 'ngx-treeview';
 import { TreeModule } from 'primeng/tree';
+import { CommentsModule } from '../comments/comments.module';
+
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 @NgModule({
   declarations: [MessagesComponent,
     //SendMessageModalComponent,
     niceDateFormatPipe],
   imports: [
+    CommentsModule,
     CommonModule,
     MessagesRoutingModule,
     AppCommonModule,
