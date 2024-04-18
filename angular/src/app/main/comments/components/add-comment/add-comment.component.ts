@@ -163,7 +163,16 @@ export class AddCommentComponent extends AppComponentBase {
                     this.showContactSuggstions=true;
                 }
             }
+            if(this.showContactSuggstions){
+               this._appEntitiesServiceProxy.getContactsToMention(this.relatedEntityId,'')
+               .subscribe((res) => {
+                    if(res){
+                     this.mentionSuggList=res;
+                   }
+               });
+            }
         }else{
+          
             let lastCharachter = inputValueWithoutMentions.charAt(inputValueWithoutMentions.length - 1);
               if(lastCharachter=='@'||this.showContactSuggstions){
                 if(!this.showContactSuggstions)this.showContactSuggstions=true
