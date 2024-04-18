@@ -202,6 +202,8 @@ export class AddCommentComponent extends AppComponentBase {
         this.comment.mentionedUsers=this.mentionedUsers;
         this.comment.bodyFormat = this.comment.body
         this.comment.messageCategory="UPDATEMESSAGE" ;
+        debugger
+        if(!this.comment.relatedEntityId&&this.relatedEntityId)this.comment.relatedEntityId=this.relatedEntityId;
         this._messageServiceProxy.createMessage(this.comment)
         .pipe(
             finalize( ()=> this.saving = false )
@@ -213,8 +215,7 @@ export class AddCommentComponent extends AppComponentBase {
             this.saveDone.emit(comment);
         })
     }
-    show(comment:CreateMessageInput){
-      debugger
+    show(comment:any){
         this.active = true
         this.commentObject = comment
         this.comment.init(CreateMessageInput.fromJS(this.commentObject))

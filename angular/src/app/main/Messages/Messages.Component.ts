@@ -110,7 +110,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         } catch (err) {}
     } */
     newCommentAddedHandler(event){
-
+        this.selectMessage(this.messagesDetails[0].messages)
     }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
@@ -280,7 +280,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     focusAddComment(){
     if(this.addCommentComponent){
         this.addCommentComponent.focusCommentTextArea()
-        this.addCommentComponent.show(this.messagesDetails[0].messages[0])
+        this.messagesDetails[0].messages.relatedEntityId=this.messagesDetails[0].messages.entityId
+        this.addCommentComponent.show(this.messagesDetails[0].messages) 
     }
         
     }
