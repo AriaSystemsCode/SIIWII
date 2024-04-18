@@ -839,10 +839,10 @@ margin-right: 6px;"></i>
                                     }}</span>
                             </button>
                         </div>
-                        <app-add-comment  *ngIf="messageCategoryFilter=='MENTION'" 
+                        <app-add-comment  [hidden]="messageCategoryFilter!=='MENTION'" 
                         [cartStyle]="true"
                         (saveDone)="newCommentAddedHandler($event)"
-                        [relatedEntityId]=""
+                        [relatedEntityId]="messagesDetails[0].messages.entityId"
                         #AddCommentComponent>
                     </app-add-comment>
                     </div>
@@ -1141,10 +1141,10 @@ margin-right: 6px;"></i>
                                     }}</span>
                             </button>
                         </div>
-                        <app-add-comment  *ngIf="messageCategoryFilter=='MENTION'" 
+                        <app-add-comment   [hidden]="messageCategoryFilter!=='MENTION'" 
                         [cartStyle]="true"
                         (saveDone)="newCommentAddedHandler($event)"
-                        [relatedEntityId]=""
+                        [relatedEntityId]="messagesDetails[0].messages.entityId"
                         #AddCommentComponent>
                     </app-add-comment>
                     </div>

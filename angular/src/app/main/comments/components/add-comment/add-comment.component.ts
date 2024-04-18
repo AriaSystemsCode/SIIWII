@@ -146,6 +146,7 @@ export class AddCommentComponent extends AppComponentBase {
             // Getting last character using char at
             let lastCharachter = inputValueWithoutMentions.charAt(inputValueWithoutMentions.length - 1);
             this.suggListContLeft=(event.target.offsetLeft*1.5)//+event.target.selectionStart;
+            if(this.comment.body.length>4)this.suggListContLeft=this.suggListContLeft+30;
             this.suggListTop=event.target.offsetTop+10;
             let charachterIndex=inputValueWithoutMentions.indexOf(enterdValue);
 
@@ -163,8 +164,9 @@ export class AddCommentComponent extends AppComponentBase {
                 }
             }
         }else{
-            let lastCharachter = inputValueWithoutMentions.charAt(inputValueWithoutMentions.length - 2);
+            let lastCharachter = inputValueWithoutMentions.charAt(inputValueWithoutMentions.length - 1);
               if(lastCharachter=='@'||this.showContactSuggstions){
+                if(!this.showContactSuggstions)this.showContactSuggstions=true
                  this._appEntitiesServiceProxy.getContactsToMention(this.relatedEntityId,enterdValue)
                  .subscribe((res) => {
                       if(res){
@@ -172,8 +174,17 @@ export class AddCommentComponent extends AppComponentBase {
                      }
                  });
               }
-        }
+              if(this.showContactSuggstions&&event.keyCode!==8){
+                this.suggListContLeft=this.suggListContLeft+5;
+              }
+              if(this.showContactSuggstions&&event.keyCode==8){
+                this.suggListContLeft=this.suggListContLeft-5;
 
+              }
+        }
+      if(this.comment.body.length==0){
+        this.showContactSuggstions=false;
+      }
     }
     saveComment(){
         this.saving = true

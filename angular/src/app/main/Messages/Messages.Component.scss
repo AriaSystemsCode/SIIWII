@@ -326,6 +326,10 @@ li {
     padding:11px 10px;
 
 } 
+
+:host ::ng-deep .d-flex.wrapper .w-80{
+width:100% !important;
+}
 //////////////////////////
 
 @media (max-width: 960px) {

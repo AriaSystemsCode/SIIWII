@@ -38,6 +38,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     scrolltop: number = null;
     @ViewChild("container", { static: true }) container;
     @ViewChild("messageEl") containerdetails: ElementRef;
+    @ViewChild('AddCommentComponent',{static:false}) addCommentComponent :AddCommentComponent
 
     @ViewChild("SendMessageModal", { static: true })
     longmsgId: any = false;
@@ -143,7 +144,6 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.maxResultCount
             )
             .subscribe((result) => {
-                debugger
                 if (search == true) {
                     this.messages = [];
                     this.messagesDetails = null;
@@ -277,7 +277,13 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     clickEventLongMsg(event) {
         this.longmsgId = event;
     }
-
+    focusAddComment(){
+    if(this.addCommentComponent){
+        this.addCommentComponent.focusCommentTextArea()
+        this.addCommentComponent.show(this.messagesDetails[0].messages[0])
+    }
+        
+    }
     selectMessage(message: MessagesDto): void {
         this.showMainSpinner();
         this.showSideBar=false;
@@ -291,6 +297,12 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             .pipe(finalize(() => { this.displayMessageDetails = true; this.hideMainSpinner(); }))
             .subscribe((result) => {
                 this.messagesDetails = result;
+                if(this.messageCategoryFilter=='MENTION'){
+                    setTimeout(()=>{
+                        this.focusAddComment();
+
+                    },1000)
+                }
                 for (var i = 0; i < result.length; i++) {
 
                     const message = result[i].messages
