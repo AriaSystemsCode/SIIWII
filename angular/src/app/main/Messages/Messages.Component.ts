@@ -280,7 +280,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     focusAddComment(){
     if(this.addCommentComponent){
         this.addCommentComponent.focusCommentTextArea()
-        this.messagesDetails[0].messages.relatedEntityId=this.messagesDetails[0].messages.entityId
+        this.messagesDetails[0].messages.parentId=this.messagesDetails[0].messages.id
         this.addCommentComponent.show(this.messagesDetails[0].messages) 
     }
         
