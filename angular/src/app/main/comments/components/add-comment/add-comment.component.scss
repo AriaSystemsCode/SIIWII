@@ -8,6 +8,7 @@
     padding: 10px;
     box-shadow: 0 0 3px transparent;
     overflow: hidden;
+    background-color: #fff;
     &:focus {
         outline: none !important;
         box-shadow: 0 0 3px #464444;
@@ -42,7 +43,8 @@ button.send-comment-icon[disabled]{
 .suggstions-contact-list{
     background-color: #fff;
     width:300px;
-    height:300px;
+    max-height:300px;
+    min-height:45px;
     position: absolute;
     border-radius: 5px;
     box-shadow: 0px 1px 5px rgb(0 0 0 / 57%);
