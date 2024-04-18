@@ -718,7 +718,7 @@ namespace onetouch.Message
                         {
                             if (input.MentionedUsers ==null)
                                 input.MentionedUsers = new List<MentionedUserInfo>();
-
+                            if (input.MentionedUsers.FirstOrDefault(z=>z.UserId == user.Id && z.TenantId== long.Parse(user.TenantId.ToString())) == null)
                             input.MentionedUsers.Add(new MentionedUserInfo { UserId = user.Id, TenantId =long.Parse( user.TenantId.ToString())});
                         }
                     }
