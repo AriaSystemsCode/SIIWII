@@ -423,7 +423,7 @@ namespace onetouch.Message
                             }
                             else
                             {
-                                if (!messg.Messages.To.Contains(msg.Messages.UserId.ToString()))
+                                if (msg.Messages.UserId!=null && !messg.Messages.To.Contains(msg.Messages.UserId.ToString()))
                                     messg.Messages.To += "," + msg.Messages.UserId.ToString();
                             }
 
