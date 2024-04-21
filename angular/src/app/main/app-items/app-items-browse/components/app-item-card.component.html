@@ -35,13 +35,13 @@
 
                
 
-                <div class="row pl-3" *ngIf="singleItemPerRowMode &&  item?.appItem.entityCategoriesNames?.items.length >  0 ">
+                <div class="row pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode &&  item.entityObjectCategoryNames?.length >  0 ">
                     <p class="pt-2 product-name" style="color: #9E9E9E;">
-                        Categories :
+                        Categories:
                     </p>
                     <div class="row details">
-                        <div *ngFor="let category of item?.appItem.entityCategoriesNames?.items; let i = index">
-                            <ng-container *ngIf="i < 4">
+                        <div *ngFor="let category of item?.entityObjectCategoryNames; let i = index">
+                            <ng-container *ngIf="i < 3">
                                 <div class="seeMoreData">
                                     <p class="title-tag">{{ category }}</p>
                                 </div>
@@ -51,13 +51,13 @@
                     </div>
                 </div>
 
-                <div class="row pl-3" *ngIf="singleItemPerRowMode && item?.appItem.entityClassificationsNames?.items.length >  0  ">
+                <div class="row pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode && item?.entityClassificationNames?.length >  0  ">
                     <p class="pt-2 product-name" style="color: #9E9E9E;">
                         Classifications : </p>
                     <div class="row details">
                         <div
-                            *ngFor="let classification of item?.appItem.entityClassificationsNames?.items; let i = index">
-                            <ng-container *ngIf="i < 4">
+                            *ngFor="let classification of item?.entityClassificationNames; let i = index">
+                            <ng-container *ngIf="i < 3">
                                 <div class="seeMoreData">
                                     <p class="title-tag">{{ classification }}</p>
                                 </div>

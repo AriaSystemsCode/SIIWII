@@ -62069,6 +62069,8 @@ export interface IAppItemDto {
 export class GetAppItemForViewDto implements IGetAppItemForViewDto {
     appItem!: AppItemDto;
     selected!: boolean;
+    entityObjectCategoryNames!: string[] | undefined;
+    entityClassificationNames!: string[] | undefined;
 
     [key: string]: any;
 
@@ -62089,6 +62091,16 @@ export class GetAppItemForViewDto implements IGetAppItemForViewDto {
             }
             this.appItem = _data["appItem"] ? AppItemDto.fromJS(_data["appItem"]) : <any>undefined;
             this.selected = _data["selected"];
+            if (Array.isArray(_data["entityObjectCategoryNames"])) {
+                this.entityObjectCategoryNames = [] as any;
+                for (let item of _data["entityObjectCategoryNames"])
+                    this.entityObjectCategoryNames!.push(item);
+            }
+            if (Array.isArray(_data["entityClassificationNames"])) {
+                this.entityClassificationNames = [] as any;
+                for (let item of _data["entityClassificationNames"])
+                    this.entityClassificationNames!.push(item);
+            }
         }
     }
 
@@ -62107,6 +62119,16 @@ export class GetAppItemForViewDto implements IGetAppItemForViewDto {
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
         data["selected"] = this.selected;
+        if (Array.isArray(this.entityObjectCategoryNames)) {
+            data["entityObjectCategoryNames"] = [];
+            for (let item of this.entityObjectCategoryNames)
+                data["entityObjectCategoryNames"].push(item);
+        }
+        if (Array.isArray(this.entityClassificationNames)) {
+            data["entityClassificationNames"] = [];
+            for (let item of this.entityClassificationNames)
+                data["entityClassificationNames"].push(item);
+        }
         return data;
     }
 }
@@ -62114,6 +62136,8 @@ export class GetAppItemForViewDto implements IGetAppItemForViewDto {
 export interface IGetAppItemForViewDto {
     appItem: AppItemDto;
     selected: boolean;
+    entityObjectCategoryNames: string[] | undefined;
+    entityClassificationNames: string[] | undefined;
 
     [key: string]: any;
 }
