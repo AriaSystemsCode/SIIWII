@@ -35,7 +35,6 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   addressSelectedShipTo: boolean = false;
   shipFromSelectedAdd: any;
   shipToSelectedAdd: any;
-  shipingTabVaild: boolean = true;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
 
@@ -82,7 +81,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
 
     }
-    if (this.shipingTabVaild) {
+    if (this.shippingTabValid) {
       let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
       let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
       shipFromObj[0]?.contactAddressDetail ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
@@ -191,14 +190,14 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
         } else {
           shipToObj[0]?.contactAddressDetail ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
         }
-        this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId ? this.shipingTabVaild = true : this.shipingTabVaild = false;  
+        this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId ? this.shippingTabValid = true : this.shippingTabValid = false;  
 
         if (this.enableSAveShipFrom && this.enableSAveShipTo &&this.appTransactionsForViewDto.shipViaId) {  
-          this.shipingTabVaild = true;
+          this.shippingTabValid = true;
           this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
 
         } else {
-          this.shipingTabVaild = false;
+          this.shippingTabValid = false;
         }
       } else {
         if (sectionIndex == 1) {
