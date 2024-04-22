@@ -1,6 +1,5 @@
 <div class="single-item position-relative" [ngClass]=" { 'row': singleItemPerRowMode }">
-    <div class="purple-selection position-absolute" style="width: 45px;top: 3px;
-        z-index: 999999;"
+    <div class="purple-selection position-absolute" style="width: 45px;top: 3px;"
         *ngIf="browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections ">
         <p-inputSwitch [(ngModel)]="item.selected" name="showCode" (onChange)="handleSelection($event)"
             [styleClass]="'purple-selection'" [ngStyle]="{'right.px': !singleItemPerRowMode ? 50 : 0}"></p-inputSwitch>
