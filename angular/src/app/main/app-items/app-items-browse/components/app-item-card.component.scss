@@ -13,10 +13,13 @@ $default-font-weight : 400;
 }
 .single-item {
     min-width: 0;
+    border: 1px solid #EDEDED !important;
+    margin: 5px;
+    background-color: #FFFFFF;
 }
 .single-item-photo{
-    width: 116px;
-    height: 163px;
+   // width: 116px;
+    //height: 163px;
     background-size: contain;
     background-image: url('../../../../../assets/placeholders/card-placeholder.png');
     cursor:pointer;
@@ -84,14 +87,36 @@ a.btn {
     bottom: 2rem;
 }
 
+.seeMoreData {
+    background-color: #f4f4f4;
+    display: inline-block;
+    margin: 0 0 20px 0;
+    margin-left: 20px;
+    padding: 11px 33px 0px 34px;
+    text-align: center;
+    position: relative;
+    border-radius: 6px;
+}
+
+
 .actions-menu {
     position: absolute;
-    top: 20px;
-    right: 10px;
+    top: 3px;
+    right: 3px;
+    border: 1px solid white;
+    border-radius: 5px;
+   background-color: white;
 }
 
 
 .share-level{
+    border: 1px solid #EEEEEEEE;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+    color: #9E9E9E;
+    float: right;
+
     span{
         display: flex;
         align-items: center;
