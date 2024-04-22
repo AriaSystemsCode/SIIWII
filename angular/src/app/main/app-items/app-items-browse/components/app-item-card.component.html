@@ -16,12 +16,13 @@
             <div class="pl-2 pr-0 pt-3 w-100"
                 [ngStyle]="{'margin-right.px':browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections ? 0 : 0}">
 
-                <div class="row d-flex justify-content-between p-3">
-                    <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" (click)="viewItemHandler()">
-                        {{ item.appItem.code | textSubstring: 15 }}
+                <div class="row d-flex justify-content-between p-3 flex-column flex-nowrap">
+                    <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" style="white-space: nowrap;" (click)="viewItemHandler()">
+                        {{item.appItem.code | textSubstring:12}}
                     </h4>
                     <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;">
-                        <div class="price pt-2">
+                        <div class="price pt-2" style="float: right;
+                        clear: both;">
                             {{ "MSRP" | localize }}:
                             {{ tenantDefaultCurrency.symbol
                             }}{{item?.appItem?.price }}
