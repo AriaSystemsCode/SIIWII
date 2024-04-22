@@ -68,8 +68,8 @@
                 </div>
 
                 <p class="mb-2" [ngClass]="{ 'd-none': !singleItemPerRowMode }"
-                    style="max-width: 70ch; color: #9E9E9E;">
-                    {{ item?.appItem?.description | textSubstring: 180 }}
+                    style="max-width: 70ch; color: #9E9E9E;"  [innerHTML]="item?.appItem?.description | textSubstring: 180">
+                    <!-- {{ item?.appItem?.description | textSubstring: 180 }} -->
                 </p>
                 <!-- <p
                     class="text-dark mb-2"
