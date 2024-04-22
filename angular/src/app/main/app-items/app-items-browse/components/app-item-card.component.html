@@ -1,6 +1,5 @@
 <div class="single-item position-relative" [ngClass]=" { 'row': singleItemPerRowMode }">
-    <div class="purple-selection position-absolute" style="width: 45px;top: 3px;
-        z-index: 999999;"
+    <div class="purple-selection position-absolute" style="width: 45px;top: 3px;"
         *ngIf="browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections ">
         <p-inputSwitch [(ngModel)]="item.selected" name="showCode" (onChange)="handleSelection($event)"
             [styleClass]="'purple-selection'" [ngStyle]="{'right.px': !singleItemPerRowMode ? 50 : 0}"></p-inputSwitch>
@@ -16,12 +15,13 @@
             <div class="pl-2 pr-0 pt-3 w-100"
                 [ngStyle]="{'margin-right.px':browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections ? 0 : 0}">
 
-                <div class="row d-flex justify-content-between p-3">
-                    <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" (click)="viewItemHandler()">
-                        {{ item.appItem.code | textSubstring: 15 }}
+                <div class="row d-flex justify-content-between p-3 flex-column flex-nowrap">
+                    <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" style="white-space: nowrap;" (click)="viewItemHandler()">
+                        {{item.appItem.code | textSubstring:12}}
                     </h4>
                     <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;">
-                        <div class="price pt-2">
+                        <div class="price pt-2" style="float: right;
+                        clear: both;">
                             {{ "MSRP" | localize }}:
                             {{ tenantDefaultCurrency.symbol
                             }}{{item?.appItem?.price }}
@@ -35,13 +35,13 @@
 
                
 
-                <div class="row pl-3" *ngIf="singleItemPerRowMode &&  item?.appItem.entityCategoriesNames?.items.length >  0 ">
+                <div class="row pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode &&  item.entityObjectCategoryNames?.length >  0 ">
                     <p class="pt-2 product-name" style="color: #9E9E9E;">
-                        Categories :
+                        Categories:
                     </p>
                     <div class="row details">
-                        <div *ngFor="let category of item?.appItem.entityCategoriesNames?.items; let i = index">
-                            <ng-container *ngIf="i < 4">
+                        <div *ngFor="let category of item?.entityObjectCategoryNames; let i = index">
+                            <ng-container *ngIf="i < 3">
                                 <div class="seeMoreData">
                                     <p class="title-tag">{{ category }}</p>
                                 </div>
@@ -51,13 +51,13 @@
                     </div>
                 </div>
 
-                <div class="row pl-3" *ngIf="singleItemPerRowMode && item?.appItem.entityClassificationsNames?.items.length >  0  ">
+                <div class="row pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode && item?.entityClassificationNames?.length >  0  ">
                     <p class="pt-2 product-name" style="color: #9E9E9E;">
                         Classifications : </p>
                     <div class="row details">
                         <div
-                            *ngFor="let classification of item?.appItem.entityClassificationsNames?.items; let i = index">
-                            <ng-container *ngIf="i < 4">
+                            *ngFor="let classification of item?.entityClassificationNames; let i = index">
+                            <ng-container *ngIf="i < 3">
                                 <div class="seeMoreData">
                                     <p class="title-tag">{{ classification }}</p>
                                 </div>
@@ -67,8 +67,8 @@
                 </div>
 
                 <p class="mb-2" [ngClass]="{ 'd-none': !singleItemPerRowMode }"
-                    style="max-width: 70ch; color: #9E9E9E;">
-                    {{ item?.appItem?.description | textSubstring: 180 }}
+                    style="max-width: 70ch; color: #9E9E9E;"  [innerHTML]="item?.appItem?.description | textSubstring: 180">
+                    <!-- {{ item?.appItem?.description | textSubstring: 180 }} -->
                 </p>
                 <!-- <p
                     class="text-dark mb-2"
