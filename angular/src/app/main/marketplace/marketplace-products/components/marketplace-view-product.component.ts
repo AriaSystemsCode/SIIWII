@@ -213,7 +213,17 @@ export class MarketplaceViewProductComponent
         this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
         this.isColorView = true
         this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex].colorImg;
+        this.setSizes( this.currentIndex)
     }
+
+slideToPreviousImage(): void {
+    // Update currentIndex and translateX
+    this.currentIndex = (this.currentIndex - 1 + this.colorsData.length) % this.colorsData.length;
+    this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
+    this.isColorView = true;
+    this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex].colorImg;
+    this.setSizes( this.currentIndex)
+}
 
     // create order by size summary JSON
     onNumberChange(e: any, color: any, sizeIndex: any) {
