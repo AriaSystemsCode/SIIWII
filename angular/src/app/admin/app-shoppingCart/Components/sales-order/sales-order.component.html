@@ -257,6 +257,7 @@
                             [(ngModel)]="availableDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
+                            [minDate]="completeDate"
                         ></p-calendar>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
@@ -278,7 +279,9 @@
                         <p-calendar
                             [(ngModel)]="completeDate"
                             [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
+                            (onSelect)="changeCompleteDate(completeDate)"
+                            (ngModelChange)="changeCompleteDate(completeDate)"
+                            [minDate]="startDate"
                         ></p-calendar>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
