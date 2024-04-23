@@ -58,7 +58,7 @@
                     formControlName="startDate"
                     [showIcon]="true"
                     (onSelect)="changeStartDate(orderForm.get('startDate'))"
-                    [readonlyInput]="true"
+                    [readonlyInput]="false"
                 ></p-calendar>
                 </div>     
 
@@ -73,7 +73,10 @@
                     formControlName="completeDate"
                     [showIcon]="true"
                     [minDate]="minDate"
-                    [readonlyInput]="true"
+                    [readonlyInput]="false"
+                    (onSelect)="changeCompleteDate(orderForm.get('completeDate'))"
+                    (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
+
                 ></p-calendar>
                 </div>     
 
@@ -87,8 +90,8 @@
                     appendTo="body"
                     formControlName="availableDate"
                     [showIcon]="true"
-                    [readonlyInput]="true"
-                    [minDate]="minDate"
+                    [readonlyInput]="false"
+                    [minDate]="orderForm.get('completeDate').value"
 
                 ></p-calendar>
                 </div>     
