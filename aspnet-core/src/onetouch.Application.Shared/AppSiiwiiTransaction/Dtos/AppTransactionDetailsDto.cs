@@ -78,7 +78,9 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual AccountBranchDto selectedBranch { set; get; }
         public virtual PhoneNumberAndtype selectedPhoneType { set; get; }
         public virtual string selectContactPhoneNumber { set; get; }
-        
+        public virtual string selectedContactEmail { set; get; }
+
+
         //Iteration37-MMT[Start]
         [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
         public virtual string ContactAddressName { get; set; }
