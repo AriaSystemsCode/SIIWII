@@ -485,8 +485,8 @@ export class CreateOrEditAppItemComponent
                         extraAttr.paginationSetting.list.length - 1,
                         1
                     );
-                     let isExist=result.items.filter((item)=>{item.value==extraAttr.attributeId});
-                    if(isExist!.length==0||isExist==undefined){
+                     let isExist=result.items.filter((item)=>{ return item.value==extraAttr.attributeId});
+                    if((isExist!.length==0||isExist==undefined)  && extraAttr?.selectedValues?.length>0){
 
                         const tempAtt = new LookupLabelDto({
                             code:extraAttr.code,
@@ -1270,7 +1270,7 @@ export class CreateOrEditAppItemComponent
                     extraAttr?.selectedValues?.forEach((attributeValueId) => {
                         const alreadySelected: AppEntityExtraDataDto =
                             previousExtraAttributes.filter((item) => {
-                                item.attributeValueId == attributeValueId;
+                                return item.attributeValueId == attributeValueId;
                             })[0];
                         if (alreadySelected)
                             return this.appItem.entityExtraData.push(
@@ -1287,18 +1287,18 @@ export class CreateOrEditAppItemComponent
                     // single selection
                     const alreadySelected: AppEntityExtraDataDto =
                         previousExtraAttributes.filter((item) => {
-                            item.attributeId = extraAttr.attributeId;
+                         return   item.attributeId == extraAttr.attributeId;
                         })[0];
                     if (alreadySelected) {
                         alreadySelected.attributeValueId =
-                            extraAttr?.selectedValues;
+                        parseInt(extraAttr?.selectedValues);
                         this.appItem.entityExtraData.push(alreadySelected);
                     } else {
                         const entityExtraData: AppEntityExtraDataDto =
                             new AppEntityExtraDataDto();
                         entityExtraData.id = 0;
                         entityExtraData.attributeValueId =
-                            extraAttr?.selectedValues;
+                            parseInt(extraAttr?.selectedValues);
                         entityExtraData.attributeId = extraAttr.attributeId;
                         this.appItem.entityExtraData.push(entityExtraData);
                     }
@@ -1307,7 +1307,7 @@ export class CreateOrEditAppItemComponent
                 // any other not lookup data
                 const alreadySelected: AppEntityExtraDataDto =
                     previousExtraAttributes.filter((item) => {
-                        item.attributeId = extraAttr?.attributeId;
+                       return item.attributeId == extraAttr?.attributeId;
                     })[0];
                 if (alreadySelected) {
                     alreadySelected.attributeValue = extraAttr?.selectedValues;
