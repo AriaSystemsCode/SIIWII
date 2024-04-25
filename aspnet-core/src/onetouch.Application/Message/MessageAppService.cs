@@ -17,6 +17,7 @@ using NUglify.Helpers;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
 using onetouch.AppMarketplaceMessages;
+using onetouch.AppPosts;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.Authorization;
 using onetouch.Authorization.Users;
@@ -52,13 +53,14 @@ namespace onetouch.Message
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IRepository<AppEntityReactionsCount, long> _appEntityReactionsCount;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
+        private readonly IRepository<AppPost, long> _appPostRepo;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
             IRepository<AppEntityClassification, long> appEntityClassificationRepository,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
-            IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository
+            IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo
             )
         {
             _MessagesRepository = messagesRepository;
@@ -70,6 +72,7 @@ namespace onetouch.Message
             _appEntityReactionsCount = appEntityReactionsCount;
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _AppMarketplaceMessagesRepository = appMarketplaceMessagesRepository;
+            _appPostRepo = appPostRepo;
         }
 
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)
@@ -90,7 +93,7 @@ namespace onetouch.Message
             var entityObjectClassStarred = await _helper.SystemTables.GetEntityObjectClassificationStarredMessageID();
             var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeComment();
             var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
-            
+            var entityObjectPost = await _helper.SystemTables.GetObjectPostId();
 
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -233,7 +236,7 @@ namespace onetouch.Message
                     { 
                         message.Messages.ProfilePictureId = (Guid)profilePictureId;
                     }
-                    message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER6+") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
+                    message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
                     if (message.Messages.EntityObjectTypeCode == "COMMENT")
                     {
                         var comment = await _AppMarketplaceMessagesRepository.GetAll().Where(z => z.Id == message.Messages.ThreadId).FirstOrDefaultAsync();
@@ -243,6 +246,27 @@ namespace onetouch.Message
                             message.Messages.BodyFormat = comment.BodyFormat;
                         }
                     }
+                    //MM
+                    if (message.Messages.RelatedEntityId != null)
+                    {
+                        var ent = await _appEntityRepository.GetAll().Where(z => z.Id == message.Messages.RelatedEntityId).FirstOrDefaultAsync();
+                        if (ent != null)
+                        {
+                            if (ent.ObjectId == entityObjectPost)
+                            {
+                                var post = await _appPostRepo.GetAll().Where(z => z.AppEntityId == message.Messages.RelatedEntityId).FirstOrDefaultAsync();
+                                if (post != null)
+                                {
+                                    message.Messages.RelatedEntityObjectTypeDescription = post.Description;
+                                }
+                            }
+                            else {
+                                if (ent.EntityObjectTypeCode.ToUpper() == "SALESORDER" || ent.EntityObjectTypeCode.ToUpper() == "PURCHASEORDER")
+                                    message.Messages.RelatedEntityObjectTypeDescription = ent.Name;
+                            }
+                        }
+                    }
+                    //MM
                 }
                 
                 return new MessagePagedResultDto(

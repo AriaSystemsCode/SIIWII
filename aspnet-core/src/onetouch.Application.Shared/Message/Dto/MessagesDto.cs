@@ -53,6 +53,7 @@ namespace onetouch.Message.Dto
         public long? RelatedEntityId { get; set; }
         //MMT
         public string? RelatedEntityObjectTypeCode { get; set; }
+        public string? RelatedEntityObjectTypeDescription { get; set; }
         //MMT
         public Guid ProfilePictureId { get; set; }
         public GetProfilePictureOutput UserImage { get; set; }
