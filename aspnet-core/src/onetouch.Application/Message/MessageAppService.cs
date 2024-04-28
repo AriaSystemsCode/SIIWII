@@ -382,9 +382,9 @@ namespace onetouch.Message
                                           Messages = new MessagesDto
                                           {
                                               SenderId = o.SenderId,
-                                              // To = o.To,
-                                              // CC = o.CC,
-                                              // BCC = o.BCC,
+                                              To = o.To,
+                                              CC = o.CC,
+                                              BCC = o.BCC,
                                               Subject = o.Subject,
                                               Body = o.Body,
                                               BodyFormat = o.BodyFormat,
@@ -418,6 +418,8 @@ namespace onetouch.Message
                                z.Messages.SenderId == msg.Messages.SenderId && z.Messages.Body == msg.Messages.Body);
                             if (messg == null)
                             {
+                                msg.Messages.SenderName = GetUserNameByID(msg.Messages.SenderId);
+                                msg.Messages.ToName = GetUsersNamesByID(msg.Messages.To);
                                 results.Add(msg);
                                 totalCount += 1;
                             }
@@ -425,11 +427,16 @@ namespace onetouch.Message
                             {
                                 if (msg.Messages.UserId!=null && !messg.Messages.To.Contains(msg.Messages.UserId.ToString()))
                                     messg.Messages.To += "," + msg.Messages.UserId.ToString();
+
+                                messg.Messages.SenderName = GetUserNameByID(messg.Messages.SenderId);
+                                messg.Messages.ToName = GetUsersNamesByID(messg.Messages.To);
                             }
 
                         }
                         else
                         {
+                            msg.Messages.SenderName = GetUserNameByID(msg.Messages.SenderId);
+                            msg.Messages.ToName = GetUsersNamesByID(msg.Messages.To);
                             results.Add(msg);
                             totalCount += 1;
                         }
@@ -558,21 +565,25 @@ namespace onetouch.Message
 
         }
 
-        public List<GetMessagesForViewDto> GetMessagesForView(long id)
+        public  List<GetMessagesForViewDto> GetMessagesForView(long id)
         {
             var entityObjectSent = _helper.SystemTables.GetEntityObjectStatusSentMessageID();
             var entityObjectSentID = long.Parse(entityObjectSent.Result.ToString());
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+
                 long? threadId = _MessagesRepository.FirstOrDefault(x => x.Id == id).ThreadId;
 
                 var messages = _MessagesRepository.GetAll()
                 .Where(e => e.Id == id || 
                 (threadId != null && (e.ThreadId == threadId && (e.UserId == AbpSession.UserId || (e.SenderId == AbpSession.UserId && e.EntityFk.EntityObjectStatusId ==  entityObjectSentID)))))
                 .Where(x => x.TenantId == AbpSession.TenantId)
+                .Include(z => z.EntityFk)
+                .Include(z => z.EntityFk).ThenInclude(z => z.EntitiesRelationships)
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
                 .OrderBy("id asc").ToList();
+
                 List<GetMessagesForViewDto> output = new List<GetMessagesForViewDto>();
                 for (int i = 0; i < messages.Count(); i++)
                 {
@@ -597,6 +608,19 @@ namespace onetouch.Message
                     message.Messages.SenderName = GetUserNameByID(messages[i].SenderId);
                     message.Messages.ToName = GetUsersNamesByID(messages[i].To);
                     message.Messages.EntityAttachments = ObjectMapper.Map<IList<AppEntityAttachmentDto>>(messages[i].EntityFk.EntityAttachments);
+                    //MMT2024
+                    if (messages[i].EntityFk.EntityObjectTypeCode == "COMMENT")
+                    {
+                        var marketplaceMessage =  _AppMarketplaceMessagesRepository.GetAll().Include(z => z.EntityFk)
+                            .ThenInclude(z => z.RelatedEntitiesRelationships)
+                            .Include(z => z.EntityFk)
+                            .ThenInclude(z => z.EntitiesRelationships)
+                            .Where(z => z.Id == message.Messages.ThreadId).FirstOrDefault();
+                        if (marketplaceMessage != null)
+                            message.Messages.RelatedEntityId = (marketplaceMessage.EntityFk.EntitiesRelationships != null && marketplaceMessage.EntityFk.EntitiesRelationships.Count > 0) ? marketplaceMessage.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                                  ((marketplaceMessage.EntityFk.RelatedEntitiesRelationships != null && marketplaceMessage.EntityFk.RelatedEntitiesRelationships.Count > 0) ? marketplaceMessage.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0);
+                     }
+                    //MMT2024
                     //Message.Messages.EntityAttachments = new List<AppEntityAttachmentDto>();
                     //var x1 = new AppEntityAttachmentDto();
                     //x1.FileName = "dfdfdf.doc";
@@ -694,7 +718,7 @@ namespace onetouch.Message
                         {
                             if (input.MentionedUsers ==null)
                                 input.MentionedUsers = new List<MentionedUserInfo>();
-
+                            if (input.MentionedUsers.FirstOrDefault(z=>z.UserId == user.Id && z.TenantId== long.Parse(user.TenantId.ToString())) == null)
                             input.MentionedUsers.Add(new MentionedUserInfo { UserId = user.Id, TenantId =long.Parse( user.TenantId.ToString())});
                         }
                     }
@@ -1134,6 +1158,10 @@ namespace onetouch.Message
                     var originalParent = await _AppMarketplaceMessagesRepository.FirstOrDefaultAsync(x => x.Id == input.ParentId);
                     if (originalParent != null)
                         threadId = originalParent.ThreadId;
+                    //else
+                    //{
+                    //    threadId = input.ThreadId;
+                    //}
                     message.ThreadId = threadId;
                 }
 
