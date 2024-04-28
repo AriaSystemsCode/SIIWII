@@ -352,7 +352,7 @@ appRootUrl() +
                                                 object-fit: cover;
                                             " />
                                     <ul class="msg-content row">
-                                        <li class="Messages col-6 col-md mr-5 mr-md-0">
+                                        <li class="Messages col-6 col-md mr-5 mr-md-0 d-flex justify-content-between">
                                             <!-- I2-10  -->
                                             <!--
                                                 <a *ngIf="this.messageTypeIndex!=2">
@@ -416,6 +416,15 @@ appRootUrl() +
                                                     | niceDateFormatPipe
                                                     }}</span>
                                             </a>
+                                            <span class="mail-info text-right">
+                                            <i [ngClass]="
+                                                    message.entityObjectStatusCode ==
+                                                    'UNREAD'?'far fa-envelope':'far fa-envelope-open'
+                                            "
+                                            ></i>
+                                            <span class="d-block ">{{message.receiveDate | date: "medium" }}</span>
+                                            </span>
+
                                         </li>
                                         <div class="col-2 d-block d-md-none ml-5 mt-5 pl-5"
                                             style="white-space: nowrap;">
@@ -462,7 +471,7 @@ appRootUrl() +
                                                 object-fit: cover;
                                             " />
                                     <ul class="msg-content row">
-                                        <li class="Messages col-6 col-md mr-5 mr-md-0">
+                                        <li class="Messages col-6 col-md mr-5 mr-md-0 d-flex justify-content-between">
                                             <!-- I2-10  -->
                                             <!--
                                                 <a *ngIf="this.messageTypeIndex!=2">
@@ -526,6 +535,15 @@ appRootUrl() +
                                                     | niceDateFormatPipe
                                                     }}</span>
                                             </a>
+                                            <span class="mail-info">
+                                             <i [ngClass]="
+                                                message.entityObjectStatusCode ==
+                                                'UNREAD'?'far fa-envelope':'far fa-envelope-open'
+                                        "
+                                        ></i>
+                                        <span >{{message.receiveDate | date: "medium" }}</span>
+                                            </span>
+
                                         </li>
                                         <div class="col-2 d-block d-md-none ml-5 mt-5 pl-5"
                                             style="white-space: nowrap;">

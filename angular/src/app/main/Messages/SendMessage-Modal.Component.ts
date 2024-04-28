@@ -526,6 +526,12 @@ export class SendMessageModalComponent
                 this.displayCC = false;
                 this.messages.entityAttachments = [];
                 this.modalSave.emit(this.messages);
+                this.subject="";
+                this.htmlEditorInput='';
+                this.toUsers=[];
+                this.ccUsers=[];
+                this.bccUsers=[];
+                this.messages=new CreateMessageInput();
             });
     }
 
@@ -563,16 +569,13 @@ export class SendMessageModalComponent
                     for (var i = 0; i < Users.length; i++) {
                         //xxx
                         if (
-                            Users[i].users.value.toString() !=
+                            Users[i]?.users?.value.toString() !=
                             this.appSession.userId.toString()
                         ) {
                             //xxx
                             //I2-9 -  receipt name, last name @ tenant name
-                            Users[i].users.name +=
-                                "." +
-                                Users[i].surname +
-                                " @ " +
-                                Users[i].tenantName;
+                            Users[i].users={name:Users[i].userName,value:Users[i].userId.toString()}
+
                             //  Users[i].users.name += "@" + Users[i].tenantName;
                             this.filteredUsers.push(Users[i].users);
                         }

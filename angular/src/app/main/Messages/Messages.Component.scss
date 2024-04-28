@@ -184,7 +184,18 @@
     display: table;
     clear: both;
 }
-
+.mail-info{
+i, span{
+    color: #b6b4b4;
+}
+i{
+    font-size: 15px;
+}
+span{
+    font-size: 10px;
+    font-weight: normal;
+}
+}
 .icon {
     background: url(/assets/message/Messaging_search_icon.svg) no-repeat scroll
         7px 7px;
