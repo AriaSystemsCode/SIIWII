@@ -2,7 +2,7 @@
     <h4 class="text-captitalize">{{ title }}</h4>
     <span (click)="triggerListCollapse()" *ngIf="filterMetaData?.collapsedDisplayedListCount < filterMetaData?.listTotalCount">
         <i
-            class="fas fa-2x text-primary"
+            class="fas fa-2x"
             [ngClass]="
             collapseListDataCollapseButton ? 'fa-angle-up' : 'fa-angle-down'
             "

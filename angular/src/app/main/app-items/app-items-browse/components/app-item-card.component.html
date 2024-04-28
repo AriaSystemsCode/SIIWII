@@ -5,9 +5,9 @@
             [styleClass]="'purple-selection'" [ngStyle]="{'right.px': !singleItemPerRowMode ? 50 : 0}"></p-inputSwitch>
     </div>
 
-    <div class="single-item-photo" (click)="viewItemHandler()">
+    <div class="single-item-photo" #photoDiv (click)="viewItemHandler()">
         <img class="w-100" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl" alt="" style="height: 300px;"
-            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"   [ngStyle]="{ 'height.px': photoDiv.clientHeight }" />
     </div>
     <div class="single-item-body col d-flex position-static p-0 pl-2">
         <div class="align-items-center row w-100">
