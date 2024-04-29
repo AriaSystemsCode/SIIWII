@@ -485,8 +485,8 @@ export class CreateOrEditAppItemComponent
                         extraAttr.paginationSetting.list.length - 1,
                         1
                     );
-                     let isExist=result.items.filter((item)=>{item.value==extraAttr.attributeId});
-                    if(isExist!.length==0||isExist==undefined){
+                     let isExist=result.items.filter((item)=>{ return item.value==extraAttr.attributeId});
+                    if((isExist!.length==0||isExist==undefined)  && extraAttr?.selectedValues?.length>0){
 
                         const tempAtt = new LookupLabelDto({
                             code:extraAttr.code,
@@ -631,7 +631,7 @@ export class CreateOrEditAppItemComponent
         if (data.selectionDone && data.selectedRecord) {
             // add or edit done
            if(!(this.appItem?.id>0)) {
-            this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false).subscribe((res: any) => {
+            this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false,this.appSession.tenantId).subscribe((res: any) => {
                 this.appItem.code = res;
                 this.appItem.OriginalCode = res
             })
@@ -727,8 +727,8 @@ export class CreateOrEditAppItemComponent
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
-            if(! (!element?.parent && !element?.leaf)){
-            console.log(element);
+            if (element.leaf) {
+                console.log(element);
             const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
                 new AppEntityDtoWithActions<AppEntityCategoryDto>({
                     entityDto: new AppEntityCategoryDto({
@@ -737,12 +737,12 @@ export class CreateOrEditAppItemComponent
                             element.data.sycEntityObjectCategory.id,
                         entityObjectCategoryCode:
                             element.data.sycEntityObjectCategory.code,
-                            entityObjectCategoryName: this.getPath(element),
+                            entityObjectCategoryName:this.getPath(element),
                     }),
                 });
        
             this.categories.push(newCategory);
-        }
+    }
         });
         this.appItem.entityCategories = selectedCategories;
         this.formTouched = true;
@@ -839,21 +839,18 @@ export class CreateOrEditAppItemComponent
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
-            if(! (!element?.parent && !element?.leaf)){
-            console.log(element);
-            const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
-                new AppEntityDtoWithActions<AppEntityCategoryDto>({
-                    entityDto: new AppEntityCategoryDto({
-                        id: 0,
-                        entityObjectCategoryId:
-                            element.data.sycEntityObjectCategory.id,
-                        entityObjectCategoryCode:
-                            element.data.sycEntityObjectCategory.code,
-                        entityObjectCategoryName: this.getPath(element),
-                    }),
-                });
-            this.departments.push(newCategory);
-            }
+            if (element.leaf) {
+                    const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
+                        new AppEntityDtoWithActions<AppEntityCategoryDto>({
+                            entityDto: new AppEntityCategoryDto({
+                                id: 0,
+                                entityObjectCategoryId: element.data.sycEntityObjectCategory.id,
+                                entityObjectCategoryCode: element.data.sycEntityObjectCategory.code,
+                                entityObjectCategoryName: this.getPath(element),
+                            }),
+                        });
+                    this.departments.push(newCategory);
+                }
         });
     }
 
@@ -861,7 +858,10 @@ export class CreateOrEditAppItemComponent
         if (!item.parent) {
             return item.label;
         }
-        return this.getPath(item.parent) + "-" + item.label;
+    
+        // Recursively build the path including all ancestor nodes
+        const parentPath = this.getPath(item.parent);
+        return parentPath ? parentPath + "-" + item.label : item.label;
     }
 
     seperateNewAndRemovedCategories() {
@@ -957,7 +957,7 @@ export class CreateOrEditAppItemComponent
     ): void {
         this.formTouched = true;
         selected.forEach((element) => {
-            if(! (!element?.parent && !element?.leaf)){
+            if (element.leaf) {
             const newClass: AppEntityDtoWithActions<AppEntityClassificationDto> =
                 new AppEntityDtoWithActions<AppEntityClassificationDto>({
                     entityDto: new AppEntityClassificationDto({
@@ -970,7 +970,7 @@ export class CreateOrEditAppItemComponent
                     }),
                 });
             this.classifications.push(newClass);
-            }
+        }
         });
     }
 
@@ -1270,7 +1270,7 @@ export class CreateOrEditAppItemComponent
                     extraAttr?.selectedValues?.forEach((attributeValueId) => {
                         const alreadySelected: AppEntityExtraDataDto =
                             previousExtraAttributes.filter((item) => {
-                                item.attributeValueId == attributeValueId;
+                                return item.attributeValueId == attributeValueId;
                             })[0];
                         if (alreadySelected)
                             return this.appItem.entityExtraData.push(
@@ -1287,18 +1287,18 @@ export class CreateOrEditAppItemComponent
                     // single selection
                     const alreadySelected: AppEntityExtraDataDto =
                         previousExtraAttributes.filter((item) => {
-                            item.attributeId = extraAttr.attributeId;
+                         return   item.attributeId == extraAttr.attributeId;
                         })[0];
                     if (alreadySelected) {
                         alreadySelected.attributeValueId =
-                            extraAttr?.selectedValues;
+                        parseInt(extraAttr?.selectedValues);
                         this.appItem.entityExtraData.push(alreadySelected);
                     } else {
                         const entityExtraData: AppEntityExtraDataDto =
                             new AppEntityExtraDataDto();
                         entityExtraData.id = 0;
                         entityExtraData.attributeValueId =
-                            extraAttr?.selectedValues;
+                            parseInt(extraAttr?.selectedValues);
                         entityExtraData.attributeId = extraAttr.attributeId;
                         this.appItem.entityExtraData.push(entityExtraData);
                     }
@@ -1307,7 +1307,7 @@ export class CreateOrEditAppItemComponent
                 // any other not lookup data
                 const alreadySelected: AppEntityExtraDataDto =
                     previousExtraAttributes.filter((item) => {
-                        item.attributeId = extraAttr?.attributeId;
+                       return item.attributeId == extraAttr?.attributeId;
                     })[0];
                 if (alreadySelected) {
                     alreadySelected.attributeValue = extraAttr?.selectedValues;

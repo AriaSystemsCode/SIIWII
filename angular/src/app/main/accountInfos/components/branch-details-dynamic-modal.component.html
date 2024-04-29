@@ -114,6 +114,9 @@
                         <span *ngIf="billingAddress && billingAddress.countryName">
                             {{ ', ' + billingAddress.countryName  }}
                         </span>
+                        <span *ngIf="billingAddress && billingAddress.postalCode">
+                            {{ ', ' + billingAddress.postalCode  }}
+                        </span>
                         <span *ngIf="billingAddress">
                             .
                         </span>
@@ -143,6 +146,9 @@
                         </span>
                         <span *ngIf="shippingAddress && shippingAddress.countryName">
                             {{ ', ' + shippingAddress.countryName  }}
+                        </span>
+                        <span *ngIf="shippingAddress && shippingAddress.postalCode">
+                            {{ ', ' + shippingAddress.postalCode  }}
                         </span>
                         <span *ngIf="shippingAddress">
                             .
@@ -174,6 +180,9 @@
                         <span *ngIf="distributionAddress && distributionAddress.countryName">
                             {{ ', ' + distributionAddress.countryName  }}
                         </span>
+                        <span *ngIf="distributionAddress && distributionAddress.postalCode">
+                            {{ ', ' + distributionAddress.postalCode  }}
+                        </span>
                         <span *ngIf="distributionAddress">
                             .
                         </span>
@@ -202,6 +211,9 @@
                         </span>
                         <span *ngIf="mailingAddress && mailingAddress.countryName">
                             {{ ', ' + mailingAddress.countryName  }}
+                        </span>
+                        <span *ngIf="mailingAddress && mailingAddress.postalCode">
+                            {{ ', ' + mailingAddress.postalCode  }}
                         </span>
                         <span *ngIf="mailingAddress">
                             .

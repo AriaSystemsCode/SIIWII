@@ -1,15 +1,17 @@
 @import "../../../../../assets/styles/base/variables";
 
 .app-items-container{
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: 1200px;
+   // overflow-y: auto;
+    //overflow-x: hidden;
+   // height: 1200px;
     width: 100%;
     // max-height: 100%;
     // min-height: 800px;
 }
 
-
+button{
+    cursor: pointer;
+}
 .thin-scroll::-webkit-scrollbar, .p-table-scrollable-body::-webkit-scrollbar {
     width: 15px;
     height: 15px;
@@ -17,6 +19,38 @@
 .thin-scroll::-webkit-scrollbar, .p-table-scrollable-body::-webkit-scrollbar {
     width: 15px;
     height: 6px;
+}
+
+
+.selection-btns{
+    border-radius: 6px;
+    background-color: white !important;
+    color: #4A0D4A !important;
+    border: 1px #EEEEEEEE !important;
+    padding:15px !important
+}
+
+.btn-sync{
+    border-radius: 6px;
+    background-color: white !important;
+    color: #F88011 !important;
+    border: 1px #EEEEEEEE !important;
+    padding: 15px !important
+}
+
+.btn-applySelection{
+    border-radius: 6px;
+    background-color: #4A0D4A !important;
+    color: white !important;
+    border: 1px #EEEEEEEE !important;
+    padding: 15px !important
+}
+
+.icon-box{
+    border: 1px solid #D9D9D9 !important;
+    padding: 10px !important;
+    background-color: #FFFFFF;
+    border-radius: 10px !important;
 }
 
 .selection-bar {
@@ -49,4 +83,32 @@
 
 .importIcons {
     width: 30px;
+}
+
+.view-profile-cover {
+    margin:0;
+    width: 100%;
+    // height: 245px;
+    background-color: #ccc;
+}
+
+.dev-logo{
+    min-height:140px;
+}
+.logo-profile{
+    width: 100%;
+    /* height: 100%; */
+    position: absolute;
+    top: -23px;
+    left: 35px;
+    border-radius: 50%;
+}
+@media (max-width: 768px) {
+    .dev-logo {
+        padding-bottom: 60px;
+        padding-top: 60px;
+    }
+    .logo-profile {
+        top: -52px;
+    }
 }

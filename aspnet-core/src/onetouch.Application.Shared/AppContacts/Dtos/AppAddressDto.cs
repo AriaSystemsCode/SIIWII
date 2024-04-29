@@ -31,7 +31,7 @@ namespace onetouch.AppContacts
 
 		public virtual string PostalCode { get; set; }
 
-		public virtual long CountryId { get; set; }
+		public virtual long? CountryId { get; set; }
 
 		public virtual string CountryCode { get; set; }
 

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using onetouch.AppContacts.Dtos;
 using onetouch.AppItems.Dtos;
 using onetouch.Sessions.Dto;
+using onetouch.AppSiiwiiTransaction.Dtos;
 
 namespace onetouch.AppEntities
 {
@@ -82,6 +83,7 @@ namespace onetouch.AppEntities
 		//MMT
 		Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code);
 		Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode);
+		Task<List<ContactInformationOutputDto>> GetContactsToMention(long entityId, string? filter);
         //MMT
 
     }

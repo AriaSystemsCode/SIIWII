@@ -17,6 +17,36 @@
     }
 
 }
+
+.toggle-replay-cont {
+    width: fit-content;
+    border: 1px solid #c1c1c1;
+    border-radius: 7px;
+    margin-left: 5.1rem !important;
+    margin-top: -14px;
+
+    label{
+        margin-bottom:0 ;
+        padding: 6px;
+        cursor: pointer;
+        color: #4a0d4a;
+
+        &:hover,&.focused{
+            background-color: #4a0d4a;
+            color: #fff;
+        }
+        &:first-child{
+            border-right: 1px solid #c1c1c1;
+            border-top-left-radius: 7px;
+            border-bottom-left-radius: 7px;
+
+        }
+        &:nth-child(2){
+            border-top-right-radius: 7px;
+            border-bottom-right-radius: 7px;
+        }
+    }
+}
 :host ::ng-deep .cart-cont .text-wrapper{
     background-color: #fff;
     border-radius: 4px;

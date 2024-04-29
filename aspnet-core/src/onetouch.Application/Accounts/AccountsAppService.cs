@@ -797,7 +797,7 @@ namespace onetouch.Accounts
                 if (originalPublishContactFortCurrTenant == null)
                     throw new UserFriendlyException("Ooppps! please publish your account first.");
 
-                originalContact = await _appContactRepository.GetAll()
+                originalContact = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (originalContact != null && originalContact.TenantId != null)
@@ -988,8 +988,8 @@ namespace onetouch.Accounts
                                 {
                                     address = addressCon;
                                 }
-                                if (contactDto.ContactAddresses == null)
-                                    contactDto.ContactAddresses = new List<AppContactAddressDto>();
+                                if (contactDto2.ContactAddresses == null)
+                                    contactDto2.ContactAddresses = new List<AppContactAddressDto>();
                                 AppContactAddress newContactAddress = new AppContactAddress();
                                 newContactAddress.Id = 0;
                                 newContactAddress.AddressId = address.Id;
@@ -998,9 +998,18 @@ namespace onetouch.Accounts
                                 newContactAddress.AddressCode = contactAddress.AddressCode;
                                 newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
                                 newContactAddress.ContactCode = contactAddress.ContactCode;
-
                                 
-                               // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto2.Id, ContactId = contactDto2.Id });
+                                contactDto2.ContactAddresses.Add(new AppContactAddressDto
+                                {
+                                    AddressTypeId = contactAddress.AddressTypeId,
+                                    AddressTypeIdName = contactAddress.AddressTypeCode,
+                                    Code = address.Code,
+                                    AddressId = address.Id,
+                                    AccountId = contactDto2.Id,
+                                    ContactId = contactDto2.Id
+                                });
+
+                                // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto2.Id, ContactId = contactDto2.Id });
                                 await _appContactAddressRepository.InsertAsync(newContactAddress);
                                 await CurrentUnitOfWork.SaveChangesAsync();
                             }
@@ -3758,7 +3767,10 @@ namespace onetouch.Accounts
                 var logoAttach = input.EntityAttachments.Where(x => x.AttachmentCategoryId == attPhotoId).FirstOrDefault();
                 if (logoAttach != null && !string.IsNullOrEmpty(logoAttach.FileName))
                 {
+                    if (!string.IsNullOrEmpty(logoAttach.guid))
                     await UpdateProfilePicture(logoAttach.guid + "." + logoAttach.FileName.Split('.')[1], long.Parse(input.UserId.ToString()));
+                    else
+                        await UpdateProfilePicture( logoAttach.FileName, long.Parse(input.UserId.ToString()));
                 }
             }
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
@@ -4996,7 +5008,9 @@ namespace onetouch.Accounts
                     addressDto.City = address.City;
                     addressDto.State = address.State;
                     addressDto.PostalCode = address.PostalCode;
-                    addressDto.CountryId = GetTypeId(address.CountryIdName, countries);
+                    if (string.IsNullOrEmpty(address.CountryIdName)) address.CountryIdName = "USA";
+                    var countryId = GetTypeId(address.CountryIdName, countries);
+                    addressDto.CountryId = countryId == 0 ? null : countryId;
                     addressDto.AccountId = AccountId;
                     var appAddressDtoRet = await CreateOrEditAddress(addressDto);
                     address.AddressId = appAddressDtoRet.Id;
@@ -5304,9 +5318,9 @@ namespace onetouch.Accounts
                     accountContact.Phone1Ext = createOrEditAccountInfoDto.Phone1Ex;
                     accountContact.Phone2Ext = createOrEditAccountInfoDto.Phone2Ex;
                     accountContact.Phone3Ext = createOrEditAccountInfoDto.Phone3Ex;
-                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId;
-                    accountContact.Phone2TypeId = createOrEditAccountInfoDto.Phone2TypeId;
-                    accountContact.Phone3TypeId = createOrEditAccountInfoDto.Phone3TypeId;
+                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId == 0 ? null : createOrEditAccountInfoDto.Phone1TypeId; 
+                    accountContact.Phone2TypeId = createOrEditAccountInfoDto.Phone2TypeId == 0 ? null : createOrEditAccountInfoDto.Phone2TypeId;
+                    accountContact.Phone3TypeId = createOrEditAccountInfoDto.Phone3TypeId == 0 ? null : createOrEditAccountInfoDto.Phone3TypeId;
                     accountContact.PriceLevel = createOrEditAccountInfoDto.PriceLevel;
                     accountContact.Website = createOrEditAccountInfoDto.Website;
                     accountContact.EntityFk = new AppEntity();
@@ -5485,9 +5499,9 @@ namespace onetouch.Accounts
                             branchContact.Phone1Ext = branchDto.Phone1Ext;
                             branchContact.Phone2Ext = branchDto.Phone2Ext;
                             branchContact.Phone3Ext = branchDto.Phone3Ext;
-                            branchContact.Phone1TypeId = branchDto.Phone1TypeId;
-                            branchContact.Phone2TypeId = branchDto.Phone2TypeId;
-                            branchContact.Phone3TypeId = branchDto.Phone3TypeId;
+                            branchContact.Phone1TypeId = branchDto.Phone1TypeId == 0 ? null : branchDto.Phone1TypeId;
+                            branchContact.Phone2TypeId = branchDto.Phone2TypeId == 0 ? null : branchDto.Phone2TypeId;
+                            branchContact.Phone3TypeId = branchDto.Phone3TypeId == 0 ? null : branchDto.Phone3TypeId;
                             branchContact.PriceLevel = accountContact.PriceLevel;
                             branchContact.Website = branchDto.Website;
                             branchContact.EntityFk = new AppEntity();
@@ -5625,9 +5639,9 @@ namespace onetouch.Accounts
                                     teamContact.Phone1Ext = personDto.Phone1Ext;
                                     teamContact.Phone2Ext = personDto.Phone2Ext;
                                     teamContact.Phone3Ext = personDto.Phone3Ext;
-                                    teamContact.Phone1TypeId = personDto.Phone1TypeId;
-                                    teamContact.Phone2TypeId = personDto.Phone2TypeId;
-                                    teamContact.Phone3TypeId = personDto.Phone3TypeId;
+                                    teamContact.Phone1TypeId = personDto.Phone1TypeId == 0 ? null : personDto.Phone1TypeId;
+                                    teamContact.Phone2TypeId = personDto.Phone2TypeId == 0 ? null : personDto.Phone2TypeId;
+                                    teamContact.Phone3TypeId = personDto.Phone3TypeId == 0 ? null : personDto.Phone3TypeId;
                                     teamContact.PriceLevel = accountContact.PriceLevel;
                                     teamContact.Website = personDto.Website;
                                     teamContact.EntityFk = new AppEntity();

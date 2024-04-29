@@ -108,6 +108,7 @@ using onetouch.AppSiiwiiTransaction;
 using onetouch.AppMarketplaceItems;
 using onetouch.AppMarketplaceItemLists;
 using onetouch.AppMarketplaceItems.Dtos;
+using onetouch.AppMarketplaceMessages;
 
 namespace onetouch
 {
@@ -457,6 +458,14 @@ namespace onetouch
             configuration.CreateMap<CreateMessageInput, AppMessage>().ReverseMap();
             configuration.CreateMap<CreateMessageInput, AppEntityDto>().ReverseMap();
             configuration.CreateMap<CreateMessageForRecieversInput, AppEntityDto>().ReverseMap();
+            configuration.CreateMap<CreateMessageInput, AppMarketplaceMessage>().ReverseMap();
+
+            configuration.CreateMap<MessagesDto, AppMarketplaceMessage>();
+            configuration.CreateMap<AppMarketplaceMessage, MessagesDto>()
+                .ForMember(d => d.SendDate, s => s.MapFrom(ss => ss.CreationTime))
+                .ForMember(d => d.ReceiveDate, s => s.MapFrom(ss => ss.CreationTime))
+                .ForMember(d => d.EntityObjectTypeCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeFk.Code))//.EntityObjectTypeCode
+                .ForMember(d => d.EntityObjectStatusCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectStatusCode));
             //Esraa
             //configuration.CreateMap<AppContact, TreeNode<BranchDto>>()
             //    .ForMember(d => d.label, s => s.MapFrom(ss => ss.Name))

@@ -1,8 +1,21 @@
 <div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'' ]" >
     <app-add-comment [cartStyle]="cartStyle"
         (saveDone)="newCommentAddedHandler($event)"
+        [relatedEntityId]="entityId"
         #AddCommentComponent>
     </app-add-comment>
+
+ <!--<SendMessageModal #SendMessageModal (modalSave)="saveNewDirectMsg()"></SendMessageModal>-->
+
+
+    <div *ngIf="showCommentToggle&&addNewThread&&cartStyle" class="toggle-replay-cont">
+        <label class="comment focused">
+            <i class="fa-regular far fa-comment"></i>
+        </label>
+        <label class="direct-message">
+            <i class="fa-regular far fa-envelope"></i>       
+         </label>
+    </div>
     <div *ngFor="let comment of comments" [ngClass]="cartStyle?'mt-2  comment-inner':'mt-4 ml-3'">
         <div class="mb-2">
             <app-comment [comment]="comment"></app-comment>

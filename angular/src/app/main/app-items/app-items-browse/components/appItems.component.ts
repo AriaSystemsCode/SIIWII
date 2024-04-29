@@ -16,6 +16,8 @@ import {
     ArrtibuteFilter,
     GetAllAppItemsInput,
     AppItemStockAvailabilityServiceProxy,
+    SycAttachmentCategoryDto,
+    AccountsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
@@ -61,7 +63,8 @@ export class AppItemsComponent extends AppComponentBase {
     selectedItemId: number;
     selectedIndex: number;
     filterText = "";
-
+    allSelectedShared:boolean=true;
+    selectedItemsList:any;
     _entityTypeFullName = "onetouch.AppItems.AppItem";
     entityHistoryEnabled = false;
 
@@ -102,12 +105,18 @@ export class AppItemsComponent extends AppComponentBase {
     multiSelectionInfo : MultiSelectionInfo
     applySelectionTitle:string = 'Apply'
     oldValue;
+    coverPhoto: any = ""
+    logoPhoto: any = ""
+sycAttachmentCategoryLogo :SycAttachmentCategoryDto
+    sycAttachmentCategoryBanner :SycAttachmentCategoryDto
+    sycAttachmentCategoryImage :SycAttachmentCategoryDto
     constructor(
         injector: Injector,
         private _importService: MainImportService,
         private _appItemsServiceProxy: AppItemsServiceProxy,
         private _fileDownloadService: FileDownloadService,
         private _appItemsActionService: AppItemsActionsService,
+        private _AccountsServiceProxy: AccountsServiceProxy,
         private _router: Router,
         private _fb : FormBuilder
     ) {
@@ -174,6 +183,30 @@ export class AppItemsComponent extends AppComponentBase {
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
         this.getUserPreferenceForListView();
         this.initFilterForm()
+        this.getAllForAccountInfo()
+    }
+
+   async getAllForAccountInfo() {
+        this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER","IMAGE"]).subscribe((result)=>{
+            result.forEach(item=>{
+                if(item.code == "LOGO") this.sycAttachmentCategoryLogo = item
+                else if(item.code == "BANNER") this.sycAttachmentCategoryBanner = item
+                else if(item.code == "IMAGE") this.sycAttachmentCategoryImage = item
+            })
+        })
+
+        this.showMainSpinner()
+        const result = await this._AccountsServiceProxy.getAccountForView(this.appSession.user.accountId,5)
+        .toPromise()
+        .finally(
+            ()=> {
+                this.hideMainSpinner()
+            }
+        )
+        let accountDataForView = result ? result.account : undefined
+        if (accountDataForView?.coverUrl) this.coverPhoto = `${this?.attachmentBaseUrl}/${accountDataForView?.coverUrl}`;
+        if (accountDataForView?.logoUrl) this.logoPhoto = `${this?.attachmentBaseUrl}/${accountDataForView?.logoUrl}`;
+
     }
 
     setMainPageFilter(filter:ItemsFilterTypesEnum){
@@ -401,11 +434,39 @@ export class AppItemsComponent extends AppComponentBase {
     }
 
     eventHandler(event:ActionsMenuEventEmitter<AppItemBrowseEvents>,index?:number): void {
+      this.selectedItemsList=this.items.filter((item)=>{return item.selected==true});
+        this.allSelectedShared=true;
+        this.selectedItemsList.forEach((item)=>{
+            if(!item?.appItem?.sharingLevel){
+                this.allSelectedShared=false;
+                return;
+            }
+        })
+        if(this.selectedItemsList.length==0){
+            this.allSelectedShared=true;
+        }
         if(event.event == AppItemBrowseEvents.Delete) this.deleteItemHandler(index)
         this.eventTriggered.emit(event)
     }
 
+    bulkShareItems(){
+        this._appItemsServiceProxy
+        .shareSelectedProducts(this.filterBody.selectorKey)
+        .subscribe((result) => {
+            debugger
+            this.notify.success(this.l(result+" Item shared"));
 
+        });
+    }
+    bulkSyncItems(){
+        this._appItemsServiceProxy
+        .syncSelectedProduct(this.filterBody.selectorKey)
+        .subscribe((result) => {
+            debugger
+            this.notify.success(this.l(result+" Item synced"));
+
+        });
+    }
     saveUserPreferenceForListView() {
         const key = "appitem-list-view-mode";
         const value = String(Number(this.singleItemPerRowMode));
@@ -467,6 +528,7 @@ export class AppItemsComponent extends AppComponentBase {
         this.eventTriggered.emit({ event:AppItemBrowseEvents.CancelSelection })
     }
     applySelection(){
+        debugger
         this.eventTriggered.emit({ event:AppItemBrowseEvents.ApplySelection })
     }
     onFinishImport($event) {

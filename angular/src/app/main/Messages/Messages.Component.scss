@@ -6,10 +6,10 @@
     margin-top: -25px;
 }
 .subject-msg {
-    font-size: 14px;
-    font-weight: bold;
-    color: #464e5f;
-    overflow-wrap: break-word; 
+    font-size: 18px;
+    font-weight: 800;
+    color: #1B101B;
+    overflow-wrap: break-word;
 }
 .subject-msg-fs13 {
     font-weight: bold;
@@ -48,8 +48,9 @@
     min-height: 668px;
 }
 .msg-bodyformat {
-    font-size: 13px;
-    color: #464e5f;
+    font-size: 12px;
+    color: #949494;
+    font-weight: 500;
     img {
         max-width: 100%;
     }
@@ -72,26 +73,40 @@
 }
 .body-msg {
     margin-top: -19px;
+    margin-left: -27px;
+    font-size: 12px;
+    color: #949494;
+    font-weight: 500;
 }
 .wrapper-dev {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 0px;
 }
 .active-msg {
-    padding: 20px;
+    padding: 9px 24px;
 }
 .number-count {
     position: absolute;
     top: -8px;
     left: 4px;
 }
-.composeBtn {
+.composeBtn,.ReplyBtn ,.ForwardBtn {
     background-color: #700066 !important;
-   // margin: 10px !important;
-    width:  164px !important;
+    width: 146px !important;
     border: none !important;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
 }
-
+.ForwardBtn{
+    background-color: #fff !important;
+    color: #700066 !important;
+    border:1px solid #700066 !important;
+}
+.searchBarCont,.messageTitleCont{
+    border-bottom: 1px solid #eee;
+}
 .composeBtn:hover{
     background-color: #700066 !important;
     border: none !important;
@@ -147,7 +162,7 @@
     color: black !important;
     // margin-left: 40px;
     padding: 19px;
-    padding-left: 5%;
+    border-radius: 12px;
     // margin-right: 165px;
     // margin-right: 25px;
    // margin-right: 164px;
@@ -169,34 +184,42 @@
 .search input {
     top: 268px;
     left: 432px;
-    //width: 284px;
-    height: 32px;
-    border-radius: 6px;
+    height: 44px;
+    border-radius: 12px;
     opacity: 1;
-    margin-bottom: 20px;
-    margin-top: 6px;
+    padding: 10px 8px 10px 37px;
+    border: 1px solid #D9D9D9;
+    background-color: #F8F8F8 !important;
+    background-position: 11px;
+    width: 90%;
+    margin: 6px auto 20px auto;
 }
 
 .Messages {
     //  width: 308px;
     height: auto;
     opacity: 1;
-    padding: 15px;
+    padding: 15px 10px 0px 10px;
     margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 14px;
+
 }
 
 li {
     list-style: none;
 }
+.borderdCont,.SelectedMessage,.active-msg,#contentmsg{
+    border: 1px solid #eee;
 
+}
 .SelectedMessage {
-    background: #f5f5f5 0% 0% no-repeat padding-box;
-    border-left: 3px solid #700066;
+    background: #F9F7F9 0% 0% no-repeat padding-box;    
 }
 
 .ReplyBtn {
     //width: 72px;
-    height: 32px;
+   /* height: 32px;
     border: 1px solid #5f6368;
     border-radius: 6px;
     opacity: 1;
@@ -204,16 +227,31 @@ li {
     color: #464e5f;
     background-color: #700066 !important;
     border: none !important;
-    width: 119pt;
+    width: 119pt;*/
 }
 
 .ReplyBtn :hover{
     background-color:transparent !important;
 }
-
+.mentionIcon {
+    border: 1px solid;
+    padding: 13px 2px 13px 3px;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+.tabs-cont{
+    button{
+        background-color: #F8F8F8 !important;
+  
+    }
+}
+.btns-replay {
+    text-align: right;
+    margin-top: 30px;
+}
 .ForwardBtn {
     //width: 97px;
-    height: 32px;
+    /*height: 32px;
     border: 1px solid #5f6368;
     border-radius: 6px;
     opacity: 1;
@@ -221,7 +259,7 @@ li {
     color: #464e5f;
     background-color: #700066 !important;
     border: none !important;
-    width: 119pt;
+    width: 119pt;*/
 }
 .ForwardBtn :hover{
     background-color:transparent !important;
@@ -249,7 +287,19 @@ li {
    // height: 420px;
     height: 70vh;
 }
-
+.messageDetailTitle{
+    font-size: 14px;
+    font-weight: 600;
+    color: #1B101B;
+}
+#contentmsg {
+    overflow-y: scroll;
+    height: 82vh;
+    margin: 10px 0px 10px 10px;
+    width: 98% !important;
+    border-radius: 6px;
+    padding:15px 10px;
+}
 .uploaded-attchments,
 .display-name {
     cursor: pointer;
@@ -261,7 +311,10 @@ li {
     overflow: hidden;
     cursor: pointer;
 }
+.show-detail-btn{
+    padding:11px 10px;
 
+} 
 //////////////////////////
 
 @media (max-width: 960px) {
@@ -301,7 +354,6 @@ li {
     }
     .wrapper-dev {
         overflow-x: auto;
-        margin-bottom: 8px;
     }
     .leftPanel {
         width: max-content;
@@ -338,7 +390,7 @@ li {
     }
     .wrapper-dev {
         overflow-x: auto;
-        margin-bottom: 8px;
+        margin-bottom: 0px;
     }
     .leftPanel {
         width: max-content;
@@ -352,9 +404,11 @@ li {
     padding-left: 35px;
 }
 .to-block {
-    // position: absolute;
-    margin-top: -6px;
-    // top: 16px;
+    display: inline-block;
+    font-weight: 500;
+    color: #949494;
+    font-size: 12px;
+    padding-left: 38px;
 }
 .message-data {
     margin-top: -15px;
@@ -393,7 +447,7 @@ li {
     /* height: 10px; */
     padding: 10px 0;
 }
-actionDropdown:focus{
+.actionDropdown:focus{
     background-color: transparent !important;
 }
 .btn-action:hover {
@@ -512,10 +566,14 @@ body .btn.btn-action:after {
 
 
 .clickBtn {
-    background-color: white !important;
+    background-color: #f5e9ff  !important;
 }
-.clickBtn:focus {
-    background-color: #f5e9ff !important;
+.clickBtn{
+    color: #9E9E9E !important;
+}
+.clickBtn:focus ,.clickBtn.active-tab{
+    background-color: #fff !important;
+    color: #700066 !important;
 }
 
 .clickBtn:hover {

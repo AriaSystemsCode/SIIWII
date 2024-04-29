@@ -1,21 +1,23 @@
 <div class="boxes row  mt-md-5 mb-5">
 
 
-    <div class="rightbox col mr-0 mr-md-5">
-        <div class="d-flex flex-row" style="justify-content: space-between;">
+    <div class="rightbox col mr-0 mr-md-3 ml-md-5">
+        <div class="d-flex flex-row mb-4" style="justify-content: space-between;">
             <div class="btn-group dropdown actionDropdown mr-3" dropdown container="body">
-                <h4 style="color: #4A0D4A !important;
+                <h4 style="color: #1B101B !important;
                 font-family: Poppins !important;
-                font-size: 20px !important;
+                font-size: 26px !important;
                 font-style: normal !important;
-                font-weight: 600 !important;
+                font-weight: 700 !important;
                 line-height: normal !important;">Messages</h4>
 
                 <button class="btn btn-primary btn-sm ml-5 ng-tns-c357-9 pb-0" dropdownToggle style="cursor: pointer;
-                    border-radius: 4px;
-                    border: 1px solid #E2E2EA !important;
+                    border-radius: 6px;
+                    padding: 1px 16px 1px 16px;
+                    border: 1px solid #eee !important;
                     background-color: transparent !important;
-                    color: black !important;height: 38px">
+                    box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
+                    color: black !important;height: 44px">
 
                     <img *ngIf="messageTypeIndex==1" [src]="
 appRootUrl() +
@@ -122,18 +124,24 @@ appRootUrl() +
 
 
 
-                <div *ngIf="messageTypeIndex==1">
-                    <button class="btn btn-primary btn-sm ng-tns-c357-9 pb-0 m-0 ml-3 clickBtn" style="cursor: pointer;
-                    border-radius: 4px;
-                    border: 1px solid #E2E2EA !important;
-                    color:#A461D8 !important;height: 38px">
+                <div class="tabs-cont ml-3" *ngIf="messageTypeIndex==1">
+                    <button class="active-tab btn btn-primary btn-sm ng-tns-c357-9 pb-0 m-0 ml-3 clickBtn active-tab" style="cursor: pointer;
+                    border-radius: 6px 0px 0px 6px;
+                    padding: 1px 16px 1px 16px;
+                    border: 1px solid #eee !important;
+                    box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
+                    color: #9E9E9E ;
+                    height: 44px;" id="firstTabBtn">
+                  <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 1" [src]="
+                  appRootUrl() +
+                  'assets/message/Messaging_Inbox_icon.svg'" border="0" />
 
                         <span class="pr-3" style="
                     font-family: Poppins;
                     font-size: 16px;
                     font-style: normal;
                     font-weight: 600;
-                    line-height: normal;" (click)="getPrimaryMessage()">Primary</span>
+                    line-height: normal;" (click)="getPrimaryMessage()">Direct Message</span>
                         <label style="text-align: center !important" *ngIf="totalPrimaryUnread>0">
                             <span  style="left: 10px">{{
                                 totalPrimaryUnread
@@ -142,27 +150,51 @@ appRootUrl() +
                     </button>
 
                     <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
-                border-radius: 4px;
-                border: 1px solid #E2E2EA !important;
-                color: #F88011 !important;height: 38px" (click)="getUpdatesMessage()">
-
+                    border-radius: 0px;
+                    padding: 1px 16px 1px 16px;
+                    border: 1px solid #eee !important;
+                    box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
+                    color: #9E9E9E ;
+                    height: 44px;" (click)="getUpdatesMessage($event)">
+                   <i class="pi pi-comments"  style="font-size:20px;"></i>
                         <span class="pr-3" style="
                 font-family: Poppins;
                 font-size: 16px;
                 font-style: normal;
                 font-weight: 600;
-                line-height: normal;">Updates</span>
+                line-height: normal;">Threads</span>
                        <label style="text-align: center !important" *ngIf="totalUpdatesUnread>0">
                         <span  style="left: 10px">{{
                             totalUpdatesUnread
-                            }}</span>
+                            }}</span> 
                     </label>
                     </button>
+                    <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0 clickBtn" style="cursor: pointer;
+                    border-radius:0px 6px 6px 0px;
+                    padding: 1px 16px 1px 16px;
+                    border: 1px solid #eee !important;
+                    box-shadow: 1px 1px 1px rgb(22 22 22 / 5%);
+                    color: #9E9E9E ;
+                    height: 44px;" (click)="getMentionsMessage($event)">
+                       <i class="fa fa-at mentionIcon" aria-hidden="true"  style="font-size:20px;"></i>
+
+                            <span class="pr-3" style="
+                    font-family: Poppins;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: normal;">Mentions</span>
+                           <label style="text-align: center !important" *ngIf="totalMentionUnRead>0">
+                            <span  style="left: 10px">{{
+                                totalMentionUnRead
+                                }}</span>
+                        </label>
+                        </button>
                 </div>
             </div>
             <div class="d-none d-md-block">
                 <button (click)="SendMessageModal.show()" class="composeBtn btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 16 16" fill="none"
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="none"
                         class="mr-2 mb-1">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                             d="M13.5619 4.72553C13.5619 4.28481 13.9191 3.92754 14.3598 3.92754C14.8006 3.92754 15.1578 4.28481 15.1578 4.72553V12.6581C15.1578 14.5035 13.6618 15.9996 11.8163 15.9996H3.33766C1.49216 15.9996 -0.00390625 14.5035 -0.00390625 12.6581V4.17946C-0.00390625 2.33396 1.49216 0.837891 3.33766 0.837891H11.0183C11.459 0.837891 11.8163 1.19516 11.8163 1.63588C11.8163 2.07659 11.459 2.43386 11.0183 2.43386H3.33766C2.37359 2.43386 1.59207 3.21539 1.59207 4.17946V12.6581C1.59207 13.6221 2.37359 14.4036 3.33766 14.4036H11.8163C12.7803 14.4036 13.5619 13.6221 13.5619 12.6581V4.72553ZM14.2659 0.24769C14.5699 -0.0714687 15.075 -0.0838211 15.3941 0.2201C15.7133 0.524021 15.7256 1.02913 15.4217 1.34828L7.78141 9.37165C7.47749 9.69081 6.97238 9.70316 6.65323 9.39924C6.33407 9.09532 6.32172 8.59021 6.62564 8.27106L14.2659 0.24769Z"
@@ -172,10 +204,9 @@ appRootUrl() +
                 </button>
             </div>
         </div>
-        <hr />
         <div class="row">
-            <div class="col-md-4 pt-2 pl-4">
-                <div class="d-none d-md-block">
+            <div class="col-md-4 pt-2 pl-0 pr-0 borderdCont">
+                <div class="pt-4 pb-4 searchBarCont d-none d-md-block">
                     <!-- <h4>{{ messageType }}</h4> -->
                     <div class="search" style="width: 100%; padding-right: 17px">
                         <input placeholder="Search for messages" [(ngModel)]="filterText" name="filterText" autoFocus
@@ -189,8 +220,7 @@ appRootUrl() +
                         <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
                             <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 1" [src]="
                             appRootUrl() +
-                            'assets/message/Messaging_Inbox_icon.svg'
-                        " border="0" />
+                            'assets/message/Messaging_Inbox_icon.svg'" border="0" />
                             <img class="pb-2 pr-1" *ngIf="messageTypeIndex == 2" [src]="
                             appRootUrl() +
                             'assets/message/Messaging_SentItems_icon.svg'
@@ -306,7 +336,7 @@ appRootUrl() +
                     <div class="row">
                         <div class="col-md-12" *ngFor="let message of itemsToShow; let i = index">
                             <div class="wrapper-dev">
-                                <div class="active-msg mr-2" (click)="selectMessage(message)" [ngClass]="{
+                                <div class="active-msg mr-0" (click)="selectMessage(message)" [ngClass]="{
                                             SelectedMessage: isActive(message, i)
                                         }">
                                     <img [src]="
@@ -314,8 +344,8 @@ appRootUrl() +
                                                     ? message.profilePictureUrl
                                                     : 'assets/chat/user-chat.png'
                                             " class="rounded-circle" style="
-                                                width: 50px;
-                                                height: 50px;
+                                                width: 44px;
+                                                height: 44px;
                                                 object-fit: cover;
                                             " />
                                     <ul class="msg-content row">
@@ -391,7 +421,7 @@ appRootUrl() +
                                     </ul>
                                     <div class="body-msg row">
                                         <div class="col-1 mr-5"></div>
-                                        <div class="ml-md-4 ml-0">
+                                        <div class="ml-md-4 w-75 ml-0">
                                             <p class="" [ngClass]="{
                                                     'subject-msg-fs13':
                                                         message.entityObjectStatusCode ==
@@ -501,7 +531,7 @@ appRootUrl() +
                                     </ul>
                                     <div class="body-msg row">
                                         <div class="col-1 mr-5"></div>
-                                        <div class="ml-md-4 ml-0">
+                                        <div class="ml-md-4 w-75 ml-0">
                                             <p class="" [ngClass]="{
                                                     'subject-msg-fs13':
                                                         message.entityObjectStatusCode ==
@@ -521,19 +551,22 @@ appRootUrl() +
                     </div>
                 </div>
             </div>
-            <div [ngClass]="{ 'col-md-8': !showSideBar, 'col-md-5': showSideBar }"
-             class="col d-none  d-md-block p-2 m-5 m-md-0" style="padding: 0">
+            <div [ngClass]="{ 'col-md-8 borderdCont': !showSideBar, 'col-md-5': showSideBar }"
+             class="col d-none  d-md-block p-0 m-5 m-md-0" style="padding: 0">
                 <div *ngIf="messagesDetails">
+                    <div class="pt-5 pb-5 pl-1 messageTitleCont">
                     <span class="subject-msg">{{ messagesDetails[0].messages.subject }}
                     </span>
-                    <div class="actions-message pr-4" style="">
+                    <div class="actions-message pr-4" >
                         <div class="row">
                             <div class="mr-3">
-                                <button class="btn btn-primary btn-sm  ng-tns-c357-9 pb-0 m-0" style="cursor: pointer;
+                                <button class="btn btn-primary btn-sm show-detail-btn ng-tns-c357-9  m-0" style="cursor: pointer;
                              border-radius: 4px;
                              border: 1px solid #E2E2EA !important;
                              background-color: transparent !important;
                              color: #F88011 !important" (click)="onShowSideBar(!showSideBar)">
+<i class="fa fa-eye fa-2x" aria-hidden="true" style="margin-top: -3px;
+margin-right: 6px;"></i>
 
                                     <span class="pr-3" style="
                              font-family: Poppins;
@@ -610,9 +643,7 @@ appRootUrl() +
                             </div>
                         </div>
                     </div>
-
-                    <hr class="mt-5" style="border: 1px solid #e7e8ef; opacity: 1" />
-
+                    </div>
                     
                     <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
                         [scrollTop]="scrolltop" style="position: relative">
@@ -655,25 +686,15 @@ appRootUrl() +
                                             ? messagedetail.messages
                                                   .profilePictureUrl
                                             : 'assets/chat/user-chat.png'
-                                    " class="rounded-circle" style="
-                                        width: 30px;
-                                        height: 30px;
+                                    " class="rounded-circle mr-3" style="
+                                        width: 60px;
+                                        height: 60px;
                                         object-fit: cover;
                                     " />
-                            <span style="
-                                        font-size: 15px;
-                                        font-weight: bold;
-                                        color: #464e5f;
-                                        padding-left: 7px;
-                                        position: absolute;
-                                    ">{{ messagedetail.messages.senderName }}</span><br />
+                            <span class="messageDetailTitle">{{ messagedetail.messages.senderName }}</span><br />
                             <div class="to-block">
                                 <span class="to">{{ "To" | localize }} :</span>
-                                <span style="
-                                            font-size: 13px;
-                                            color: #464e5f;
-                                            padding-left: 1px;
-                                        ">{{ messagedetail.messages.toName }}
+                                <span>{{ messagedetail.messages.toName }}
                                 </span>
                             </div>
                             <br />
@@ -705,106 +726,109 @@ appRootUrl() +
                             <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
                             <br />
                         </div>
-                    </div>
-                    <div>
-                        <p *ngIf="
-                                    messagesDetails[0].messages.entityAttachments
-                                        .length > 0
-                                " class="title-attach">
-                            <span>{{
-                                messagesDetails[0].messages
-                                .entityAttachments.length
-                                }}
-                                {{ "Attachments" | localize }}</span>
-                        </p>
-
-                        <div class="files-uploaded" *ngFor="let item of entityAttachments">
-                            <div class="uploaded-attchments" *ngIf="
-                                        item.fileName.includes('.doc') ||
-                                        item.fileName.includes('.docs')
-                                    ">
-                                <img src="assets/message/microsoft-word.svg" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.ppt')">
-                                <img src="assets/message/microsoft-powerpoint.svg" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="
-                                        item.fileName.includes('.jpg') ||
-                                        item.fileName.includes('.png') ||
-                                        item.fileName.includes('.svg')
-                                    ">
-                                <img [src]="getImage(item.url)" height="30px" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.xls')">
-                                <img src="assets/message/excel.svg" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.pdf')">
-                                <img src="assets/message/adobe.svg" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="
-                                        !item.fileName.includes('.xls') &&
-                                        !item.fileName.includes('.pdf') &&
-                                        !item.fileName.includes('.docs') &&
-                                        !item.fileName.includes('.doc') &&
-                                        !item.fileName.includes('.ppt') &&
-                                        !item.fileName.includes('.jpg') &&
-                                        !item.fileName.includes('.svg') &&
-                                        !item.fileName.includes('.png')
-                                    ">
-                                <img src="assets/message/document.png" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-
-                            <p class="display-name">
-                                <span>{{ item.displayName }}</span>
+                        <div>
+                            <p *ngIf="
+                                        messagesDetails[0].messages.entityAttachments
+                                            .length > 0
+                                    " class="title-attach">
+                                <span>{{
+                                    messagesDetails[0].messages
+                                    .entityAttachments.length
+                                    }}
+                                    {{ "Attachments" | localize }}</span>
                             </p>
+    
+                            <div class="files-uploaded" *ngFor="let item of entityAttachments">
+                                <div class="uploaded-attchments" *ngIf="
+                                            item.fileName.includes('.doc') ||
+                                            item.fileName.includes('.docs')
+                                        ">
+                                    <img src="assets/message/microsoft-word.svg" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="item.fileName.includes('.ppt')">
+                                    <img src="assets/message/microsoft-powerpoint.svg" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="
+                                            item.fileName.includes('.jpg') ||
+                                            item.fileName.includes('.png') ||
+                                            item.fileName.includes('.svg')
+                                        ">
+                                    <img [src]="getImage(item.url)" height="30px" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="item.fileName.includes('.xls')">
+                                    <img src="assets/message/excel.svg" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="item.fileName.includes('.pdf')">
+                                    <img src="assets/message/adobe.svg" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="
+                                            !item.fileName.includes('.xls') &&
+                                            !item.fileName.includes('.pdf') &&
+                                            !item.fileName.includes('.docs') &&
+                                            !item.fileName.includes('.doc') &&
+                                            !item.fileName.includes('.ppt') &&
+                                            !item.fileName.includes('.jpg') &&
+                                            !item.fileName.includes('.svg') &&
+                                            !item.fileName.includes('.png')
+                                        ">
+                                    <img src="assets/message/document.png" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+    
+                                <p class="display-name">
+                                    <span>{{ item.displayName }}</span>
+                                </p>
+                            </div>
+                        </div>
+    
+                        <!-- <div class="files-uploaded">
+                            <div class="uploaded-attchments">
+                               <img src="assets/message/word.png">
+        
+                           </div>
+                           <p><span>Wordfile.doc</span></p>
+                        </div> -->
+    
+                        <div class="btns-replay">
+                            <button (click)="
+                                        SendMessageModal.show(
+                                            messagesDetails[0].messages.id,
+                                            messagesDetails[0].messages.threadId,
+                                            false,
+                                            messagesDetails[0].messages
+                                                .mesasgeObjectType
+                                        )
+                                    " class="ReplyBtn btn btn-primary">
+                                <img src="assets/message/replay.svg" style="width: 20px;
+                                color: #fff;
+                                filter: brightness(14);" />
+                                <span> {{ "Reply" | localize }}</span>
+                            </button>
+                            <button (click)="
+                                        SendMessageModal.show(
+                                            messagesDetails[0].messages.id,
+                                            messagesDetails[0].messages.threadId,
+                                            true
+                                        )
+                                    " class="ForwardBtn btn btn-primary">
+                                <span style="padding-right: 5px">{{
+                                    "Forward" | localize
+                                    }}</span><img src="assets/message/forward.svg" style="width: 13px" />
+                            </button>
                         </div>
                     </div>
 
-                    <!-- <div class="files-uploaded">
-                        <div class="uploaded-attchments">
-                           <img src="assets/message/word.png">
-    
-                       </div>
-                       <p><span>Wordfile.doc</span></p>
-                    </div> -->
-
-                    <div class="btns-replay">
-                        <button (click)="
-                                    SendMessageModal.show(
-                                        messagesDetails[0].messages.id,
-                                        messagesDetails[0].messages.threadId,
-                                        false,
-                                        messagesDetails[0].messages
-                                            .mesasgeObjectType
-                                    )
-                                " class="ReplyBtn btn btn-primary">
-                            <img src="assets/message/replay.svg" style="width: 13px" />
-                            <span> {{ "Reply" | localize }}</span>
-                        </button>
-                        <button (click)="
-                                    SendMessageModal.show(
-                                        messagesDetails[0].messages.id,
-                                        messagesDetails[0].messages.threadId,
-                                        true
-                                    )
-                                " class="ForwardBtn btn btn-primary">
-                            <span style="padding-right: 5px">{{
-                                "Forward" | localize
-                                }}</span><img src="assets/message/forward.svg" style="width: 13px" />
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -948,25 +972,15 @@ appRootUrl() +
                                             ? messagedetail.messages
                                                   .profilePictureUrl
                                             : 'assets/chat/user-chat.png'
-                                    " class="rounded-circle" style="
-                                        width: 30px;
-                                        height: 30px;
+                                    " class="rounded-circle mr-3" style="
+                                        width: 60px;
+                                        height: 60px;
                                         object-fit: cover;
                                     " />
-                            <span style="
-                                        font-size: 15px;
-                                        font-weight: bold;
-                                        color: #464e5f;
-                                        padding-left: 7px;
-                                        position: absolute;
-                                    ">{{ messagedetail.messages.senderName }}</span><br />
+                            <span class="messageDetailTitle">{{ messagedetail.messages.senderName }}</span><br />
                             <div class="to-block">
                                 <span class="to">{{ "To" | localize }} :</span>
-                                <span style="
-                                            font-size: 13px;
-                                            color: #464e5f;
-                                            padding-left: 1px;
-                                        ">{{ messagedetail.messages.toName }}
+                                <span >{{ messagedetail.messages.toName }}
                                 </span>
                             </div>
                             <br />
@@ -998,106 +1012,109 @@ appRootUrl() +
                             <hr *ngIf="i != messagesDetails.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
                             <br />
                         </div>
-                    </div>
-                    <div>
-                        <p *ngIf="
-                                    messagesDetails[0].messages.entityAttachments
-                                        .length > 0
-                                " class="title-attach">
-                            <span>{{
-                                messagesDetails[0].messages
-                                .entityAttachments.length
-                                }}
-                                {{ "Attachments" | localize }}</span>
-                        </p>
-
-                        <div class="files-uploaded" *ngFor="let item of entityAttachments">
-                            <div class="uploaded-attchments" *ngIf="
-                                        item.fileName.includes('.doc') ||
-                                        item.fileName.includes('.docs')
-                                    ">
-                                <img src="assets/message/microsoft-word.svg" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.ppt')">
-                                <img src="assets/message/microsoft-powerpoint.svg" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="
-                                        item.fileName.includes('.jpg') ||
-                                        item.fileName.includes('.png') ||
-                                        item.fileName.includes('.svg')
-                                    ">
-                                <img [src]="getImage(item.url)" height="30px" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.xls')">
-                                <img src="assets/message/excel.svg" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="item.fileName.includes('.pdf')">
-                                <img src="assets/message/adobe.svg" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-                            <div class="uploaded-attchments" *ngIf="
-                                        !item.fileName.includes('.xls') &&
-                                        !item.fileName.includes('.pdf') &&
-                                        !item.fileName.includes('.docs') &&
-                                        !item.fileName.includes('.doc') &&
-                                        !item.fileName.includes('.ppt') &&
-                                        !item.fileName.includes('.jpg') &&
-                                        !item.fileName.includes('.svg') &&
-                                        !item.fileName.includes('.png')
-                                    ">
-                                <img src="assets/message/document.png" (click)="
-                                            downloadFile(item.url, item.displayName)
-                                        " />
-                            </div>
-
-                            <p class="display-name">
-                                <span>{{ item.displayName }}</span>
+                        <div>
+                            <p *ngIf="
+                                        messagesDetails[0].messages.entityAttachments
+                                            .length > 0
+                                    " class="title-attach">
+                                <span>{{
+                                    messagesDetails[0].messages
+                                    .entityAttachments.length
+                                    }}
+                                    {{ "Attachments" | localize }}</span>
                             </p>
+    
+                            <div class="files-uploaded" *ngFor="let item of entityAttachments">
+                                <div class="uploaded-attchments" *ngIf="
+                                            item.fileName.includes('.doc') ||
+                                            item.fileName.includes('.docs')
+                                        ">
+                                    <img src="assets/message/microsoft-word.svg" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="item.fileName.includes('.ppt')">
+                                    <img src="assets/message/microsoft-powerpoint.svg" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="
+                                            item.fileName.includes('.jpg') ||
+                                            item.fileName.includes('.png') ||
+                                            item.fileName.includes('.svg')
+                                        ">
+                                    <img [src]="getImage(item.url)" height="30px" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="item.fileName.includes('.xls')">
+                                    <img src="assets/message/excel.svg" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="item.fileName.includes('.pdf')">
+                                    <img src="assets/message/adobe.svg" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+                                <div class="uploaded-attchments" *ngIf="
+                                            !item.fileName.includes('.xls') &&
+                                            !item.fileName.includes('.pdf') &&
+                                            !item.fileName.includes('.docs') &&
+                                            !item.fileName.includes('.doc') &&
+                                            !item.fileName.includes('.ppt') &&
+                                            !item.fileName.includes('.jpg') &&
+                                            !item.fileName.includes('.svg') &&
+                                            !item.fileName.includes('.png')
+                                        ">
+                                    <img src="assets/message/document.png" (click)="
+                                                downloadFile(item.url, item.displayName)
+                                            " />
+                                </div>
+    
+                                <p class="display-name">
+                                    <span>{{ item.displayName }}</span>
+                                </p>
+                            </div>
+                        </div>
+    
+                        <!-- <div class="files-uploaded">
+                            <div class="uploaded-attchments">
+                               <img src="assets/message/word.png">
+        
+                           </div>
+                           <p><span>Wordfile.doc</span></p>
+                        </div> -->
+    
+                        <div class="btns-replay">
+                            <button (click)="
+                                        SendMessageModal.show(
+                                            messagesDetails[0].messages.id,
+                                            messagesDetails[0].messages.threadId,
+                                            false,
+                                            messagesDetails[0].messages
+                                                .mesasgeObjectType
+                                        )
+                                    " class="ReplyBtn btn btn-primary">
+                                <img src="assets/message/replay.svg" style="width: 20px;
+                                color: #fff;
+                                filter: brightness(14);" />
+                                <span> {{ "Reply" | localize }}</span>
+                            </button>
+                            <button (click)="
+                                        SendMessageModal.show(
+                                            messagesDetails[0].messages.id,
+                                            messagesDetails[0].messages.threadId,
+                                            true
+                                        )
+                                    " class="ForwardBtn btn btn-primary">
+                                <span style="padding-right: 5px">{{
+                                    "Forward" | localize
+                                    }}</span><img src="assets/message/forward.svg" style="width: 13px" />
+                            </button>
                         </div>
                     </div>
 
-                    <!-- <div class="files-uploaded">
-                        <div class="uploaded-attchments">
-                           <img src="assets/message/word.png">
-    
-                       </div>
-                       <p><span>Wordfile.doc</span></p>
-                    </div> -->
-
-                    <div class="btns-replay">
-                        <button (click)="
-                                    SendMessageModal.show(
-                                        messagesDetails[0].messages.id,
-                                        messagesDetails[0].messages.threadId,
-                                        false,
-                                        messagesDetails[0].messages
-                                            .mesasgeObjectType
-                                    )
-                                " class="ReplyBtn btn btn-primary">
-                            <img src="assets/message/replay.svg" style="width: 13px" />
-                            <span> {{ "Reply" | localize }}</span>
-                        </button>
-                        <button (click)="
-                                    SendMessageModal.show(
-                                        messagesDetails[0].messages.id,
-                                        messagesDetails[0].messages.threadId,
-                                        true
-                                    )
-                                " class="ForwardBtn btn btn-primary">
-                            <span style="padding-right: 5px">{{
-                                "Forward" | localize
-                                }}</span><img src="assets/message/forward.svg" style="width: 13px" />
-                        </button>
-                    </div>
                 </div>
             </div>
 

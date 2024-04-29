@@ -3899,6 +3899,86 @@ namespace onetouch.Migrations
                         });
                 });
 
+            modelBuilder.Entity("onetouch.AppMarketplaceMessages.AppMarketplaceMessage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BodyFormat")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EntityCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("EntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("OriginalMessageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("SendDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("SenderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<long?>("ThreadId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityId");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("ThreadId");
+
+                    b.ToTable("AppMarketplaceMessages", t =>
+                        {
+                            t.HasTrigger("AppMarketplaceMessages_Trigger");
+                        });
+                });
+
             modelBuilder.Entity("onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionContacts", b =>
                 {
                     b.Property<long>("Id")
@@ -8035,6 +8115,35 @@ namespace onetouch.Migrations
                     b.Navigation("SizeScaleFK");
                 });
 
+            modelBuilder.Entity("onetouch.AppMarketplaceMessages.AppMarketplaceMessage", b =>
+                {
+                    b.HasOne("onetouch.AppEntities.AppEntity", "EntityFk")
+                        .WithMany()
+                        .HasForeignKey("EntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.AppMarketplaceMessages.AppMarketplaceMessage", null)
+                        .WithMany("ParentFKList")
+                        .HasForeignKey("ParentId");
+
+                    b.HasOne("Abp.Authorization.Users.AbpUserBase", "SenderFk")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.AppMarketplaceMessages.AppMarketplaceMessage", "ThreadFk")
+                        .WithMany()
+                        .HasForeignKey("ThreadId");
+
+                    b.Navigation("EntityFk");
+
+                    b.Navigation("SenderFk");
+
+                    b.Navigation("ThreadFk");
+                });
+
             modelBuilder.Entity("onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionContacts", b =>
                 {
                     b.HasOne("onetouch.AppEntities.AppEntity", "ContactPhoneTypeFk")
@@ -8728,6 +8837,11 @@ namespace onetouch.Migrations
             modelBuilder.Entity("onetouch.AppMarketplaceItems.AppMarketplaceItemSizeScaleHeaders", b =>
                 {
                     b.Navigation("AppItemSizeScalesDetails");
+                });
+
+            modelBuilder.Entity("onetouch.AppMarketplaceMessages.AppMarketplaceMessage", b =>
+                {
+                    b.Navigation("ParentFKList");
                 });
 
             modelBuilder.Entity("onetouch.Authorization.Roles.Role", b =>

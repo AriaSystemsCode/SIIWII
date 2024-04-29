@@ -75,12 +75,12 @@ namespace onetouch.Accounts.Dtos
 		public string JobTitle  { set; get; }
 		public DateTime JoinDate { set; get; }
 		public bool LanguageIsPublic { set; get; }
-		public bool EmailAddressIsPublic { set; get; }
-		public bool Phone1IsPublic { set; get; }
-		public bool Phone2IsPublic { set; get; }
-		public bool Phone3IsPublic { set; get; }
+		public bool EmailAddressIsPublic { set; get; } = true;
+		public bool Phone1IsPublic { set; get; } = true;
+        public bool Phone2IsPublic { set; get; } = true;
+        public bool Phone3IsPublic { set; get; } = true;
 
-		public bool JoinDateIsPublic { set; get; }
+        public bool JoinDateIsPublic { set; get; }
 		public string UserName { set; get; }
 		public bool UserNameIsPublic { set; get; }
 		public string Notes { get; set; }

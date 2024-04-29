@@ -28,12 +28,18 @@
                             [maxlength]="maxAcceptedChars"
                             contenteditable="true"
                         ></div>
-                        <!--<div [ngStyle]="{'left':suggListContLeft+'px','top':suggListTop+'px'}"
+                        <div [ngStyle]="{'left':suggListContLeft+'px','top':suggListTop+'px'}"
                          class="suggstions-contact-list" *ngIf="showContactSuggstions">
-                             <ul class="contact-list-cont">
-                                <li class="contact" (click)="addContact({name:'Omar Ramadan',company:'SIWII'})">Omar Ramadan @SIWII</li>
+                             <ul class="contact-list-cont" *ngIf="mentionSuggList">
+                                <li *ngFor="let contact of mentionSuggList"
+                                 class="contact" (click)="addContact({name:contact.userName,
+                                 id:contact.id,
+                                 userId:contact.userId,
+                                 tenantId:contact.tenantId,
+                                 tenantName:contact.tenantName,
+                                })">{{contact.userName}}</li>
                              </ul>
-                        </div>-->
+                        </div>
                         <ng-container *ngIf="cartStyle;">
 
                         <button

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, ElementRef, Injector,HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppPostsServiceProxy, CreateMessageInput, GetMessagesForViewDto, MesasgeObjectType, MessageServiceProxy, ProfileServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppPostsServiceProxy, CreateMessageInput, GetMessagesForViewDto, MesasgeObjectType,
+     MessageServiceProxy, ProfileServiceProxy,AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -16,6 +17,7 @@ export class AddCommentComponent extends AppComponentBase {
     active : boolean
     showContactSuggstions:boolean=false;
     @Input() cartStyle: boolean;
+    @Input() relatedEntityId:any;
     suggListContLeft:any=0;
     suggListTop:any=0;
 
@@ -23,7 +25,8 @@ export class AddCommentComponent extends AppComponentBase {
         private injector: Injector,
         private _messageServiceProxy: MessageServiceProxy,
         private _profileService : ProfileServiceProxy,
-        private eRef: ElementRef
+        private eRef: ElementRef,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
         super(injector)
     }
@@ -33,6 +36,7 @@ export class AddCommentComponent extends AppComponentBase {
     maxAcceptedChars:number = 1300
     writtenChars:number = 0
     emptyText:string='emptyText';
+    mentionSuggList:any;
     extendTextAreaHandler($event){
       /*  var textarea = $event.target
         const text:string = textarea.value
@@ -60,6 +64,8 @@ export class AddCommentComponent extends AppComponentBase {
       spanHtml.innerHTML=contact.name;
       spanHtml.className='selectedContact'; 
       spanHtml.setAttribute("contenteditable", "false");
+      spanHtml.setAttribute("style", "border: 1px solid #92bfed;padding: 0px 5px;border-radius: 14px;background-color: #f7fbff;cursor: pointer");
+
       let pattern;
       let inputValueWithoutMentions=this.CommentTextArea.nativeElement.innerHTML;
       if(this.CommentTextArea.nativeElement.childNodes.length>1){
@@ -78,14 +84,48 @@ export class AddCommentComponent extends AppComponentBase {
         pattern =String.fromCharCode(inputValueWithoutMentions.charCodeAt(0));
 
       }
-      this.CommentTextArea.nativeElement.innerHTML = this.CommentTextArea.nativeElement.innerHTML.replace('@', spanHtml.outerHTML);
+debugger
+      let sel, range;
+      if (window.getSelection) {
+        // IE9 and non-IE
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+          range = sel.getRangeAt(0);
+          range.deleteContents();
+
+          // Range.createContextualFragment() would be useful here but is
+          // non-standard and not supported in all browsers (IE9, for one)
+          const el = document.createElement("div");
+          el.innerHTML = 'test';
+          el.setAttribute('class','maiClass')
+          let frag = document.createDocumentFragment(),
+            node,
+            lastNode;
+          while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+          }
+          range.insertNode(frag);
+
+          // Preserve the selection
+          if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+
+
+      this.CommentTextArea.nativeElement.innerHTML = this.CommentTextArea.nativeElement.innerHTML.replace(this.CommentTextArea.nativeElement.innerHTML.match(/@\S+/g), spanHtml.outerHTML);
       this.showContactSuggstions=false;
 
     }
+}
 
     mentionContact(event){
         this.comment.body=event.target.innerHTML;
-       /* let inputValueWithoutMentions=event.target.innerHTML;
+        let inputValueWithoutMentions=event.target.innerHTML;
         if(event.target.childNodes.length>1){
             inputValueWithoutMentions='';
          event.target.childNodes.forEach(function(node){
@@ -107,17 +147,27 @@ export class AddCommentComponent extends AppComponentBase {
             let previosCharachter:string;
             if(enterdValue==lastCharachter){
                 previosCharachter= inputValueWithoutMentions.charAt(charachterIndex-1);
-                if(previosCharachter==' '||previosCharachter==undefined||inputValueWithoutMentions.length==1){
+                if(/\s/g.test(previosCharachter)||previosCharachter==undefined||inputValueWithoutMentions.length==1){
                   this.showContactSuggstions=true;
                 }
             }else{
 
                 previosCharachter= inputValueWithoutMentions.charAt(charachterIndex-1);
-                if(previosCharachter==' '||previosCharachter==undefined){
+                if(/\s/g.test(previosCharachter)||previosCharachter==undefined){
                     this.showContactSuggstions=true;
                 }
             }
-        }*/
+        }else{
+            let lastCharachter = inputValueWithoutMentions.charAt(inputValueWithoutMentions.length - 2);
+              if(lastCharachter=='@'||this.showContactSuggstions){
+                 this._appEntitiesServiceProxy.getContactsToMention(this.relatedEntityId,enterdValue)
+                 .subscribe((res) => {
+                      if(res){
+                       this.mentionSuggList=res;
+                     }
+                 });
+              }
+        }
     }
     saveComment(){
         this.saving = true

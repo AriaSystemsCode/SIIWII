@@ -101,6 +101,11 @@
                 [(ngModel)]="appTransactionsForViewDto.paymentTermsId"
             >
             </p-dropdown>
+            <p class="text-danger" *ngIf="!appTransactionsForViewDto.paymentTermsId">
+                <small>
+                    Please select payment terms option
+                </small>
+            </p>
             </div>
         </div>
         </div>

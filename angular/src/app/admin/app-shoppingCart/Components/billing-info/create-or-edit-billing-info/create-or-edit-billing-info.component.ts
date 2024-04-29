@@ -81,8 +81,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
       let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
       apContactObj[0]?.contactAddressDetail ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
       arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
-
-      if (this.enableSAveArcontact && this.enableSAveApcontact) {
+debugger
+      if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) {   
         this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 
       }
@@ -111,7 +111,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
         } else {
           arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
         }
-        if (this.enableSAveArcontact && this.enableSAveApcontact) {
+        this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId ? this.isContactsValid = true : this.isContactsValid = false;    
+        if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
           this.isContactsValid = true;
           this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
 
@@ -124,7 +125,6 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
         } else {
           this.enableSAveArcontact = false;
         }
-        this.enableSAveArcontact && this.enableSAveApcontact ? this.isContactsValid = true : this.isContactsValid = false;
 
       }
 
@@ -134,8 +134,12 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   loadpayTermsListListist() {
     this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('PAYMENT-TERMS')
       .subscribe((res) => {
-        debugger
         this.payTermsListList = res;
+        if(!this.appTransactionsForViewDto.paymentTermsId&&this.payTermsListList.length==1){
+            this.appTransactionsForViewDto.paymentTermsId = this.payTermsListList[0]?.value;
+            this.appTransactionsForViewDto.paymentTermsCode = this.payTermsListList[0]?.code;
+        
+        }
       })
   }
   onUpdateAppTransactionsForViewDto($event) {
