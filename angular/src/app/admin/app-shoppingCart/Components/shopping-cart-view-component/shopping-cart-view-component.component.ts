@@ -128,7 +128,7 @@ export class ShoppingCartViewComponentComponent
     this.getShoppingCartData();
   }
 
-  resetTabValidation() {
+ /*  resetTabValidation() {
     var valid: boolean = false;
 
     if (this.shoppingCartDetails?.entityStatusCode?.toUpperCase() == 'OPEN')
@@ -140,10 +140,10 @@ export class ShoppingCartViewComponentComponent
     this.SalesRepInfoValid = valid;
     this.shippingInfOValid = valid;
     this.BillingInfoValid = valid;
-  }
+  } */
 
   resetData() {
-    this.resetTabValidation();
+   // this.resetTabValidation();
     this.activeIndex = 0;
     this.transactionNum = 0;
     this.productCode = undefined;
@@ -202,7 +202,7 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             this.shoppingCartDetails = res;
-            this.resetTabValidation();
+           // this.resetTabValidation();
 
             this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
 
