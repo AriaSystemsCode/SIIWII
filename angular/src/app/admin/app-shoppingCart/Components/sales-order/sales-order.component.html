@@ -212,6 +212,7 @@
                         <label class="label">Entered Date</label>
                         <div class="read-only-calendar">
                             <p-calendar
+                            appendTo="body"
                                 [(ngModel)]="enteredDate"
                                 [showIcon]="true"
                                 (ngModelChange)="onChangeDate()"
@@ -234,6 +235,7 @@
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Start Date</label>
                         <p-calendar
+                        appendTo="body"
                             [(ngModel)]="startDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
@@ -254,6 +256,7 @@
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Avaialable Date</label>
                         <p-calendar
+                        appendTo="body"
                             [(ngModel)]="availableDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
@@ -276,6 +279,7 @@
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Complete Date</label>
                         <p-calendar
+                        appendTo="body"
                             [(ngModel)]="completeDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"

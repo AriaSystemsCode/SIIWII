@@ -133,6 +133,23 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.changeStartDate(this.orderForm.get('startDate'));
     }
     ngOnChanges(){
+        this.orderForm = this.fb.group({
+            startDate: [ Date, [Validators.required]],
+            completeDate: ["", [Validators.required]],
+            availableDate: ["", [Validators.required]],
+            sellerCompanyName: ["", [Validators.required]],
+            sellerContactName: [""],
+            sellerContactEMailAddress: ["", [Validators.email]],
+            sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyName: ["", [Validators.required]],
+            buyerContactName: [""],
+            buyerContactEMailAddress: ["", [Validators.email]],
+            buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyBranch:["", [Validators.required]],
+            sellerCompanyBranch:["", [Validators.required]],
+            istemp: [false],
+        });
+        this.orderForm.reset();
         this.orderForm.controls['startDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
@@ -219,6 +236,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
             this.orderForm.controls["buyerCompanyName"].reset();
+            
         }
     }
     selectTempSeller() {
