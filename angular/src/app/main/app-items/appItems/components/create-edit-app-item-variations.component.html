@@ -2,7 +2,7 @@
     <form #ProductVariationForm="ngForm" >
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal">
             <div class="kt-subheader kt-grid__item " >
-                <div [class]="containerClass">
+                <div [class]="containerClass" style="background-color: #EEEEEEEE;">
                   <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
                         {{ 'VariationCombinations' | localize }}
@@ -19,11 +19,15 @@
                   </div>
                   <div class="kt-subheader__toolbar">
                     <div class="kt-subheader__wrapper">
-                        <button class="btn btn-primary text-capitalize" type="button" [disabled]="editVariationsOpend"  (click)="saveVariations()">
-                            {{ "ApplyVariations" | localize }}
-                        </button>
-                        <button type="button" (click)="cancelVariations()" class="btn btn-light cancel text-capitalize" type="button">
+                        <button type="button" (click)="cancelVariations()" class="btn btn-light cancel text-capitalize mr-4" type="button" style="border-radius: 5px;
+                        background-color: white !important;
+                        border: white !important;color: #4A0D4A !important;">
                             {{ "Cancel" | localize }}
+                        </button>
+                        <button class="btn btn-primary text-capitalize" type="button" [disabled]="editVariationsOpend"  (click)="saveVariations()"  style="border-radius: 5px;
+                        background-color: #4A0D4A !important;
+                        border: #4A0D4A !important;color: white;">
+                            {{  !appItem?.id   ?  ("ApplyVariations" | localize ): ("Apply Changes" | localize) }}
                         </button>
                     </div>
                 </div>
@@ -40,8 +44,9 @@
                                 {{ "SelectAnAttributeAndThenSelectTheOptionsOfTheProductsYouSell.ToSeeMoreAttributes,ClickAdd." | localize }}
                             </p>
                         </div>
-                        <div class="mr-4 ml-4 mb-2">
-                            <h6>{{ "Attributes" | localize }} </h6>
+                        <div class="m-1 mb-2">
+                            <h6 class="font-weight-bold p-3" style="background-color: #EEEEEEEE;
+                            border-radius: 5px;">{{ "Attributes" | localize }} </h6>
                             <div class="align-items-baseline d-flex flex-row justify-content-start">
                                 <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
                                     <!-- attributes -->
@@ -51,9 +56,9 @@
                                         (click)="setActiveExtraAttribute(i)"
                                      [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE'"   >
                                        {{selectedExtraAttribute.name | localize}}
-                                        <span (click)="removeExtraAttribute(selectedExtraAttribute,i)" class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle">
+                                        <!-- <span (click)="removeExtraAttribute(selectedExtraAttribute,i)" class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle">
                                             <i class="flaticon2-delete"></i>
-                                        </span>
+                                        </span> -->
                                     </a>
                                 </div>
                                 <div class="dropdown" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
@@ -62,14 +67,25 @@
                                         <span class="mr-1">+</span> {{ "AddAttribute" | localize }}
                                     </button> -->
                                     <!-- attribute DropDown -->
-                                    <select class="form-select form-control sizeAttrsDDl"   (change)="handleAttrChange($event)" aria-label="Default select example">
-                                        <option selected>{{ "AddVariationAttribute" | localize }}</option>
-                                        <option *ngFor="let extraAttribute of extraVariations"
+                                    <!-- <select class="form-select form-control sizeAttrsDDl"   (change)="handleAttrChange($event)" aria-label="Default select example">
+                                         <option selected>{{ "AddVariationAttribute" | localize }}</option> 
+                                        <option *ngFor="let extraAttribute of extraVariations;let i=index"
                                                [selected]="extraAttribute.id == selectedAttrID && variationPossibilities > 0"
                                                [value]="extraAttribute.id">
                                             {{extraAttribute.name|localize}}
                                         </option>
-                                    </select>
+                                    </select> -->
+
+                                    <select class="form-select form-control sizeAttrsDDl" 
+                                    (change)="handleAttrChange($event)" 
+                                    aria-label="Default select example" 
+                                    [(ngModel)]="selectedAttrID">
+                                <option *ngFor="let extraAttribute of extraVariations; let i = index"
+                                        [value]="extraAttribute.id" 
+                                        [selected]="extraAttribute.id == selectedAttrID && variationPossibilities > 0">
+                                    {{ extraAttribute.name | localize }}
+                                </option>
+                            </select>
 
                                     <!-- <div class="dropdown-menu pl-3 pr-3"  *dropdownMenu>
                                         <div class="form-group mb-4 pt-2">
@@ -104,7 +120,7 @@
                                 <tabset>
                                     <tab (deselect)="sizeScalesChanged(sizeScaleComponent.mapMatrixGridToAppSizeScaleDto(),sizeScaleComponent?.sizeScaleForm?.form?.valid)">
                                         <ng-template tabHeading >
-                                            <span class="tab-item pl-4 pr-4">{{'SelectSizes' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4" style="color: black;">{{'SelectSizes' | localize}}</span>
                                         </ng-template>
                                         <app-size-scale
                                             #sizeScaleComponent
@@ -116,7 +132,7 @@
                                     </tab>
                                     <tab >
                                         <ng-template tabHeading>
-                                            <span class="tab-item pl-4 pr-4">{{'ViewSelectedSizes' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4"  style="color: black;">{{'ViewSelectedSizes' | localize}}</span>
                                         </ng-template>
                                         <app-size-scale
                                             #viewSelectedSizesComponent
@@ -128,7 +144,7 @@
                                     </tab>
                                     <tab (selectTab)="showSizeRatio()" >
                                         <ng-template tabHeading>
-                                            <span class="tab-item pl-4 pr-4">{{'SizeRatio' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4"  style="color: black;">{{'SizeRatio' | localize}}</span>
                                         </ng-template>
                                         <app-size-ratio
                                             #sizeRatioComponent
@@ -241,14 +257,21 @@
                                     </div>
                                     <div class="col-12 item-photos-body pt-4 pb-5" >
                                         <div>
-                                            <a
+                                            <!-- <a
                                             class="mr-4 aria-tag p-2"
                                             *ngFor="let attachmentObj of defaultExtraAttrForAttachments.selectedValuesAttachments | keyvalue"
                                             (click)="activeAttachmentOption = attachmentObj.value"
                                             [ngClass]="{'active':activeAttachmentOption == attachmentObj.value}"
                                             >
                                                 {{attachmentObj?.value?.lookupData?.label | localize}}
-                                            </a>
+                                            </a> -->
+
+<p-dropdown [options]="defaultExtraAttrForAttachments.selectedValuesAttachments | keyvalue" 
+            optionLabel="value.lookupData.label"
+            (onChange)="onAttachmentOptionChange($event.value)"
+            [(ngModel)]="activeAttachmentOption">
+</p-dropdown>
+
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
                                             <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i">

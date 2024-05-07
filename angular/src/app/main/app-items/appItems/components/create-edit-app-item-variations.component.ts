@@ -159,13 +159,21 @@ export class CreateEditAppItemVariationsComponent
     }
 
     handleAttrChange(event: any) {
+        let value;
+        if(event?.target?.value)
+        value=event?.target?.value;
+    else
+    value=event;
+            
         let varaitionsValue = this.extraVariations.map((variation: any) => {
-            if (Number(event.target.value) === variation.id) {
+            if (Number(value) === variation.id) {
                 return variation.variationAttributes;
             }
         });
-        this.appItem.sycIdentifierId = Number(event.target.value);
-        this.attributeID = event.target.value;
+        this.appItem.sycIdentifierId = Number(value);
+        this.attributeID = value;
+    
+    
         varaitionsValue[0].map((variation: any) => {
             this.extraAttributes.map((attr: IsVariationExtraAttribute) => {
                 if (attr.attributeId === variation.attributeId) {
@@ -290,6 +298,9 @@ export class CreateEditAppItemVariationsComponent
                 this.selectedItemTypeData
             );
 
+
+
+
         }
     }
 
@@ -321,6 +332,9 @@ export class CreateEditAppItemVariationsComponent
         // adjust image urls
         // reverse engineer the selected extra attributes and all selected unique values
         // this.extraAttributesOptions = ExtraAttributesOptionsData
+
+        if(this.extraVariations?.length>0)
+        this.handleAttrChange(this.extraVariations[0]?.id)
     }
 
     deepCloneVariations() {
@@ -1890,6 +1904,9 @@ export class CreateEditAppItemVariationsComponent
     //         extraAttr.selected = false
     //     }
     // }
+    onAttachmentOptionChange($event){
+        this.activeAttachmentOption = $event.value ;
+    }
 }
 export interface ApplyVariationOutput {
     variation: VariationItemDto[];

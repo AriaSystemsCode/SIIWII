@@ -451,3 +451,19 @@ color: #700066 !important;
     background-color: red;
     border: none;
 }
+
+
+.nav-link.active{
+    background-color: #4A0D4A !important;
+}
+
+.nav-link.active span {
+    color: white !important;
+}
+.text-primary {
+    color: #4A0D4A !important;
+}
+
+input[type="radio"], input[type="checkbox"] {
+    accent-color: #4A0D4A !important;
+}
