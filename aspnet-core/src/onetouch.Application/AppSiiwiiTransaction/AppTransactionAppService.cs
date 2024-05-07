@@ -3572,6 +3572,13 @@ namespace onetouch.AppSiiwiiTransaction
                             var user = UserManager.GetUserById(long.Parse(con.contact.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
                             if (user != null)
                             {
+                                //T-SII-20240329.0013,1 MMT 05/07/2024 - Transactions - Transaction share with(users default list) shouldn't contain the transaction creator in this list and it cannot be added[Start]
+                                var userId = long.Parse(con.contact.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue);
+                                if (userId == AbpSession.UserId)
+                                {
+                                    continue;
+                                }
+                                //T-SII-20240329.0013,1 MMT 05/07/2024 - Transactions - Transaction share with(users default list) shouldn't contain the transaction creator in this list and it cannot be added[End]
                                 ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
                                 var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
                                      if (output.FirstOrDefault(z=>z.UserId == long.Parse(con.contact.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue))==null)
