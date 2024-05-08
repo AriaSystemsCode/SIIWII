@@ -209,7 +209,7 @@ export class MainImportComponent
         } else {
             this.uploader.onSuccessItem = (item, response, status) => {
                 const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-                if (ajaxResponse.success) {
+                if (ajaxResponse?.success) {
                     setTimeout(() => {
                         this.CheckRatio();
                     }, 0);

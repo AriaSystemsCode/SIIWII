@@ -70751,6 +70751,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     selectedBranch!: AccountBranchDto;
     selectedPhoneType!: PhoneNumberAndtype;
     selectContactPhoneNumber!: string | undefined;
+    selectedContactEmail!: string | undefined;
     contactAddressName!: string | undefined;
     contactAddressLine1!: string | undefined;
     contactAddressLine2!: string | undefined;
@@ -70798,6 +70799,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.selectedBranch = _data["selectedBranch"] ? AccountBranchDto.fromJS(_data["selectedBranch"]) : <any>undefined;
             this.selectedPhoneType = _data["selectedPhoneType"] ? PhoneNumberAndtype.fromJS(_data["selectedPhoneType"]) : <any>undefined;
             this.selectContactPhoneNumber = _data["selectContactPhoneNumber"];
+            this.selectedContactEmail = _data["selectedContactEmail"];
             this.contactAddressName = _data["contactAddressName"];
             this.contactAddressLine1 = _data["contactAddressLine1"];
             this.contactAddressLine2 = _data["contactAddressLine2"];
@@ -70843,6 +70845,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["selectedBranch"] = this.selectedBranch ? this.selectedBranch.toJSON() : <any>undefined;
         data["selectedPhoneType"] = this.selectedPhoneType ? this.selectedPhoneType.toJSON() : <any>undefined;
         data["selectContactPhoneNumber"] = this.selectContactPhoneNumber;
+        data["selectedContactEmail"] = this.selectedContactEmail;
         data["contactAddressName"] = this.contactAddressName;
         data["contactAddressLine1"] = this.contactAddressLine1;
         data["contactAddressLine2"] = this.contactAddressLine2;
@@ -70877,6 +70880,7 @@ export interface IAppTransactionContactDto {
     selectedBranch: AccountBranchDto;
     selectedPhoneType: PhoneNumberAndtype;
     selectContactPhoneNumber: string | undefined;
+    selectedContactEmail: string | undefined;
     contactAddressName: string | undefined;
     contactAddressLine1: string | undefined;
     contactAddressLine2: string | undefined;
@@ -81415,6 +81419,8 @@ export class MessagesDto implements IMessagesDto {
     mesasgeObjectType!: MesasgeObjectType;
     relatedEntityId!: number | undefined;
     relatedEntityObjectTypeCode!: string | undefined;
+    relatedEntityObjectTypeDescription!: string | undefined;
+    relatedEntityCreatorName!: string | undefined;
     profilePictureId!: string;
     userImage!: GetProfilePictureOutput;
     profilePictureUrl!: string | undefined;
@@ -81473,6 +81479,8 @@ export class MessagesDto implements IMessagesDto {
             this.mesasgeObjectType = _data["mesasgeObjectType"];
             this.relatedEntityId = _data["relatedEntityId"];
             this.relatedEntityObjectTypeCode = _data["relatedEntityObjectTypeCode"];
+            this.relatedEntityObjectTypeDescription = _data["relatedEntityObjectTypeDescription"];
+            this.relatedEntityCreatorName = _data["relatedEntityCreatorName"];
             this.profilePictureId = _data["profilePictureId"];
             this.userImage = _data["userImage"] ? GetProfilePictureOutput.fromJS(_data["userImage"]) : <any>undefined;
             this.profilePictureUrl = _data["profilePictureUrl"];
@@ -81529,6 +81537,8 @@ export class MessagesDto implements IMessagesDto {
         data["mesasgeObjectType"] = this.mesasgeObjectType;
         data["relatedEntityId"] = this.relatedEntityId;
         data["relatedEntityObjectTypeCode"] = this.relatedEntityObjectTypeCode;
+        data["relatedEntityObjectTypeDescription"] = this.relatedEntityObjectTypeDescription;
+        data["relatedEntityCreatorName"] = this.relatedEntityCreatorName;
         data["profilePictureId"] = this.profilePictureId;
         data["userImage"] = this.userImage ? this.userImage.toJSON() : <any>undefined;
         data["profilePictureUrl"] = this.profilePictureUrl;
@@ -81566,6 +81576,8 @@ export interface IMessagesDto {
     mesasgeObjectType: MesasgeObjectType;
     relatedEntityId: number | undefined;
     relatedEntityObjectTypeCode: string | undefined;
+    relatedEntityObjectTypeDescription: string | undefined;
+    relatedEntityCreatorName: string | undefined;
     profilePictureId: string;
     userImage: GetProfilePictureOutput;
     profilePictureUrl: string | undefined;

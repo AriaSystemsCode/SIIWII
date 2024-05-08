@@ -352,7 +352,7 @@ appRootUrl() +
                                                 object-fit: cover;
                                             " />
                                     <ul class="msg-content row">
-                                        <li class="Messages col-6 col-md mr-5 mr-md-0">
+                                        <li class="Messages col-6 mb-0 col-md mr-5 mr-md-0 d-flex justify-content-between">
                                             <!-- I2-10  -->
                                             <!--
                                                 <a *ngIf="this.messageTypeIndex!=2">
@@ -416,6 +416,15 @@ appRootUrl() +
                                                     | niceDateFormatPipe
                                                     }}</span>
                                             </a>
+                                            <span class="mail-info text-right">
+                                            <i [ngClass]="
+                                                    message.entityObjectStatusCode ==
+                                                    'UNREAD'?'far fa-envelope':'far fa-envelope-open'
+                                            "
+                                            ></i>
+                                            <span class="d-block ">{{message.receiveDate | date: "medium" }}</span>
+                                            </span>
+
                                         </li>
                                         <div class="col-2 d-block d-md-none ml-5 mt-5 pl-5"
                                             style="white-space: nowrap;">
@@ -462,7 +471,7 @@ appRootUrl() +
                                                 object-fit: cover;
                                             " />
                                     <ul class="msg-content row">
-                                        <li class="Messages col-6 col-md mr-5 mr-md-0">
+                                        <li class="Messages col-6 mb-0 col-md mr-5 mr-md-0 d-flex justify-content-between">
                                             <!-- I2-10  -->
                                             <!--
                                                 <a *ngIf="this.messageTypeIndex!=2">
@@ -526,6 +535,15 @@ appRootUrl() +
                                                     | niceDateFormatPipe
                                                     }}</span>
                                             </a>
+                                            <span class="mail-info">
+                                             <i [ngClass]="
+                                                message.entityObjectStatusCode ==
+                                                'UNREAD'?'far fa-envelope':'far fa-envelope-open'
+                                        "
+                                        ></i>
+                                        <span >{{message.receiveDate | date: "medium" }}</span>
+                                            </span>
+
                                         </li>
                                         <div class="col-2 d-block d-md-none ml-5 mt-5 pl-5"
                                             style="white-space: nowrap;">
@@ -557,10 +575,10 @@ appRootUrl() +
             <div [ngClass]="{ 'col-md-8 borderdCont': !showSideBar, 'col-md-5': showSideBar }"
              class="col d-none  d-md-block p-0 m-5 m-md-0" style="padding: 0">
                 <div *ngIf="messagesDetails">
-                    <div class="pt-5 pb-5 pl-1 messageTitleCont">
+                    <div class="pt-5 pb-5 pl-3 messageTitleCont" style="padding-bottom: 70px !important;">
                     <span class="subject-msg">{{ messagesDetails[0].messages.subject }}
                     </span>
-                    <div class="actions-message pr-4" >
+                    <div class="actions-message pr-4 pt-5" >
                         <div class="row">
                             <div class="mr-3">
                                 <button class="btn btn-primary btn-sm show-detail-btn ng-tns-c357-9  m-0" style="cursor: pointer;
@@ -581,13 +599,13 @@ margin-right: 6px;"></i>
                             </div>
                             <div *ngIf="!messagesDetails[0].messages.isFavorite" (click)="
                                         favoriteMessage(messagesDetails[0].messages)
-                                    " title="UnFavorite" class="mr-3">
+                                    " title="UnFavorite" class="mr-3 mt-2">
                                 <img src="assets/message/Messaging_Favorite_icon.svg" style="width: 20px" />
                             </div>
 
                             <div *ngIf="messagesDetails[0].messages.isFavorite" (click)="
                                         favoriteMessage(messagesDetails[0].messages)
-                                    " title="Favorite" class="mr-3">
+                                    " title="Favorite" class="mr-3 mt-2">
                                 <img src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
                                     style="width: 20px" />
                             </div>
@@ -596,7 +614,7 @@ margin-right: 6px;"></i>
     
                                 </span> -->
 
-                            <div title="Archive" class="mr-3">
+                            <div title="Archive" class="mr-3 mt-2">
                                 <img src="{{
                                             appRootUrl()
                                         }}assets/message/Messaging_Archiving_icon.svg" style="width: 20px" (click)="
@@ -878,12 +896,12 @@ margin-right: 6px;"></i>
                                         favoriteMessage(messagesDetails[0].messages)
                                     " title="UnFavorite">
                                 <img src="assets/message/Messaging_Favorite_icon.svg" style="width: 20px"
-                                    class="mr-3" />
+                                    class="mr-3 mt-2" />
                             </div>
 
                             <div *ngIf="messagesDetails[0].messages.isFavorite" (click)="
                                         favoriteMessage(messagesDetails[0].messages)
-                                    " title="Favorite" class="mr-3">
+                                    " title="Favorite" class="mr-3 mt-2">
                                 <img src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
                                     style="width: 20px" />
                             </div>
@@ -892,7 +910,7 @@ margin-right: 6px;"></i>
     
                                 </span> -->
 
-                            <div title="Archive" class="mr-3">
+                            <div title="Archive" class="mr-3 mt-2">
                                 <img src="{{
                                             appRootUrl()
                                         }}assets/message/Messaging_Archiving_icon.svg" style="width: 20px" (click)="

@@ -479,7 +479,8 @@ export class SendMessageModalComponent
 
     sendMessage(): void {
         this.showMainSpinner();
-        this.onUploadAttachmets();
+        if(this.attachments?.length>0)
+          this.onUploadAttachmets();
         let ToList = "";
         let CCList = "";
         let BCCList = "";
@@ -514,7 +515,6 @@ export class SendMessageModalComponent
         //this.Messages.entityAttachments=[];
         // this.Messages.entityAttachments=this.attachments
         this.saving = true;
-
         this._MessageServiceProxy
             .createMessage(this.messages)
             .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();}))
@@ -526,6 +526,13 @@ export class SendMessageModalComponent
                 this.displayCC = false;
                 this.messages.entityAttachments = [];
                 this.modalSave.emit(this.messages);
+                this.subject="";
+                this.htmlEditorInput='';
+                this.toUsers=[];
+                this.ccUsers=[];
+                this.bccUsers=[];
+                this.messages=new CreateMessageInput();
+                this.attachments=[];
             });
     }
 
@@ -563,16 +570,13 @@ export class SendMessageModalComponent
                     for (var i = 0; i < Users.length; i++) {
                         //xxx
                         if (
-                            Users[i].users.value.toString() !=
+                            Users[i]?.users?.value.toString() !=
                             this.appSession.userId.toString()
                         ) {
                             //xxx
                             //I2-9 -  receipt name, last name @ tenant name
-                            Users[i].users.name +=
-                                "." +
-                                Users[i].surname +
-                                " @ " +
-                                Users[i].tenantName;
+                            Users[i].users={name:Users[i].userName,value:Users[i].userId.toString()}
+
                             //  Users[i].users.name += "@" + Users[i].tenantName;
                             this.filteredUsers.push(Users[i].users);
                         }

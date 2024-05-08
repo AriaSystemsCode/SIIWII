@@ -214,6 +214,7 @@
                             <div class="form-group editor-text">
                                 <p-editor
                                     [(ngModel)]="htmlEditorInput"
+                                    [ngModelOptions]="{standalone: true}"
                                     [style]="{ height: '200px' }"
                                 >
                                 </p-editor>
@@ -508,6 +509,7 @@
                                 <div class="form-group editor-text h-100">
                                     <p-editor
                                         [(ngModel)]="htmlEditorInput"
+                                        [ngModelOptions]="{standalone: true}"
                                         class="HtmlEditorInput-sm h-100"
                                         [style]="{ height: '70%' }"
                                     >
@@ -601,7 +603,7 @@
             </div>
     </div>    
 </div>
-<form class="reply-w-direct-message" *ngIf="!modalView" #MessageForm="ngForm" novalidate>
+<form class="reply-w-direct-message" *ngIf="!modalView" #MessageForm="ngForm" novalidate style="position: relative;">
     <div class="modal-body">
         <div class="row">
             <a
@@ -791,6 +793,7 @@
                 <div class="form-group editor-text mt-1 mb-1">  
                     <p-editor
                         [(ngModel)]="htmlEditorInput"
+                        [ngModelOptions]="{standalone: true}"
                         [style]="{ height: '100px' }"
                     >
                     </p-editor>

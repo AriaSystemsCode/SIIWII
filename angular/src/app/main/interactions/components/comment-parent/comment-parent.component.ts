@@ -68,11 +68,13 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         }
 
     show(creatorUserId:number,entityId:number,parentId?:number,threadId?:number){
+        this.comments=[];
+        this.totalCount=0;
         this.creatorUserId = creatorUserId
         this.entityId = entityId
         if(parentId) this.parentId = parentId
         if(threadId) this.threadId = threadId
-        if(this.comments.length === 0){
+     if(this.comments.length === 0){
             this.getAllComments()
         }
         this.showAddComment()

@@ -267,7 +267,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
         uploader.onSuccessItem = (item, response, status) => {
             const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-            if (ajaxResponse.success) {
+            if (ajaxResponse?.success) {
                 this.notify.info(this.l('UploadSuccessfully'));
                 if (success) {
                     success(ajaxResponse.result);

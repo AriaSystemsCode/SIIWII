@@ -1,15 +1,5 @@
 <div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ]" >
-    <app-add-comment [hidden]="!showRegularComment" *ngIf="addNewThread||!addNewThread&&commentType!=='MESSAGE'" [cartStyle]="cartStyle"
-        (saveDone)="newCommentAddedHandler($event)"
-        [relatedEntityId]="entityId"
-        #AddCommentComponent>
-    </app-add-comment>
-
-<SendMessageModal [entityId]="entityId" 
-[parentId]="parentId"
-*ngIf="!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp"  
-#SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()"></SendMessageModal>
-
+   
 
     <div *ngIf="addNewThread&&cartStyle" class="toggle-replay-cont">
         <label [class]="showRegularComment?'comment focused':'comment'"  (click)="toggleMessageType(1)">
@@ -39,4 +29,18 @@
     <div style="margin-left: 50px;" *ngIf="totalCount > comments?.length" (click)="getAllComments()">
         <a class="text-underline"> {{ parentId ? ("ShowMoreReplies" | localize) : ("ShowMoreComments" | localize) }}</a>
     </div>
+</div>
+
+<div>
+    <app-add-comment [hidden]="!showRegularComment" *ngIf="addNewThread||!addNewThread&&commentType!=='MESSAGE'" [cartStyle]="cartStyle"
+    (saveDone)="newCommentAddedHandler($event)"
+    [relatedEntityId]="entityId"
+    #AddCommentComponent>
+</app-add-comment>
+
+<SendMessageModal [entityId]="entityId" 
+[parentId]="parentId"
+*ngIf="!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp"  
+#SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()"></SendMessageModal>
+
 </div>

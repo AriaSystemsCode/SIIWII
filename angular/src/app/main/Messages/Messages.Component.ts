@@ -91,7 +91,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.displayMessageDetails = false;
         this.selectMessagetype(1, this.l("Inbox"));
         this.messageCategoryFilter = "MESSAGE";
-        document.getElementById('firstTabBtn').focus();
+        document.getElementById('firstTabBtn')?.focus();
 
         this._sycEntityObjectClassificationsServiceProxy
             .getAllChildsForLables()
@@ -240,6 +240,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
 
     getUpdatesMessage(event,messageType) {
+        this.showMainSpinner();
         Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
             element.classList.remove("active-tab");
 
@@ -300,6 +301,19 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             .pipe(finalize(() => { this.displayMessageDetails = true; this.hideMainSpinner(); }))
             .subscribe((result) => {
                 this.messagesDetails = result;
+                // set message Subject [Start]
+                for (let i = 0; i < this.messagesDetails.length; i++) {
+                    let msgSubject = this.messagesDetails[i].messages.subject;
+                    if((this.messageCategoryFilter=='THREAD' || this.messageCategoryFilter=='MENTION') &&(message.entityObjectTypeCode=="COMMENT"))
+                     msgSubject="Comment by "+ message.senderName+ " on "+ message.relatedEntityObjectTypeCode +" '" +
+                    (message.relatedEntityObjectTypeCode=="transaction"? message.relatedEntityObjectTypeDescription : message.relatedEntityObjectTypeDescription.substring(0,30))
+                    + "..' Created by "+message.relatedEntityCreatorName  ; 
+
+                    this.messagesDetails[i].messages.subject=msgSubject;
+                }
+
+// set message Subject [End]
+                
                 if(this.messageCategoryFilter=='MENTION'){
                     setTimeout(()=>{
                         this.focusAddComment();
