@@ -267,6 +267,7 @@ export abstract class AppComponentBase {
                     success(ajaxResponse.result);
                 }
             } else {
+                if(ajaxResponse?.error?.message)
                 this.message.error(ajaxResponse?.error?.message);
             }
         };
@@ -298,6 +299,7 @@ export abstract class AppComponentBase {
                     success(ajaxResponse.result);
                 }
             } else {
+                if(ajaxResponse?.error?.message)
                 this.message.error(ajaxResponse?.error?.message);
             }
         };

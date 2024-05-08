@@ -479,7 +479,8 @@ export class SendMessageModalComponent
 
     sendMessage(): void {
         this.showMainSpinner();
-        this.onUploadAttachmets();
+        if(this.attachments?.length>0)
+          this.onUploadAttachmets();
         let ToList = "";
         let CCList = "";
         let BCCList = "";
@@ -501,7 +502,6 @@ export class SendMessageModalComponent
                 BCCList += this.bccUsers[i].value + ",";
             else BCCList += this.bccUsers[i].value;
         }
-        debugger
 
         this.messages.to = ToList;
         this.messages.cc = CCList;
@@ -532,6 +532,7 @@ export class SendMessageModalComponent
                 this.ccUsers=[];
                 this.bccUsers=[];
                 this.messages=new CreateMessageInput();
+                this.attachments=[];
             });
     }
 

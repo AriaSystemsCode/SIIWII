@@ -81420,6 +81420,7 @@ export class MessagesDto implements IMessagesDto {
     relatedEntityId!: number | undefined;
     relatedEntityObjectTypeCode!: string | undefined;
     relatedEntityObjectTypeDescription!: string | undefined;
+    relatedEntityCreatorName!: string | undefined;
     profilePictureId!: string;
     userImage!: GetProfilePictureOutput;
     profilePictureUrl!: string | undefined;
@@ -81479,6 +81480,7 @@ export class MessagesDto implements IMessagesDto {
             this.relatedEntityId = _data["relatedEntityId"];
             this.relatedEntityObjectTypeCode = _data["relatedEntityObjectTypeCode"];
             this.relatedEntityObjectTypeDescription = _data["relatedEntityObjectTypeDescription"];
+            this.relatedEntityCreatorName = _data["relatedEntityCreatorName"];
             this.profilePictureId = _data["profilePictureId"];
             this.userImage = _data["userImage"] ? GetProfilePictureOutput.fromJS(_data["userImage"]) : <any>undefined;
             this.profilePictureUrl = _data["profilePictureUrl"];
@@ -81536,6 +81538,7 @@ export class MessagesDto implements IMessagesDto {
         data["relatedEntityId"] = this.relatedEntityId;
         data["relatedEntityObjectTypeCode"] = this.relatedEntityObjectTypeCode;
         data["relatedEntityObjectTypeDescription"] = this.relatedEntityObjectTypeDescription;
+        data["relatedEntityCreatorName"] = this.relatedEntityCreatorName;
         data["profilePictureId"] = this.profilePictureId;
         data["userImage"] = this.userImage ? this.userImage.toJSON() : <any>undefined;
         data["profilePictureUrl"] = this.profilePictureUrl;
@@ -81574,6 +81577,7 @@ export interface IMessagesDto {
     relatedEntityId: number | undefined;
     relatedEntityObjectTypeCode: string | undefined;
     relatedEntityObjectTypeDescription: string | undefined;
+    relatedEntityCreatorName: string | undefined;
     profilePictureId: string;
     userImage: GetProfilePictureOutput;
     profilePictureUrl: string | undefined;
