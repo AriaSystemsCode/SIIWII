@@ -258,11 +258,23 @@ namespace onetouch.Message
                                 if (post != null)
                                 {
                                     message.Messages.RelatedEntityObjectTypeDescription = post.Description;
+                                    message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
+                                       + "." + UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Surname).FirstOrDefault().ToString()
+                                        + " @ " +
+                                       (UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.TenantId).FirstOrDefault().Value == null ?
+                                       L("Onetouch") : TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString());
                                 }
                             }
                             else {
                                 if (ent.EntityObjectTypeCode.ToUpper() == "SALESORDER" || ent.EntityObjectTypeCode.ToUpper() == "PURCHASEORDER")
+                                {
                                     message.Messages.RelatedEntityObjectTypeDescription = ent.Name;
+                                    message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
+                                       + "." + UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.Surname).FirstOrDefault().ToString()
+                                        + " @ " +
+                                       (UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.TenantId).FirstOrDefault().Value == null ?
+                                       L("Onetouch") : TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString());
+                                }
                             }
                         }
                     }

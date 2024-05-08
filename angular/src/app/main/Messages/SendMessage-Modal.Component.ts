@@ -501,6 +501,7 @@ export class SendMessageModalComponent
                 BCCList += this.bccUsers[i].value + ",";
             else BCCList += this.bccUsers[i].value;
         }
+        debugger
 
         this.messages.to = ToList;
         this.messages.cc = CCList;
@@ -514,7 +515,6 @@ export class SendMessageModalComponent
         //this.Messages.entityAttachments=[];
         // this.Messages.entityAttachments=this.attachments
         this.saving = true;
-
         this._MessageServiceProxy
             .createMessage(this.messages)
             .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();}))

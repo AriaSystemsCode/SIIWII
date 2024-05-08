@@ -95,7 +95,7 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
 
         uploader.onSuccessItem = (item, response, status) => {
             const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-            if (ajaxResponse.success) {
+            if (ajaxResponse?.success) {
                 this.notify.info(this.l('SavedSuccessfully'));
                 if (success) {
                     success(ajaxResponse.result);
