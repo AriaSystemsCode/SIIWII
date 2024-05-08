@@ -269,9 +269,8 @@
 <p-dropdown [options]="defaultExtraAttrForAttachments.selectedValuesAttachments | keyvalue" 
             optionLabel="value.lookupData.label"
             (onChange)="onAttachmentOptionChange($event.value)"
-            [(ngModel)]="activeAttachmentOption">
+            [(ngModel)]="firstAttachSelection">
 </p-dropdown>
-
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
                                             <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i">

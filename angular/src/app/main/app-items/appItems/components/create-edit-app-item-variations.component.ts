@@ -112,6 +112,7 @@ export class CreateEditAppItemVariationsComponent
     attributeID: any;
     sizeId: any;
     selectedAttrID:string
+    firstAttachSelection;
 
     @Input("selectedItemTypeData")
     selectedItemTypeData: GetAllEntityObjectTypeOutput;
@@ -1543,7 +1544,10 @@ export class CreateEditAppItemVariationsComponent
             this.defaultExtraAttrForAttachments.selectedValuesAttachments[
                 firstValueSelected
             ];
-        this.updateVaritaionAttachments();
+
+            this.firstAttachSelection= this.defaultExtraAttrForAttachments.selectedValuesAttachments[firstValueSelected];
+                
+         this.updateVaritaionAttachments();
         this.showVariationPhotos = true;
         this.sortVaritaionCombination();
     }
