@@ -12,7 +12,7 @@ import { CommentParentComponent } from './components/comment-parent/comment-pare
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 //import { MessagesModule } from '../Messages/messages.module';
 import { SendDirectMessageComponent } from './components/send-direct-message/send-direct-message.component';
-
+import { AppCommonModule } from '@app/shared/common/app-common.module';
 
 @NgModule({
     declarations: [
@@ -30,12 +30,13 @@ import { SendDirectMessageComponent } from './components/send-direct-message/sen
         SocializationStatsModule,
         CommentsModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        AppCommonModule
     ],
     exports:[
         InteractionsComponent,
         CommentParentComponent
     ],
-    providers:[ReactionsService]
+    providers:[ReactionsService]           
 })
 export class InteractionsModule { }

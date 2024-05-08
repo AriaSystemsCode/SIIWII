@@ -629,8 +629,11 @@ namespace onetouch.AppSiiwiiTransaction
                     if (input.lFromPlaceOrder)
                     {
                         await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == header.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
-                        foreach (var det in header.AppTransactionDetails.Where(z=>z.ParentId==null))
-                            await GetProductFromMarketplace(det.SSIN,int.Parse( buyerTenantId.ToString()));
+                        if (buyerTenantId != null)
+                        {
+                            foreach (var det in header.AppTransactionDetails.Where(z => z.ParentId == null))
+                                await GetProductFromMarketplace(det.SSIN, int.Parse(buyerTenantId.ToString()));
+                        }
                     }
                     
                     appTrans.Id = header.Id;
@@ -1067,9 +1070,12 @@ namespace onetouch.AppSiiwiiTransaction
                 if (input.lFromPlaceOrder)
                 {
                     await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == appTrans.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
-                    appTrans.AppTransactionDetails = _appTransactionDetails.GetAll().AsNoTracking().Where(z=>z.TransactionId==appTrans.Id && z.ParentId==null).ToList();
-                    foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
-                    await GetProductFromMarketplace(det.SSIN,int.Parse( buyerTenantId.ToString()));
+                    if (buyerTenantId != null)
+                    {
+                        appTrans.AppTransactionDetails = _appTransactionDetails.GetAll().AsNoTracking().Where(z => z.TransactionId == appTrans.Id && z.ParentId == null).ToList();
+                        foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
+                            await GetProductFromMarketplace(det.SSIN, int.Parse(buyerTenantId.ToString()));
+                    }
                 }
                 foreach (var con in appTrans.AppTransactionContacts)
                 {
@@ -2886,8 +2892,7 @@ namespace onetouch.AppSiiwiiTransaction
                         entityVar.Id = 0;
                         entityVar.EntityExtraData = null;
                         entityVar.ObjectId = itemObjectId;
-
-                       
+                        entityVar.Code = itemVar.Code;
                         entityVar.EntityAttachments = null;
                         entityVar.EntityClassifications = null;
                         entityVar.EntityCategories = null;
@@ -3031,6 +3036,8 @@ namespace onetouch.AppSiiwiiTransaction
                             item.EntityFk.EntityExtraData.Add(extr);
 
                         }
+                    }
+                    { 
                         if (marketplaceItem.EntityCategories != null)
                         {
                             item.EntityFk.EntityCategories = new List<AppEntityCategory>();
@@ -3111,7 +3118,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         extr.EntityId = tenantVariation.EntityFk.Id;
                                         extr.Id = 0;
                                         extr.EntityFk = null;
-                                        extr.EntityCode = variation.Code;
+                                        extr.EntityCode = tenantVariation.Code;
 
                                         if (ext.AttributeId == 202 && !string.IsNullOrEmpty(ext.AttributeValue))
                                             MoveFile(ext.AttributeValue, -1,tenantId);
@@ -3126,7 +3133,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     {
                                         AppEntityCategory entCategory = new AppEntityCategory();
                                         entCategory.EntityId = tenantVariation.EntityFk.Id;
-                                        entCategory.EntityCode = variation.Code;
+                                        entCategory.EntityCode = tenantVariation.Code;
                                         entCategory.EntityObjectCategoryCode = cat.EntityObjectCategoryCode;
                                         entCategory.EntityObjectCategoryId = cat.EntityObjectCategoryId;
                                         entCategory.EntityObjectCategoryFk = null;
@@ -3140,7 +3147,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     {
                                         AppEntityClassification entClass = new AppEntityClassification();
                                         entClass.EntityId = tenantVariation.EntityFk.Id;
-                                        entClass.EntityCode = variation.Code;
+                                        entClass.EntityCode = tenantVariation.Code;
                                         entClass.EntityObjectClassificationCode = cal.EntityObjectClassificationCode;
                                         entClass.EntityObjectClassificationId = cal.EntityObjectClassificationId;
                                         entClass.EntityObjectClassificationFk = null;

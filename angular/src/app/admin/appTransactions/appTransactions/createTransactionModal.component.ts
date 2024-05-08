@@ -101,7 +101,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     invokeAction = '/DXXRDV';
     reportUrl="";
     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
-
+    minCompleteDate:Date;
+    minStartDate:Date;
+    
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -631,23 +633,55 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         }
     }
     changeStartDate(date){
-        let newDate = new Date();
-        let month = date.value.getMonth();
-        let year = date.value.getFullYear();
-        let day = date.value.getDate();
 
-        let monthVal = (month === 11) ? 0 : month +1;
+        const newDate = new Date();
+
+        let month = date?.value?.getMonth();
+        let year = date?.value?.getFullYear();
+        let day = date?.value?.getDate();
+
+        let monthVal = (month === 11) ? 0 : month + 1;
         let yearVal = (monthVal === 0) ? year + 1 : year;
         this.minDate = newDate;
         this.minDate.setDate(day);
         this.minDate.setMonth(monthVal);
         this.minDate.setFullYear(yearVal);
-        this.orderForm.controls['completeDate'].setValue(this.minDate);
-       this.orderForm.controls['availableDate'].setValue(this.minDate);
-       //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
+        const completeDateControl = this.orderForm.controls['completeDate'];
+        const availableDateControl = this.orderForm.controls['availableDate'];
+    
 
+
+        if (!completeDateControl?.value || completeDateControl?.value?.getTime() <= date?.value?.getTime()) {
+            this.orderForm.controls['completeDate'].setValue(this.minDate);
+        }
+
+        if (!availableDateControl?.value || availableDateControl?.value?.getTime() <= date?.value?.getTime()) {
+            this.orderForm.controls['availableDate'].setValue(this.minDate);
+        }
+
+        this.minCompleteDate = this.orderForm.get('completeDate')?.value;
+        this.minStartDate = this.orderForm.get('startDate')?.value;
+       //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
+    
+   
 
     }
+
+    changeCompleteDate(event) {
+        const newDate = event.value;
+    
+        this.orderForm.controls['availableDate'].setValue(newDate);
+        this.minCompleteDate = newDate;
+        this.minStartDate = this.orderForm.get('startDate')?.value;
+
+        // Check if the new date is different from the current value to prevent infinite loops
+        if (newDate?.getTime() !== this.orderForm.controls['completeDate']?.value?.getTime()) 
+            this.orderForm.controls['completeDate'].setValue(newDate);
+    }
+
+
+   
+
     async validateShoppingCart() {
         this.showMainSpinner();
         var transactionType: TransactionType;

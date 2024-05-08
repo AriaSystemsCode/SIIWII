@@ -6,6 +6,7 @@
     role="dialog"
     aria-labelledby="mySmallModalLabel"
     aria-hidden="true"
+    *ngIf="modalView"
 >
     <div class="d-none d-md-block  modal-dialog modal-lg MessageDialog thin-scroll"> 
         <div class="modal-content">
@@ -598,7 +599,283 @@
                    
                 </form>
             </div>
-    </div> 
-
-   
+    </div>    
 </div>
+<form class="reply-w-direct-message" *ngIf="!modalView" #MessageForm="ngForm" novalidate>
+    <div class="modal-body">
+        <div class="row">
+            <a
+                href="javascript:;"
+                (click)="showCC()"
+                *ngIf="!displayCC"
+                ><span class="text-input-label mr-1 ml-1">{{
+                    "CC" | localize
+                }}</span></a
+            >
+            <a
+                href="javascript:;"
+                (click)="showBCC()"
+                *ngIf="!displayBCC"
+                ><span class="text-input-label mr-1 ml-1">
+                    {{ "BCC" | localize }}</span
+                ></a
+            >
+        </div>
+        <div class="row align-items-start mb-3 mb-1">
+
+            <div class="col-md-1">
+                <div class="InputText">
+                    <span class="text-input-label"
+                        >{{ "To" | localize }}:</span
+                    >
+                </div>
+            </div>
+            <div
+                class="p-0 sendUsers col-md-11">
+                <p-autoComplete
+                    [style]="{ width: '100%' }"
+                    [inputStyle]="{ width: '100%' }"
+                    class="
+                        InputText
+                        email-autocomplete
+                        sendMessageInputs
+                    "
+                    [(ngModel)]="toUsers"
+                    [forceSelection]="true"
+                    [suggestions]="filteredUsers"
+                    (completeMethod)="filterUsersFilterByEntity($event)"
+                    [minLength]="1"
+                    field="name"
+                    name="MultiSelectInputTo"
+                    id="MultiSelectInputTo"
+                    [required]="true"
+                    [multiple]="true"
+                >
+                </p-autoComplete>
+            </div>
+            <div
+                [ngClass]="{
+                    'col-md-2': !displayCC && !displayBCC,
+                    'col-md-1':
+                        (!displayCC && displayBCC) ||
+                        (displayCC && !displayBCC),
+                    'd-none': displayCC && displayBCC
+                }"
+            >
+
+            </div>
+        </div>
+
+        <div class="row align-items-start mb-3 mb-1" *ngIf="displayCC">
+            <div class="col-md-1">
+                <div
+                    class="InputText"
+                    *ngIf="displayCC"
+                    style="padding-top: 0px !important"
+                >
+                    <span class="text-input-label"
+                        >{{ "CC" | localize }}:</span
+                    >
+                </div>
+            </div>
+            <div class="col-md-11 sendUsers">
+                <p-autoComplete
+                    [style]="{ width: '100%' }"
+                    [inputStyle]="{
+                        width: '100%'
+                    }"
+                    *ngIf="displayCC"
+                    class="
+                        InputText
+                        email-autocomplete
+                        sendMessageInputs
+                    "
+                    [(ngModel)]="ccUsers"
+                    [suggestions]="filteredUsers"
+                    (completeMethod)="filterUsersFilterByEntity($event)"
+                    [minLength]="1"
+                    field="name"
+                    name="MultiSelectInputCC"
+                    id="MultiSelectInputCC"
+                    [multiple]="true"
+                >
+                </p-autoComplete>
+            </div>
+        </div>
+
+        <div class="row align-items-start mb-3 mb-1" *ngIf="displayBCC">
+            <div class="col-md-1">
+                <div
+                    class="InputText"
+                    *ngIf="displayBCC"
+                    style="padding-top: 0px !important"
+                >
+                    <span class="text-input-label"
+                        >{{ "BCC" | localize }}:</span
+                    >
+                </div>
+            </div>
+            <div class="col-md-11 sendUsers">
+                <p-autoComplete
+                    [style]="{ width: '100%' }"
+                    [inputStyle]="{ width: '100%' }"
+                    *ngIf="displayBCC"
+                    class="
+                        InputText
+                        email-autocomplete
+                        sendMessageInputs
+                    "
+                    [(ngModel)]="bccUsers"
+                    [suggestions]="filteredUsers"
+                    (completeMethod)="filterUsersFilterByEntity($event)"
+                    [minLength]="1"
+                    field="name"
+                    name="MultiSelectInputBCC"
+                    id="MultiSelectInputBCC"
+                    [multiple]="true"
+                >
+                </p-autoComplete>
+            </div>
+        </div>
+
+        <div class="form-group group-input subject-label">
+            <div
+                class="InputText row"
+                *ngIf="replyMessageId == 0"
+                style="padding-top: 4px !important; display: flex"
+            >
+                <span
+                    class="text-input-label subject-label col-md-2"
+                    *ngIf="replyMessageId == 0"
+                    >{{ "subject" | localize }}:</span
+                >
+                <div class="col-md-10">
+                                    <input
+                    *ngIf="replyMessageId == 0"
+                    class="form-control Input bg-white"
+                    style="padding: 6px; height: 20px !important"
+                    placeholder=""
+                    type="Text"
+                    [(ngModel)]="subject"
+                    name="subject"
+                    required
+                />
+                </div>
+
+            </div>
+            <div
+                class="InputText"
+                *ngIf="replyMessageId > 0"
+                style="padding-top: 4px !important; display: flex"
+            >
+                <span
+                    class="text-input-label subject-label"
+                    *ngIf="replyMessageId > 0"
+                    >{{ "Subject" | localize }}:</span
+                >
+                <input
+                    *ngIf="replyMessageId > 0"
+                    readonly
+                    class="form-control Input"
+                    style="padding: 6px; height: 9px"
+                    placeholder=""
+                    type="Text"
+                    [(ngModel)]="subject"
+                    name="subject"
+                    required
+                />
+            </div>
+        </div>
+        <form class="kt-form">
+            <div class="kt-portlet__body">
+                <div class="form-group editor-text mt-1 mb-1">  
+                    <p-editor
+                        [(ngModel)]="htmlEditorInput"
+                        [style]="{ height: '100px' }"
+                    >
+                    </p-editor>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="attachments-files">
+        <div *ngFor="let item of attachments">
+            <div *ngIf="item.type.includes('image')">
+                <img
+                    src="assets/message/image.png"
+                    class="icon-file"
+                /><span>{{ item.name }}</span>
+            </div>
+            <div
+                *ngIf="
+                    item.name.includes('.doc') ||
+                    item.name.includes('.docs')
+                "
+            >
+                <img
+                    src="assets/message/microsoft-word.svg"
+                    class="icon-file"
+                /><span>{{ item.name }}</span>
+            </div>
+            <div *ngIf="item.name.includes('.ppt')">
+                <img
+                    src="assets/message/microsoft-powerpoint.svg"
+                    class="icon-file"
+                /><span>{{ item.name }}</span>
+            </div>
+            <div *ngIf="item.name.includes('.xls')">
+                <img
+                    src="assets/message/excel.svg"
+                    class="icon-file"
+                /><span>{{ item.name }}</span>
+            </div>
+            <div
+                *ngIf="
+                    item.name.toLowerCase().indexOf('.ppt') ===
+                        -1 &&
+                    item.name.toLowerCase().indexOf('.xls') ===
+                        -1 &&
+                    item.name.toLowerCase().indexOf('.doc') ===
+                        -1 &&
+                    item.type.toLowerCase().indexOf('image') === -1
+                "
+            >
+                <img
+                    src="assets/message/document.png"
+                    class="icon-file"
+                /><span>{{ item.name }}</span>
+            </div>
+        </div>
+    </div>
+    <div
+        class="modal-footer"
+        style="
+            justify-content: flex-start !important
+          ;
+            border-bottom: none;
+        "
+    >
+        <button
+            type="button"
+            [class.disabled]="toUsers.length == 0 || subject == ''"
+            [disabled]="toUsers.length == 0 || subject == ''"
+            class="sendBtn"
+            (click)="sendMessage()"
+        >
+            {{ "Send" | localize }}
+        </button>
+        <div class="icon-upload">
+            <label for="file-input">
+                <i class="fa fa-paperclip" aria-hidden="true"></i>
+            </label>
+
+            <input
+                id="file-input"
+                type="file"
+                (change)="handleInputChangeAttachment($event)"
+                multiple
+            />
+        </div>
+    </div>
+</form>

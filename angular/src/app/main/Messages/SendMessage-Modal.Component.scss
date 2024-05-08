@@ -19,7 +19,11 @@
     box-shadow: none !important;
     //width: 300px !important;
 }
+.reply-w-direct-message{
+    position: absolute;
+    bottom: 0;
 
+}
 .MessageDialog .Header {
     // width: 534px;
     height: 41px;
@@ -57,7 +61,7 @@
     text-decoration: underline !important;
 }
 
-.MessageDialog .sendBtn {
+ .sendBtn {
     align-items: center;
     border-radius: 4px;
     box-sizing: border-box;

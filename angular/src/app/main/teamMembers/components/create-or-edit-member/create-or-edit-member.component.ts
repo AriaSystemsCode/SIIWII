@@ -8,6 +8,7 @@ import { finalize } from 'rxjs/operators';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { UpdateLogoService } from '@shared/utils/update-logo.service';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-create-or-edit-member',
@@ -39,6 +40,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     active = false;
     phonesLoaded : boolean = false
     entityObjectType:string ="MANUALACCOUNTCONTACT";
+    joinDate= new Date();
 
     constructor(injector: Injector,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -145,6 +147,11 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     async getContactDataForView(memberId){
         const result = await this._AccountsServiceProxy.getContactForView(memberId).toPromise()
         if(result) this.memberDto = result.contact
+
+        if(result?.contact?.joinDate)
+        this.joinDate = moment(result?.contact?.joinDate).toDate();
+    console.log("joindate= "+ this.joinDate)
+
         if(result?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + result?.coverUrl
         if(result?.imageUrl) this.ProfileImg = this.attachmentBaseUrl + '/' + result?.imageUrl
         this.selectedBranchName =  result?.branchName &&  result?.branchName!='' ?  result?.branchName:'';
@@ -155,6 +162,11 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         this.selectedBranchName+=  result?.zipCode  &&  result?.zipCode !='' ?   (  this.selectedBranchName !='' ?  ' , ' +result?.zipCode  : result?.zipCode ) :'';
         this.selectedBranchName+=  result?.countryName &&  result?.countryName!='' ?   (  this.selectedBranchName !='' ?  ' , ' +result?.countryName : result?.countryName) :'';
         this.selectedBranchId = result.contact.parentId;
+    }
+
+    onChangejoinDate(){
+        let _joinDate = this.joinDate.toLocaleString();
+        this.memberDto.joinDate = moment.utc(_joinDate);
     }
 
     getAccountBranches() {

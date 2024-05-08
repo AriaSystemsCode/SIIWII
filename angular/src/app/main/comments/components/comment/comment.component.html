@@ -9,11 +9,28 @@
             class="mr-3 rounded-circle w-100"
         />
     </div>
-    <div class="w-80">
+    <div class="w-80" *ngIf="comment?.messages?.entityObjectTypeCode!=='MESSAGE'">
         <div class="w-100 text-wrapper p-3">
             <h5>{{comment?.messages?.senderName}}</h5>
             <p>
                 {{comment?.messages?.body}}
+            </p>
+        </div>
+    </div>
+    <div class="w-80" *ngIf="comment?.messages?.entityObjectTypeCode=='MESSAGE'">
+        <div class="w-100 text-wrapper p-3">
+            <small>From : {{comment?.messages?.senderName}}</small>
+            <br/>
+            <small>To : {{comment?.messages?.toName}}</small>
+            <br/>
+            <small *ngIf="comment?.messages?.ccUsers">CC : {{comment?.messages?.ccUsers}}</small>
+             <br/>
+             <small *ngIf="comment?.messages?.bccUsers">BCC : {{comment?.messages?.bccUsers}}</small>
+
+            <h6 class="subject-title">Subject : {{comment?.messages?.subject}}</h6>
+            <hr/>
+            <p class="message-body">
+                {{comment?.messages?.body?comment?.messages?.body:comment?.messages?.bodyFormat}}
             </p>
         </div>
     </div>
