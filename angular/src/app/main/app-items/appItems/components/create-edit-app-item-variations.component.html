@@ -274,7 +274,7 @@
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
                                             <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i">
-                                                <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" for="variation_file_{{i}}">
+                                                <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" for="variation_file_{{i}}" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'default-border':'' ">
                                                     <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons">
                                                         <div class="left-icon">
                                                             <i class="fa-photo-video fas" ></i>
