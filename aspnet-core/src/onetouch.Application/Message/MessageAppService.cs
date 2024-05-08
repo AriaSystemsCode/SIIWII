@@ -257,6 +257,7 @@ namespace onetouch.Message
                                 var post = await _appPostRepo.GetAll().Where(z => z.AppEntityId == message.Messages.RelatedEntityId).FirstOrDefaultAsync();
                                 if (post != null)
                                 {
+                                    message.Messages.RelatedEntityObjectTypeCode = "Post";
                                     message.Messages.RelatedEntityObjectTypeDescription = post.Description;
                                     message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
                                        + "." + UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Surname).FirstOrDefault().ToString()
@@ -603,6 +604,8 @@ namespace onetouch.Message
 
         public  List<GetMessagesForViewDto> GetMessagesForView(long id)
         {
+            var entityObjectTypeComment =  _helper.SystemTables.GetEntityObjectTypeComment();
+            var entityObjectTypeCommentType = long.Parse(entityObjectTypeComment.Result.ToString());
             var entityObjectSent = _helper.SystemTables.GetEntityObjectStatusSentMessageID();
             var entityObjectSentID = long.Parse(entityObjectSent.Result.ToString());
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -612,8 +615,8 @@ namespace onetouch.Message
 
                 var messages = _MessagesRepository.GetAll()
                 .Where(e => e.Id == id || 
-                (threadId != null && (e.ThreadId == threadId && (e.UserId == AbpSession.UserId || (e.SenderId == AbpSession.UserId && e.EntityFk.EntityObjectStatusId ==  entityObjectSentID)))))
-                .Where(x => x.TenantId == AbpSession.TenantId)
+                (threadId != null && (e.ThreadId == threadId && (e.UserId == AbpSession.UserId || (e.EntityFk.EntityObjectTypeId == entityObjectTypeCommentType && e.CreatorUserId==null) || (e.SenderId == AbpSession.UserId && e.EntityFk.EntityObjectStatusId ==  entityObjectSentID)))))
+                .Where(x => (x.TenantId == AbpSession.TenantId) || (x.EntityFk.EntityObjectTypeId == entityObjectTypeCommentType && x.CreatorUserId == null))
                 .Include(z => z.EntityFk)
                 .Include(z => z.EntityFk).ThenInclude(z => z.EntitiesRelationships)
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
