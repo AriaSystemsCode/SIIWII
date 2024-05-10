@@ -19,6 +19,8 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
     @Output("showBuyer_sellerEditMode") showBuyer_sellerEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
     @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output("isContactsValid") isContactsValid: EventEmitter<boolean> = new EventEmitter<boolean>()
+    
 
     @Input("canChange")  canChange:boolean=true;
   constructor(
@@ -57,7 +59,9 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
         }
       });
   }
-
-
+  isContactFormValid(value) {
+    if(this.activeTab==this.shoppingCartoccordionTabs.BuyerContactInfo ||this.activeTab==this.shoppingCartoccordionTabs.SellerContactInfo)
+      this.isContactsValid.emit(value)
+  }
   
 }

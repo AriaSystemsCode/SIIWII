@@ -124,7 +124,9 @@
     [selectedAddressDetailsTo]="shipToSelectedAdd"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
     [createOrEditshippingInfO]="createOrEditshippingInfO" 
-    [canChange]="canChange">
+    [canChange]="canChange"
+    (isContactsValid_1)="isContactFormValid($event,1)"
+    (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-shipping-information>
 </div>
 </div>
