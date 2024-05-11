@@ -54,8 +54,8 @@
                                         *ngFor="let selectedExtraAttribute of selectedExtraAttributes;index  as i"
                                         [ngClass]="{'active':i == activeExtraAttributeIndex}"
                                         (click)="setActiveExtraAttribute(i)"
-                                     [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE'"   >
-                                       {{selectedExtraAttribute.name | localize}}
+                                        [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE' &&  selectedExtraAttribute?.entityObjectTypeCode!=='CLOSURE'"   >
+                                        {{selectedExtraAttribute.name | localize}}
                                         <!-- <span (click)="removeExtraAttribute(selectedExtraAttribute,i)" class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle">
                                             <i class="flaticon2-delete"></i>
                                         </span> -->
