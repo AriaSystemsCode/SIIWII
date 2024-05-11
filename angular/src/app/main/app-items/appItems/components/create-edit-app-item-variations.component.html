@@ -268,8 +268,10 @@
 
 <p-dropdown [options]="defaultExtraAttrForAttachments.selectedValuesAttachments | keyvalue" 
             optionLabel="value.lookupData.label"
-            (onChange)="onAttachmentOptionChange($event.value)"
-            [(ngModel)]="firstAttachSelection">
+            optionValue="value"
+            (onChange)="onAttachmentOptionChange($event)"
+            [(ngModel)]="activeAttachmentOption"
+            name="firstAttachSelection">
 </p-dropdown>
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
