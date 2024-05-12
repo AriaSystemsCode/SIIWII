@@ -7218,7 +7218,7 @@ namespace onetouch.AppItems
                             var identifierDef = await _iAppSycIdentifierDefinitionsService.GetSycIdentifierDefinitionForView(long.Parse(identifierId.ToString()));
                             if (identifierDef != null)
                             {
-                                var identifierDefDet = await _iAppSycIdentifierDefinitionsService.GetSycIdentifierDefinitionByTypeForView(identifierDef.SycIdentifierDefinition.Code);
+                                var identifierDefDet = await _iAppSycIdentifierDefinitionsService.GetSycIdentifierDefinitionByTypeForView(productType.SycEntityObjectType.Code);//(identifierDef.SycIdentifierDefinition.Code);
                                 if (identifierDefDet != null)
                                 {
                                     var productCodeSegment = identifierDefDet.SycSegmentIdentifierDefinitions.FirstOrDefault(z => z.SegmentNumber == 1);
@@ -7313,7 +7313,7 @@ namespace onetouch.AppItems
                             var identifierDef = await _iAppSycIdentifierDefinitionsService.GetSycIdentifierDefinitionForView(long.Parse(identifierId.ToString()));
                             if (identifierDef != null)
                             {
-                                var identifierDefDet = await _iAppSycIdentifierDefinitionsService.GetSycIdentifierDefinitionByTypeForView(identifierDef.SycIdentifierDefinition.Code);
+                                var identifierDefDet = await _iAppSycIdentifierDefinitionsService.GetSycIdentifierDefinitionByTypeForView(productType.SycEntityObjectType.Code);//(identifierDef.SycIdentifierDefinition.Code);
                                 if (identifierDefDet != null)
                                 {
 
