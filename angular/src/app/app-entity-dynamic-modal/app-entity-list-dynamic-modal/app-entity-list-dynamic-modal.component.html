@@ -20,6 +20,13 @@
             <div class="align-items-center border-dashed-bottom d-flex justify-content-between p-3"
                 *ngFor="let item of displayedRecords;index as i">
                 <div class="d-flex" style="align-items: center;" [ngClass]="{'t-checkbox-list':acceptMultiValues}">
+                    <label class="pl-3 pt-3 pr-2" [ngClass]="acceptMultiValues ? 'kt-checkbox kt-checkbox--dark':'ml-3'"
+                    [for]="item.value">
+                    <p-checkbox *ngIf="acceptMultiValues" [value]="item.value" [id]="item.value"
+                        [(ngModel)]="selectedRecords" [name]="entityObjectType.name"></p-checkbox>
+                    <input type="radio" *ngIf="!acceptMultiValues" [value]="item.value" [id]="item.value"
+                        [(ngModel)]="selectedRecords" [name]="entityObjectType.name" />
+                </label>
 
                     <div style="
     width: 50px;
@@ -35,15 +42,11 @@
     height: 50px;
 " src="../../../../../assets/placeholders/appitem-placeholder.png" />
 
-                    <label class="pl-3 pt-3 pr-2" [ngClass]="acceptMultiValues ? 'kt-checkbox kt-checkbox--dark':'ml-3'"
-                        [for]="item.value">
-                        <p-checkbox *ngIf="acceptMultiValues" [value]="item.value" [id]="item.value"
-                            [(ngModel)]="selectedRecords" [name]="entityObjectType.name"></p-checkbox>
-                        <input type="radio" *ngIf="!acceptMultiValues" [value]="item.value" [id]="item.value"
-                            [(ngModel)]="selectedRecords" [name]="entityObjectType.name" />
-                    </label>
+                  
+                    <div class="d-flex flex-column pl-3">
                     <span class="pt-1"> {{item.label}}</span>
                     <span class="pt-1"> {{item.code}}</span>
+                </div>
                 </div>
 
                 <!-- <div class="row" *ngIf="item.value">
