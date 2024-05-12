@@ -37,7 +37,7 @@ export class CodesComponent extends AppComponentBase implements OnInit {
 
   }
   OnGetCodeValue(nameInput: any) {
-    this.code = nameInput.target.value;
+    this.code = nameInput.target.value.toUpperCase();
     this.getCodeValue.emit(this.code);
   }
 

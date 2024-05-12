@@ -467,3 +467,15 @@ tabset .nav-link.active span {
 input[type="radio"], input[type="checkbox"] {
     accent-color: #4A0D4A !important;
 }
+
+p-tree[selectionmode=single] .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label{
+    background-color: #4A0D4A !important;
+}
+
+.p-checkbox-box.p-highlight .p-checkbox-icon {
+    color: white !important;
+}
+.p-checkbox-box.p-highlight {
+    background-color: #4A0D4A !important;
+    border-color: #4A0D4A !important;
+}

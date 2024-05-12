@@ -3,6 +3,7 @@ import {
     Component,
     EventEmitter,
     Injector,
+    Input,
     Output,
     ViewChild,
 } from "@angular/core";
@@ -27,6 +28,7 @@ import { Observable, Subscription } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { AppEntityListDynamicModalComponent } from "../app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component";
 import { throws } from "assert";
+import { SelectItem } from "primeng/api";
 
 @Component({
     selector: "app-create-or-edit-app-entity-dynamic-modal",
@@ -61,6 +63,12 @@ export class CreateOrEditAppEntityDynamicModalComponent
     SelectedVal: any;
     attCategoriesShow:boolean=false;
     attCategories: GetSycAttachmentCategoryForViewDto [];
+    @Input() enableAddToLookup:boolean=true;
+    addToLookup:boolean=true;
+    visual = {
+        solid: true,
+        image: false
+    };
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -612,4 +620,9 @@ export class CreateOrEditAppEntityDynamicModalComponent
     getCodeValue(code: string) {
         this.appEntity.code = code;
     }
+    setSolid(value:boolean){
+        this.visual.solid=value;
+        this.visual.image=!value;
+    }
 }
+

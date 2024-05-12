@@ -86,7 +86,11 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" (click)="cropDone()">{{'Apply' | localize}}</button>
-        <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">{{'Cancel' | localize}}</button>
+        <button type="button" class="btn btn-default" (click)="bsModalRef.hide()" style="border-radius: 5px;
+        background-color: white !important;
+       color: #4A0D4A !important;">{{'Cancel' | localize}}</button>
+        <button type="button" class="btn btn-default" (click)="cropDone()" style="border-radius: 5px;
+        background-color: #4A0D4A !important;
+        border: #4A0D4A !important;color: white;">{{'Apply' | localize}}</button>
     </div>
 </div>
