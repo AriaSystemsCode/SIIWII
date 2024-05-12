@@ -565,37 +565,37 @@ namespace onetouch.AppEntities
             //var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId(); *Abdo : Not used variable 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var filteredAppEntities = _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
+                var filteredAppEntities = _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z=>z.AttachmentFk).Include(z=>z.EntityExtraData)
                 .Where(x => x.EntityObjectTypeCode == input.SycEntityObjectTypeNameFilter &&
                 (x.TenantId == AbpSession.TenantId || x.TenantId == null))
                 .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), x => false || x.Name.Contains(input.NameFilter));// *Abdo : is added to filter by name "Red" as  example
 
-                var pagedAndFilteredAppEntities = filteredAppEntities
-                  .OrderBy(input.Sorting ?? "Name asc")
-                  .PageBy(input);
+            var pagedAndFilteredAppEntities = filteredAppEntities
+              .OrderBy(input.Sorting ?? "Name asc")
+              .PageBy(input);
 
-                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
 
-                var appEntities = from o in pagedAndFilteredAppEntities
-                                  select new LookupLabelDto()
-                                  {
-                                      Value = o.Id,
-                                      Label = o.Name.ToString(),
-                                      Code = o.Code,
-                                      IsHostRecord = o.TenantId == null,
-                                      HexaCode = (o.EntityExtraData != null && o.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? o.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
-                                      Image = (o.EntityAttachments != null && o.EntityAttachments.FirstOrDefault() != null && o.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
-                                      (imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
-                                  };
+            var appEntities = from o in pagedAndFilteredAppEntities
+                              select new LookupLabelDto()
+                              {
+                                  Value = o.Id,
+                                  Label = o.Name.ToString(),
+                                  Code = o.Code,
+                                  IsHostRecord = o.TenantId == null,
+                                  HexaCode = (o.EntityExtraData!=null && o.EntityExtraData.Where(z=>z.AttributeId ==39).FirstOrDefault()!=null) ? o.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue:"",
+                                  Image = (o.EntityAttachments!= null && o.EntityAttachments.FirstOrDefault() !=null && o.EntityAttachments.FirstOrDefault().AttachmentFk !=null) ? 
+                                  (imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()):""
+        };
 
 
-                var totalCount = await filteredAppEntities.CountAsync();
+            var totalCount = await filteredAppEntities.CountAsync();
 
-                return new PagedResultDto<LookupLabelDto>(
-                    totalCount,
-                    await appEntities.ToListAsync()
-                );
-            }
+            return new PagedResultDto<LookupLabelDto>(
+                totalCount,
+                await appEntities.ToListAsync()
+            );
+                }
         }
 
         public async Task<List<LookupLabelDto>> GetLineSheetColorSort()
