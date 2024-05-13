@@ -123,7 +123,9 @@
     [selectedAddressDetailsAp]="apContactSelectedAdd"
     [selectedAddressDetailsAr]="arContactSelectedAdd"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
-    [canChange]="canChange">
+    [canChange]="canChange"
+    (isContactsValid_1)="isContactFormValid($event,1)"
+    (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-billing-info>
 </div>
 </div>

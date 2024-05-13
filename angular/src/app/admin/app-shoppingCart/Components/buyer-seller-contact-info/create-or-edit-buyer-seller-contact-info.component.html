@@ -46,7 +46,8 @@
     [appTransactionsForViewDto]="appTransactionsForViewDto"
     (showBuyer_sellerEditMode)="onshowBuyer_sellerEditMode($event)"
     (onshowSaveBtn)="onshowSaveBtn($event)"
-    [canChange]="canChange"></app-view-buyer-seller-contact-info>
+    [canChange]="canChange"
+    (isContactsValid)="isContactFormValid($event)"></app-view-buyer-seller-contact-info>
     </div>
     </div>
     

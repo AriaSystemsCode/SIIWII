@@ -372,9 +372,9 @@ slideToPreviousImage(): void {
         this.colorsData[this.currentIndex].sizes.forEach((item) => {
             sum = sum + item.sizeRatio;
         });
-        console.log('first pack ' , sum)
-        sum=Math.round(sum * 100 / 100).toFixed(2);
-        console.log('second pack ' , sum)
+        //console.log('first pack ' , sum)
+        //sum=Math.round(sum * 100 / 100).toFixed(2);
+        //console.log('second pack ' , sum)
 
         return sum;
     }

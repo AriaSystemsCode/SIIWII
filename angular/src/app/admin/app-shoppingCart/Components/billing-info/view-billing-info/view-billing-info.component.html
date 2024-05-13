@@ -22,6 +22,7 @@
             [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                (formValidityChanged)="isContactFormValid_1($event)"
                 ></app-contact>
         </div>
     </div>
@@ -49,6 +50,7 @@
             [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                (formValidityChanged)="isContactFormValid_2($event)"
                 ></app-contact>
         </div>
     </div>

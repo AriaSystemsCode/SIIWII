@@ -20,6 +20,8 @@ export class ViewBillingInfoComponent   extends AppComponentBase{
   @Output("showBillingEditMode") showBillingEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
   @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
+  @Output("isContactsValid_1") isContactsValid_1: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("isContactsValid_2") isContactsValid_2: EventEmitter<boolean> = new EventEmitter<boolean>()
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -35,5 +37,14 @@ export class ViewBillingInfoComponent   extends AppComponentBase{
     this.onshowSaveBtn.emit(true);
     this.showBillingEditMode
     .emit(true);
+  }
+  isContactFormValid_1(value) {
+    if (this.activeTab == this.shoppingCartoccordionTabs.BillingInfo) 
+      this.isContactsValid_1.emit(value)
+  }
+
+  isContactFormValid_2(value) {
+    if (this.activeTab == this.shoppingCartoccordionTabs.BillingInfo) 
+      this.isContactsValid_2.emit(value)
   }
 }

@@ -22,6 +22,8 @@ export class ViewShippingInformationComponent  extends AppComponentBase{
   @Output("showShippingEditMode") showShippingEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
   @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
+  @Output("isContactsValid_1") isContactsValid_1: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("isContactsValid_2") isContactsValid_2: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
 
@@ -40,5 +42,14 @@ export class ViewShippingInformationComponent  extends AppComponentBase{
     this.createOrEditshippingInfO = true;
     this.onshowSaveBtn.emit(true);
     this.showShippingEditMode.emit(true);
+  }
+  isContactFormValid_1(value) {
+    if (this.activeTab == this.shoppingCartoccordionTabs.ShippingInfo) 
+      this.isContactsValid_1.emit(value)
+  }
+
+  isContactFormValid_2(value) {
+    if (this.activeTab == this.shoppingCartoccordionTabs.ShippingInfo) 
+      this.isContactsValid_2.emit(value)
   }
 }
