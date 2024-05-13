@@ -3806,7 +3806,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 if (userTenantInfo != null)
                                 {
                                     //var info = userTenantInfo.Split(',');
-                                    tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == userTenantInfo.Code && z.TenantId == shar.SharedTenantId).FirstOrDefaultAsync();
+                                    tran = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Code == userTenantInfo.Code && z.TenantId == shar.SharedTenantId && z.EntityObjectTypeCode == userTenantInfo.TransactionType).FirstOrDefaultAsync();
                                     if (tran != null)
                                     {
                                         if (!string.IsNullOrEmpty(userTenantInfo.Code))
