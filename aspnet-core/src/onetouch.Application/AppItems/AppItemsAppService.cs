@@ -398,7 +398,7 @@ namespace onetouch.AppItems
                                        Description = d.EntityFk.Notes,
                                        //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
                                        //Price = d.Price,
-                                       Price = d.ItemPricesFkList.FirstOrDefault()!=null? d.ItemPricesFkList.FirstOrDefault().Price: d.Price,
+                                       Price = d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault()!=null? d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price: d.Price,
                                        //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                                        Id = d.Id,
 
@@ -437,7 +437,7 @@ namespace onetouch.AppItems
                                            Description = o.item.EntityFk.Notes,
                                            //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
                                            //Price = o.item.Price,
-                                           Price = o.item.ItemPricesFkList.FirstOrDefault()!=null? o.item.ItemPricesFkList.FirstOrDefault().Price: o.item.Price,
+                                           Price = o.item.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault()!=null? o.item.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price: o.item.Price,
                                            //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                                            Id = o.item.Id,
 
@@ -474,7 +474,7 @@ namespace onetouch.AppItems
                                            Description = d.EntityFk.Notes,
                                            //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
                                            //Price = d.Price,
-                                           Price = d.ItemPricesFkList.FirstOrDefault()!=null? d.ItemPricesFkList.FirstOrDefault().Price : d.Price,
+                                           Price = d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault()!=null? d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price : d.Price,
                                            //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                                            Id = d.Id,
                                            //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
