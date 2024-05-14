@@ -453,7 +453,7 @@
                                                         {{extraAttr.name | localize}} {{"Code" | localize}}
                                                     </th>
                                                     <th *ngFor="let extraAttr of selectedExtraAttributes">
-                                                        SIWII Marketplace  {{extraAttr.name | localize}}
+                                                      <div *ngIf="extraAttr?.entityObjectTypeCode!=='CLOSURE'"> SIWII Marketplace  {{extraAttr.name | localize}}</div> 
                                                     </th>
                                                     <th>
                                                         {{ "VariationCode" | localize }}

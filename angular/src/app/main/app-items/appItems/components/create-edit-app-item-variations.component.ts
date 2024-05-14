@@ -484,6 +484,8 @@ export class CreateEditAppItemVariationsComponent
                         label:entityExtraData?.attributeValue,
                         stockAvailability:0,
                         isHostRecord:false,
+                        hexaCode:undefined,
+                        image:undefined
                     })
                     extraAttr?.lookupData?.push(tempAtt)
                 }
@@ -1877,6 +1879,9 @@ export class CreateEditAppItemVariationsComponent
                     label:code,
                     stockAvailability:0,
                     isHostRecord:false,
+                    hexaCode:undefined,
+                    image:undefined
+                    
                 })
                 sizeExtraAttr?.lookupData?.push(tempAtt)
                 selectedValuesIds.push(tempAtt.value)

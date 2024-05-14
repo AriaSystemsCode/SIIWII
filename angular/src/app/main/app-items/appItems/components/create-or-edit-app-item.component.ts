@@ -494,6 +494,8 @@ export class CreateOrEditAppItemComponent
                             stockAvailability:undefined,
                             value:extraAttr.selectedValues,
                             isHostRecord:false,
+                            hexaCode:undefined,
+                            image:undefined
                         })
                         result.items.push(tempAtt)
                     }

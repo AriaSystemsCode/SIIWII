@@ -31,13 +31,13 @@
                     <div style="
     width: 50px;
     height: 50px;
-" *ngIf="item?.colorCode != null"  [ngStyle]="{'background-color': item?.colorCode}"></div>
-                    <img *ngIf="item?.colorCode == null &&item?.colorImg != null" style="
+" *ngIf="item?.hexaCode"  [ngStyle]="{'background-color': item?.hexaCode}"></div>
+                    <img *ngIf="!item?.hexaCode && item?.image" style="
     width: 50px;
     height: 50px;
-" [src]="attachmentBaseUrl + '/' + item?.colorImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+" [src]="attachmentBaseUrl + '/' + item?.image" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
 
-<img *ngIf="item?.colorCode == null &&item?.colorImg == null" style="
+<img *ngIf="!item?.hexaCode && !item?.image" style="
     width: 50px;
     height: 50px;
 " src="../../../../../assets/placeholders/appitem-placeholder.png" />

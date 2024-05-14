@@ -52347,6 +52347,8 @@ export class LookupLabelDto implements ILookupLabelDto {
     code!: string | undefined;
     stockAvailability!: number | undefined;
     isHostRecord!: boolean | undefined;
+    hexaCode!: string | undefined;
+    image!: string | undefined;
 
     [key: string]: any;
 
@@ -52370,6 +52372,8 @@ export class LookupLabelDto implements ILookupLabelDto {
             this.code = _data["code"];
             this.stockAvailability = _data["stockAvailability"];
             this.isHostRecord = _data["isHostRecord"];
+            this.hexaCode = _data["hexaCode"];
+            this.image = _data["image"];
         }
     }
 
@@ -52391,6 +52395,8 @@ export class LookupLabelDto implements ILookupLabelDto {
         data["code"] = this.code;
         data["stockAvailability"] = this.stockAvailability;
         data["isHostRecord"] = this.isHostRecord;
+        data["hexaCode"] = this.hexaCode;
+        data["image"] = this.image;
         return data;
     }
 }
@@ -52401,6 +52407,8 @@ export interface ILookupLabelDto {
     code: string | undefined;
     stockAvailability: number | undefined;
     isHostRecord: boolean | undefined;
+    hexaCode: string | undefined;
+    image: string | undefined;
 
     [key: string]: any;
 }
@@ -59626,6 +59634,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
     code!: string | undefined;
     stockAvailability!: number | undefined;
     isHostRecord!: boolean | undefined;
+    hexaCode!: string | undefined;
+    image!: string | undefined;
 
     [key: string]: any;
 
@@ -59650,6 +59660,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
             this.code = _data["code"];
             this.stockAvailability = _data["stockAvailability"];
             this.isHostRecord = _data["isHostRecord"];
+            this.hexaCode = _data["hexaCode"];
+            this.image = _data["image"];
         }
     }
 
@@ -59672,6 +59684,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
         data["code"] = this.code;
         data["stockAvailability"] = this.stockAvailability;
         data["isHostRecord"] = this.isHostRecord;
+        data["hexaCode"] = this.hexaCode;
+        data["image"] = this.image;
         return data;
     }
 }
@@ -59683,6 +59697,8 @@ export interface ILookupLabelWithAttachmentDto {
     code: string | undefined;
     stockAvailability: number | undefined;
     isHostRecord: boolean | undefined;
+    hexaCode: string | undefined;
+    image: string | undefined;
 
     [key: string]: any;
 }
@@ -59754,6 +59770,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
     code!: string | undefined;
     stockAvailability!: number | undefined;
     isHostRecord!: boolean | undefined;
+    hexaCode!: string | undefined;
+    image!: string | undefined;
 
     [key: string]: any;
 
@@ -59778,6 +59796,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
             this.code = _data["code"];
             this.stockAvailability = _data["stockAvailability"];
             this.isHostRecord = _data["isHostRecord"];
+            this.hexaCode = _data["hexaCode"];
+            this.image = _data["image"];
         }
     }
 
@@ -59800,6 +59820,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
         data["code"] = this.code;
         data["stockAvailability"] = this.stockAvailability;
         data["isHostRecord"] = this.isHostRecord;
+        data["hexaCode"] = this.hexaCode;
+        data["image"] = this.image;
         return data;
     }
 }
@@ -59811,6 +59833,8 @@ export interface ICurrencyInfoDto {
     code: string | undefined;
     stockAvailability: number | undefined;
     isHostRecord: boolean | undefined;
+    hexaCode: string | undefined;
+    image: string | undefined;
 
     [key: string]: any;
 }
