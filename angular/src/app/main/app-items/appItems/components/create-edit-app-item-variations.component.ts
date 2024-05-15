@@ -89,6 +89,9 @@ export class CreateEditAppItemVariationsComponent
         if (this.isListing) this.selectedVaritaions = this.variationMatrices;
         this._showVariations = value;
     }
+
+   
+   
     showVariationValues = false;
     showVariationSelectionMetaData = false;
     showVariationPhotos: boolean = false;
@@ -405,6 +408,7 @@ export class CreateEditAppItemVariationsComponent
             this.extraAttributes.map((item) => {
                 item.selected = false;
                 item.selectedValues = [];
+                item.displayedSelectedValues=[];
             });
             this.activeExtraAttributeIndex = -1;
             return;
@@ -452,6 +456,7 @@ export class CreateEditAppItemVariationsComponent
                     let lookupData = responses[index];
                     extraAttr.lookupData = lookupData;
                     extraAttr.displayedLookupData = extraAttr.lookupData;
+                    extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
                 });
                 this.tempAddNewAttributes()
                 resolve(true);
@@ -506,6 +511,7 @@ export class CreateEditAppItemVariationsComponent
         }
         extraAttr.selected = false;
         extraAttr.selectedValues = [];
+        extraAttr.displayedSelectedValues=[];
         if (this.selectedExtraAttributes.length === 0)
             this.activeExtraAttributeIndex = -1;
         if (this.activeExtraAttributeIndex == index && index > 0)
@@ -1373,6 +1379,7 @@ export class CreateEditAppItemVariationsComponent
             );
             this.extraAttributes[currentExtraDataIndex].selected = true;
             this.extraAttributes[currentExtraDataIndex].selectedValues = [];
+            this.extraAttributes[currentExtraDataIndex].displayedSelectedValues=[];
         });
 
         let selectedExtraAttrIds = this.selectedExtraAttributes.map(
@@ -1715,8 +1722,10 @@ export class CreateEditAppItemVariationsComponent
             );
             let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
-            if (modalRefData.selectionDone)
+            if (modalRefData.selectionDone){
                 extraAttr.selectedValues = modalRefData.selectedRecords;
+                extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+            }
             if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
@@ -1725,12 +1734,18 @@ export class CreateEditAppItemVariationsComponent
         
         const extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
-        extraAttr.displayedLookupData = extraAttr.lookupData.filter((item) =>
-            (item.label as string)
-                .trim()
-                .toLowerCase()
-                .includes(search.trim().toLowerCase())
-        );
+            extraAttr.displayedSelectedValues=extraAttr.selectedValues.filter((item) =>
+                (item.label as string)
+                    .trim()
+                    .toLowerCase()
+                    .includes(search.trim().toLowerCase())
+            );
+        // extraAttr.displayedLookupData = extraAttr.lookupData.filter((item) =>
+        //     (item.label as string)
+        //         .trim()
+        //         .toLowerCase()
+        //         .includes(search.trim().toLowerCase())
+        // );
     }
 
     getUnselectedProductVariations(productId: number) {
@@ -1778,6 +1793,8 @@ export class CreateEditAppItemVariationsComponent
         this.oldExtraAttributesData = [];
         this.extraAttributes.forEach((elem) => {
             this.oldExtraAttributesData.push(cloneDeep(elem));
+            elem.displayedSelectedValues =  elem.lookupData.filter(item => elem.selectedValues.includes(item.value))
+
         });
         this.mapExtraAttrSelectionDataFromVariationMatrices();
         this.showVariationSelectionMetaData = false;
@@ -1916,6 +1933,20 @@ export class CreateEditAppItemVariationsComponent
     onAttachmentOptionChange($event){
         this.activeAttachmentOption = $event.value ;
     }
+
+
+    editSelectedAttributesVlaue(event) {
+       this.openCreateNewAppEntityModal();
+    }
+
+    deselectSelectedAttributesValue(event){
+        const extraAttr =
+        this.selectedExtraAttributes[this.activeExtraAttributeIndex];
+        extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues.filter(item => item.value !== event.value);
+        extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.value);
+    }
+
+
 }
 export interface ApplyVariationOutput {
     variation: VariationItemDto[];

@@ -41,13 +41,15 @@
                                     [code]="appEntity.code"
                                     [editMode]=false
                                     placeHolder="Add your code"
-                                    (getCodeValue)="getCodeValue($event)" >
+                                    (getCodeValue)="getCodeValue($event)" 
+                                    [maxlength]="10">
                                 </app-codes>
                                 <app-codes *ngIf="appEntity?.id"
                                     [objectType]="entityObjectType.code"
                                     [editMode]=true
                                     [code]="appEntity.code"
-                                    (getCodeValue)="getCodeValue($event)" >
+                                    (getCodeValue)="getCodeValue($event)"
+                                    [maxlength]="10" >
                                 </app-codes>
 
                             </div>

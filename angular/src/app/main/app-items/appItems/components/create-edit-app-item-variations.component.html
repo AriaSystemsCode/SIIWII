@@ -115,7 +115,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div *ngIf="activeExtraAttributeIndex > -1 && selectedExtraAttributes" class="extra-attribute-options-wrapper pb-4 pl-4 pr-4 pt-4" >
+                        <div *ngIf="activeExtraAttributeIndex > -1 && selectedExtraAttributes" class="extra-attribute-options-wrapper m-2 pb-4 pl-4 pr-4 pt-4" style="    background-color: white;
+                            border: 1px solid #EEEEEEEE;
+                            border-radius: 5px;">
                             <div class="tab-wrapper size-attr-tabset bg-white p-4" *ngIf="sizeExtraAttrCode == selectedExtraAttributes[activeExtraAttributeIndex].entityObjectTypeCode?.toUpperCase();else valuesSelectionelseTemp">
                                 <tabset>
                                     <tab (deselect)="sizeScalesChanged(sizeScaleComponent.mapMatrixGridToAppSizeScaleDto(),sizeScaleComponent?.sizeScaleForm?.form?.valid)">
@@ -158,24 +160,88 @@
                             </div>
                             <ng-template #valuesSelectionelseTemp>
                                 <h6 *ngIf="activeExtraAttributeIndex > -1 && selectedExtraAttributes" class="align-items-center d-flex">
-                                    <span>
+                                    <!-- <span>
                                         {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }} {{ "Options" | localize }} /
+                                    </span> -->
+                                    <span> 
+                                        {{ "Selected " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }}{{"S: "}} 
+                                        <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{"You have been select "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
                                     </span>
                                     <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + selectedExtraAttributes[activeExtraAttributeIndex].name" (input)="filterLookup($event)">
+                                    <button style="border-radius: 5px;
+                                    background-color: white !important;
+                                    border: 1px solid #EEEEEEEE !important;color: #4A0D4A !important;" class="ml-3 p-3 btn btn-outline-primary font-weight-normal p-2" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
+                                        <span class="mr-1">+</span> {{ "Add " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name}}
+                                    </button>
                                 </h6>
+                                
+                              
                                 <div *ngIf="activeExtraAttributeIndex > -1" class="align-items-center d-flex flex-row justify-content-start pt-2">
-                                    <p-selectButton
+                                    <!-- <p-selectButton
                                         [options]="selectedExtraAttributes[activeExtraAttributeIndex].displayedLookupData"
                                         multiple="multiple"
                                         [name]="selectedExtraAttributes[activeExtraAttributeIndex].name"
                                         [(ngModel)]="selectedExtraAttributes[activeExtraAttributeIndex].selectedValues"
                                     >
-                                    </p-selectButton>
-                                    <button style="border-radius: 5px;
-                                    background-color: white !important;
-                                    border: white !important;color: #4A0D4A !important;" class="btn btn-outline-primary font-weight-normal p-2" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
-                                        <span class="mr-1">+</span> {{ "AddNew" | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name}}
-                                    </button>
+                                    </p-selectButton> -->
+                                    <!-- <p-selectButton
+                                        [options]="selectedExtraAttributes[activeExtraAttributeIndex].displayedSelectedValues"
+                                        multiple="multiple"
+                                        [name]="selectedExtraAttributes[activeExtraAttributeIndex].name"
+                                        [(ngModel)]="selectedExtraAttributes[activeExtraAttributeIndex].selectedValues"
+                                    >
+                                    </p-selectButton> -->
+                                    <div class="d-flex flex-row mb-3 w-100" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].displayedSelectedValues.length">
+                                        <div class="d-flex flex-column justify-content-between m-4 position-relative col-1 m-0 p-0" style="border-radius: 5px;border: 1px solid #EEEEEE;    background-color: white;"
+                                            *ngFor="let item of selectedExtraAttributes[activeExtraAttributeIndex].displayedSelectedValues;index as i">
+                                            <div class="d-flex flex-column" style="align-items: center;">
+                            
+                                                <div style="
+                                width: 100%;
+                                height: 120px;
+                            " *ngIf="item?.hexaCode"  [ngStyle]="{'background-color': item?.hexaCode}"></div>
+                                                <img *ngIf="!item?.hexaCode && item?.image" style="
+                                width: 100%;
+                                height: 120px;
+                            " [src]="attachmentBaseUrl + '/' + item?.image" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                            
+                            <img *ngIf="!item?.hexaCode && !item?.image" style="
+                                 width: 100%;
+                                height: 120px;
+                            " src="../../../../../assets/placeholders/appitem-placeholder.png" />
+                                              
+                                               
+                                            </div>
+                            
+                                            <!-- <div class="row" *ngIf="item.value">
+                                                *Added to lookup
+                                            </div> -->
+                                            <div class="">
+                                                <div class="btn-group dropdown position-absolute" dropdown container="body" placement='bottom right' style="top: 0;
+                                                right: 0;">
+                                                    <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
+                                                    </button>
+                                                    <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                                                        *dropdownMenu>
+                                                        <li>
+                                                            <a (click)="editSelectedAttributesVlaue(item)"> <img  class="mr-2"  src="../../../../../assets/Items/Vector.png"/>{{'Edit' | localize}}</a>
+                                                        </li>
+                                                        <li>
+                                                            <a (click)="deselectSelectedAttributesValue(item)"> <img  class="mr-2" src="../../../../../assets/Items/material-symbols_deselect-sharp.png"/>{{'DeSelect' | localize}}</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-column p-3">
+                                                <span class="pt-1 font-weight-bold"> {{item.code}}</span>
+                                            <span class="pt-1" style="color: #9E9E9E;"> {{item.label}}</span>
+                                        </div>
+                            
+                                        </div>
+                                       
+                                    </div>
+
+
                                 </div>
                             </ng-template>
                         </div>
