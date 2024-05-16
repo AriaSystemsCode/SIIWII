@@ -1063,9 +1063,34 @@ namespace onetouch.AppItems
                             //      secondAttributeValuesFor1st = secondAttributeValuesFor1st1.FirstOrDefault().Distinct().ToList();
                             //  }
                         }
-
-
-
+                        //MMT I41[Start]
+                        if (firstattributeCodes != null && firstattributeCodes.Count > 0)
+                        {
+                            for (int cod=0; cod < firstattributeCodes.Count; cod++)
+                            {
+                                var entity = await _appEntityRepository.GetAll()
+                                    .Where(z => (z.EntityObjectTypeCode == firstAttributeValue && z.Code== firstattributeCodes[cod].AttributeCode) && (z.TenantId==null || z.TenantId==AbpSession.TenantId)).FirstOrDefaultAsync();
+                                if (entity == null)
+                                {
+                                    AppEntityExtraData? hexa, img;
+                                    hexa = null;
+                                    img = null;
+                                    var itm = varAppItems.Where(z => z.EntityFk.EntityExtraData
+                                    .Where(x => x.AttributeId == long.Parse(firstAttributeID.ToString()) && x.AttributeCode == firstattributeCodes[cod].AttributeCode).Count() > 0).FirstOrDefault();
+                                    if (itm != null)
+                                    {
+                                        hexa = itm.EntityFk.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                        img = itm.EntityFk.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                                    }
+                                    output.NonLookupValues.Add(new LookupLabelDto { Code  = firstattributeCodes[cod].AttributeCode,
+                                        Label= firstattributeValues[cod],
+                                        HexaCode = hexa !=null ? hexa.AttributeValue:"",
+                                        Image= img!=null ? img.AttributeValue:""
+                                    });
+                                }
+                            }
+                        }
+                        //MMT I41[end]
 
                         //MMT
 

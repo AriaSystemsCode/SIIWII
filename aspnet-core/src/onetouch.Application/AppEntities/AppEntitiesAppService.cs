@@ -527,17 +527,25 @@ namespace onetouch.AppEntities
 
         public async Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code)
         {
+            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
             var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
-            return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                return await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
+                .Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
                 .OrderBy("Name asc")
                 .Select(appEntity => new LookupLabelDto
                 {
                     Value = appEntity.Id,
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
-                    IsHostRecord = appEntity.TenantId == null
+                    IsHostRecord = appEntity.TenantId == null,
+                    HexaCode = (appEntity.EntityExtraData != null && appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
+                    Image = (appEntity.EntityAttachments != null && appEntity.EntityAttachments.FirstOrDefault() != null && appEntity.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
+                                  (imagesUrl + "-1" + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
                 })
                 .ToListAsync();
+            }
         }
         //MMT30
         public async Task<List<LookupLabelDto>> GetMarketPlaceSizes()

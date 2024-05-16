@@ -78,6 +78,9 @@ namespace onetouch.AppItems.Dtos
         public string OriginalCode { get; set; }
         public long? SycIdentifierId { get; set; }
         //MMT
+        //MMT-IT41[Start]
+        public IList<LookupLabelDto> NonLookupValues { set; get; }
+        //MMT-IT41[End]
     }
     //MMT
     public class AppItemPriceInfo : EntityDto<long>
