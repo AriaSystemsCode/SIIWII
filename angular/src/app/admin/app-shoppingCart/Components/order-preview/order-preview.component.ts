@@ -30,7 +30,6 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         this.loadPdf();
     }
     loadPdf() {
-        this.loadingError = true;
         this.showMainSpinner()
         this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
         .pipe(finalize(() => {
@@ -44,6 +43,8 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
                 pdfViewer.src = 'data:application/pdf;base64,' + base64String;
                 this.loadingError = false;
             }
+            else
+                this.loadingError = true;
         });
        
     }
