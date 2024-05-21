@@ -1145,7 +1145,7 @@ namespace onetouch.Message
                              //.WhereIf(MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
                              //.Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), MessageCategoryFilter)).ToString()).Count() > 0)
                        .Where(x => (x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) || (x.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) > 0))
-                       .Where(e => e.ParentId == null)
+                      // .Where(e => e.ParentId == null)
                        .Where(x => x.TenantId == AbpSession.TenantId && (x.UserId == AbpSession.UserId)).CountAsync();
 
                 return unreadCount;
