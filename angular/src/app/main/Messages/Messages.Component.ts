@@ -143,6 +143,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.skipCount,
                 this.maxResultCount
             )
+            .pipe(finalize(() => {  this.hideMainSpinner(); }))
             .subscribe((result) => {
                 if (search == true) {
                     this.messages = [];
