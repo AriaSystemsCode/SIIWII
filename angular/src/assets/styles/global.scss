@@ -451,3 +451,12 @@ color: #700066 !important;
     background-color: red;
     border: none;
 }
+
+.selectedContact{
+    color: rgb(248 128 17);
+    padding: 6px 4px;
+    border-radius: 2px;
+    background-color: rgba(248, 128, 17, 0.15);
+    cursor: pointer;
+    font-weight: 700;
+}
