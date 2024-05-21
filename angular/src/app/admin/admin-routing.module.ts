@@ -1,5 +1,8 @@
 ﻿import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { AppFeaturesComponent } from './appSubScriptionPlan/appFeatures/appFeatures.component';
+import { CreateOrEditAppFeatureComponent } from './appSubScriptionPlan/appFeatures/create-or-edit-appFeature.component';
+import { ViewAppFeatureComponent } from './appSubScriptionPlan/appFeatures/view-appFeature.component';
 import { MaintainancesComponent } from './maintainances/maintainances/maintainances.component';
 import { SycIdentifierDefinitionsComponent } from './sycIdentifierDefinitions/sycIdentifierDefinitions/sycIdentifierDefinitions.component';
 import { SycSegmentIdentifierDefinitionsComponent } from './sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions.component';
@@ -49,6 +52,9 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
             {
                 path: '',
                 children: [
+                    { path: 'appSubScriptionPlan/appFeatures', component: AppFeaturesComponent, data: { permission: 'Pages.Administration.AppFeatures' }  },
+                    { path: 'appSubScriptionPlan/appFeatures/createOrEdit', component: CreateOrEditAppFeatureComponent, data: { permission: 'Pages.Administration.AppFeatures.Create' }  },
+                    { path: 'appSubScriptionPlan/appFeatures/view', component: ViewAppFeatureComponent, data: { permission: 'Pages.Administration.AppFeatures' }  },
                     { path: 'maintainances/maintainances', component: MaintainancesComponent, data: { permission: 'Pages.Administration.Maintainances' }  },
                     { path: 'sycIdentifierDefinitions/sycIdentifierDefinitions', component: SycIdentifierDefinitionsComponent, data: { permission: 'Pages.Administration.SycIdentifierDefinitions' }  },
                     { path: 'sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions', component: SycSegmentIdentifierDefinitionsComponent, data: { permission: 'Pages.Administration.SycSegmentIdentifierDefinitions' }  },

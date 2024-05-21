@@ -1,8 +1,12 @@
-
+﻿
 import { FileUploadModule as PrimeNgFileUploadModule } from 'primeng/fileupload';
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { AppFeaturesComponent } from './appSubScriptionPlan/appFeatures/appFeatures.component';
+import { ViewAppFeatureComponent } from './appSubScriptionPlan/appFeatures/view-appFeature.component';
+import { CreateOrEditAppFeatureComponent } from './appSubScriptionPlan/appFeatures/create-or-edit-appFeature.component';
+
 import { AppCommonModule } from "@app/shared/common/app-common.module";
 import { MaintainancesComponent } from "./maintainances/maintainances/maintainances.component";
 import { ViewMaintainanceModalComponent } from "./maintainances/maintainances/view-maintainance-modal.component";
@@ -233,6 +237,10 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
     ],
     declarations: [
+		AppFeaturesComponent,
+
+		ViewAppFeatureComponent,
+		CreateOrEditAppFeatureComponent,
         MaintainancesComponent,
 
         ViewMaintainanceModalComponent,

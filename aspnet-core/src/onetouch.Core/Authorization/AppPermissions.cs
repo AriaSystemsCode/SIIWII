@@ -6,6 +6,11 @@
     /// </summary>
     public static class AppPermissions
     {
+        public const string Pages_Administration_AppFeatures = "Pages.Administration.AppFeatures";
+        public const string Pages_Administration_AppFeatures_Create = "Pages.Administration.AppFeatures.Create";
+        public const string Pages_Administration_AppFeatures_Edit = "Pages.Administration.AppFeatures.Edit";
+        public const string Pages_Administration_AppFeatures_Delete = "Pages.Administration.AppFeatures.Delete";
+
         public const string Pages_Administration_Maintainances = "Pages.Administration.Maintainances";
         public const string Pages_Administration_Maintainances_Create = "Pages.Administration.Maintainances.Create";
         public const string Pages_Administration_Maintainances_Edit = "Pages.Administration.Maintainances.Edit";
@@ -125,7 +130,7 @@
         public const string Pages_AppItems_EditListing = "Pages.AppItems.EditListing";
         public const string Pages_AppItems_DeleteListing = "Pages.AppItems.DeleteListing";
         public const string Pages_AppItems_Publish = "Pages.AppItems.Publish";
-        
+
         public const string Pages_AppSiiwiiTransactions = "Pages.AppSiiwiiTransactions";
 
         public const string Pages_Accounts = "Pages.Accounts";

@@ -146,6 +146,11 @@ namespace onetouch.Authorization
 
             var administration = pages.CreateChildPermission(AppPermissions.Pages_Administration, L("Administration"));
 
+            var appFeatures = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppFeatures, L("AppFeatures"), multiTenancySides: MultiTenancySides.Host);
+            appFeatures.CreateChildPermission(AppPermissions.Pages_Administration_AppFeatures_Create, L("CreateNewAppFeature"), multiTenancySides: MultiTenancySides.Host);
+            appFeatures.CreateChildPermission(AppPermissions.Pages_Administration_AppFeatures_Edit, L("EditAppFeature"), multiTenancySides: MultiTenancySides.Host);
+            appFeatures.CreateChildPermission(AppPermissions.Pages_Administration_AppFeatures_Delete, L("DeleteAppFeature"), multiTenancySides: MultiTenancySides.Host);
+
             var maintainances = administration.CreateChildPermission(AppPermissions.Pages_Administration_Maintainances, L("Maintainances"), multiTenancySides: MultiTenancySides.Host);
             maintainances.CreateChildPermission(AppPermissions.Pages_Administration_Maintainances_Create, L("CreateNewMaintainance"), multiTenancySides: MultiTenancySides.Host);
             maintainances.CreateChildPermission(AppPermissions.Pages_Administration_Maintainances_Edit, L("EditMaintainance"), multiTenancySides: MultiTenancySides.Host);

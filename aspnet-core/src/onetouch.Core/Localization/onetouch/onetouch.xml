@@ -1,6 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>
+	<texts>    <text name="AppSubScriptionPlan">App sub scription plan</text>
+    <text name="AppFeature">App feature</text>
+    <text name="onetouch.AppSubScriptionPlan.AppFeature">AppFeature</text>
+    <text name="Id">Id</text>
+    <text name="UnitOfMeasurementCode">Unit of measurement code</text>
+    <text name="UnitOfMeasurementName">Unit of measurement name</text>
+    <text name="FeaturePeriodLimit">Feature period limit</text>
+    <text name="Billable">Billable</text>
+    <text name="NotBillable">Not billable</text>
+    <text name="BillingCode">Billing code</text>
+    <text name="Category">Category</text>
+    <text name="TrackActivity">Track activity</text>
+    <text name="NotTrackActivity">Not track activity</text>
+    <text name="AppFeaturesHeaderInfo">App features header info</text>
+    <text name="CreateNewAppFeature">Create new app feature</text>
+    <text name="EditAppFeature">Edit app feature</text>
+    <text name="DeleteAppFeature">Delete app feature</text>
+    <text name="AppFeatures">App features</text>
+
 		<text name="MinimumInStock">Minimum (in Stock) Qty</text>
 		<text name="OnlyInStockColors">Only (in Stock) Colors</text>
 		

@@ -1,4 +1,5 @@
-﻿using onetouch.Maintainances;
+﻿using onetouch.AppSubScriptionPlan;
+using onetouch.Maintainances;
 using onetouch.AppItemSelectors;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.SycSegmentIdentifierDefinitions;
@@ -56,9 +57,11 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<AppFeature> AppFeatures { get; set; }
+
         public virtual DbSet<Maintainance> Maintainances { get; set; }
 
-        public virtual DbSet<SycEntityLocalization> SycEntityLocalizations { set; get;}
+        public virtual DbSet<SycEntityLocalization> SycEntityLocalizations { set; get; }
         public virtual DbSet<AppItemPrices> AppItemPrices { get; set; }
         public virtual DbSet<AppItemSizeScalesDetails> AppItemSizeScalesDetails { get; set; }
         public virtual DbSet<AppItemSizeScalesHeader> AppItemSizeScalesHeaders { get; set; }
