@@ -63821,6 +63821,7 @@ export interface IAppItemForViewDto {
 
 export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
     appItem!: AppItemForViewDto;
+    nonLookupValues!: LookupLabelDto[] | undefined;
 
     [key: string]: any;
 
@@ -63840,6 +63841,11 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
                     this[property] = _data[property];
             }
             this.appItem = _data["appItem"] ? AppItemForViewDto.fromJS(_data["appItem"]) : <any>undefined;
+            if (Array.isArray(_data["nonLookupValues"])) {
+                this.nonLookupValues = [] as any;
+                for (let item of _data["nonLookupValues"])
+                    this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
+            }
         }
     }
 
@@ -63857,12 +63863,18 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
                 data[property] = this[property];
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
+        if (Array.isArray(this.nonLookupValues)) {
+            data["nonLookupValues"] = [];
+            for (let item of this.nonLookupValues)
+                data["nonLookupValues"].push(item.toJSON());
+        }
         return data;
     }
 }
 
 export interface IGetAppItemDetailForViewDto {
     appItem: AppItemForViewDto;
+    nonLookupValues: LookupLabelDto[] | undefined;
 
     [key: string]: any;
 }
@@ -64331,6 +64343,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     appItemSizesScaleInfo!: AppItemSizesScaleInfo[] | undefined;
     originalCode!: string | undefined;
     sycIdentifierId!: number | undefined;
+    nonLookupValues!: LookupLabelDto[] | undefined;
     id!: number;
 
     [key: string]: any;
@@ -64465,6 +64478,11 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             }
             this.originalCode = _data["originalCode"];
             this.sycIdentifierId = _data["sycIdentifierId"];
+            if (Array.isArray(_data["nonLookupValues"])) {
+                this.nonLookupValues = [] as any;
+                for (let item of _data["nonLookupValues"])
+                    this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
+            }
             this.id = _data["id"];
         }
     }
@@ -64597,6 +64615,11 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         }
         data["originalCode"] = this.originalCode;
         data["sycIdentifierId"] = this.sycIdentifierId;
+        if (Array.isArray(this.nonLookupValues)) {
+            data["nonLookupValues"] = [];
+            for (let item of this.nonLookupValues)
+                data["nonLookupValues"].push(item.toJSON());
+        }
         data["id"] = this.id;
         return data;
     }
@@ -64642,6 +64665,7 @@ export interface ICreateOrEditAppItemDto {
     appItemSizesScaleInfo: AppItemSizesScaleInfo[] | undefined;
     originalCode: string | undefined;
     sycIdentifierId: number | undefined;
+    nonLookupValues: LookupLabelDto[] | undefined;
     id: number;
 
     [key: string]: any;
