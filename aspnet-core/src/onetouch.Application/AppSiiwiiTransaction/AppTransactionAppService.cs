@@ -3318,6 +3318,27 @@ namespace onetouch.AppSiiwiiTransaction
                 }
             }
         }
+        public async Task<Byte[]> GetTransactionOrderConfirmation(long transactionId)
+        {
+            Byte[] returnList = new Byte[1];
+            var transOrg = await _appTransactionsHeaderRepository.GetAll()
+                    .Include(a => a.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                .Where(a => a.Id == transactionId).FirstOrDefaultAsync();
+            if (transOrg != null)
+            {
+                if (transOrg.EntityAttachments != null && transOrg.EntityAttachments.Count > 0)
+                {
+                    string filePath = _appConfiguration[$"Attachment:Path"] + @"\" + (transOrg.TenantId == null ? "-1" : transOrg.TenantId.ToString()) + @"\" + transOrg.EntityAttachments[0].AttachmentFk.Attachment;
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        returnList = System.IO.File.ReadAllBytes(filePath);
+                     //   viewTrans.EntityAttachments[0].Url = @"attachments/" + (viewTrans.TenantId == null ? -1 : viewTrans.TenantId) + @"/" + viewTrans.EntityAttachments[0].FileName;
+                    }
+                }
+            }
+            return returnList;
+
+        }
         public async Task<GetAppTransactionsForViewDto> GetAppTransactionsForView(long transactionId, GetAllAppTransactionsInputDto? input, TransactionPosition? position)
         {
 
