@@ -1732,14 +1732,21 @@ export class CreateEditAppItemVariationsComponent
     filterLookup($event) {
         const search = $event.target.value;
         
+        
         const extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
-            extraAttr.displayedSelectedValues=extraAttr.selectedValues.filter((item) =>
-                (item.label as string)
-                    .trim()
-                    .toLowerCase()
-                    .includes(search.trim().toLowerCase())
-            );
+
+            extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+
+
+            if(search){
+            extraAttr.displayedSelectedValues= extraAttr.displayedSelectedValues.filter((item) => {  
+                  const itemLabel = (item.label as string)?.trim().toLowerCase();  
+                    const searchValue = (search ?? '').trim().toLowerCase();   
+                     return itemLabel.includes(searchValue);}
+                     );
+            }
+
         // extraAttr.displayedLookupData = extraAttr.lookupData.filter((item) =>
         //     (item.label as string)
         //         .trim()
