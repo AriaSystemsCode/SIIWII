@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, OnChanges, SimpleChanges } from '@angular/core';
 import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -9,7 +9,7 @@ import { AddressComponent } from '../../Components/address/address.component';
   templateUrl: './create-or-add-shipping-information.component.html',
   styleUrls: ['./create-or-add-shipping-information.component.scss']
 })
-export class CreateOrAddShippingInformationComponent extends AppComponentBase {
+export class CreateOrAddShippingInformationComponent extends AppComponentBase implements OnInit , OnChanges {
   @Input("activeTab") activeTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("shippingInfOValid") shippingInfOValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
@@ -48,6 +48,10 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   }
 
   ngOnInit() {
+
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
     shipFromObj[0]?.companySSIN ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
@@ -56,8 +60,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
     this.storeVal = this.appTransactionsForViewDto?.buyerStore;
     //this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
     this.loadShipViaList();
-
   }
+
 
   updateTabInfo(addObj, contactRole) {
     let contactIndex = this.appTransactionsForViewDto?.appTransactionContacts?.findIndex(x => x.contactRole == contactRole);
