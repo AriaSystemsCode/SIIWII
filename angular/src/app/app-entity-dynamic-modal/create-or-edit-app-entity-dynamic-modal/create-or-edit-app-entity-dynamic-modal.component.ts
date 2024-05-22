@@ -64,6 +64,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
     attCategoriesShow:boolean=false;
     attCategories: GetSycAttachmentCategoryForViewDto [];
     @Input() enableAddToLookup:boolean=true;
+    @Input()  wantdisplaySaveSideBar :boolean=true;
     addToLookup:boolean=true;
     visual = {
         solid: true,
@@ -226,7 +227,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
             )
             .subscribe(() => {
                 this.notify.info(this.l("SavedSuccessfully"));
+                if(this.wantdisplaySaveSideBar)
                 this.displaySaveSideBar = true;
+
+                else {
+                     this.saveDone.emit(true);
+                    this.hide();
+                }
             });
     }
 

@@ -530,7 +530,7 @@
                                                     </button>
                                                     <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"
                                                         *dropdownMenu>
-                                                        <li>
+                                                        <li *ngIf="!item.isHostRecord">
                                                             <a (click)="editSelectedAttributesVlaue(item)"> <img  class="mr-2"  src="../../../../../assets/Items/Vector.png"/>{{'Edit' | localize}}</a>
                                                         </li>
                                                         <li>
@@ -723,3 +723,6 @@
     (_cancel)="onCancelHandler()"
 >
 </app-generic-form-modal> -->
+<app-create-or-edit-app-entity-dynamic-modal #createOreEditAppEntityModal 
+    (saveDone)="onCreateOrEditDoneHandler()" [enableAddToLookup]="true" [wantdisplaySaveSideBar]="false">
+</app-create-or-edit-app-entity-dynamic-modal>

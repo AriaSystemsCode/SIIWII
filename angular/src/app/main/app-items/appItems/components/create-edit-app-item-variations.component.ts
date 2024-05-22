@@ -27,6 +27,7 @@ import {
     AppSizeScalesDetailDto,
     AppItemSizesScaleInfo,
     IAppItemSizesScaleInfo,
+    AppEntityDto,
 } from "@shared/service-proxies/service-proxies";
 import { BsDropdownDirective } from "ngx-bootstrap/dropdown";
 import { cloneDeep } from "lodash";
@@ -44,6 +45,7 @@ import { AccordionTab } from "primeng/accordion";
 import { SelectItem } from "primeng/api";
 import { SelectAppItemTypeComponent } from "@app/app-item-type/select-app-item-type/select-app-item-type.component";
 import { table } from "console";
+import { CreateOrEditAppEntityDynamicModalComponent } from "@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component";
 
 @Component({
     selector: "app-create-edit-app-item-variations",
@@ -63,6 +65,8 @@ export class CreateEditAppItemVariationsComponent
     @Input() productCode: any;
     @Input() extraVariationsTypes:any
     @ViewChild("variationCombinationTap") variationCombinationTap: AccordionTab;
+    @ViewChild("createOreEditAppEntityModal") createOreEditAppEntityModal: CreateOrEditAppEntityDynamicModalComponent;
+    
     extraVariations: any[];
     siwiMarketPlaceColor: any[];
     sizes: any[];
@@ -1715,11 +1719,17 @@ export class CreateEditAppItemVariationsComponent
             config
         );
         let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
-            this._extraAttributeDataService.getExtraAttributeLookupData(
+            const  subscription=  this._extraAttributeDataService.getExtraAttributeLookupData(
                 extraAttr.entityObjectTypeCode,
                 extraAttr.lookupData,
                 extraAttr
             );
+    
+            subscription.subscribe((result) => {
+                extraAttr.lookupData=result;
+                extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+            });
+
             let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
             if (modalRefData.selectionDone){
@@ -1942,8 +1952,32 @@ export class CreateEditAppItemVariationsComponent
     }
 
 
-    editSelectedAttributesVlaue(event) {
-       this.openCreateNewAppEntityModal();
+    editSelectedAttributesVlaue(item) {
+        let extraAttr =
+        this.selectedExtraAttributes[this.activeExtraAttributeIndex];
+      let  entityObjectType = {
+            name: extraAttr.name,
+            code: extraAttr.entityObjectTypeCode
+        };
+        const appEntity : AppEntityDto = new AppEntityDto()
+        if(item) {
+            appEntity.id = item?.value
+        }
+        this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+    }
+   async onCreateOrEditDoneHandler(){
+      
+        const extraAttr =
+        this.selectedExtraAttributes[this.activeExtraAttributeIndex];
+        const  subscription=  this._extraAttributeDataService.getExtraAttributeLookupData(
+            extraAttr.entityObjectTypeCode,
+            extraAttr.lookupData,
+            extraAttr
+        );
+
+        subscription.subscribe((result) => {
+            extraAttr.displayedSelectedValues = result.filter(item => extraAttr.selectedValues.includes(item.value));
+          });
     }
 
     deselectSelectedAttributesValue(event){
