@@ -32,6 +32,7 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     showMoreListDataButton : boolean
     searchQuery:string
     searchSubj:Subject<string>=new Subject<string>()
+    nonLookupValues:LookupLabelDto[];
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -81,6 +82,7 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
 
             if( isFirstPage ) this.allRecords = []
             this.allRecords.push(...result.items);
+            this.allRecords.push(...this.nonLookupValues);
             this.displayedRecords = this.allRecords
             this.totalCount = result.totalCount;
             this.showMoreListDataButton = !isLastPage
@@ -110,6 +112,21 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
     onCreateOrEditDoneHandler(){
         this.resetList()
+    }
+    onAddNonLookupValues($event:AppEntityDto){
+        var nonLookupValue : LookupLabelDto =new LookupLabelDto();
+        nonLookupValue.code =  $event?.code;
+        nonLookupValue.label = $event?.name;
+        nonLookupValue.hexaCode =$event?.entityExtraData ?  $event?.entityExtraData[0]?.attributeValue : null ;
+        var imgName_Type = $event?.entityAttachments ?  $event?.entityAttachments[0]?.fileName?.split('.') : [];
+        var imgType =  imgName_Type.length  >0 ?  imgName_Type?.[imgName_Type.length - 1] : "" ;
+
+
+        nonLookupValue.image ="attachments/-1/" + $event?.entityAttachments[0]?.guid+"."+ imgType;   
+        nonLookupValue.value = $event?.objectId;      // ??????????????????????
+        nonLookupValue.isHostRecord =  false;
+        nonLookupValue.stockAvailability = null;
+    this.nonLookupValues.push(nonLookupValue);
     }
 
     resetList(){

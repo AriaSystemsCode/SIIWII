@@ -102,5 +102,5 @@
 
 
 <app-create-or-edit-app-entity-dynamic-modal #createOreEditAppEntityModal (cancel)="onCanceledHandler()"
-    (saveDone)="onCreateOrEditDoneHandler()" [enableAddToLookup]="true">
+    (saveDone)="onCreateOrEditDoneHandler()" [enableAddToLookup]="true" (addNonLookupValues)="onAddNonLookupValues($event)">
 </app-create-or-edit-app-entity-dynamic-modal>

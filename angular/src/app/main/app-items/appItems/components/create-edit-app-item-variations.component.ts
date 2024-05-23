@@ -1700,7 +1700,6 @@ export class CreateEditAppItemVariationsComponent
     // }
 
     openCreateNewAppEntityModal() {
-        
         let extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
         let config: ModalOptions = new ModalOptions();
@@ -1712,6 +1711,7 @@ export class CreateEditAppItemVariationsComponent
             },
             selectedRecords: extraAttr.selectedValues,
             acceptMultiValues: extraAttr.acceptMultipleValues,
+            nonLookupValues:  this.appItem.nonLookupValues ? this.appItem.nonLookupValues : []
         };
         config.initialState = modalDefaultData;
         let modalRef: BsModalRef = this._BsModalService.show(
@@ -1728,6 +1728,8 @@ export class CreateEditAppItemVariationsComponent
             subscription.subscribe((result) => {
                 extraAttr.lookupData=result;
                 extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+                this.appItem.nonLookupValue = modalRefData.nonLookupValues;
+                this.appItem.nonLookupValue .push(...this.appItem.nonLookupValue.filter(item => extraAttr.selectedValues.includes(item.value)));
             });
 
             let modalRefData: AppEntityListDynamicModalComponent =
@@ -1735,6 +1737,9 @@ export class CreateEditAppItemVariationsComponent
             if (modalRefData.selectionDone){
                 extraAttr.selectedValues = modalRefData.selectedRecords;
                 extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+                this.appItem.nonLookupValue = modalRefData.nonLookupValues;
+                this.appItem.nonLookupValue .push(...this.appItem.nonLookupValue.filter(item => extraAttr.selectedValues.includes(item.value)));
+
             }
             if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });

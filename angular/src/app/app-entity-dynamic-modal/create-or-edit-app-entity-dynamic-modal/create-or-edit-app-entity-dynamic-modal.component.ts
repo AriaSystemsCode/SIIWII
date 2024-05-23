@@ -19,6 +19,7 @@ import {
     AppEntityExtraDataDto,
     GetAllEntityObjectTypeOutput,
     GetSycAttachmentCategoryForViewDto,
+    LookupLabelDto,
     SycAttachmentCategoryDto,
     SycEntityObjectTypesServiceProxy,
     
@@ -66,10 +67,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
     @Input() enableAddToLookup:boolean=true;
     @Input()  wantdisplaySaveSideBar :boolean=true;
     addToLookup:boolean=true;
+    hasSize:boolean=false;
     visual = {
         solid: true,
         image: false
     };
+    
+    @Output() addNonLookupValues: EventEmitter<any> = new EventEmitter<any>();
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -217,6 +221,16 @@ export class CreateOrEditAppEntityDynamicModalComponent
             return this.notify.error(this.l("CodeIsRequired"));
         }
 
+        if(!this.addToLookup){
+            //I41- Validate code 
+            this.notify.info(this.l("SavedSuccessfully"));
+            this.addNonLookupValues.emit(this.appEntity)
+                 this.saveDone.emit(true);
+                this.hide();
+        }
+
+
+        else{
         this.saving = true;
         this._appEntitiesServiceProxy
             .saveEntity(this.appEntity)
@@ -235,6 +249,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                     this.hide();
                 }
             });
+        }
     }
 
     getExtrAttributes() {
@@ -288,6 +303,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             isLookupExtraAttributes.map((extraAttr) => extraAttr.code);
         console.log(">>", isLookupExtraAttributesCodes);
         this.isSize = isLookupExtraAttributesCodes[0] === "SIZE" ? true : false;
+        this.hasSize=isLookupExtraAttributesCodes[0]?.toUpperCase().includes('SIZE');
         this.isColor =
             isLookupExtraAttributesCodes[0] === "COLOR-SCHEME" ? true : false;
         if (this.isSize) {
