@@ -48,7 +48,7 @@ namespace onetouch.AppMarketplaceContacts
 		public virtual string CardPaymentToken { get; set; }
 
 		[ForeignKey("ContactId")]
-		public virtual AppContact ContactFk { get; set; }
+		public virtual AppMarketplaceContact ContactFk { get; set; }
 
 	}
 }

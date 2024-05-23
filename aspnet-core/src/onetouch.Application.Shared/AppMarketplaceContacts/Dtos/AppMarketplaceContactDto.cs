@@ -72,7 +72,7 @@ namespace onetouch.AppMarketplaceContacts.Dtos
 		//Mariam
 		public virtual long? AccountId { get; set; }
 		//Mariam
-		public virtual IList<AppContactAddressDto> ContactAddresses { get; set; }
+		public virtual IList<AppMarketplaceContactAddressDto> ContactAddresses { get; set; }
 
 	}
 

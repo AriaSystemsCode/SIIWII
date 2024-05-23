@@ -124,10 +124,10 @@ namespace onetouch.AppMarketplaceContacts
 		public virtual AppEntity EntityFk { get; set; }
 
 		//[ForeignKey("ParentId")]
-		public virtual AppContact ParentFk { get; set; }
+		public virtual AppMarketplaceContact ParentFk { get; set; }
 
 		//[ForeignKey("PartnerId")]
-		public virtual AppContact PartnerFk { get; set; }
+		public virtual AppMarketplaceContact PartnerFk { get; set; }
 
 		[ForeignKey("Phone1TypeId")]
 		public virtual AppEntity Phone1TypeFk { get; set; }
@@ -141,16 +141,16 @@ namespace onetouch.AppMarketplaceContacts
 		//MARIAM
 		public virtual long? AccountId { get; set; }
 		[ForeignKey("AccountId")]
-		public virtual AppContact AccountFk { get; set; }
+		public virtual AppMarketplaceContact AccountFk { get; set; }
 		//Mariam
 
-		public ICollection<AppContact> ParentFkList { get; set; }
+		public ICollection<AppMarketplaceContact> ParentFkList { get; set; }
 
-		public ICollection<AppContact> PartnerFkList { get; set; }
+		public ICollection<AppMarketplaceContact> PartnerFkList { get; set; }
 
-		public ICollection<AppContactAddress> AppContactAddresses { get; set; }
+		public ICollection<AppMarketplaceContactAddress> AppContactAddresses { get; set; }
 
-		public ICollection<AppContactPaymentMethod> AppContactPaymentMethods { get; set; }
+		public ICollection<AppMarketplaceContactPaymentMethod> AppContactPaymentMethods { get; set; }
 
 
 	}

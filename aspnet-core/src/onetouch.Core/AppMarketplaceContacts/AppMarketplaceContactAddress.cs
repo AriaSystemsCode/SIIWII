@@ -35,11 +35,11 @@ namespace onetouch.AppMarketplaceContacts
 		public virtual AppEntity AddressTypeFk { get; set; }
 
 		[ForeignKey("AddressId")]
-		public virtual AppAddress AddressFk { get; set; }
+		public virtual AppMarketplaceAddress AddressFk { get; set; }
 
 
 		[ForeignKey("ContactId")]
-		public virtual AppContact ContactFk { get; set; }
+		public virtual AppMarketplaceContact ContactFk { get; set; }
 
 	}
 }
