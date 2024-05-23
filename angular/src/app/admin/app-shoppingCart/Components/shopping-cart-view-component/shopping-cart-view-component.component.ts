@@ -222,7 +222,6 @@ export class ShoppingCartViewComponentComponent
             this.colors = res.colors;
             this.sizes = res.sizes;
 
-
           });
 
 
@@ -634,7 +633,7 @@ export class ShoppingCartViewComponentComponent
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
-            this.onGeneratOrderReport(true);
+            this.onGeneratOrderReport(true,undefined,true);
             this.hideMainSpinner();
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
@@ -728,8 +727,8 @@ export class ShoppingCartViewComponentComponent
   offShareTransaction() {
     this.onshare = false;
   }
-  onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams) {
-    if ($event) {
+  onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean) {
+    if (($event && this.shoppingCartDetails?.entityStatusCode?.toUpperCase()!='DRAFT') || ($event && FromPlaceOrder)) {
       this.reportUrl="";
       if(printInfoParam)
       this.printInfoParam=printInfoParam;
