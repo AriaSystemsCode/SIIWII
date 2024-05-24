@@ -69,7 +69,7 @@ using onetouch.AppMarketplaceContacts;
 namespace onetouch.MarketplaceAccounts
 {
     [AbpAuthorize(AppPermissions.Pages_Accounts)]
-    public class AccountsAppService : onetouchAppServiceBase, IMarketplaceAccountsAppService, IExcelImporter<AccountExcelResultsDTO>
+    public class MarketplaceAccountsAppService : onetouchAppServiceBase, IMarketplaceAccountsAppService
     {
         private readonly TenantManager _tenantManager;
         private readonly IRepository<AppMarketplaceContact, long> _appContactRepository;
@@ -100,7 +100,7 @@ namespace onetouch.MarketplaceAccounts
             MasterCard, Visa, AmericanExpress, Discover, JCB
         };
 
-        public AccountsAppService(IRepository<AppMarketplaceContact, long> appContactRepository
+        public MarketplaceAccountsAppService(IRepository<AppMarketplaceContact, long> appContactRepository
             , IRepository<AppEntity, long> appEntityRepository
             , Helper helper, IRepository<AppMarketplaceAddress, long> appAddressRepository
             , IRepository<AppMarketplaceContactAddress, long> appContactAddressRepository
