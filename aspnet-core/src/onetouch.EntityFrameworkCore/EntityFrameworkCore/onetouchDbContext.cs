@@ -40,6 +40,7 @@ using onetouch.MultiTenancy.Accounting;
 using onetouch.MultiTenancy.Payments;
 using onetouch.Storage;
 using onetouch.AppContacts;
+using onetouch.AppMarketplaceContacts;
 using onetouch.Attachments;
 using onetouch.Message;
 using onetouch.TenantInvitations;
@@ -147,9 +148,11 @@ namespace onetouch.EntityFrameworkCore
         //public virtual DbSet<SysObjectTypeProperty> SysObjectTypeProperties { get; set; }
 
         public virtual DbSet<AppContactPaymentMethod> AppContactPaymentMethods { get; set; }
+        public virtual DbSet<AppMarketplaceContactPaymentMethod> AppMarketplaceContactPaymentMethod { get; set; }
         public virtual DbSet<AppAddress> AppAddresss { get; set; }
+        public virtual DbSet<AppMarketplaceAddress> AppMarketplaceAddress { get; set; }
         public virtual DbSet<AppContactAddress> AppContactAddresss { get; set; }
-
+        public virtual DbSet<AppMarketplaceContactAddress> AppMarketplaceContactAddress { get; set; }
         public virtual DbSet<AppEntityAddress> AppEntityAddress { get; set; }
         public virtual DbSet<AppEntityAttachment> AppEntityAttachments { get; set; }
         public virtual DbSet<AppAttachment> AppAttachments { get; set; }
@@ -158,6 +161,7 @@ namespace onetouch.EntityFrameworkCore
         public virtual DbSet<SuiIcon> SuiIcons { get; set; }
 
         public virtual DbSet<AppContact> AppContacts { get; set; }
+        public virtual DbSet<AppContact> AppMarketplaceContacts { get; set; }
         public virtual DbSet<AppEntity> AppEntities { get; set; }
         public virtual DbSet<AppEntityCategory> AppEntityCategories { get; set; }
         public virtual DbSet<AppEntityClassification> AppEntityClassifications { get; set; }
@@ -365,6 +369,11 @@ namespace onetouch.EntityFrameworkCore
                        .WithMany(x => x.ParentFkList)
                        .HasForeignKey(x => x.ParentId);
 
+            modelBuilder.Entity<AppMarketplaceContact>()
+                   .HasOne(x => x.ParentFk)
+                   .WithMany(x => x.ParentFkList)
+                   .HasForeignKey(x => x.ParentId);
+
             modelBuilder.Entity<AppEntityExtraData>()
                .HasOne(x => x.EntityFk)
                .WithMany(x => x.EntityExtraData)
@@ -394,6 +403,18 @@ namespace onetouch.EntityFrameworkCore
             {
                 a.HasIndex(e => new { e.TenantId });
             });
+
+
+            modelBuilder.Entity<AppMarketplaceContact>()
+          .HasOne(x => x.PartnerFk)
+          .WithMany(x => x.PartnerFkList)
+          .HasForeignKey(x => x.PartnerId);
+
+            modelBuilder.Entity<AppMarketplaceContact>(a =>
+            {
+                a.HasIndex(e => new { e.TenantId });
+            });
+
             modelBuilder.Entity<BinaryObject>(b =>
                        {
                            b.HasIndex(e => new { e.TenantId });

@@ -7,9 +7,6 @@ using Abp.Linq.Extensions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
-using onetouch.AppMarketplaceAccounts.Exporting;
-using onetouch.MarketplaceAccounts.Dtos;
-using onetouch.Dto;
 using Abp.Application.Services.Dto;
 using onetouch.Authorization;
 using Abp.Extensions;
@@ -65,6 +62,9 @@ using Twilio.Rest.Trunking.V1;
 using NUglify.Helpers;
 using onetouch.AppMarketplaceAccounts;
 using onetouch.AppMarketplaceContacts;
+using onetouch.AppMarketplaceContacts.Dtos;
+using onetouch.Accounts.Dtos;
+
 
 namespace onetouch.MarketplaceAccounts
 {
@@ -141,7 +141,7 @@ namespace onetouch.MarketplaceAccounts
 
         }
 
-        public async Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input)
+        public async Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -289,7 +289,7 @@ namespace onetouch.MarketplaceAccounts
                     //    List<string> Account_AccountType = GetLookUPLabels(account.Account.AccountTypeString, tmpAccountType);
                     //    account.Account.AccountType = Account_AccountType;
                     //}
-                    var x = new PagedResultDto<GetAccountForViewDto>(
+                    var x = new PagedResultDto<GetMarketplaceAccountForViewDto>(
                         totalCount,
                         accountsList
                     );

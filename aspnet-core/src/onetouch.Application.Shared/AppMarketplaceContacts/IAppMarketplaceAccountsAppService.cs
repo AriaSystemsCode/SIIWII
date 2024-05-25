@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
-using onetouch.MarketplaceAccounts.Dtos;
+using onetouch.AppMarketplaceContacts.Dtos;
 using onetouch.Dto;
 using System.Collections.Generic;
 using onetouch.AccountInfos.Dtos;
+using onetouch.Accounts.Dtos;
 
 namespace onetouch.AppMarketplaceAccounts
 {
