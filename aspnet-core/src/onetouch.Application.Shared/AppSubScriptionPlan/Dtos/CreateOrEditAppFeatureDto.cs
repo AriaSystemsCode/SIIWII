@@ -47,6 +47,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         //public string Category { get; set; }
 
         public bool TrackActivity { get; set; }
+
         public string EntityStatusCode { set; get; }
         public int? EntityStatusId{ get; set; }
 

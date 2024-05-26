@@ -15,6 +15,7 @@ using Abp.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
+using onetouch.Helpers;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -23,12 +24,12 @@ namespace onetouch.AppSubScriptionPlan
     {
         private readonly IRepository<AppFeature, long> _appFeatureRepository;
         private readonly IAppFeaturesExcelExporter _appFeaturesExcelExporter;
-
-        public AppFeaturesAppService(IRepository<AppFeature,long> appFeatureRepository, IAppFeaturesExcelExporter appFeaturesExcelExporter)
+        private readonly Helper _helper;
+        public AppFeaturesAppService(IRepository<AppFeature,long> appFeatureRepository, IAppFeaturesExcelExporter appFeaturesExcelExporter, Helper helper)
         {
             _appFeatureRepository = appFeatureRepository;
             _appFeaturesExcelExporter = appFeaturesExcelExporter;
-
+            _helper = helper;
         }
 
         public async Task<PagedResultDto<GetAppFeatureForViewDto>> GetAll(GetAllAppFeaturesInput input)
@@ -143,7 +144,13 @@ namespace onetouch.AppSubScriptionPlan
         protected virtual async Task Create(CreateOrEditAppFeatureDto input)
         {
             var appFeature = ObjectMapper.Map<AppFeature>(input);
-
+            var appFeatureObjectId = await _helper.SystemTables.GetObjectStandardFeatureId();
+            appFeature.ObjectId = appFeatureObjectId;
+            var StatusId = input.EntityStatusCode == "ACTIVE" ? await _helper.SystemTables.GetEntityObjectStatusItemActive() : await _helper.SystemTables.GetEntityObjectStatusItemDraft();
+            appFeature.EntityObjectStatusId = StatusId;
+            var entityFeatureObjectType = await _helper.SystemTables.GetEntityObjectTypeFeature();
+            appFeature.EntityObjectTypeId = entityFeatureObjectType.Id;
+            appFeature.EntityObjectTypeCode = entityFeatureObjectType.Code;
             await _appFeatureRepository.InsertAsync(appFeature);
 
         }

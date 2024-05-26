@@ -93,7 +93,33 @@ namespace onetouch.Helpers
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "ITEM");
             return obj.Id;
         }
-
+        //MMT -I43
+        public async Task<long> GetEntityObjectTypeFeatureId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
+            return obj.Id;
+        }
+        public async Task<long> GetObjectStandardFeatureId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
+            return obj.Id;
+        }
+        public async Task<long> GetObjectStandardSubscriptionPlanId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "STANDARDSUBSCRIPTIONPLAN");
+            return obj.Id;
+        }
+        public async Task<SycEntityObjectType> GetEntityObjectTypeFeature()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
+            return obj;
+        }
+        public async Task<long> GetObjectTenantActivityLogId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "TENANTACTIVITYLOG");
+            return obj.Id;
+        }
+        //MMT -I43
         public async Task<long> GetObjectListingId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "LISTING");
