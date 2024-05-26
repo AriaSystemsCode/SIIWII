@@ -11,7 +11,7 @@ using onetouch.Accounts.Dtos;
 namespace onetouch.AppMarketplaceAccounts
 {
     public interface IMarketplaceAccountsAppService : IApplicationService 
-    {   Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input);
+    {   Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input);
 
 
 

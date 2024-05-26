@@ -20,6 +20,10 @@
         //MMT10
         public bool IsPublished { get; set; }
         public string AllowedAction { get; set; }
+
+        public string AvaliableConnectionName { get; set; }
+        public string ConnectionName { get; set; }
+
         //MMT10
     }
 

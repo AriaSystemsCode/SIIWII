@@ -250,10 +250,12 @@ namespace onetouch.MarketplaceAccounts
                                         //join o1 in _appEntityRepository.GetAll() on o.AppContactAddresses.FirstOrDefault().AddressFk.CountryId equals o1.Id into j1
                                         //from s1 in j1.DefaultIfEmpty()
 
-                                    select new GetAccountForViewDto()
+                                    select new GetMarketplaceAccountForViewDto()
                                     {
+                                        AvaliableConnectionName = "Follow",
+                                        ConnectionName = "",
                                         Account = new AccountDto
-                                        {
+                                        {   
                                             AccountTypeString = o.EntityFk.EntityObjectTypeCode,
                                             AccountTypeId = o.EntityFk.EntityObjectTypeId,
                                             AccountType = o.EntityFk.EntityObjectTypeCode,
