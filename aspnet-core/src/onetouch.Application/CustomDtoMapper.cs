@@ -118,7 +118,11 @@ namespace onetouch
     {
         public static void CreateMappings(IMapperConfigurationExpression configuration)
         {
-            
+            configuration.CreateMap<CreateOrEditAppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
+            configuration.CreateMap<AppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap();
+            configuration.CreateMap<AppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap();
+
             configuration.CreateMap<CreateOrEditMaintainanceDto, Maintainance>().ReverseMap();
             configuration.CreateMap<MaintainanceDto, Maintainance>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppItemSelectorDto, AppItemSelector>().ReverseMap();

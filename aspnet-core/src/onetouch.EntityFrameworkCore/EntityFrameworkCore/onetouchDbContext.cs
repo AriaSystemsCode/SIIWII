@@ -57,6 +57,10 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<AppSubscriptionPlanHeader> AppSubscriptionPlanHeaders { get; set; }
+
+        public virtual DbSet<AppSubscriptionPlanDetail> AppSubscriptionPlanDetails { get; set; }
+
         public virtual DbSet<AppFeature> AppFeatures { get; set; }
 
         public virtual DbSet<Maintainance> Maintainances { get; set; }

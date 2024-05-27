@@ -1,5 +1,6 @@
 ﻿import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { AppSubscriptionPlanDetailsComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetails.component';
 import { AppFeaturesComponent } from './appSubScriptionPlan/appFeatures/appFeatures.component';
 import { CreateOrEditAppFeatureComponent } from './appSubScriptionPlan/appFeatures/create-or-edit-appFeature.component';
 import { ViewAppFeatureComponent } from './appSubScriptionPlan/appFeatures/view-appFeature.component';
@@ -52,6 +53,7 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
             {
                 path: '',
                 children: [
+                    { path: 'appSubScriptionPlan/appSubscriptionPlanDetails', component: AppSubscriptionPlanDetailsComponent, data: { permission: 'Pages.Administration.AppSubscriptionPlanDetails' }  },
                     { path: 'appSubScriptionPlan/appFeatures', component: AppFeaturesComponent, data: { permission: 'Pages.Administration.AppFeatures' }  },
                     { path: 'appSubScriptionPlan/appFeatures/createOrEdit', component: CreateOrEditAppFeatureComponent, data: { permission: 'Pages.Administration.AppFeatures.Create' }  },
                     { path: 'appSubScriptionPlan/appFeatures/view', component: ViewAppFeatureComponent, data: { permission: 'Pages.Administration.AppFeatures' }  },

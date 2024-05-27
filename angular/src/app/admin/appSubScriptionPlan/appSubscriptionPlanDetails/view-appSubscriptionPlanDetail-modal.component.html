@@ -1,0 +1,97 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{l("Details")}}</span>
+                </h4>
+                <button type="button" class="close" (click)="close()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureCode")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.featureCode }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureName")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.featureName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Availability")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.availability }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureLimit")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.featureLimit }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("RollOver")}} :</h6>
+                        <div *ngIf="item.appSubscriptionPlanDetail.rollOver" class="text-left"><i class="fa fa-check-circle kt--font-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.appSubscriptionPlanDetail.rollOver" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>                    <div class="col-6 mb-3">
+                        <h6>{{l("UnitPrice")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.unitPrice }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeaturePeriodLimit")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.featurePeriodLimit }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Category")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.category }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureDescription")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.featureDescription }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureStatus")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.featureStatus }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("UnitOfMeasurementName")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.unitOfMeasurementName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("UnitOfMeasurmentCode")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.unitOfMeasurmentCode }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("IsFeatureBillable")}} :</h6>
+                        <div *ngIf="item.appSubscriptionPlanDetail.isFeatureBillable" class="text-left"><i class="fa fa-check-circle kt--font-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.appSubscriptionPlanDetail.isFeatureBillable" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureBillingCode")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.featureBillingCode }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureCategory")}} :</h6>
+                        {{ item.appSubscriptionPlanDetail.featureCategory }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Trackactivity")}} :</h6>
+                        <div *ngIf="item.appSubscriptionPlanDetail.trackactivity" class="text-left"><i class="fa fa-check-circle kt--font-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.appSubscriptionPlanDetail.trackactivity" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>({{l("AppSubscriptionPlanHeader")}}) {{l("")}} :</h6>
+                        {{item.appSubscriptionPlanHeader}}
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button [disabled]="saving" type="button" class="btn btn-primary blue" (click)="close()">{{l("Close")}}</button>
+            </div>
+        </div>
+    </div>
+
+</div>

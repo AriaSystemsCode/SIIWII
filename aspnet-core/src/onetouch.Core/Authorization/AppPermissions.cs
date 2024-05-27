@@ -6,6 +6,16 @@
     /// </summary>
     public static class AppPermissions
     {
+        public const string Pages_AppSubscriptionPlanHeaders = "Pages.AppSubscriptionPlanHeaders";
+        public const string Pages_AppSubscriptionPlanHeaders_Create = "Pages.AppSubscriptionPlanHeaders.Create";
+        public const string Pages_AppSubscriptionPlanHeaders_Edit = "Pages.AppSubscriptionPlanHeaders.Edit";
+        public const string Pages_AppSubscriptionPlanHeaders_Delete = "Pages.AppSubscriptionPlanHeaders.Delete";
+
+        public const string Pages_Administration_AppSubscriptionPlanDetails = "Pages.Administration.AppSubscriptionPlanDetails";
+        public const string Pages_Administration_AppSubscriptionPlanDetails_Create = "Pages.Administration.AppSubscriptionPlanDetails.Create";
+        public const string Pages_Administration_AppSubscriptionPlanDetails_Edit = "Pages.Administration.AppSubscriptionPlanDetails.Edit";
+        public const string Pages_Administration_AppSubscriptionPlanDetails_Delete = "Pages.Administration.AppSubscriptionPlanDetails.Delete";
+
         public const string Pages_Administration_AppFeatures = "Pages.Administration.AppFeatures";
         public const string Pages_Administration_AppFeatures_Create = "Pages.Administration.AppFeatures.Create";
         public const string Pages_Administration_AppFeatures_Edit = "Pages.Administration.AppFeatures.Edit";

@@ -30,6 +30,11 @@ namespace onetouch.Authorization
 
             var pages = context.GetPermissionOrNull(AppPermissions.Pages) ?? context.CreatePermission(AppPermissions.Pages, L("Pages"));
 
+            var appSubscriptionPlanHeaders = pages.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders, L("AppSubscriptionPlanHeaders"), multiTenancySides: MultiTenancySides.Host);
+            appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Create, L("CreateNewAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
+            appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Edit, L("EditAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
+            appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Delete, L("DeleteAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
+
             var appItemSelectors = pages.CreateChildPermission(AppPermissions.Pages_AppItemSelectors, L("AppItemSelectors"));
             appItemSelectors.CreateChildPermission(AppPermissions.Pages_AppItemSelectors_Create, L("CreateNewAppItemSelector"));
             appItemSelectors.CreateChildPermission(AppPermissions.Pages_AppItemSelectors_Edit, L("EditAppItemSelector"));
@@ -145,6 +150,11 @@ namespace onetouch.Authorization
             pages.CreateChildPermission(AppPermissions.Pages_DemoUiComponents, L("DemoUiComponents"), multiTenancySides: MultiTenancySides.Host);
 
             var administration = pages.CreateChildPermission(AppPermissions.Pages_Administration, L("Administration"));
+
+            var appSubscriptionPlanDetails = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppSubscriptionPlanDetails, L("AppSubscriptionPlanDetails"), multiTenancySides: MultiTenancySides.Host);
+            appSubscriptionPlanDetails.CreateChildPermission(AppPermissions.Pages_Administration_AppSubscriptionPlanDetails_Create, L("CreateNewAppSubscriptionPlanDetail"), multiTenancySides: MultiTenancySides.Host);
+            appSubscriptionPlanDetails.CreateChildPermission(AppPermissions.Pages_Administration_AppSubscriptionPlanDetails_Edit, L("EditAppSubscriptionPlanDetail"), multiTenancySides: MultiTenancySides.Host);
+            appSubscriptionPlanDetails.CreateChildPermission(AppPermissions.Pages_Administration_AppSubscriptionPlanDetails_Delete, L("DeleteAppSubscriptionPlanDetail"), multiTenancySides: MultiTenancySides.Host);
 
             var appFeatures = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppFeatures, L("AppFeatures"), multiTenancySides: MultiTenancySides.Host);
             appFeatures.CreateChildPermission(AppPermissions.Pages_Administration_AppFeatures_Create, L("CreateNewAppFeature"), multiTenancySides: MultiTenancySides.Host);

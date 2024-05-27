@@ -151,6 +151,7 @@ namespace onetouch.AppSubScriptionPlan
             var entityFeatureObjectType = await _helper.SystemTables.GetEntityObjectTypeFeature();
             appFeature.EntityObjectTypeId = entityFeatureObjectType.Id;
             appFeature.EntityObjectTypeCode = entityFeatureObjectType.Code;
+            appFeature.TenantId = null;
             await _appFeatureRepository.InsertAsync(appFeature);
 
         }

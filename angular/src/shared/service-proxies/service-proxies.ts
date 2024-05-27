@@ -17441,6 +17441,963 @@ export class AppSizeScaleServiceProxy {
 }
 
 @Injectable()
+export class AppSubscriptionPlanDetailsServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param featureCodeFilter (optional) 
+     * @param featureNameFilter (optional) 
+     * @param availabilityFilter (optional) 
+     * @param maxFeatureLimitFilter (optional) 
+     * @param minFeatureLimitFilter (optional) 
+     * @param rollOverFilter (optional) 
+     * @param maxUnitPriceFilter (optional) 
+     * @param minUnitPriceFilter (optional) 
+     * @param featurePeriodLimitFilter (optional) 
+     * @param categoryFilter (optional) 
+     * @param featureDescriptionFilter (optional) 
+     * @param featureStatusFilter (optional) 
+     * @param unitOfMeasurementNameFilter (optional) 
+     * @param unitOfMeasurmentCodeFilter (optional) 
+     * @param isFeatureBillableFilter (optional) 
+     * @param featureBillingCodeFilter (optional) 
+     * @param featureCategoryFilter (optional) 
+     * @param trackactivityFilter (optional) 
+     * @param appSubscriptionPlanHeaderFilter (optional) 
+     * @param appSubscriptionPlanHeaderIdFilter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(filter: string | null | undefined, featureCodeFilter: string | null | undefined, featureNameFilter: string | null | undefined, availabilityFilter: string | null | undefined, maxFeatureLimitFilter: number | null | undefined, minFeatureLimitFilter: number | null | undefined, rollOverFilter: number | null | undefined, maxUnitPriceFilter: number | null | undefined, minUnitPriceFilter: number | null | undefined, featurePeriodLimitFilter: string | null | undefined, categoryFilter: string | null | undefined, featureDescriptionFilter: string | null | undefined, featureStatusFilter: string | null | undefined, unitOfMeasurementNameFilter: string | null | undefined, unitOfMeasurmentCodeFilter: string | null | undefined, isFeatureBillableFilter: number | null | undefined, featureBillingCodeFilter: string | null | undefined, featureCategoryFilter: string | null | undefined, trackactivityFilter: number | null | undefined, appSubscriptionPlanHeaderFilter: string | null | undefined, appSubscriptionPlanHeaderIdFilter: number | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanDetails/GetAll?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (featureCodeFilter !== undefined && featureCodeFilter !== null)
+            url_ += "FeatureCodeFilter=" + encodeURIComponent("" + featureCodeFilter) + "&";
+        if (featureNameFilter !== undefined && featureNameFilter !== null)
+            url_ += "FeatureNameFilter=" + encodeURIComponent("" + featureNameFilter) + "&";
+        if (availabilityFilter !== undefined && availabilityFilter !== null)
+            url_ += "AvailabilityFilter=" + encodeURIComponent("" + availabilityFilter) + "&";
+        if (maxFeatureLimitFilter !== undefined && maxFeatureLimitFilter !== null)
+            url_ += "MaxFeatureLimitFilter=" + encodeURIComponent("" + maxFeatureLimitFilter) + "&";
+        if (minFeatureLimitFilter !== undefined && minFeatureLimitFilter !== null)
+            url_ += "MinFeatureLimitFilter=" + encodeURIComponent("" + minFeatureLimitFilter) + "&";
+        if (rollOverFilter !== undefined && rollOverFilter !== null)
+            url_ += "RollOverFilter=" + encodeURIComponent("" + rollOverFilter) + "&";
+        if (maxUnitPriceFilter !== undefined && maxUnitPriceFilter !== null)
+            url_ += "MaxUnitPriceFilter=" + encodeURIComponent("" + maxUnitPriceFilter) + "&";
+        if (minUnitPriceFilter !== undefined && minUnitPriceFilter !== null)
+            url_ += "MinUnitPriceFilter=" + encodeURIComponent("" + minUnitPriceFilter) + "&";
+        if (featurePeriodLimitFilter !== undefined && featurePeriodLimitFilter !== null)
+            url_ += "FeaturePeriodLimitFilter=" + encodeURIComponent("" + featurePeriodLimitFilter) + "&";
+        if (categoryFilter !== undefined && categoryFilter !== null)
+            url_ += "CategoryFilter=" + encodeURIComponent("" + categoryFilter) + "&";
+        if (featureDescriptionFilter !== undefined && featureDescriptionFilter !== null)
+            url_ += "FeatureDescriptionFilter=" + encodeURIComponent("" + featureDescriptionFilter) + "&";
+        if (featureStatusFilter !== undefined && featureStatusFilter !== null)
+            url_ += "FeatureStatusFilter=" + encodeURIComponent("" + featureStatusFilter) + "&";
+        if (unitOfMeasurementNameFilter !== undefined && unitOfMeasurementNameFilter !== null)
+            url_ += "UnitOfMeasurementNameFilter=" + encodeURIComponent("" + unitOfMeasurementNameFilter) + "&";
+        if (unitOfMeasurmentCodeFilter !== undefined && unitOfMeasurmentCodeFilter !== null)
+            url_ += "UnitOfMeasurmentCodeFilter=" + encodeURIComponent("" + unitOfMeasurmentCodeFilter) + "&";
+        if (isFeatureBillableFilter !== undefined && isFeatureBillableFilter !== null)
+            url_ += "IsFeatureBillableFilter=" + encodeURIComponent("" + isFeatureBillableFilter) + "&";
+        if (featureBillingCodeFilter !== undefined && featureBillingCodeFilter !== null)
+            url_ += "FeatureBillingCodeFilter=" + encodeURIComponent("" + featureBillingCodeFilter) + "&";
+        if (featureCategoryFilter !== undefined && featureCategoryFilter !== null)
+            url_ += "FeatureCategoryFilter=" + encodeURIComponent("" + featureCategoryFilter) + "&";
+        if (trackactivityFilter !== undefined && trackactivityFilter !== null)
+            url_ += "TrackactivityFilter=" + encodeURIComponent("" + trackactivityFilter) + "&";
+        if (appSubscriptionPlanHeaderFilter !== undefined && appSubscriptionPlanHeaderFilter !== null)
+            url_ += "AppSubscriptionPlanHeaderFilter=" + encodeURIComponent("" + appSubscriptionPlanHeaderFilter) + "&";
+        if (appSubscriptionPlanHeaderIdFilter !== undefined && appSubscriptionPlanHeaderIdFilter !== null)
+            url_ += "AppSubscriptionPlanHeaderIdFilter=" + encodeURIComponent("" + appSubscriptionPlanHeaderIdFilter) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getAppSubscriptionPlanDetailForView(id: number | undefined): Observable<GetAppSubscriptionPlanDetailForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanDetails/GetAppSubscriptionPlanDetailForView?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppSubscriptionPlanDetailForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppSubscriptionPlanDetailForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAppSubscriptionPlanDetailForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAppSubscriptionPlanDetailForViewDto>;
+        }));
+    }
+
+    protected processGetAppSubscriptionPlanDetailForView(response: HttpResponseBase): Observable<GetAppSubscriptionPlanDetailForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAppSubscriptionPlanDetailForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getAppSubscriptionPlanDetailForEdit(id: number | undefined): Observable<GetAppSubscriptionPlanDetailForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanDetails/GetAppSubscriptionPlanDetailForEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppSubscriptionPlanDetailForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppSubscriptionPlanDetailForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAppSubscriptionPlanDetailForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAppSubscriptionPlanDetailForEditOutput>;
+        }));
+    }
+
+    protected processGetAppSubscriptionPlanDetailForEdit(response: HttpResponseBase): Observable<GetAppSubscriptionPlanDetailForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAppSubscriptionPlanDetailForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEdit(body: CreateOrEditAppSubscriptionPlanDetailDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanDetails/CreateOrEdit";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processCreateOrEdit(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanDetails/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param featureCodeFilter (optional) 
+     * @param featureNameFilter (optional) 
+     * @param availabilityFilter (optional) 
+     * @param maxFeatureLimitFilter (optional) 
+     * @param minFeatureLimitFilter (optional) 
+     * @param rollOverFilter (optional) 
+     * @param maxUnitPriceFilter (optional) 
+     * @param minUnitPriceFilter (optional) 
+     * @param featurePeriodLimitFilter (optional) 
+     * @param categoryFilter (optional) 
+     * @param featureDescriptionFilter (optional) 
+     * @param featureStatusFilter (optional) 
+     * @param unitOfMeasurementNameFilter (optional) 
+     * @param unitOfMeasurmentCodeFilter (optional) 
+     * @param isFeatureBillableFilter (optional) 
+     * @param featureBillingCodeFilter (optional) 
+     * @param featureCategoryFilter (optional) 
+     * @param trackactivityFilter (optional) 
+     * @param appSubscriptionPlanHeaderFilter (optional) 
+     * @param appSubscriptionPlanHeaderIdFilter (optional) 
+     * @return Success
+     */
+    getAppSubscriptionPlanDetailsToExcel(filter: string | null | undefined, featureCodeFilter: string | null | undefined, featureNameFilter: string | null | undefined, availabilityFilter: string | null | undefined, maxFeatureLimitFilter: number | null | undefined, minFeatureLimitFilter: number | null | undefined, rollOverFilter: number | null | undefined, maxUnitPriceFilter: number | null | undefined, minUnitPriceFilter: number | null | undefined, featurePeriodLimitFilter: string | null | undefined, categoryFilter: string | null | undefined, featureDescriptionFilter: string | null | undefined, featureStatusFilter: string | null | undefined, unitOfMeasurementNameFilter: string | null | undefined, unitOfMeasurmentCodeFilter: string | null | undefined, isFeatureBillableFilter: number | null | undefined, featureBillingCodeFilter: string | null | undefined, featureCategoryFilter: string | null | undefined, trackactivityFilter: number | null | undefined, appSubscriptionPlanHeaderFilter: string | null | undefined, appSubscriptionPlanHeaderIdFilter: number | null | undefined): Observable<FileDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanDetails/GetAppSubscriptionPlanDetailsToExcel?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (featureCodeFilter !== undefined && featureCodeFilter !== null)
+            url_ += "FeatureCodeFilter=" + encodeURIComponent("" + featureCodeFilter) + "&";
+        if (featureNameFilter !== undefined && featureNameFilter !== null)
+            url_ += "FeatureNameFilter=" + encodeURIComponent("" + featureNameFilter) + "&";
+        if (availabilityFilter !== undefined && availabilityFilter !== null)
+            url_ += "AvailabilityFilter=" + encodeURIComponent("" + availabilityFilter) + "&";
+        if (maxFeatureLimitFilter !== undefined && maxFeatureLimitFilter !== null)
+            url_ += "MaxFeatureLimitFilter=" + encodeURIComponent("" + maxFeatureLimitFilter) + "&";
+        if (minFeatureLimitFilter !== undefined && minFeatureLimitFilter !== null)
+            url_ += "MinFeatureLimitFilter=" + encodeURIComponent("" + minFeatureLimitFilter) + "&";
+        if (rollOverFilter !== undefined && rollOverFilter !== null)
+            url_ += "RollOverFilter=" + encodeURIComponent("" + rollOverFilter) + "&";
+        if (maxUnitPriceFilter !== undefined && maxUnitPriceFilter !== null)
+            url_ += "MaxUnitPriceFilter=" + encodeURIComponent("" + maxUnitPriceFilter) + "&";
+        if (minUnitPriceFilter !== undefined && minUnitPriceFilter !== null)
+            url_ += "MinUnitPriceFilter=" + encodeURIComponent("" + minUnitPriceFilter) + "&";
+        if (featurePeriodLimitFilter !== undefined && featurePeriodLimitFilter !== null)
+            url_ += "FeaturePeriodLimitFilter=" + encodeURIComponent("" + featurePeriodLimitFilter) + "&";
+        if (categoryFilter !== undefined && categoryFilter !== null)
+            url_ += "CategoryFilter=" + encodeURIComponent("" + categoryFilter) + "&";
+        if (featureDescriptionFilter !== undefined && featureDescriptionFilter !== null)
+            url_ += "FeatureDescriptionFilter=" + encodeURIComponent("" + featureDescriptionFilter) + "&";
+        if (featureStatusFilter !== undefined && featureStatusFilter !== null)
+            url_ += "FeatureStatusFilter=" + encodeURIComponent("" + featureStatusFilter) + "&";
+        if (unitOfMeasurementNameFilter !== undefined && unitOfMeasurementNameFilter !== null)
+            url_ += "UnitOfMeasurementNameFilter=" + encodeURIComponent("" + unitOfMeasurementNameFilter) + "&";
+        if (unitOfMeasurmentCodeFilter !== undefined && unitOfMeasurmentCodeFilter !== null)
+            url_ += "UnitOfMeasurmentCodeFilter=" + encodeURIComponent("" + unitOfMeasurmentCodeFilter) + "&";
+        if (isFeatureBillableFilter !== undefined && isFeatureBillableFilter !== null)
+            url_ += "IsFeatureBillableFilter=" + encodeURIComponent("" + isFeatureBillableFilter) + "&";
+        if (featureBillingCodeFilter !== undefined && featureBillingCodeFilter !== null)
+            url_ += "FeatureBillingCodeFilter=" + encodeURIComponent("" + featureBillingCodeFilter) + "&";
+        if (featureCategoryFilter !== undefined && featureCategoryFilter !== null)
+            url_ += "FeatureCategoryFilter=" + encodeURIComponent("" + featureCategoryFilter) + "&";
+        if (trackactivityFilter !== undefined && trackactivityFilter !== null)
+            url_ += "TrackactivityFilter=" + encodeURIComponent("" + trackactivityFilter) + "&";
+        if (appSubscriptionPlanHeaderFilter !== undefined && appSubscriptionPlanHeaderFilter !== null)
+            url_ += "AppSubscriptionPlanHeaderFilter=" + encodeURIComponent("" + appSubscriptionPlanHeaderFilter) + "&";
+        if (appSubscriptionPlanHeaderIdFilter !== undefined && appSubscriptionPlanHeaderIdFilter !== null)
+            url_ += "AppSubscriptionPlanHeaderIdFilter=" + encodeURIComponent("" + appSubscriptionPlanHeaderIdFilter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppSubscriptionPlanDetailsToExcel(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppSubscriptionPlanDetailsToExcel(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileDto>;
+        }));
+    }
+
+    protected processGetAppSubscriptionPlanDetailsToExcel(response: HttpResponseBase): Observable<FileDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FileDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllAppSubscriptionPlanHeaderForLookupTable(filter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanDetails/GetAllAppSubscriptionPlanHeaderForLookupTable?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllAppSubscriptionPlanHeaderForLookupTable(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllAppSubscriptionPlanHeaderForLookupTable(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto>;
+        }));
+    }
+
+    protected processGetAllAppSubscriptionPlanHeaderForLookupTable(response: HttpResponseBase): Observable<PagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class AppSubscriptionPlanHeadersServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param descriptionFilter (optional) 
+     * @param isStandardFilter (optional) 
+     * @param isBillableFilter (optional) 
+     * @param maxDiscountFilter (optional) 
+     * @param minDiscountFilter (optional) 
+     * @param billingCodeFilter (optional) 
+     * @param maxMonthlyPriceFilter (optional) 
+     * @param minMonthlyPriceFilter (optional) 
+     * @param maxYearlyPriceFilter (optional) 
+     * @param minYearlyPriceFilter (optional) 
+     * @param codeFilter (optional) 
+     * @param nameFilter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(filter: string | null | undefined, descriptionFilter: string | null | undefined, isStandardFilter: number | null | undefined, isBillableFilter: number | null | undefined, maxDiscountFilter: number | null | undefined, minDiscountFilter: number | null | undefined, billingCodeFilter: string | null | undefined, maxMonthlyPriceFilter: number | null | undefined, minMonthlyPriceFilter: number | null | undefined, maxYearlyPriceFilter: number | null | undefined, minYearlyPriceFilter: number | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanHeaders/GetAll?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (descriptionFilter !== undefined && descriptionFilter !== null)
+            url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
+        if (isStandardFilter !== undefined && isStandardFilter !== null)
+            url_ += "IsStandardFilter=" + encodeURIComponent("" + isStandardFilter) + "&";
+        if (isBillableFilter !== undefined && isBillableFilter !== null)
+            url_ += "IsBillableFilter=" + encodeURIComponent("" + isBillableFilter) + "&";
+        if (maxDiscountFilter !== undefined && maxDiscountFilter !== null)
+            url_ += "MaxDiscountFilter=" + encodeURIComponent("" + maxDiscountFilter) + "&";
+        if (minDiscountFilter !== undefined && minDiscountFilter !== null)
+            url_ += "MinDiscountFilter=" + encodeURIComponent("" + minDiscountFilter) + "&";
+        if (billingCodeFilter !== undefined && billingCodeFilter !== null)
+            url_ += "BillingCodeFilter=" + encodeURIComponent("" + billingCodeFilter) + "&";
+        if (maxMonthlyPriceFilter !== undefined && maxMonthlyPriceFilter !== null)
+            url_ += "MaxMonthlyPriceFilter=" + encodeURIComponent("" + maxMonthlyPriceFilter) + "&";
+        if (minMonthlyPriceFilter !== undefined && minMonthlyPriceFilter !== null)
+            url_ += "MinMonthlyPriceFilter=" + encodeURIComponent("" + minMonthlyPriceFilter) + "&";
+        if (maxYearlyPriceFilter !== undefined && maxYearlyPriceFilter !== null)
+            url_ += "MaxYearlyPriceFilter=" + encodeURIComponent("" + maxYearlyPriceFilter) + "&";
+        if (minYearlyPriceFilter !== undefined && minYearlyPriceFilter !== null)
+            url_ += "MinYearlyPriceFilter=" + encodeURIComponent("" + minYearlyPriceFilter) + "&";
+        if (codeFilter !== undefined && codeFilter !== null)
+            url_ += "CodeFilter=" + encodeURIComponent("" + codeFilter) + "&";
+        if (nameFilter !== undefined && nameFilter !== null)
+            url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getAppSubscriptionPlanHeaderForView(id: number | undefined): Observable<GetAppSubscriptionPlanHeaderForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanHeaders/GetAppSubscriptionPlanHeaderForView?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppSubscriptionPlanHeaderForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppSubscriptionPlanHeaderForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAppSubscriptionPlanHeaderForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAppSubscriptionPlanHeaderForViewDto>;
+        }));
+    }
+
+    protected processGetAppSubscriptionPlanHeaderForView(response: HttpResponseBase): Observable<GetAppSubscriptionPlanHeaderForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAppSubscriptionPlanHeaderForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getAppSubscriptionPlanHeaderForEdit(id: number | undefined): Observable<GetAppSubscriptionPlanHeaderForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanHeaders/GetAppSubscriptionPlanHeaderForEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppSubscriptionPlanHeaderForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppSubscriptionPlanHeaderForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAppSubscriptionPlanHeaderForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAppSubscriptionPlanHeaderForEditOutput>;
+        }));
+    }
+
+    protected processGetAppSubscriptionPlanHeaderForEdit(response: HttpResponseBase): Observable<GetAppSubscriptionPlanHeaderForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAppSubscriptionPlanHeaderForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEdit(body: CreateOrEditAppSubscriptionPlanHeaderDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanHeaders/CreateOrEdit";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processCreateOrEdit(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanHeaders/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param descriptionFilter (optional) 
+     * @param isStandardFilter (optional) 
+     * @param isBillableFilter (optional) 
+     * @param maxDiscountFilter (optional) 
+     * @param minDiscountFilter (optional) 
+     * @param billingCodeFilter (optional) 
+     * @param maxMonthlyPriceFilter (optional) 
+     * @param minMonthlyPriceFilter (optional) 
+     * @param maxYearlyPriceFilter (optional) 
+     * @param minYearlyPriceFilter (optional) 
+     * @param codeFilter (optional) 
+     * @param nameFilter (optional) 
+     * @return Success
+     */
+    getAppSubscriptionPlanHeadersToExcel(filter: string | null | undefined, descriptionFilter: string | null | undefined, isStandardFilter: number | null | undefined, isBillableFilter: number | null | undefined, maxDiscountFilter: number | null | undefined, minDiscountFilter: number | null | undefined, billingCodeFilter: string | null | undefined, maxMonthlyPriceFilter: number | null | undefined, minMonthlyPriceFilter: number | null | undefined, maxYearlyPriceFilter: number | null | undefined, minYearlyPriceFilter: number | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined): Observable<FileDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanHeaders/GetAppSubscriptionPlanHeadersToExcel?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (descriptionFilter !== undefined && descriptionFilter !== null)
+            url_ += "DescriptionFilter=" + encodeURIComponent("" + descriptionFilter) + "&";
+        if (isStandardFilter !== undefined && isStandardFilter !== null)
+            url_ += "IsStandardFilter=" + encodeURIComponent("" + isStandardFilter) + "&";
+        if (isBillableFilter !== undefined && isBillableFilter !== null)
+            url_ += "IsBillableFilter=" + encodeURIComponent("" + isBillableFilter) + "&";
+        if (maxDiscountFilter !== undefined && maxDiscountFilter !== null)
+            url_ += "MaxDiscountFilter=" + encodeURIComponent("" + maxDiscountFilter) + "&";
+        if (minDiscountFilter !== undefined && minDiscountFilter !== null)
+            url_ += "MinDiscountFilter=" + encodeURIComponent("" + minDiscountFilter) + "&";
+        if (billingCodeFilter !== undefined && billingCodeFilter !== null)
+            url_ += "BillingCodeFilter=" + encodeURIComponent("" + billingCodeFilter) + "&";
+        if (maxMonthlyPriceFilter !== undefined && maxMonthlyPriceFilter !== null)
+            url_ += "MaxMonthlyPriceFilter=" + encodeURIComponent("" + maxMonthlyPriceFilter) + "&";
+        if (minMonthlyPriceFilter !== undefined && minMonthlyPriceFilter !== null)
+            url_ += "MinMonthlyPriceFilter=" + encodeURIComponent("" + minMonthlyPriceFilter) + "&";
+        if (maxYearlyPriceFilter !== undefined && maxYearlyPriceFilter !== null)
+            url_ += "MaxYearlyPriceFilter=" + encodeURIComponent("" + maxYearlyPriceFilter) + "&";
+        if (minYearlyPriceFilter !== undefined && minYearlyPriceFilter !== null)
+            url_ += "MinYearlyPriceFilter=" + encodeURIComponent("" + minYearlyPriceFilter) + "&";
+        if (codeFilter !== undefined && codeFilter !== null)
+            url_ += "CodeFilter=" + encodeURIComponent("" + codeFilter) + "&";
+        if (nameFilter !== undefined && nameFilter !== null)
+            url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppSubscriptionPlanHeadersToExcel(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppSubscriptionPlanHeadersToExcel(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileDto>;
+        }));
+    }
+
+    protected processGetAppSubscriptionPlanHeadersToExcel(response: HttpResponseBase): Observable<FileDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FileDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class AppTenantPlansServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -42059,6 +43016,265 @@ export class SystemTablesServiceProxy {
     /**
      * @return Success
      */
+    getEntityObjectTypeFeatureId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeFeatureId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeFeatureId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeFeatureId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeFeatureId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectStandardFeatureId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectStandardFeatureId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectStandardFeatureId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectStandardFeatureId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectStandardFeatureId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectStandardSubscriptionPlanId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectStandardSubscriptionPlanId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectStandardSubscriptionPlanId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectStandardSubscriptionPlanId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectStandardSubscriptionPlanId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeFeature(): Observable<SycEntityObjectType> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeFeature";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeFeature(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeFeature(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SycEntityObjectType>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SycEntityObjectType>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeFeature(response: HttpResponseBase): Observable<SycEntityObjectType> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SycEntityObjectType.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectTenantActivityLogId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectTenantActivityLogId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectTenantActivityLogId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectTenantActivityLogId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectTenantActivityLogId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getObjectListingId(): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectListingId";
         url_ = url_.replace(/[?&]$/, "");
@@ -62526,7 +63742,6 @@ export interface IPagedResultDtoOfGetAppFeatureForViewDto {
 }
 
 export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
-    id!: number;
     code!: string;
     name!: string;
     description!: string;
@@ -62536,8 +63751,11 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
     billable!: boolean;
     billingCode!: string | undefined;
     unitPrice!: number | undefined;
-    category!: string;
     trackActivity!: boolean;
+    entityStatusCode!: string | undefined;
+    entityStatusId!: number | undefined;
+    entityCategories!: AppEntityCategoryDto[] | undefined;
+    id!: number | undefined;
 
     [key: string]: any;
 
@@ -62556,7 +63774,6 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            this.id = _data["id"];
             this.code = _data["code"];
             this.name = _data["name"];
             this.description = _data["description"];
@@ -62566,8 +63783,15 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
             this.billable = _data["billable"];
             this.billingCode = _data["billingCode"];
             this.unitPrice = _data["unitPrice"];
-            this.category = _data["category"];
             this.trackActivity = _data["trackActivity"];
+            this.entityStatusCode = _data["entityStatusCode"];
+            this.entityStatusId = _data["entityStatusId"];
+            if (Array.isArray(_data["entityCategories"])) {
+                this.entityCategories = [] as any;
+                for (let item of _data["entityCategories"])
+                    this.entityCategories!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            this.id = _data["id"];
         }
     }
 
@@ -62584,7 +63808,6 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        data["id"] = this.id;
         data["code"] = this.code;
         data["name"] = this.name;
         data["description"] = this.description;
@@ -62594,14 +63817,20 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
         data["billable"] = this.billable;
         data["billingCode"] = this.billingCode;
         data["unitPrice"] = this.unitPrice;
-        data["category"] = this.category;
         data["trackActivity"] = this.trackActivity;
+        data["entityStatusCode"] = this.entityStatusCode;
+        data["entityStatusId"] = this.entityStatusId;
+        if (Array.isArray(this.entityCategories)) {
+            data["entityCategories"] = [];
+            for (let item of this.entityCategories)
+                data["entityCategories"].push(item.toJSON());
+        }
+        data["id"] = this.id;
         return data;
     }
 }
 
 export interface ICreateOrEditAppFeatureDto {
-    id: number;
     code: string;
     name: string;
     description: string;
@@ -62611,8 +63840,11 @@ export interface ICreateOrEditAppFeatureDto {
     billable: boolean;
     billingCode: string | undefined;
     unitPrice: number | undefined;
-    category: string;
     trackActivity: boolean;
+    entityStatusCode: string | undefined;
+    entityStatusId: number | undefined;
+    entityCategories: AppEntityCategoryDto[] | undefined;
+    id: number | undefined;
 
     [key: string]: any;
 }
@@ -69962,6 +71194,842 @@ export interface IAppSizeScaleForEditDto {
     dimesion3Name: string | undefined;
     appSizeScalesDetails: AppSizeScalesDetailDto[] | undefined;
     id: number | undefined;
+
+    [key: string]: any;
+}
+
+export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailDto {
+    featureCode!: string | undefined;
+    featureName!: string | undefined;
+    availability!: string | undefined;
+    featureLimit!: number;
+    rollOver!: boolean;
+    unitPrice!: number;
+    featurePeriodLimit!: string | undefined;
+    category!: string | undefined;
+    featureDescription!: string | undefined;
+    featureStatus!: string | undefined;
+    unitOfMeasurementName!: string | undefined;
+    unitOfMeasurmentCode!: string | undefined;
+    isFeatureBillable!: boolean;
+    featureBillingCode!: string | undefined;
+    featureCategory!: string | undefined;
+    trackactivity!: boolean;
+    appSubscriptionPlanHeaderId!: number;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppSubscriptionPlanDetailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.featureCode = _data["featureCode"];
+            this.featureName = _data["featureName"];
+            this.availability = _data["availability"];
+            this.featureLimit = _data["featureLimit"];
+            this.rollOver = _data["rollOver"];
+            this.unitPrice = _data["unitPrice"];
+            this.featurePeriodLimit = _data["featurePeriodLimit"];
+            this.category = _data["category"];
+            this.featureDescription = _data["featureDescription"];
+            this.featureStatus = _data["featureStatus"];
+            this.unitOfMeasurementName = _data["unitOfMeasurementName"];
+            this.unitOfMeasurmentCode = _data["unitOfMeasurmentCode"];
+            this.isFeatureBillable = _data["isFeatureBillable"];
+            this.featureBillingCode = _data["featureBillingCode"];
+            this.featureCategory = _data["featureCategory"];
+            this.trackactivity = _data["trackactivity"];
+            this.appSubscriptionPlanHeaderId = _data["appSubscriptionPlanHeaderId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppSubscriptionPlanDetailDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppSubscriptionPlanDetailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["featureCode"] = this.featureCode;
+        data["featureName"] = this.featureName;
+        data["availability"] = this.availability;
+        data["featureLimit"] = this.featureLimit;
+        data["rollOver"] = this.rollOver;
+        data["unitPrice"] = this.unitPrice;
+        data["featurePeriodLimit"] = this.featurePeriodLimit;
+        data["category"] = this.category;
+        data["featureDescription"] = this.featureDescription;
+        data["featureStatus"] = this.featureStatus;
+        data["unitOfMeasurementName"] = this.unitOfMeasurementName;
+        data["unitOfMeasurmentCode"] = this.unitOfMeasurmentCode;
+        data["isFeatureBillable"] = this.isFeatureBillable;
+        data["featureBillingCode"] = this.featureBillingCode;
+        data["featureCategory"] = this.featureCategory;
+        data["trackactivity"] = this.trackactivity;
+        data["appSubscriptionPlanHeaderId"] = this.appSubscriptionPlanHeaderId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppSubscriptionPlanDetailDto {
+    featureCode: string | undefined;
+    featureName: string | undefined;
+    availability: string | undefined;
+    featureLimit: number;
+    rollOver: boolean;
+    unitPrice: number;
+    featurePeriodLimit: string | undefined;
+    category: string | undefined;
+    featureDescription: string | undefined;
+    featureStatus: string | undefined;
+    unitOfMeasurementName: string | undefined;
+    unitOfMeasurmentCode: string | undefined;
+    isFeatureBillable: boolean;
+    featureBillingCode: string | undefined;
+    featureCategory: string | undefined;
+    trackactivity: boolean;
+    appSubscriptionPlanHeaderId: number;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class GetAppSubscriptionPlanDetailForViewDto implements IGetAppSubscriptionPlanDetailForViewDto {
+    appSubscriptionPlanDetail!: AppSubscriptionPlanDetailDto;
+    appSubscriptionPlanHeader!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAppSubscriptionPlanDetailForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appSubscriptionPlanDetail = _data["appSubscriptionPlanDetail"] ? AppSubscriptionPlanDetailDto.fromJS(_data["appSubscriptionPlanDetail"]) : <any>undefined;
+            this.appSubscriptionPlanHeader = _data["appSubscriptionPlanHeader"];
+        }
+    }
+
+    static fromJS(data: any): GetAppSubscriptionPlanDetailForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAppSubscriptionPlanDetailForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appSubscriptionPlanDetail"] = this.appSubscriptionPlanDetail ? this.appSubscriptionPlanDetail.toJSON() : <any>undefined;
+        data["appSubscriptionPlanHeader"] = this.appSubscriptionPlanHeader;
+        return data;
+    }
+}
+
+export interface IGetAppSubscriptionPlanDetailForViewDto {
+    appSubscriptionPlanDetail: AppSubscriptionPlanDetailDto;
+    appSubscriptionPlanHeader: string | undefined;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto implements IPagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto {
+    totalCount!: number;
+    items!: GetAppSubscriptionPlanDetailForViewDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(GetAppSubscriptionPlanDetailForViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto {
+    totalCount: number;
+    items: GetAppSubscriptionPlanDetailForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class CreateOrEditAppSubscriptionPlanDetailDto implements ICreateOrEditAppSubscriptionPlanDetailDto {
+    featureCode!: string;
+    featureName!: string;
+    availability!: string;
+    featureLimit!: number;
+    rollOver!: boolean;
+    unitPrice!: number;
+    featurePeriodLimit!: string;
+    category!: string;
+    featureDescription!: string | undefined;
+    featureStatus!: string | undefined;
+    unitOfMeasurementName!: string;
+    unitOfMeasurmentCode!: string;
+    isFeatureBillable!: boolean;
+    featureBillingCode!: string | undefined;
+    featureCategory!: string | undefined;
+    trackactivity!: boolean;
+    notes!: string | undefined;
+    appSubscriptionPlanHeaderId!: number;
+    id!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateOrEditAppSubscriptionPlanDetailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.featureCode = _data["featureCode"];
+            this.featureName = _data["featureName"];
+            this.availability = _data["availability"];
+            this.featureLimit = _data["featureLimit"];
+            this.rollOver = _data["rollOver"];
+            this.unitPrice = _data["unitPrice"];
+            this.featurePeriodLimit = _data["featurePeriodLimit"];
+            this.category = _data["category"];
+            this.featureDescription = _data["featureDescription"];
+            this.featureStatus = _data["featureStatus"];
+            this.unitOfMeasurementName = _data["unitOfMeasurementName"];
+            this.unitOfMeasurmentCode = _data["unitOfMeasurmentCode"];
+            this.isFeatureBillable = _data["isFeatureBillable"];
+            this.featureBillingCode = _data["featureBillingCode"];
+            this.featureCategory = _data["featureCategory"];
+            this.trackactivity = _data["trackactivity"];
+            this.notes = _data["notes"];
+            this.appSubscriptionPlanHeaderId = _data["appSubscriptionPlanHeaderId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditAppSubscriptionPlanDetailDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditAppSubscriptionPlanDetailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["featureCode"] = this.featureCode;
+        data["featureName"] = this.featureName;
+        data["availability"] = this.availability;
+        data["featureLimit"] = this.featureLimit;
+        data["rollOver"] = this.rollOver;
+        data["unitPrice"] = this.unitPrice;
+        data["featurePeriodLimit"] = this.featurePeriodLimit;
+        data["category"] = this.category;
+        data["featureDescription"] = this.featureDescription;
+        data["featureStatus"] = this.featureStatus;
+        data["unitOfMeasurementName"] = this.unitOfMeasurementName;
+        data["unitOfMeasurmentCode"] = this.unitOfMeasurmentCode;
+        data["isFeatureBillable"] = this.isFeatureBillable;
+        data["featureBillingCode"] = this.featureBillingCode;
+        data["featureCategory"] = this.featureCategory;
+        data["trackactivity"] = this.trackactivity;
+        data["notes"] = this.notes;
+        data["appSubscriptionPlanHeaderId"] = this.appSubscriptionPlanHeaderId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ICreateOrEditAppSubscriptionPlanDetailDto {
+    featureCode: string;
+    featureName: string;
+    availability: string;
+    featureLimit: number;
+    rollOver: boolean;
+    unitPrice: number;
+    featurePeriodLimit: string;
+    category: string;
+    featureDescription: string | undefined;
+    featureStatus: string | undefined;
+    unitOfMeasurementName: string;
+    unitOfMeasurmentCode: string;
+    isFeatureBillable: boolean;
+    featureBillingCode: string | undefined;
+    featureCategory: string | undefined;
+    trackactivity: boolean;
+    notes: string | undefined;
+    appSubscriptionPlanHeaderId: number;
+    id: number | undefined;
+
+    [key: string]: any;
+}
+
+export class GetAppSubscriptionPlanDetailForEditOutput implements IGetAppSubscriptionPlanDetailForEditOutput {
+    appSubscriptionPlanDetail!: CreateOrEditAppSubscriptionPlanDetailDto;
+    appSubscriptionPlanHeader!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAppSubscriptionPlanDetailForEditOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appSubscriptionPlanDetail = _data["appSubscriptionPlanDetail"] ? CreateOrEditAppSubscriptionPlanDetailDto.fromJS(_data["appSubscriptionPlanDetail"]) : <any>undefined;
+            this.appSubscriptionPlanHeader = _data["appSubscriptionPlanHeader"];
+        }
+    }
+
+    static fromJS(data: any): GetAppSubscriptionPlanDetailForEditOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAppSubscriptionPlanDetailForEditOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appSubscriptionPlanDetail"] = this.appSubscriptionPlanDetail ? this.appSubscriptionPlanDetail.toJSON() : <any>undefined;
+        data["appSubscriptionPlanHeader"] = this.appSubscriptionPlanHeader;
+        return data;
+    }
+}
+
+export interface IGetAppSubscriptionPlanDetailForEditOutput {
+    appSubscriptionPlanDetail: CreateOrEditAppSubscriptionPlanDetailDto;
+    appSubscriptionPlanHeader: string | undefined;
+
+    [key: string]: any;
+}
+
+export class AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto implements IAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto {
+    id!: number;
+    displayName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.displayName = _data["displayName"];
+        }
+    }
+
+    static fromJS(data: any): AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["displayName"] = this.displayName;
+        return data;
+    }
+}
+
+export interface IAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto {
+    id: number;
+    displayName: string | undefined;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto implements IPagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto {
+    totalCount!: number;
+    items!: AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfAppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto {
+    totalCount: number;
+    items: AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class AppSubscriptionPlanHeaderDto implements IAppSubscriptionPlanHeaderDto {
+    description!: string | undefined;
+    isStandard!: boolean;
+    isBillable!: boolean;
+    discount!: number;
+    billingCode!: string | undefined;
+    monthlyPrice!: number;
+    yearlyPrice!: number;
+    code!: string | undefined;
+    name!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppSubscriptionPlanHeaderDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.description = _data["description"];
+            this.isStandard = _data["isStandard"];
+            this.isBillable = _data["isBillable"];
+            this.discount = _data["discount"];
+            this.billingCode = _data["billingCode"];
+            this.monthlyPrice = _data["monthlyPrice"];
+            this.yearlyPrice = _data["yearlyPrice"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppSubscriptionPlanHeaderDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppSubscriptionPlanHeaderDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["description"] = this.description;
+        data["isStandard"] = this.isStandard;
+        data["isBillable"] = this.isBillable;
+        data["discount"] = this.discount;
+        data["billingCode"] = this.billingCode;
+        data["monthlyPrice"] = this.monthlyPrice;
+        data["yearlyPrice"] = this.yearlyPrice;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppSubscriptionPlanHeaderDto {
+    description: string | undefined;
+    isStandard: boolean;
+    isBillable: boolean;
+    discount: number;
+    billingCode: string | undefined;
+    monthlyPrice: number;
+    yearlyPrice: number;
+    code: string | undefined;
+    name: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class GetAppSubscriptionPlanHeaderForViewDto implements IGetAppSubscriptionPlanHeaderForViewDto {
+    appSubscriptionPlanHeader!: AppSubscriptionPlanHeaderDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAppSubscriptionPlanHeaderForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appSubscriptionPlanHeader = _data["appSubscriptionPlanHeader"] ? AppSubscriptionPlanHeaderDto.fromJS(_data["appSubscriptionPlanHeader"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetAppSubscriptionPlanHeaderForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAppSubscriptionPlanHeaderForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appSubscriptionPlanHeader"] = this.appSubscriptionPlanHeader ? this.appSubscriptionPlanHeader.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetAppSubscriptionPlanHeaderForViewDto {
+    appSubscriptionPlanHeader: AppSubscriptionPlanHeaderDto;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto implements IPagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto {
+    totalCount!: number;
+    items!: GetAppSubscriptionPlanHeaderForViewDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(GetAppSubscriptionPlanHeaderForViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto {
+    totalCount: number;
+    items: GetAppSubscriptionPlanHeaderForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class CreateOrEditAppSubscriptionPlanHeaderDto implements ICreateOrEditAppSubscriptionPlanHeaderDto {
+    description!: string | undefined;
+    isStandard!: boolean;
+    isBillable!: boolean;
+    discount!: number;
+    billingCode!: string | undefined;
+    monthlyPrice!: number;
+    yearlyPrice!: number;
+    code!: string;
+    name!: string;
+    id!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateOrEditAppSubscriptionPlanHeaderDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.description = _data["description"];
+            this.isStandard = _data["isStandard"];
+            this.isBillable = _data["isBillable"];
+            this.discount = _data["discount"];
+            this.billingCode = _data["billingCode"];
+            this.monthlyPrice = _data["monthlyPrice"];
+            this.yearlyPrice = _data["yearlyPrice"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditAppSubscriptionPlanHeaderDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditAppSubscriptionPlanHeaderDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["description"] = this.description;
+        data["isStandard"] = this.isStandard;
+        data["isBillable"] = this.isBillable;
+        data["discount"] = this.discount;
+        data["billingCode"] = this.billingCode;
+        data["monthlyPrice"] = this.monthlyPrice;
+        data["yearlyPrice"] = this.yearlyPrice;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ICreateOrEditAppSubscriptionPlanHeaderDto {
+    description: string | undefined;
+    isStandard: boolean;
+    isBillable: boolean;
+    discount: number;
+    billingCode: string | undefined;
+    monthlyPrice: number;
+    yearlyPrice: number;
+    code: string;
+    name: string;
+    id: number | undefined;
+
+    [key: string]: any;
+}
+
+export class GetAppSubscriptionPlanHeaderForEditOutput implements IGetAppSubscriptionPlanHeaderForEditOutput {
+    appSubscriptionPlanHeader!: CreateOrEditAppSubscriptionPlanHeaderDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetAppSubscriptionPlanHeaderForEditOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appSubscriptionPlanHeader = _data["appSubscriptionPlanHeader"] ? CreateOrEditAppSubscriptionPlanHeaderDto.fromJS(_data["appSubscriptionPlanHeader"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetAppSubscriptionPlanHeaderForEditOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAppSubscriptionPlanHeaderForEditOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appSubscriptionPlanHeader"] = this.appSubscriptionPlanHeader ? this.appSubscriptionPlanHeader.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetAppSubscriptionPlanHeaderForEditOutput {
+    appSubscriptionPlanHeader: CreateOrEditAppSubscriptionPlanHeaderDto;
 
     [key: string]: any;
 }

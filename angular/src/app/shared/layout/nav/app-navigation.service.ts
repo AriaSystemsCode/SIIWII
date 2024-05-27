@@ -63,13 +63,23 @@ export class AppNavigationService {
             // new AppMenuItem('DemoUiComponents', 'Pages.DemoUiComponents', 'flaticon-shapes', '/app/admin/demo-ui-components')
         )
         let adminMenu = new AppMenuItem('Administration', '', 'flaticon-interface-8', '', [], [])
-        if (!this.isHost) {
+        let AppSubscriptionPlanHeaders=   new AppMenuItem('Subscriptions Plan', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders')
+        let AppSubscriptionPlanDetail=  new AppMenuItem('Subscription Plan Details', 'Pages.Administration.AppSubscriptionPlanDetails', 'flaticon-more', '/app/admin/appSubScriptionPlan/appSubscriptionPlanDetails')
+
+     
+
+            if (!this.isHost) {
             adminMenu.items.push(
                 new AppMenuItem('AccountProfile', 'Pages.Accounts', 'flaticon-more', '/app/main/account')
             )
         }
         adminMenu.items.push(
                 // new AppMenuItem('Merge/Convert Accounts', '', 'flaticon-interface-8', '/app/main/accounts/accounts/merge-convert-accounts-tool'),
+                
+                    AppSubscriptionPlanHeaders,
+                    AppSubscriptionPlanDetail,
+            
+            
                 new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [
                 new AppMenuItem('AppTenantsActivitiesLog', 'Pages.Administration.AppTenantsActivitiesLogs', 'flaticon-more', '/app/admin/appTenantsActivitiesLogs/appTenantsActivitiesLogs'),
                 new AppMenuItem('AppTenantPlans', 'Pages.Administration.AppTenantPlans', 'flaticon-more', '/app/admin/appTenantPlans/appTenantPlans'),
@@ -83,6 +93,7 @@ export class AppNavigationService {
             new AppMenuItem('OrganizationUnits', 'Pages.Administration.OrganizationUnits', 'flaticon-map', '/app/admin/organization-units'),
             new AppMenuItem('Roles', 'Pages.Administration.Roles', 'flaticon-suitcase', '/app/admin/roles'),
             new AppMenuItem('Users', 'Pages.Administration.Users', 'flaticon-users', '/app/admin/users'),
+            
             new AppMenuItem('AppFeatures', 'Pages.Administration.AppFeatures', 'flaticon-more', '/app/admin/appSubScriptionPlan/appFeatures'),
             
             new AppMenuItem('Maintainances', 'Pages.Administration.Maintainances', 'flaticon-more', '/app/admin/maintainances/maintainances'),

@@ -109,6 +109,11 @@ namespace onetouch.Helpers
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "STANDARDSUBSCRIPTIONPLAN");
             return obj.Id;
         }
+        public async Task<SycEntityObjectType> GetObjectStandardSubscriptionPlan()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDSUBSCRIPTIONPLAN");
+            return obj;
+        }
         public async Task<SycEntityObjectType> GetEntityObjectTypeFeature()
         {
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");

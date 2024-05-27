@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+﻿import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AppCommonModule } from "@app/shared/common/app-common.module";
@@ -43,6 +43,16 @@ import { TreeviewModule } from "ngx-treeview";
 import { eventsModule } from "./AppEvent/events.module";;
 import { SycLandingPageSettingsModule} from './SycLandingPageSettings/SycLandingPageSettings.module'
 ;
+import { AppSubscriptionPlanHeadersComponent } from "./appSubScriptionPlan/appSubscriptionPlanHeaders/appSubscriptionPlanHeaders.component";
+import { ViewAppSubscriptionPlanHeaderModalComponent } from "./appSubScriptionPlan/appSubscriptionPlanHeaders/view-appSubscriptionPlanHeader-modal.component";
+import { CreateOrEditAppSubscriptionPlanHeaderModalComponent } from "./appSubScriptionPlan/appSubscriptionPlanHeaders/create-or-edit-appSubscriptionPlanHeader-modal.component";
+import { MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDetailsComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/masterDetailChild_AppSubscriptionPlanHeader_appSubscriptionPlanDetails.component";
+import { CreateOrEditAppSubscriptionPlanDetailModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/create-or-edit-appSubscriptionPlanDetail-modal.component";
+import { ViewAppSubscriptionPlanDetailModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/view-appSubscriptionPlanDetail-modal.component";
+import { MasterDetailChild_AppSubscriptionPlanHeader_ViewAppSubscriptionPlanDetailModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/masterDetailChild_AppSubscriptionPlanHeader_view-appSubscriptionPlanDetail-modal.component";
+import { MasterDetailChild_AppSubscriptionPlanHeader_CreateOrEditAppSubscriptionPlanDetailModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/masterDetailChild_AppSubscriptionPlanHeader_create-or-edit-appSubscriptionPlanDetail-modal.component";
+import { AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetail-appSubscriptionPlanHeader-lookup-table-modal.component";
+import { AppSubscriptionPlanDetailsComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetails.component";
 
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 
@@ -88,8 +98,18 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
         SycAttachmentTypesComponent,
         ViewSycAttachmentTypeModalComponent,
         CreateOrEditSycAttachmentTypeModalComponent,
-        DashboardComponent
-    ],
+        AppSubscriptionPlanHeadersComponent, 
+        ViewAppSubscriptionPlanHeaderModalComponent,
+        CreateOrEditAppSubscriptionPlanHeaderModalComponent,
+        ViewAppSubscriptionPlanHeaderModalComponent,
+        CreateOrEditAppSubscriptionPlanDetailModalComponent,
+        ViewAppSubscriptionPlanDetailModalComponent,
+        AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent,
+        MasterDetailChild_AppSubscriptionPlanHeader_ViewAppSubscriptionPlanDetailModalComponent,
+        MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDetailsComponent,
+        MasterDetailChild_AppSubscriptionPlanHeader_CreateOrEditAppSubscriptionPlanDetailModalComponent,
+        AppSubscriptionPlanDetailsComponent
+        ],
     exports: [
         CommonModule,
         MainRoutingModule,

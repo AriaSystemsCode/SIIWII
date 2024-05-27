@@ -1,6 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>    <text name="AppSubScriptionPlan">App sub scription plan</text>
+	<texts>    <text name="onetouch.AppSubScriptionPlan.AppSubscriptionPlanHeader">AppSubscriptionPlanHeader</text>
+    <text name="IsStandard">Is standard</text>
+    <text name="NotIsStandard">Not is standard</text>
+    <text name="IsBillable">Is billable</text>
+    <text name="NotIsBillable">Not is billable</text>
+    <text name="Discount">Discount</text>
+    <text name="YearlyPrice">Yearly price</text>
+    <text name="AppSubscriptionPlanHeadersHeaderInfo">App subscription plan headers header info</text>
+    <text name="CreateNewAppSubscriptionPlanHeader">Create new app subscription plan header</text>
+    <text name="EditAppSubscriptionPlanHeader">Edit app subscription plan header</text>
+    <text name="DeleteAppSubscriptionPlanHeader">Delete app subscription plan header</text>
+    <text name="AppSubscriptionPlanHeaders">App subscription plan headers</text>
+    <text name="AppSubscriptionPlanHeader">App subscription plan header</text>
+    <text name="PickAppSubscriptionPlanHeader">Pick app subscription plan header</text>
+    <text name="AppSubscriptionPlanDetail">App subscription plan detail</text>
+    <text name="onetouch.AppSubScriptionPlan.AppSubscriptionPlanDetail">AppSubscriptionPlanDetail</text>
+    <text name="FeatureCode">Feature code</text>
+    <text name="FeatureName">Feature name</text>
+    <text name="Availability">Availability</text>
+    <text name="FeatureLimit">Feature limit</text>
+    <text name="RollOver">Roll over</text>
+    <text name="NotRollOver">Not roll over</text>
+    <text name="FeatureDescription">Feature description</text>
+    <text name="FeatureStatus">Feature status</text>
+    <text name="UnitOfMeasurmentCode">Unit of measurment code</text>
+    <text name="IsFeatureBillable">Is feature billable</text>
+    <text name="NotIsFeatureBillable">Not is feature billable</text>
+    <text name="FeatureBillingCode">Feature billing code</text>
+    <text name="FeatureCategory">Feature category</text>
+    <text name="Trackactivity">Trackactivity</text>
+    <text name="NotTrackactivity">Not trackactivity</text>
+    <text name="AppSubscriptionPlanDetailsHeaderInfo">App subscription plan details header info</text>
+    <text name="CreateNewAppSubscriptionPlanDetail">Create new app subscription plan detail</text>
+    <text name="EditAppSubscriptionPlanDetail">Edit app subscription plan detail</text>
+    <text name="DeleteAppSubscriptionPlanDetail">Delete app subscription plan detail</text>
+    <text name="AppSubscriptionPlanDetails">App subscription plan details</text>
+    <text name="AppSubScriptionPlan">App sub scription plan</text>
     <text name="AppFeature">App feature</text>
     <text name="onetouch.AppSubScriptionPlan.AppFeature">AppFeature</text>
     <text name="Id">Id</text>
