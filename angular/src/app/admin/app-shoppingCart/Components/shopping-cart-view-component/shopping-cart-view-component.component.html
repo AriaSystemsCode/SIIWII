@@ -118,7 +118,7 @@
                         <!-- order information tab -->
 
                         <!-- [ngClass]="{'shoppingCartAccordionNotValidTab':!orderInfoValid}" -->
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs" (click)="currentTab=0">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg" *ngIf="orderInfoValid" />
@@ -127,7 +127,8 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Information</h6>
                                 </div>
                             </ng-template>
-                                <app-sales-order [activeTab]="activeIndex ?  activeIndex :0"
+                                <app-sales-order [activeTab]="0"
+                                [currentTab]="currentTab"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     (orderInfoValid)="ontabInfoValid($event)"
                                     [createOrEditorderInfo]="createOrEditorderInfo"
@@ -138,7 +139,7 @@
                         </p-accordionTab>
                         <!-- order information tab -->
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=1">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -150,7 +151,8 @@
                             </ng-template>
                                 <div>
                                     <app-create-or-edit-buyer-seller-contact-info
-                                        [activeTab]="activeIndex ?  activeIndex :1"
+                                        [activeTab]="1"
+                                        [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)"
@@ -160,7 +162,7 @@
                                 </div>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=2">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -172,7 +174,8 @@
                             </ng-template>
                                 <div>
                                     <app-create-or-edit-buyer-seller-contact-info
-                                        [activeTab]="activeIndex ?  activeIndex :2"
+                                        [activeTab]="2"
+                                        [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)" [showSaveBtn]="showSaveBtn"
@@ -182,7 +185,7 @@
                                 </div>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=3">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -196,7 +199,8 @@
 
                            
                                 <div>
-                                    <app-create-or-edit-sales-rep-info [activeTab]="activeIndex ?  activeIndex :3"
+                                    <app-create-or-edit-sales-rep-info [activeTab]="3"
+                                    [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [showSaveBtn]="showSaveBtn"
@@ -206,7 +210,7 @@
                                 </div>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=4">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -218,7 +222,8 @@
                                 </div>
                             </ng-template>
                                 <div>
-                                    <app-create-or-add-shipping-information [activeTab]="activeIndex ?  activeIndex :4"
+                                    <app-create-or-add-shipping-information [activeTab]="4"
+                                    [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [createOrEditshippingInfO]="createOrEditshippingInfO"
@@ -227,7 +232,7 @@
                                     </app-create-or-add-shipping-information>
                                 </div>
                         </p-accordionTab>
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=5">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -238,7 +243,8 @@
                                 </div>
                             </ng-template>
                                 <div>
-                                    <app-create-or-edit-billing-info [activeTab]="activeIndex ?  activeIndex :5"
+                                    <app-create-or-edit-billing-info [activeTab]="5"
+                                    [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [createOrEditBillingInfo]="createOrEditBillingInfo"

@@ -17,6 +17,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     @Output() formValidityChanged = new EventEmitter<boolean>();
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("activeTab") activeTab: number;
+    @Input("currentTab") currentTab: number;
     @Input("isCreateOrEdit") isCreateOrEdit: boolean;
     @Input("salesRepIndex") salesRepIndex: number = 1;
     @Input("shipInfoIndex") shipInfoIndex: number;

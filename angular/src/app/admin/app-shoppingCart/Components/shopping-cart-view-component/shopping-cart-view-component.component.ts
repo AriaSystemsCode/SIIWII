@@ -79,6 +79,7 @@ export class ShoppingCartViewComponentComponent
   isOwnedByMe:boolean=true;
   canChange:boolean=true;
   companeyNames:GetAccountInformationOutputDto[];
+  currentTab:number
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,

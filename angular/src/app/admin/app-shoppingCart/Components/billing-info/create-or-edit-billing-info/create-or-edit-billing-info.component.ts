@@ -12,6 +12,7 @@ import { AddressComponent } from '../../address/address.component';
 })
 export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("BillingInfoValid") BillingInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;

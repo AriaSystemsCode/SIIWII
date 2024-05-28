@@ -11,6 +11,7 @@ import { AddressComponent } from '../../Components/address/address.component';
 })
 export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("shippingInfOValid") shippingInfOValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
