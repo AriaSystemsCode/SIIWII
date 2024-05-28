@@ -63,6 +63,7 @@ using Abp.EntityFrameworkCore.Uow;
 using onetouch.EntityFrameworkCore;
 using Twilio.Rest.Trunking.V1;
 using NUglify.Helpers;
+using onetouch.AppMarketplaceAccounts;
 
 namespace onetouch.Accounts
 {
@@ -77,6 +78,7 @@ namespace onetouch.Accounts
         private readonly IRepository<AppContactAddress, long> _appContactAddressRepository;
         private readonly IEmailSender _emailSender;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
+        private readonly ICreateMarketplaceAccount _iCreateMarketplaceAccount;
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<AppContactPaymentMethod, long> _appContactPaymentMethodRepository;
         private readonly ISycEntityObjectClassificationsAppService _sycEntityObjectClassificationsAppService;
@@ -111,7 +113,8 @@ namespace onetouch.Accounts
             , ISycAttachmentCategoriesAppService sSycAttachmentCategoriesAppService
             , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository, UserManager userManager, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepo,
               SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager,
-              TenantManager tenantManager)
+              TenantManager tenantManager
+            , ICreateMarketplaceAccount iCreateMarketplaceAccount)
         {
             _tenantManager = tenantManager;
             _appContactRepository = appContactRepository;
@@ -136,6 +139,7 @@ namespace onetouch.Accounts
             _binaryObjectManager = binaryObjectManager;
             _appMarketplaceAccountsPriceLevelsRepo= appMarketplaceAccountsPriceLevelsRepo;
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
+            _iCreateMarketplaceAccount = iCreateMarketplaceAccount;
 
         }
 

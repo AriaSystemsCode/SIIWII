@@ -1,22 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
+		<text name="MPActionJOIN">Join</text>
+		<text name="MPActionFOLLOW">Follow</text>
+		<text name="MPActionCONNECT">Connect</text>
+		<text name="MPActionEMPLOY">Employ</text>
+		<text name="MPActionINVITE">Invite</text>
+		
 		<text name="MinimumInStock">Minimum (in Stock) Qty</text>
 		<text name="OnlyInStockColors">Only (in Stock) Colors</text>
-		
-	<text name="MaintainanceAlarm">Maintenance will be from {0} to {1}.</text>
-	<text name="OpenMaintainanceAlarm">Another open Maintenance Found, Multiple Open Maintenance, Not Allowed.</text>
-	<text name="DismissIds">Dismiss ids</text>
-    <text name="Maintainances">Maintenances</text>
-    <text name="Maintainance">Maintenance</text>
-    <text name="onetouch.Maintainances.Maintainance">Maintenance</text>
-    <text name="From">From</text>
-    <text name="MaintainancesHeaderInfo">Maintenances header info</text>
-    <text name="CreateNewMaintainance">Create new maintenance</text>
-    <text name="EditMaintainance">Edit maintenances</text>
-    <text name="DeleteMaintainance">Delete maintenance</text>
-    <text name="FromRange">From range</text>
-    <text name="ToRange">To range</text>
+
+		<text name="MaintainanceAlarm">Maintenance will be from {0} to {1}.</text>
+		<text name="OpenMaintainanceAlarm">Another open Maintenance Found, Multiple Open Maintenance, Not Allowed.</text>
+		<text name="DismissIds">Dismiss ids</text>
+		<text name="Maintainances">Maintenances</text>
+		<text name="Maintainance">Maintenance</text>
+		<text name="onetouch.Maintainances.Maintainance">Maintenance</text>
+		<text name="From">From</text>
+		<text name="MaintainancesHeaderInfo">Maintenances header info</text>
+		<text name="CreateNewMaintainance">Create new maintenance</text>
+		<text name="EditMaintainance">Edit maintenances</text>
+		<text name="DeleteMaintainance">Delete maintenance</text>
+		<text name="FromRange">From range</text>
+		<text name="ToRange">To range</text>
 
 		<text name="AppItemSelectors">App item selectors</text>
 		<text name="AppItemSelector">App item selector</text>
@@ -1712,7 +1718,7 @@
 		<text name="ProductDetails">Product Details</text>
 		<text name="doesnottHaveExtraAttributes.">Doesn't Have Extra Attributes.</text>
 		<text name="PleaseChooseAProductTypeFirst">Please Choose A Product Type First</text>
-    <text name="PleaseAddAProductCode">Please Add A Product code First</text>
+		<text name="PleaseAddAProductCode">Please Add A Product code First</text>
 		<text name="fields">fields</text>
 		<text name="CompleteAllTheRequired">Complete All The Required</text>
 		<text name="AreYouSureYouWantToDeleteAllTheAttachments?">Are you sure you want to delete all the attachments?</text>
@@ -1860,7 +1866,7 @@
 		<text name="SaveChanges" >Save changes</text>
 		<text name="ThisListSharedWith" >This list shared with</text>
 		<text name="PublicList's" >Public list's</text>
-    <text name="Share" >Share</text>
+		<text name="Share" >Share</text>
 		<text name="SharedWithMe" >Shared with me</text>
 		<text name="Location" >Location</text>
 		<text name="CreateNewProductList" >Create new product list</text>
@@ -1896,7 +1902,7 @@
 		<text name="UnpublishList">Unpublish List</text>
 		<text name="AreYouSureYouWantToCancelPrintingThisProductListCatalogue?">Are You Sure You Want To Cancel Printing This Product List Catalogue ?</text>
 		<text name="PrintProductsList">Print product List</text>
-    
+
 		<text name="CatalogueReport">Catalogue Report</text>
 		<text name="ProductsCatalogInfo/Print">Products Catalog Info / Print</text>
 		<text name="ChooseTemplate">Choose Template</text>
@@ -2119,8 +2125,8 @@
 		<text name="DateDescending ">Date Descending</text>
 		<text name="ViewsAscending">Views Ascending</text>
 		<text name="ViewsDescending">Views Descending</text>
-		
-		
+
+
 		<text name="attendees">attendees</text>
 		<text name="InPerson">In Person</text>
 		<text name="Going">Going</text>
@@ -2157,7 +2163,7 @@
 		<text name="LetsView">Lets View</text>
 		<text name="Event">Event</text>
 		<text name="Notinterest">Not interest</text>
-	    <text name="RSVP">RSVP</text>
+		<text name="RSVP">RSVP</text>
 		<text name="AddReply">Add reply</text>
 		<text name="AddComment">Add comment</text>
 		<text name="ShowMoreReplies">Show more replies</text>
@@ -2186,7 +2192,7 @@
 		<text name="DeletedSuccessfully">Deleted Successfully</text>
 		<text name="FromDate">From Date</text>
 		<text name="ToDate">To Date</text>
-	    <text name="UserName@DomainName">User Name@Domain Name</text>
+		<text name="UserName@DomainName">User Name@Domain Name</text>
 		<text name="DomainTooltip">Use your organization's company name or business domain. (The company name should only have one word in capital letters, without special characters)</text>
 		<text name="InviteNewUser">Invite New User</text>
 		<text name="AccountName">Account name</text>
@@ -2213,8 +2219,8 @@
 		<text name="ClickOrDrop">click or drop</text>
 		<text name="SelectFromTheBelowBranches">Select from the below branches</text>
 		<text name="AddNew">Add new</text>
-    	<text name="ItemMajor">Item Major</text>
-    	<text name="VariationCode">Variation Code</text>
+		<text name="ItemMajor">Item Major</text>
+		<text name="VariationCode">Variation Code</text>
 		<text name="SourceAccountType">Source Account Type</text>
 		<text name="DestinationAccountType">Destination Account Type</text>
 		<text name="DeleteSourceAccount">Delete Source Account</text>
@@ -2225,12 +2231,12 @@
 		<text name="Merge/Convert">Merge/Convert</text>
 		<text name="Manual">Manual</text>
 		<text name="External">External</text>
-    	<text name="MergeSuccessful">Merge Successful</text>
-    	<text name="RegenerateVariation">Regenerate variation</text>
-	    <text name="InvitationSentSuccessfully">Invitation sent successfully</text>
+		<text name="MergeSuccessful">Merge Successful</text>
+		<text name="RegenerateVariation">Regenerate variation</text>
+		<text name="InvitationSentSuccessfully">Invitation sent successfully</text>
 		<text name="YouAreAboutToLoseAllTheChangesYouHaveDone,AreYouSure?">You are about to lose all the changes you have done,Are you sure?</text>
-    	<text name="HomeImage">Home Image</text>
-    	<text name="MarketPlaceImage">MarketPlace Image</text>
+		<text name="HomeImage">Home Image</text>
+		<text name="MarketPlaceImage">MarketPlace Image</text>
 		<text name="ImportProducts">Import Products</text>
 		<text name="TemplateVersion">Template Version</text>
 		<text name="Itemsuploadstatus">Items upload status</text>
@@ -2242,8 +2248,8 @@
 		<text name="ImportItems">Import Items</text>
 		<text name="HomePageView">Home page view</text>
 		<text name="NoBusinessclassificationstodisplay">No Business classifications to display</text>
-		<text name="NoDepartmentstodisplay">No Departments to display</text> 
-		<text name="Noimagestodisplay">No images to display</text> 
+		<text name="NoDepartmentstodisplay">No Departments to display</text>
+		<text name="Noimagestodisplay">No images to display</text>
 		<text name="NoAccounttypestodisplay">No Account types to display</text>
 		<text name="CodeIsAlreadyExists">Code {0} Is Already Exists.</text>
 		<text name="WorkspaceName">Workspace Name</text>
@@ -2276,7 +2282,7 @@
 		<text name="DRAFT">Draft</text>
 		<text name="ACTIVE">Active</text>
 		<text name="DoYouWantToPublishThisProductList?">Do you want to publish this product list?</text>
-    	<text name="URL">URL</text>
+		<text name="URL">URL</text>
 		<text name="ThisNameAlreadyExists!">This name already exists!</text>
 		<text name="Re-enter">Re-enter</text>
 		<text name="Proceed">Proceed</text>
@@ -2354,28 +2360,28 @@
 		<text name="DefaultCurrencyMustExist">Default currency must exist</text>
 		<text name="EnterProductList">Enter Product List</text>
 		<text name="ConnectedAccounts">Connected Accounts</text>
-	    <text name="PersonalEmailAddress">personal email</text>
+		<text name="PersonalEmailAddress">personal email</text>
 		<text name="PriceLevel">Price Level</text>
 		<text name="AccountSSIN">Account SSIN</text>
 		<text name="SellerID">Seller ID</text>
 		<text name="BuyerID">Buyer ID</text>
 		<text name="TransactionType">Transaction Type</text>
 		<text name="TransactionID">Transaction ID</text>
-	    <text name="DateCreated">Date Created</text>
-	    <text name="MyTransactions">My Transactions</text>
-	    <text name="SalesOrder">Sales Order</text>
-	    <text name="purchaseOrder">purchase Order</text>
-	
+		<text name="DateCreated">Date Created</text>
+		<text name="MyTransactions">My Transactions</text>
+		<text name="SalesOrder">Sales Order</text>
+		<text name="purchaseOrder">purchase Order</text>
+
 
 		<text name="DetailsPage">Details Page</text>
 		<text name="Customizeyourlinesheet">Customize your linesheet</text>
 		<text name="ShowProductCode">Show Product Code</text>
 		<text name="ShowProductAvailableQuantity">Show Product Available Quantity</text>
 		<text name="ShowMSRPPrice">Show MSRP Price</text>
-	    <text name="ShowSpecialPrice">Show Special Price</text>
-	    <text name="ShowGroupheaderindetailpages">Show Group header in detail pages </text>
+		<text name="ShowSpecialPrice">Show Special Price</text>
+		<text name="ShowGroupheaderindetailpages">Show Group header in detail pages </text>
 		<text name="ShowGroupheaderinColorpage">Show Group header in Color page </text>
-	    <text name="Background">Background </text>
+		<text name="Background">Background </text>
 		<text name="NoBackground">No Background </text>
 		<text name="ShowColorPage">Show Color Page</text>
 		<text name="ShowCoverPage">Show Cover Page </text>
@@ -2399,39 +2405,39 @@
 		<text name="Sellercontactinfo"> Seller contact info</text>
 		<text name="SalesRepInformation"> Sales Rep Information</text>
 		<text name="Shippinginformation"> Shipping information</text>
-	    <text name="BillingInformation"> Billing Information</text>
-	    <text name="OrderDetails"> Order Details</text>
+		<text name="BillingInformation"> Billing Information</text>
+		<text name="OrderDetails"> Order Details</text>
 		<text name="ShowVariations"> Show Variations</text>
 		<text name="DiscardShopping"> Discard Shopping</text>
 		<text name="ContinueShopping"> Continue Shopping</text>
 		<text name="Placeyourorder"> Place your order</text>
-	    <text name="Comments"> Comments</text>
-	    <text name="ShipFrom"> Ship From</text>
-	    <text name="ShipTo"> Ship To</text>
+		<text name="Comments"> Comments</text>
+		<text name="ShipFrom"> Ship From</text>
+		<text name="ShipTo"> Ship To</text>
 		<text name="SelectAddresses">Select Addresses</text>
 		<text name="AddNewAddressDetails">Add New Address Details</text>
 		<text name="PleaseSelectFromTheSavedAddressesBelow">Please select from the saved addresses below</text>
 		<text name="PleaseEnterThenewAddressInformation">Please enter the new address information</text>
-        <text name="AddANewAddress">Add A New Address</text>
-	    <text name="AddressLineOne">Address Line 1</text>
-	    <text name="AddressLineTow">Address Line 2</text>
-	<text name="AddressType">Address Type</text>
+		<text name="AddANewAddress">Add A New Address</text>
+		<text name="AddressLineOne">Address Line 1</text>
+		<text name="AddressLineTow">Address Line 2</text>
+		<text name="AddressType">Address Type</text>
 		<text name="Store">Store</text>
-       <text name="ShipVia">Ship Via</text>
+		<text name="ShipVia">Ship Via</text>
 		<text name="APContact">AP Contact</text>
 		<text name="ARContact">AR Contact</text>
 		<text name="PaymentInformation">Payment Information</text>
 		<text name="PaymentTerms">Payment Terms</text>
-  <text name="ShareTransaction">Share Transaction</text>
-    <text name="MessageTransactionToSiiwiiUsers">Message Transaction To Siiwii Users</text>
-    <text name="SelectedUsersList">Selected Users List</text>
-    <text name="EmailTransactionToNonSiiwiiUsers">Email Transaction To Non Siiwii Users</text>
-    <text name="TypeEmailAddress">Type Email Address</text>
-    <text name="Addamessagehere">Add a message here</text>
-    <text name="Add2">Add</text>
-    <text name="Done">Done</text>
-    <text name="MessageBody">Message body</text>
-    <text name="InvalidEmailFormate">Invalid email formate</text>
-    <text name="TransactionHasBeenSent">Transaction has been sent</text>
-  </texts>  
+		<text name="ShareTransaction">Share Transaction</text>
+		<text name="MessageTransactionToSiiwiiUsers">Message Transaction To Siiwii Users</text>
+		<text name="SelectedUsersList">Selected Users List</text>
+		<text name="EmailTransactionToNonSiiwiiUsers">Email Transaction To Non Siiwii Users</text>
+		<text name="TypeEmailAddress">Type Email Address</text>
+		<text name="Addamessagehere">Add a message here</text>
+		<text name="Add2">Add</text>
+		<text name="Done">Done</text>
+		<text name="MessageBody">Message body</text>
+		<text name="InvalidEmailFormate">Invalid email formate</text>
+		<text name="TransactionHasBeenSent">Transaction has been sent</text>
+	</texts>
 </localizationDictionary>
