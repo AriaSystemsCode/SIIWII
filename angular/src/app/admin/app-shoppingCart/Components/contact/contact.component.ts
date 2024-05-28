@@ -3,6 +3,7 @@ import { AccountBranchDto, AppEntitiesServiceProxy, AppTransactionContactDto, Ap
 import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import { stringInsert } from "@devexpress/analytics-core/analytics-internal";
 import { AppComponentBase } from "@shared/common/app-component-base";
+import { EMPTY, switchMap } from "rxjs";
 
 @Component({
     selector: "app-contact",
@@ -49,18 +50,18 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     ngOnInit(): void {
-        this.resetSelectedData();
+        this.resetSelectedData(); 
         this.setSelectedData();
-        this.getAllCompanies();
-
+     //   this.getAllCompaniesData();
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (this.appTransactionsForViewDto && this.activeTab != null && this.activeTab >= 0) {
+        if (this.appTransactionsForViewDto && this.activeTab != null && (this.activeTab >=0) ) {
+            this.companeyNames=this.appTransactionsForViewDto?.companeyNames;
             this.showMainSpinner();
             //   this.resetSelectedData();
-            this.getAllCompanies();
             this.getAppTransactionContactsIndex();
+            this.getAllCompaniesData();
         }
     }
     resetSelectedData() {
@@ -230,43 +231,43 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         
         }
 
-    getContacts(tempContact:boolean=false) {
-        if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
-            this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, undefined).subscribe(result => {
-                this.allContacts = result;
-
-                if (tempContact &&  this.allContacts?.length>0) {
-                    this.tempContact=true;
-                    this.contactNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName + "*";
-
-                    this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName;
-                    if (this.contactFilterValue)
-                        this.handleContactSearch(this.contactFilterValue);
-                }
-                else {
-                    this.tempContact=false;
-                    if(this.appTransactionsForViewDto)
-                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = this.allContacts?.find(x => x.ssin == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactSSIN);
-
-                    if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact)
-                        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
-
-                    else
-                        this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact);
-                }
-            });
+        getContacts(tempContact:boolean=false) {
+            if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
+                this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, undefined).subscribe(result => {
+                    this.allContacts = result;
+    
+                    if (tempContact &&  this.allContacts?.length>0) {
+                        this.tempContact=true;
+                        this.contactNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName + "*";
+    
+                        this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName;
+                        if (this.contactFilterValue)
+                            this.handleContactSearch(this.contactFilterValue);
+                    }
+                    else {
+                        this.tempContact=false;
+                        if(this.appTransactionsForViewDto)
+                        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = this.allContacts?.find(x => x.ssin == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactSSIN);
+    
+                        if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact)
+                            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
+    
+                        else
+                            this.onChangeContact(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact);
+                    }
+                });
+            }
+    
+            else {
+                this.allContacts = [];
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
+            }
+    
         }
-
-        else {
-            this.allContacts = [];
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = null;
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = "";
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = "";
-        }
-
-    }
-
+    
     handleContactSearch($event) {
         setTimeout(() => {
             this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, $event.filter)
@@ -275,7 +276,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 });
         }, 1000);
     }
-
+  
     getBranches() {
         if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
             this.showMainSpinner();
@@ -294,32 +295,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             });
         }
     }
-    getAllCompanies() {
-        this._AppTransactionServiceProxy
-            .getRelatedAccounts(
-                "",
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                0,
-                30,false
-            )
-            .subscribe((res: PagedResultDtoOfGetAccountInformationOutputDto) => {
-                this.companeyNames = [...res.items];
+    getAllCompaniesData() {
+       
                 //////////////////////////////////////////////////// I36 -Temp Account scenario
                 if ((this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN == "0" || !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName) {
                     this.tempAccount = true;
@@ -347,7 +324,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 }
 
                 this.hideMainSpinner();
-            });
     }
 
     isValidForm(): boolean {

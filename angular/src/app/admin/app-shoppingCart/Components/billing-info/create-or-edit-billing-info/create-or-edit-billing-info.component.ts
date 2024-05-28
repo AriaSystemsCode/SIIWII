@@ -150,6 +150,7 @@ debugger
     this.contactIdApContact = data.compId;
     this.apContactSelectedAdd = null;
     //if(data.compssin){
+      if( this.AddressComponentChild)
     this.AddressComponentChild['first']?.getAddressList(data.compssin);
 
     //}
@@ -160,6 +161,7 @@ debugger
     this.contactIdARContact = data.compId;
     this.loadAddresComponentShipTo = true;
     this.arContactSelectedAdd = null;
+    if( this.AddressComponentChild)
     this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
 
     // }
