@@ -15,6 +15,7 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
 
   @Input("createOrEditSalesRepInfo") createOrEditSalesRepInfo: boolean;
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
   @Output("showSalesRepEditMode") showSalesRepEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 

@@ -11,6 +11,7 @@ import { AddressComponent } from '../../Components/address/address.component';
 })
 export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("shippingInfOValid") shippingInfOValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
@@ -242,6 +243,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
     this.contactIdShipFrom = data.compId;
     this.shipFromSelectedAdd = null;
     // if(data.compssin){
+      if( this.AddressComponentChild)
     this.AddressComponentChild['first']?.getAddressList(data.compssin);
 
     //}
@@ -253,6 +255,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
     // if(data.compssin){
     this.contactIdShipTo = data.compId;
     this.loadAddresComponentShipTo = true;
+    if( this.AddressComponentChild)
     this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
 
     // }
