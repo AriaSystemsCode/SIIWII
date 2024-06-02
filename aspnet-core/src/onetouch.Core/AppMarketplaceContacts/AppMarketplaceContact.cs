@@ -15,10 +15,10 @@ namespace onetouch.AppMarketplaceContacts
 	//Code,Name,TradeName,LanguageId,LanguageCode,CurrencyId,CurrencyCode,EMailAddress,Website,EntityId,EntityCode,ParentId,ParentCode,PartnerId,PartnerCode,TenantId,AccountType,IsProfileData,Phone1TypeId,Phone1TypeName,Phone1Number,Phone1Ext,Phone2TypeId,Phone2TypeName,Phone2Number,Phone2Ext,Phone3TypeId,Phone3TypeName,Phone3Number,Phone3Ext
 	[Table("AppMarketplaceContacts")]
     [Audited]
-    public class AppMarketplaceContact : FullAuditedEntity<long> , IMayHaveTenant
+    public class AppMarketplaceContact : AppEntity
     {
-			public int? TenantId { get; set; }
-			
+		public int? TenantId { get; set; }
+        public int? OwnerId { get; set; }
 
 		[Required]
 		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
@@ -47,10 +47,10 @@ namespace onetouch.AppMarketplaceContacts
 		[StringLength(AppContactConsts.MaxEMailLength, MinimumLength = AppContactConsts.MinEMailLength)]
 		public virtual string Website { get; set; }
 
-		public virtual long EntityId { get; set; }
+		//public virtual long EntityId { get; set; }
 
 		[StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
-		public virtual string EntityCode { get; set; }
+		//public virtual string EntityCode { get; set; }
 
 		//public virtual long? AccountId { get; set; }
 
@@ -59,10 +59,10 @@ namespace onetouch.AppMarketplaceContacts
 		[StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
 		public virtual string ParentCode { get; set; }
 
-		public virtual long? PartnerId { get; set; }
+		//public virtual long? PartnerId { get; set; }
 
 		[StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
-		public virtual string PartnerCode { get; set; }
+		//public virtual string PartnerCode { get; set; }
 
 		public virtual string AccountType { get; set; }
         public virtual long AccountTypeId { get; set; }
@@ -120,8 +120,8 @@ namespace onetouch.AppMarketplaceContacts
 		[ForeignKey("CurrencyId")]
 		public virtual AppEntity CurrencyFk { get; set; }
 
-		[ForeignKey("EntityId")]
-		public virtual AppEntity EntityFk { get; set; }
+		//[ForeignKey("EntityId")]
+		//public virtual AppEntity EntityFk { get; set; }
 
 		//[ForeignKey("ParentId")]
 		public virtual AppMarketplaceContact ParentFk { get; set; }

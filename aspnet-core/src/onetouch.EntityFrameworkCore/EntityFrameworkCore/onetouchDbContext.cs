@@ -161,7 +161,7 @@ namespace onetouch.EntityFrameworkCore
         public virtual DbSet<SuiIcon> SuiIcons { get; set; }
 
         public virtual DbSet<AppContact> AppContacts { get; set; }
-        public virtual DbSet<AppContact> AppMarketplaceContacts { get; set; }
+        public virtual DbSet<AppMarketplaceContact> AppMarketplaceContacts { get; set; }
         public virtual DbSet<AppEntity> AppEntities { get; set; }
         public virtual DbSet<AppEntityCategory> AppEntityCategories { get; set; }
         public virtual DbSet<AppEntityClassification> AppEntityClassifications { get; set; }
@@ -406,9 +406,7 @@ namespace onetouch.EntityFrameworkCore
 
 
             modelBuilder.Entity<AppMarketplaceContact>()
-          .HasOne(x => x.PartnerFk)
-          .WithMany(x => x.PartnerFkList)
-          .HasForeignKey(x => x.PartnerId);
+          ;
 
             modelBuilder.Entity<AppMarketplaceContact>(a =>
             {
