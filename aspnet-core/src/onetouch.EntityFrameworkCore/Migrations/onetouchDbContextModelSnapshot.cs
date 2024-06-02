@@ -4366,7 +4366,7 @@ namespace onetouch.Migrations
                         });
                 });
 
-            modelBuilder.Entity("onetouch.AppTenantsActivitiesLogs.AppTenantsActivitiesLog", b =>
+            modelBuilder.Entity("onetouch.AppTenantsActivitiesLogs.oldAppTenantsActivitiesLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -7483,6 +7483,138 @@ namespace onetouch.Migrations
                         });
                 });
 
+            modelBuilder.Entity("onetouch.AppSubScriptionPlan.AppTenantActivitiesLog", b =>
+                {
+                    b.HasBaseType("onetouch.AppEntities.AppEntity");
+
+                    b.Property<DateTime>("ActivityDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ActivityType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("AppSubscriptionPlanCode")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<long>("AppSubscriptionPlanHeaderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Billable")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("ConsumedQty")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CreditId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CreditOrUsage")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("FeatureCode")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("FeatureName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("InvoiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InvoiceNumber")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<bool>("Invoiced")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Month")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long>("Qty")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reference")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("RemainingQty")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("TenantName")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Year")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.ToTable("AppTenantActivitiesLog", t =>
+                        {
+                            t.HasTrigger("AppTenantActivitiesLog_Trigger");
+                        });
+                });
+
+            modelBuilder.Entity("onetouch.AppSubScriptionPlan.AppTenantSubscriptionPlan", b =>
+                {
+                    b.HasBaseType("onetouch.AppEntities.AppEntity");
+
+                    b.Property<bool>("AllowOverAge")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("AppSubscriptionPlanHeaderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BillingPeriod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CurrentPeriodEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CurrentPeriodStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SubscriptionPlanCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("TenantName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasIndex("AppSubscriptionPlanHeaderId");
+
+                    b.ToTable("AppTenantSubscriptionPlans", t =>
+                        {
+                            t.HasTrigger("AppTenantSubscriptionPlans_Trigger");
+                        });
+                });
+
             modelBuilder.Entity("Abp.Authorization.Roles.RoleClaim", b =>
                 {
                     b.HasOne("onetouch.Authorization.Roles.Role", null)
@@ -8376,7 +8508,7 @@ namespace onetouch.Migrations
                     b.Navigation("PlanFk");
                 });
 
-            modelBuilder.Entity("onetouch.AppTenantsActivitiesLogs.AppTenantsActivitiesLog", b =>
+            modelBuilder.Entity("onetouch.AppTenantsActivitiesLogs.oldAppTenantsActivitiesLog", b =>
                 {
                     b.HasOne("onetouch.SycApplications.SycApplication", "ApplicationFk")
                         .WithMany()
@@ -8937,6 +9069,32 @@ namespace onetouch.Migrations
                         .HasForeignKey("onetouch.AppSubScriptionPlan.AppSubscriptionPlanHeader", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("onetouch.AppSubScriptionPlan.AppTenantActivitiesLog", b =>
+                {
+                    b.HasOne("onetouch.AppEntities.AppEntity", null)
+                        .WithOne()
+                        .HasForeignKey("onetouch.AppSubScriptionPlan.AppTenantActivitiesLog", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("onetouch.AppSubScriptionPlan.AppTenantSubscriptionPlan", b =>
+                {
+                    b.HasOne("onetouch.AppSubScriptionPlan.AppSubscriptionPlanHeader", "AppSubscriptionPlanHeaderFk")
+                        .WithMany()
+                        .HasForeignKey("AppSubscriptionPlanHeaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", null)
+                        .WithOne()
+                        .HasForeignKey("onetouch.AppSubScriptionPlan.AppTenantSubscriptionPlan", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppSubscriptionPlanHeaderFk");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.AbpUserBase", b =>

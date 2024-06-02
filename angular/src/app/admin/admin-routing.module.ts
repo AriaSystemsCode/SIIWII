@@ -1,5 +1,8 @@
 ﻿import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { AppTenantActivitiesLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/appTenantActivitiesLog.component';
+import { CreateOrEditAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/create-or-edit-appTenantActivityLog.component';
+import { ViewAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/view-appTenantActivityLog.component';
 import { AppSubscriptionPlanDetailsComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetails.component';
 import { AppFeaturesComponent } from './appSubScriptionPlan/appFeatures/appFeatures.component';
 import { CreateOrEditAppFeatureComponent } from './appSubScriptionPlan/appFeatures/create-or-edit-appFeature.component';
@@ -13,7 +16,6 @@ import { CreateOrEditAppAdvertisementComponent } from './appAdvertisements/appAd
 import { ViewAppAdvertisementComponent } from './appAdvertisements/appAdvertisements/view-appAdvertisement.component';
 import { TicketNotesComponent } from './autoTaskTicketNotes/ticketNotes/ticketNotes.component';
 import { TicketsComponent } from './autoTaskTickets/tickets/tickets.component';
-import { AppTenantsActivitiesLogsComponent } from './appTenantsActivitiesLogs/appTenantsActivitiesLogs/appTenantsActivitiesLogs.component';
 import { AppTenantPlansComponent } from './appTenantPlans/appTenantPlans/appTenantPlans.component';
 import { AppTransactionsComponent } from './appTransactions/appTransactions/appTransactions.component';
 import { AppTransactionsBrowseComponent } from './appTransactions/appTransactions/appTransBrowse.component';
@@ -41,6 +43,9 @@ import { UsersComponent } from './users/users.component';
 import { WebhookSubscriptionComponent } from './webhook-subscription/webhook-subscription.component';
 import { WebhookSubscriptionDetailComponent } from './webhook-subscription/webhook-subscription-detail.component';
 import { WebhookEventDetailComponent } from './webhook-subscription/webhook-event-detail.component';
+import { AppTenantSubscriptionPlansComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/appTenantSubscriptionPlans.component';
+import { CreateOrEditAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
+import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
 // import { DynamicParameterComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter.component';
 // import { DynamicParameterDetailComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-detail.component';
 // import { EntityDynamicParameterComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter.component';
@@ -53,7 +58,13 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
             {
                 path: '',
                 children: [
+                    { path: 'appSubScriptionPlan/appTenantActivitiesLog', component: AppTenantActivitiesLogComponent  },
+                    { path: 'appSubScriptionPlan/appTenantActivitiesLog/createOrEdit', component: CreateOrEditAppTenantActivityLogComponent   },
+                    { path: 'appSubScriptionPlan/appTenantActivitiesLog/view', component: ViewAppTenantActivityLogComponent  },
                     { path: 'appSubScriptionPlan/appSubscriptionPlanDetails', component: AppSubscriptionPlanDetailsComponent, data: { permission: 'Pages.Administration.AppSubscriptionPlanDetails' }  },
+                    { path: 'appSubScriptionPlan/appTenantSubscriptionPlans', component: AppTenantSubscriptionPlansComponent, data: { permission: 'Pages.Administration.AppTenantSubscriptionPlans' }  },
+                    { path: 'appSubScriptionPlan/appTenantSubscriptionPlans/createOrEdit', component: CreateOrEditAppTenantSubscriptionPlanComponent },
+                    { path: 'appSubScriptionPlan/appTenantSubscriptionPlans/view', component: ViewAppTenantSubscriptionPlanComponent, data: { permission: 'Pages.Administration.AppTenantSubscriptionPlans' }  },
                     { path: 'appSubScriptionPlan/appFeatures', component: AppFeaturesComponent, data: { permission: 'Pages.Administration.AppFeatures' }  },
                     { path: 'appSubScriptionPlan/appFeatures/createOrEdit', component: CreateOrEditAppFeatureComponent, data: { permission: 'Pages.Administration.AppFeatures.Create' }  },
                     { path: 'appSubScriptionPlan/appFeatures/view', component: ViewAppFeatureComponent, data: { permission: 'Pages.Administration.AppFeatures' }  },
@@ -64,7 +75,7 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
                     { path: 'appAdvertisements/appAdvertisements', component: AppAdvertisementsComponent, data: { permission: 'Pages.Administration.AppAdvertisements' }  },
                     { path: 'appAdvertisements/appAdvertisements/createOrEdit', component: CreateOrEditAppAdvertisementComponent, data: { permission: 'Pages.Administration.AppAdvertisements.Create' }  },
                     { path: 'appAdvertisements/appAdvertisements/view', component: ViewAppAdvertisementComponent, data: { permission: 'Pages.Administration.AppAdvertisements' }  },
-                    { path: 'appTenantsActivitiesLogs/appTenantsActivitiesLogs', component: AppTenantsActivitiesLogsComponent, data: { permission: 'Pages.Administration.AppTenantsActivitiesLogs' }  },
+                   { path: 'appTenantsActivitiesLogs/appTenantsActivitiesLogs', component: AppTenantActivitiesLogComponent , data: { permission: 'Pages.Administration.AppTenantsActivitiesLogs' }  },
                     { path: 'appTenantPlans/appTenantPlans', component: AppTenantPlansComponent, data: { permission: 'Pages.Administration.AppTenantPlans' }  },
                     { path: 'appTransactions/appTransactions', component: AppTransactionsComponent, data: { permission: 'Pages.Administration.AppTransactions' }  },
                     { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent , data: { permission: 'Pages.AppSiiwiiTransactions' } } ,

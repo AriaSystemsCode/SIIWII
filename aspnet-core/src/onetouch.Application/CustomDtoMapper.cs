@@ -118,6 +118,12 @@ namespace onetouch
     {
         public static void CreateMappings(IMapperConfigurationExpression configuration)
         {
+            configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
+            configuration.CreateMap<AppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, AppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<AppTenantActivityLogDto, AppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantSubscriptionPlanDto, AppTenantSubscriptionPlan>().ReverseMap();
+            configuration.CreateMap<AppTenantSubscriptionPlanDto, AppTenantSubscriptionPlan>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
             configuration.CreateMap<AppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap();
@@ -223,8 +229,8 @@ namespace onetouch
             configuration.CreateMap<AppItemsListDto, AppItemsList>().ReverseMap();
             configuration.CreateMap<CreateOrEditAutotaskQueueDto, AutotaskQueue>().ReverseMap();
             configuration.CreateMap<AutotaskQueueDto, AutotaskQueue>().ReverseMap();
-            configuration.CreateMap<CreateOrEditAppTenantsActivitiesLogDto, AppTenantsActivitiesLog>().ReverseMap();
-            configuration.CreateMap<AppTenantsActivitiesLogDto, AppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantsActivitiesLogDto, oldAppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<AppTenantsActivitiesLogDto, oldAppTenantsActivitiesLog>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantPlanDto, AppTenantPlan>().ReverseMap();
             configuration.CreateMap<AppTenantPlanDto, AppTenantPlan>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTransactionDto, AppTransaction>().ReverseMap();

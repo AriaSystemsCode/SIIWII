@@ -26,6 +26,9 @@ namespace onetouch.EntityHistory
 
         public static readonly Type[] HostSideTrackedTypes =
         {
+            typeof(AppTenantActivitiesLog),
+            typeof(AppTenantsActivitiesLog),
+            typeof(AppTenantSubscriptionPlan),
             typeof(AppSubscriptionPlanHeader),
             typeof(AppSubscriptionPlanDetail),
             typeof(AppFeature),

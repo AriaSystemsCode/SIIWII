@@ -1,0 +1,102 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+            				<span *ngIf="active && appTenantSubscriptionPlan.id">{{"EditAppTenantSubscriptionPlan" }}</span>
+            				<span *ngIf="active && !appTenantSubscriptionPlan.id">{{l("CreateAppTenantSubscriptionPlan")}}</span>
+            			</h3>
+            			<span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            			<div class="kt-subheader__breadcrumbs">
+            				<a [routerLink]="['/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans']"
+            					class="kt-subheader__breadcrumbs-home"><i
+            						class="flaticon2-shelter"></i>{{l("AppTenantSubscriptionPlan")}}</a>
+            				<span class="kt-subheader__breadcrumbs-separator"></span>
+            				<a 
+            					class="kt-subheader__breadcrumbs-link kt-subheader__breadcrumbs-link--active">
+            					<span *ngIf="active && appTenantSubscriptionPlan.id">{{l("Edit")}}</span>
+            					<span *ngIf="active && !appTenantSubscriptionPlan.id">{{l("Create")}}</span>
+            				</a>
+            			</div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">              
+                
+                
+								<div class="form-group">
+									<label for="AppTenantSubscriptionPlan_TenantId">{{l("TenantId")}}</label>
+									<input type="number" #AppTenantSubscriptionPlan_TenantId="ngModel" id="AppTenantSubscriptionPlan_TenantId" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.tenantId" name="TenantId"  />
+								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_TenantId"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppTenantSubscriptionPlan_TenantName">{{l("TenantName")}} *</label>
+									<input type="text" #AppTenantSubscriptionPlan_TenantName="ngModel" id="AppTenantSubscriptionPlan_TenantName" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.tenantName" name="TenantName"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_TenantName"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppTenantSubscriptionPlan_AppSubscriptionHeaderId">{{l("AppSubscriptionHeaderId")}}</label>
+									<input type="number" #AppTenantSubscriptionPlan_AppSubscriptionHeaderId="ngModel" id="AppTenantSubscriptionPlan_AppSubscriptionHeaderId" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.appSubscriptionHeaderId" name="AppSubscriptionHeaderId"  />
+								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_AppSubscriptionHeaderId"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppTenantSubscriptionPlan_SubscriptionPlanCode">{{l("SubscriptionPlanCode")}} *</label>
+									<input type="text" #AppTenantSubscriptionPlan_SubscriptionPlanCode="ngModel" id="AppTenantSubscriptionPlan_SubscriptionPlanCode" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.subscriptionPlanCode" name="SubscriptionPlanCode"   minlength="1"  maxlength="30"  required/>
+								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_SubscriptionPlanCode"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppTenantSubscriptionPlan_CurrentPeriodStartDate">{{l("CurrentPeriodStartDate")}}</label>
+									 <input required class="form-control m-input" #AppTenantSubscriptionPlan_CurrentPeriodStartDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTenantSubscriptionPlan.currentPeriodStartDate" id="AppTenantSubscriptionPlan_CurrentPeriodStartDate" name="AppTenantSubscriptionPlan_CurrentPeriodStartDate">
+									<validation-messages [formCtrl]="AppTenantSubscriptionPlan_CurrentPeriodStartDate"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppTenantSubscriptionPlan_CurrentPeriodEndDate">{{l("CurrentPeriodEndDate")}}</label>
+									 <input required class="form-control m-input" #AppTenantSubscriptionPlan_CurrentPeriodEndDate type="datetime" bsDatepicker  datePickerMomentModifier  [(date)]="appTenantSubscriptionPlan.currentPeriodEndDate" id="AppTenantSubscriptionPlan_CurrentPeriodEndDate" name="AppTenantSubscriptionPlan_CurrentPeriodEndDate">
+									<validation-messages [formCtrl]="AppTenantSubscriptionPlan_CurrentPeriodEndDate"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppTenantSubscriptionPlan_BillingPeriod">{{l("BillingPeriod")}} *</label>
+									<input type="text" #AppTenantSubscriptionPlan_BillingPeriod="ngModel" id="AppTenantSubscriptionPlan_BillingPeriod" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.billingPeriod" name="BillingPeriod"   minlength="1"  maxlength="30"  required/>
+								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_BillingPeriod"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="AppTenantSubscriptionPlan_AllowOverAge" class="kt-checkbox">
+										<input #AppTenantSubscriptionPlan_AllowOverAge="ngModel" id="AppTenantSubscriptionPlan_AllowOverAge" type="checkbox" name="AllowOverAge" [(ngModel)]="appTenantSubscriptionPlan.allowOverAge"> 
+										{{l("AllowOverAge")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppTenantSubscriptionPlan_AllowOverAge"></validation-messages>
+								</div>
+					
+            </div>
+              <div class="kt-portlet__foot">
+				<div class="col-lg-12">
+					<button (click)="save()" class="btn btn-primary blue float-right"
+                        [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
+                        <span>{{l("Save")}}</span>
+                    </button>
+                    <button *ngIf="!this.appTenantSubscriptionPlan.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
+                        [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
+                        <span>{{l("SaveAndNew")}}</span>
+                    </button>
+				</div>
+		    </div>
+        </div>
+    </div>
+  </div>
+  
+</div>

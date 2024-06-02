@@ -1,0 +1,66 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+            				<span>{{l("Entity_Name_Plural_Here")}} {{l("Details")}}</span>
+            			</h3>
+            			<span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            			<div class="kt-subheader__breadcrumbs">
+            				<a [routerLink]="['/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans']"
+            					class="kt-subheader__breadcrumbs-home"><i
+            						class="flaticon2-shelter"></i>{{l("AppTenantSubscriptionPlan")}}</a>
+            				<span class="kt-subheader__breadcrumbs-separator"></span>
+            				<a 
+            					class="kt-subheader__breadcrumbs-link kt-subheader__breadcrumbs-link--active">
+            					<span>{{l("Details")}}</span>
+            				</a>
+            			</div>
+                    </div>
+                  </div>
+                </div>
+             
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <div class="row align-items-center">
+                                     <div class="col-6 mb-3">
+                        <h6>{{l("TenantName")}} :</h6>
+                        {{ item.appTenantSubscriptionPlan.tenantName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("AppSubscriptionHeaderId")}} :</h6>
+                        {{ item.appTenantSubscriptionPlan.appSubscriptionHeaderId }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("SubscriptionPlanCode")}} :</h6>
+                        {{ item.appTenantSubscriptionPlan.subscriptionPlanCode }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("CurrentPeriodStartDate")}} :</h6>
+                        {{ item.appTenantSubscriptionPlan.currentPeriodStartDate |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("CurrentPeriodEndDate")}} :</h6>
+                        {{ item.appTenantSubscriptionPlan.currentPeriodEndDate |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("BillingPeriod")}} :</h6>
+                        {{ item.appTenantSubscriptionPlan.billingPeriod }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("AllowOverAge")}} :</h6>
+                        <div *ngIf="item.appTenantSubscriptionPlan.allowOverAge" class="text-left"><i class="fa fa-check-circle kt--font-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.appTenantSubscriptionPlan.allowOverAge" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>
+                 
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>

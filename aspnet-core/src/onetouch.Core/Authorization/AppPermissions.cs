@@ -6,6 +6,21 @@
     /// </summary>
     public static class AppPermissions
     {
+        public const string Pages_Administration_AppTenantActivitiesLog = "Pages.Administration.AppTenantActivitiesLog";
+        public const string Pages_Administration_AppTenantActivitiesLog_Create = "Pages.Administration.AppTenantActivitiesLog.Create";
+        public const string Pages_Administration_AppTenantActivitiesLog_Edit = "Pages.Administration.AppTenantActivitiesLog.Edit";
+        public const string Pages_Administration_AppTenantActivitiesLog_Delete = "Pages.Administration.AppTenantActivitiesLog.Delete";
+
+        public const string Pages_AppTenantActivitiesLog = "Pages.AppTenantActivitiesLog";
+        public const string Pages_AppTenantActivitiesLog_Create = "Pages.AppTenantActivitiesLog.Create";
+        public const string Pages_AppTenantActivitiesLog_Edit = "Pages.AppTenantActivitiesLog.Edit";
+        public const string Pages_AppTenantActivitiesLog_Delete = "Pages.AppTenantActivitiesLog.Delete";
+
+        public const string Pages_Administration_AppTenantSubscriptionPlans = "Pages.Administration.AppTenantSubscriptionPlans";
+        public const string Pages_Administration_AppTenantSubscriptionPlans_Create = "Pages.Administration.AppTenantSubscriptionPlans.Create";
+        public const string Pages_Administration_AppTenantSubscriptionPlans_Edit = "Pages.Administration.AppTenantSubscriptionPlans.Edit";
+        public const string Pages_Administration_AppTenantSubscriptionPlans_Delete = "Pages.Administration.AppTenantSubscriptionPlans.Delete";
+
         public const string Pages_AppSubscriptionPlanHeaders = "Pages.AppSubscriptionPlanHeaders";
         public const string Pages_AppSubscriptionPlanHeaders_Create = "Pages.AppSubscriptionPlanHeaders.Create";
         public const string Pages_AppSubscriptionPlanHeaders_Edit = "Pages.AppSubscriptionPlanHeaders.Edit";

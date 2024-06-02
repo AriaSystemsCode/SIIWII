@@ -3,6 +3,10 @@ import { FileUploadModule as PrimeNgFileUploadModule } from 'primeng/fileupload'
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+//import { AppTenantActivitiesLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/appTenantActivitiesLog.component';
+import { ViewAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/view-appTenantActivityLog.component';
+import { CreateOrEditAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/create-or-edit-appTenantActivityLog.component';
+
 import { AppFeaturesComponent } from './appSubScriptionPlan/appFeatures/appFeatures.component';
 import { ViewAppFeatureComponent } from './appSubScriptionPlan/appFeatures/view-appFeature.component';
 import { CreateOrEditAppFeatureComponent } from './appSubScriptionPlan/appFeatures/create-or-edit-appFeature.component';
@@ -47,9 +51,9 @@ import { TicketsComponent } from "./autoTaskTickets/tickets/tickets.component";
 import { ViewTicketModalComponent } from "./autoTaskTickets/tickets/view-ticket-modal.component";
 import { CreateOrEditTicketModalComponent } from "./autoTaskTickets/tickets/create-or-edit-ticket-modal.component";
 
-import { AppTenantsActivitiesLogsComponent } from "./appTenantsActivitiesLogs/appTenantsActivitiesLogs/appTenantsActivitiesLogs.component";
-import { ViewAppTenantsActivitiesLogModalComponent } from "./appTenantsActivitiesLogs/appTenantsActivitiesLogs/view-appTenantsActivitiesLog-modal.component";
-import { CreateOrEditAppTenantsActivitiesLogModalComponent } from "./appTenantsActivitiesLogs/appTenantsActivitiesLogs/create-or-edit-appTenantsActivitiesLog-modal.component";
+//import { AppTenantsActivitiesLogsComponent } from "./app/admin/appSubScriptionPlan/appTenantActivitiesLog/appTenantsActivitiesLogs.component";
+//import { ViewAppTenantsActivitiesLogModalComponent } from "./appTenantsActivitiesLogs/appTenantsActivitiesLogs/view-appTenantsActivitiesLog-modal.component";
+//import { CreateOrEditAppTenantsActivitiesLogModalComponent } from "./appTenantsActivitiesLogs/appTenantsActivitiesLogs/create-or-edit-appTenantsActivitiesLog-modal.component";
 
 import { AppTenantPlansComponent } from "./appTenantPlans/appTenantPlans/appTenantPlans.component";
 import { ViewAppTenantPlanModalComponent } from "./appTenantPlans/appTenantPlans/view-appTenantPlan-modal.component";
@@ -237,6 +241,10 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
     ],
     declarations: [
+		//AppTenantActivitiesLogComponent,
+
+		ViewAppTenantActivityLogComponent,
+		CreateOrEditAppTenantActivityLogComponent,
 		AppFeaturesComponent,
 
 		ViewAppFeatureComponent,
@@ -278,10 +286,10 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
         ViewTicketModalComponent,
         CreateOrEditTicketModalComponent,
-        AppTenantsActivitiesLogsComponent,
+        //AppTenantActivitiesLogComponent,
 
-        ViewAppTenantsActivitiesLogModalComponent,
-        CreateOrEditAppTenantsActivitiesLogModalComponent,
+        //AppTenantActivitiesLogComponent,
+        CreateOrEditAppTenantActivityLogComponent,
         AppTenantPlansComponent,
 
         ViewAppTenantPlanModalComponent,

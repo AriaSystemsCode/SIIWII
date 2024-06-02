@@ -65,8 +65,8 @@ export class AppNavigationService {
         let adminMenu = new AppMenuItem('Administration', '', 'flaticon-interface-8', '', [], [])
         let AppSubscriptionPlanHeaders=   new AppMenuItem('Subscriptions Plan', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders')
         let AppSubscriptionPlanDetail=  new AppMenuItem('Subscription Plan Details', 'Pages.Administration.AppSubscriptionPlanDetails', 'flaticon-more', '/app/admin/appSubScriptionPlan/appSubscriptionPlanDetails')
-
-     
+        let AppTenantSubscriptionPlan = new AppMenuItem('Tenant Subscription Plans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans')
+        let AppTenantActivityLog = new AppMenuItem('Tenant Activities Log', '', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantActivitiesLog')
 
             if (!this.isHost) {
             adminMenu.items.push(
@@ -78,10 +78,9 @@ export class AppNavigationService {
                 
                     AppSubscriptionPlanHeaders,
                     AppSubscriptionPlanDetail,
-            
-            
+                    AppTenantSubscriptionPlan,
+                    AppTenantActivityLog,
                 new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [
-                new AppMenuItem('AppTenantsActivitiesLog', 'Pages.Administration.AppTenantsActivitiesLogs', 'flaticon-more', '/app/admin/appTenantsActivitiesLogs/appTenantsActivitiesLogs'),
                 new AppMenuItem('AppTenantPlans', 'Pages.Administration.AppTenantPlans', 'flaticon-more', '/app/admin/appTenantPlans/appTenantPlans'),
                 new AppMenuItem('AppTransactions', 'Pages.Administration.AppTransactions', 'flaticon-more', '/app/admin/appTransactions/appTransactions'),
                 new AppMenuItem('SycPlanServices', 'Pages.Administration.SycPlanServices', 'flaticon-more', '/app/admin/sycPlanServices/sycPlanServices'),
@@ -93,6 +92,10 @@ export class AppNavigationService {
             new AppMenuItem('OrganizationUnits', 'Pages.Administration.OrganizationUnits', 'flaticon-map', '/app/admin/organization-units'),
             new AppMenuItem('Roles', 'Pages.Administration.Roles', 'flaticon-suitcase', '/app/admin/roles'),
             new AppMenuItem('Users', 'Pages.Administration.Users', 'flaticon-users', '/app/admin/users'),
+
+            
+            //new AppMenuItem('AppTenantSubscriptionPlans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans'),
+            
             
             new AppMenuItem('AppFeatures', 'Pages.Administration.AppFeatures', 'flaticon-more', '/app/admin/appSubScriptionPlan/appFeatures'),
             

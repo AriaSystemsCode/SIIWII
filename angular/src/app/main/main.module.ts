@@ -53,6 +53,10 @@ import { MasterDetailChild_AppSubscriptionPlanHeader_ViewAppSubscriptionPlanDeta
 import { MasterDetailChild_AppSubscriptionPlanHeader_CreateOrEditAppSubscriptionPlanDetailModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/masterDetailChild_AppSubscriptionPlanHeader_create-or-edit-appSubscriptionPlanDetail-modal.component";
 import { AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetail-appSubscriptionPlanHeader-lookup-table-modal.component";
 import { AppSubscriptionPlanDetailsComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetails.component";
+import { AppTenantSubscriptionPlansComponent } from '@app/admin/appSubScriptionPlan/appTenantSubscriptionPlans/appTenantSubscriptionPlans.component';
+import { CreateOrEditAppTenantSubscriptionPlanComponent } from '@app/admin/appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
+import { ViewAppTenantSubscriptionPlanComponent } from '@app/admin/appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
+import { AppTenantActivitiesLogComponent } from "@app/admin/appSubScriptionPlan/appTenantActivitiesLog/appTenantActivitiesLog.component";
 
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 
@@ -108,7 +112,8 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
         MasterDetailChild_AppSubscriptionPlanHeader_ViewAppSubscriptionPlanDetailModalComponent,
         MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDetailsComponent,
         MasterDetailChild_AppSubscriptionPlanHeader_CreateOrEditAppSubscriptionPlanDetailModalComponent,
-        AppSubscriptionPlanDetailsComponent
+        AppSubscriptionPlanDetailsComponent, AppTenantSubscriptionPlansComponent ,CreateOrEditAppTenantSubscriptionPlanComponent ,
+         ViewAppTenantSubscriptionPlanComponent,AppTenantActivitiesLogComponent
         ],
     exports: [
         CommonModule,

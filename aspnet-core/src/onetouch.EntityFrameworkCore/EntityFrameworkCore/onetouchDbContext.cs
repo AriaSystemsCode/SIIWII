@@ -57,6 +57,12 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<AppTenantActivitiesLog> AppTenantActivitiesLog { get; set; }
+
+       // public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLog { get; set; }
+
+        public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
+
         public virtual DbSet<AppSubscriptionPlanHeader> AppSubscriptionPlanHeaders { get; set; }
 
         public virtual DbSet<AppSubscriptionPlanDetail> AppSubscriptionPlanDetails { get; set; }
@@ -103,7 +109,7 @@ namespace onetouch.EntityFrameworkCore
 
         public virtual DbSet<AppItemSharing> AppItemSharings { get; set; }
 
-        public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLogs { get; set; }
+        public virtual DbSet<oldAppTenantsActivitiesLog> AppTenantsActivitiesLogs { get; set; }
 
         public virtual DbSet<AppTenantPlan> AppTenantPlans { get; set; }
 
@@ -319,7 +325,7 @@ namespace onetouch.EntityFrameworkCore
             {
                 a.HasIndex(e => new { e.TenantId });
             });
-            modelBuilder.Entity<AppTenantsActivitiesLog>(a =>
+            modelBuilder.Entity<oldAppTenantsActivitiesLog>(a =>
                        {
                            a.HasIndex(e => new { e.TenantId });
                        });
