@@ -597,6 +597,7 @@ margin-right: 6px;"></i>
                              line-height: normal;">{{showHideSideBarTitle}}</span>
                                 </button>
                             </div>
+<div class="d-flex flex-row justify-content-between pt-1">
                             <div *ngIf="!messagesDetails[0].messages.isFavorite" (click)="
                                         favoriteMessage(messagesDetails[0].messages)
                                     " title="UnFavorite" class="mr-3 mt-2">
@@ -605,7 +606,7 @@ margin-right: 6px;"></i>
 
                             <div *ngIf="messagesDetails[0].messages.isFavorite" (click)="
                                         favoriteMessage(messagesDetails[0].messages)
-                                    " title="Favorite" class="mr-3 mt-2">
+                                    " title="Favorite"  class="mr-3 mt-2">
                                 <img src="https://www.gstatic.com/images/icons/material/system/1x/grade_black_20dp.png"
                                     style="width: 20px" />
                             </div>
@@ -614,7 +615,7 @@ margin-right: 6px;"></i>
     
                                 </span> -->
 
-                            <div title="Archive" class="mr-3 mt-2">
+                            <div title="Archive" class="mr-2 mt-2">
                                 <img src="{{
                                             appRootUrl()
                                         }}assets/message/Messaging_Archiving_icon.svg" style="width: 20px" (click)="
@@ -623,7 +624,7 @@ margin-right: 6px;"></i>
                                             )
                                         " />
                             </div>
-                            <div class="btn-group dropdown actionDropdown mr-3" dropdown container="body">
+                            <div class="actionDropdown btn-group dropdown mb-3 mr-3" dropdown container="body">
                                 <button class="dropdown-toggle btn btn-sm btn-primary btn-action" dropdownToggle
                                     style="cursor: pointer"></button>
 
@@ -662,6 +663,7 @@ margin-right: 6px;"></i>
                                     </li>
                                 </ul>
                             </div>
+                        </div>
                         </div>
                     </div>
                     </div>
@@ -725,7 +727,7 @@ margin-right: 6px;"></i>
                                             color: #b5b5c3;
                                             position: absolute;
                                             right: 0;
-                                            top: -14px;
+                                            top: 20px;
                                         ">{{
                                     messagedetail.messages.sendDate
                                     | niceDateFormatPipe
@@ -910,7 +912,7 @@ margin-right: 6px;"></i>
     
                                 </span> -->
 
-                            <div title="Archive" class="mr-3 mt-2">
+                            <div title="Archive" class="mr-2 mt-2">
                                 <img src="{{
                                             appRootUrl()
                                         }}assets/message/Messaging_Archiving_icon.svg" style="width: 20px" (click)="
@@ -1026,7 +1028,7 @@ margin-right: 6px;"></i>
                                             color: #b5b5c3;
                                             position: absolute;
                                             right: 0;
-                                            top: -14px;
+                                            top: 20px;
                                         ">{{
                                     messagedetail.messages.sendDate
                                     | niceDateFormatPipe
