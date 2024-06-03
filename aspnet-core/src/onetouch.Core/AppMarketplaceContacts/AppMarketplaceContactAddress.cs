@@ -40,6 +40,6 @@ namespace onetouch.AppMarketplaceContacts
 
 		[ForeignKey("ContactId")]
 		public virtual AppMarketplaceContact ContactFk { get; set; }
-
-	}
+        public virtual DateTime TimeStamp { get; set; }
+    }
 }

@@ -148,7 +148,7 @@ namespace onetouch.EntityFrameworkCore
         //public virtual DbSet<SysObjectTypeProperty> SysObjectTypeProperties { get; set; }
 
         public virtual DbSet<AppContactPaymentMethod> AppContactPaymentMethods { get; set; }
-        public virtual DbSet<AppMarketplaceContactPaymentMethod> AppMarketplaceContactPaymentMethod { get; set; }
+        //public virtual DbSet<AppMarketplaceContactPaymentMethod> AppMarketplaceContactPaymentMethod { get; set; }
         public virtual DbSet<AppAddress> AppAddresss { get; set; }
         public virtual DbSet<AppMarketplaceAddress> AppMarketplaceAddress { get; set; }
         public virtual DbSet<AppContactAddress> AppContactAddresss { get; set; }

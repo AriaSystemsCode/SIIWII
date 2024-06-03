@@ -67,11 +67,11 @@ namespace onetouch.AppMarketplaceContacts
 		public virtual string AccountType { get; set; }
         public virtual long AccountTypeId { get; set; }
         public virtual string SSIN { get; set; }
-        public virtual string PriceLevel { get; set; }
-
+        //public virtual string PriceLevel { get; set; }
+        public virtual DateTime TimeStamp { get; set; }
         public virtual bool IsProfileData { get; set; }
-
-		public virtual long? Phone1TypeId { get; set; }
+        public virtual bool IsHidden { get; set; }
+        public virtual long? Phone1TypeId { get; set; }
 
 		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
 		public virtual string Phone1TypeName { get; set; }
@@ -138,11 +138,11 @@ namespace onetouch.AppMarketplaceContacts
 		[ForeignKey("Phone3TypeId")]
 		public virtual AppEntity Phone3TypeFk { get; set; }
 
-		//MARIAM
-		public virtual long? AccountId { get; set; }
-		[ForeignKey("AccountId")]
-		public virtual AppMarketplaceContact AccountFk { get; set; }
-		//Mariam
+		////MARIAM
+		//public virtual long? AccountId { get; set; }
+		//[ForeignKey("AccountId")]
+		//public virtual AppMarketplaceContact AccountFk { get; set; }
+		////Mariam
 
 		public ICollection<AppMarketplaceContact> ParentFkList { get; set; }
 
@@ -150,7 +150,7 @@ namespace onetouch.AppMarketplaceContacts
 
 		public ICollection<AppMarketplaceContactAddress> AppContactAddresses { get; set; }
 
-		public ICollection<AppMarketplaceContactPaymentMethod> AppContactPaymentMethods { get; set; }
+		//public ICollection<AppMarketplaceContactPaymentMethod> AppContactPaymentMethods { get; set; }
 
 
 	}

@@ -46,7 +46,7 @@ namespace onetouch.AppMarketplaceContacts
 
 		[ForeignKey("CountryId")]
 		public virtual AppEntity CountryFk { get; set; }
-		
+        public virtual DateTime TimeStamp { get; set; }
 
-	}
+    }
 }

@@ -85,7 +85,7 @@ namespace onetouch.MarketplaceAccounts
         private readonly IEmailSender _emailSender;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IConfigurationRoot _appConfiguration;
-        private readonly IRepository<AppMarketplaceContactPaymentMethod, long> _appContactPaymentMethodRepository;
+       // private readonly IRepository<AppMarketplaceContactPaymentMethod, long> _appContactPaymentMethodRepository;
         private readonly ISycEntityObjectClassificationsAppService _sycEntityObjectClassificationsAppService;
         private readonly ISycEntityObjectCategoriesAppService _sycEntityObjectCategoriesAppService;
         private readonly ISycAttachmentCategoriesAppService _sSycAttachmentCategoriesAppService;
@@ -112,7 +112,7 @@ namespace onetouch.MarketplaceAccounts
             , IEmailSender emailSender
             , IAppEntitiesAppService appEntitiesAppService
             , IAppConfigurationAccessor appConfigurationAccessor
-            , IRepository<AppMarketplaceContactPaymentMethod, long> appContactPaymentMethodRepository
+            //, IRepository<AppMarketplaceContactPaymentMethod, long> appContactPaymentMethodRepository
             , ISycEntityObjectClassificationsAppService sycEntityObjectClassificationsAppService
             , ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService
             , ISycAttachmentCategoriesAppService sSycAttachmentCategoriesAppService
@@ -133,7 +133,7 @@ namespace onetouch.MarketplaceAccounts
             _emailSender = emailSender;
             _appEntitiesAppService = appEntitiesAppService;
             _appConfiguration = appConfigurationAccessor.Configuration;
-            _appContactPaymentMethodRepository = appContactPaymentMethodRepository;
+           // _appContactPaymentMethodRepository = appContactPaymentMethodRepository;
             _sycEntityObjectClassificationsAppService = sycEntityObjectClassificationsAppService;
             _sycEntityObjectCategoriesAppService = sycEntityObjectCategoriesAppService;
             _sSycAttachmentCategoriesAppService = sSycAttachmentCategoriesAppService;
@@ -246,7 +246,8 @@ namespace onetouch.MarketplaceAccounts
                                             AccountTypeId = o.EntityObjectTypeId,
                                             AccountType = o.EntityObjectTypeCode,
                                             SSIN = o.SSIN,
-                                            PriceLevel = o.PriceLevel,
+                                            //PriceLevel = o.PriceLevel,
+                                            PriceLevel = "",
                                             Name = o.Name,
                                             City = o.AppContactAddresses.FirstOrDefault().AddressFk.City,
                                             State = o.AppContactAddresses.FirstOrDefault().AddressFk.State,
@@ -549,7 +550,7 @@ namespace onetouch.MarketplaceAccounts
  
                 var contact = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
                     .ThenInclude(x => x.AddressFk).AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.AccountId == null);
+                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true );
   
                 if (contact != null)
                 {
@@ -673,7 +674,7 @@ namespace onetouch.MarketplaceAccounts
 
                     //Mariam -Publish Account related branches [Start]
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                    var branchInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.AccountId == contact.Id &&
+                    var branchInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.SSIN == contact.SSIN &&
                                      x.ParentId == contact.Id && x.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
 
                     foreach (var branchObj in branchInfo)
@@ -683,7 +684,7 @@ namespace onetouch.MarketplaceAccounts
                     //Mariam -Publish Account related branches [End]
                     //Publish contacts
                     var contactInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id 
-                    && x.AccountId == contact.Id && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
+                    && x.SSIN == contact.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
 
                     foreach (var contactObj in contactInfo)
                     {
@@ -826,7 +827,7 @@ namespace onetouch.MarketplaceAccounts
                 }
                 //Mariam - Publish Account related contacts[Start]
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var contactInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id && x.AccountId == contact.AccountId && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
+                var contactInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id && x.SSIN == contact.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
 
                 foreach (var contactObj in contactInfo)
                 {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using onetouch.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    partial class onetouchDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240602204340_addMarketplacecontact")]
+    partial class addMarketplacecontact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3642,9 +3645,6 @@ namespace onetouch.Migrations
                     b.Property<int?>("TenantId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
@@ -3684,9 +3684,6 @@ namespace onetouch.Migrations
                     b.Property<long>("ContactId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
@@ -3698,6 +3695,89 @@ namespace onetouch.Migrations
                     b.ToTable("AppMarketplaceContactAddresses", t =>
                         {
                             t.HasTrigger("AppMarketplaceContactAddresses_Trigger");
+                        });
+                });
+
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContactPaymentMethod", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CardExpirationMonth")
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
+                    b.Property<string>("CardExpirationYear")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("CardHolderName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("CardNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CardPaymentToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CardProfileToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("CardType")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("ContactCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("ContactId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte>("PaymentType")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("AppMarketplaceContactPaymentMethods", t =>
+                        {
+                            t.HasTrigger("AppMarketplaceContactPaymentMethods_Trigger");
                         });
                 });
 
@@ -7051,9 +7131,6 @@ namespace onetouch.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsHidden")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsProfileData")
                         .HasColumnType("bit");
 
@@ -7135,8 +7212,8 @@ namespace onetouch.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("PriceLevel")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TradeName")
                         .IsRequired()
@@ -8325,6 +8402,17 @@ namespace onetouch.Migrations
                     b.Navigation("ContactFk");
                 });
 
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContactPaymentMethod", b =>
+                {
+                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceContact", "ContactFk")
+                        .WithMany("AppContactPaymentMethods")
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ContactFk");
+                });
+
             modelBuilder.Entity("onetouch.AppMarketplaceItemLists.AppMarketplaceItemsListDetails", b =>
                 {
                     b.HasOne("onetouch.AppMarketplaceItems.AppMarketplaceItems", "ItemFK")
@@ -9259,6 +9347,8 @@ namespace onetouch.Migrations
             modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContact", b =>
                 {
                     b.Navigation("AppContactAddresses");
+
+                    b.Navigation("AppContactPaymentMethods");
 
                     b.Navigation("ParentFkList");
 
