@@ -19,7 +19,7 @@
             <div class="col-md-5">
                 <div class="details mx-3 d-flex flex-column">
                     <div class="d-flex justify-content-end">
-                    <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData.sellerSSIN"
+                    <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
                     >
                         <a
                             style="text-decoration: none"
@@ -51,7 +51,7 @@
                         <div class="price mb-4">
                             <!-- show msrp price and range in this product has no special pricing -->
                             <div
-                                class="msrp d-flex"
+                                class="msrp d-flex mb-4"
                             >
                                 <h5 class="mr-2" style="color: black !important;">MSRP:  </h5>
                                 <h5>
@@ -90,11 +90,11 @@
                                 <h5> /EAC </h5>
                             </div>
                             <div 
-                            *ngIf="productDetails?.minSpecialPrice"
-                            class="msrp d-flex align-items-baseline justify-content-end"
+                            *ngIf="productDetails?.minSpecialPrice "
+                            class="msrp d-flex"
                         >
                             <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
-                            <h5>
+                            <h5 *ngIf="showEditSpecialPrice"> 
                                 <!-- {{
                                     productDetails?.appItemPriceInfos[0]
                                         .currencySymbol
@@ -108,7 +108,7 @@
                             <span
                                 *ngIf="
                                     productDetails?.minSpecialPrice !==
-                                    productDetails?.maxSpecialPrice
+                                    productDetails?.maxSpecialPrice && showEditSpecialPrice
                                 "
                             >
                                 -
@@ -116,8 +116,8 @@
                             <h5
                                 *ngIf="
                                 productDetails?.minSpecialPrice !==
-                                productDetails?.maxSpecialPrice
-                                "
+                                productDetails?.maxSpecialPrice  && showEditSpecialPrice"
+                                
                             >
                                 <!-- {{
                                     productDetails?.appItemPriceInfos[0]
@@ -129,6 +129,38 @@
                                     
                                 {{ productDetails?.maxSpecialPrice }}
                             </h5>
+                            <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false" />
+                            
+                            <label class="ml-3"
+                            *ngIf="!showEditSpecialPrice">
+                            <div class="editQtyContainer">
+                                <div class="fieldset">
+                                    <div class="input-group">
+                                      <input type="number" min="0" class="form-control inputs form-text" id="editQty"
+                                             [(ngModel)]="updatedSpecialPrice">
+                                      <div class="input-group-append position-absolute" style=" right: 0px;
+                                      top: 4px;    z-index: 99999;">
+                                        <button class="btn btn-save  mr-0 pr-0" (click)="onEditpecialPrice(updatedSpecialPrice)"
+                                                [ngClass]="{ 'disabled': updatedSpecialPrice <= 0 ||
+                                               updatedSpecialPrice == productDetails.minSpecialPrice }"
+                                                [disabled]="updatedSpecialPrice <= 0 ||
+                                               updatedSpecialPrice == productDetails.minSpecialPrice ">
+                                          <i class="fa fa-save"></i>
+                                        </button>
+                                      </div>
+                                      <div  class="input-group-append position-absolute" style="right: 10px;    z-index: 99999;">
+                                        <button class="btn ml-0 pl-2 pt-3 pb-3" (click)="showEditSpecialPrice= true">
+                                          <i class="clear-text fa fa-1x fa-times"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                    
+                                  </div>
+                            </div>
+
+                        </label>
+
+                        
                         </div>
                         </div>
                     </div>

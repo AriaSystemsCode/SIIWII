@@ -185,3 +185,11 @@ table th{
 .summaryTables td {
     color: #9E9E9E !important;
 }
+
+
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
