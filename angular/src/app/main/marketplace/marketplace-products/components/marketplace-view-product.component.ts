@@ -518,7 +518,7 @@ slideToPreviousImage(): void {
     onEditpecialPrice(updatedSpecialPrice){
         this.productDetails.minSpecialPrice=updatedSpecialPrice;
         this.productDetails.maxSpecialPrice= updatedSpecialPrice;
-
+        this.showEditSpecialPrice= true
     }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();

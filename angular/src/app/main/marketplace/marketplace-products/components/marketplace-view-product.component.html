@@ -129,7 +129,7 @@
                                     
                                 {{ productDetails?.maxSpecialPrice }}
                             </h5>
-                            <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false" />
+                            <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" />
                             
                             <label class="ml-3"
                             *ngIf="!showEditSpecialPrice">
