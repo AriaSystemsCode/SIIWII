@@ -4,68 +4,35 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using Abp.Linq.Extensions;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.Application.Services.Dto;
 using onetouch.Authorization;
-using Abp.Extensions;
 using Abp.Authorization;
 using Microsoft.EntityFrameworkCore;
 using onetouch.AppMarketplaceContacts;
 using onetouch.Helpers;
 using Abp.Domain.Uow;
 using Abp.Net.Mail;
-using System.Net.Mail;
-using onetouch.Mail;
 using onetouch.AppEntities.Dtos;
 using onetouch.AppMarketplaceContacts.Dtos;
 using Abp.Collections.Extensions;
 using Abp.UI;
 using onetouch.AccountInfos.Dtos;
-using onetouch.Common;
-using Stripe.Checkout;
-using AuthorizeNet.Api.Contracts.V1;
-using AuthorizeNet.Api.Controllers.Bases;
-using AuthorizeNet.Api.Controllers;
-using Abp.UI;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using onetouch.Configuration;
 using onetouch.SystemObjects;
-using onetouch.SystemObjects.Dtos;
 using System.Data;
-using System.IO;
-//using OfficeOpenXml;
-using Bytescout.Spreadsheet;
-using onetouch.AppItems.Dtos;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using onetouch.Authorization.Users;
 using onetouch.SycIdentifierDefinitions;
-using onetouch.Globals.Dtos;
-using System.ComponentModel;
-using System.Dynamic;
-using onetouch.Globals;
 using onetouch.Notifications;
 using onetouch.Storage;
-using onetouch.Sessions.Dto;
-using AutoMapper;
-using Stripe;
-using Abp.Runtime.Session;
 using onetouch.MultiTenancy;
-using onetouch.AppMarketplaceAccountsPriceLevels;
-using System.Diagnostics;
 using Abp.EntityFrameworkCore.Uow;
 using onetouch.EntityFrameworkCore;
-using Twilio.Rest.Trunking.V1;
-using NUglify.Helpers;
 using onetouch.AppMarketplaceAccounts;
-using onetouch.AppMarketplaceContacts;
-using onetouch.AppMarketplaceContacts.Dtos;
 using onetouch.Accounts.Dtos;
 using onetouch.Accounts;
-using onetouch.AppContacts;
 using onetouch.AppContacts.Dtos;
 
 namespace onetouch.MarketplaceAccounts
@@ -85,26 +52,17 @@ namespace onetouch.MarketplaceAccounts
         private readonly IEmailSender _emailSender;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IConfigurationRoot _appConfiguration;
-       // private readonly IRepository<AppMarketplaceContactPaymentMethod, long> _appContactPaymentMethodRepository;
         private readonly ISycEntityObjectClassificationsAppService _sycEntityObjectClassificationsAppService;
         private readonly ISycEntityObjectCategoriesAppService _sycEntityObjectCategoriesAppService;
         private readonly ISycAttachmentCategoriesAppService _sSycAttachmentCategoriesAppService;
         private readonly Helper _helper;
         private readonly UserManager _userManager;
         private readonly SycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
-        //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
         private readonly IAppNotifier _appNotifier;
         private readonly IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> _appMarketplaceAccountsPriceLevelsRepo;
-        //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
-        //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
         private const int MaxProfilPictureBytes = 5242880;
         private readonly IBinaryObjectManager _binaryObjectManager;
-        //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
-        private enum CardType
-        {
-            MasterCard, Visa, AmericanExpress, Discover, JCB
-        };
-
+        
         public MarketplaceAccountsAppService(IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository
             , IRepository<AppEntity, long> appEntityRepository
             , Helper helper, IRepository<AppMarketplaceAddress, long> appAddressRepository
@@ -133,7 +91,7 @@ namespace onetouch.MarketplaceAccounts
             _emailSender = emailSender;
             _appEntitiesAppService = appEntitiesAppService;
             _appConfiguration = appConfigurationAccessor.Configuration;
-           // _appContactPaymentMethodRepository = appContactPaymentMethodRepository;
+            // _appContactPaymentMethodRepository = appContactPaymentMethodRepository;
             _sycEntityObjectClassificationsAppService = sycEntityObjectClassificationsAppService;
             _sycEntityObjectCategoriesAppService = sycEntityObjectCategoriesAppService;
             _sSycAttachmentCategoriesAppService = sSycAttachmentCategoriesAppService;
@@ -156,22 +114,13 @@ namespace onetouch.MarketplaceAccounts
             {
                 try
                 {
-
-
-                    //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                    //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
-                    //var currPublishContact = _appContactRepository.GetAll().Include(x => x.PartnerFkList).FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData);
+                    
                     var filteredAccounts = _appContactRepository.GetAll()
-                            .Include(e => e.AppContactAddresses).ThenInclude(a => a.AddressFk).ThenInclude(a => a.CountryFk)
-                            .Include(encl => encl.EntityClassifications)
-                            .Include(enca => enca.EntityCategories)
-                            .Include(ena => ena.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                            /*.WhereIf(currPublishContact != null,
-                                x => (x.SSIN != currPublishContact.Id))*///not current profile
-
-                            .WhereIf(input.FilterType < 3 && input.FilterType != 6 && input.FilterType != 2,//if filtertype != manual then filter all published acounts only
-                                x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null))
+                            .Include(e => e.AppContactAddresses).ThenInclude(e => e.AddressFk).ThenInclude(e => e.CountryFk)
+                            .Include(e => e.EntityClassifications)
+                            .Include(e => e.EntityCategories)
+                            .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
 
                             .WhereIf(!string.IsNullOrEmpty(input.Filter),
                                 x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
@@ -179,7 +128,7 @@ namespace onetouch.MarketplaceAccounts
                             .WhereIf(input.FilterType <= 1 && input.FilterType != 6,
                                 x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null && x.EntityObjectStatusId != cancelledStatusId))
                             .WhereIf(input.FilterType == 2 && input.FilterType != 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN!= null)
+                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
                                 && (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
                             .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
                                 x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null))
@@ -221,7 +170,8 @@ namespace onetouch.MarketplaceAccounts
                             .WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x => x.EntityObjectTypeId == input.AccountTypeId)
                             .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
-                           input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId));
+                           input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
+                            .Where(e=> e.IsProfileData && e.ParentId == null && e.IsHidden!=true);
 
                     var pagedAndFilteredAccounts = filteredAccounts
                     .OrderBy(input.Sorting ?? "name asc")
@@ -239,7 +189,7 @@ namespace onetouch.MarketplaceAccounts
                                     select new GetMarketplaceAccountForViewDto()
                                     {
                                         AvaliableConnectionName = GetAction(o.EntityObjectTypeCode),
-                                        ConnectionName = s1!=null && !s1.IsDeleted && s1.Id>0? GetAction(o.EntityObjectTypeCode) : "",
+                                        ConnectionName = s1 != null && !s1.IsDeleted && s1.Id > 0 ? GetAction(o.EntityObjectTypeCode) : "",
                                         Account = new AccountDto
                                         {
                                             AccountTypeString = o.EntityObjectTypeCode,
@@ -303,7 +253,7 @@ namespace onetouch.MarketplaceAccounts
             string action = "";
             if (string.IsNullOrEmpty(accountTypeCode))
             {
-                if (currentTenantEdition== "Personal" && accountTypeCode == "Personal") { action = "MPActionCONNECT"; }
+                if (currentTenantEdition == "Personal" && accountTypeCode == "Personal") { action = "MPActionCONNECT"; }
                 if (currentTenantEdition == "Personal" && accountTypeCode == "Business") { action = "MPActionFOLLOW"; }
                 if (currentTenantEdition == "Personal" && accountTypeCode == "Group") { action = "MPActionJOIN"; }
 
@@ -349,6 +299,20 @@ namespace onetouch.MarketplaceAccounts
             _appContactAddressRepository = appContactAddressRepository;
             _appAddressRepository = appAddressRepository;
         }
+
+        public async Task<bool> HideAccount(string SSIN)
+        {
+            try
+            {
+                
+                var ret = await _appContactRepository.FirstOrDefaultAsync(e => e.TenantId == null && e.SSIN == SSIN);
+                ret.IsHidden = true;
+                return true;
+            }
+            catch (Exception ex)
+            { return false; }
+        }
+
         public async Task<long> CreateOrEditAccount(CreateOrEditAccountInfoDto input)
         {
             if (input.UseDTOTenant == false)
@@ -547,11 +511,11 @@ namespace onetouch.MarketplaceAccounts
 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
- 
+
                 var contact = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
                     .ThenInclude(x => x.AddressFk).AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true );
-  
+                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true);
+
                 if (contact != null)
                 {
                     var entity = await _appEntityRepository.GetAll().AsNoTracking().Include(x => x.EntityCategories)
@@ -607,7 +571,7 @@ namespace onetouch.MarketplaceAccounts
                     var addressesIds = contact.AppContactAddresses.Select(x => x.AddressId).ToArray();
 
                     var addresses = _appAddressRepository.GetAll().Where(x => addressesIds.Contains(x.Id)).ToList();
-                    
+
                     foreach (var contactAddress in contact.AppContactAddresses)
                     {
                         var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
@@ -619,7 +583,7 @@ namespace onetouch.MarketplaceAccounts
 
                             //if (contactDto.ContactAddresses != null)
                             existedInPublish = await _appAddressRepository.GetAll()
-                                .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null 
+                                .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null
                                        && x.AccountId == contactDto.Id).FirstOrDefaultAsync();
 
                             ObjectMapper.Map(savedAddress, address);
@@ -683,7 +647,7 @@ namespace onetouch.MarketplaceAccounts
                     }
                     //Mariam -Publish Account related branches [End]
                     //Publish contacts
-                    var contactInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id 
+                    var contactInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id
                     && x.SSIN == contact.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
 
                     foreach (var contactObj in contactInfo)
@@ -765,13 +729,13 @@ namespace onetouch.MarketplaceAccounts
                     var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
                     AppMarketplaceAddress address = new AppMarketplaceAddress();
 
-                      
+
                     if (savedAddress != null)
                     {
                         AppMarketplaceAddress existedInPublish = null;
 
                         existedInPublish = await _appAddressRepository.GetAll()
-                            .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null 
+                            .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null
                             && x.AccountId == contactDto.Id).FirstOrDefaultAsync();
 
                         ObjectMapper.Map(savedAddress, address);
@@ -848,7 +812,7 @@ namespace onetouch.MarketplaceAccounts
         }
         private async Task<bool> PublishMember(long contactId)
         {
-            var contact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId 
+            var contact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
             && x.Id == contactId && x.IsProfileData == true);
             var entity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
@@ -856,12 +820,12 @@ namespace onetouch.MarketplaceAccounts
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contact.Id);
             //Get Contact Related Published records of Account and Branch
-            var publishedAccount = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null 
+            var publishedAccount = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
             && x.SSIN == contact.SSIN && x.IsProfileData == false);
-            var publishedBranch = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null 
+            var publishedBranch = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
             && x.SSIN == contact.SSIN && x.IsProfileData == false);
             //
-            var publishContact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null 
+            var publishContact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
             && x.IsProfileData == false && x.SSIN == contact.SSIN);
 
             AppEntityDto entityDto = new AppEntityDto();
