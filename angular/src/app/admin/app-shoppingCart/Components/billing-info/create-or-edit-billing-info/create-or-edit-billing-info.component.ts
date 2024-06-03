@@ -12,6 +12,7 @@ import { AddressComponent } from '../../address/address.component';
 })
 export class CreateOrEditBillingInfoComponent extends AppComponentBase {
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("BillingInfoValid") BillingInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
@@ -150,6 +151,7 @@ debugger
     this.contactIdApContact = data.compId;
     this.apContactSelectedAdd = null;
     //if(data.compssin){
+      if( this.AddressComponentChild)
     this.AddressComponentChild['first']?.getAddressList(data.compssin);
 
     //}
@@ -160,6 +162,7 @@ debugger
     this.contactIdARContact = data.compId;
     this.loadAddresComponentShipTo = true;
     this.arContactSelectedAdd = null;
+    if( this.AddressComponentChild)
     this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
 
     // }

@@ -29,6 +29,7 @@
                 <div class="pr-3" *ngIf="salesRepIndex>0">
                     <div class="row ml-1">
                         <app-contact class="w-100" [isCreateOrEdit]="createOrEditSalesRepInfo" [activeTab]="activeTab"
+                        [currentTab]="currentTab"
                             [salesRepIndex]="salesRepIndex" [appTransactionsForViewDto]="appTransactionsForViewDto"
                             (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                             (formValidityChanged)="isContactFormValid($event)"
@@ -47,7 +48,8 @@
     </div>
 
     <div *ngIf="!createOrEditSalesRepInfo">
-        <app-view-sales-rep-info [activeTab]="activeTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
+        <app-view-sales-rep-info [activeTab]="activeTab" 
+        [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
             (showSalesRepEditMode)="onShowSalesRepEditMode($event)" (onshowSaveBtn)="onshowSaveBtn($event)"
             [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"
             [canChange]="canChange"></app-view-sales-rep-info>

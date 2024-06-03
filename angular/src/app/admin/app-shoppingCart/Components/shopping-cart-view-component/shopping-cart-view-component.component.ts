@@ -3,7 +3,7 @@ import {
   , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -78,7 +78,8 @@ export class ShoppingCartViewComponentComponent
   @ViewChild('reportViewerContainer', { read: ViewContainerRef }) reportViewerContainer: ViewContainerRef;
   isOwnedByMe:boolean=true;
   canChange:boolean=true;
-  shareDone:boolean=false;
+  companeyNames:GetAccountInformationOutputDto[];
+  currentTab:number
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -91,6 +92,7 @@ export class ShoppingCartViewComponentComponent
 
   }
   ngOnInit(): void {
+   
   }
   loadCommentsList() {
     // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
@@ -163,7 +165,6 @@ export class ShoppingCartViewComponentComponent
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
-    this.shareDone=false;
   }
 
   getColumns() {
@@ -182,60 +183,87 @@ export class ShoppingCartViewComponentComponent
     //header
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
-        this.appTransactionsForViewDto = res;
-
-        this.isOwnedByMe= res.isOwnedByMe;
-       this.canChange= this.isOwnedByMe
-        this.transactionCode=res?.code;
-        if (res?.entityAttachments?.length > 0)
-          this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
-
-        this.orderConfirmationFile = res.orderConfirmationFile;
-        this.loadCommentsList()
-
-        //lines
         this._AppTransactionServiceProxy
-          .getOrderDetailsForView(
-            this.orderId,
-            this.showVariations,
-            this.colorFilter,
-            this.sizeFilter,
-            this.productCode
-          )
-          .subscribe((res) => {
-            this.shoppingCartDetails = res;
-           // this.resetTabValidation();
-
-            this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
-
-            this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-            if (res.transactionType == TransactionType.PurchaseOrder)
-              this.transactionType = "Purchase Order";
-
-            if (res.transactionType == TransactionType.SalesOrder)
-              this.transactionType = "Sales Order";
-
-              this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
-
-
-            if (!temp) this.shoppingCartTreeNodes = res.detailsView;
-            else this.shoppingCartTreeNodes = temp;
-
-            this.colors = res.colors;
-            this.sizes = res.sizes;
-
-
-          });
-
-
-          //Currency
-            this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
-                .subscribe((res: CurrencyInfoDto) => {
-                    this.currencySymbol = res.symbol ? res.symbol : res.code  ;
-                });
-        this.modal.hide();
-        this.modal.show();
-        this.hideMainSpinner();
+        .getRelatedAccounts(
+            "",
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            0,
+            30,false
+        )
+        .subscribe((res2: PagedResultDtoOfGetAccountInformationOutputDto) => {
+          this.companeyNames= [...res2.items];
+         res.companeyNames=this.companeyNames;
+          this.appTransactionsForViewDto = res;
+          this.isOwnedByMe= res.isOwnedByMe;
+          this.canChange= this.isOwnedByMe
+           this.transactionCode=res?.code;
+           if (res?.entityAttachments?.length > 0)
+             this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
+   
+           this.orderConfirmationFile = res.orderConfirmationFile;
+           this.loadCommentsList()
+   
+           //lines
+           this._AppTransactionServiceProxy
+             .getOrderDetailsForView(
+               this.orderId,
+               this.showVariations,
+               this.colorFilter,
+               this.sizeFilter,
+               this.productCode
+             )
+             .subscribe((res) => {
+               this.shoppingCartDetails = res;
+              // this.resetTabValidation();
+   
+               this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
+   
+               this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+               if (res.transactionType == TransactionType.PurchaseOrder)
+                 this.transactionType = "Purchase Order";
+   
+               if (res.transactionType == TransactionType.SalesOrder)
+                 this.transactionType = "Sales Order";
+   
+                 this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
+   
+   
+               if (!temp) this.shoppingCartTreeNodes = res.detailsView;
+               else this.shoppingCartTreeNodes = temp;
+   
+               this.colors = res.colors;
+               this.sizes = res.sizes;
+   
+             });
+   
+   
+             //Currency
+               this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+                   .subscribe((res: CurrencyInfoDto) => {
+                       this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+                   });
+           this.modal.hide();
+           this.modal.show();
+           this.hideMainSpinner();
+        });
+          
+    
       });
   }
 
@@ -554,6 +582,7 @@ export class ShoppingCartViewComponentComponent
     this.showMainSpinner();
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
+        res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
         this.hideMainSpinner();
         this.showTabs = true;
@@ -636,7 +665,7 @@ export class ShoppingCartViewComponentComponent
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
-            this.onGeneratOrderReport(true);
+            this.onGeneratOrderReport(true,undefined,true);
             this.hideMainSpinner();
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
@@ -716,6 +745,7 @@ export class ShoppingCartViewComponentComponent
   }
 
   onChangeAppTransactionsForViewDto($event) {
+    $event.companeyNames=this.companeyNames;
     this.appTransactionsForViewDto = $event;
   }
 
@@ -730,8 +760,8 @@ export class ShoppingCartViewComponentComponent
   offShareTransaction() {
     this.onshare = false;
   }
-  onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams) {
-    if ($event) {
+  onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean) {
+    if (($event && this.shoppingCartDetails?.entityStatusCode?.toUpperCase()!='DRAFT') || ($event && FromPlaceOrder)) {
       this.reportUrl="";
       if(printInfoParam)
       this.printInfoParam=printInfoParam;
