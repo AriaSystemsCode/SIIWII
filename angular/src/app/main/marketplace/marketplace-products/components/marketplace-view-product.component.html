@@ -17,22 +17,24 @@
                 ></app-product-detail-images>
             </div>
             <div class="col-md-5">
-                <div class="details mx-3">
+                <div class="details mx-3 d-flex flex-column">
+                    <div class="d-flex justify-content-end">
                     <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData.sellerSSIN"
                     >
                         <a
-                            style="text-decoration: underline"
+                            style="text-decoration: none"
                           (click)="goToShowroom()"
                             rel="noopener noreferrer"
                             >Visit the vitrual showroom</a
                         >
                     </button>
+                    </div>
                     <div
-                        class="ssin_price my-3 d-flex align-items-center justify-content-between"
+                        class="ssin_price my-3  align-items-center justify-content-between"
                     >
-                        <div class="d-flex">
-                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode">
-                                Code : {{ productDetails?.manufacturerCode }}
+                        <div class="d-flex mb-3">
+                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
+                                {{ productDetails?.manufacturerCode }}
                             </h5>
                             <h6 class="type ml-1">
                                 {{
@@ -42,12 +44,16 @@
                                 }}
                             </h6>
                         </div>
-                        <div class="price">
+                        <div class="product-name mb-4">
+                            <h3 style="color: black !important;">{{ productDetails?.name }}</h3>
+                        </div>
+                        
+                        <div class="price mb-4">
                             <!-- show msrp price and range in this product has no special pricing -->
                             <div
-                                class="msrp d-flex align-items-baseline justify-content-end"
+                                class="msrp d-flex"
                             >
-                                <h5 class="mr-2">MSRP</h5>
+                                <h5 class="mr-2" style="color: black !important;">MSRP:  </h5>
                                 <h5>
                                     <!-- {{
                                         productDetails?.appItemPriceInfos[0]
@@ -81,13 +87,13 @@
                                      }}
                                     {{ productDetails?.maxMSRP }}
                                 </h5>
-                                <h5>/EAC</h5>
+                                <h5> /EAC </h5>
                             </div>
                             <div 
                             *ngIf="productDetails?.minSpecialPrice"
                             class="msrp d-flex align-items-baseline justify-content-end"
                         >
-                            <h5 class="mr-2">Special Price</h5>
+                            <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
                             <h5>
                                 <!-- {{
                                     productDetails?.appItemPriceInfos[0]
@@ -126,15 +132,13 @@
                         </div>
                         </div>
                     </div>
-                    <div class="product-name">
-                        <h3>{{ productDetails?.name }}</h3>
-                    </div>
-                    <div class="description my-3">
+                   
+                    <div class="description my-3 d-flex justify-content-end">
                         <button
                             (click)="scrollToTargetDiv()"
                             class="btn text-primary m-0 p-0"
                         >
-                            <a style="text-decoration: underline"
+                            <a style="text-decoration: none;font-weight: bold;"
                                 >Product description</a
                             >
                         </button>
@@ -147,7 +151,7 @@
                     />
 
                     <div class="color-selection">
-                        <h5 class="my-2" style="text-decoration: underline">
+                        <h5 class="my-2" style="text-decoration: none;color:black  !important">
                             Colors
                         </h5>
                         <!-- color selections -->
@@ -274,7 +278,7 @@
                         <h5
                             *ngIf="!productDetails?.orderByPrePack"
                             class="my-4"
-                            style="text-decoration: underline"
+                            style="text-decoration: none"
                         >
                             Order By Size
                         </h5>
@@ -325,7 +329,7 @@
                         <h5
                             *ngIf="productDetails?.orderByPrePack"
                             class="my-4"
-                            style="text-decoration: underline"
+                            style="text-decoration: none;color:black  !important"
                         >
                             Prepack Definition
                         </h5>
@@ -335,7 +339,7 @@
                         >
                             <tbody>
                                 <tr>
-                                    <th>Size</th>
+                                    <th  style="background-color: #F8F8F8;">Size</th>
                                     <td
                                         *ngFor="
                                             let size of colorsData[currentIndex]
@@ -344,10 +348,10 @@
                                     >
                                         {{ size.label }}
                                     </td>
-                                    <th>Total Pcs</th>
+                                    <th  style="background-color: #F8F8F8;">Total Pcs</th>
                                 </tr>
                                 <tr>
-                                    <th>Prepack</th>
+                                    <th  style="background-color: #F8F8F8;">Prepack</th>
                                     <td
                                         *ngFor="
                                             let size of colorsData[currentIndex]
@@ -474,7 +478,7 @@
             <div class="col-md-3">
                 <div class="summary border">
                     <div class="header">
-                        <h6 class="p-0 m-0">Ordered Summary</h6>
+                        <h6 class="p-0 m-0" style=" font-weight: bold;">Ordered Summary</h6>
                     </div>
                     <div class="totals">
                         <p class="p-0 m-0">qty {{ totalOrderQTY  }}</p>
@@ -532,7 +536,7 @@
                                     </button>
                                 </div>
                                 <!-- order by size summary table -->
-                                <table class="table">
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>Size</th>
@@ -587,8 +591,8 @@
                                                 ) !== 0
                                             "
                                         >
-                                            <th></th>
-                                            <th>
+                                            <th>Total</th>
+                                            <th style=" color: #9E9E9E !important;">
                                                 {{
                                                     calculateOrderedQTYSum(
                                                         order.color.sizes
@@ -596,14 +600,13 @@
                                                 }}
                                             </th>
                                             <th></th>
-                                            <th>
+                                            <th  style=" color: #9E9E9E !important;">
                                                 {{
                                                     calculatePriceSum(
                                                         order.color.sizes
                                                     )| currency:' '
                                                 }}
                                             </th>
-                                            <th></th>
                                         </tr>
                                     </tbody>
                                     <tbody
@@ -639,7 +642,7 @@
                                             </tr>
                                         </ng-container>
                                         <tr>
-                                            <th></th>
+                                            <th>Total</th>
                                             <th>
                                                 {{
                                                     calculatePrepackOrderedQTYSum(
@@ -657,7 +660,6 @@
                                                     )| currency:' '
                                                 }}
                                             </th>
-                                            <th></th>
                                         </tr>
                                     </tbody>
                                 </table>
