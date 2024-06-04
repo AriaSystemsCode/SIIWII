@@ -80,6 +80,7 @@ export class ShoppingCartViewComponentComponent
   canChange:boolean=true;
   companeyNames:GetAccountInformationOutputDto[];
   currentTab:number
+  shareDone:boolean=false;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -165,6 +166,7 @@ export class ShoppingCartViewComponentComponent
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
+    this.shareDone=false;
   }
 
   getColumns() {

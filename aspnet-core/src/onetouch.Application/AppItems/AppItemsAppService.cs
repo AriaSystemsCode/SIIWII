@@ -5879,7 +5879,7 @@ namespace onetouch.AppItems
                         appItemSizeScalesHeader.NoOfDimensions = sizescale.Result.NoOfDimensions;
                         appItemSizeScalesHeader.Dimesion1Name = sizescale.Result.Dimesion1Name;
                         appItemSizeScalesHeader.ParentId = null;
-                        appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(sizescale.Result.AppSizeScalesDetails);
+                        appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(sizescale.Result.AppSizeScalesDetails.Where(z => z.DimensionName!=null));
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
                         //appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
@@ -5968,30 +5968,32 @@ namespace onetouch.AppItems
                                 //        SizeRatio = int.Parse(arraySizeRatio[pos])
                                 //    });
                                 //}
-                                var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
-                                var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
-                                var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
-                                if (sizesRatio != null)
-                                {
-                                    foreach (var sz in sizesRatio)
+                                if (!string.IsNullOrEmpty(excelDto.SizeRatioName) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[0]) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[1]))
                                     {
-                                        var posinArr = sizesList.IndexOf(sz.SizeCode);
-                                        if (posinArr >= 0)
+                                    var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
+                                    var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
+                                    var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+                                    if (sizesRatio != null)
+                                    {
+                                        foreach (var sz in sizesRatio)
                                         {
-                                            appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                            var posinArr = sizesList.IndexOf(sz.SizeCode);
+                                            if (posinArr >= 0)
                                             {
-                                                SizeCode = sz.SizeCode.TrimEnd(),
-                                                D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
-                                                SizeId = null,
-                                                D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
-                                                D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
-                                                SizeRatio = int.Parse(sizesRatios[posinArr])
-                                            });
+                                                appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                                {
+                                                    SizeCode = sz.SizeCode.TrimEnd(),
+                                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+                                                    SizeId = null,
+                                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
+                                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
+                                                    SizeRatio = int.Parse(sizesRatios[posinArr])
+                                                });
+                                            }
                                         }
+                                        appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
                                     }
-                                    appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
                                 }
-
                                 if (string.IsNullOrEmpty(excelDto.SizeRatioName) && (appSizeScaleRatioForEditDto.AppSizeScalesDetails == null || appSizeScaleRatioForEditDto.AppSizeScalesDetails.Count == 0))
                                 {
                                     foreach (var sz in appSizeScaleForEditDto.AppSizeScalesDetails)
