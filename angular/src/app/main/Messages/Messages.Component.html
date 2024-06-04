@@ -125,7 +125,7 @@ appRootUrl() +
 
 
                 <div class="tabs-cont ml-3" *ngIf="messageTypeIndex==1">
-                    <button class="active-tab btn btn-primary btn-sm ng-tns-c357-9 pb-0 m-0 ml-3 clickBtn active-tab" style="cursor: pointer;
+                    <button class="active-tab btn btn-primary btn-sm ng-tns-c357-9 pb-0 m-0 ml-3 clickBtn" style="cursor: pointer;
                     border-radius: 6px 0px 0px 6px;
                     padding: 1px 16px 1px 16px;
                     border: 1px solid #eee !important;
@@ -140,8 +140,8 @@ appRootUrl() +
                     font-family: Poppins;
                     font-size: 16px;
                     font-style: normal;
-                    font-weight: 600;
-                    line-height: normal;" (click)="getPrimaryMessage()">Direct Message</span>
+                    font-weight: 600; 
+                    line-height: normal;" (click)="getPrimaryMessage($event)">Direct Message</span>
                         <label style="text-align: center !important" *ngIf="totalPrimaryUnread>0">
                             <span  style="left: 10px">{{
                                 totalPrimaryUnread
@@ -669,10 +669,10 @@ margin-right: 6px;"></i>
                     </div>
                     
                     <div #messageEl id="contentmsg"  class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
-                        [scrollTop]="scrolltop" style="position: relative">
-                        <div *ngFor="
+                        [scrollTop]="scrolltop">
+                        <div style="position: relative" *ngFor="
                                     let messagedetail of messagesDetails;
-                                    let i = index
+                                    let i = index 
                                 ">
                             <!-- <div class="btn-group dropdown btn-actions-message" dropdown container="body">
     
@@ -970,8 +970,8 @@ margin-right: 6px;"></i>
 
 
                     <div #messageEl id="contentmsg" class="w-100" [ngClass]="{ Scroll: messagesDetails.length > 1 }"
-                        [scrollTop]="scrolltop" style="position: relative">
-                        <div *ngFor="
+                        [scrollTop]="scrolltop"> 
+                        <div style="position: relative" *ngFor="
                                     let messagedetail of messagesDetails;
                                     let i = index
                                 ">
