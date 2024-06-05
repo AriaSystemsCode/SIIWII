@@ -23,7 +23,7 @@
                     ></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row align-items-start mb-3">
+                    <div class="row align-items-start mb-3 border-bottom">
                         <div class="col-md-1">
                             <div class="InputText">
                                 <span class="text-input-label"
@@ -32,7 +32,7 @@
                             </div>
                         </div>
                         <div
-                            class="p-0 sendUsers"
+                            class="p-0 sendusers mb-1 mb-1"
                             [ngClass]="
                                 'col-md-' +
                                 (9 + (displayCC ? 1 : 0) + (displayBCC ? 1 : 0))
@@ -89,7 +89,7 @@
                         </div>
                     </div>
 
-                    <div class="row align-items-start mb-3" *ngIf="displayCC">
+                    <div class="row align-items-start mb-3 border-bottom" *ngIf="displayCC">
                         <div class="col-md-1">
                             <div
                                 class="InputText"
@@ -101,7 +101,7 @@
                                 >
                             </div>
                         </div>
-                        <div class="col-md-11 sendUsers">
+                        <div class="col-md-11 sendusers mb-1">
                             <p-autoComplete
                                 [style]="{ width: '100%' }"
                                 [inputStyle]="{
@@ -126,7 +126,7 @@
                         </div>
                     </div>
 
-                    <div class="row align-items-start mb-3" *ngIf="displayBCC">
+                    <div class="row align-items-start mb-3 border-bottom" *ngIf="displayBCC">
                         <div class="col-md-1">
                             <div
                                 class="InputText"
@@ -138,7 +138,7 @@
                                 >
                             </div>
                         </div>
-                        <div class="col-md-11 sendUsers">
+                        <div class="col-md-11 sendusers mb-1">
                             <p-autoComplete
                                 [style]="{ width: '100%' }"
                                 [inputStyle]="{ width: '100%' }"
@@ -275,23 +275,17 @@
                 <div
                     class="modal-footer"
                     style="
-                        justify-content: flex-start !important
-                      ;
                         border-bottom: none;
                     "
                 >
-                    <button
-                        type="button"
-                        [class.disabled]="toUsers.length == 0 || subject == ''"
-                        [disabled]="toUsers.length == 0 || subject == ''"
-                        class="sendBtn"
-                        (click)="sendMessage()"
-                    >
-                        {{ "Send" | localize }}
-                    </button>
+                   
                     <div class="icon-upload">
                         <label for="file-input">
-                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                            <!-- <i class="fa fa-paperclip" aria-hidden="true"></i> -->
+                            <i  aria-hidden="true"> <img
+                                src="../../../assets/message/iconamoon_attachment.png"
+                                class="icon-file"
+                            /></i>
                         </label>
 
                         <input
@@ -301,6 +295,15 @@
                             multiple
                         />
                     </div>
+                    <button
+                    type="button"
+                    [class.disabled]="toUsers.length == 0 || subject == ''"
+                    [disabled]="toUsers.length == 0 || subject == ''"
+                    class="sendBtn"
+                    (click)="sendMessage()"
+                >
+                <i class="fa  fa-paper-plane mr-1" style="color: white;"></i>   {{ "Send" | localize }}
+                </button>
                 </div>
             </form>
             
@@ -318,7 +321,7 @@
                         <label class="p-3"  *ngIf="replyMessageId > 0"> {{ subject }}</label>
                     </div>
                     <div class="modal-body  h-100 mr-3">
-                        <div class="row align-items-start mb-3">
+                        <div class="row align-items-start mb-3 border-bottom">
                             <div class="col-1">
                                 <div class="InputText">
                                     <span class="text-input-label"
@@ -327,7 +330,7 @@
                                 </div>
                             </div>
                             <div
-                                class="p-0 sendUsers"
+                                class="p-0 sendusers mb-1"
                                 [ngClass]="
                                     'col-' +
                                     (9 + (displayCC ? 1 : 0) + (displayBCC ? 1 : 0))
@@ -384,7 +387,7 @@
                             </div>
                         </div>
     
-                        <div class="row align-items-start mb-3" *ngIf="displayCC">
+                        <div class="row align-items-start mb-3 border-bottom" *ngIf="displayCC">
                             <div class="col-1">
                                 <div
                                     class="InputText"
@@ -396,7 +399,7 @@
                                     >
                                 </div>
                             </div>
-                            <div class="col-11 sendUsers">
+                            <div class="col-11 sendusers mb-1">
                                 <p-autoComplete
                                     [style]="{ width: '100%' }"
                                     [inputStyle]="{
@@ -421,7 +424,7 @@
                             </div>
                         </div>
     
-                        <div class="row align-items-start mb-3" *ngIf="displayBCC">
+                        <div class="row align-items-start mb-3 border-bottom" *ngIf="displayBCC">
                             <div class="col-1">
                                 <div
                                     class="InputText"
@@ -433,7 +436,7 @@
                                     >
                                 </div>
                             </div>
-                            <div class="col-11 sendUsers">
+                            <div class="col-11 sendusers mb-1">
                                 <p-autoComplete
                                     [style]="{ width: '100%' }"
                                     [inputStyle]="{ width: '100%' }"
@@ -569,23 +572,17 @@
                     <div
                         class="modal-footer w-100 mt-3"
                         style="
-                            justify-content: flex-start !important
-                          ;
                             border-bottom: none;
                         "
                     >
-                        <button
-                            type="button"
-                            [class.disabled]="toUsers.length == 0 || subject == ''"
-                            [disabled]="toUsers.length == 0 || subject == ''"
-                            class="sendBtn"
-                            (click)="sendMessage()"
-                        >
-                            {{ "Send" | localize }}
-                        </button>
+                        
                         <div class="icon-upload">
                             <label for="file-input">
-                                <i class="fa fa-paperclip" aria-hidden="true"></i>
+                                <!-- <i class="fa fa-paperclip" aria-hidden="true"></i> -->
+                                <i  aria-hidden="true"> <img
+                                    src="../../../assets/message/iconamoon_attachment.png"
+                                    class="icon-file"
+                                /></i>
                             </label>
     
                             <input
@@ -595,6 +592,15 @@
                                 multiple
                             />
                         </div>
+                        <button
+                            type="button"
+                            [class.disabled]="toUsers.length == 0 || subject == ''"
+                            [disabled]="toUsers.length == 0 || subject == ''"
+                            class="sendBtn"
+                            (click)="sendMessage()"
+                        >
+                        <i class="fa  fa-paper-plane mr-1" style="color: white;"></i> {{ "Send" | localize }}
+                        </button>
                     </div>
                     </div>
     
@@ -623,7 +629,7 @@
                 ></a
             >
         </div>
-        <div class="row align-items-start mb-3 mb-1">
+        <div class="row align-items-start mb-3 mb-1 border-bottom">
 
             <div class="col-md-1">
                 <div class="InputText">
@@ -633,7 +639,7 @@
                 </div>
             </div>
             <div
-                class="p-0 sendUsers col-md-11">
+                class="p-0 sendusers mb-1 col-md-11">
                 <p-autoComplete
                     [style]="{ width: '100%' }"
                     [inputStyle]="{ width: '100%' }"
@@ -668,7 +674,7 @@
             </div>
         </div>
 
-        <div class="row align-items-start mb-3 mb-1" *ngIf="displayCC">
+        <div class="row align-items-start mb-3 mb-1 border-bottom" *ngIf="displayCC">
             <div class="col-md-1">
                 <div
                     class="InputText"
@@ -680,7 +686,7 @@
                     >
                 </div>
             </div>
-            <div class="col-md-11 sendUsers">
+            <div class="col-md-11 sendusers mb-1">
                 <p-autoComplete
                     [style]="{ width: '100%' }"
                     [inputStyle]="{
@@ -705,7 +711,7 @@
             </div>
         </div>
 
-        <div class="row align-items-start mb-3 mb-1" *ngIf="displayBCC">
+        <div class="row align-items-start mb-3 mb-1 border-bottom" *ngIf="displayBCC">
             <div class="col-md-1">
                 <div
                     class="InputText"
@@ -717,7 +723,7 @@
                     >
                 </div>
             </div>
-            <div class="col-md-11 sendUsers">
+            <div class="col-md-11 sendusers mb-1">
                 <p-autoComplete
                     [style]="{ width: '100%' }"
                     [inputStyle]="{ width: '100%' }"
@@ -854,11 +860,25 @@
     <div
         class="modal-footer"
         style="
-            justify-content: flex-start !important
-          ;
             border-bottom: none;
         "
     >
+    <div class="icon-upload">
+        <label for="file-input">
+            <!-- <i class="fa fa-paperclip" aria-hidden="true"></i> -->
+            <i  aria-hidden="true"> <img
+                src="../../../assets/message/iconamoon_attachment.png"
+                class="icon-file"
+            /></i>
+        </label>
+
+        <input
+            id="file-input"
+            type="file"
+            (change)="handleInputChangeAttachment($event)"
+            multiple
+        />
+    </div>
         <button
             type="button"
             [class.disabled]="toUsers.length == 0 || subject == ''"
@@ -866,19 +886,8 @@
             class="sendBtn"
             (click)="sendMessage()"
         >
-            {{ "Send" | localize }}
+        <i class="fa  fa-paper-plane mr-1" style="color: white;"></i>  {{ "Send" | localize }}
         </button>
-        <div class="icon-upload">
-            <label for="file-input">
-                <i class="fa fa-paperclip" aria-hidden="true"></i>
-            </label>
-
-            <input
-                id="file-input"
-                type="file"
-                (change)="handleInputChangeAttachment($event)"
-                multiple
-            />
-        </div>
+        
     </div>
 </form>
