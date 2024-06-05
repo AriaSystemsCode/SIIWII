@@ -386,9 +386,15 @@ slideToPreviousImage(): void {
     calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item) => {
-            let multiby =
+            let multiby ;
+            if(this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack )
+            multiby =item.orderedPrePacks;
+
+                else
+             multiby =
                 item.sizeRatio *
                 this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
+
             sum = sum + multiby;
         });
 
@@ -399,9 +405,15 @@ slideToPreviousImage(): void {
     getTotalPrepackSizeAmount(prepackSizes: any, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item) => {
-            let multiby =
+            let multiby ;
+            if(this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack )
+            multiby =item.orderedPrePacks;
+        
+        else 
+            multiby =
                 item.sizeRatio *
                 this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
+                
             let amount = multiby * item.price;
             sum = sum + amount;
         });
