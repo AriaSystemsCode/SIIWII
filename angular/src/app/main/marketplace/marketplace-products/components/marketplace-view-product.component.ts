@@ -516,6 +516,21 @@ slideToPreviousImage(): void {
         this.router.navigateByUrl("app/main/marketplace/products");
     }
     onEditpecialPrice(updatedSpecialPrice){
+        this.productDetails.variations.map((variation: any) => {
+            if (variation.extraAttrName === "COLOR") {
+                variation.selectedValues.forEach((value) => {
+                        value.edRestAttributes.forEach((attr) => {
+                            if (attr.extraAttrName === "SIZE") {
+                                attr.values.forEach((sizeValue) => {
+                                    sizeValue.price =updatedSpecialPrice;
+                                });
+                            }
+                        });
+                    
+                });
+            }
+        });
+
         this.productDetails.minSpecialPrice=updatedSpecialPrice;
         this.productDetails.maxSpecialPrice= updatedSpecialPrice;
         this.showEditSpecialPrice= true
