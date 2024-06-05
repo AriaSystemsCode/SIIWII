@@ -413,7 +413,7 @@ slideToPreviousImage(): void {
             multiby =
                 item.sizeRatio *
                 this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
-                
+
             let amount = multiby * item.price;
             sum = sum + amount;
         });
@@ -528,6 +528,25 @@ slideToPreviousImage(): void {
         this.router.navigateByUrl("app/main/marketplace/products");
     }
     onEditpecialPrice(updatedSpecialPrice){
+        Swal.fire({
+            title: "",
+            text: "The price assigned to the ordered Items will be updated ",
+            icon: "info",
+            showCancelButton: false,
+            confirmButtonText: "Yes",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+            customClass: {
+              popup: 'popup-class',
+              icon: 'icon-class',
+              content: 'content-class',
+              actions: 'actions-class',
+              confirmButton: 'confirm-button-class2',
+      
+            },
+          }).then((result) => {
+            if (result.isConfirmed) {
         this.productDetails.variations.map((variation: any) => {
             if (variation.extraAttrName === "COLOR") {
                 variation.selectedValues.forEach((value) => {
@@ -542,11 +561,12 @@ slideToPreviousImage(): void {
                 });
             }
         });
-
+    
         this.productDetails.minSpecialPrice=updatedSpecialPrice;
         this.productDetails.maxSpecialPrice= updatedSpecialPrice;
         this.showEditSpecialPrice= true
-    }
+}});
+  }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
