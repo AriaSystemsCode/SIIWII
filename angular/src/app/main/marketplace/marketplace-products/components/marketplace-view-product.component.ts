@@ -58,7 +58,7 @@ export class MarketplaceViewProductComponent
     currencySymbol: string = "";
     showEditSpecialPrice:boolean=true;
     updatedSpecialPrice:number=0;
-
+    chk_Order_by_prepack: boolean = true;
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -244,7 +244,7 @@ slideToPreviousImage(): void {
         if (!foundColor) {
             this.orderSummary.push(orederedMappedData);
         }
-        if (this.productDetails.orderByPrePack) {
+       if (!(this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack ) ) {
             this.productDetails.variations.map((variation: any) => {
                 if (variation.extraAttrName === "COLOR") {
                     variation.selectedValues.forEach((value) => {
