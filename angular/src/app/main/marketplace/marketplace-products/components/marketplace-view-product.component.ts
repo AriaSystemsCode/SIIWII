@@ -479,6 +479,27 @@ slideToPreviousImage(): void {
             },
         }).then((result) => {
             if (result.isConfirmed) {
+
+
+/////
+if ((this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack ) ) {
+this.productDetails.variations.map((variation: any) => {
+    if (variation.extraAttrName === "COLOR") {
+        variation.selectedValues.forEach((value) => {
+                value.edRestAttributes.forEach((attr) => {
+                    if (attr.extraAttrName === "SIZE") {
+                        attr.values.forEach((sizeValue) => {
+                            sizeValue.orderedQty=  sizeValue.orderedPrePacks;
+                            sizeValue.orderedPrePacks =0;
+                        });
+                    }
+                });
+    });
+}
+});
+}
+/////
+
                 let bodyRequest: any = {
                     appItem: this.productDetails,
                 };
