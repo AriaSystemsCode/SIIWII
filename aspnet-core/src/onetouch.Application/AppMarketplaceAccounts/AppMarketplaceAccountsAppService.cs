@@ -33,6 +33,7 @@ using onetouch.EntityFrameworkCore;
 using onetouch.AppMarketplaceAccounts;
 using onetouch.Accounts.Dtos;
 using onetouch.Accounts;
+using onetouch.AppContacts;
 using onetouch.AppContacts.Dtos;
 
 namespace onetouch.MarketplaceAccounts
@@ -43,7 +44,8 @@ namespace onetouch.MarketplaceAccounts
         private readonly TenantManager _tenantManager;
         private readonly IAccountsAppService _iAccountsAppService;
         private readonly ICreateMarketplaceAccount _iCreateMarketplaceAccount;
-        private readonly IRepository<AppMarketplaceContact, long> _appContactRepository;
+        private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        private readonly IRepository<AppContact, long> _appContactRepository;
 
         private readonly IRepository<AppEntity, long> _appEntityRepository;
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
@@ -74,16 +76,19 @@ namespace onetouch.MarketplaceAccounts
             , ISycEntityObjectClassificationsAppService sycEntityObjectClassificationsAppService
             , ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService
             , ISycAttachmentCategoriesAppService sSycAttachmentCategoriesAppService
-            , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository, UserManager userManager, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepo,
-              SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager,
-              TenantManager tenantManager,
-              IAccountsAppService iAccountsAppService
-            , ICreateMarketplaceAccount iCreateMarketplaceAccount)
+            , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository, UserManager userManager, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepo
+              ,SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager
+              ,TenantManager tenantManager
+              ,IAccountsAppService iAccountsAppService
+            , ICreateMarketplaceAccount iCreateMarketplaceAccount
+              ,IRepository<AppContact, long> appContactRepository)
+
         {
             _tenantManager = tenantManager;
+            _appContactRepository = appContactRepository;
             _iAccountsAppService = iAccountsAppService;
             _iCreateMarketplaceAccount = iCreateMarketplaceAccount;
-            _appContactRepository = appMarketplaceContactRepository;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _appEntityRepository = appEntityRepository;
             _appAddressRepository = appAddressRepository;
             _appContactAddressRepository = appContactAddressRepository;
@@ -116,12 +121,11 @@ namespace onetouch.MarketplaceAccounts
                 {
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
                     
-                    var filteredAccounts = _appContactRepository.GetAll()
+                    var filteredAccounts = _appMarketplaceContactRepository.GetAll()
                             .Include(e => e.AppContactAddresses).ThenInclude(e => e.AddressFk).ThenInclude(e => e.CountryFk)
                             .Include(e => e.EntityClassifications)
                             .Include(e => e.EntityCategories)
                             .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
-
                             .WhereIf(!string.IsNullOrEmpty(input.Filter),
                                 x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
 
@@ -129,21 +133,21 @@ namespace onetouch.MarketplaceAccounts
                                 x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null && x.EntityObjectStatusId != cancelledStatusId))
                             .WhereIf(input.FilterType == 2 && input.FilterType != 6,
                                 x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
-                                && (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
+                                && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
                             .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
                                 x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null))
                              .WhereIf(input.FilterType == 6,
                                 x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null)
                                 || (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
-                                && (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
+                                && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
 
                             .WhereIf(!string.IsNullOrEmpty(input.Name),
                                 x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))
                             .WhereIf(input.Status != null && input.Status.Count(x => x == 1) > 0,
-                                x => _appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
 
                             .WhereIf(input.Status != null && input.Status.Count(x => x == 2) > 0,
-                                x => (_appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
+                                x => (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
                                 )
                             .WhereIf(input.Classifications != null && input.Classifications.Count(x => x > 0) > 0,
                                 x => _appEntityRepository.GetAll().Include(ec => ec.EntityClassifications).FirstOrDefault(e => e.Id == x.Id).EntityClassifications.Any(a => input.Classifications.Contains(a.EntityObjectClassificationId)))
@@ -151,27 +155,28 @@ namespace onetouch.MarketplaceAccounts
                                 x => _appEntityRepository.GetAll().Include(ec => ec.EntityCategories).FirstOrDefault(e => e.Id == x.Id).EntityCategories.Any(a => input.Categories.Contains(a.EntityObjectCategoryId)))
 
                             .WhereIf(!string.IsNullOrEmpty(input.City),
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.City.Contains(input.City))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.City.Contains(input.City))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.Address),
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.AddressLine1.Contains(input.Address) || a.AddressFk.AddressLine2.Contains(input.Address))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.AddressLine1.Contains(input.Address) || a.AddressFk.AddressLine2.Contains(input.Address))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.State),
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.State.Contains(input.State))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.State.Contains(input.State))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.Postal),
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.PostalCode.Contains(input.Postal))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.PostalCode.Contains(input.Postal))) > 0)
                             .WhereIf(input.Countries != null && input.Countries.Count(x => x > 0) > 0,
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => input.Countries.Contains(a.AddressFk.CountryId))) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => input.Countries.Contains(a.AddressFk.CountryId))) > 0)
 
                             .WhereIf(input.Languages != null && input.Languages.Count(x => x > 0) > 0,
-                                x => _appContactRepository.GetAll().Count(c => c.Id == x.Id && c.LanguageId != null && input.Languages.Contains((long)c.LanguageId)) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Count(c => c.Id == x.Id && c.LanguageId != null && input.Languages.Contains((long)c.LanguageId)) > 0)
 
                             .WhereIf(input.Curruncies != null && input.Curruncies.Count(x => x > 0) > 0,
-                                x => _appContactRepository.GetAll().Count(c => c.Id == x.Id && c.CurrencyId != null && input.Curruncies.Contains((long)c.CurrencyId)) > 0)
+                                x => _appMarketplaceContactRepository.GetAll().Count(c => c.Id == x.Id && c.CurrencyId != null && input.Curruncies.Contains((long)c.CurrencyId)) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.SSIN), x => x.SSIN == input.SSIN)
                             .WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x => x.EntityObjectTypeId == input.AccountTypeId)
                             .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
-                            .Where(e=> e.IsProfileData && e.ParentId == null && e.IsHidden!=true);
+                            .Where(e=> (e.IsProfileData && e.ParentId == null ) && ((e.IsHidden!=true) ||
+                            (_appContactRepository.GetAll().Where(x=> x.TenantId==AbpSession.TenantId && x.SSIN==e.SSIN).Count() > 0 )));
 
                     var pagedAndFilteredAccounts = filteredAccounts
                     .OrderBy(input.Sorting ?? "name asc")
@@ -204,8 +209,8 @@ namespace onetouch.MarketplaceAccounts
                                             ZipCode = o.AppContactAddresses.FirstOrDefault().AddressFk.PostalCode,
                                             AddressLine1 = o.AppContactAddresses.FirstOrDefault().AddressFk.AddressLine1,
                                             CountryName = o.AppContactAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
-                                            Status = input.FilterType != 1 ? (_appContactRepository.GetAll().Count(x => x.TenantId == null && x.SSIN == o.SSIN) > 0 || (o.TenantId != null && o.ParentId == null && o.SSIN == null)) :
-                                            (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.SSIN == o.SSIN) > 0 || (o.TenantId != null && o.ParentId == null && o.SSIN == null)),
+                                            Status = input.FilterType != 1 ? (_appMarketplaceContactRepository.GetAll().Count(x => x.TenantId == null && x.SSIN == o.SSIN) > 0 || (o.TenantId != null && o.ParentId == null && o.SSIN == null)) :
+                                            (_appMarketplaceContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.SSIN == o.SSIN) > 0 || (o.TenantId != null && o.ParentId == null && o.SSIN == null)),
                                             Id = o.Id,
                                             IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && o.SSIN == null,
                                             LogoUrl = string.IsNullOrEmpty(o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
@@ -279,21 +284,25 @@ namespace onetouch.MarketplaceAccounts
     public class CreateMarketplaceAccount : onetouchAppServiceBase, ICreateMarketplaceAccount
     {
         private readonly IRepository<AppMarketplaceContactAddress, long> _appContactAddressRepository;
-        private readonly IRepository<AppMarketplaceContact, long> _appContactRepository;
+        private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
         private readonly IRepository<AppMarketplaceAddress, long> _appAddressRepository;
+        private readonly IRepository<AppContact, long> _appContactRepository;
+
         private readonly IRepository<AppEntity, long> _appEntityRepository;
         private readonly Helper _helper;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         public CreateMarketplaceAccount(IRepository<AppMarketplaceContact
-            , long> appContactRepository
+            , long> appMarketplaceContactRepository
             , Helper helper
             , IRepository<AppEntity, long> appEntityRepository
             , IAppEntitiesAppService appEntitiesAppService
             , IRepository<AppMarketplaceContactAddress, long> appContactAddressRepository
-            , IRepository<AppMarketplaceAddress, long> appAddressRepository)
+            , IRepository<AppMarketplaceAddress, long> appAddressRepository
+            , IRepository<AppContact, long> appContactRepository)
         {
-            _appContactRepository = appContactRepository;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _helper = helper;
+            _appContactRepository = appContactRepository;
             _appEntityRepository = appEntityRepository;
             _appEntitiesAppService = appEntitiesAppService;
             _appContactAddressRepository = appContactAddressRepository;
@@ -305,7 +314,7 @@ namespace onetouch.MarketplaceAccounts
             try
             {
                 
-                var ret = await _appContactRepository.FirstOrDefaultAsync(e => e.TenantId == null && e.SSIN == SSIN);
+                var ret = await _appMarketplaceContactRepository.FirstOrDefaultAsync(e => e.TenantId == null && e.SSIN == SSIN);
                 ret.IsHidden = true;
                 return true;
             }
@@ -327,159 +336,162 @@ namespace onetouch.MarketplaceAccounts
 
         private async Task<long> Update(CreateOrEditAccountInfoDto input)
         {
-            AppMarketplaceContact contactOriginal;
-            if (input.AccountLevel == AccountLevelEnum.Profile)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                contactOriginal = await _appContactRepository.FirstOrDefaultAsync(x => x.IsProfileData & x.ParentId == null);
-
-                var tenantObj = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
-                if (tenantObj != null) { tenantObj.Name = input.Name; }
-
-            }
-            else
-            {
-                contactOriginal = await _appContactRepository.FirstOrDefaultAsync(x => x.Id == input.Id);
-            }
-            //temp solution to test 
-            if (string.IsNullOrEmpty(input.Code))
-                input.Code = System.Guid.NewGuid().ToString();
-
-
-
-            var contactObjectId = await _helper.SystemTables.GetObjectContactId();
-
-            var partnerEntityObjectTypeId = input.AccountTypeId;
-            var partnerEntityObjectTypeCode = input.AccountType;
-            if (partnerEntityObjectTypeId == null || input.AccountTypeId < 1)
-            {
-                var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
-                partnerEntityObjectTypeId = partnerEntityObjectType.Id;
-                partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
-            }
-
-
-            AppEntityDto entity = new AppEntityDto();
-            ObjectMapper.Map(input, entity);
-            entity.Id = 0;
-            entity.ObjectId = contactObjectId;
-            entity.EntityObjectTypeId = partnerEntityObjectTypeId;
-            entity.EntityObjectTypeCode = partnerEntityObjectTypeCode;
-            entity.Name = input.Name;
-            entity.Notes = input.Notes;
-            if (input.UseDTOTenant)
-            {
-                entity.TenantId = input.TenantId;
-
-            }
-            else
-            {
-                entity.TenantId = AbpSession.TenantId;
-            }
-
-            entity.Code = input.Code;
-
-            AppContactDto contact = new AppContactDto();
-            //var contactSavedId = contact.Id;
-            ObjectMapper.Map(input, contact);
-            //contact.Id = contactSavedId;
-
-            #region stop phone update from here as it overrider by saving in branch update method...
-            if (contactOriginal != null)
-            {
-                contact.Phone1Ext = contactOriginal.Phone1Ext;
-                contact.Phone1Number = contactOriginal.Phone1Number;
-                contact.Phone1TypeId = contactOriginal.Phone1TypeId;
-
-                contact.Phone2Ext = contactOriginal.Phone2Ext;
-                contact.Phone2Number = contactOriginal.Phone2Number;
-                contact.Phone2TypeId = contactOriginal.Phone2TypeId;
-
-                contact.Phone3Ext = contactOriginal.Phone3Ext;
-                contact.Phone3Number = contactOriginal.Phone3Number;
-                contact.Phone3TypeId = contactOriginal.Phone3TypeId;
-            }
-            #endregion stop phone update from here as it overrider by saving in branch update method...
-
-            //contact.AccountType = "";
-            //if (input.AccountType.Count > 0)
-            //  contact.AccountType = input.AccountType.JoinAsString(";");
-
-            contact.IsProfileData = input.AccountLevel == AccountLevelEnum.Profile;
-
-            if (input.UseDTOTenant)
-            { contact.TenantId = input.TenantId; }
-            else
-            {
-                contact.TenantId = AbpSession.TenantId;
-            }
-
-            entity.Id = contactOriginal == null ? 0 : contactOriginal.Id;
-
-            contact.Id = contactOriginal == null ? 0 : contactOriginal.Id;
-
-
-            var isManual = (contact.TenantId == AbpSession.TenantId && !contact.IsProfileData && contact.ParentId == null && contact.SSIN == null);
-            if (string.IsNullOrEmpty(input.SSIN))
-            {
-                if (isManual)
+                AppMarketplaceContact contactOriginal;
+                if (input.AccountLevel == AccountLevelEnum.Profile)
                 {
-                    var profileSSIN = "";
-                    var accountInfo = await _appContactRepository.GetAll().Include(e => e)
-                  //MyAccount case
-                  .WhereIf(input == null || input.Id == 0,
-                      x => x.IsProfileData && x.ParentId == null && x.TenantId == AbpSession.TenantId)
-                  .FirstOrDefaultAsync();
+                    contactOriginal = await _appMarketplaceContactRepository.FirstOrDefaultAsync
+                        (x => x.IsProfileData && x.ParentId == null && x.SSIN== input.SSIN );
 
-                    if (accountInfo != null)
-                    {
-                        profileSSIN = accountInfo.SSIN;
-                        if (string.IsNullOrEmpty(accountInfo.SSIN))
-                        {
-                            AppEntityDto accountInfoEntity = new AppEntityDto();
-                            ObjectMapper.Map(accountInfo, accountInfoEntity);
-                            profileSSIN = await _helper.SystemTables.GenerateSSIN(contactObjectId, accountInfoEntity);
-                        }
+                    var tenantObj = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
+                    if (tenantObj != null) { tenantObj.Name = input.Name; }
 
-                        if (!string.IsNullOrEmpty(profileSSIN))
-                        {
-                            accountInfo.SSIN = profileSSIN;
-                            await _appEntityRepository.UpdateAsync(accountInfo);
-                            input.SSIN = profileSSIN + "-" + contact.Code;
-                        }
-                    }
                 }
                 else
                 {
-                    entity.IsHostRecord = true;
-                    input.SSIN = await _helper.SystemTables.GenerateSSIN(contactObjectId, entity);
-                    entity.IsHostRecord = false;
+                    contactOriginal = await _appMarketplaceContactRepository.FirstOrDefaultAsync
+                        (x => x.Id == input.Id);
                 }
+                //temp solution to test 
+                //if (string.IsNullOrEmpty(input.Code))
+                    //input.Code = System.Guid.NewGuid().ToString();
+
+
+
+                var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+
+                var partnerEntityObjectTypeId = input.AccountTypeId;
+                var partnerEntityObjectTypeCode = input.AccountType;
+                if (partnerEntityObjectTypeId == null || input.AccountTypeId < 1)
+                {
+                    var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+                    partnerEntityObjectTypeId = partnerEntityObjectType.Id;
+                    partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
+                }
+
+
+                AppEntityDto entity = new AppEntityDto();
+                ObjectMapper.Map(input, entity);
+                entity.Id = 0;
+                entity.ObjectId = contactObjectId;
+                entity.EntityObjectTypeId = partnerEntityObjectTypeId;
+                entity.EntityObjectTypeCode = partnerEntityObjectTypeCode;
+                entity.Name = input.Name;
+                entity.Notes = input.Notes;
+                if (input.UseDTOTenant)
+                {
+                    entity.TenantId = input.TenantId;
+
+                }
+                else
+                {
+                    entity.TenantId = AbpSession.TenantId;
+                }
+
+                entity.Code = input.Code;
+
+                AppContactDto contact = new AppContactDto();
+                //var contactSavedId = contact.Id;
+                ObjectMapper.Map(input, contact);
+                //contact.Id = contactSavedId;
+
+                #region stop phone update from here as it overrider by saving in branch update method...
+                if (contactOriginal != null)
+                {
+                    contact.Phone1Ext = contactOriginal.Phone1Ext;
+                    contact.Phone1Number = contactOriginal.Phone1Number;
+                    contact.Phone1TypeId = contactOriginal.Phone1TypeId;
+
+                    contact.Phone2Ext = contactOriginal.Phone2Ext;
+                    contact.Phone2Number = contactOriginal.Phone2Number;
+                    contact.Phone2TypeId = contactOriginal.Phone2TypeId;
+
+                    contact.Phone3Ext = contactOriginal.Phone3Ext;
+                    contact.Phone3Number = contactOriginal.Phone3Number;
+                    contact.Phone3TypeId = contactOriginal.Phone3TypeId;
+                }
+                #endregion stop phone update from here as it overrider by saving in branch update method...
+
+                //contact.AccountType = "";
+                //if (input.AccountType.Count > 0)
+                //  contact.AccountType = input.AccountType.JoinAsString(";");
+
+                contact.IsProfileData = input.AccountLevel == AccountLevelEnum.Profile;
+
+                if (input.UseDTOTenant)
+                { contact.TenantId = input.TenantId; }
+                else
+                {
+                    contact.TenantId = AbpSession.TenantId;
+                }
+
+                entity.Id = contactOriginal == null ? 0 : contactOriginal.Id;
+
+                contact.Id = contactOriginal == null ? 0 : contactOriginal.Id;
+
+
+                var isManual = (contact.TenantId == AbpSession.TenantId && !contact.IsProfileData && contact.ParentId == null && contact.SSIN == null);
+                if (string.IsNullOrEmpty(input.SSIN))
+                {
+                    if (isManual)
+                    {
+                        var profileSSIN = "";
+                        var accountInfo = await _appMarketplaceContactRepository.GetAll().Include(e => e)
+                      //MyAccount case
+                      .WhereIf(input == null || input.Id == 0,
+                          x => x.IsProfileData && x.ParentId == null && x.TenantId == AbpSession.TenantId)
+                      .FirstOrDefaultAsync();
+
+                        if (accountInfo != null)
+                        {
+                            profileSSIN = accountInfo.SSIN;
+                            if (string.IsNullOrEmpty(accountInfo.SSIN))
+                            {
+                                AppEntityDto accountInfoEntity = new AppEntityDto();
+                                ObjectMapper.Map(accountInfo, accountInfoEntity);
+                                profileSSIN = await _helper.SystemTables.GenerateSSIN(contactObjectId, accountInfoEntity);
+                            }
+
+                            if (!string.IsNullOrEmpty(profileSSIN))
+                            {
+                                accountInfo.SSIN = profileSSIN;
+                                await _appEntityRepository.UpdateAsync(accountInfo);
+                                input.SSIN = profileSSIN + "-" + contact.Code;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        entity.IsHostRecord = true;
+                        input.SSIN = await _helper.SystemTables.GenerateSSIN(contactObjectId, entity);
+                        entity.IsHostRecord = false;
+                    }
+                }
+                contact.PriceLevel = input.PriceLevel;
+                contact.SSIN = input.SSIN;
+                entity.SSIN = input.SSIN;
+                //var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
+
+                //contact.Id = savedEntity;
+
+                long newId = 0;
+                if (input.ReturnId)
+                { newId = await SaveContact(contact); }
+                else
+                { await SaveContact(contact); }
+
+                //await CreateAdminContact();
+
+                await CurrentUnitOfWork.SaveChangesAsync();
+                // return await GetAccountForEdit(new EntityDto<long> { Id = newId });
+                return newId;
             }
-            contact.PriceLevel = input.PriceLevel;
-            contact.SSIN = input.SSIN;
-            entity.SSIN = input.SSIN;
-            var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
-
-            contact.Id = savedEntity;
-
-            long newId = 0;
-            if (input.ReturnId)
-            { newId = await _appEntitiesAppService.SaveContact(contact); }
-            else
-            { await _appEntitiesAppService.SaveContact(contact); }
-
-            //await CreateAdminContact();
-
-            await CurrentUnitOfWork.SaveChangesAsync();
-            // return await GetAccountForEdit(new EntityDto<long> { Id = newId });
-            return newId;
 
         }
-
-
-        public async Task<long> SaveContact(AppMarketplaceContactDto input)
+        public async Task<long> SaveContact(AppContactDto input)
         {
-            AppMarketplaceContact contact;
+            AppContact contact;
             if (input.Id != 0)
             {
                 contact = await _appContactRepository.GetAll()
@@ -487,7 +499,7 @@ namespace onetouch.MarketplaceAccounts
             }
             else
             {
-                contact = new AppMarketplaceContact();
+                contact = new AppContact();
             }
 
 
@@ -505,6 +517,34 @@ namespace onetouch.MarketplaceAccounts
         }
 
 
+        public async Task<long> SaveContact(AppMarketplaceContactDto input)
+        {
+            AppMarketplaceContact contact;
+            if (input.Id != 0)
+            {
+                contact = await _appMarketplaceContactRepository.GetAll()
+                    .FirstOrDefaultAsync(x => x.Id == input.Id);
+            }
+            else
+            {
+                contact = new AppMarketplaceContact();
+            }
+
+
+            var contactSavedId = contact.Id;
+            ObjectMapper.Map(input, contact);
+
+            if (contact.Id == 0)
+            {
+                contact = await _appMarketplaceContactRepository.InsertAsync(contact);
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
+
+            return contact.Id;
+
+        }
+
+
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
         public async Task PublishProfile()
         {
@@ -512,7 +552,7 @@ namespace onetouch.MarketplaceAccounts
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
 
-                var contact = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
+                var contact = await _appMarketplaceContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
                     .ThenInclude(x => x.AddressFk).AsNoTracking()
                     .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true);
 
@@ -524,7 +564,7 @@ namespace onetouch.MarketplaceAccounts
                                         .AsNoTracking()
                                         .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contact.Id);
 
-                    var publishContact = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
+                    var publishContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
                         .FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.SSIN == contact.SSIN);
 
                     AppEntityDto entityDto = new AppEntityDto();
@@ -638,7 +678,7 @@ namespace onetouch.MarketplaceAccounts
 
                     //Mariam -Publish Account related branches [Start]
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                    var branchInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.SSIN == contact.SSIN &&
+                    var branchInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData && x.SSIN == contact.SSIN &&
                                      x.ParentId == contact.Id && x.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
 
                     foreach (var branchObj in branchInfo)
@@ -647,7 +687,7 @@ namespace onetouch.MarketplaceAccounts
                     }
                     //Mariam -Publish Account related branches [End]
                     //Publish contacts
-                    var contactInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id
+                    var contactInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id
                     && x.SSIN == contact.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
 
                     foreach (var contactObj in contactInfo)
@@ -663,24 +703,24 @@ namespace onetouch.MarketplaceAccounts
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var contact = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
+                var contact = await _appMarketplaceContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
                     .ThenInclude(x => x.AddressFk).AsNoTracking()
                     .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.Id == branchId);
 
                 var entity = await _appEntityRepository.GetAll().AsNoTracking()
                                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contact.Id);
-                var parentContact2 = await _appContactRepository.GetAll().ToListAsync();
+                var parentContact2 = await _appMarketplaceContactRepository.GetAll().ToListAsync();
 
-                var parentContact = await _appContactRepository.GetAll().AsNoTracking()
+                var parentContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
                     .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contact.ParentId && x.IsProfileData == true);
 
-                var publishedParentContact = await _appContactRepository.GetAll().AsNoTracking()
+                var publishedParentContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
                     .FirstOrDefaultAsync(x => x.TenantId == null && x.SSIN == parentContact.SSIN && x.IsProfileData == false);
 
-                var publishContact = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
+                var publishContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
                     .FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.SSIN == contact.SSIN);
                 //Get branch Related Published record of Account 
-                var publishedAccount = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null && x.SSIN == contact.SSIN && x.IsProfileData == false);
+                var publishedAccount = await _appMarketplaceContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null && x.SSIN == contact.SSIN && x.IsProfileData == false);
                 //
                 AppEntityDto entityDto = new AppEntityDto();
                 ObjectMapper.Map(entity, entityDto);
@@ -791,14 +831,14 @@ namespace onetouch.MarketplaceAccounts
                 }
                 //Mariam - Publish Account related contacts[Start]
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var contactInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id && x.SSIN == contact.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
+                var contactInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id && x.SSIN == contact.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
 
                 foreach (var contactObj in contactInfo)
                 {
                     await PublishMember(contactObj.Id);
                 }
                 //var presonEntityObjectTypeId = = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var branchInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData &&
+                var branchInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData &&
                                  x.ParentId == contact.Id && x.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
 
                 foreach (var branchObj in branchInfo)
@@ -812,7 +852,7 @@ namespace onetouch.MarketplaceAccounts
         }
         private async Task<bool> PublishMember(long contactId)
         {
-            var contact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
+            var contact = await _appMarketplaceContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
             && x.Id == contactId && x.IsProfileData == true);
             var entity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
@@ -820,12 +860,12 @@ namespace onetouch.MarketplaceAccounts
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contact.Id);
             //Get Contact Related Published records of Account and Branch
-            var publishedAccount = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
+            var publishedAccount = await _appMarketplaceContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
             && x.SSIN == contact.SSIN && x.IsProfileData == false);
-            var publishedBranch = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
+            var publishedBranch = await _appMarketplaceContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
             && x.SSIN == contact.SSIN && x.IsProfileData == false);
             //
-            var publishContact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
+            var publishContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
             && x.IsProfileData == false && x.SSIN == contact.SSIN);
 
             AppEntityDto entityDto = new AppEntityDto();
