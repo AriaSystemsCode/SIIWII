@@ -7459,7 +7459,7 @@ namespace onetouch.AppItems
                 foreach (var variation in variationsList)
                 {
                     //xx
-                    if (variation.Id != 0)
+                    if (variation.Id != 0 && !string.IsNullOrEmpty(variation.Code))
                         continue;
                     List<AppEntityExtraDataDto> extrData = new List<AppEntityExtraDataDto>();
                     extrData.AddRange(variation.EntityExtraData);
