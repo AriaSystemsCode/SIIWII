@@ -407,7 +407,7 @@
                             <span class="slider round"></span>
                         </label>
 
-                        <p-tabView *ngIf="productDetails?.orderByPrePack">
+                        <p-tabView *ngIf="productDetails?.orderByPrePack" [activeIndex]="chk_Order_by_prepack? 0 : 1">
                             <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack" >
                                 <table
                                     *ngIf="productDetails?.orderByPrePack"
