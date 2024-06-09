@@ -3742,7 +3742,7 @@ namespace onetouch.AppItems
                         AppMarketplaceItems.AppMarketplaceItems publishChild = new AppMarketplaceItems.AppMarketplaceItems(); ;
                         if (publishedEntityId != 0)
                             publishChild = await _appMarketplaceItem.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Include(z => z.EntityExtraData)
+                                .Include(z => z.EntityExtraData).Include(z=>z.ItemPricesFkList)
                                 .Where(x => x.Code == child.SSIN).FirstOrDefaultAsync();
                         //marketplaceItem.ParentFkList.FirstOrDefault(x => x.Code == child.SSIN);
                         long publishId = 0;
@@ -3773,6 +3773,13 @@ namespace onetouch.AppItems
                         {
                             newSSIN = publishChild.SSIN;
                             //SS
+                            if (publishChild.ItemPricesFkList  != null)
+                            {
+                                foreach (var itemPrice in publishChild.ItemPricesFkList)
+                                {
+                                    await _appMarketplaceItemPricesRepository.DeleteAsync(a=>a.Id == itemPrice.Id);
+                                }
+                            }
                             if (publishChild.EntityExtraData != null)
                             {
                                 foreach (var parentExtrData in publishChild.EntityExtraData)
