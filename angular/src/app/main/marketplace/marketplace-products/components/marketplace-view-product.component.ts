@@ -56,7 +56,8 @@ export class MarketplaceViewProductComponent
     orderType: string = "";
     productVarImages: MarketplaceExtraDataAttrDto[];
     currencySymbol: string = "";
-
+    showEditSpecialPrice:boolean=true;
+    updatedSpecialPrice:number=0;
 
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
@@ -112,6 +113,7 @@ export class MarketplaceViewProductComponent
     }
 
     getProductDetailsForView() {
+        this.showEditSpecialPrice=true;
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
                 if (res.orderType == TransactionType.SalesOrder)
@@ -154,6 +156,7 @@ export class MarketplaceViewProductComponent
                     )
                     .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
                         this.productDetails = res.appItem;
+                        this.updatedSpecialPrice = this.productDetails.minSpecialPrice;
                         this.productDetails?.minMSRP % 1 ==0?this.productDetails.minMSRP=Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2):null; 
                         this.productDetails?.maxMSRP % 1 ==0?this.productDetails.maxMSRP=Math.round(this.productDetails.maxMSRP * 100 / 100).toFixed(2):null; 
                         this.productImages = res.appItem.entityAttachments;
@@ -511,6 +514,26 @@ slideToPreviousImage(): void {
         );
 
         this.router.navigateByUrl("app/main/marketplace/products");
+    }
+    onEditpecialPrice(updatedSpecialPrice){
+        this.productDetails.variations.map((variation: any) => {
+            if (variation.extraAttrName === "COLOR") {
+                variation.selectedValues.forEach((value) => {
+                        value.edRestAttributes.forEach((attr) => {
+                            if (attr.extraAttrName === "SIZE") {
+                                attr.values.forEach((sizeValue) => {
+                                    sizeValue.price =updatedSpecialPrice;
+                                });
+                            }
+                        });
+                    
+                });
+            }
+        });
+
+        this.productDetails.minSpecialPrice=updatedSpecialPrice;
+        this.productDetails.maxSpecialPrice= updatedSpecialPrice;
+        this.showEditSpecialPrice= true
     }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
