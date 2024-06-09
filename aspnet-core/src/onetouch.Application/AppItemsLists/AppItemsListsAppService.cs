@@ -1096,7 +1096,7 @@ namespace onetouch.AppItemsLists
                     publishItemsList.TenantId = null;
                     var itemObjectId = await _helper.SystemTables.GetObjectItemId();
                     publishItemsList.SSIN = itemsList.SSIN; // await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
-                    publishItemsList.Code= itemsList.SSIN;
+                    publishItemsList.Code = itemsList.SSIN;
                     publishItemsList.TenantOwner = int.Parse(itemsList.TenantId.ToString());
                 }
                 else
@@ -1111,6 +1111,10 @@ namespace onetouch.AppItemsLists
                 publishItemsList.Code = itemsList.SSIN;
                 if (!input.SyncProductList)
                 publishItemsList.SharingLevel = input.SharingLevel;
+
+                if (input.SyncProductList)
+                    publishItemsList.SharingLevel = 1;
+
 
                 if (publishItemsList.Id != 0)
                 {
