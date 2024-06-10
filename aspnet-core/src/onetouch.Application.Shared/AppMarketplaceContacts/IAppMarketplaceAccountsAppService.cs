@@ -7,6 +7,7 @@ using onetouch.Dto;
 using System.Collections.Generic;
 using onetouch.AccountInfos.Dtos;
 using onetouch.Accounts.Dtos;
+using onetouch.AppMarketplaceContacts;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -18,7 +19,8 @@ namespace onetouch.AppMarketplaceAccounts
     }
     public interface ICreateMarketplaceAccount : IApplicationService
     {
-        Task<long> CreateOrEditAccount(CreateOrEditAccountInfoDto input);
+        Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input);
+         
         Task<bool> HideAccount(string SSIN);
 
 

@@ -17,19 +17,19 @@ namespace onetouch.AppMarketplaceContacts
     [Audited]
     public class AppMarketplaceContact : AppEntity
     {
-		public int? TenantId { get; set; }
+		//public int? TenantId { get; set; }
         public int? OwnerId { get; set; }
 
-		[Required]
-		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
-		public virtual string Name { get; set; }
+		//[Required]
+		//[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
+		//public virtual string Name { get; set; }
 
 		[Required]
 		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
 		public virtual string TradeName { get; set; }
 
 		[StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
-		public virtual string Code { get; set; }
+		//public virtual string Code { get; set; }
 		
 		public virtual long? LanguageId { get; set; }
 
@@ -66,7 +66,7 @@ namespace onetouch.AppMarketplaceContacts
 
 		public virtual string AccountType { get; set; }
         public virtual long AccountTypeId { get; set; }
-        public virtual string SSIN { get; set; }
+        //public virtual string SSIN { get; set; }
         //public virtual string PriceLevel { get; set; }
         public virtual DateTime TimeStamp { get; set; }
         public virtual bool IsProfileData { get; set; }
@@ -148,7 +148,7 @@ namespace onetouch.AppMarketplaceContacts
 
 		public ICollection<AppMarketplaceContact> PartnerFkList { get; set; }
 
-		public ICollection<AppMarketplaceContactAddress> AppContactAddresses { get; set; }
+		public ICollection<AppMarketplaceContactAddress> ContactAddresses { get; set; }
 
 		//public ICollection<AppMarketplaceContactPaymentMethod> AppContactPaymentMethods { get; set; }
 

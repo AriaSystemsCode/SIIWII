@@ -109,6 +109,8 @@ using onetouch.AppMarketplaceItems;
 using onetouch.AppMarketplaceItemLists;
 using onetouch.AppMarketplaceItems.Dtos;
 using onetouch.AppMarketplaceMessages;
+using onetouch.AppMarketplaceContacts;
+using onetouch.AppMarketplaceContacts.Dtos;
 
 namespace onetouch
 {
@@ -477,12 +479,28 @@ namespace onetouch
                 .ForMember(d => d.AccountType, s => s.Ignore())
                 .ForMember(d => d.CurrencyId, s => s.MapFrom(ss => ss.CurrencyId == 0 ? null : ss.CurrencyId))
                 .ForMember(d => d.LanguageId, s => s.MapFrom(ss => ss.LanguageId == 0 ? null : ss.LanguageId))
+               ;
+
+            configuration.CreateMap<CreateOrEditMarketplaceAccountInfoDto, AppContact>()
+                .ForMember(d => d.AccountType, s => s.Ignore())
+                .ForMember(d => d.CurrencyId, s => s.MapFrom(ss => ss.CurrencyId == 0 ? null : ss.CurrencyId))
+                .ForMember(d => d.LanguageId, s => s.MapFrom(ss => ss.LanguageId == 0 ? null : ss.LanguageId))
+               ;
+
+            configuration.CreateMap<AppContact, CreateOrEditMarketplaceAccountInfoDto>()
+                .ForMember(d => d.AccountType, s => s.Ignore())
+                .ForMember(d => d.CurrencyId, s => s.MapFrom(ss => ss.CurrencyId == 0 ? null : ss.CurrencyId))
+                .ForMember(d => d.LanguageId, s => s.MapFrom(ss => ss.LanguageId == 0 ? null : ss.LanguageId))
+                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses))
                 ;
+
+
 
             configuration.CreateMap<AppContact, CreateOrEditAccountInfoDto>()
                 .ForMember(d => d.AccountType, s => s.Ignore())
                 .ForMember(d => d.CurrencyId, s => s.MapFrom(ss => ss.CurrencyId == 0 ? null : ss.CurrencyId))
                 .ForMember(d => d.LanguageId, s => s.MapFrom(ss => ss.LanguageId == 0 ? null : ss.LanguageId))
+                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses))
                 ;
 
             configuration.CreateMap<CreateOrEditAccountInfoDto, AppContactDto>()
@@ -559,6 +577,29 @@ namespace onetouch
                 .ReverseMap();
 
             configuration.CreateMap<CreateOrEditSycEntityObjectClassificationDto, SycEntityObjectClassification>().ReverseMap();
+
+            //AppMarketplaceContact
+            configuration.CreateMap<AppMarketplaceAddressDto, AppAddress>().ReverseMap();
+            configuration.CreateMap<AppMarketplaceAddressDto, AppMarketplaceAddress>().ReverseMap();
+
+            configuration.CreateMap<AppMarketplaceContactAddressDto, AppContactAddress>();
+            configuration.CreateMap<AppMarketplaceContactAddressDto, AppMarketplaceContactAddress>();
+
+            configuration.CreateMap<AppContactAddress, AppMarketplaceContactAddressDto>()
+            .ForMember(d => d.AddressFk, s => s.MapFrom(ss => ss.AddressFk));
+
+            configuration.CreateMap<CreateOrEditAccountInfoDto, AppMarketplaceContact>()
+              .ForMember(a => a.Code, b => b.MapFrom(ent => ent.SSIN))
+               ;
+            
+
+            configuration.CreateMap<AppContactAddressDto, AppMarketplaceContactAddress>();
+
+            configuration.CreateMap<CreateOrEditMarketplaceAccountInfoDto, AppMarketplaceContact>()
+              .ForMember(a => a.Code, b => b.MapFrom(ent => ent.SSIN))
+               ;
+            
+
             //.ForMember(dest => dest.Code, opt => opt.Condition(source => source.Id == 0 || source.Id == null)).ReverseMap();
             configuration.CreateMap<SycEntityObjectClassificationDto, SycEntityObjectClassification>().ReverseMap();
             configuration.CreateMap<CreateOrEditSycEntityObjectStatusDto, SycEntityObjectStatus>()

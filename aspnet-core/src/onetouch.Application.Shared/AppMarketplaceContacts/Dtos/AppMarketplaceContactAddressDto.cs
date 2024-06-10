@@ -1,7 +1,4 @@
 ﻿using Abp.Application.Services.Dto;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace onetouch.AppMarketplaceContacts.Dtos
 {
@@ -31,8 +28,9 @@ namespace onetouch.AppMarketplaceContacts.Dtos
 		public virtual string PostalCode { get; set; }
 
 		public virtual long CountryId { get; set; }
+        public virtual onetouch.AppMarketplaceContacts.AppMarketplaceAddressDto	 AddressFk { get; set; }
 
-		public virtual string CountryIdName { get; set; }
+        public virtual string CountryIdName { get; set; }
 
 	}
 }
