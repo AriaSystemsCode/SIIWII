@@ -1854,7 +1854,7 @@ namespace onetouch.Accounts
                                     contactDto.ParentId = account.Id;
                                     //temp solution to test 
                                     //contactDto.Code = System.Guid.NewGuid().ToString();
-                                    contactDto.Code = '01';
+                                    contactDto.Code = "01";
                                     ContactDto savedContactDto = await CreateOrEditContact(contactDto);
 
                                 }
