@@ -120,63 +120,63 @@ namespace onetouch.MarketplaceAccounts
                 try
                 {
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                    
+
                     var filteredAccounts = _appMarketplaceContactRepository.GetAll()
                             .Include(e => e.ContactAddresses).ThenInclude(e => e.AddressFk).ThenInclude(e => e.CountryFk)
                             .Include(e => e.EntityClassifications)
                             .Include(e => e.EntityCategories)
                             .Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
-                            .WhereIf(!string.IsNullOrEmpty(input.Filter),
-                                x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
+                           // .WhereIf(!string.IsNullOrEmpty(input.Filter),
+                           //     x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
 
-                            .WhereIf(input.FilterType <= 1 && input.FilterType != 6,
-                                x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null && x.EntityObjectStatusId != cancelledStatusId))
-                            .WhereIf(input.FilterType == 2 && input.FilterType != 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
-                                && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
-                            .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null))
-                             .WhereIf(input.FilterType == 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null)
-                                || (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
-                                && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
+                           // .WhereIf(input.FilterType <= 1 && input.FilterType != 6,
+                           //     x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null && x.EntityObjectStatusId != cancelledStatusId))
+                           // .WhereIf(input.FilterType == 2 && input.FilterType != 6,
+                           //     x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
+                           //     && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
+                           // .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
+                           //     x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null))
+                           //  .WhereIf(input.FilterType == 6,
+                           //     x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null)
+                           //     || (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
+                           //     && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
 
-                            .WhereIf(!string.IsNullOrEmpty(input.Name),
-                                x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))
-                            .WhereIf(input.Status != null && input.Status.Count(x => x == 1) > 0,
-                                x => _appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
+                           // .WhereIf(!string.IsNullOrEmpty(input.Name),
+                           //     x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))
+                           // .WhereIf(input.Status != null && input.Status.Count(x => x == 1) > 0,
+                           //     x => _appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
 
-                            .WhereIf(input.Status != null && input.Status.Count(x => x == 2) > 0,
-                                x => (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
-                                )
-                            .WhereIf(input.Classifications != null && input.Classifications.Count(x => x > 0) > 0,
-                                x => _appEntityRepository.GetAll().Include(ec => ec.EntityClassifications).FirstOrDefault(e => e.Id == x.Id).EntityClassifications.Any(a => input.Classifications.Contains(a.EntityObjectClassificationId)))
-                            .WhereIf(input.Categories != null && input.Categories.Count(x => x > 0) > 0,
-                                x => _appEntityRepository.GetAll().Include(ec => ec.EntityCategories).FirstOrDefault(e => e.Id == x.Id).EntityCategories.Any(a => input.Categories.Contains(a.EntityObjectCategoryId)))
+                           // .WhereIf(input.Status != null && input.Status.Count(x => x == 2) > 0,
+                           //     x => (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
+                           //     )
+                           // .WhereIf(input.Classifications != null && input.Classifications.Count(x => x > 0) > 0,
+                           //     x => _appEntityRepository.GetAll().Include(ec => ec.EntityClassifications).FirstOrDefault(e => e.Id == x.Id).EntityClassifications.Any(a => input.Classifications.Contains(a.EntityObjectClassificationId)))
+                           // .WhereIf(input.Categories != null && input.Categories.Count(x => x > 0) > 0,
+                           //     x => _appEntityRepository.GetAll().Include(ec => ec.EntityCategories).FirstOrDefault(e => e.Id == x.Id).EntityCategories.Any(a => input.Categories.Contains(a.EntityObjectCategoryId)))
 
-                            .WhereIf(!string.IsNullOrEmpty(input.City),
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.City.Contains(input.City))) > 0)
-                            .WhereIf(!string.IsNullOrEmpty(input.Address),
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.AddressLine1.Contains(input.Address) || a.AddressFk.AddressLine2.Contains(input.Address))) > 0)
-                            .WhereIf(!string.IsNullOrEmpty(input.State),
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.State.Contains(input.State))) > 0)
-                            .WhereIf(!string.IsNullOrEmpty(input.Postal),
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.PostalCode.Contains(input.Postal))) > 0)
-                            .WhereIf(input.Countries != null && input.Countries.Count(x => x > 0) > 0,
-                                x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => input.Countries.Contains(a.AddressFk.CountryId))) > 0)
+                           // .WhereIf(!string.IsNullOrEmpty(input.City),
+                           //     x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.City.Contains(input.City))) > 0)
+                           // .WhereIf(!string.IsNullOrEmpty(input.Address),
+                           //     x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.AddressLine1.Contains(input.Address) || a.AddressFk.AddressLine2.Contains(input.Address))) > 0)
+                           // .WhereIf(!string.IsNullOrEmpty(input.State),
+                           //     x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.State.Contains(input.State))) > 0)
+                           // .WhereIf(!string.IsNullOrEmpty(input.Postal),
+                           //     x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => a.AddressFk.PostalCode.Contains(input.Postal))) > 0)
+                           // .WhereIf(input.Countries != null && input.Countries.Count(x => x > 0) > 0,
+                           //     x => _appMarketplaceContactRepository.GetAll().Include(ca => ca.ContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.ContactAddresses.Any(a => input.Countries.Contains(a.AddressFk.CountryId))) > 0)
 
-                            .WhereIf(input.Languages != null && input.Languages.Count(x => x > 0) > 0,
-                                x => _appMarketplaceContactRepository.GetAll().Count(c => c.Id == x.Id && c.LanguageId != null && input.Languages.Contains((long)c.LanguageId)) > 0)
+                           // .WhereIf(input.Languages != null && input.Languages.Count(x => x > 0) > 0,
+                           //     x => _appMarketplaceContactRepository.GetAll().Count(c => c.Id == x.Id && c.LanguageId != null && input.Languages.Contains((long)c.LanguageId)) > 0)
 
-                            .WhereIf(input.Curruncies != null && input.Curruncies.Count(x => x > 0) > 0,
-                                x => _appMarketplaceContactRepository.GetAll().Count(c => c.Id == x.Id && c.CurrencyId != null && input.Curruncies.Contains((long)c.CurrencyId)) > 0)
-                            .WhereIf(!string.IsNullOrEmpty(input.SSIN), x => x.SSIN == input.SSIN)
-                            .WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x => x.EntityObjectTypeId == input.AccountTypeId)
-                            .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
-                            .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
-                           input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
-                            .Where(e=> (e.IsProfileData && e.ParentId == null ) && ((e.IsHidden!=true) ||
-                            (_appContactRepository.GetAll().Where(x=> x.TenantId==AbpSession.TenantId && x.SSIN==e.SSIN).Count() > 0 )));
+                           // .WhereIf(input.Curruncies != null && input.Curruncies.Count(x => x > 0) > 0,
+                           //     x => _appMarketplaceContactRepository.GetAll().Count(c => c.Id == x.Id && c.CurrencyId != null && input.Curruncies.Contains((long)c.CurrencyId)) > 0)
+                           // .WhereIf(!string.IsNullOrEmpty(input.SSIN), x => x.SSIN == input.SSIN)
+                           // .WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x => x.EntityObjectTypeId == input.AccountTypeId)
+                           // .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
+                           // .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
+                           //input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
+                           .Where(e=> (e.IsProfileData && e.ParentId == null ) && ((e.IsHidden!=true) ||
+                           (_appContactRepository.GetAll().Where(x=> x.TenantId==AbpSession.TenantId && x.SSIN==e.SSIN).Count() > 0 )));
 
                     var pagedAndFilteredAccounts = filteredAccounts
                     .OrderBy(input.Sorting ?? "name asc")
@@ -195,7 +195,8 @@ namespace onetouch.MarketplaceAccounts
                                     {
                                         //AvaliableConnectionName = GetAction(o.EntityObjectTypeCode),
                                         AvaliableConnectionName = "Follow",
-                                        ConnectionName = s1 != null && !s1.IsDeleted && s1.Id > 0 ? "Follow" : "",
+                                        //ConnectionName = s1 != null && !s1.IsDeleted && s1.Id > 0 ? "Follow" : "",
+                                        ConnectionName = "Follow",
                                         Account = new AccountDto
                                         {
                                             AccountTypeString = o.EntityObjectTypeCode,
@@ -226,6 +227,11 @@ namespace onetouch.MarketplaceAccounts
                                     };
 
                     var accountsList = await _accounts.ToListAsync();
+                    foreach (var account in accountsList)
+                    {
+                        account.AvaliableConnectionName = GetAction(account.Account.AccountType);
+                        account.ConnectionName = account.ConnectionName=="Follow" ? GetAction(account.Account.AccountType) : "";
+                    }
                     var totalCount = await filteredAccounts.CountAsync();
 
                     // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
@@ -255,22 +261,23 @@ namespace onetouch.MarketplaceAccounts
         {
             
             int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
-            var currentTenantEdition = TenantManager.GetById(((int)currentTenant)).Edition.Name;
+            var tenant = TenantManager.GetById(((int)currentTenant)).Edition;
+            var currentTenantEdition = tenant==null?"Personal": tenant.Name;
             currentTenantEdition = currentTenantEdition == null ? "" : currentTenantEdition;
             string action = "";
-            if (string.IsNullOrEmpty(accountTypeCode))
+            if (!string.IsNullOrEmpty(accountTypeCode))
             {
-                if (currentTenantEdition == "Personal" && accountTypeCode == "Personal") { action = "MPActionCONNECT"; }
-                if (currentTenantEdition == "Personal" && accountTypeCode == "Business") { action = "MPActionFOLLOW"; }
-                if (currentTenantEdition == "Personal" && accountTypeCode == "Group") { action = "MPActionJOIN"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = "MPActionCONNECT"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionFOLLOW"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = "MPActionJOIN"; }
 
-                if (currentTenantEdition == "Business" && accountTypeCode == "Personal") { action = " MPActionEMPLOY"; }
-                if (currentTenantEdition == "Business" && accountTypeCode == "Business") { action = "MPActionCONNECT"; }
-                if (currentTenantEdition == "Business" && accountTypeCode == "Group") { action = "MPActionJOIN"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = " MPActionEMPLOY"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionCONNECT"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = "MPActionJOIN"; }
 
-                if (currentTenantEdition == "Group" && accountTypeCode == "Personal") { action = "MPActionINVITE"; }
-                if (currentTenantEdition == "Group" && accountTypeCode == "Business") { action = "MPActionINVITE"; }
-                if (currentTenantEdition == "Group" && accountTypeCode == "Group") { action = ""; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = "MPActionINVITE"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionINVITE"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "GROUP") { action = ""; }
 
 
             }
