@@ -5271,7 +5271,7 @@ namespace onetouch.AppItems
                             //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
                             if (lNewVariation == true)
                             {
-                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z => z.ItemPricesFkList)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
@@ -5280,6 +5280,7 @@ namespace onetouch.AppItems
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .Include(x => x.ParentFkList).ThenInclude(z=>z.ItemPricesFkList)
                                .FirstOrDefault();
                                 break;
                             }
@@ -5289,7 +5290,7 @@ namespace onetouch.AppItems
                         case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                                                                  //createOrEditAccountInfoDto.Id = account.Id
 
-                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z=>z.ItemPricesFkList)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
@@ -5298,6 +5299,7 @@ namespace onetouch.AppItems
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
                                .FirstOrDefault();
                             //itemOrg.ParentFkList.Clear();
                             //appItemDeleteList.Add(itemOrg);
@@ -5430,10 +5432,23 @@ namespace onetouch.AppItems
                     appItem.CreatorUserId = AbpSession.UserId;
                 }
                 appItem.Description = excelDto.ProductDescription;
+
+                if (string.IsNullOrEmpty(excelDto.Price))
+                    excelDto.Price = "0";
+
                 appItem.Price = decimal.Parse(excelDto.Price);
                 //XX
-                appItem.ItemPricesFkList = new List<AppItemPrices>();
-                if (appItem.Price > 0)
+                if (appItem.ItemPricesFkList == null)
+                    appItem.ItemPricesFkList = new List<AppItemPrices>();
+                else {
+                    if (appItem.ItemPricesFkList.Count>0) {
+                        foreach (var itmPrc in appItem.ItemPricesFkList)
+                        {
+                            itmPrc.IsDeleted = true;
+                        }
+                    }
+                }
+                //if (appItem.Price > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5452,8 +5467,10 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
+                if (string.IsNullOrEmpty(excelDto.PriceA))
+                    excelDto.PriceA = "0";
                 //MMT0311
-                if (!string.IsNullOrEmpty(excelDto.PriceA) && decimal.Parse(excelDto.PriceA) > 0)
+                if (!string.IsNullOrEmpty(excelDto.PriceA))// && decimal.Parse(excelDto.PriceA) > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5472,7 +5489,10 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
-                if (!string.IsNullOrEmpty(excelDto.PriceB) &&  decimal.Parse(excelDto.PriceB) > 0)
+                if (string.IsNullOrEmpty(excelDto.PriceB))
+                    excelDto.PriceB = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceB))// &&  decimal.Parse(excelDto.PriceB) > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5491,7 +5511,10 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
-                if (!string.IsNullOrEmpty(excelDto.PriceC) && decimal.Parse(excelDto.PriceC) > 0)
+                if (string.IsNullOrEmpty(excelDto.PriceC))
+                    excelDto.PriceC = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceC))// && decimal.Parse(excelDto.PriceC) > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5510,7 +5533,10 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
-                if (!string.IsNullOrEmpty(excelDto.PriceD) && decimal.Parse(excelDto.PriceD) > 0)
+                if (string.IsNullOrEmpty(excelDto.PriceD))
+                    excelDto.PriceD = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceD))// && decimal.Parse(excelDto.PriceD) > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -6285,8 +6311,21 @@ namespace onetouch.AppItems
 
                     }
                     //XX
-                    appChildItem.ItemPricesFkList = new List<AppItemPrices>();
-                    if (appChildItem.Price > 0)
+                    if (appChildItem.ItemPricesFkList == null)
+                        appChildItem.ItemPricesFkList = new List<AppItemPrices>();
+                    else {
+                        if (appChildItem.ItemPricesFkList.Count>0)
+                        {
+                            foreach (var prc in appChildItem.ItemPricesFkList)
+                            {
+                                prc.IsDeleted = true;
+                            }
+                        }
+                    }
+                    if (string.IsNullOrEmpty(appChildItem.Price.ToString()))
+                        appChildItem.Price = 0;
+
+                    //if (appChildItem.Price > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6306,7 +6345,10 @@ namespace onetouch.AppItems
                         });
                     }
                     //MMT0311
-                    if (!string.IsNullOrEmpty(item.PriceA) &&  decimal.Parse(item.PriceA) > 0)
+                    if (string.IsNullOrEmpty(item.PriceA))
+                        item.PriceA = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceA))// &&  decimal.Parse(item.PriceA) > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6325,7 +6367,10 @@ namespace onetouch.AppItems
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
                         });
                     }
-                    if (!string.IsNullOrEmpty(item.PriceB) && decimal.Parse(item.PriceB) > 0)
+                    if (string.IsNullOrEmpty(item.PriceB))
+                        item.PriceB = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceB))// && decimal.Parse(item.PriceB) > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6344,7 +6389,10 @@ namespace onetouch.AppItems
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
                         });
                     }
-                    if (!string.IsNullOrEmpty(item.PriceC) && decimal.Parse(item.PriceC) > 0)
+                    if (string.IsNullOrEmpty(item.PriceC))
+                        item.PriceC = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceC))// && decimal.Parse(item.PriceC) > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6363,7 +6411,10 @@ namespace onetouch.AppItems
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
                         });
                     }
-                    if (!string.IsNullOrEmpty(item.PriceD) && decimal.Parse(item.PriceD) > 0)
+                    if (string.IsNullOrEmpty(item.PriceD))
+                        item.PriceD = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceD))// && decimal.Parse(item.PriceD) > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
