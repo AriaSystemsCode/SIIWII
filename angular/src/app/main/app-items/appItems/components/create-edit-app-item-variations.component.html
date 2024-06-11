@@ -48,12 +48,30 @@
                                         </p>
                                     </div>
                                 </ng-template>
+                               
+
                                 <form #varitationsForm="ngForm" *ngIf="showVariations">
                                     <div class="mt-1 primeng-datatable-container table-transparent-header table-transparent-rows variation-table  pt-1 transparent-p-table" [busyIf]="primengTableHelper.isLoading" *ngIf="primengTableHelper?.records">
+                                        <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
+                                            <!-- attributes -->
+                                            <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
+                                                [ngClass]="{'active':activeExisttingVariation}"
+                                                (click)=" activeExisttingVariation=true;activeNewVariation=false" *ngIf="showExisttingVariation" >
+                                                Exciting Variations
+                                            </a>
+                                            <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
+                                            [ngClass]="{'active':activeNewVariation}"
+                                            (click)=" activeExisttingVariation=false;activeNewVariation=true"  >
+                                        New Variations
+                                        </a>
+                                        </div>
                                         <div class="mb-3 d-flex flex-row" *ngIf="selectedVaritaions.length > 0">
-                                            <a class="text-primary mr-4">{{ "SelectionActions" | localize }}:</a>
+                                            <a class="mr-4">{{ "SelectionActions" | localize }}:</a>
                                             <div class="dropdown mr-4" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
-                                                <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2"
+                                                <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2" style="border-radius: 5px;
+                                                background-color: white !important;
+                                                border: 1px solid #4A0D4A !important;
+                                                color: #4A0D4A !important;"
                                                     dropdownToggle>
                                                     {{'edit/set price' | localize}}
                                                 </button>
@@ -75,7 +93,7 @@
                                                                     [(ngModel)]="appItem.price"
                                                                     [name]="'price-set'"
                                                                     [min]="1"
-                                                                    [styleClass]="'price form-control form-control-border-grey text-primary font-weight-bold bg-grey'"
+                                                                    [styleClass]="'price form-control form-control-border-grey  font-weight-bold bg-grey'"
                                                                     [minFractionDigits]="2"
                                                                     [maxFractionDigits]="2">
                                                                 </p-inputNumber> -->
@@ -84,7 +102,7 @@
                                                                 placeholder="Price"
                                                                 step="any"
                                                                 name="price"
-                                                                class="form-control price form-control form-control-border-grey text-primary font-weight-bold bg-grey"
+                                                                class="form-control price form-control form-control-border-grey  font-weight-bold bg-grey"
                                                                 id="price-varitaion-set"
                                                                 [(ngModel)]="appItem.price"
                                                                 [name]="'price-set'">
@@ -93,17 +111,26 @@
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <button [disabled]="!priceInput.value" class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="setPrice(priceInput.value,dropdown)">
+                                                        <button [disabled]="!priceInput.value" class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="setPrice(priceInput.value,dropdown)" style="border-radius: 5px;
+                                                        background-color: white !important;
+                                                        border: 1px solid #4A0D4A !important;
+                                                        color: #4A0D4A !important;">
                                                             {{ 'Apply' | localize }}
                                                         </button>
-                                                        <button class="btn btn-outline-primary btn-sm cancel text-capitalize" type="button" (click)="dropdown.hide()">
+                                                        <button class="btn btn-outline-primary btn-sm cancel text-capitalize" type="button" (click)="dropdown.hide()" style="border-radius: 5px;
+                                                        background-color: white !important;
+                                                        border: 1px solid #4A0D4A !important;
+                                                        color: #4A0D4A !important;">
                                                             {{ 'Cancel' | localize}}
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="dropdown mr-4" *ngIf="listingMode === undefined" dropdown #dropdown="bs-dropdown" [autoClose]="true"  [insideClick]="false">
-                                                <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2"
+                                            <div class="dropdown mr-4" *ngIf="listingMode === undefined && !activeNewVariation" dropdown #dropdown="bs-dropdown" [autoClose]="true"  [insideClick]="false">
+                                                <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2" style="border-radius: 5px;
+                                                background-color: white !important;
+                                                border: 1px solid #4A0D4A !important;
+                                                color: #4A0D4A !important;"
                                                     dropdownToggle>
                                                     {{ "DeleteSelections" | localize }}
                                                 </button>
@@ -123,10 +150,16 @@
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <button type="button" class="btn btn-primary btn-sm text-capitalize mr-2" (click)="deleteSelectedVariations(dropdown)">
+                                                        <button type="button" class="btn btn-primary btn-sm text-capitalize mr-2" (click)="deleteSelectedVariations(dropdown)" style="border-radius: 5px;
+                                                        background-color: white !important;
+                                                        border: 1px solid #4A0D4A !important;
+                                                        color: #4A0D4A !important;">
                                                             {{ "Yes" | localize }}
                                                         </button>
-                                                        <button class="btn btn-outline-primary btn-sm cancel text-capitalize" type="button" (click)="dropdown.hide()">
+                                                        <button class="btn btn-outline-primary btn-sm cancel text-capitalize" type="button" (click)="dropdown.hide()" style="border-radius: 5px;
+                                                        background-color: white !important;
+                                                        border: 1px solid #4A0D4A !important;
+                                                        color: #4A0D4A !important;">
                                                             {{ "Cancel" | localize }}
                                                         </button>
                                                     </div>
@@ -213,10 +246,10 @@
                                                         </label>
                                                     </td>
                                                     <td>
-                                                        <input type="text" readonly [value]="appItem?.code || ''" class="form-control rounded-lg pt-3 pb-3 row-item">
+                                                        <input type="text" readonly [value]="appItem?.code || ''" class="form-control rounded-lg pt-3 pb-3 row-item" name="code">
                                                     </td>
                                                     <td *ngFor="let entityExtraData of record.entityExtraData" [hidden]="entityExtraData.entityObjectTypeCode !== 'COLOR' && entityExtraData.entityObjectTypeCode !== 'SIZE' && entityExtraData?.entityObjectTypeCode!=='CLOSURE'">
-                                                        <input type="text" readonly [value]="entityExtraData?.attributeCode || entityExtraData?.attributeValueFkCode" class="form-control rounded-lg pt-3 pb-3 row-item">
+                                                        <input type="text" readonly name="" [value]="entityExtraData?.attributeCode || entityExtraData?.attributeValueFkCode" class="form-control rounded-lg pt-3 pb-3 row-item">
                                                     </td>
                                                     <td>
                                                         <div *ngFor="let entityExtraData of record.entityExtraData, let i = index" >
@@ -342,7 +375,8 @@
             </div>
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body pl-0 pr-0 pt-0" *ngIf="!showVariationSelectionMetaData ;else editVaritaionTemplate">
+                    <div class="kt-portlet__body pl-0 pr-0 pt-0">
+                        <!-- *ngIf="!showVariationSelectionMetaData ;else editVaritaionTemplate" -->
                         <!-- <div class="d-inline-block custom-header border-dashed-bottom mb-4 pb-4 ml-4 mr-4">
                             <h5 class="mb-1">
                                 <span >{{ (variationMatrices?.length ? "CreateYourVariations" : 'EditYourVariations') | localize }}</span>
@@ -351,9 +385,20 @@
                                 {{ "SelectAnAttributeAndThenSelectTheOptionsOfTheProductsYouSell.ToSeeMoreAttributes,ClickAdd." | localize }}
                             </p>
                         </div> -->
-                        <div class="mb-2">
+                        <div class="mb-2 position-relative">
                             <h6 class="font-weight-bold p-4" style="background-color: #EEEEEEEE;
                             border-radius: 5px;">{{ "Attributes" | localize }} </h6>
+                                    <button [disabled]="shouldDisableCreateVarButton()"
+                                        class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="right: 0px;
+                                        position: absolute;
+                                        border-radius: 5px;
+                                        background-color: #4A0D4A !important;
+                                        border: #4A0D4A !important;
+                                        color: white !important;">
+                                       {{ "Create" | localize }}
+                                       {{ variationPossibilities > 0 ? variationPossibilities : ' '  }}
+                                       {{ "Variations" | localize }}
+                                   </button>
                             <div class="align-items-baseline d-flex flex-row justify-content-start">
                                 <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
                                     <!-- attributes -->
@@ -386,6 +431,7 @@
                                     <select class="form-select form-control sizeAttrsDDl" 
                                     (change)="handleAttrChange($event)" 
                                     aria-label="Default select example" 
+                                    [name]="'selectedAttrID'"
                                     [(ngModel)]="selectedAttrID">
                                 <option *ngFor="let extraAttribute of extraVariations; let i = index"
                                         [value]="extraAttribute.id" 
@@ -474,7 +520,7 @@
                                         {{ "Selected " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }}{{"S: "}} 
                                         <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{"You have been select "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
                                     </span>
-                                    <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + selectedExtraAttributes[activeExtraAttributeIndex].name" (input)="filterLookup($event)">
+                                    <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + selectedExtraAttributes[activeExtraAttributeIndex].name" (input)="filterLookup($event)" name="search" >
                                     <button style="border-radius: 5px;
                                     background-color: white !important;
                                     border: 1px solid #EEEEEEEE !important;color: #4A0D4A !important;" class="ml-3 p-3 btn btn-outline-primary font-weight-normal p-2" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
@@ -498,7 +544,7 @@
                                         [(ngModel)]="selectedExtraAttributes[activeExtraAttributeIndex].selectedValues"
                                     >
                                     </p-selectButton> -->
-                                    <div class="d-flex flex-row mb-3 w-100" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].displayedSelectedValues.length">
+                                    <div class="d-flex flex-row mb-3 w-100" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.displayedSelectedValues?.length">
                                         <div class="d-flex flex-column justify-content-between m-4 position-relative col-1 m-0 p-0" style="border-radius: 5px;border: 1px solid #EEEEEE;    background-color: white;"
                                             *ngFor="let item of selectedExtraAttributes[activeExtraAttributeIndex].displayedSelectedValues;index as i">
                                             <div class="d-flex flex-column" style="align-items: center; cursor: pointer;" title="{{item.label}}">
@@ -553,15 +599,18 @@
                             </ng-template>
                         </div>
                         <div class="mt-4 pl-4 pr-4">
-                            <button [disabled]="!variationPossibilities  || selectedExtraAttributes?.length  < 2   || !(selectedExtraAttributes?.length  >= 2  && selectedExtraAttributes[0]?.selectedValues?.length >0  && selectedExtraAttributes[1]?.selectedValues?.length >0 ) "
-                                 class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()">
+                            <!-- <button [disabled]="!variationPossibilities  || selectedExtraAttributes?.length  < 2   || !(selectedExtraAttributes?.length  >= 2  && selectedExtraAttributes[0]?.selectedValues?.length >0  && selectedExtraAttributes[1]?.selectedValues?.length >0 ) "
+                                 class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="border-radius: 5px;
+                                 background-color: #4A0D4A !important;
+                                 border: #4A0D4A !important;color: white;">
                                 {{ "Create" | localize }}
                                 {{ variationPossibilities > 0 ? variationPossibilities : ' '  }}
                                 {{ "Variations" | localize }}
-                            </button>
-                            <button class="btn btn-outline-primary btn-sm cancel text-capitalize" type="button" (click)="cancelExtraAttributeSelection()">
+                            </button> -->
+                            <!-- <button class="btn btn-outline-primary btn-sm cancel text-capitalize" type="button" (click)="
+                                ()">
                                 {{ "Cancel" | localize }}
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                     <ng-template #editVaritaionTemplate>
@@ -692,7 +741,7 @@
                                                         {{ "IsDefaultImage" | localize }}
                                                     </a>
                                                 </a>
-                                                <input type="file" id="variation_file_{{i}}" class="d-none" #file (change)="fileChange($event,i)">
+                                                <input type="file" id="variation_file_{{i}}"  name="file"  class="d-none" #file (change)="fileChange($event,i)">
                                             </div>
                                         </div>
                                     </div>

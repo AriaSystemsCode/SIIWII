@@ -55,7 +55,7 @@ export class AddCommentComponent extends AppComponentBase {
 
     @HostListener('document:click', ['$event'])
     clickout(event) {
-      if(!event.target.className.includes("suggstions-contact-list")&&!event.target.className.includes("contact")&&!event.target.className.includes("contact-list-cont")) {
+      if(!String(event?.target?.className)?.includes("suggstions-contact-list")&&!String(event?.target?.className).includes("contact")&&!String(event?.target?.className)?.includes("contact-list-cont")) {
         this.showContactSuggstions=false;
       }
     }

@@ -91,7 +91,10 @@ export class CreateEditAppItemVariationsComponent
     }
     public set showVariations(value: boolean) {
         if (this.isListing) this.selectedVaritaions = this.variationMatrices;
-        this._showVariations = value;
+  this._showVariations = value;
+        if(this.activeNewVariation)
+        this.selectedVaritaions = [...this.primengTableHelper?.records];
+      
     }
 
    
@@ -216,6 +219,10 @@ export class CreateEditAppItemVariationsComponent
         )[0];
     }
 
+    showExisttingVariation=false;
+    activeExisttingVariation=false;
+    activeNewVariation=false;
+
     constructor(
         injector: Injector,
         private _extraAttributeDataService: ExtraAttributeDataService,
@@ -307,8 +314,17 @@ export class CreateEditAppItemVariationsComponent
             );
 
 
+            }
 
-
+            if(this.appItem?.id){
+ this.showExisttingVariation=true;
+            this.activeExisttingVariation=true;
+            this.activeNewVariation=false;
+        }
+        else{
+            this.showExisttingVariation=false;
+            this.activeExisttingVariation=false;
+            this.activeNewVariation=true;
         }
     }
 
@@ -333,6 +349,7 @@ export class CreateEditAppItemVariationsComponent
                 this.getUnselectedProductVariations(this.appItem.listingItemId);
             this.initializePricesObjects();
             this.checkAndAddDefaultPriceObjects();
+            this.editExtraAtrributeSelection();
         }
         // images
         // define the default attribute for images
@@ -530,7 +547,10 @@ export class CreateEditAppItemVariationsComponent
     }
 
     saveExtraAtrributeSelection() {
-        
+        if(this.appItem?.id){
+// Set values of 2 tabs (existing variations & new variations)
+        }
+
         const oldVariations = this.variationMatrices;
         this.editVariationsOpend=false;
         this.variationMatrices = [];
@@ -598,6 +618,7 @@ export class CreateEditAppItemVariationsComponent
                 })*/
                 
                 this.primengTableHelper.records = response;
+                this.selectedVaritaions = [...this.primengTableHelper.records];
                 this.variationMatrices = response;
                 this.hideMainSpinner();
 
@@ -1235,6 +1256,19 @@ export class CreateEditAppItemVariationsComponent
     }
 
     saveVariations() {
+        if(this.selectedVaritaions && this.selectedVaritaions?.length>0){
+        let sectedRecordsPositions: number[] = this.selectedVaritaions.reduce(
+            (accum, variation) => {
+                accum.push(variation.position);
+                return accum;
+            },
+            []
+        );
+        this.variationMatrices = this.variationMatrices.filter((variation) => {
+            return sectedRecordsPositions.includes(variation.position);
+        });
+    }
+
         let invalidPrice = this.variationMatrices.some((variation) => {
             let defaultPriceindex =
                 this._pricingHelpersService.getDefaultPricingIndex(
@@ -1801,22 +1835,51 @@ export class CreateEditAppItemVariationsComponent
         });
     }
 
+
+    deepEqual(obj1: any, obj2: any): boolean {
+        if (obj1 === obj2) return true;
+    
+        if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) return false;
+    
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
+    
+        if (keys1.length !== keys2.length) return false;
+    
+        for (const key of keys1) {
+          if (!keys2.includes(key)) return false;
+          if (!this.deepEqual(obj1[key], obj2[key])) return false;
+        }
+    
+        return true;
+      }
+    shouldDisableCreateVarButton(): boolean {
+        return !this.variationPossibilities || 
+          this.selectedExtraAttributes?.length < 2  || 
+          !(this.selectedExtraAttributes?.length >= 2 && 
+            this.selectedExtraAttributes[0]?.selectedValues?.length > 0 && 
+            this.selectedExtraAttributes[1]?.selectedValues?.length > 0)  || 
+            this.deepEqual(this.oldExtraAttributesData, this.selectedExtraAttributes)   && 
+            this.variationMatrices?.length == this.variationPossibilities  ;
+
+    }
     showUnselectedProductVariations() {
         this.hideUnselectedVariations = true;
         this.variationMatrices.push(...this.parentProductUnselectedVariations);
     }
     editExtraAtrributeSelection() {
-        this.editVariationsOpend=true;
+      //  this.editVariationsOpend=true;
         this.oldExtraAttributesData = [];
         this.extraAttributes.forEach((elem) => {
-            this.oldExtraAttributesData.push(cloneDeep(elem));
+            if(elem.selected){
             elem.displayedSelectedValues =  elem.lookupData.filter(item => elem.selectedValues.includes(item.value))
-
+            this.oldExtraAttributesData.push(cloneDeep(elem));
+            }
         });
         this.mapExtraAttrSelectionDataFromVariationMatrices();
-        this.showVariationSelectionMetaData = false;
-        this.showVariationPhotos = false;
-        this.showVariations = false;
+       // this.showVariationSelectionMetaData = false;
+        // this.showVariationPhotos = false;
+      //  this.showVariations = false;
         this.activeExtraAttributeIndex = 0;
         this.oldDefaultExtraAttrForAttachments =
             this.defaultExtraAttrForAttachments;
