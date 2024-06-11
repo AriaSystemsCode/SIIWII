@@ -458,7 +458,7 @@
                                     </tbody>
                                 </table>
                             </p-tabPanel>
-                            <p-tabPanel header="Order By Size ">
+                            <p-tabPanel [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack)  ? 'Order By Size' : 'View Ordered Quantity By Size'" >
                                 <table
                                     class="table text-center table-bordered table-white"
                                 >
