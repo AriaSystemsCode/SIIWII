@@ -803,9 +803,13 @@ export class CreateEditAppItemVariationsComponent
             return this.notify.info(
                 "Please set another image as default first"
             );
-        this.activeAttachmentOption.entityAttachments.splice(i, 1);
-        this.activeAttachmentOption.attachmentSrcs.splice(i, 1);
-        let imagesCount = this.activeAttachmentOption.entityAttachments.length;
+            var index= this.activeAttachmentOption.entityAttachments.findIndex(x=>x.fileName == (this.activeAttachmentOption.attachmentSrcs[0].split('/').pop() || ''));
+
+            this.activeAttachmentOption.attachmentSrcs.splice(i, 1);
+                if(index>=0)
+                this.activeAttachmentOption.entityAttachments.splice(index, 1);
+        
+                let imagesCount = this.activeAttachmentOption.entityAttachments.length;
         if (
             (imagesCount === 9 &&
                 this.activeAttachmentOption.attachmentSrcs.every(
