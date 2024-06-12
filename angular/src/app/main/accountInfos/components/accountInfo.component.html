@@ -163,9 +163,16 @@
                       <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
                         {{l("Contacts")}}
                       </span>
+                      
                     </a>
                   </li>
-
+                  <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile && !viewMode">
+                    <a class="nav-link">
+                      <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.Payments" src="assets/payment/payment-icon-active.svg">
+                      <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.Payments" src="assets/payment/payment-icon.svg">
+                      <span>{{l("AccountBilling")}}</span>
+                    </a>
+                  </li>
                 <!-- Sara Start -->
 
 

@@ -9,5 +9,6 @@ export enum AccountInfoPageTabs {
     ViewMember,
     ContactsList,
     CreateOrEditContact,
-    ViewContact
+    ViewContact,
+    BillingOptions
 }

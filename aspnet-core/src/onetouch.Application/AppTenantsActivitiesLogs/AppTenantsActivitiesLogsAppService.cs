@@ -71,7 +71,8 @@ namespace onetouch.AppTenantsActivitiesLogs
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SycServiceCodeFilter), e => e.ServiceFk != null && e.ServiceFk.Code == input.SycServiceCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SycApplicationNameFilter), e => e.ApplicationFk != null && e.ApplicationFk.Name == input.SycApplicationNameFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppTransactionCodeFilter), e => e.TransactionFk != null && e.TransactionFk.Code == input.AppTransactionCodeFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.SycPlanNameFilter), e => e.PlanFk != null && e.PlanFk.Name == input.SycPlanNameFilter);
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.SycPlanNameFilter), e => e.PlanFk != null && e.PlanFk.Name == input.SycPlanNameFilter)
+                        .WhereIf(AbpSession.TenantId!=null, e => e.TenantId==AbpSession.TenantId) ;
 
             var pagedAndFilteredAppTenantsActivitiesLogs = filteredAppTenantsActivitiesLogs
                 .OrderBy(input.Sorting ?? "id asc")

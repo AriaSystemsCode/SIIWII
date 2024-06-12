@@ -109,7 +109,7 @@ namespace onetouch.EntityFrameworkCore
 
         public virtual DbSet<AppItemSharing> AppItemSharings { get; set; }
 
-        public virtual DbSet<oldAppTenantsActivitiesLog> AppTenantsActivitiesLogs { get; set; }
+        public virtual DbSet<AppTenantsActivitiesLogs.AppTenantsActivitiesLog> AppTenantsActivitiesLogs { get; set; }
 
         public virtual DbSet<AppTenantPlan> AppTenantPlans { get; set; }
 
@@ -325,9 +325,9 @@ namespace onetouch.EntityFrameworkCore
             {
                 a.HasIndex(e => new { e.TenantId });
             });
-            modelBuilder.Entity<oldAppTenantsActivitiesLog>(a =>
+            modelBuilder.Entity<AppTenantsActivitiesLogs.AppTenantsActivitiesLog>(a =>
                        {
-                           a.HasIndex(e => new { e.TenantId });
+                           a.HasIndex(e => (new { e.TenantId }));
                        });
             modelBuilder.Entity<AppTenantPlan>(a =>
                        {
