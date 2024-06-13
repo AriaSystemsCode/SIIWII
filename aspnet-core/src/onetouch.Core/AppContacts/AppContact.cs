@@ -28,7 +28,9 @@ namespace onetouch.AppContacts
 		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
 		public virtual string TradeName { get; set; }
 
-		[StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
+        public virtual string RelationName { get; set; }
+
+        [StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
 		public virtual string Code { get; set; }
 		
 		public virtual long? LanguageId { get; set; }
