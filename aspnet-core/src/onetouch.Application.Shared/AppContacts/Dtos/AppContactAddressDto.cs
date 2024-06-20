@@ -29,8 +29,9 @@ namespace onetouch.AppContacts.Dtos
 		public virtual string State { get; set; }
 
 		public virtual string PostalCode { get; set; }
+        public virtual onetouch.AppContacts.AppAddressDto AddressFk { get; set; }
 
-		public virtual long CountryId { get; set; }
+        public virtual long CountryId { get; set; }
 
 		public virtual string CountryIdName { get; set; }
 
