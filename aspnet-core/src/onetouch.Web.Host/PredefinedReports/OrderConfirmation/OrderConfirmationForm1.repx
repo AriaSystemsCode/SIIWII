@@ -232,7 +232,7 @@
         </Item7>
         <Item8 Ref="125" ControlType="XRLabel" Name="label12" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="338.3359,38.5762329" LocationFloat="18.520853,211.379562" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
-            <Item1 Ref="126" EventName="BeforePrint" PropertyName="Text" Expression="'Role: '+  iif([TenantOwner]=?tenantId,Trim(Substring([EnteredUserByRole],7 )),[AppTransactionHeadersCreator_address].[ContactRole])" />
+            <Item1 Ref="126" EventName="BeforePrint" PropertyName="Text" Expression="'Role: '+  iif([TenantOwner]=?tenantId,Trim(Substring([EnteredUserByRole],6 )),[AppTransactionHeadersCreator_address].[ContactRole])" />
           </ExpressionBindings>
           <StylePriority Ref="127" UseFont="false" UseTextAlignment="false" />
         </Item8>
