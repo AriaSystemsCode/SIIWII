@@ -339,21 +339,24 @@ namespace onetouch.MarketplaceAccounts
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
                 ObjectMapper.Map(input, appMarketplaceContact);
                 appMarketplaceContact.Id = 0;
+                // HIA look !!
+                appMarketplaceContact.IsProfileData = true;
                 appMarketplaceContact.ObjectId = foundEntity.ObjectId;
                 appMarketplaceContact.EntityObjectTypeId = foundEntity.EntityObjectTypeId;
                 appMarketplaceContact.EntityObjectTypeCode = foundEntity.EntityObjectTypeCode;
                 
                 appMarketplaceContact.Name = input.Name;
                 appMarketplaceContact.Notes = input.Notes;
+                appMarketplaceContact.OwnerId = input.TenantId;
                 appMarketplaceContact.TenantId = null;
                 appMarketplaceContact.Code = input.SSIN;
                 appMarketplaceContact.SSIN = input.SSIN;
-                appMarketplaceContact.OwnerId = input.TenantId;
+                
 
                 foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
                 {
                     contactAddress.Id = 0;
-                    contactAddress.AddressFk.Id = 0; 
+                    contactAddress.AddressFk.Id = 0;
                 }
 
                     long newId = 0;
@@ -364,25 +367,25 @@ namespace onetouch.MarketplaceAccounts
 
                 await CurrentUnitOfWork.SaveChangesAsync();
                 //save addresses
-                foreach(var contactAddress in appMarketplaceContact.ContactAddresses)
-                {
-                    var address = contactAddress.AddressFk;
-                    address.Id = 0;
-                    address.TenantId = null;
-                    address.AccountId = 0;
-                    var addressRetId = await _appAddressRepository.InsertAndGetIdAsync(address);
-                    await CurrentUnitOfWork.SaveChangesAsync();
+                //foreach(var contactAddress in appMarketplaceContact.ContactAddresses)
+                //{
+                //    var address = contactAddress.AddressFk;
+                //    address.Id = 0;
+                //    address.TenantId = null;
+                //    address.AccountId = 0;
+                //    var addressRetId = await _appAddressRepository.InsertAndGetIdAsync(address);
+                //    await CurrentUnitOfWork.SaveChangesAsync();
 
 
-                    contactAddress.Id = 0;
-                    contactAddress.AddressId = addressRetId;
-                    contactAddress.ContactId = newId;
+                //    contactAddress.Id = 0;
+                //    contactAddress.AddressId = addressRetId;
+                //    contactAddress.ContactId = newId;
                     
-                    var addressRet = await _appContactAddressRepository.InsertAsync(contactAddress);
-                    await CurrentUnitOfWork.SaveChangesAsync();
+                //    var addressRet = await _appContactAddressRepository.InsertAsync(contactAddress);
+                //    await CurrentUnitOfWork.SaveChangesAsync();
 
 
-                }
+                //}
                 // return await GetAccountForEdit(new EntityDto<long> { Id = newId });
                 return newId;
             }

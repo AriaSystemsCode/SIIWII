@@ -1917,14 +1917,14 @@ namespace onetouch.Accounts
                 
                 if (contact != null)
                 {
-                    var entity = await _appEntityRepository.GetAll().AsNoTracking()
-                                        .Include(x => x.EntityCategories)
-                                        .Include(x => x.EntityClassifications)
-                                        .Include(x => x.EntityAttachments)
-                                        .ThenInclude(x => x.AttachmentFk)
-                                        .AsNoTracking()
-                                        .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId 
-                                                               && x.Id == contact.EntityId);
+                    //var entity = await _appEntityRepository.GetAll().AsNoTracking()
+                    //                    .Include(x => x.EntityCategories)
+                    //                    .Include(x => x.EntityClassifications)
+                    //                    .Include(x => x.EntityAttachments)
+                    //                    .ThenInclude(x => x.AttachmentFk)
+                    //                    .AsNoTracking()
+                    //                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId 
+                    //                                           && x.Id == contact.EntityId);
 
                     var publishContact = await _appMarketplaceContactRepository.GetAll()
                                                 .AsNoTracking().Include(x => x.ContactAddresses)
@@ -1936,14 +1936,14 @@ namespace onetouch.Accounts
                     // if profile already published return
                     if (publishContact !=null) return;
 
-                    AppEntityDto entityDto = new AppEntityDto();
-                    ObjectMapper.Map(entity, entityDto);
-                    entityDto.Id = 0;
-                    //entityDto.TenantId = null;
+                    //AppEntityDto entityDto = new AppEntityDto();
+                    //ObjectMapper.Map(entity, entityDto);
+                    //entityDto.Id = 0;
+                    ////entityDto.TenantId = null;
 
                     CreateOrEditMarketplaceAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditMarketplaceAccountInfoDto();
                     ObjectMapper.Map(contact, createOrEditAccountInfoDto);
-                    createOrEditAccountInfoDto.TenantId = null;
+                    //createOrEditAccountInfoDto.TenantId = null;
                     //createOrEditAccountInfoDto.ContactAddresses = null;
                     createOrEditAccountInfoDto.Id = 0;
 
@@ -1968,41 +1968,37 @@ namespace onetouch.Accounts
                                         .Include(x => x.EntityClassifications)
                                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                         .AsNoTracking()
-                                        .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId 
+                                        .FirstOrDefaultAsync(x => x.TenantId == null 
                                          && x.Id == input);
-
-                   // var publishContact = await _appContactRepository.GetAll().AsNoTracking().
-                     //   Include(x => x.AppContactAddresses).FirstOrDefaultAsync(x => x.TenantId == null
-                       // && x.IsProfileData == false && x.PartnerId == contact.Id);
-
+                     
                     AppEntityDto entityDto = new AppEntityDto();
                     ObjectMapper.Map(entity, entityDto);
                     entityDto.Id = 0;
-                    entityDto.TenantId = AbpSession.TenantId;
-
-                    AppContactDto contactDto = new AppContactDto();
-                    ObjectMapper.Map(marketplaceContact, contactDto);
-
-                    contactDto.PartnerId = marketplaceContact.Id;
-                    //contactDto.EntityId = entityDto.Id;
-                    contactDto.IsProfileData = false;
-                    //contactDto.TenantId = AbpSession.TenantId;
-                    //contactDto.ContactAddresses = null;
-                    contactDto.Id = 0;
-
+                    entityDto.Code = "";
                     entityDto.TenantId = AbpSession.TenantId;
                     var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
 
+                    AppContactDto contactDto = new AppContactDto();
+                    ObjectMapper.Map(marketplaceContact, contactDto);
+                    //contactDto.PartnerId = marketplaceContact.Id;
+                    contactDto.IsProfileData = false;
+                    contactDto.TenantId = AbpSession.TenantId; 
+                    contactDto.Id = 0;
                     contactDto.EntityId = savedEntity;
                     
-                    
-
                     foreach (var contactAddress in contactDto.ContactAddresses)
                     {
                         contactAddress.Id = 0;
+                        //contactAddress.AddressId = 0;
+                        contactAddress.AccountId = 0;
+                         
                         contactAddress.AddressFk.Id = 0;
+                        //contactAddress.AddressFk.TenantId = AbpSession.TenantId;
+                        contactAddress.AddressFk.AccountId = 0;
+                         
+
                     }
-                    contactDto.Id = await _appEntitiesAppService.SaveContact(contactDto);
+                    var contactDto_Id = await _appEntitiesAppService.SaveContact(contactDto);
                     // Add Addresses
                    // var addressesIds = marketplaceContact.ContactAddresses.Select(x => x.AddressId).ToArray();
 
@@ -2102,6 +2098,36 @@ namespace onetouch.Accounts
                     //End
                 }
             }
+        }
+
+        public async Task CloseRelation(long input)
+        {
+
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var marketplaceContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
+                    .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
+                    .FirstOrDefaultAsync(x =>
+                    x.IsProfileData == true && x.Id == input);
+
+                if (marketplaceContact != null)
+                {
+                    var AppContact = await  _appContactRepository.GetAll()
+                       .FirstOrDefaultAsync(e => (e.SSIN == marketplaceContact.SSIN) && (e.TenantId == AbpSession.TenantId));
+
+                     if(AppContact != null) {
+                        var appContactAddress = _appContactAddressRepository.FirstOrDefault(e => e.ContactId == AppContact.Id);
+                        if (appContactAddress != null)
+                        {
+                            await _appContactAddressRepository.DeleteAsync(e=> e.Id == appContactAddress.Id);
+                            await _appAddressRepository.DeleteAsync(e => e.Id == appContactAddress.AddressId);
+                        }
+
+                        await _appContactRepository.DeleteAsync(AppContact);
+                    }
+                }
+            }
+
         }
 
         //Mariam[start]

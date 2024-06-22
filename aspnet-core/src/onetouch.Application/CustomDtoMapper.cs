@@ -579,6 +579,9 @@ namespace onetouch
             configuration.CreateMap<CreateOrEditSycEntityObjectClassificationDto, SycEntityObjectClassification>().ReverseMap();
 
             //AppMarketplaceContact
+            configuration.CreateMap<AppMarketplaceAddress, AppAddressDto>().ReverseMap();
+
+            configuration.CreateMap<AppMarketplaceAddressDto, AppAddressDto>().ReverseMap();
             configuration.CreateMap<AppMarketplaceAddressDto, AppAddress>().ReverseMap();
             configuration.CreateMap<AppMarketplaceAddressDto, AppMarketplaceAddress>().ReverseMap();
 
