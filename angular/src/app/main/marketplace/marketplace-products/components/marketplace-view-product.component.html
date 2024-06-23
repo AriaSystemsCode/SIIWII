@@ -403,7 +403,7 @@
                        
                         <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"   class="p-4 font-weight-bold" style="color:black !important" >Order by prepack</span>
                           <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack" class="switch switch-container my-4 font-weight-bold" >
-                            <input type="checkbox" [(ngModel)]="chk_Order_by_prepack" checked>
+                            <input type="checkbox" [(ngModel)]="chk_Order_by_prepack" checked (change)="onChangechk_Order_by_prepack()">
                             <span class="slider round"></span>
                         </label>
 
