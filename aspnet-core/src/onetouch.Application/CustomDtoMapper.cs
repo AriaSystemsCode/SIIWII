@@ -595,9 +595,8 @@ namespace onetouch
               .ForMember(a => a.Code, b => b.MapFrom(ent => ent.SSIN))
                ;
 
-            configuration.CreateMap<AppMarketplaceContact, AppContactDto>()
-              
-               ;
+            configuration.CreateMap<AppMarketplaceContact, AppContactDto>();
+            configuration.CreateMap<AppMarketplaceContact, AppContact>().ReverseMap();
 
             configuration.CreateMap<AppContactAddressDto, AppMarketplaceContactAddress>().ReverseMap();
 

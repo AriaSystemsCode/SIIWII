@@ -1916,16 +1916,7 @@ namespace onetouch.Accounts
                                            && x.IsProfileData == true && x.AccountId == null);
                 
                 if (contact != null)
-                {
-                    //var entity = await _appEntityRepository.GetAll().AsNoTracking()
-                    //                    .Include(x => x.EntityCategories)
-                    //                    .Include(x => x.EntityClassifications)
-                    //                    .Include(x => x.EntityAttachments)
-                    //                    .ThenInclude(x => x.AttachmentFk)
-                    //                    .AsNoTracking()
-                    //                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId 
-                    //                                           && x.Id == contact.EntityId);
-
+                { 
                     var publishContact = await _appMarketplaceContactRepository.GetAll()
                                                 .AsNoTracking().Include(x => x.ContactAddresses)
                                                 .FirstOrDefaultAsync(x => x.TenantId == null 
@@ -1935,12 +1926,7 @@ namespace onetouch.Accounts
                     
                     // if profile already published return
                     if (publishContact !=null) return;
-
-                    //AppEntityDto entityDto = new AppEntityDto();
-                    //ObjectMapper.Map(entity, entityDto);
-                    //entityDto.Id = 0;
-                    ////entityDto.TenantId = null;
-
+ 
                     CreateOrEditMarketplaceAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditMarketplaceAccountInfoDto();
                     ObjectMapper.Map(contact, createOrEditAccountInfoDto);
                     //createOrEditAccountInfoDto.TenantId = null;
