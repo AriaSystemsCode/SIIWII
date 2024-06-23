@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges } from '@angular/core';
 import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -9,7 +9,7 @@ import { AddressComponent } from '../../Components/address/address.component';
   templateUrl: './create-or-add-shipping-information.component.html',
   styleUrls: ['./create-or-add-shipping-information.component.scss']
 })
-export class CreateOrAddShippingInformationComponent extends AppComponentBase {
+export class CreateOrAddShippingInformationComponent extends AppComponentBase  implements OnInit,OnChanges{
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
@@ -58,6 +58,17 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
     //this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
     this.loadShipViaList();
 
+  }
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.appTransactionsForViewDto) {
+      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+      let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+      shipFromObj[0]?.companySSIN ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
+      let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
+      shipToObj[0]?.companySSIN ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
+      this.storeVal = this.appTransactionsForViewDto?.buyerStore;
+      this.loadShipViaList();
+    }
   }
 
   updateTabInfo(addObj, contactRole) {
