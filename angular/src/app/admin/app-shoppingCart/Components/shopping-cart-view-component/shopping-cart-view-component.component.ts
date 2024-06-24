@@ -441,6 +441,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
+                  this.onGeneratOrderReport(true,undefined);
                 this.getShoppingCartData();
                 this.hideMainSpinner();
               });
@@ -457,6 +458,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
+                  this.onGeneratOrderReport(true,undefined);
                 this.getShoppingCartData();
                 this.hideMainSpinner();
               });
@@ -471,6 +473,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
+                  this.onGeneratOrderReport(true,undefined);
                 this.getShoppingCartData();
                 this.hideMainSpinner();
               });
@@ -497,6 +500,7 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             if (res) this.notify.info("Successfully Updated.");
+            this.onGeneratOrderReport(true,undefined);
             this.getShoppingCartData();
             rowNode.node.data.showEditQty = false;
             this.hideMainSpinner();
@@ -585,6 +589,7 @@ export class ShoppingCartViewComponentComponent
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
+        this.onGeneratOrderReport(true,undefined);
         this.hideMainSpinner();
         this.showTabs = true;
       });
