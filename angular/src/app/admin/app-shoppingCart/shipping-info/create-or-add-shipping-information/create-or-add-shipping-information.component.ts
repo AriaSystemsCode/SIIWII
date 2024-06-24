@@ -9,7 +9,7 @@ import { AddressComponent } from '../../Components/address/address.component';
   templateUrl: './create-or-add-shipping-information.component.html',
   styleUrls: ['./create-or-add-shipping-information.component.scss']
 })
-export class CreateOrAddShippingInformationComponent extends AppComponentBase implements OnInit,OnChanges {
+export class CreateOrAddShippingInformationComponent extends AppComponentBase  implements OnInit,OnChanges{
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
@@ -59,10 +59,16 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     this.loadShipViaList();
 
   }
-
   ngOnChanges(changes: SimpleChanges) {
-    if (this.appTransactionsForViewDto) 
-        this.loadShipViaList();
+    if (this.appTransactionsForViewDto) {
+      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+      let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
+      shipFromObj[0]?.companySSIN ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
+      let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
+      shipToObj[0]?.companySSIN ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
+      this.storeVal = this.appTransactionsForViewDto?.buyerStore;
+      this.loadShipViaList();
+    }
   }
 
   updateTabInfo(addObj, contactRole) {

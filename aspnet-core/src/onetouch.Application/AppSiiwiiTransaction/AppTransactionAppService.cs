@@ -4934,19 +4934,22 @@ namespace onetouch.AppSiiwiiTransaction
 
             var cont = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
                     .Where(z => z.IsProfileData && z.ParentId == null && z.PartnerId == null).FirstOrDefaultAsync();
-            foreach (var clss in cont.EntityFk.EntityClassifications)
+            if (cont != null && cont.EntityFk != null && cont.EntityFk.EntityClassifications != null)
             {
-                if (transType == "SO")
+                foreach (var clss in cont.EntityFk.EntityClassifications)
                 {
-                    var rep = cont.EntityFk.EntityClassifications.Where(z => z.EntityObjectClassificationFk.Name == "Independent Sales Rep").FirstOrDefault();
-                    if (rep != null)
-                        returnRole = rep.EntityObjectClassificationFk.Name;
-                }
-                else
-                {
-                    var office = cont.EntityFk.EntityClassifications.Where(z => z.EntityObjectClassificationFk.Name == "Independent Buying Office").FirstOrDefault();
-                    if (office != null)
-                        returnRole = office.EntityObjectClassificationFk.Name;
+                    if (transType == "SO")
+                    {
+                        var rep = cont.EntityFk.EntityClassifications.Where(z => z.EntityObjectClassificationFk.Name == "Independent Sales Rep").FirstOrDefault();
+                        if (rep != null)
+                            returnRole = rep.EntityObjectClassificationFk.Name;
+                    }
+                    else
+                    {
+                        var office = cont.EntityFk.EntityClassifications.Where(z => z.EntityObjectClassificationFk.Name == "Independent Buying Office").FirstOrDefault();
+                        if (office != null)
+                            returnRole = office.EntityObjectClassificationFk.Name;
+                    }
                 }
             }
             return returnRole;
