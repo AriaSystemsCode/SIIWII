@@ -56,8 +56,8 @@ export class MarketplaceViewProductComponent
     orderType: string = "";
     productVarImages: MarketplaceExtraDataAttrDto[];
     currencySymbol: string = "";
-    showEditSpecialPrice:boolean=true;
-    updatedSpecialPrice:number=0;
+    showEditSpecialPrice: boolean = true;
+    updatedSpecialPrice: number = 0;
     chk_Order_by_prepack: boolean = true;
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
@@ -113,7 +113,7 @@ export class MarketplaceViewProductComponent
     }
 
     getProductDetailsForView() {
-        this.showEditSpecialPrice=true;
+        this.showEditSpecialPrice = true;
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
                 if (res.orderType == TransactionType.SalesOrder)
@@ -157,8 +157,8 @@ export class MarketplaceViewProductComponent
                     .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
                         this.productDetails = res.appItem;
                         this.updatedSpecialPrice = this.productDetails.minSpecialPrice;
-                        this.productDetails?.minMSRP % 1 ==0?this.productDetails.minMSRP=Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2):null; 
-                        this.productDetails?.maxMSRP % 1 ==0?this.productDetails.maxMSRP=Math.round(this.productDetails.maxMSRP * 100 / 100).toFixed(2):null; 
+                        this.productDetails?.minMSRP % 1 == 0 ? this.productDetails.minMSRP = Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2) : null;
+                        this.productDetails?.maxMSRP % 1 == 0 ? this.productDetails.maxMSRP = Math.round(this.productDetails.maxMSRP * 100 / 100).toFixed(2) : null;
                         this.productImages = res.appItem.entityAttachments;
                         this.productVarImages = res?.appItem?.variations;
                         let colorVariation: any[] = res.appItem.variations.filter(
@@ -195,7 +195,7 @@ export class MarketplaceViewProductComponent
     GetCurrencyInfo() {
         this._AppEntitiesServiceProxy.getCurrencyInfo(this.productBodyData.currencyCode)
             .subscribe((res: CurrencyInfoDto) => {
-                this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+                this.currencySymbol = res.symbol ? res.symbol : res.code;
             });
     }
 
@@ -216,17 +216,17 @@ export class MarketplaceViewProductComponent
         this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
         this.isColorView = true
         this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex].colorImg;
-        this.setSizes( this.currentIndex)
+        this.setSizes(this.currentIndex)
     }
 
-slideToPreviousImage(): void {
-    // Update currentIndex and translateX
-    this.currentIndex = (this.currentIndex - 1 + this.colorsData.length) % this.colorsData.length;
-    this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
-    this.isColorView = true;
-    this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex].colorImg;
-    this.setSizes( this.currentIndex)
-}
+    slideToPreviousImage(): void {
+        // Update currentIndex and translateX
+        this.currentIndex = (this.currentIndex - 1 + this.colorsData.length) % this.colorsData.length;
+        this.translateX = -this.currentIndex * 60; // Adjust the width of each image as needed
+        this.isColorView = true;
+        this.colorAttachmentForMainIamge = this.colorsData[this.currentIndex].colorImg;
+        this.setSizes(this.currentIndex)
+    }
 
     // create order by size summary JSON
     onNumberChange(e: any, color: any, sizeIndex: any) {
@@ -244,7 +244,7 @@ slideToPreviousImage(): void {
         if (!foundColor) {
             this.orderSummary.push(orederedMappedData);
         }
-       if (!(this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack ) ) {
+        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
             this.productDetails.variations.map((variation: any) => {
                 if (variation.extraAttrName === "COLOR") {
                     variation.selectedValues.forEach((value) => {
@@ -279,7 +279,7 @@ slideToPreviousImage(): void {
         orders.map((order: any) => {
             order.color.sizes.map((size) => {
                 if (this.productDetails.orderByPrePack) {
-                    
+
                     let multiby =
                         size.sizeRatio * order.color.sizes[0].orderedPrePacks;
                     let priceMultibly = multiby * size.price;
@@ -287,7 +287,7 @@ slideToPreviousImage(): void {
                     price = price + priceMultibly;
                 } else {
                     if (!size.orderedQty)
-                      size.orderedQty = 0
+                        size.orderedQty = 0
                     let priceMultibly = size.orderedQty * size.price;
                     qty = qty + size.orderedQty;
                     price = price + priceMultibly;
@@ -361,7 +361,7 @@ slideToPreviousImage(): void {
 
     // total ordered Price in order by size
     calculatePriceSum(sizes): number {
-        let sum:any = 0;
+        let sum: any = 0;
         sizes.forEach((item) => {
             let multiby = item.price * item.orderedQty;
             sum = sum + multiby;
@@ -371,7 +371,7 @@ slideToPreviousImage(): void {
 
     // totla ratios in order by prepack
     getTotlaPrepackSum() {
-        let sum:any = 0;
+        let sum: any = 0;
         this.colorsData[this.currentIndex].sizes.forEach((item) => {
             sum = sum + item.sizeRatio;
         });
@@ -386,14 +386,14 @@ slideToPreviousImage(): void {
     calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item) => {
-            let multiby ;
-            if(this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack )
-            multiby =item.orderedPrePacks;
+            let multiby;
+            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)
+                multiby = item.orderedPrePacks;
 
-                else
-             multiby =
-                item.sizeRatio *
-                this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
+            else
+                multiby =
+                    item.sizeRatio *
+                    this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
 
             sum = sum + multiby;
         });
@@ -405,14 +405,14 @@ slideToPreviousImage(): void {
     getTotalPrepackSizeAmount(prepackSizes: any, orderIndex: number) {
         let sum = 0;
         prepackSizes.forEach((item) => {
-            let multiby ;
-            if(this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack )
-            multiby =item.orderedPrePacks;
-        
-        else 
-            multiby =
-                item.sizeRatio *
-                this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
+            let multiby;
+            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)
+                multiby = item.orderedPrePacks;
+
+            else
+                multiby =
+                    item.sizeRatio *
+                    this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
 
             let amount = multiby * item.price;
             sum = sum + amount;
@@ -481,24 +481,24 @@ slideToPreviousImage(): void {
             if (result.isConfirmed) {
 
 
-/////
-if ((this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack ) ) {
-this.productDetails.variations.map((variation: any) => {
-    if (variation.extraAttrName === "COLOR") {
-        variation.selectedValues.forEach((value) => {
-                value.edRestAttributes.forEach((attr) => {
-                    if (attr.extraAttrName === "SIZE") {
-                        attr.values.forEach((sizeValue) => {
-                            sizeValue.orderedQty=  sizeValue.orderedPrePacks;
-                            sizeValue.orderedPrePacks =0;
-                        });
-                    }
-                });
-    });
-}
-});
-}
-/////
+                /////
+                if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
+                    this.productDetails.variations.map((variation: any) => {
+                        if (variation.extraAttrName === "COLOR") {
+                            variation.selectedValues.forEach((value) => {
+                                value.edRestAttributes.forEach((attr) => {
+                                    if (attr.extraAttrName === "SIZE") {
+                                        attr.values.forEach((sizeValue) => {
+                                            sizeValue.orderedQty = sizeValue.orderedPrePacks;
+                                            sizeValue.orderedPrePacks = 0;
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+                /////
 
                 let bodyRequest: any = {
                     appItem: this.productDetails,
@@ -548,7 +548,7 @@ this.productDetails.variations.map((variation: any) => {
 
         this.router.navigateByUrl("app/main/marketplace/products");
     }
-    onEditpecialPrice(updatedSpecialPrice){
+    onEditpecialPrice(updatedSpecialPrice) {
         Swal.fire({
             title: "",
             text: "The price assigned to the ordered Items will be updated ",
@@ -559,35 +559,51 @@ this.productDetails.variations.map((variation: any) => {
             allowEscapeKey: false,
             backdrop: true,
             customClass: {
-              popup: 'popup-class',
-              icon: 'icon-class',
-              content: 'content-class',
-              actions: 'actions-class',
-              confirmButton: 'confirm-button-class2',
-      
+                popup: 'popup-class',
+                icon: 'icon-class',
+                content: 'content-class',
+                actions: 'actions-class',
+                confirmButton: 'confirm-button-class2',
+
             },
-          }).then((result) => {
+        }).then((result) => {
             if (result.isConfirmed) {
-        this.productDetails.variations.map((variation: any) => {
-            if (variation.extraAttrName === "COLOR") {
-                variation.selectedValues.forEach((value) => {
-                        value.edRestAttributes.forEach((attr) => {
-                            if (attr.extraAttrName === "SIZE") {
-                                attr.values.forEach((sizeValue) => {
-                                    sizeValue.price =updatedSpecialPrice;
-                                });
-                            }
+                this.productDetails.variations.map((variation: any) => {
+                    if (variation.extraAttrName === "COLOR") {
+                        variation.selectedValues.forEach((value) => {
+                            value.edRestAttributes.forEach((attr) => {
+                                if (attr.extraAttrName === "SIZE") {
+                                    attr.values.forEach((sizeValue) => {
+                                        sizeValue.price = updatedSpecialPrice;
+                                    });
+                                }
+                            });
+
                         });
-                    
+                    }
                 });
+
+                this.productDetails.minSpecialPrice = updatedSpecialPrice;
+                this.productDetails.maxSpecialPrice = updatedSpecialPrice;
+                this.showEditSpecialPrice = true
             }
         });
-    
-        this.productDetails.minSpecialPrice=updatedSpecialPrice;
-        this.productDetails.maxSpecialPrice= updatedSpecialPrice;
-        this.showEditSpecialPrice= true
-}});
-  }
+    }
+    onChangechk_Order_by_prepack() {
+        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
+            this.colorsData[this.currentIndex].sizes.forEach((item) => {
+                item.orderedPrePacks=0;
+            });
+        }
+            else{
+            this.colorsData[this.currentIndex].sizes.forEach((item) => {
+                item.orderedPrePacks*=item.sizeRatio;
+            });
+        }
+
+
+
+    }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
