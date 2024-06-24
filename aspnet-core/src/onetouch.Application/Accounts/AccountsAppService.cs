@@ -63,6 +63,8 @@ using Abp.EntityFrameworkCore.Uow;
 using onetouch.EntityFrameworkCore;
 using Twilio.Rest.Trunking.V1;
 using NUglify.Helpers;
+using Abp.Domain.Entities;
+using onetouch.Attachments;
 
 namespace onetouch.Accounts
 {
@@ -93,6 +95,8 @@ namespace onetouch.Accounts
         private const int MaxProfilPictureBytes = 5242880;
         private readonly IBinaryObjectManager _binaryObjectManager;
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
+        private readonly IRepository<AppEntityAttachment, long> _appEntityAttachmentRepository;
+        private readonly IRepository<AppAttachment, long> _appAttachmentRepository;
         private enum CardType
         {
             MasterCard, Visa, AmericanExpress, Discover, JCB
@@ -111,8 +115,10 @@ namespace onetouch.Accounts
             , ISycAttachmentCategoriesAppService sSycAttachmentCategoriesAppService
             , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository, UserManager userManager, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepo,
               SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager,
-              TenantManager tenantManager)
+              TenantManager tenantManager, IRepository<AppEntityAttachment, long> appEntityAttachmentRepository, IRepository<AppAttachment, long> appAttachmentRepository)
         {
+            _appAttachmentRepository = appAttachmentRepository;
+            _appEntityAttachmentRepository = appEntityAttachmentRepository;
             _tenantManager = tenantManager;
             _appContactRepository = appContactRepository;
             _appEntityRepository = appEntityRepository;
@@ -138,7 +144,36 @@ namespace onetouch.Accounts
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
 
         }
+        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
+        {
+            if (sourceTenantId == null) sourceTenantId = -1;
+            if (distinationTenantId == null) distinationTenantId = -1;
 
+            var tmpPath = _appConfiguration[$"Attachment:PathTemp"] + @"\" + sourceTenantId + @"\" + fileName;
+            var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + sourceTenantId + @"\" + fileName;
+            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + fileName;
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId);
+            }
+
+            try
+            {
+                System.IO.File.Copy(tmpPath.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    System.IO.File.Copy(pathSource.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+                }
+                catch (Exception ex1)
+                {
+
+                }
+            }
+        }
         public async Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -842,9 +877,10 @@ namespace onetouch.Accounts
                     {
                         //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
 
-                        var entity = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Id == originalPublishContactFortCurrTenant.EntityId);
+                        var entity = await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk).FirstOrDefaultAsync(x => x.Id == originalPublishContactFortCurrTenant.EntityId);
                         AppEntityDto entityDto = new AppEntityDto();
                         ObjectMapper.Map(entity, entityDto);
+                        entityDto.EntityAttachments = null;
                         entityDto.Id = 0;
                         //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[Start]
                         entityDto.TenantId = profileContactofOtherTenant.TenantId;
@@ -867,9 +903,37 @@ namespace onetouch.Accounts
 
                         //temp solution to test 
                         entityDto.Code = System.Guid.NewGuid().ToString();
-
+                        
                         var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
+                        //MMT24
+                        if (entity.EntityAttachments != null)
+                        {
+                            var entityEntityAttachments = new List<AppEntityAttachment>();
+                            entityEntityAttachments = ObjectMapper.Map<List<AppEntityAttachment>>(entity.EntityAttachments);
+                            foreach (var attach in entityEntityAttachments)
+                            {
 
+                                attach.Id = 0;
+                                attach.AttachmentId = 0;
+                                attach.AttachmentFk.Id = 0;
+                                attach.EntityId = savedEntity;
+                                attach.EntityFk = null;
+                                attach.AttachmentFk.TenantId = profileContactofOtherTenant.TenantId;
+                                MoveFile(attach.AttachmentFk.Attachment,  -1, profileContactofOtherTenant.TenantId);
+                                //entityEntityAttachments.Add(attach);
+                                var attachIns = await  _appAttachmentRepository.InsertAsync(attach.AttachmentFk);
+                                attach.AttachmentId = attachIns.Id;
+                                await _appEntityAttachmentRepository.InsertAsync(attach);
+                            }
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                            //var ent = await _appEntityRepository.GetAll().FirstOrDefaultAsync(z=>z.Id==savedEntity);
+                            //if (ent != null)
+                            //{
+                            //    ent.EntityAttachments = entityEntityAttachments;
+                            //    _appEntityRepository.UpdateAsync(ent);
+                            //}
+                        }
+                        //MMT24
                         contactDto.EntityId = savedEntity;
 
                         //temp solution to test 
@@ -936,7 +1000,7 @@ namespace onetouch.Accounts
                     }
                     //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
                     // Add Data for the other Tenant
-                    var entity2 = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Id == originalContact.EntityId);
+                    var entity2 = await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk).FirstOrDefaultAsync(x => x.Id == originalContact.EntityId);
                     AppEntityDto entityDto2 = new AppEntityDto();
                     ObjectMapper.Map(entity2, entityDto2);
                     entityDto2.Id = 0;
@@ -956,7 +1020,34 @@ namespace onetouch.Accounts
                     entityDto2.Code = System.Guid.NewGuid().ToString();
 
                     var savedEntity2 = await _appEntitiesAppService.SaveEntity(entityDto2);
-
+                    //MMT24
+                    if (entity2.EntityAttachments != null)
+                    {
+                        var entityEntityAttachments = new List<AppEntityAttachment>();
+                        entityEntityAttachments = ObjectMapper.Map<List<AppEntityAttachment>>(entity2.EntityAttachments);
+                        foreach (var attach in entityEntityAttachments)
+                        {
+                            attach.Id = 0;
+                            attach.AttachmentId = 0;
+                            attach.AttachmentFk.Id = 0;
+                            attach.EntityId = savedEntity2;
+                            attach.EntityFk = null;
+                            attach.AttachmentFk.TenantId = AbpSession.TenantId;
+                            MoveFile(attach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                            //entityEntityAttachments.Add(attach);
+                            var attachIns = await _appAttachmentRepository.InsertAsync(attach.AttachmentFk);
+                            attach.AttachmentId = attachIns.Id;
+                            await _appEntityAttachmentRepository.InsertAsync(attach);
+                        }
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                        //var ent = await _appEntityRepository.GetAll().FirstOrDefaultAsync(z => z.Id == savedEntity2);
+                        //if (ent != null)
+                        //{
+                        //    ent.EntityAttachments = entityEntityAttachments;
+                        //    await _appEntityRepository.UpdateAsync(ent);
+                        //}
+                    }
+                    //MMT24
                     contactDto2.EntityId = savedEntity2;
 
                     //temp solution to test 
@@ -7760,7 +7851,7 @@ namespace onetouch.Accounts
             return appContactAddressDtos;
 
         }
-
+       
 
     }
 
