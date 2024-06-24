@@ -10,7 +10,7 @@ import { AddressComponent } from '../../address/address.component';
   templateUrl: './create-or-edit-billing-info.component.html',
   styleUrls: ['./create-or-edit-billing-info.component.scss']
 })
-export class CreateOrEditBillingInfoComponent extends AppComponentBase  implements OnInit,OnChanges{
+export class CreateOrEditBillingInfoComponent extends AppComponentBase implements OnInit,OnChanges {
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
