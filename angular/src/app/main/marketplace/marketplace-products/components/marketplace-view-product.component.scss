@@ -65,6 +65,7 @@ td {
     display: flex;
     flex-direction: row;
     transition: transform 0.5s;
+    background-color: transparent !important;
 }
 
 .indicator-btns {
@@ -233,7 +234,7 @@ input[type="number"] {
     width: 26px;
     left: 4px;
     bottom: 4px;
-    background-color: white;
+    //background-color: white;
     transition: .4s;
 }
 
