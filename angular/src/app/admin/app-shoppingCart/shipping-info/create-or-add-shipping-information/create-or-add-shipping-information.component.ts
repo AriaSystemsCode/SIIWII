@@ -241,7 +241,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
   reloadAddresscomponentShipFrom(data) {
     this.loadAddresComponentShipFrom = true;
     this.contactIdShipFrom = data.compId;
-    this.shipFromSelectedAdd = null;
+   // this.shipFromSelectedAdd = null;
     // if(data.compssin){
       if( this.AddressComponentChild)
     this.AddressComponentChild['first']?.getAddressList(data.compssin);
@@ -250,7 +250,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase {
 
   }
   reloadAddresscomponentShipTo(data) {
-    this.shipToSelectedAdd = null;
+  //  this.shipToSelectedAdd = null;
 
     // if(data.compssin){
     this.contactIdShipTo = data.compId;
