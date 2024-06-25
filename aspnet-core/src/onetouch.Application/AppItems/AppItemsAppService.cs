@@ -64,6 +64,8 @@ using onetouch.Attachments;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Org.BouncyCastle.Utilities.Encoders;
 using onetouch.AppSiiwiiTransaction;
+using NPOI.HPSF;
+using NPOI.POIFS.NIO;
 
 namespace onetouch.AppItems
 {
@@ -2242,7 +2244,9 @@ namespace onetouch.AppItems
                                     colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
                                     if (colorImage != null)
                                     {
-                                        if (string.IsNullOrEmpty(colorImage.AttributeValue))
+                                        var path = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString().Trim() + @"\" + colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+                                        
+                                        if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
                                                 MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
@@ -5982,7 +5986,7 @@ namespace onetouch.AppItems
                                 appSizeScaleRatioForEditDto.Dimesion1Name = sizescale.Result.Dimesion1Name;
                                 appSizeScaleRatioForEditDto.Name = (!string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Result.Name.TrimEnd() + " Ratio");
                                 string[] arraySizeRatio = new string[sizes.Count];
-                                Array.Fill(arraySizeRatio, "0");
+                                System.Array.Fill(arraySizeRatio, "0");
                                 if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
                                 {
                                     var arrayRatio = excelDto.SizeRatioValue.Split('=')[0];
