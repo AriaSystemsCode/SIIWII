@@ -120,8 +120,8 @@ namespace onetouch
         {
             configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
             configuration.CreateMap<AppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
-            configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, AppTenantsActivitiesLog>().ReverseMap();
-            configuration.CreateMap<AppTenantActivityLogDto, AppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, oldAppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<AppTenantActivityLogDto, oldAppTenantsActivitiesLog>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantSubscriptionPlanDto, AppTenantSubscriptionPlan>().ReverseMap();
             configuration.CreateMap<AppTenantSubscriptionPlanDto, AppTenantSubscriptionPlan>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
