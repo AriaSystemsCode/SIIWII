@@ -900,7 +900,13 @@ export class CreateEditAppItemVariationsComponent
         att.index = index;
         att.fileName = file.name;
         let extraAttrId = this.defaultExtraAttrForAttachments.attributeId;
-        let optionValue = this.activeAttachmentOption.lookupData.value;
+       // let optionValue = this.activeAttachmentOption.lookupData.value;
+       let optionValue;
+       if('code' in  this.activeAttachmentOption?.lookupData)
+        optionValue=this.activeAttachmentOption?.lookupData?.code;
+    else
+    optionValue=this.activeAttachmentOption.lookupData.value;
+
         att.attributes = `${extraAttrId}=${optionValue}`;
         att.attachmentCategoryId =
             this.attachmentCategory.sycAttachmentCategory.id;
@@ -1461,11 +1467,17 @@ export class CreateEditAppItemVariationsComponent
                 // let isSizeExtraAttr: boolean =
                 //     selectedExtraAttr[currentExtraDataIndex]
                 //         .entityObjectTypeCode == this.sizeExtraAttrCode;
-                let optionvalue = 
+               // let optionvalue =  Number(attributes[1]);
                     //isSizeExtraAttr
                     //? attributes[1]
                     //: 
-                    Number(attributes[1]);
+                    let optionValueCode=attributes[1];
+                    let optionvalue   = selectedExtraAttr[
+                        currentExtraDataIndex
+                    ]?.lookupData?.filter(
+                        (item) => item.code == optionValueCode
+                    )[0]?.value;
+
                 let attachmentObj: { [key: number]: IVaritaionAttachment } =
                     selectedExtraAttr[currentExtraDataIndex]
                         .selectedValuesAttachments
