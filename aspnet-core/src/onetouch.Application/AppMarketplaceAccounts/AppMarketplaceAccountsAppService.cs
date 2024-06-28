@@ -64,7 +64,7 @@ namespace onetouch.MarketplaceAccounts
         private readonly IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> _appMarketplaceAccountsPriceLevelsRepo;
         private const int MaxProfilPictureBytes = 5242880;
         private readonly IBinaryObjectManager _binaryObjectManager;
-        
+
         public MarketplaceAccountsAppService(IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository
             , IRepository<AppEntity, long> appEntityRepository
             , Helper helper, IRepository<AppMarketplaceAddress, long> appAddressRepository
@@ -77,11 +77,11 @@ namespace onetouch.MarketplaceAccounts
             , ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService
             , ISycAttachmentCategoriesAppService sSycAttachmentCategoriesAppService
             , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository, UserManager userManager, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepo
-              ,SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager
-              ,TenantManager tenantManager
-              ,IAccountsAppService iAccountsAppService
+              , SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager
+              , TenantManager tenantManager
+              , IAccountsAppService iAccountsAppService
             , ICreateMarketplaceAccount iCreateMarketplaceAccount
-              ,IRepository<AppContact, long> appContactRepository)
+              , IRepository<AppContact, long> appContactRepository)
 
         {
             _tenantManager = tenantManager;
@@ -175,8 +175,8 @@ namespace onetouch.MarketplaceAccounts
                            // .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
                            // .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            //input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
-                           .Where(e=> (e.IsProfileData && e.ParentId == null ) && ((e.IsHidden!=true) ||
-                           (_appContactRepository.GetAll().Where(x=> x.TenantId==AbpSession.TenantId && x.SSIN==e.SSIN).Count() > 0 )));
+                           .Where(e => (e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ||
+                           (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
 
                     var pagedAndFilteredAccounts = filteredAccounts
                     .OrderBy(input.Sorting ?? "name asc")
@@ -230,7 +230,7 @@ namespace onetouch.MarketplaceAccounts
                     foreach (var account in accountsList)
                     {
                         account.AvaliableConnectionName = GetAction(account.Account.AccountType);
-                        account.ConnectionName = account.ConnectionName=="Follow" ? GetAction(account.Account.AccountType) : "";
+                        account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
                     }
                     var totalCount = await filteredAccounts.CountAsync();
 
@@ -259,10 +259,10 @@ namespace onetouch.MarketplaceAccounts
 
         public string GetAction(string accountTypeCode)
         {
-            
+
             int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
             var tenant = TenantManager.GetById(((int)currentTenant)).Edition;
-            var currentTenantEdition = tenant==null?"Personal": tenant.Name;
+            var currentTenantEdition = tenant == null ? "Personal" : tenant.Name;
             currentTenantEdition = currentTenantEdition == null ? "" : currentTenantEdition;
             string action = "";
             if (!string.IsNullOrEmpty(accountTypeCode))
@@ -322,7 +322,7 @@ namespace onetouch.MarketplaceAccounts
         {
             try
             {
-                
+
                 var ret = await _appMarketplaceContactRepository.FirstOrDefaultAsync(e => e.TenantId == null && e.SSIN == SSIN);
                 ret.IsHidden = true;
                 return true;
@@ -332,26 +332,27 @@ namespace onetouch.MarketplaceAccounts
         }
 
         public async Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input)
-        {  
+        {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                var mainAccountID = input.Id;
                 var foundEntity = _appEntityRepository.GetAll().FirstOrDefault(e => e.Id == input.EntityId);
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
                 ObjectMapper.Map(input, appMarketplaceContact);
                 appMarketplaceContact.Id = 0;
-                // HIA look !!
+                 
                 appMarketplaceContact.IsProfileData = true;
                 appMarketplaceContact.ObjectId = foundEntity.ObjectId;
                 appMarketplaceContact.EntityObjectTypeId = foundEntity.EntityObjectTypeId;
                 appMarketplaceContact.EntityObjectTypeCode = foundEntity.EntityObjectTypeCode;
-                
+
                 appMarketplaceContact.Name = input.Name;
                 appMarketplaceContact.Notes = input.Notes;
                 appMarketplaceContact.OwnerId = input.TenantId;
                 appMarketplaceContact.TenantId = null;
                 appMarketplaceContact.Code = input.SSIN;
                 appMarketplaceContact.SSIN = input.SSIN;
-                
+
 
                 foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
                 {
@@ -360,38 +361,41 @@ namespace onetouch.MarketplaceAccounts
                 }
 
                 long newId = 0;
-                //if (input.ReturnId)
                 { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
-                //else
-                //{ var ret = await _appMarketplaceContactRepository.InsertAsync(appMarketplaceContact); }
-
                 await CurrentUnitOfWork.SaveChangesAsync();
 
 
-                //Mariam -Publish Account related branches [Start]
-                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var branchInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.AccountId == input.Id &&
-                                 x.ParentId == input.Id && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
-
+                //HIA - share Account related branches [Start]
+                var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var branchInfo = _appContactRepository.GetAll()
+                    .Where(x => x.IsProfileData
+                           && x.AccountId == mainAccountID
+                           && x.TenantId == AbpSession.TenantId
+                           && x.ParentId == mainAccountID
+                           && x.EntityFk.EntityObjectTypeId != personEntityObjectTypeId).ToList();
+                // First level of branches
                 foreach (var branchObj in branchInfo)
                 {
-                    await PublishBranch(branchObj.Id, newId);
+                    await PublishBranch(branchObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
                 }
-                //Mariam -Publish Account related branches [End]
+                //HIA - share Account related branches [End]
+
                 //Publish contacts
-                var contactInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == input.Id && x.AccountId == contact.Id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
-
+                var contactInfo = _appContactRepository.GetAll()
+                    .Where(x => x.IsProfileData
+                           && x.AccountId == mainAccountID
+                           && x.TenantId == AbpSession.TenantId
+                           && x.ParentId == mainAccountID
+                           && x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId).ToList();
                 foreach (var contactObj in contactInfo)
-                {
-                    await PublishMember(contactObj.Id);
+                {    
+                    await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
                 }
-
-
                 return newId;
             }
 
         }
-        
+
 
 
         private async Task<long> SaveContact(AppMarketplaceContactDto input)
@@ -423,178 +427,179 @@ namespace onetouch.MarketplaceAccounts
 
 
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
-        public async Task PublishProfile()
-        {
+        //public async Task PublishProfile()
+        //{
 
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+
+        //        var contact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
+        //            .Include(x => x.ContactAddresses)
+        //            .ThenInclude(x => x.AddressFk).AsNoTracking()
+        //            .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true);
+
+        //        if (contact != null)
+        //        {
+        //            var entity = await _appEntityRepository.GetAll().AsNoTracking().Include(x => x.EntityCategories)
+        //                                .Include(x => x.EntityClassifications)
+        //                                .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+        //                                .AsNoTracking()
+        //                                .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contact.Id);
+
+        //            var publishContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking().Include(x => x.ContactAddresses)
+        //                .FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.SSIN == contact.SSIN);
+
+        //            AppEntityDto entityDto = new AppEntityDto();
+        //            ObjectMapper.Map(entity, entityDto);
+        //            entityDto.Id = 0;
+        //            entityDto.TenantId = null;
+
+        //            AppMarketplaceContactDto contactDto = new AppMarketplaceContactDto();
+        //            ObjectMapper.Map(contact, contactDto);
+
+        //            contactDto.SSIN = contact.SSIN;
+        //            contactDto.IsProfileData = false;
+        //            contactDto.TenantId = null;
+        //            contactDto.ContactAddresses = null;
+        //            contactDto.Id = 0;
+
+        //            if (publishContact != null)
+        //            {
+        //                contactDto.Id = publishContact.Id;
+        //                entityDto.Id = publishContact.Id;
+        //                //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
+        //                entityDto.EntityObjectStatusId = null;
+        //                //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
+        //            }
+        //            // fix bug as per Mariam, 2022-08-14 entity tenant should be null 
+        //            entityDto.TenantId = null;
+        //            var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
+
+        //            contactDto.Id = savedEntity;
+        //            contactDto.Id = await SaveContact(contactDto);
+
+        //            // Remove Addresses
+        //            if (publishContact != null)
+        //            {
+        //                var publishAddressesIds = publishContact.ContactAddresses.Select(x => x.AddressId).ToArray();
+        //                var publishContactAddressesIds = publishContact.ContactAddresses.Select(x => x.Id).ToArray();
+
+        //                await _appContactAddressRepository.DeleteAsync(x => x.ContactId == contactDto.Id); //  publishContactAddressesIds.Contains(x.Id));
+        //                await _appAddressRepository.DeleteAsync(x => publishAddressesIds.Contains(x.Id));
+        //                await CurrentUnitOfWork.SaveChangesAsync();
+        //            }
+
+        //            // Add Addresses
+        //            var addressesIds = contact.ContactAddresses.Select(x => x.AddressId).ToArray();
+
+        //            var addresses = _appAddressRepository.GetAll().Where(x => addressesIds.Contains(x.Id)).ToList();
+
+        //            foreach (var contactAddress in contact.ContactAddresses)
+        //            {
+        //                var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+        //                if (savedAddress != null)
+        //                {
+        //                    AppMarketplaceAddress address = new AppMarketplaceAddress();
+
+        //                    AppMarketplaceAddress existedInPublish = null;
+
+        //                    //if (contactDto.ContactAddresses != null)
+        //                    existedInPublish = await _appAddressRepository.GetAll()
+        //                        .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null
+        //                               && x.AccountId == contactDto.Id).FirstOrDefaultAsync();
+
+        //                    ObjectMapper.Map(savedAddress, address);
+        //                    if (existedInPublish == null)
+        //                    {
+        //                        //ObjectMapper.Map(savedAddress, address);
+        //                        address.Id = 0;
+        //                        address.AccountId = contactDto.Id;
+        //                        address.TenantId = null;
+        //                        address = await _appAddressRepository.InsertAsync(address);
+        //                        await CurrentUnitOfWork.SaveChangesAsync();
+        //                    }
+        //                    else
+        //                    {
+        //                        address.TenantId = null;
+        //                        address.Id = existedInPublish.Id;
+        //                        address.Code = existedInPublish.Code;
+        //                        address.AccountId = contactDto.Id;
+        //                        var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+        //                        x.ChangeTracker.Clear();
+        //                        await _appAddressRepository.UpdateAsync(address);
+        //                        await CurrentUnitOfWork.SaveChangesAsync();
+        //                    }
+
+
+        //                    AppMarketplaceContactAddress newContactAddress = new AppMarketplaceContactAddress();
+        //                    //ObjectMapper.Map(contactAddress, newContactAddress);
+        //                    newContactAddress.Id = 0;
+        //                    newContactAddress.AddressId = address.Id;
+        //                    newContactAddress.ContactId = contactDto.Id;
+        //                    newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
+        //                    newContactAddress.AddressCode = contactAddress.AddressCode;
+        //                    newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
+        //                    newContactAddress.ContactCode = contactAddress.ContactCode;
+        //                    if (contactDto.ContactAddresses == null)
+        //                        contactDto.ContactAddresses = new List<AppMarketplaceContactAddressDto>();
+        //                    contactDto.ContactAddresses.Add(new AppMarketplaceContactAddressDto
+        //                    {
+        //                        AddressTypeId = contactAddress.AddressTypeId,
+        //                        AddressTypeIdName = contactAddress.AddressTypeCode,
+        //                        Code = address.Code,
+        //                        AddressId = address.Id,
+        //                        AccountId = contactDto.Id,
+        //                        ContactId = contactDto.Id
+        //                    });
+        //                    //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
+        //                    //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
+        //                    await _appContactAddressRepository.InsertAsync(newContactAddress);
+        //                    await CurrentUnitOfWork.SaveChangesAsync();
+        //                }
+        //            }
+
+        //            //Mariam -Publish Account related branches [Start]
+        //            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+        //            var branchInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData && x.SSIN == contact.SSIN &&
+        //                             x.ParentId == contact.Id && x.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
+
+        //            foreach (var branchObj in branchInfo)
+        //            {
+        //                await PublishBranch(branchObj.Id, contactDto.Id);
+        //            }
+        //            //Mariam -Publish Account related branches [End]
+        //            //Publish contacts
+        //            var contactInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id
+        //            && x.SSIN == contact.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
+
+        //            foreach (var contactObj in contactInfo)
+        //            {
+        //                //await PublishMember(contactObj.Id, contactDto.Id);
+        //            }
+        //            //End
+        //        }
+        //    }
+        //}
+        ////Mariam[start]
+        private async Task<bool> PublishBranch(long branchId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID)
+        {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-
-                var contact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
-                    .Include(x => x.ContactAddresses)
+                var input = await _appContactRepository.GetAll().AsNoTracking()
+                    .Include(x => x.AppContactAddresses)
                     .ThenInclude(x => x.AddressFk).AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true);
-
-                if (contact != null)
-                {
-                    var entity = await _appEntityRepository.GetAll().AsNoTracking().Include(x => x.EntityCategories)
-                                        .Include(x => x.EntityClassifications)
-                                        .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                                        .AsNoTracking()
-                                        .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contact.Id);
-
-                    var publishContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking().Include(x => x.ContactAddresses)
-                        .FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.SSIN == contact.SSIN);
-
-                    AppEntityDto entityDto = new AppEntityDto();
-                    ObjectMapper.Map(entity, entityDto);
-                    entityDto.Id = 0;
-                    entityDto.TenantId = null;
-
-                    AppMarketplaceContactDto contactDto = new AppMarketplaceContactDto();
-                    ObjectMapper.Map(contact, contactDto);
-
-                    contactDto.SSIN = contact.SSIN;
-                    contactDto.IsProfileData = false;
-                    contactDto.TenantId = null;
-                    contactDto.ContactAddresses = null;
-                    contactDto.Id = 0;
-
-                    if (publishContact != null)
-                    {
-                        contactDto.Id = publishContact.Id;
-                        entityDto.Id = publishContact.Id;
-                        //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
-                        entityDto.EntityObjectStatusId = null;
-                        //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
-                    }
-                    // fix bug as per Mariam, 2022-08-14 entity tenant should be null 
-                    entityDto.TenantId = null;
-                    var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
-
-                    contactDto.Id = savedEntity;
-                    contactDto.Id = await SaveContact(contactDto);
-
-                    // Remove Addresses
-                    if (publishContact != null)
-                    {
-                        var publishAddressesIds = publishContact.ContactAddresses.Select(x => x.AddressId).ToArray();
-                        var publishContactAddressesIds = publishContact.ContactAddresses.Select(x => x.Id).ToArray();
-
-                        await _appContactAddressRepository.DeleteAsync(x => x.ContactId == contactDto.Id); //  publishContactAddressesIds.Contains(x.Id));
-                        await _appAddressRepository.DeleteAsync(x => publishAddressesIds.Contains(x.Id));
-                        await CurrentUnitOfWork.SaveChangesAsync();
-                    }
-
-                    // Add Addresses
-                    var addressesIds = contact.ContactAddresses.Select(x => x.AddressId).ToArray();
-
-                    var addresses = _appAddressRepository.GetAll().Where(x => addressesIds.Contains(x.Id)).ToList();
-
-                    foreach (var contactAddress in contact.ContactAddresses)
-                    {
-                        var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
-                        if (savedAddress != null)
-                        {
-                            AppMarketplaceAddress address = new AppMarketplaceAddress();
-
-                            AppMarketplaceAddress existedInPublish = null;
-
-                            //if (contactDto.ContactAddresses != null)
-                            existedInPublish = await _appAddressRepository.GetAll()
-                                .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null
-                                       && x.AccountId == contactDto.Id).FirstOrDefaultAsync();
-
-                            ObjectMapper.Map(savedAddress, address);
-                            if (existedInPublish == null)
-                            {
-                                //ObjectMapper.Map(savedAddress, address);
-                                address.Id = 0;
-                                address.AccountId = contactDto.Id;
-                                address.TenantId = null;
-                                address = await _appAddressRepository.InsertAsync(address);
-                                await CurrentUnitOfWork.SaveChangesAsync();
-                            }
-                            else
-                            {
-                                address.TenantId = null;
-                                address.Id = existedInPublish.Id;
-                                address.Code = existedInPublish.Code;
-                                address.AccountId = contactDto.Id;
-                                var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
-                                x.ChangeTracker.Clear();
-                                await _appAddressRepository.UpdateAsync(address);
-                                await CurrentUnitOfWork.SaveChangesAsync();
-                            }
-
-
-                            AppMarketplaceContactAddress newContactAddress = new AppMarketplaceContactAddress();
-                            //ObjectMapper.Map(contactAddress, newContactAddress);
-                            newContactAddress.Id = 0;
-                            newContactAddress.AddressId = address.Id;
-                            newContactAddress.ContactId = contactDto.Id;
-                            newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
-                            newContactAddress.AddressCode = contactAddress.AddressCode;
-                            newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
-                            newContactAddress.ContactCode = contactAddress.ContactCode;
-                            if (contactDto.ContactAddresses == null)
-                                contactDto.ContactAddresses = new List<AppMarketplaceContactAddressDto>();
-                            contactDto.ContactAddresses.Add(new AppMarketplaceContactAddressDto
-                            {
-                                AddressTypeId = contactAddress.AddressTypeId,
-                                AddressTypeIdName = contactAddress.AddressTypeCode,
-                                Code = address.Code,
-                                AddressId = address.Id,
-                                AccountId = contactDto.Id,
-                                ContactId = contactDto.Id
-                            });
-                            //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
-                            //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
-                            await _appContactAddressRepository.InsertAsync(newContactAddress);
-                            await CurrentUnitOfWork.SaveChangesAsync();
-                        }
-                    }
-
-                    //Mariam -Publish Account related branches [Start]
-                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                    var branchInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData && x.SSIN == contact.SSIN &&
-                                     x.ParentId == contact.Id && x.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
-
-                    foreach (var branchObj in branchInfo)
-                    {
-                        await PublishBranch(branchObj.Id);
-                    }
-                    //Mariam -Publish Account related branches [End]
-                    //Publish contacts
-                    var contactInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData && x.ParentId == contact.Id
-                    && x.SSIN == contact.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
-
-                    foreach (var contactObj in contactInfo)
-                    {
-                        await PublishMember(contactObj.Id);
-                    }
-                    //End
-                }
-            }
-        }
-        //Mariam[start]
-        private async Task<bool> PublishBranch(long branchId, long parentId)
-        {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                var input = await _appContactRepository.GetAll().AsNoTracking().Include(x => x.AppContactAddresses)
-                    .ThenInclude(x => x.AddressFk).AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && 
+                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId &&
                     x.IsProfileData == true && x.Id == branchId);
 
                 var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
-                                   .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId 
+                                   .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
                                    && x.Id == input.EntityId);
 
 
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
                 ObjectMapper.Map(input, appMarketplaceContact);
                 appMarketplaceContact.Id = 0;
-                // HIA look !!
+                 
                 appMarketplaceContact.IsProfileData = true;
                 appMarketplaceContact.ObjectId = foundEntity.ObjectId;
                 appMarketplaceContact.EntityObjectTypeId = foundEntity.EntityObjectTypeId;
@@ -606,7 +611,7 @@ namespace onetouch.MarketplaceAccounts
                 appMarketplaceContact.TenantId = null;
                 appMarketplaceContact.Code = input.SSIN;
                 appMarketplaceContact.SSIN = input.SSIN;
-
+                appMarketplaceContact.AccountId = newAccountID;
 
                 foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
                 {
@@ -615,146 +620,139 @@ namespace onetouch.MarketplaceAccounts
                 }
 
                 long newId = 0;
-                //if (input.ReturnId)
                 { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
-                //else
-                //{ var ret = await _appMarketplaceContactRepository.InsertAsync(appMarketplaceContact); }
-
                 await CurrentUnitOfWork.SaveChangesAsync();
 
-
-
+                //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var contactInfo = _appContactRepository.GetAll()
+                .Where(x => x.IsProfileData
+                           && x.AccountId == mainAccountID
+                           && x.TenantId == AbpSession.TenantId
+                           && x.ParentId == input.Id
+                           && x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId).ToList();
                  
-
-                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var contactInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData && 
-                x.ParentId == input.Id && x.SSIN == input.SSIN && x.EntityObjectTypeId == presonEntityObjectTypeId).ToList();
-
                 foreach (var contactObj in contactInfo)
                 {
-                    await PublishMember(contactObj.Id, newId);
+                    await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newAccountID);
                 }
-                 
-                var branchInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.IsProfileData &&
-                                 x.ParentId == input.Id && x.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
+
+                //publish sub branches
+                var branchInfo = _appContactRepository.GetAll()
+                .Where(x => x.IsProfileData
+                           && x.AccountId == mainAccountID
+                           && x.TenantId == AbpSession.TenantId
+                           && x.ParentId == input.Id
+                           && x.EntityFk.EntityObjectTypeId != personEntityObjectTypeId).ToList();
 
                 foreach (var branchObj in branchInfo)
                 {
-                    await PublishBranch(branchObj.Id, newId);
+                    await PublishBranch(branchObj.Id, newId, personEntityObjectTypeId, mainAccountID, newAccountID);
                 }
-                  
+
             }
             return true;
         }
-        private async Task<bool> PublishMember(long contactId, long parentId )
+
+        private async Task<bool> PublishMember(long contactId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID)
         {
-            var contact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
-            && x.Id == contactId && x.IsProfileData == true);
-            var entity = await _appEntityRepository.GetAll().AsNoTracking()
+            var input = await _appContactRepository.GetAll().AsNoTracking()
+                .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId 
+                                        && x.AccountId == mainAccountID
+                                        && x.Id == contactId && x.IsProfileData == true);
+            var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                 .Include(x => x.EntityExtraData)
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
-                                && x.Id == contact.Id);
+                                && x.Id == input.EntityId);
 
+            AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
+            ObjectMapper.Map(input, appMarketplaceContact);
+            appMarketplaceContact.Id = 0;
+            appMarketplaceContact.EntityExtraData = foundEntity.EntityExtraData;
+            appMarketplaceContact.IsProfileData = true;
+            appMarketplaceContact.ObjectId = foundEntity.ObjectId;
+            appMarketplaceContact.EntityObjectTypeId = foundEntity.EntityObjectTypeId;
+            appMarketplaceContact.EntityObjectTypeCode = foundEntity.EntityObjectTypeCode;
+            appMarketplaceContact.ParentId = parentId;
+            appMarketplaceContact.Name = input.Name;
+            appMarketplaceContact.Notes = foundEntity.Notes;
+            appMarketplaceContact.OwnerId = input.TenantId;
+            appMarketplaceContact.TenantId = null;
+            appMarketplaceContact.Code = input.SSIN;
+            appMarketplaceContact.SSIN = input.SSIN;
+            appMarketplaceContact.AccountId = newAccountID;
 
-
-
-            //Get Contact Related Published records of Account and Branch
-            //var publishedAccount = await _appMarketplaceContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
-            //&& x.SSIN == contact.SSIN && x.IsProfileData == false);
-            //var publishedBranch = await _appMarketplaceContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null
-            //&& x.SSIN == contact.SSIN && x.IsProfileData == false);
-            
-            //var publishContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
-            //    .FirstOrDefaultAsync(x => x.TenantId == null
-            //    && x.IsProfileData == false && x.SSIN == contact.SSIN);
-
-            //AppEntityDto entityDto = new AppEntityDto();
-            //ObjectMapper.Map(entity, entityDto);
-            //entityDto.Id = 0;
-            var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-            entity.EntityObjectTypeId = presonEntityObjectTypeId;
-
-            AppMarketplaceContactDto contactDto = new AppMarketplaceContactDto();
-            ObjectMapper.Map(contact, contactDto);
-
-            contactDto.SSIN = contact.SSIN;
-            contactDto.IsProfileData = false;
-            contactDto.ParentId = parentId;
-            contactDto.TenantId = null;
-            contactDto.ContactAddresses = null;
-            contactDto.Id = 0;
-            //contactDto.AccountId = publishedAccount.Id;
-
-            if (publishContact != null)
+            foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
             {
-                contactDto.Id = publishContact.Id;
-                entityDto.Id = publishContact.Id;
+                contactAddress.Id = 0;
+                contactAddress.AddressFk.Id = 0;
             }
-            if (entity.EntityAttachments != null)
+
+              
+            if (appMarketplaceContact.EntityAttachments != null)
             {
-                ObjectMapper.Map<IList<AppEntityAttachmentDto>>(entity.EntityAttachments);
+                ObjectMapper.Map<IList<AppEntityAttachmentDto>>(appMarketplaceContact.EntityAttachments);
             }
             //Extra Attributes[Start]
-            if (entityDto.EntityExtraData != null)
+            if (appMarketplaceContact.EntityExtraData != null)
             {
-                foreach (var extraAtt in entityDto.EntityExtraData)
+                foreach (var extraAtt in appMarketplaceContact.EntityExtraData)
                 {
                     //AppEntityExtraDataDto appEntityExtraDto = new AppEntityExtraDataDto();
                     //ObjectMapper.Map(extraAtt, appEntityExtraDto);
-                    if (extraAtt.AttributeValueId == null) extraAtt.AttributeValueId = 0;
-                    extraAtt.EntityObjectTypeId = presonEntityObjectTypeId;
+                    //if (extraAtt.AttributeValueId == null) extraAtt.AttributeValueId = 0;
+                    extraAtt.EntityObjectTypeId = personEntityObjectTypeId;
                     extraAtt.Id = 0;
                     switch (extraAtt.AttributeId)
                     {
                         case 708: //Language ID
                             if (extraAtt.AttributeValue.ToLower() == "false")
                             {
-                                contactDto.LanguageId = null;
-                                contactDto.LanguageCode = null;
+                                appMarketplaceContact.LanguageId = null;
+                                appMarketplaceContact.LanguageCode = null;
                             }
                             break;
                         case 709: //Email Address
                             if (extraAtt.AttributeValue.ToLower() == "false")
                             {
-                                contactDto.EMailAddress = null;
+                                appMarketplaceContact.EMailAddress = null;
                             }
                             break;
                         case 710: //Phone#1
                             if (extraAtt.AttributeValue.ToLower() == "false")
                             {
-                                contactDto.Phone1Ext = null;
-                                contactDto.Phone1Number = null;
-                                contactDto.Phone1TypeId = null;
-                                contactDto.Phone1TypeName = null;
+                                appMarketplaceContact.Phone1Ext = null;
+                                appMarketplaceContact.Phone1Number = null;
+                                appMarketplaceContact.Phone1TypeId = null;
+                                appMarketplaceContact.Phone1TypeName = null;
                             }
                             break;
 
                         case 711://Phone#2
                             if (extraAtt.AttributeValue.ToLower() == "false")
                             {
-                                contactDto.Phone2Ext = null;
-                                contactDto.Phone2Number = null;
-                                contactDto.Phone2TypeId = null;
-                                contactDto.Phone2TypeName = null;
+                                appMarketplaceContact.Phone2Ext = null;
+                                appMarketplaceContact.Phone2Number = null;
+                                appMarketplaceContact.Phone2TypeId = null;
+                                appMarketplaceContact.Phone2TypeName = null;
                             }
                             break;
 
                         case 712://Phone#3
                             if (extraAtt.AttributeValue.ToLower() == "false")
                             {
-                                contactDto.Phone3Ext = null;
-                                contactDto.Phone3Number = null;
-                                contactDto.Phone3TypeId = null;
-                                contactDto.Phone3TypeName = null;
+                                appMarketplaceContact.Phone3Ext = null;
+                                appMarketplaceContact.Phone3Number = null;
+                                appMarketplaceContact.Phone3TypeId = null;
+                                appMarketplaceContact.Phone3TypeName = null;
                             }
                             break;
                         case 713:  // Join DATE 
                             if (extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 // entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 713));
-                                entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue = null;
+                                appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 707).AttributeValue = null;
                             }
 
                             break;
@@ -764,7 +762,7 @@ namespace onetouch.MarketplaceAccounts
                             if (extraAtt.AttributeValue.ToLower() == "false")
                             {
                                 //entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 714));
-                                entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue = null;
+                                appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703).AttributeValue = null;
                             }
                             //entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 703));
                             break;
@@ -772,20 +770,17 @@ namespace onetouch.MarketplaceAccounts
                     }
                 }
             }
-            while (entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeValue == null) != null)
+            while (appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeValue == null) != null)
             {
-                entityDto.EntityExtraData.Remove(entityDto.EntityExtraData.FirstOrDefault(x => x.AttributeValue == null));
+                appMarketplaceContact.EntityExtraData.Remove(appMarketplaceContact.EntityExtraData.FirstOrDefault(x => x.AttributeValue == null));
             }
             //Extra Attributes[End]
-            entityDto.TenantId = null;
-            var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
-            contactDto.Id = savedEntity;
-            contactDto.Id = await SaveContact(contactDto);
+            long newId = 0;
+            { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
             await CurrentUnitOfWork.SaveChangesAsync();
 
-            return (contactDto.Id != 0);
+            return (appMarketplaceContact.Id != 0);
         }
-        
 
     }
 

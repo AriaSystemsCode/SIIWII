@@ -39,7 +39,7 @@ namespace onetouch.AppMarketplaceContacts
         [Required]
         
         public string TradeName { get; set; }
-
+        public virtual long? AccountId { get; set; }
 
         public string AccountType { get; set; }
         public long AccountTypeId { get; set; }

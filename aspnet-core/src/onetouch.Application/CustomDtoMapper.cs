@@ -580,6 +580,7 @@ namespace onetouch
 
             //AppMarketplaceContact
             configuration.CreateMap<AppMarketplaceAddress, AppAddressDto>().ReverseMap();
+            configuration.CreateMap<AppMarketplaceAddress, AppAddress>().ReverseMap();
 
             configuration.CreateMap<AppMarketplaceAddressDto, AppAddressDto>().ReverseMap();
             configuration.CreateMap<AppMarketplaceAddressDto, AppAddress>().ReverseMap();
@@ -587,6 +588,7 @@ namespace onetouch
 
             configuration.CreateMap<AppMarketplaceContactAddressDto, AppContactAddress>();
             configuration.CreateMap<AppMarketplaceContactAddressDto, AppMarketplaceContactAddress>();
+            configuration.CreateMap<AppContactAddress, AppMarketplaceContactAddress>().ReverseMap();
 
             configuration.CreateMap<AppContactAddress, AppMarketplaceContactAddressDto>()
             .ForMember(d => d.AddressFk, s => s.MapFrom(ss => ss.AddressFk));
@@ -596,7 +598,10 @@ namespace onetouch
                ;
 
             configuration.CreateMap<AppMarketplaceContact, AppContactDto>();
-            configuration.CreateMap<AppMarketplaceContact, AppContact>().ReverseMap();
+            configuration.CreateMap<AppMarketplaceContact, AppContact>()
+            .ForMember(d => d.AppContactAddresses, s => s.MapFrom(ss => ss.ContactAddresses));
+            configuration.CreateMap<AppContact, AppMarketplaceContact>()
+                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses));
 
             configuration.CreateMap<AppContactAddressDto, AppMarketplaceContactAddress>().ReverseMap();
 

@@ -1931,7 +1931,7 @@ namespace onetouch.Accounts
                     ObjectMapper.Map(contact, createOrEditAccountInfoDto);
                     //createOrEditAccountInfoDto.TenantId = null;
                     //createOrEditAccountInfoDto.ContactAddresses = null;
-                    createOrEditAccountInfoDto.Id = 0;
+                    //createOrEditAccountInfoDto.Id = 0;
 
                     var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto);
                 }

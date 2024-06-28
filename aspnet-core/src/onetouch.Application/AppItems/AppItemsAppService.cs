@@ -2698,7 +2698,8 @@ namespace onetouch.AppItems
         }
 
         [AbpAuthorize(AppPermissions.Pages_AccountInfo_Publish)]
-        public async Task PublishProduct(PublishItemOptions input)
+        public async Task 
+            PublishProduct(PublishItemOptions input)
         {
             SharingItemOptions aa = new SharingItemOptions();
             aa.AppItemId = long.Parse(input.ListingItemId.ToString());

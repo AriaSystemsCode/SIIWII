@@ -52,7 +52,7 @@ namespace onetouch.AppMarketplaceContacts
 		[StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
 		//public virtual string EntityCode { get; set; }
 
-		//public virtual long? AccountId { get; set; }
+		public virtual long? AccountId { get; set; }
 
 		public virtual long? ParentId { get; set; }
 
