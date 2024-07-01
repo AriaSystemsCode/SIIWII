@@ -19,7 +19,7 @@ namespace onetouch.AppMarketplaceAccounts
     }
     public interface ICreateMarketplaceAccount : IApplicationService
     {
-        Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input);
+        Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input, bool sync);
          
         Task<bool> HideAccount(string SSIN);
 

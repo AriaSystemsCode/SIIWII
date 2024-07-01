@@ -331,15 +331,25 @@ namespace onetouch.MarketplaceAccounts
             { return false; }
         }
 
-        public async Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input)
+        public async Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input, Boolean sync)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var mainAccountID = input.Id;
                 var foundEntity = _appEntityRepository.GetAll().FirstOrDefault(e => e.Id == input.EntityId);
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
+                if (sync)
+                {
+                    appMarketplaceContact = await _appMarketplaceContactRepository.GetAll()
+                            .AsNoTracking().Include(x => x.ContactAddresses)
+                            .FirstOrDefaultAsync(x => x.TenantId == null
+                            && x.IsProfileData == true
+                            && x.OwnerId == AbpSession.TenantId
+                            && x.SSIN == input.SSIN);
+                }
+
                 ObjectMapper.Map(input, appMarketplaceContact);
-                appMarketplaceContact.Id = 0;
+                appMarketplaceContact.Id = sync? appMarketplaceContact.Id: 0;
                  
                 appMarketplaceContact.IsProfileData = true;
                 appMarketplaceContact.ObjectId = foundEntity.ObjectId;
@@ -355,7 +365,7 @@ namespace onetouch.MarketplaceAccounts
 
 
                 foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
-                {
+                { 
                     contactAddress.Id = 0;
                     contactAddress.AddressFk.Id = 0;
                 }
@@ -581,7 +591,7 @@ namespace onetouch.MarketplaceAccounts
         //    }
         //}
         ////Mariam[start]
-        private async Task<bool> PublishBranch(long branchId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID)
+        private async Task<bool> PublishBranch(long branchId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID )
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {

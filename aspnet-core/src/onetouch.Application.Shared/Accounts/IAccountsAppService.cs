@@ -11,7 +11,7 @@ namespace onetouch.Accounts
 {
     public interface IAccountsAppService : IApplicationService 
     {
-		Task ApplyRelation(long input);
+		Task ApplyRelationOnProfile(long input);
         Task CloseRelation(long input);
         Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input);
 
