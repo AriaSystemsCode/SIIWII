@@ -1491,6 +1491,9 @@ namespace onetouch.AppSiiwiiTransaction
         {
 
             var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+            //T-SII-20240610.0002
+            var manualAccountEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeManual();
+            
             //T-SII-20240103.0001,1 MMT 01/04/2024 - Transactions - (Order info) and(Buyer / Seller Contact Info) accordions are not show the company information[Start]
             AppContact myAccount = null;
             if (lExclueMyAcc == true)
@@ -1506,7 +1509,8 @@ namespace onetouch.AppSiiwiiTransaction
                 //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[Start]
                 .WhereIf(myAccount != null,z=>z.Id != myAccount.Id)
                 //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[End]
-                .Where(a => a.TenantId == AbpSession.TenantId & a.ParentId == null && a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id);
+                .Where(a => a.TenantId == AbpSession.TenantId & a.ParentId == null
+                && (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id || a.EntityFk.EntityObjectTypeId == manualAccountEntityObjectType.Id) );
 
 
             var pagedAndFilteredAccounts = accountsList.OrderBy(accountFilter.Sorting ?? "name asc");
