@@ -5294,17 +5294,27 @@ namespace onetouch.AppItems
                         case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                                                                  //createOrEditAccountInfoDto.Id = account.Id
 
-                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z=>z.ItemPricesFkList)
+                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                               .Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               //.Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
                                .FirstOrDefault();
+                            if (itemOrg != null)
+                            {
+                                itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().Where(z => z.AppItemId == excelDto.Id).ToList();
+                                itemOrg.ParentFkList = _appItemRepository.GetAll()
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .Include(z => z.ItemPricesFkList).Where(z => z.ParentId == excelDto.Id).ToList();
+                            }
                             //itemOrg.ParentFkList.Clear();
                             //appItemDeleteList.Add(itemOrg);
                             //if (itemOrg.EntityFk.EntityExtraData != null && itemOrg.EntityFk.EntityExtraData.Count > 0)
@@ -5357,33 +5367,33 @@ namespace onetouch.AppItems
                             //            EntityObjectCategoryId = productTypeId.Id,
                             //            EntityObjectCategoryCode = productTypeId.DisplayName
 
-                            //        });
-                            //        if (excelDto.EntityObjectCategoryID.HasValue)
-                            //        {
-                            //            itemOrg.EntityFk.EntityCategories.Add(new AppEntityCategory
-                            //            {
-                            //                EntityCode = excelDto.Code,
-                            //                EntityObjectCategoryCode = excelDto.ProductClassificationCode,
-                            //                EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
-                            //            });
-                            //        }
-                            //        var relatedItems = result.Where(x => x.ParentCode == excelDto.Code).ToList();
-                            //        foreach (var chItem in relatedItems)
-                            //        {
-                            //            var childOrg = itemOrg.ParentFkList.FirstOrDefault(x => x.Code == chItem.Code);
-                            //            if (childOrg != null)
-                            //            {
-                            //                childOrg.Name = chItem.Name;
-                            //                childOrg.Description = chItem.ProductDescription;
-                            //                childOrg.EntityFk.EntityExtraData.Clear();
+                                //        });
+                                //        if (excelDto.EntityObjectCategoryID.HasValue)
+                                //        {
+                                //            itemOrg.EntityFk.EntityCategories.Add(new AppEntityCategory
+                                //            {
+                                //                EntityCode = excelDto.Code,
+                                //                EntityObjectCategoryCode = excelDto.ProductClassificationCode,
+                                //                EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
+                                //            });
+                                //        }
+                                //        var relatedItems = result.Where(x => x.ParentCode == excelDto.Code).ToList();
+                                //        foreach (var chItem in relatedItems)
+                                //        {
+                                //            var childOrg = itemOrg.ParentFkList.FirstOrDefault(x => x.Code == chItem.Code);
+                                //            if (childOrg != null)
+                                //            {
+                                //                childOrg.Name = chItem.Name;
+                                //                childOrg.Description = chItem.ProductDescription;
+                                //                childOrg.EntityFk.EntityExtraData.Clear();
 
-                            //            }
-                            //        }
+                                //            }
+                                //        }
 
-                            //    }
+                                //    }
 
 
-                            //}
+                                //}
                             break;
                         case ExcelRecordRepeateHandler.CreateACopy: // override
                             string oldCode = excelDto.Code;
