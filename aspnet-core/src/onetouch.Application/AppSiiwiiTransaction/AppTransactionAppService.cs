@@ -2242,8 +2242,11 @@ namespace onetouch.AppSiiwiiTransaction
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+                var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails).Where(e => e.TenantId == AbpSession.TenantId
-                && e.CreatorUserId == AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId
+                && e.CreatorUserId == AbpSession.UserId 
+                && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
                 && e.Id == orderId).FirstOrDefault();
 
                 if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
@@ -2268,10 +2271,12 @@ namespace onetouch.AppSiiwiiTransaction
             {
 
                 var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+                var entityOpenObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(e => e.AppTransactionDetails)
                     .ThenInclude(e => e.EntityExtraData)
                     .Where(e => e.TenantId == AbpSession.TenantId
-                && e.CreatorUserId == AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId
+                && e.CreatorUserId == AbpSession.UserId
+                && (e.EntityObjectStatusId == entityObjectStatusId || e.EntityObjectStatusId == entityOpenObjectStatusId)
                 && e.Id == orderId).FirstOrDefault();
 
                 if (filteredAppTransactions != null && filteredAppTransactions.Id > 0)
