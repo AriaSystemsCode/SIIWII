@@ -1,6 +1,6 @@
 <div class="position-relative tab-cont thin-scroll">
-<div *ngIf="createOrEditshippingInfO">
-    <div class="container-fluid pt-1 mb-3 " >
+<div >
+    <div class="container-fluid pt-1 mb-3 " *ngIf="createOrEditshippingInfO">
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
             <button 
@@ -39,7 +39,12 @@
             ></app-contact>
             </div>
         </div>
+        
+    </div>
+
+    <div   [ngClass]="createOrEditshippingInfO ?  'd-block' : 'd-none'"> 
         <hr class="my-2" />
+
         <app-address 
         [appTransactionsForViewDto]="appTransactionsForViewDto"
         [isCreateOredit]="createOrEditshippingInfO"
@@ -49,9 +54,8 @@
         [showAddressType]="false"
         [canChange]="canChange"
         ></app-address>
-        
     </div>
-    <div class="container-fluid pt-1">
+    <div class="container-fluid pt-1" *ngIf="createOrEditshippingInfO">
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
             <!--<button [disabled]="(!enableSAveShipTo)" (click)="createOrEditTransaction()"
@@ -75,17 +79,23 @@
             ></app-contact>
             </div>
         </div>
-        <hr class="my-2" />
-        <app-address 
-        [appTransactionsForViewDto]="appTransactionsForViewDto"
-        [isCreateOredit]="createOrEditshippingInfO"
-        [contactId]="contactIdShipTo"
-        (updateSelectedAddress)="updateShipToAddress($event)"
-        [selectedAddressDetails]="shipToSelectedAdd"
-        [showAddressType]="false"
-        [canChange]="canChange"
-        ></app-address>
-<div class="row edit-mode ">
+       
+   </div>
+   
+   <div   [ngClass]="createOrEditshippingInfO ?  'd-block' : 'd-none'">
+    <hr class="my-2" />
+   <app-address 
+   [appTransactionsForViewDto]="appTransactionsForViewDto"
+   [isCreateOredit]="createOrEditshippingInfO"
+   [contactId]="contactIdShipTo"
+   (updateSelectedAddress)="updateShipToAddress($event)"
+   [selectedAddressDetails]="shipToSelectedAdd"
+   [showAddressType]="false"
+   [canChange]="canChange"
+   ></app-address>
+</div>
+
+<div class="row edit-mode " *ngIf="createOrEditshippingInfO">
     <div class="col-6 mb-4">
         <label class="label mt-1 mb-1">{{l("Store")}}</label>
 <input type="text" class="form-control w-100" (input)="enterStore()"  [(ngModel)]="storeVal" #store/>
@@ -111,7 +121,7 @@
     </div>
 </div>
 
-    </div>
+    
 </div>
 
 
