@@ -120,6 +120,12 @@ namespace onetouch.Helpers
             return obj;
         }
 
+        public async Task<SycEntityObjectType> GetEntityObjectTypeManual()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "MANUALACCOUNT");
+            return obj;
+        }
+        
         public async Task<long> GetEntityObjectTypeAdvertisementId()
         {
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "ADVERTISEMENT");
