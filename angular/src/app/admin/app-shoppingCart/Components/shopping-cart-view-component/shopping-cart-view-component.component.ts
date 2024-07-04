@@ -783,6 +783,7 @@ export class ShoppingCartViewComponentComponent
     }
       this.reportUrl = this.printInfoParam.getReportUrl()
       this.createReportViewer();
+      this.orderId=this.orderId;
     }
   }
 
