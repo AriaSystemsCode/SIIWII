@@ -487,7 +487,8 @@
 
                         </div>
                     </ng-container>
-                    <div class="row mt-4" *ngIf="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone))">
+                    <div class="row mt-4" 
+                    *ngIf="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone))">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                         <div class="w-100 comment-warper  h-100 summarySection p-4 ml-2 mt-3 purpleColor">
                             <app-comment-parent [addNewThread]="true" 
