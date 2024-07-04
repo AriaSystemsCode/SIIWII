@@ -60,6 +60,9 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
         this.selectedAddressDetails.state=  this.selectedAddressDetails?.state ? this.selectedAddressDetails?.state : '' ;
         this.selectedAddressDetails.countryName=  this.selectedAddressDetails?.countryName ? this.selectedAddressDetails?.countryName : '' ;
         this.selectedAddressDetails.postalCode=  this.selectedAddressDetails?.postalCode ? this.selectedAddressDetails?.postalCode : '' ;
+
+        if(!this.selectedAddress && this.selectedAddressDetails)
+        this.selectedAddress=this.selectedAddressDetails;
         }
     }
     filterAddressList(filterVal){
