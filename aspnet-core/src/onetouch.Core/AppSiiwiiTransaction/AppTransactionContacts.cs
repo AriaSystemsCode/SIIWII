@@ -55,7 +55,7 @@ namespace onetouch.AppSiiwiiTransaction
         [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
         public virtual string? ContactAddressLine1 { get; set; }
 
-        [StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
+        //[StringLength(AppAddressConsts.MaxNameLength, MinimumLength = AppAddressConsts.MinNameLength)]
         public virtual string? ContactAddressLine2 { get; set; }
 
         [StringLength(AppAddressConsts.MaxCodeLength, MinimumLength = AppAddressConsts.MinCodeLength)]
