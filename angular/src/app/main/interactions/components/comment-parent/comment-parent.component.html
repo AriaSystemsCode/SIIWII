@@ -1,18 +1,11 @@
-<div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'' ]" >
-    <app-add-comment [cartStyle]="cartStyle"
-        (saveDone)="newCommentAddedHandler($event)"
-        [relatedEntityId]="entityId"
-        #AddCommentComponent>
-    </app-add-comment>
+<div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ]" >
+   
 
- <!--<SendMessageModal #SendMessageModal (modalSave)="saveNewDirectMsg()"></SendMessageModal>-->
-
-
-    <div *ngIf="showCommentToggle&&addNewThread&&cartStyle" class="toggle-replay-cont">
-        <label class="comment focused">
+    <div *ngIf="addNewThread&&cartStyle" class="toggle-replay-cont">
+        <label [class]="showRegularComment?'comment focused':'comment'"  (click)="toggleMessageType(1)">
             <i class="fa-regular far fa-comment"></i>
         </label>
-        <label class="direct-message">
+        <label [class]="showRegularComment?'direct-message':'direct-message focused'" (click)="toggleMessageType(2)">
             <i class="fa-regular far fa-envelope"></i>       
          </label>
     </div>
@@ -29,10 +22,25 @@
                 [threadId]="comment.messages.threadId"
                 [postCreatorUserId]="creatorUserId"
                 (refreshStats)="newCommentAddedHandler()"
+                [commentType]="comment.messages.entityObjectTypeCode"
             ></app-interactions>
         </div>
     </div>
     <div style="margin-left: 50px;" *ngIf="totalCount > comments?.length" (click)="getAllComments()">
         <a class="text-underline"> {{ parentId ? ("ShowMoreReplies" | localize) : ("ShowMoreComments" | localize) }}</a>
     </div>
+</div>
+
+<div>
+    <app-add-comment [hidden]="!showRegularComment" *ngIf="addNewThread||!addNewThread&&commentType!=='MESSAGE'" [cartStyle]="cartStyle"
+    (saveDone)="newCommentAddedHandler($event)"
+    [relatedEntityId]="entityId"
+    #AddCommentComponent>
+</app-add-comment>
+
+<SendMessageModal [entityId]="entityId" 
+[parentId]="parentId"
+*ngIf="!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp"  
+#SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()"></SendMessageModal>
+
 </div>

@@ -99,10 +99,21 @@
     font-weight: 700;
     font-size: 16px;
 }
+.ReplyBtn:hover{
+    background-color: #700066 !important;
+    border: none !important;
+
+}
 .ForwardBtn{
     background-color: #fff !important;
     color: #700066 !important;
-    border:1px solid #700066 !important;
+    border:none !important;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.19);
+    &:hover{
+        background-color: #fff !important;
+        border:none !important;
+
+    }
 }
 .searchBarCont,.messageTitleCont{
     border-bottom: 1px solid #eee;
@@ -173,7 +184,18 @@
     display: table;
     clear: both;
 }
-
+.mail-info{
+i, span{
+    color: #b6b4b4;
+}
+i{
+    font-size: 15px;
+}
+span{
+    font-size: 10px;
+    font-weight: normal;
+}
+}
 .icon {
     background: url(/assets/message/Messaging_search_icon.svg) no-repeat scroll
         7px 7px;
@@ -285,7 +307,7 @@ li {
 #contentmsg {
     overflow-y: scroll;
    // height: 420px;
-    height: 70vh;
+   // height: 70vh;
 }
 .messageDetailTitle{
     font-size: 14px;
@@ -294,7 +316,7 @@ li {
 }
 #contentmsg {
     overflow-y: scroll;
-    height: 82vh;
+    min-height: 36vh;
     margin: 10px 0px 10px 10px;
     width: 98% !important;
     border-radius: 6px;
@@ -315,6 +337,10 @@ li {
     padding:11px 10px;
 
 } 
+
+:host ::ng-deep .d-flex.wrapper .w-80{
+width:100% !important;
+}
 //////////////////////////
 
 @media (max-width: 960px) {
@@ -574,6 +600,10 @@ body .btn.btn-action:after {
 .clickBtn:focus ,.clickBtn.active-tab{
     background-color: #fff !important;
     color: #700066 !important;
+    img{
+        filter: brightness(0.5);
+
+    }
 }
 
 .clickBtn:hover {

@@ -70,6 +70,9 @@ export class SendMessageModalComponent
     demoUiEditor: DemoUiEditorComponent;
     public uploader: FileUploader;
     @Output() modalSave: EventEmitter<any> = new EventEmitter<any>();
+    @Input() modalView:boolean;
+    @Input() parentId:any;
+    @Input() entityId:any;
     active: boolean;
     displayCC: boolean = false;
     displayBCC: boolean = false;
@@ -90,7 +93,9 @@ export class SendMessageModalComponent
     constructor(
         injector: Injector,
         private _tokenService: TokenService,
-        private _MessageServiceProxy: MessageServiceProxy
+        private _MessageServiceProxy: MessageServiceProxy,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
+
     ) {
         super(injector);
     }
@@ -474,7 +479,8 @@ export class SendMessageModalComponent
 
     sendMessage(): void {
         this.showMainSpinner();
-        this.onUploadAttachmets();
+        if(this.attachments?.length>0)
+          this.onUploadAttachmets();
         let ToList = "";
         let CCList = "";
         let BCCList = "";
@@ -503,23 +509,30 @@ export class SendMessageModalComponent
         this.messages.subject = this.subject;
         this.messages.bodyFormat = this.htmlEditorInput;
         this.messages.parentId = this.replyMessageId;
-        this.messages.threadId = this.threadId;
+        this.messages.threadId = !this.modalView?this.entityId:this.threadId;
+        this.messages.relatedEntityId =!this.modalView?this.entityId: undefined;
         this.messages.mesasgeObjectType = MesasgeObjectType.Message
         //this.Messages.entityAttachments=[];
         // this.Messages.entityAttachments=this.attachments
         this.saving = true;
-
         this._MessageServiceProxy
             .createMessage(this.messages)
             .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();}))
             .subscribe(() => {
                 this.notify.info(this.l("SendSuccessfully"));
-                this.SendMessageModal.hide();
+                if(this.SendMessageModal)this.SendMessageModal.hide();
                 this.active = false;
                 this.displayBCC = false;
                 this.displayCC = false;
                 this.messages.entityAttachments = [];
                 this.modalSave.emit(this.messages);
+                this.subject="";
+                this.htmlEditorInput='';
+                this.toUsers=[];
+                this.ccUsers=[];
+                this.bccUsers=[];
+                this.messages=new CreateMessageInput();
+                this.attachments=[];
             });
     }
 
@@ -548,4 +561,26 @@ export class SendMessageModalComponent
                 }
             });
     }
+        // get Users related to entity
+        filterUsersFilterByEntity(event): void {
+            this._appEntitiesServiceProxy.
+            getContactsToMention(this.entityId,event.query)
+                .subscribe((Users) => {
+                    this.filteredUsers = [];
+                    for (var i = 0; i < Users.length; i++) {
+                        //xxx
+                        if (
+                            Users[i]?.users?.value.toString() !=
+                            this.appSession.userId.toString()
+                        ) {
+                            //xxx
+                            //I2-9 -  receipt name, last name @ tenant name
+                            Users[i].users={name:Users[i].userName,value:Users[i].userId.toString()}
+
+                            //  Users[i].users.name += "@" + Users[i].tenantName;
+                            this.filteredUsers.push(Users[i].users);
+                        }
+                    }
+                });
+        }
 }

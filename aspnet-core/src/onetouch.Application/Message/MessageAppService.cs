@@ -17,6 +17,7 @@ using NUglify.Helpers;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
 using onetouch.AppMarketplaceMessages;
+using onetouch.AppPosts;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.Authorization;
 using onetouch.Authorization.Users;
@@ -52,13 +53,14 @@ namespace onetouch.Message
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IRepository<AppEntityReactionsCount, long> _appEntityReactionsCount;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
+        private readonly IRepository<AppPost, long> _appPostRepo;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
             IRepository<AppEntityClassification, long> appEntityClassificationRepository,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
-            IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository
+            IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo
             )
         {
             _MessagesRepository = messagesRepository;
@@ -70,6 +72,7 @@ namespace onetouch.Message
             _appEntityReactionsCount = appEntityReactionsCount;
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _AppMarketplaceMessagesRepository = appMarketplaceMessagesRepository;
+            _appPostRepo = appPostRepo;
         }
 
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)
@@ -90,7 +93,7 @@ namespace onetouch.Message
             var entityObjectClassStarred = await _helper.SystemTables.GetEntityObjectClassificationStarredMessageID();
             var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeComment();
             var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
-            
+            var entityObjectPost = await _helper.SystemTables.GetObjectPostId();
 
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -129,8 +132,9 @@ namespace onetouch.Message
 .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MENTION", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeComment)
 .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
 .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD", z => (z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage || z.EntityFk.EntityObjectTypeId == entityObjectTypeComment) &&
-  (z.ParentFKList.Count > 0 || z.ParentId != null))
-// Iteration 39 [End]
+  (z.ParentFKList.Count > 0 || z.ParentId != null || (z.EntityFk.EntityObjectTypeId == entityObjectTypeComment &&  _MessagesRepository.GetAll().Count(x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId) &&
+   x.ThreadId == z.ThreadId && x.EntityFk.EntityObjectTypeId == z.EntityFk.EntityObjectTypeId ) > 0))) // || _MessagesRepository.GetAll().Count(x => x.ThreadId == z.ThreadId) > 0
+                                                                                                                             // Iteration 39 [End]
 .WhereIf(input.messageTypeIndex == 3 && (!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE"), x => (x.EntityFk.EntityObjectStatusId != ObjectStatusDeleted) && (x.SenderId == AbpSession.UserId || x.UserId == AbpSession.UserId))
                                     //xx
                                     .WhereIf(input.messageTypeIndex == 3 && (!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE"), x => x.EntityFk.EntityClassifications.Count(x => x.EntityObjectClassificationId == entityObjectClassStarred) > 0)
@@ -141,10 +145,13 @@ namespace onetouch.Message
                                      e.SenderFk.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.UserFk.UserName.ToUpper().Contains(input.Filter.ToUpper()))
                                      .WhereIf(!string.IsNullOrWhiteSpace(input.BodyFilter), e => e.Body == input.BodyFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
-                        .Where(
-                    x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)                
-                   ||
-                   (x.SenderId == AbpSession.UserId)));
+                         .WhereIf(string.IsNullOrEmpty(input.MessageCategoryFilter) || input.MessageCategoryFilter.ToUpper() != "THREAD", x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)
+           ||
+           (x.SenderId == AbpSession.UserId)))
+                         .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD",x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId));
+                /*.Where(x => x.TenantId == AbpSession.TenantId && ((x.UserId == AbpSession.UserId)                
+           ||
+           (x.SenderId == AbpSession.UserId)));*/
 
                 //.Where(
                 //    (x => x.TenantId == AbpSession.TenantId && (
@@ -209,7 +216,7 @@ namespace onetouch.Message
                                };
 
 
-                var totalCount = await filteredMessages.CountAsync();
+                var totalCount = await filteredMessages.GroupBy<AppMessage,long?>(z => z.ThreadId).CountAsync();
                 var unreadCount = 0;
 
 
@@ -217,13 +224,24 @@ namespace onetouch.Message
                     .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MENTION", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeComment)
 .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "MESSAGE", z => z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage)
 .WhereIf(!string.IsNullOrEmpty(input.MessageCategoryFilter) && input.MessageCategoryFilter.ToUpper() == "THREAD", z => (z.EntityFk.EntityObjectTypeId == entityObjectTypeMessage || z.EntityFk.EntityObjectTypeId == entityObjectTypeComment) &&
-  (z.ParentFKList.Count > 0 || z.ParentId != null))
+  (z.ParentFKList.Count > 0 || z.ParentId != null || (z.EntityFk.EntityObjectTypeId == entityObjectTypeComment && _MessagesRepository.GetAll().Count(x => (x.UserId == AbpSession.UserId) || (x.SenderId == AbpSession.UserId) && x.ThreadId == z.ThreadId && x.EntityFk.EntityObjectTypeId == z.EntityFk.EntityObjectTypeId) > 0)))// || _MessagesRepository.GetAll().Count(x => x.ThreadId == x.ThreadId) > 0
                        .Where(x => (x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) || (x.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) > 0))
                        .Where(e => e.ParentId == null)
                        .Where(x => x.TenantId == AbpSession.TenantId && x.UserId == AbpSession.UserId).CountAsync();
 
 
                 var listmessages = await messages.ToListAsync();
+                var threads = listmessages.Select(z=>z.Messages.ThreadId).ToList();
+                foreach (var th in threads)
+                {
+                    var frst = listmessages.Where(z=>z.Messages.ThreadId== th).FirstOrDefault();
+                    if (frst!=null)
+                    {
+
+                        listmessages.RemoveAll(z=>z.Messages.ThreadId==th && z.Messages.Id!= frst.Messages.Id);
+                    }
+                }
+                
 
                 foreach (var message in listmessages)
                 {
@@ -233,7 +251,7 @@ namespace onetouch.Message
                     { 
                         message.Messages.ProfilePictureId = (Guid)profilePictureId;
                     }
-                    message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER6+") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
+                    message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
                     if (message.Messages.EntityObjectTypeCode == "COMMENT")
                     {
                         var comment = await _AppMarketplaceMessagesRepository.GetAll().Where(z => z.Id == message.Messages.ThreadId).FirstOrDefaultAsync();
@@ -243,6 +261,40 @@ namespace onetouch.Message
                             message.Messages.BodyFormat = comment.BodyFormat;
                         }
                     }
+                    //MM
+                    if (message.Messages.RelatedEntityId != null)
+                    {
+                        var ent = await _appEntityRepository.GetAll().Where(z => z.Id == message.Messages.RelatedEntityId).FirstOrDefaultAsync();
+                        if (ent != null)
+                        {
+                            if (ent.ObjectId == entityObjectPost)
+                            {
+                                var post = await _appPostRepo.GetAll().Where(z => z.AppEntityId == message.Messages.RelatedEntityId).FirstOrDefaultAsync();
+                                if (post != null)
+                                {
+                                    message.Messages.RelatedEntityObjectTypeCode = "Post";
+                                    message.Messages.RelatedEntityObjectTypeDescription = post.Description;
+                                    message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
+                                       + "." + UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Surname).FirstOrDefault().ToString()
+                                        + " @ " +
+                                       (UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.TenantId).FirstOrDefault().Value == null ?
+                                       L("Onetouch") : TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString());
+                                }
+                            }
+                            else {
+                                if (ent.EntityObjectTypeCode.ToUpper() == "SALESORDER" || ent.EntityObjectTypeCode.ToUpper() == "PURCHASEORDER")
+                                {
+                                    message.Messages.RelatedEntityObjectTypeDescription = ent.Name;
+                                    message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
+                                       + "." + UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.Surname).FirstOrDefault().ToString()
+                                        + " @ " +
+                                       (UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.TenantId).FirstOrDefault().Value == null ?
+                                       L("Onetouch") : TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString());
+                                }
+                            }
+                        }
+                    }
+                    //MM
                 }
                 
                 return new MessagePagedResultDto(
@@ -254,6 +306,9 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllComments(GetAllMessagesInput input)
         {
+            var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeComment();
+            var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
+            var orgComponentId = input.MainComponentEntitlyId;
             IQueryable<AppMarketplaceMessage> filteredMessages = null;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -290,6 +345,7 @@ namespace onetouch.Message
                             .WhereIf( input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
                                 e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
                                      e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
+                            
                             .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
                             .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
@@ -299,7 +355,7 @@ namespace onetouch.Message
                         .Where(
                                  x =>
                                  //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
-                                 x.OriginalMessageId == x.Id  
+                                 x.OriginalMessageId == x.Id && (x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage ? x.EntityFk.TenantId==AbpSession.TenantId:true)
                              );
 
                 var pagedAndFilteredMessages = filteredMessages
@@ -341,7 +397,108 @@ namespace onetouch.Message
                 var unreadCount = 0;
 
                 var results = await appComments.ToListAsync();
-                foreach(var x in results)
+                //MMT
+                if (orgComponentId != null && orgComponentId != 0 && orgComponentId != input.MainComponentEntitlyId)
+                {
+                    var filteredMessages2 = _MessagesRepository.GetAll()
+                                                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                                                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
+                                                     .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
+                                                     .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
+                                                     .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
+                                                     .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
+                                              .WhereIf(orgComponentId != null && orgComponentId != 0,
+                                                  e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)orgComponentId).Count() > 0 ||
+                                                       e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)orgComponentId).Count() > 0)
+
+                                              .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
+                                              .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
+                                              .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Body.Contains(input.Filter) || e.Subject.Contains(input.Filter))
+                                              .WhereIf(!string.IsNullOrWhiteSpace(input.BodyFilter), e => e.Body == input.BodyFilter)
+                                              .WhereIf(!string.IsNullOrWhiteSpace(input.SubjectFilter), e => e.Subject == input.SubjectFilter)
+                                              .WhereIf(input.ThreadId != null && input.ThreadId > 0, e => e.ThreadId == input.ThreadId)
+                                          .Where(
+                                                   x =>
+                                                   //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
+                                                   x.OriginalMessageId == x.Id && (x.UserId == AbpSession.UserId || x.SenderId==AbpSession.UserId )
+                                                   && x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage && x.TenantId == AbpSession.TenantId
+                                               );
+
+                    var pagedAndFilteredMessages2 = filteredMessages2
+                        .OrderBy(input.Sorting ?? "id desc")
+                        .PageBy(input);
+                    var appComments2 = from o in pagedAndFilteredMessages2
+                                      select new
+                                       GetMessagesForViewDto()
+                                      {
+                                          Messages = new MessagesDto
+                                          {
+                                              SenderId = o.SenderId,
+                                              To = o.To,
+                                              CC = o.CC,
+                                              BCC = o.BCC,
+                                              Subject = o.Subject,
+                                              Body = o.Body,
+                                              BodyFormat = o.BodyFormat,
+                                              SendDate = o.CreationTime,
+                                              ReceiveDate = o.CreationTime,
+                                              EntityCode = o.EntityCode,
+                                              Id = o.Id,
+                                              SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
+                                           + "." + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString()
+                                            + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
+                                              ThreadId = o.ThreadId,
+                                              ParentId = o.ParentId,
+                                              EntityId = (int)o.EntityId,
+                                              ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
+                                              HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
+                                              EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
+                                              RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                              ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                          },
+                                      }
+                                    ;
+
+                   //  totalCount += await filteredMessages2.CountAsync();
+
+                    var results2 = await appComments2.ToListAsync();
+                    foreach (var msg in results2)
+                    {
+                        if (msg.Messages.SenderId == AbpSession.UserId)
+                        {
+                            var messg = results.FirstOrDefault(z => z.Messages.Subject == msg.Messages.Subject &&
+                               z.Messages.SenderId == msg.Messages.SenderId && z.Messages.Body == msg.Messages.Body);
+                            if (messg == null)
+                            {
+                                msg.Messages.SenderName = GetUserNameByID(msg.Messages.SenderId);
+                                msg.Messages.ToName = GetUsersNamesByID(msg.Messages.To);
+                                results.Add(msg);
+                                totalCount += 1;
+                            }
+                            else
+                            {
+                                if (msg.Messages.UserId!=null && !messg.Messages.To.Contains(msg.Messages.UserId.ToString()))
+                                    messg.Messages.To += "," + msg.Messages.UserId.ToString();
+
+                                messg.Messages.SenderName = GetUserNameByID(messg.Messages.SenderId);
+                                messg.Messages.ToName = GetUsersNamesByID(messg.Messages.To);
+                            }
+
+                        }
+                        else
+                        {
+                            msg.Messages.SenderName = GetUserNameByID(msg.Messages.SenderId);
+                            msg.Messages.ToName = GetUsersNamesByID(msg.Messages.To);
+                            results.Add(msg);
+                            totalCount += 1;
+                        }
+                    }
+
+                    
+                    //results.AddRange(results2);
+                    }
+                //MMT
+                foreach (var x in results)
                 {
                     var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == x.Messages.SenderId).ProfilePictureId;
                     if (profilePictureId != null)
@@ -440,41 +597,50 @@ namespace onetouch.Message
             var EntityObjectReadId = await _helper.SystemTables.GetEntityObjectStatusReadMessageID();
             var EntityObjectUnReadId = await _helper.SystemTables.GetEntityObjectStatusUnreadMessageID();
 
-
-            if (message.EntityFk.EntityObjectStatusId == EntityObjectUnReadId)
+            if (message != null)
             {
-                var entity = await _appEntityRepository.FirstOrDefaultAsync(message.EntityId);
-                entity.EntityObjectStatusId = EntityObjectReadId;
-                entity.EntityObjectStatusCode = "READ";
-            }
+                if (message.EntityFk.EntityObjectStatusId == EntityObjectUnReadId)
+                {
+                    var entity = await _appEntityRepository.FirstOrDefaultAsync(message.EntityId);
+                    entity.EntityObjectStatusId = EntityObjectReadId;
+                    entity.EntityObjectStatusCode = "READ";
+                }
 
 
-            var ChildMessages = message.ParentFKList.Where(x => x.EntityFk.EntityObjectStatusId == EntityObjectUnReadId).ToList();
-            foreach (var msg in ChildMessages)
-            {
-                var entity = await _appEntityRepository.FirstOrDefaultAsync(msg.EntityId);
-                entity.EntityObjectStatusId = EntityObjectReadId;
-                entity.EntityObjectStatusCode = "READ";
+                var ChildMessages = message.ParentFKList.Where(x => x.EntityFk.EntityObjectStatusId == EntityObjectUnReadId).ToList();
+                foreach (var msg in ChildMessages)
+                {
+                    var entity = await _appEntityRepository.FirstOrDefaultAsync(msg.EntityId);
+                    entity.EntityObjectStatusId = EntityObjectReadId;
+                    entity.EntityObjectStatusCode = "READ";
+                }
             }
 
 
         }
 
-        public List<GetMessagesForViewDto> GetMessagesForView(long id)
+        public  List<GetMessagesForViewDto> GetMessagesForView(long id)
         {
+            var entityObjectTypeComment =  _helper.SystemTables.GetEntityObjectTypeComment();
+            var entityObjectTypeCommentType = long.Parse(entityObjectTypeComment.Result.ToString());
             var entityObjectSent = _helper.SystemTables.GetEntityObjectStatusSentMessageID();
             var entityObjectSentID = long.Parse(entityObjectSent.Result.ToString());
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+
                 long? threadId = _MessagesRepository.FirstOrDefault(x => x.Id == id).ThreadId;
 
                 var messages = _MessagesRepository.GetAll()
                 .Where(e => e.Id == id || 
-                (threadId != null && (e.ThreadId == threadId && (e.UserId == AbpSession.UserId || (e.SenderId == AbpSession.UserId && e.EntityFk.EntityObjectStatusId ==  entityObjectSentID)))))
-                .Where(x => x.TenantId == AbpSession.TenantId)
+                (threadId != null && (e.ThreadId == threadId && (e.UserId == AbpSession.UserId || (e.EntityFk.EntityObjectTypeId == entityObjectTypeCommentType) ||
+                (e.SenderId == AbpSession.UserId && e.EntityFk.EntityObjectStatusId ==  entityObjectSentID)))))
+                .Where(x => (x.TenantId == AbpSession.TenantId) || (x.EntityFk.EntityObjectTypeId == entityObjectTypeCommentType))
+                .Include(z => z.EntityFk)
+                .Include(z => z.EntityFk).ThenInclude(z => z.EntitiesRelationships)
                 .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
                 .OrderBy("id asc").ToList();
+
                 List<GetMessagesForViewDto> output = new List<GetMessagesForViewDto>();
                 for (int i = 0; i < messages.Count(); i++)
                 {
@@ -499,6 +665,19 @@ namespace onetouch.Message
                     message.Messages.SenderName = GetUserNameByID(messages[i].SenderId);
                     message.Messages.ToName = GetUsersNamesByID(messages[i].To);
                     message.Messages.EntityAttachments = ObjectMapper.Map<IList<AppEntityAttachmentDto>>(messages[i].EntityFk.EntityAttachments);
+                    //MMT2024
+                    if (messages[i].EntityFk.EntityObjectTypeCode == "COMMENT")
+                    {
+                        var marketplaceMessage =  _AppMarketplaceMessagesRepository.GetAll().Include(z => z.EntityFk)
+                            .ThenInclude(z => z.RelatedEntitiesRelationships)
+                            .Include(z => z.EntityFk)
+                            .ThenInclude(z => z.EntitiesRelationships)
+                            .Where(z => z.Id == message.Messages.ThreadId).FirstOrDefault();
+                        if (marketplaceMessage != null)
+                            message.Messages.RelatedEntityId = (marketplaceMessage.EntityFk.EntitiesRelationships != null && marketplaceMessage.EntityFk.EntitiesRelationships.Count > 0) ? marketplaceMessage.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                                  ((marketplaceMessage.EntityFk.RelatedEntitiesRelationships != null && marketplaceMessage.EntityFk.RelatedEntitiesRelationships.Count > 0) ? marketplaceMessage.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0);
+                     }
+                    //MMT2024
                     //Message.Messages.EntityAttachments = new List<AppEntityAttachmentDto>();
                     //var x1 = new AppEntityAttachmentDto();
                     //x1.FileName = "dfdfdf.doc";
@@ -517,7 +696,16 @@ namespace onetouch.Message
                     {
                         message.Messages.ProfilePictureId = (Guid)profilePictureId;
                     }
-                    output.Add(message);
+                    //abc
+                   
+                    var messg = output.FirstOrDefault(z => z.Messages.Subject == messages[i].Subject &&
+                           z.Messages.SenderId == messages[i].SenderId && z.Messages.Body == messages[i].Body);
+                    if (messg == null)
+                    {
+                        output.Add(message);
+                    }
+                    //abc
+                   
                 }
                 return output;
             }
@@ -596,7 +784,7 @@ namespace onetouch.Message
                         {
                             if (input.MentionedUsers ==null)
                                 input.MentionedUsers = new List<MentionedUserInfo>();
-
+                            if (input.MentionedUsers.FirstOrDefault(z=>z.UserId == user.Id && z.TenantId== long.Parse(user.TenantId.ToString())) == null)
                             input.MentionedUsers.Add(new MentionedUserInfo { UserId = user.Id, TenantId =long.Parse( user.TenantId.ToString())});
                         }
                     }
@@ -764,6 +952,33 @@ namespace onetouch.Message
                 AppEntityDto appEntity = new AppEntityDto();
                 ObjectMapper.Map(input, appEntity);
                 appEntity.Name = "Message";
+                //MMT39
+                string transactionSSIN = "";
+                if (input.CreateMessageInput.RelatedEntityId != null)
+                {
+                    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == input.CreateMessageInput.RelatedEntityId).FirstOrDefaultAsync();
+                    if (entity != null && (entity.EntityObjectTypeCode == "SALESORDER" || entity.EntityObjectTypeCode == "PURCHASEORDER"))
+                    {
+                        transactionSSIN = entity.SSIN;
+                        //if (!string.IsNullOrEmpty(transactionSSIN))
+                        //{
+                        //    var entityShared = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                        //    if (entityShared != null)
+                        //    {
+                        //        input.CreateMessageInput.RelatedEntityId = entityShared.Id;
+                        //    }
+                        //}
+                    }
+                }
+                if (!string.IsNullOrEmpty(transactionSSIN) && tenantId != null)
+                {
+                    var entityTenant = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == tenantId).FirstOrDefaultAsync();
+                    if (entityTenant != null)
+                    {
+                        input.CreateMessageInput.RelatedEntityId = entityTenant.Id;
+                    }
+                }
+                //MMT39
                 //Iteration37,1 [Start]
                 //SycEntityObjectCategory messageCategory = null;
                 //if (input.CreateMessageInput.MessageCategory != null)
@@ -957,7 +1172,7 @@ namespace onetouch.Message
                              //.WhereIf(MessageCategoryFilter != null, x => x.EntityFk.EntityCategories
                              //.Where(z => z.EntityObjectCategoryCode.Replace("-", string.Empty) == ((MessageCategory)Enum.Parse(typeof(MessageCategory), MessageCategoryFilter)).ToString()).Count() > 0)
                        .Where(x => (x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) || (x.ParentFKList.Count(x => x.EntityFk.EntityObjectStatusId == entityObjectStatusUnreadID) > 0))
-                       .Where(e => e.ParentId == null)
+                      // .Where(e => e.ParentId == null)
                        .Where(x => x.TenantId == AbpSession.TenantId && (x.UserId == AbpSession.UserId)).CountAsync();
 
                 return unreadCount;
@@ -1009,6 +1224,10 @@ namespace onetouch.Message
                     var originalParent = await _AppMarketplaceMessagesRepository.FirstOrDefaultAsync(x => x.Id == input.ParentId);
                     if (originalParent != null)
                         threadId = originalParent.ThreadId;
+                    //else
+                    //{
+                    //    threadId = input.ThreadId;
+                    //}
                     message.ThreadId = threadId;
                 }
 

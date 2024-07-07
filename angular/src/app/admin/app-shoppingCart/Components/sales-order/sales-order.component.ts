@@ -40,6 +40,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     @Output("orderInfoValid") orderInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
     @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
     @Input("activeTab") activeTab: number;
+    @Input("currentTab") currentTab: number;
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     shoppingCartoccordionTabs = ShoppingCartoccordionTabs; 
     @Input("createOrEditorderInfo") createOrEditorderInfo: boolean ;
@@ -399,15 +400,33 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     onChangeDate() {
         //Dates
 
+       
+    
+        if ( !this.completeDate || this.completeDate <=  this.startDate) {
+            this.completeDate=this.startDate;
+        }
+    
+        if ( !this.availableDate ||  this.availableDate <= this.startDate) {
+            this.availableDate=this.startDate;
+        }
+
         let enteredDate = this.enteredDate.toLocaleString();
         let startDate = this.startDate.toLocaleString();
         let availableDate = this.availableDate.toLocaleString();
         let completeDate = this.completeDate.toLocaleString();
 
+
         this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
         this.appTransactionsForViewDto.startDate = moment.utc(startDate);
         this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
         this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+    }
+    changeCompleteDate(date) {
+        const selectedDate = date;
+    
+        this.completeDate = selectedDate;
+        this.availableDate=selectedDate;
+        this.onChangeDate()
     }
 
     createOrEditTransaction() {

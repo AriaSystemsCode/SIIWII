@@ -19836,6 +19836,63 @@ export class AppTransactionServiceProxy {
 
     /**
      * @param transactionId (optional) 
+     * @return Success
+     */
+    getTransactionOrderConfirmation(transactionId: number | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetTransactionOrderConfirmation?";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTransactionOrderConfirmation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTransactionOrderConfirmation(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetTransactionOrderConfirmation(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param transactionId (optional) 
      * @param withDetails (optional) 
      * @param since_Id (optional) 
      * @param filter (optional) 
@@ -41821,6 +41878,57 @@ export class SystemTablesServiceProxy {
     }
 
     protected processGetEntityObjectTypeParetner(response: HttpResponseBase): Observable<SycEntityObjectType> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SycEntityObjectType.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeManual(): Observable<SycEntityObjectType> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeManual";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeManual(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeManual(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SycEntityObjectType>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SycEntityObjectType>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeManual(response: HttpResponseBase): Observable<SycEntityObjectType> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -70799,6 +70907,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
     selectedBranch!: AccountBranchDto;
     selectedPhoneType!: PhoneNumberAndtype;
     selectContactPhoneNumber!: string | undefined;
+    selectedContactEmail!: string | undefined;
     contactAddressName!: string | undefined;
     contactAddressLine1!: string | undefined;
     contactAddressLine2!: string | undefined;
@@ -70846,6 +70955,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
             this.selectedBranch = _data["selectedBranch"] ? AccountBranchDto.fromJS(_data["selectedBranch"]) : <any>undefined;
             this.selectedPhoneType = _data["selectedPhoneType"] ? PhoneNumberAndtype.fromJS(_data["selectedPhoneType"]) : <any>undefined;
             this.selectContactPhoneNumber = _data["selectContactPhoneNumber"];
+            this.selectedContactEmail = _data["selectedContactEmail"];
             this.contactAddressName = _data["contactAddressName"];
             this.contactAddressLine1 = _data["contactAddressLine1"];
             this.contactAddressLine2 = _data["contactAddressLine2"];
@@ -70891,6 +71001,7 @@ export class AppTransactionContactDto implements IAppTransactionContactDto {
         data["selectedBranch"] = this.selectedBranch ? this.selectedBranch.toJSON() : <any>undefined;
         data["selectedPhoneType"] = this.selectedPhoneType ? this.selectedPhoneType.toJSON() : <any>undefined;
         data["selectContactPhoneNumber"] = this.selectContactPhoneNumber;
+        data["selectedContactEmail"] = this.selectedContactEmail;
         data["contactAddressName"] = this.contactAddressName;
         data["contactAddressLine1"] = this.contactAddressLine1;
         data["contactAddressLine2"] = this.contactAddressLine2;
@@ -70925,6 +71036,7 @@ export interface IAppTransactionContactDto {
     selectedBranch: AccountBranchDto;
     selectedPhoneType: PhoneNumberAndtype;
     selectContactPhoneNumber: string | undefined;
+    selectedContactEmail: string | undefined;
     contactAddressName: string | undefined;
     contactAddressLine1: string | undefined;
     contactAddressLine2: string | undefined;
@@ -81463,6 +81575,8 @@ export class MessagesDto implements IMessagesDto {
     mesasgeObjectType!: MesasgeObjectType;
     relatedEntityId!: number | undefined;
     relatedEntityObjectTypeCode!: string | undefined;
+    relatedEntityObjectTypeDescription!: string | undefined;
+    relatedEntityCreatorName!: string | undefined;
     profilePictureId!: string;
     userImage!: GetProfilePictureOutput;
     profilePictureUrl!: string | undefined;
@@ -81521,6 +81635,8 @@ export class MessagesDto implements IMessagesDto {
             this.mesasgeObjectType = _data["mesasgeObjectType"];
             this.relatedEntityId = _data["relatedEntityId"];
             this.relatedEntityObjectTypeCode = _data["relatedEntityObjectTypeCode"];
+            this.relatedEntityObjectTypeDescription = _data["relatedEntityObjectTypeDescription"];
+            this.relatedEntityCreatorName = _data["relatedEntityCreatorName"];
             this.profilePictureId = _data["profilePictureId"];
             this.userImage = _data["userImage"] ? GetProfilePictureOutput.fromJS(_data["userImage"]) : <any>undefined;
             this.profilePictureUrl = _data["profilePictureUrl"];
@@ -81577,6 +81693,8 @@ export class MessagesDto implements IMessagesDto {
         data["mesasgeObjectType"] = this.mesasgeObjectType;
         data["relatedEntityId"] = this.relatedEntityId;
         data["relatedEntityObjectTypeCode"] = this.relatedEntityObjectTypeCode;
+        data["relatedEntityObjectTypeDescription"] = this.relatedEntityObjectTypeDescription;
+        data["relatedEntityCreatorName"] = this.relatedEntityCreatorName;
         data["profilePictureId"] = this.profilePictureId;
         data["userImage"] = this.userImage ? this.userImage.toJSON() : <any>undefined;
         data["profilePictureUrl"] = this.profilePictureUrl;
@@ -81614,6 +81732,8 @@ export interface IMessagesDto {
     mesasgeObjectType: MesasgeObjectType;
     relatedEntityId: number | undefined;
     relatedEntityObjectTypeCode: string | undefined;
+    relatedEntityObjectTypeDescription: string | undefined;
+    relatedEntityCreatorName: string | undefined;
     profilePictureId: string;
     userImage: GetProfilePictureOutput;
     profilePictureUrl: string | undefined;

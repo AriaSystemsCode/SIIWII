@@ -15,9 +15,11 @@
         <div class="row ml-1">
             <app-contact 
                 class="w-100" [isCreateOrEdit]="isCreateOrEdit" [activeTab]="activeTab"
+                [currentTab]="currentTab"
                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                     (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
-                    [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"></app-contact>
+                    [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"
+                    (formValidityChanged)="isContactFormValid($event)"></app-contact>
         </div>
     </div>
     <hr class="my-2" />

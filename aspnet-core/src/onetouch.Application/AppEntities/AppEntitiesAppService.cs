@@ -70,6 +70,7 @@ namespace onetouch.AppEntities
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
         private readonly IAppNotifier _appNotifier;
         private readonly IRepository<AppMarketplaceTransactionContacts, long> _appMarketplaceTransactionContactsRepository;
+        private readonly IRepository<AppTransactionContacts, long> _appTransactionContactsRepository;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
 
         public AppEntitiesAppService(IRepository<AppEntity, long> appEntityRepository
@@ -92,6 +93,7 @@ namespace onetouch.AppEntities
             IRepository<AppEntityUserReactions, long> appEntityUserReactions,
             IRepository<AppPost, long> appPostRepository, IProfileAppService iProfileAppService, IAppNotifier appNotifier
             , IRepository<AppEntityState, long> appEntityStateRepository, IRepository<AppMarketplaceTransactionContacts, long> appMarketplaceTransactionContactsRepository
+            , IRepository<AppTransactionContacts, long> appTransactionContactsRepository
             )
         {
              
@@ -120,6 +122,7 @@ namespace onetouch.AppEntities
             //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
             _appNotifier = appNotifier;
             _appMarketplaceTransactionContactsRepository = appMarketplaceTransactionContactsRepository;
+            _appTransactionContactsRepository = appTransactionContactsRepository;
             //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
         }
 
@@ -2083,7 +2086,7 @@ namespace onetouch.AppEntities
                     {
                         var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
-                        var transactionContacts = _appMarketplaceTransactionContactsRepository.GetAll().Where(z => z.TransactionId == entityId && z.CompanySSIN != null && z.ContactSSIN!=null); //&& z.CompanySSIN !=null
+                        var transactionContacts = _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == entityId && z.CompanySSIN != null && z.ContactSSIN!=null); //&& z.CompanySSIN !=null
 
                         /*var appEntities = _appEntityRepository.GetAll().Include(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
                                   .Where(z => z.TenantId == null && z.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantOwner != null);*/
@@ -2099,7 +2102,7 @@ namespace onetouch.AppEntities
                                       from e in j.DefaultIfEmpty()
                                       select new { e.AccountId };
 
-                        var transactionContactsList = await contact.Distinct().ToListAsync();
+                        var transactionContactsList =await  contact.Distinct().ToListAsync();
                         
                         /*var newContact = from x in contact
                                          join y in appEntities

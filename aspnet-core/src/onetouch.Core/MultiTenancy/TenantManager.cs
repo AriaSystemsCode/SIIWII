@@ -150,7 +150,9 @@ namespace onetouch.MultiTenancy
                     var userRole = _roleManager.Roles.Single(r => r.Name == StaticRoleNames.Tenants.User);
                     userRole.IsDefault = true;
                     CheckErrors(await _roleManager.UpdateAsync(userRole));
-
+                    //T-SII-20230928.0002,1 MMT 07/02/2024 - Users - Assign default permissions to default static (User) role when inviting a new user from (Users) page[Start]
+                    await _roleManager.GrantAllPermissionsAsync(userRole);
+                    //T-SII-20230928.0002,1 MMT 07/02/2024 - Users - Assign default permissions to default static (User) role when inviting a new user from (Users) page[End]
                     //Create admin user for the tenant
 
                     //Mariam[Start]

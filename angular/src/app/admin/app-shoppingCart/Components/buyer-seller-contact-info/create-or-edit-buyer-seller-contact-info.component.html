@@ -28,7 +28,8 @@
                 <div class="row ml-1">
                     <app-contact class="w-100"
                         [isCreateOrEdit]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo ? createOrEditbuyerContactInfo : createOrEditSellerContactInfo"
-                        [activeTab]="activeTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
+                        [activeTab]="activeTab" 
+                        [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
                         (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                         (formValidityChanged)="isContactFormValid($event)"
                         [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"></app-contact>
@@ -41,12 +42,14 @@
     
     <div *ngIf="activeTab == shoppingCartoccordionTabs.BuyerContactInfo ? !createOrEditbuyerContactInfo : !createOrEditSellerContactInfo">
     <app-view-buyer-seller-contact-info
-    [activeTab]="activeTab"
+    [activeTab]="activeTab" 
+    [currentTab]="currentTab" 
     [isCreateOrEdit]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo ? createOrEditbuyerContactInfo : createOrEditSellerContactInfo"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
     (showBuyer_sellerEditMode)="onshowBuyer_sellerEditMode($event)"
     (onshowSaveBtn)="onshowSaveBtn($event)"
-    [canChange]="canChange"></app-view-buyer-seller-contact-info>
+    [canChange]="canChange"
+    (isContactsValid)="isContactFormValid($event)"></app-view-buyer-seller-contact-info>
     </div>
     </div>
     

@@ -20,8 +20,10 @@
             class="w-100"  
              [billingIndexInfo]="1"
             [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab"
+            [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                (formValidityChanged)="isContactFormValid_1($event)"
                 ></app-contact>
         </div>
     </div>
@@ -47,8 +49,10 @@
             class="w-100"  
              [billingIndexInfo]="2"
             [isCreateOrEdit]="createOrEditBillingInfo" [activeTab]="activeTab"
+            [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                (formValidityChanged)="isContactFormValid_2($event)"
                 ></app-contact>
         </div>
     </div>

@@ -1,4 +1,4 @@
-<div [hidden]="!active">
+<div [hidden]="!active" class="mt-5 mb-5" style="position: relative;">
     <form #loginForm="ngForm" (ngSubmit)="saveComment()" >
         <div class="d-flex wrapper" >
             <div class="logo">
@@ -16,7 +16,6 @@
                     <div>
                         <div
                             class="w-100"
-                            name="commentBody"
                             id="commentBody"
                             cols="20"
                             rows="1"
@@ -46,8 +45,9 @@
                         [disabled]="!comment.body"
                         [buttonBusy]="saving"
                         [busyText]="emptyText"
-                        class="send-comment-icon">
-                        <i class="fa fa-paper-plane"></i>
+                        class="send-comment-icon" style="    background-color: #4A0D4A;">
+                        <!-- <i class="">  <img src="../../../../../assets/message/Frame 13.png" /></i> -->
+                        <i class="fa fa-paper-plane" style="color: white;"></i>
                         </button>
                     </ng-container>
                     </div>
@@ -60,7 +60,8 @@
                                 [disabled]="loginForm.invalid"
                                 [buttonBusy]="saving"
                                 [busyText]="l('SavingWithThreeDot')"
-                                class="btn btn-primary">
+                                class="btn btn-primary" style="background-color: #F88011 !important;
+                                border: #F88011 !important;">
                                     {{ "Send" | localize }}
                             </button>
                             </ng-container>

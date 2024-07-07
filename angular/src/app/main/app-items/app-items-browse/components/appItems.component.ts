@@ -450,20 +450,31 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     }
 
     bulkShareItems(){
+        this.showMainSpinner()
         this._appItemsServiceProxy
         .shareSelectedProducts(this.filterBody.selectorKey)
+        .pipe(
+            finalize(() => {
+                this.hideMainSpinner();
+            }))
         .subscribe((result) => {
             debugger
             this.notify.success(this.l(result+" Item shared"));
-
+            this.getFreshData();
         });
     }
     bulkSyncItems(){
+        this.showMainSpinner()
         this._appItemsServiceProxy
         .syncSelectedProduct(this.filterBody.selectorKey)
+        .pipe(
+            finalize(() => {
+                this.hideMainSpinner();
+            }))
         .subscribe((result) => {
             debugger
             this.notify.success(this.l(result+" Item synced"));
+            this.getFreshData();
 
         });
     }
