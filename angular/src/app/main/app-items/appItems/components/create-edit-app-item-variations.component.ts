@@ -92,8 +92,8 @@ export class CreateEditAppItemVariationsComponent
     public set showVariations(value: boolean) {
         if (this.isListing) this.selectedVaritaions = this.variationMatrices;
   this._showVariations = value;
-        if(this.activeNewVariation)
-        this.selectedVaritaions = [...this.primengTableHelper?.records];
+        // if(this.activeNewVariation)
+        // this.selectedVaritaions = [...this.primengTableHelper?.records];
       
     }
 
@@ -221,6 +221,7 @@ export class CreateEditAppItemVariationsComponent
 
     showExisttingVariation=false;
     activeExisttingVariation=false;
+    showNewVariation=false;
     activeNewVariation=false;
 
     constructor(
@@ -320,11 +321,13 @@ export class CreateEditAppItemVariationsComponent
  this.showExisttingVariation=true;
             this.activeExisttingVariation=true;
             this.activeNewVariation=false;
+            this.showNewVariation=false;
         }
         else{
             this.showExisttingVariation=false;
             this.activeExisttingVariation=false;
-            this.activeNewVariation=true;
+           this.activeNewVariation=true;
+           this.showNewVariation=true;
         }
     }
 
@@ -547,13 +550,11 @@ export class CreateEditAppItemVariationsComponent
     }
 
     saveExtraAtrributeSelection() {
-        if(this.appItem?.id){
-// Set values of 2 tabs (existing variations & new variations)
-        }
 
         const oldVariations = this.variationMatrices;
         this.editVariationsOpend=false;
-        this.variationMatrices = [];
+        if(!this.appItem?.id)
+         this.variationMatrices = [];
         if (this.selectedExtraAttributes.length === 0)
             return this.notify.error(this.l("PleaseSelectVariationsFirst"));
         const sizeIsSelected = this.selectedExtraAttributes.filter(
@@ -620,6 +621,9 @@ export class CreateEditAppItemVariationsComponent
                 this.primengTableHelper.records = response;
                 this.selectedVaritaions = [...this.primengTableHelper.records];
                 this.variationMatrices = response;
+
+                if(this.appItem?.id)
+                this.getExistingVariations()
                 this.hideMainSpinner();
 
             });
@@ -1192,7 +1196,11 @@ export class CreateEditAppItemVariationsComponent
              if(curentItem?.stockAvailability>0){
                 newVariation.stockAvailability=curentItem.stockAvailability;
             }
+
+            if(!curentItem){
                 this.variationMatrices.push(newVariation);
+                this.showNewVariation=true;
+            }
             }
         };
             // if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
@@ -2065,7 +2073,21 @@ export class CreateEditAppItemVariationsComponent
         extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues.filter(item => item.value !== event.value);
         extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.value);
     }
+    getExistingVariations(){
+        this.activeExisttingVariation=true;
+        this.activeNewVariation=false
+        this.primengTableHelper.records=this.variationMatrices.filter((variation) => {
+            return variation.ssin;
+        });
+    }
 
+    getNewVariations(){
+        this.activeExisttingVariation=false;
+        this.activeNewVariation=true
+        this.primengTableHelper.records=this.variationMatrices.filter((variation) => {
+            return !variation.ssin;
+        });
+    }
 
 }
 export interface ApplyVariationOutput {

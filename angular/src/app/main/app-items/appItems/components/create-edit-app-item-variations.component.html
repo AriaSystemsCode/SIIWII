@@ -56,12 +56,12 @@
                                             <!-- attributes -->
                                             <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
                                                 [ngClass]="{'active':activeExisttingVariation}"
-                                                (click)=" activeExisttingVariation=true;activeNewVariation=false" *ngIf="showExisttingVariation" >
+                                                (click)="getExistingVariations()" *ngIf="showExisttingVariation" >
                                                 Exciting Variations
                                             </a>
-                                            <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
+                                            <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg" *ngIf="!showExisttingVariation || showNewVariation"
                                             [ngClass]="{'active':activeNewVariation}"
-                                            (click)=" activeExisttingVariation=false;activeNewVariation=true"  >
+                                            (click)="getNewVariations()"  >
                                         New Variations
                                         </a>
                                         </div>
