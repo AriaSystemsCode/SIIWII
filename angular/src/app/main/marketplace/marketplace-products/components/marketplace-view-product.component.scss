@@ -230,6 +230,11 @@ input[type="number"] {
 .switch .slider:before {
 background-color: white;
 }
+
+.switch .slider {
+    border: #aaaaaa solid 1px !important;
+}
+
 .slider:before {
     position: absolute;
     content: "";
