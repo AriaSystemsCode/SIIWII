@@ -70,8 +70,9 @@ export class ShoppingCartViewComponentComponent
   currencySymbol: string = "";
   transactionCode:string="";
   transactionFormPath:string="";
+  _transactionFormPath:string="";
   onshare:boolean=false;
-  orderConfirmationFile;
+  //orderConfirmationFile;
   printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
   reportUrl: string = "";
   invokeAction = '/DXXRDV';
@@ -214,10 +215,7 @@ export class ShoppingCartViewComponentComponent
           this.isOwnedByMe= res.isOwnedByMe;
           this.canChange= this.isOwnedByMe
            this.transactionCode=res?.code;
-           if (res?.entityAttachments?.length > 0)
-             this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
-   
-           this.orderConfirmationFile = res.orderConfirmationFile;
+          
            this.loadCommentsList()
    
            //lines
@@ -229,6 +227,15 @@ export class ShoppingCartViewComponentComponent
                this.sizeFilter,
                this.productCode
              )
+             .pipe(finalize(() => {
+              if (res?.entityAttachments?.length > 0)
+             this._transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
+   
+          
+              this.modal.hide();
+              this.modal.show();
+              this.hideMainSpinner();
+             }))
              .subscribe((res) => {
                this.shoppingCartDetails = res;
               // this.resetTabValidation();
@@ -259,9 +266,6 @@ export class ShoppingCartViewComponentComponent
                    .subscribe((res: CurrencyInfoDto) => {
                        this.currencySymbol = res.symbol ? res.symbol : res.code  ;
                    });
-           this.modal.hide();
-           this.modal.show();
-           this.hideMainSpinner();
         });
           
     
@@ -442,8 +446,6 @@ export class ShoppingCartViewComponentComponent
                 if (res)
                   this.notify.info("Successfully deleted.");
                   this.onGeneratOrderReport(true,undefined);
-                this.getShoppingCartData();
-                this.hideMainSpinner();
               });
             break;
 
@@ -459,8 +461,6 @@ export class ShoppingCartViewComponentComponent
                 if (res)
                   this.notify.info("Successfully deleted.");
                   this.onGeneratOrderReport(true,undefined);
-                this.getShoppingCartData();
-                this.hideMainSpinner();
               });
             break;
 
@@ -474,8 +474,6 @@ export class ShoppingCartViewComponentComponent
                 if (res)
                   this.notify.info("Successfully deleted.");
                   this.onGeneratOrderReport(true,undefined);
-                this.getShoppingCartData();
-                this.hideMainSpinner();
               });
             break;
 
@@ -501,9 +499,7 @@ export class ShoppingCartViewComponentComponent
           .subscribe((res) => {
             if (res) this.notify.info("Successfully Updated.");
             this.onGeneratOrderReport(true,undefined);
-            this.getShoppingCartData();
             rowNode.node.data.showEditQty = false;
-            this.hideMainSpinner();
           });
         break;
 
@@ -756,7 +752,7 @@ export class ShoppingCartViewComponentComponent
   }
 
   printTransaction() {
-    var page = window.open(this.transactionFormPath);
+    var page = window.open(this._transactionFormPath);
     page.print();
   }
 
@@ -766,7 +762,7 @@ export class ShoppingCartViewComponentComponent
   offShareTransaction() {
     this.onshare = false;
   }
-  onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean) {
+  async onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean) {
     if (($event && this.shoppingCartDetails?.entityStatusCode?.toUpperCase()!='DRAFT') || ($event && FromPlaceOrder)) {
       this.reportUrl="";
       if(printInfoParam)
@@ -781,10 +777,15 @@ export class ShoppingCartViewComponentComponent
       this.printInfoParam.tenantId = this.appSession?.tenantId
       this.printInfoParam.userId = this.appSession?.userId
     }
-      this.reportUrl = this.printInfoParam.getReportUrl()
+     this.reportUrl = this.printInfoParam.getReportUrl()
+     this.getShoppingCartData();
       this.createReportViewer();
-      this.orderId=this.orderId;
     }
+  }
+
+  getOrderConfirmation(){
+    this.showMainSpinner()
+    this.transactionFormPath=this._transactionFormPath;
   }
 
   onShareTransactionByMessage($event:TenantTransactionInfo[])
