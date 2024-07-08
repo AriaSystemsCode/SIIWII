@@ -3477,6 +3477,23 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         //MMT
                         viewTrans.IsOwnedByMe = (AbpSession.TenantId == viewTrans.TenantOwner);
+                        if (viewTrans.AppTransactionContacts!=null && viewTrans.AppTransactionContacts.Count>0)
+                        {
+                            foreach (var cont in viewTrans.AppTransactionContacts)
+                            {
+                                cont.ContactAddressDetail = new ContactAppAddressDto();
+                                cont.ContactAddressDetail.State = cont.ContactAddressState;
+                                cont.ContactAddressDetail.City = cont.ContactAddressCity;
+                                cont.ContactAddressDetail.CountryCode = cont.ContactAddressCountryCode;
+                                cont.ContactAddressDetail.CountryId = cont.ContactAddressCountryId;
+                                cont.ContactAddressDetail.AddressLine1 = cont.ContactAddressLine1;
+                                cont.ContactAddressDetail.AddressLine2 = cont.ContactAddressLine2;
+                                cont.ContactAddressDetail.ContactEmail = cont.ContactEmail;
+                                cont.ContactAddressDetail.ContactPhone = cont.ContactPhoneNumber;
+                                cont.ContactAddressDetail.PostalCode = cont.ContactAddressPostalCode;
+                                
+                            }
+                        }
                         return viewTrans;
                     }
 
@@ -3489,7 +3506,26 @@ namespace onetouch.AppSiiwiiTransaction
                 .Include(a => a.AppTransactionDetails).Where(a => a.Id == transactionId).FirstOrDefaultAsync();
             if (trans != null)
             {
-                return ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
+                var retTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
+                if (retTrans.AppTransactionContacts != null && retTrans.AppTransactionContacts.Count > 0)
+                {
+                    foreach (var cont in retTrans.AppTransactionContacts)
+                    {
+                        cont.ContactAddressDetail = new ContactAppAddressDto();
+                        cont.ContactAddressDetail.State = cont.ContactAddressState;
+                        cont.ContactAddressDetail.City = cont.ContactAddressCity;
+                        cont.ContactAddressDetail.CountryCode = cont.ContactAddressCountryCode;
+                        cont.ContactAddressDetail.CountryId = cont.ContactAddressCountryId;
+                        cont.ContactAddressDetail.AddressLine1 = cont.ContactAddressLine1;
+                        cont.ContactAddressDetail.AddressLine2 = cont.ContactAddressLine2;
+                        cont.ContactAddressDetail.ContactEmail = cont.ContactEmail;
+                        cont.ContactAddressDetail.ContactPhone = cont.ContactPhoneNumber;
+                        cont.ContactAddressDetail.PostalCode = cont.ContactAddressPostalCode;
+
+                    }
+                }
+                return retTrans;
+
             }
             return null;
         }
