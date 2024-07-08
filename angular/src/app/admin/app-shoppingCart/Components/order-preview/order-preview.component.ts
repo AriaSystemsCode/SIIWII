@@ -10,10 +10,11 @@ import { finalize } from "rxjs";
 })
 export class OrderPreviewComponent extends AppComponentBase implements OnInit, OnChanges  , AfterViewInit{
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-    @Input("orderConfirmationFile") orderConfirmationFile;
+    // @Input("orderConfirmationFile") orderConfirmationFile;
     @Input("transactionFormPath") transactionFormPath;
     @Input("orderId") orderId;
     loadingError: boolean = false;
+    showReport:boolean=false;
 
     constructor(
         injector: Injector,
@@ -27,12 +28,15 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         this.loadPdf();
     }
     ngAfterViewInit(){
-        this.loadPdf();
+       // this.loadPdf();
     }
-    loadPdf() {
+   async loadPdf() {
+    this.showReport=false;
         this.showMainSpinner()
+        await this.delay(10000);
         this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
         .pipe(finalize(() => {
+            this.showReport=true;
             this.hideMainSpinner()
         }))
         .subscribe((res) => {
@@ -48,6 +52,11 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
         });
        
     }
+
+    
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 }
 
