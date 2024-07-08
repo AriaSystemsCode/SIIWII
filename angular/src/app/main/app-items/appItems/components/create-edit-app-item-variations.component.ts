@@ -92,13 +92,13 @@ export class CreateEditAppItemVariationsComponent
     public set showVariations(value: boolean) {
         if (this.isListing) this.selectedVaritaions = this.variationMatrices;
   this._showVariations = value;
-        // if(this.activeNewVariation)
-        // this.selectedVaritaions = [...this.primengTableHelper?.records];
+  
+//   this.selectedVaritaions =this.variationMatrices.filter((variation) => {
+//             return !variation.ssin;
+//         });
       
     }
 
-   
-   
     showVariationValues = false;
     showVariationSelectionMetaData = false;
     showVariationPhotos: boolean = false;
@@ -317,20 +317,38 @@ export class CreateEditAppItemVariationsComponent
 
             }
 
-            if(this.appItem?.id){
- this.showExisttingVariation=true;
-            this.activeExisttingVariation=true;
-            this.activeNewVariation=false;
-            this.showNewVariation=false;
-        }
-        else{
-            this.showExisttingVariation=false;
-            this.activeExisttingVariation=false;
-           this.activeNewVariation=true;
-           this.showNewVariation=true;
-        }
+         this.setExistingAndNewVariations();
+         this.setSelectionVariations();
+    }
+    
+    setExistingAndNewVariations (){
+        if(this.appItem?.id){
+            this.showExisttingVariation=true;
+                       this.activeExisttingVariation=true;
+           
+                    let variationsWithoutSSIN=   this.variationMatrices.filter((variation) => {
+                           return !variation.ssin;
+                       });
+                   
+                       if(!variationsWithoutSSIN || variationsWithoutSSIN?.length==0){
+                       this.activeNewVariation=false;
+                       this.showNewVariation=false;
+                       }
+                       else
+                           this.showNewVariation=true;
+                  
+                         
+                  this.getExistingVariations()
+                        }
+                   else{
+                       this.showExisttingVariation=false;
+                       this.activeExisttingVariation=false;
+                      this.activeNewVariation=true;
+                      this.showNewVariation=true;
+                   }
     }
 
+   
     detectAppItemDefaultImage() {
         this.appItemDefaultImage = this.appItem.entityAttachments.filter(
             (item) => item.isDefault
@@ -341,6 +359,10 @@ export class CreateEditAppItemVariationsComponent
         // get extraatributes data by product type id
         await this.getItemTypeDataAndExtraAttributes();
         this.deepCloneVariations();
+
+        this.setExistingAndNewVariations();
+        this.setSelectionVariations();
+
         // get item type extra data and group them and their options
         if (this.variationMatrices && this.variationMatrices.length) {
             this.variationMatrices.map((item, index) => {
@@ -619,11 +641,13 @@ export class CreateEditAppItemVariationsComponent
                 })*/
                 
                 this.primengTableHelper.records = response;
-                this.selectedVaritaions = [...this.primengTableHelper.records];
+            //    this.selectedVaritaions = [...this.primengTableHelper.records];
                 this.variationMatrices = response;
 
                 if(this.appItem?.id)
                 this.getExistingVariations()
+
+                this.setSelectionVariations();
                 this.hideMainSpinner();
 
             });
@@ -1170,7 +1194,7 @@ export class CreateEditAppItemVariationsComponent
                 ___varitation.stockAvailability = 0;
                 ___varitation.id = 0;
                 ___varitation.entityAttachments = [];
-                ___varitation.position = this.variationMatrices.length;
+                ___varitation.position = this.variationMatrices.length+1;
 
                 for (
                     var i = 0;
@@ -1229,6 +1253,15 @@ export class CreateEditAppItemVariationsComponent
             //     })
               
             // }
+
+           
+          
+    }
+
+    setSelectionVariations(){
+        this.selectedVaritaions =this.variationMatrices.filter((variation) => {
+            return !variation.ssin;
+        });
     }
 
     setPrice(price: any, dropdown: BsDropdownDirective) {
@@ -1282,9 +1315,17 @@ export class CreateEditAppItemVariationsComponent
             },
             []
         );
-        this.variationMatrices = this.variationMatrices.filter((variation) => {
+    let variationMatrices1=  this.variationMatrices.filter((variation) => {
             return sectedRecordsPositions.includes(variation.position);
+        }); 
+        
+        let variationMatrices2=  this.variationMatrices.filter((variation) => {
+            return variation.ssin; 
         });
+
+
+
+        this.variationMatrices = [...variationMatrices1, ...variationMatrices2];
     }
 
         let invalidPrice = this.variationMatrices.some((variation) => {
