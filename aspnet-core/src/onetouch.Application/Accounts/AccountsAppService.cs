@@ -2068,7 +2068,9 @@ namespace onetouch.Accounts
 
                     foreach (var branchObj in branchInfo)
                     {
-                        await ApplyRelationOnBranch(branchObj, accountId );
+                        var branchObjMarket = new AppMarketplaceContact();
+                        ObjectMapper.Map(branchObj, branchObjMarket);
+                        await ApplyRelationOnBranch(branchObjMarket, accountId );
                     }
 
                     //Publish Account related members[End]
