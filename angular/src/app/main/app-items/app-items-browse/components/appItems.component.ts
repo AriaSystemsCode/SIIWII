@@ -460,7 +460,8 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         .subscribe((result) => {
             debugger
             this.notify.success(this.l(result+" Item shared"));
-            this.getFreshData();
+            this.reloadPage();
+            
         });
     }
     bulkSyncItems(){
@@ -474,8 +475,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         .subscribe((result) => {
             debugger
             this.notify.success(this.l(result+" Item synced"));
-            this.getFreshData();
-
+            this.reloadPage();
         });
     }
     saveUserPreferenceForListView() {
