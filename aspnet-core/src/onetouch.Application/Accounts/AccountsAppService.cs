@@ -1905,7 +1905,7 @@ namespace onetouch.Accounts
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
         public async Task PublishProfile()
         {
-            bool sync = false;
+            //bool sync = false;
 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -1926,11 +1926,11 @@ namespace onetouch.Accounts
                                                 && x.SSIN == contact.SSIN);
                     
                     // if profile already published
-                    if (publishContact != null && ! sync) return;
+                    //if (publishContact != null && ! sync) return;
  
                     CreateOrEditMarketplaceAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditMarketplaceAccountInfoDto();
                     ObjectMapper.Map(contact, createOrEditAccountInfoDto);
-                    var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto, sync);
+                    var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto);
                 }
             }
         }

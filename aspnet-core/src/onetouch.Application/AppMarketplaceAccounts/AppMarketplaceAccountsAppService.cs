@@ -331,7 +331,7 @@ namespace onetouch.MarketplaceAccounts
             { return false; }
         }
 
-        public async Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input, Boolean sync)
+        public async Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -406,6 +406,80 @@ namespace onetouch.MarketplaceAccounts
 
         }
 
+        public async Task<long> SyncMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var mainAccountID = input.Id;
+                var foundEntity = _appEntityRepository.GetAll().FirstOrDefault(e => e.Id == input.EntityId);
+                AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
+                
+                {
+                    appMarketplaceContact = await _appMarketplaceContactRepository.GetAll()
+                            .AsNoTracking().Include(x => x.ContactAddresses)
+                            .FirstOrDefaultAsync(x => x.TenantId == null
+                            && x.IsProfileData == true
+                            && x.OwnerId == AbpSession.TenantId
+                            && x.SSIN == input.SSIN);
+                }
+
+                ObjectMapper.Map(input, appMarketplaceContact);
+                //appMarketplaceContact.Id = sync ? appMarketplaceContact.Id : 0;
+
+                appMarketplaceContact.IsProfileData = true;
+                appMarketplaceContact.ObjectId = foundEntity.ObjectId;
+                appMarketplaceContact.EntityObjectTypeId = foundEntity.EntityObjectTypeId;
+                appMarketplaceContact.EntityObjectTypeCode = foundEntity.EntityObjectTypeCode;
+
+                appMarketplaceContact.Name = input.Name;
+                appMarketplaceContact.Notes = input.Notes;
+                appMarketplaceContact.OwnerId = input.TenantId;
+                appMarketplaceContact.TenantId = null;
+                appMarketplaceContact.Code = input.SSIN;
+                appMarketplaceContact.SSIN = input.SSIN;
+
+
+                foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
+                {
+                    contactAddress.Id = 0;
+                    contactAddress.AddressFk.Id = 0;
+                }
+
+                long newId = 0;
+                { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
+                await CurrentUnitOfWork.SaveChangesAsync();
+
+
+                //HIA - share Account related branches [Start]
+                var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var branchInfo = _appContactRepository.GetAll()
+                    .Where(x => x.IsProfileData
+                           && x.AccountId == mainAccountID
+                           && x.TenantId == AbpSession.TenantId
+                           && x.ParentId == mainAccountID
+                           && x.EntityFk.EntityObjectTypeId != personEntityObjectTypeId).ToList();
+                // First level of branches
+                foreach (var branchObj in branchInfo)
+                {
+                    await PublishBranch(branchObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
+                }
+                //HIA - share Account related branches [End]
+
+                //Publish contacts
+                var contactInfo = _appContactRepository.GetAll()
+                    .Where(x => x.IsProfileData
+                           && x.AccountId == mainAccountID
+                           && x.TenantId == AbpSession.TenantId
+                           && x.ParentId == mainAccountID
+                           && x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId).ToList();
+                foreach (var contactObj in contactInfo)
+                {
+                    await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
+                }
+                return newId;
+            }
+
+        }
 
 
         private async Task<long> SaveContact(AppMarketplaceContactDto input)
