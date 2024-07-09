@@ -28,6 +28,8 @@ using onetouch.AppEntities;
 using onetouch.AppSiiwiiTransaction;
 using onetouch.Migrations;
 using NUglify.Helpers;
+using onetouch.SycCurrencyExchangeRates;
+using Abp.UI;
 
 namespace onetouch.AppMarketplaceItems
 {
@@ -152,7 +154,9 @@ namespace onetouch.AppMarketplaceItems
                 //   _sycEntityObjectTypeRepository.GetAll().Include(a => a.ExtraAttributes.);
                 //var currencyTenant = TenantManager.GetTenantCurrency();
                 //var account = await _appContactRepository.GetAll().Include(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData).FirstOrDefaultAsync(x => x.TenantId ==null && x.IsProfileData==false && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
-                 if (input.CurrencyCode != null)
+
+               
+                if (input.CurrencyCode != null)
                  exchangeRate = _helper.SystemTables.GetExchangeRate("USD",input.CurrencyCode);
 
                 if (input.CurrencyCode=="USD")
@@ -309,6 +313,35 @@ namespace onetouch.AppMarketplaceItems
                 );
             }
         }
+        //MMT
+        public async Task<bool> CheckCurrencyExchangeRate(string inpurCurrencyCode)
+        {
+            //MMT1
+            var currencyTenant = await TenantManager.GetTenantCurrency();
+            if (inpurCurrencyCode != null && currencyTenant != null && currencyTenant.Code != null && inpurCurrencyCode != currencyTenant.Code)
+            {
+                if (inpurCurrencyCode != "USD")
+                {
+                    var TenantCurrency = await _sycCurrencyExchangeRateRepository.GetAll().FirstOrDefaultAsync(x => x.CurrencyCode == inpurCurrencyCode);
+                    if (TenantCurrency == null)
+                    {
+                        throw new UserFriendlyException("There is no exchange rate defined for currency: " + inpurCurrencyCode.TrimEnd());
+
+                    }
+                }
+                if (currencyTenant.Code != "USD")
+                {
+                    var toCurrency = await _sycCurrencyExchangeRateRepository.GetAll().FirstOrDefaultAsync(x => x.CurrencyCode == currencyTenant.Code);
+                    if (toCurrency == null)
+                    {
+                        throw new UserFriendlyException("There is no exchange rate defined for currency: " + currencyTenant.Code.TrimEnd());
+                    }
+                }
+            }
+            return true;
+            //MMT1
+        }
+        //MMT
         public async Task<GetAccountImagesOutputDto> GetAccountImages(string accountSSIN)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
