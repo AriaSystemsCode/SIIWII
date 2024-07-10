@@ -1,4 +1,5 @@
-﻿using onetouch.AppSubScriptionPlan;
+﻿using onetouch.AppSubscriptionPlans;
+using onetouch.AppSubScriptionPlan;
 using onetouch.Maintainances;
 using onetouch.AppItemSelectors;
 using onetouch.SycIdentifierDefinitions;
@@ -57,9 +58,11 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
+
         public virtual DbSet<AppTenantActivitiesLog> AppTenantActivitiesLog { get; set; }
 
-       // public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLog { get; set; }
+        // public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLog { get; set; }
 
         public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
 

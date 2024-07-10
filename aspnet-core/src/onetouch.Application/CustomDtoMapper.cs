@@ -1,4 +1,6 @@
-﻿using onetouch.AppSubScriptionPlan.Dtos;
+﻿using onetouch.AppSubscriptionPlans.Dtos;
+using onetouch.AppSubscriptionPlans;
+using onetouch.AppSubScriptionPlan.Dtos;
 using onetouch.AppSubScriptionPlan;
 using onetouch.Maintainances.Dtos;
 using onetouch.Maintainances;
@@ -118,6 +120,8 @@ namespace onetouch
     {
         public static void CreateMappings(IMapperConfigurationExpression configuration)
         {
+            configuration.CreateMap<CreateOrEditAppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();
+            configuration.CreateMap<AppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
             configuration.CreateMap<AppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, oldAppTenantsActivitiesLog>().ReverseMap();

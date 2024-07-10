@@ -1,0 +1,57 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+            				<span>{{l("Entity_Name_Plural_Here")}} {{l("Details")}}</span>
+            			</h3>
+            			<span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            			<div class="kt-subheader__breadcrumbs">
+            				<a [routerLink]="['/app/admin/appSubscriptionPlans/appTenantInvoices']"
+            					class="kt-subheader__breadcrumbs-home"><i
+            						class="flaticon2-shelter"></i>{{l("AppTenantInvoice")}}</a>
+            				<span class="kt-subheader__breadcrumbs-separator"></span>
+            				<a 
+            					class="kt-subheader__breadcrumbs-link kt-subheader__breadcrumbs-link--active">
+            					<span>{{l("Details")}}</span>
+            				</a>
+            			</div>
+                    </div>
+                  </div>
+                </div>
+             
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <div class="row align-items-center">
+                                     <div class="col-6 mb-3">
+                        <h6>{{l("InvoiceNumber")}} :</h6>
+                        {{ item.appTenantInvoice.invoiceNumber }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("InvoiceDate")}} :</h6>
+                        {{ item.appTenantInvoice.invoiceDate |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Amount")}} :</h6>
+                        {{ item.appTenantInvoice.amount }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("DueDate")}} :</h6>
+                        {{ item.appTenantInvoice.dueDate |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("PayDate")}} :</h6>
+                        {{ item.appTenantInvoice.payDate |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+
+                 
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>

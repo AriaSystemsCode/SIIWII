@@ -38,6 +38,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         public bool Trackactivity { get; set; }
 
         public long AppSubscriptionPlanHeaderId { get; set; }
+        public bool IsAddOn { get; set; }
 
     }
 }

@@ -257,7 +257,10 @@
                                         {{l('Trackactivity')}}
                                         <p-sortIcon field="appSubscriptionPlanDetail.trackactivity"></p-sortIcon>
                                     </th>
-
+                                    <th style="width: 150px" pSortableColumn="isaddon">
+                                        {{l('AddOn')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.isaddon"></p-sortIcon>
+                                    </th>
                                 </tr>
                             </ng-template>                           
 							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">

@@ -1,5 +1,8 @@
 ﻿import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { AppTenantInvoicesComponent } from './appSubscriptionPlans/appTenantInvoices/appTenantInvoices.component';
+import { CreateOrEditAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/create-or-edit-appTenantInvoice.component';
+import { ViewAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/view-appTenantInvoice.component';
 import { AppTenantActivitiesLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/appTenantActivitiesLog.component';
 import { CreateOrEditAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/create-or-edit-appTenantActivityLog.component';
 import { ViewAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/view-appTenantActivityLog.component';
@@ -58,6 +61,9 @@ import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/ap
             {
                 path: '',
                 children: [
+                    { path: 'appSubscriptionPlans/appTenantInvoices', component: AppTenantInvoicesComponent, data: { permission: 'Pages.Administration.AppTenantInvoices' }  },
+                    { path: 'appSubscriptionPlans/appTenantInvoices/createOrEdit', component: CreateOrEditAppTenantInvoiceComponent, data: { permission: 'Pages.Administration.AppTenantInvoices.Create' }  },
+                    { path: 'appSubscriptionPlans/appTenantInvoices/view', component: ViewAppTenantInvoiceComponent, data: { permission: 'Pages.Administration.AppTenantInvoices' }  },
                     { path: 'appSubScriptionPlan/appTenantActivitiesLog', component: AppTenantActivitiesLogComponent  },
                     { path: 'appSubScriptionPlan/appTenantActivitiesLog/createOrEdit', component: CreateOrEditAppTenantActivityLogComponent   },
                     { path: 'appSubScriptionPlan/appTenantActivitiesLog/view', component: ViewAppTenantActivityLogComponent  },

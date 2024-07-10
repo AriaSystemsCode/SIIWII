@@ -6,6 +6,11 @@
     /// </summary>
     public static class AppPermissions
     {
+        public const string Pages_Administration_AppTenantInvoices = "Pages.Administration.AppTenantInvoices";
+        public const string Pages_Administration_AppTenantInvoices_Create = "Pages.Administration.AppTenantInvoices.Create";
+        public const string Pages_Administration_AppTenantInvoices_Edit = "Pages.Administration.AppTenantInvoices.Edit";
+        public const string Pages_Administration_AppTenantInvoices_Delete = "Pages.Administration.AppTenantInvoices.Delete";
+
         public const string Pages_Administration_AppTenantActivitiesLog = "Pages.Administration.AppTenantActivitiesLog";
         public const string Pages_Administration_AppTenantActivitiesLog_Create = "Pages.Administration.AppTenantActivitiesLog.Create";
         public const string Pages_Administration_AppTenantActivitiesLog_Edit = "Pages.Administration.AppTenantActivitiesLog.Edit";
