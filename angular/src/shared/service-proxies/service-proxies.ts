@@ -51775,7 +51775,7 @@ export interface IAppContactPaymentMethodDto {
 
 export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     fileToken!: string | undefined;
-    tradeName!: string;
+    tradeName!: string | undefined;
     accountType!: string | undefined;
     accountTypeId!: number;
     ssin!: string | undefined;
@@ -51967,7 +51967,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
 
 export interface ICreateOrEditAccountInfoDto {
     fileToken: string | undefined;
-    tradeName: string;
+    tradeName: string | undefined;
     accountType: string | undefined;
     accountTypeId: number;
     ssin: string | undefined;
