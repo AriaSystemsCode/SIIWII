@@ -787,9 +787,9 @@ export class ShoppingCartViewComponentComponent
   }
 
   getOrderConfirmation(){
-    this.showMainSpinner()
-    this.transactionFormPath=this._transactionFormPath;
-  }
+    this.transactionFormPath="";
+     this.transactionFormPath=this._transactionFormPath;
+   }
 
   onShareTransactionByMessage($event:TenantTransactionInfo[])
   {
