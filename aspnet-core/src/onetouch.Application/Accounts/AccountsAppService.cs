@@ -1901,12 +1901,19 @@ namespace onetouch.Accounts
 
         }
         //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
-
+        [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
+        public async Task SyncProfile()
+        {
+            await DoPublishProfile(true);
+        }
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
         public async Task PublishProfile()
         {
-            bool sync = false;
-
+            await DoPublishProfile(false);
+        }
+        [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
+        public async Task DoPublishProfile(bool sync)
+        {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var contact = await _appContactRepository.GetAll().AsNoTracking()
@@ -1925,9 +1932,9 @@ namespace onetouch.Accounts
                                                 && x.OwnerId == contact.TenantId
                                                 && x.SSIN == contact.SSIN);
                     
-                    // if profile already published
+                    // if profile already published-and not sync - return
                     if (publishContact != null && !sync) return;
- 
+                    
                     CreateOrEditMarketplaceAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditMarketplaceAccountInfoDto();
                     ObjectMapper.Map(contact, createOrEditAccountInfoDto);
                     var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto, sync);
@@ -2252,14 +2259,15 @@ namespace onetouch.Accounts
                        .FirstOrDefaultAsync(e => (e.SSIN == marketplaceContact.SSIN) && (e.TenantId == AbpSession.TenantId));
 
                      if(AppContact != null) {
-                        var appContactAddress = _appContactAddressRepository.FirstOrDefault(e => e.ContactId == AppContact.Id);
-                        if (appContactAddress != null)
-                        {
-                            await _appContactAddressRepository.DeleteAsync(e=> e.Id == appContactAddress.Id);
-                            await _appAddressRepository.DeleteAsync(e => e.Id == appContactAddress.AddressId);
-                        }
+                         await Delete(new EntityDto<long> { Id = AppContact.Id}); 
+                        //var appContactAddress = _appContactAddressRepository.FirstOrDefault(e => e.ContactId == AppContact.Id);
+                        //if (appContactAddress != null)
+                        //{
+                        //    await _appContactAddressRepository.DeleteAsync(e=> e.Id == appContactAddress.Id);
+                        //    await _appAddressRepository.DeleteAsync(e => e.Id == appContactAddress.AddressId);
+                        //}
 
-                        await _appContactRepository.DeleteAsync(AppContact);
+                        //await _appContactRepository.DeleteAsync(AppContact);
                     }
                 }
             }
