@@ -1478,6 +1478,13 @@ export class CreateEditAppItemVariationsComponent
                         (item) => item.code == optionValueCode
                     )[0]?.value;
 
+                    if (!optionvalue)
+                    optionvalue = selectedExtraAttr[
+                        currentExtraDataIndex
+                    ]?.lookupData?.filter(
+                        (item) => item.value == parseInt(optionValueCode)
+                    )[0]?.value;
+
                 let attachmentObj: { [key: number]: IVaritaionAttachment } =
                     selectedExtraAttr[currentExtraDataIndex]
                         .selectedValuesAttachments
