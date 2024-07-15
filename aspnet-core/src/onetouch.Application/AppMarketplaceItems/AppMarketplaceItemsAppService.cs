@@ -1428,7 +1428,7 @@ namespace onetouch.AppMarketplaceItems
         //                        foreach (var parentAttach in detParent.EntityAttachments)
         //                        {
         //                            parentAttach.Id = 0;
-                                    
+
         //                            parentAttach.EntityId = 0;
         //                            parentAttach.EntityFk = null;
         //                            parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
@@ -1510,7 +1510,7 @@ namespace onetouch.AppMarketplaceItems
         //                                    foreach (var parentAttach in det.EntityAttachments)
         //                                    {
         //                                        parentAttach.Id = 0;
-                                                
+
         //                                        parentAttach.EntityId = 0;
         //                                        parentAttach.EntityFk = null;
         //                                        parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
@@ -1531,7 +1531,7 @@ namespace onetouch.AppMarketplaceItems
         //                    }
         //                }
         //            }
-                   
+
         //            await CurrentUnitOfWork.SaveChangesAsync();
         //        }
         //    }
@@ -1566,5 +1566,34 @@ namespace onetouch.AppMarketplaceItems
         //        }
         //    }
         //}
+        //T-SII-20240628.0002 ,1 MMT 07/10/2024 Check if the currency has exchange rate[Start]
+        public async Task<bool> CheckCurrencyExchangeRate(string inpurCurrencyCode)
+        {
+            //MMT1
+            var currencyTenant = await TenantManager.GetTenantCurrency();
+            if (!string.IsNullOrEmpty(inpurCurrencyCode)) // != null && currencyTenant != null && currencyTenant.Code != null && inpurCurrencyCode != currencyTenant.Code)
+            {
+                if (inpurCurrencyCode != "USD")
+                {
+                    var TenantCurrency = await _sycCurrencyExchangeRateRepository.GetAll().FirstOrDefaultAsync(x => x.CurrencyCode == inpurCurrencyCode);
+                    if (TenantCurrency == null)
+                    {
+                        return false;
+                    }
+                    else
+                        return true;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+        //T-SII-20240628.0002 ,1 MMT 07/10/2024 Check if the currency has exchange rate[End]
     }
 }

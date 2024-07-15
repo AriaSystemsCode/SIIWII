@@ -13,5 +13,6 @@ namespace onetouch.AppMarketplaceItems
     public interface IAppMarketplaceItemsAppService : IApplicationService
     {
         Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAll(GetAllAppMarketItemsInput input);
+        Task<bool> CheckCurrencyExchangeRate(string inpurCurrencyCode);
     }
 }
