@@ -28,6 +28,7 @@ using onetouch.AppEntities;
 using onetouch.AppSiiwiiTransaction;
 using onetouch.Migrations;
 using NUglify.Helpers;
+using onetouch.Sessions.Dto;
 
 namespace onetouch.AppMarketplaceItems
 {
@@ -1567,15 +1568,15 @@ namespace onetouch.AppMarketplaceItems
         //    }
         //}
         //T-SII-20240628.0002 ,1 MMT 07/10/2024 Check if the currency has exchange rate[Start]
-        public async Task<bool> CheckCurrencyExchangeRate(string inpurCurrencyCode)
+        public async Task<bool> CheckCurrencyExchangeRate(CurrencyInfoDto inpurCurrencyCode)
         {
             //MMT1
-            var currencyTenant = await TenantManager.GetTenantCurrency();
-            if (!string.IsNullOrEmpty(inpurCurrencyCode)) // != null && currencyTenant != null && currencyTenant.Code != null && inpurCurrencyCode != currencyTenant.Code)
+            //var currencyTenant = await TenantManager.GetTenantCurrency();
+            if (inpurCurrencyCode!=null && !string.IsNullOrEmpty(inpurCurrencyCode.Code)) // != null && currencyTenant != null && currencyTenant.Code != null && inpurCurrencyCode != currencyTenant.Code)
             {
-                if (inpurCurrencyCode != "USD")
+                if (inpurCurrencyCode.Code != "USD")
                 {
-                    var TenantCurrency = await _sycCurrencyExchangeRateRepository.GetAll().FirstOrDefaultAsync(x => x.CurrencyCode == inpurCurrencyCode);
+                    var TenantCurrency = await _sycCurrencyExchangeRateRepository.GetAll().FirstOrDefaultAsync(x => x.CurrencyCode == inpurCurrencyCode.Code);
                     if (TenantCurrency == null)
                     {
                         return false;

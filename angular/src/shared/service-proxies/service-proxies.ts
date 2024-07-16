@@ -16117,19 +16117,21 @@ export class AppMarketplaceItemsServiceProxy {
     }
 
     /**
-     * @param inpurCurrencyCode (optional) 
+     * @param body (optional) 
      * @return Success
      */
-    checkCurrencyExchangeRate(inpurCurrencyCode: string | null | undefined): Observable<boolean> {
-        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/CheckCurrencyExchangeRate?";
-        if (inpurCurrencyCode !== undefined && inpurCurrencyCode !== null)
-            url_ += "inpurCurrencyCode=" + encodeURIComponent("" + inpurCurrencyCode) + "&";
+    checkCurrencyExchangeRate(body: CurrencyInfoDto | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/CheckCurrencyExchangeRate";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_ : any = {
+            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
                 "Accept": "text/plain"
             })
         };
