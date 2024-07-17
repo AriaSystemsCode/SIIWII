@@ -4760,7 +4760,7 @@ namespace onetouch.AppItems
                     itemExcelDto.rowNumber = rowNumber;
                     //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[Start]
                     //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code);
-                    var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ItemType == 0);
+                    var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
                     //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[End]
                     if (itemExists != null)
                     {
@@ -6259,7 +6259,7 @@ namespace onetouch.AppItems
                     var appChildItem = new AppItem();
                     if (excelDto.Id != 0)
                     {
-                        var itemExist = appItem.ParentFkList.FirstOrDefault(x => x.Code == item.Code);
+                        var itemExist = appItem.ParentFkList.FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == item.Code.Replace(" ",string.Empty));
                         if (itemExist != null)
                         {
                             appChildItem = itemExist;
