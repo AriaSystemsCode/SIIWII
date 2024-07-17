@@ -5260,6 +5260,8 @@ namespace onetouch.AppItems
 
             foreach (var excelDto in result)
             {
+                if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                    continue;
                 AppItem itemOrg = new AppItem();
                 if (excelDto.Id != 0)
                 {
@@ -5419,8 +5421,7 @@ namespace onetouch.AppItems
                             break;
                     }
                 }
-                if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                    continue;
+                
 
 
                 string isDefault = "1";
