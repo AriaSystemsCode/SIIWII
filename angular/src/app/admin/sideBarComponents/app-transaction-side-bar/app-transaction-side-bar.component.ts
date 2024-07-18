@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Injector, Input, OnInit, Output } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppTransactionServiceProxy, GetOrderDetailsForViewDto } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetOrderDetailsForViewDto } from '@shared/service-proxies/service-proxies';
 
 
 @Component({
@@ -15,11 +15,14 @@ export class AppTransactionSideBarComponent
   @Input() id = 0;
 
   @Output("hideSideBar") hideSideBar: EventEmitter<boolean> = new EventEmitter<boolean>();
+  
+  currencySymbol: string = "";
 
 
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+    private _AppEntitiesServiceProxy: AppEntitiesServiceProxy
   ) {
     super(injector);
   }
@@ -34,6 +37,13 @@ export class AppTransactionSideBarComponent
       )
       .subscribe((res) => {
         this.shoppingCartDetails = res;
+
+        //Currency
+        this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+        .subscribe((res: CurrencyInfoDto) => {
+            this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+        });
+
       });
   }
 
