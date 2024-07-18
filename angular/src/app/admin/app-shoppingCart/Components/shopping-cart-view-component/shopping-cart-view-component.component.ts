@@ -445,7 +445,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined);
+                  this.onGeneratOrderReport(true,undefined,false,true);
               });
             break;
 
@@ -460,7 +460,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined);
+                  this.onGeneratOrderReport(true,undefined,false,true);
               });
             break;
 
@@ -473,7 +473,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined);
+                  this.onGeneratOrderReport(true,undefined,false,true);
               });
             break;
 
@@ -498,7 +498,7 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             if (res) this.notify.info("Successfully Updated.");
-            this.onGeneratOrderReport(true,undefined);
+            this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
           });
         break;
@@ -585,7 +585,7 @@ export class ShoppingCartViewComponentComponent
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
-        this.onGeneratOrderReport(true,undefined);
+        this.onGeneratOrderReport(true,undefined,false,true);
         this.hideMainSpinner();
         this.showTabs = true;
       });
@@ -667,7 +667,7 @@ export class ShoppingCartViewComponentComponent
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
-            this.onGeneratOrderReport(true,undefined,true);
+            this.onGeneratOrderReport(true,undefined,true,true);
             this.hideMainSpinner();
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
@@ -762,7 +762,7 @@ export class ShoppingCartViewComponentComponent
   offShareTransaction() {
     this.onshare = false;
   }
-  async onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean) {
+  async onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean,refreshData:boolean=true) {
     if (($event && this.shoppingCartDetails?.entityStatusCode?.toUpperCase()!='DRAFT') || ($event && FromPlaceOrder)) {
       this.reportUrl="";
       if(printInfoParam)
@@ -778,15 +778,18 @@ export class ShoppingCartViewComponentComponent
       this.printInfoParam.userId = this.appSession?.userId
     }
      this.reportUrl = this.printInfoParam.getReportUrl()
-     this.getShoppingCartData();
+
+     if(refreshData)
+        this.getShoppingCartData();
+
       this.createReportViewer();
     }
   }
 
   getOrderConfirmation(){
-    this.showMainSpinner()
-    this.transactionFormPath=this._transactionFormPath;
-  }
+    this.transactionFormPath="";
+     this.transactionFormPath=this._transactionFormPath;
+   }
 
   onShareTransactionByMessage($event:TenantTransactionInfo[])
   {
@@ -800,7 +803,7 @@ export class ShoppingCartViewComponentComponent
     for (let i = 0; i < $event.length; i++) {
       printInfoParam.TransactionId = $event[i].transactionId.toString();
       printInfoParam.tenantId =$event[i].tenantId;
-      this.onGeneratOrderReport(true,printInfoParam);
+      this.onGeneratOrderReport(true,printInfoParam,false,false);
     }
   }
   createReportViewer() {
