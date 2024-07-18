@@ -371,9 +371,22 @@ namespace onetouch.AppSiiwiiTransaction
                 string? phoneTypeNameSeller = null;
                 long? sellerAddressId = null;
                 string? sellerAddressCode = null;
+                //MMT
+                string? contactAddressCode = null;
+                string? contactAddressCity = null;
+                long? contactAddressCountryId = null;
+                string? contactAddressCountryCode = null;
+                AppEntity? contactAddressCountryFk = null;
+                string? contactAddressLine1 = null;
+                string? contactAddressLine2 = null;
+                string? contactAddressName = null;
+                string? contactAddressPostalCode = null;
+                string? contactAddressState = null;
+                //MMT
                 if (!string.IsNullOrEmpty(input.SellerBranchSSIN))
                 {
-                    var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
+                    var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk)
+                        .Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk).Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
                     if (accountSSIN != null)
                     {
 
@@ -383,11 +396,21 @@ namespace onetouch.AppSiiwiiTransaction
                         phoneTypeNameSeller = !string.IsNullOrEmpty(accountSSIN.Phone1Number) ? accountSSIN.Phone1TypeName :
                             (!string.IsNullOrEmpty(accountSSIN.Phone2Number) ? accountSSIN.Phone2TypeName :
                             (!string.IsNullOrEmpty(accountSSIN.Phone3Number) ? accountSSIN.Phone3TypeName : null));
-                        var sellerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault();
+                        var sellerAddressObj = accountSSIN.AppContactAddresses.Where(z=>z.AddressTypeFk.Code == "DIRECT-SHIPPING" || z.AddressTypeFk.Code == "DISTRIBUTION-CENTER").FirstOrDefault();
                         if (sellerAddressObj != null)
                         {
                             sellerAddressId = sellerAddressObj.AddressId;
                             sellerAddressCode = sellerAddressObj.AddressCode;
+                            contactAddressCode = sellerAddressObj.AddressFk.Code;
+                            contactAddressCity = sellerAddressObj.AddressFk.City;
+                            contactAddressCountryId = sellerAddressObj.AddressFk.CountryId;
+                            contactAddressCountryCode = sellerAddressObj.AddressFk.CountryCode;
+                            contactAddressCountryFk = sellerAddressObj.AddressFk.CountryFk;
+                            contactAddressLine1 = sellerAddressObj.AddressFk.AddressLine1;
+                            contactAddressLine2 = sellerAddressObj.AddressFk.AddressLine2;
+                            contactAddressName = sellerAddressObj.AddressFk.Name;
+                            contactAddressPostalCode = sellerAddressObj.AddressFk.PostalCode;
+                            contactAddressState = sellerAddressObj.AddressFk.State;
                         }
                     }
                 }
@@ -395,9 +418,23 @@ namespace onetouch.AppSiiwiiTransaction
                 string? phoneTypeNameBuyer = null;
                 long? buyerAddressId = null;
                 string? buyerAddressCode = null;
+                //MMT
+                string? contactBuyerAddressCode = null;
+                string? contactBuyerAddressCity = null;
+                long? contactBuyerAddressCountryId = null;
+                string? contactBuyerAddressCountryCode = null;
+                AppEntity? contactBuyerAddressCountryFk = null;
+                string? contactBuyerAddressLine1 = null;
+                string? contactBuyerAddressLine2 = null;
+                string? contactBuyerAddressName = null;
+                string? contactBuyerAddressPostalCode = null;
+                string? contactBuyerAddressState = null;
+                //MMT
                 if (!string.IsNullOrEmpty(input.BuyerBranchSSIN))
                 {
-                    var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                    var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk)
+                        .Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
+                        .Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
                     if (accountSSIN != null)
                     {
                         phoneTypeBuyer = !string.IsNullOrEmpty(accountSSIN.Phone1Number) ? accountSSIN.Phone1TypeId :
@@ -406,11 +443,22 @@ namespace onetouch.AppSiiwiiTransaction
                         phoneTypeNameBuyer = !string.IsNullOrEmpty(accountSSIN.Phone1Number) ? accountSSIN.Phone1TypeName :
                             (!string.IsNullOrEmpty(accountSSIN.Phone2Number) ? accountSSIN.Phone2TypeName :
                             (!string.IsNullOrEmpty(accountSSIN.Phone3Number) ? accountSSIN.Phone3TypeName : null));
-                        var buyerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault();
+                        var buyerAddressObj = accountSSIN.AppContactAddresses.Where(z => z.AddressTypeFk.Code == "DIRECT-SHIPPING" || z.AddressTypeFk.Code == "DISTRIBUTION-CENTER").FirstOrDefault();
                         if (buyerAddressObj != null)
                         {
                             buyerAddressId = buyerAddressObj.AddressId;
                             buyerAddressCode = buyerAddressObj.AddressCode;
+                            contactBuyerAddressCode = buyerAddressObj.AddressFk.Code;
+                            contactBuyerAddressCity = buyerAddressObj.AddressFk.City;
+                            contactBuyerAddressCountryId = buyerAddressObj.AddressFk.CountryId;
+                            contactBuyerAddressCountryCode = buyerAddressObj.AddressFk.CountryCode;
+                            contactBuyerAddressCountryFk = buyerAddressObj.AddressFk.CountryFk;
+                            contactBuyerAddressLine1 = buyerAddressObj.AddressFk.AddressLine1;
+                            contactBuyerAddressLine2 = buyerAddressObj.AddressFk.AddressLine2;
+                            contactBuyerAddressName = buyerAddressObj.AddressFk.Name; ;
+                            contactBuyerAddressPostalCode = buyerAddressObj.AddressFk.PostalCode;
+                            contactBuyerAddressState = buyerAddressObj.AddressFk.State;
+
                         }
                     }
                 }
@@ -449,14 +497,24 @@ namespace onetouch.AppSiiwiiTransaction
                     BranchSSIN = input.BuyerBranchSSIN
                 });
                 //
-                var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
                 if (accountSSINBranchBuyer != null)
                 {
-                    var addressObj = accountSSINBranchBuyer.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "DIRECT-SHIPPING");
+                    var addressObj = accountSSINBranchBuyer.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code == "DIRECT-SHIPPING" || x.AddressTypeFk.Code == "DISTRIBUTION-CENTER");
                     if (addressObj != null)
                     {
                         buyerAddressId = addressObj.AddressId;
                         buyerAddressCode = addressObj.AddressCode;
+                        contactBuyerAddressCode = addressObj.AddressFk.Code;
+                        contactBuyerAddressCity = addressObj.AddressFk.City;
+                        contactBuyerAddressCountryId = addressObj.AddressFk.CountryId;
+                        contactBuyerAddressCountryCode = addressObj.AddressFk.CountryCode;
+                        contactBuyerAddressCountryFk = addressObj.AddressFk.CountryFk;
+                        contactBuyerAddressLine1 = addressObj.AddressFk.AddressLine1;
+                        contactBuyerAddressLine2 = addressObj.AddressFk.AddressLine2;
+                        contactBuyerAddressName = addressObj.AddressFk.Name; ;
+                        contactBuyerAddressPostalCode = addressObj.AddressFk.PostalCode;
+                        contactBuyerAddressState = addressObj.AddressFk.State;
                     }
                 }
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
@@ -473,16 +531,35 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
                     BranchName = input.BuyerBranchName,
-                    BranchSSIN = input.BuyerBranchSSIN
+                    BranchSSIN = input.BuyerBranchSSIN,
+                    //ContactAddressCode = contactBuyerAddressCode,
+                    ContactAddressCity = contactBuyerAddressCity,
+                    ContactAddressCountryId = contactBuyerAddressCountryId,
+                    ContactAddressCountryCode = contactBuyerAddressCountryCode,
+                    ContactAddressCountryFk = contactBuyerAddressCountryFk,
+                    ContactAddressLine1 = contactBuyerAddressLine1,
+                    ContactAddressLine2 = contactBuyerAddressLine2,
+                    ContactAddressName = contactBuyerAddressName,
+                    ContactAddressPostalCode = contactBuyerAddressPostalCode,
+                    ContactAddressState = contactBuyerAddressState
+                    
                 });
-                var accountSSINBranchBuy = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                var accountSSINBranchBuy = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
                 if (accountSSINBranchBuy != null)
                 {
-                    var addressObj = accountSSINBranchBuy.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "BILLING");
+                    var addressObj = accountSSINBranchBuy.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code== "BILLING");
                     if (addressObj != null)
                     {
                         buyerAddressId = addressObj.AddressId;
                         buyerAddressCode = addressObj.AddressCode;
+                        contactBuyerAddressCountryId = addressObj.AddressFk.CountryId;
+                        contactBuyerAddressCountryCode = addressObj.AddressFk.CountryCode;
+                        contactBuyerAddressCountryFk = addressObj.AddressFk.CountryFk;
+                        contactBuyerAddressLine1 = addressObj.AddressFk.AddressLine1;
+                        contactBuyerAddressLine2 = addressObj.AddressFk.AddressLine2;
+                        contactBuyerAddressName = addressObj.AddressFk.Name; ;
+                        contactBuyerAddressPostalCode = addressObj.AddressFk.PostalCode;
+                        contactBuyerAddressState = addressObj.AddressFk.State;
                     }
                 }
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
@@ -499,16 +576,37 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
                     BranchName = input.BuyerBranchName,
-                    BranchSSIN = input.BuyerBranchSSIN
+                    BranchSSIN = input.BuyerBranchSSIN,
+                    ContactAddressCity = contactBuyerAddressCity,
+                    ContactAddressCountryId = contactBuyerAddressCountryId,
+                    ContactAddressCountryCode = contactBuyerAddressCountryCode,
+                    ContactAddressCountryFk = contactBuyerAddressCountryFk,
+                    ContactAddressLine1 = contactBuyerAddressLine1,
+                    ContactAddressLine2 = contactBuyerAddressLine2,
+                    ContactAddressName = contactBuyerAddressName,
+                    ContactAddressPostalCode = contactBuyerAddressPostalCode,
+                    ContactAddressState = contactBuyerAddressState
                 });
-                var accountSSINBranch = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
+                var accountSSINBranch = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk)
+                    .Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
+                    .Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
                 if (accountSSINBranch != null)
                 {
-                    var sellerAddressObj = accountSSINBranch.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "DIRECT-SHIPPING");
+                    var sellerAddressObj = accountSSINBranch.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code == "DIRECT-SHIPPING" || x.AddressTypeFk.Code == "DISTRIBUTION-CENTER");
                     if (sellerAddressObj != null)
                     {
                         sellerAddressId = sellerAddressObj.AddressId;
                         sellerAddressCode = sellerAddressObj.AddressCode;
+                        contactAddressCode = sellerAddressObj.AddressFk.Code;
+                        contactAddressCity = sellerAddressObj.AddressFk.City;
+                        contactAddressCountryId = sellerAddressObj.AddressFk.CountryId;
+                        contactAddressCountryCode = sellerAddressObj.AddressFk.CountryCode;
+                        contactAddressCountryFk = sellerAddressObj.AddressFk.CountryFk;
+                        contactAddressLine1 = sellerAddressObj.AddressFk.AddressLine1;
+                        contactAddressLine2 = sellerAddressObj.AddressFk.AddressLine2;
+                        contactAddressName = sellerAddressObj.AddressFk.Name;
+                        contactAddressPostalCode = sellerAddressObj.AddressFk.PostalCode;
+                        contactAddressState = sellerAddressObj.AddressFk.State;
                     }
                 }
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
@@ -525,16 +623,37 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
                     BranchName = input.SellerBranchName,
-                    BranchSSIN = input.SellerBranchSSIN
+                    BranchSSIN = input.SellerBranchSSIN,
+                    ContactAddressCity = contactAddressCity,
+                    ContactAddressCountryId = contactAddressCountryId,
+                    ContactAddressCountryCode = contactAddressCountryCode,
+                    ContactAddressCountryFk = contactAddressCountryFk,
+                    ContactAddressLine1 = contactAddressLine1,
+                    ContactAddressLine2 = contactAddressLine2,
+                    ContactAddressName = contactAddressName,
+                    ContactAddressPostalCode = contactAddressPostalCode,
+                    ContactAddressState = contactAddressState
                 });
-                var accountSSINBranchSeller = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
+                var accountSSINBranchSeller = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk)
+                    .Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
+                    .Where(a => a.SSIN == input.SellerBranchSSIN).FirstOrDefaultAsync();
                 if (accountSSINBranchSeller != null)
                 {
-                    var addressObj = accountSSINBranchSeller.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "BILLING");
+                    var addressObj = accountSSINBranchSeller.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code == "BILLING");
                     if (addressObj != null)
                     {
                         sellerAddressId = addressObj.AddressId;
-                        sellerAddressCode = addressObj.AddressCode;
+                        sellerAddressCode = addressObj.AddressFk.Code;
+                        contactAddressCode = addressObj.AddressFk.Code;
+                        contactAddressCity = addressObj.AddressFk.City;
+                        contactAddressCountryId = addressObj.AddressFk.CountryId;
+                        contactAddressCountryCode = addressObj.AddressFk.CountryCode;
+                        contactAddressCountryFk = addressObj.AddressFk.CountryFk;
+                        contactAddressLine1 = addressObj.AddressFk.AddressLine1;
+                        contactAddressLine2 = addressObj.AddressFk.AddressLine2;
+                        contactAddressName = addressObj.AddressFk.Name;
+                        contactAddressPostalCode = addressObj.AddressFk.PostalCode;
+                        contactAddressState = addressObj.AddressFk.State;
                     }
                 }
                 appTrans.AppTransactionContacts.Add(new AppTransactionContacts
@@ -551,8 +670,18 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
                     BranchName = input.SellerBranchName,
-                    BranchSSIN = input.SellerBranchSSIN
-                });
+                    BranchSSIN = input.SellerBranchSSIN,
+                    //ContactAddressCode = sellerAddressObj.Code,
+                    ContactAddressCity = contactAddressCity,
+                    ContactAddressCountryId = contactAddressCountryId,
+                    ContactAddressCountryCode = contactAddressCountryCode,
+                    ContactAddressCountryFk = contactAddressCountryFk,
+                    ContactAddressLine1 = contactAddressLine1,
+                    ContactAddressLine2 = contactAddressLine2,
+                    ContactAddressName = contactAddressName,
+                    ContactAddressPostalCode = contactAddressPostalCode,
+                    ContactAddressState = contactAddressState
+            });
                 //
                 if (AbpSession.UserId != null)
                 {
@@ -736,10 +865,10 @@ namespace onetouch.AppSiiwiiTransaction
                             string? sellerAddressCode = null;
                             if (!string.IsNullOrEmpty(shipperBranchSSIN))
                             {
-                                var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == shipperBranchSSIN).FirstOrDefaultAsync();
+                                var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressTypeFk).Where(a => a.SSIN == shipperBranchSSIN).FirstOrDefaultAsync();
                                 if (accountSSIN != null)
                                 {
-                                    var sellerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "DIRECT-SHIPPING");
+                                    var sellerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code == "DIRECT-SHIPPING" || x.AddressTypeFk.Code == "DISTRIBUTION-CENTER");
                                     if (sellerAddressObj != null)
                                     {
                                         sellerAddressId = sellerAddressObj.AddressId;
@@ -888,10 +1017,10 @@ namespace onetouch.AppSiiwiiTransaction
                             string? buyerAddressCode = null;
                             if (!string.IsNullOrEmpty(shipToBranchSSIN))
                             {
-                                var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).Where(a => a.SSIN == shipToBranchSSIN).FirstOrDefaultAsync();
+                                var accountSSIN = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressTypeFk).Where(a => a.SSIN == shipToBranchSSIN).FirstOrDefaultAsync();
                                 if (accountSSIN != null)
                                 {
-                                    var buyerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault(x => x.AddressTypeCode == "DIRECT-SHIPPING");
+                                    var buyerAddressObj = accountSSIN.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code == "DIRECT-SHIPPING" || x.AddressTypeFk.Code == "DISTRIBUTION-CENTER");
                                     if (buyerAddressObj != null)
                                     {
                                         buyerAddressId = buyerAddressObj.AddressId;
