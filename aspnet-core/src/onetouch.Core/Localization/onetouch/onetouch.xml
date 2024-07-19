@@ -7,6 +7,18 @@
 		<text name="MPActionEMPLOY">Employ</text>
 		<text name="MPActionINVITE">Invite</text>
 		
+    <text name="SycCurrencyExchangeRates">Currency Exchange Rate</text>
+    <text name="onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates">SycCurrencyExchangeRates</text>
+    <text name="CurrencyCode">Currency code</text>
+    <text name="BaseCurrencyCode">Base currency code</text>
+    <text name="ExchangeRate">Exchange rate</text>
+    <text name="CurrencyMethod">Currency method</text>
+    <text name="CurrencyUnit">Currency unit</text>
+    <text name="SycCurrencyExchangeRatesHeaderInfo">Currency exchange rate header info</text>
+    <text name="CreateNewSycCurrencyExchangeRates">Create new currency exchange rate</text>
+    <text name="EditSycCurrencyExchangeRates">Edit currency exchange rate</text>
+    <text name="DeleteSycCurrencyExchangeRates">Delete currency exchange rate</text>
+
 		<text name="MinimumInStock">Minimum (in Stock) Qty</text>
 		<text name="OnlyInStockColors">Only (in Stock) Colors</text>
 

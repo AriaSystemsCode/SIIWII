@@ -14,6 +14,7 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
 
     @Input("isCreateOrEdit") isCreateOrEdit: boolean;
     @Input("activeTab") activeTab: number;
+    @Input("currentTab") currentTab: number;
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
     @Output("showBuyer_sellerEditMode") showBuyer_sellerEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 

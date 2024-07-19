@@ -64,6 +64,8 @@ using onetouch.Attachments;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Org.BouncyCastle.Utilities.Encoders;
 using onetouch.AppSiiwiiTransaction;
+using NPOI.HPSF;
+using NPOI.POIFS.NIO;
 
 namespace onetouch.AppItems
 {
@@ -2242,7 +2244,9 @@ namespace onetouch.AppItems
                                     colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
                                     if (colorImage != null)
                                     {
-                                        if (string.IsNullOrEmpty(colorImage.AttributeValue))
+                                        var path = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString().Trim() + @"\" + colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+                                        
+                                        if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
                                                 MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
@@ -3743,7 +3747,7 @@ namespace onetouch.AppItems
                         AppMarketplaceItems.AppMarketplaceItems publishChild = new AppMarketplaceItems.AppMarketplaceItems(); ;
                         if (publishedEntityId != 0)
                             publishChild = await _appMarketplaceItem.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Include(z => z.EntityExtraData)
+                                .Include(z => z.EntityExtraData).Include(z=>z.ItemPricesFkList)
                                 .Where(x => x.Code == child.SSIN).FirstOrDefaultAsync();
                         //marketplaceItem.ParentFkList.FirstOrDefault(x => x.Code == child.SSIN);
                         long publishId = 0;
@@ -3774,6 +3778,13 @@ namespace onetouch.AppItems
                         {
                             newSSIN = publishChild.SSIN;
                             //SS
+                            if (publishChild.ItemPricesFkList  != null)
+                            {
+                                foreach (var itemPrice in publishChild.ItemPricesFkList)
+                                {
+                                    await _appMarketplaceItemPricesRepository.DeleteAsync(a=>a.Id == itemPrice.Id);
+                                }
+                            }
                             if (publishChild.EntityExtraData != null)
                             {
                                 foreach (var parentExtrData in publishChild.EntityExtraData)
@@ -4750,7 +4761,7 @@ namespace onetouch.AppItems
                     itemExcelDto.rowNumber = rowNumber;
                     //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[Start]
                     //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code);
-                    var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ItemType == 0);
+                    var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
                     //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[End]
                     if (itemExists != null)
                     {
@@ -5250,6 +5261,8 @@ namespace onetouch.AppItems
 
             foreach (var excelDto in result)
             {
+                if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                    continue;
                 AppItem itemOrg = new AppItem();
                 if (excelDto.Id != 0)
                 {
@@ -5265,7 +5278,7 @@ namespace onetouch.AppItems
                             //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
                             if (lNewVariation == true)
                             {
-                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z => z.ItemPricesFkList)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
@@ -5274,6 +5287,7 @@ namespace onetouch.AppItems
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .Include(x => x.ParentFkList).ThenInclude(z=>z.ItemPricesFkList)
                                .FirstOrDefault();
                                 break;
                             }
@@ -5283,16 +5297,27 @@ namespace onetouch.AppItems
                         case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                                                                  //createOrEditAccountInfoDto.Id = account.Id
 
-                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               //.Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
                                .FirstOrDefault();
+                            if (itemOrg != null)
+                            {
+                                itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().Where(z => z.AppItemId == excelDto.Id).ToList();
+                                itemOrg.ParentFkList = _appItemRepository.GetAll()
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .Include(z => z.ItemPricesFkList).Where(z => z.ParentId == excelDto.Id).ToList();
+                            }
                             //itemOrg.ParentFkList.Clear();
                             //appItemDeleteList.Add(itemOrg);
                             //if (itemOrg.EntityFk.EntityExtraData != null && itemOrg.EntityFk.EntityExtraData.Count > 0)
@@ -5345,33 +5370,33 @@ namespace onetouch.AppItems
                             //            EntityObjectCategoryId = productTypeId.Id,
                             //            EntityObjectCategoryCode = productTypeId.DisplayName
 
-                            //        });
-                            //        if (excelDto.EntityObjectCategoryID.HasValue)
-                            //        {
-                            //            itemOrg.EntityFk.EntityCategories.Add(new AppEntityCategory
-                            //            {
-                            //                EntityCode = excelDto.Code,
-                            //                EntityObjectCategoryCode = excelDto.ProductClassificationCode,
-                            //                EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
-                            //            });
-                            //        }
-                            //        var relatedItems = result.Where(x => x.ParentCode == excelDto.Code).ToList();
-                            //        foreach (var chItem in relatedItems)
-                            //        {
-                            //            var childOrg = itemOrg.ParentFkList.FirstOrDefault(x => x.Code == chItem.Code);
-                            //            if (childOrg != null)
-                            //            {
-                            //                childOrg.Name = chItem.Name;
-                            //                childOrg.Description = chItem.ProductDescription;
-                            //                childOrg.EntityFk.EntityExtraData.Clear();
+                                //        });
+                                //        if (excelDto.EntityObjectCategoryID.HasValue)
+                                //        {
+                                //            itemOrg.EntityFk.EntityCategories.Add(new AppEntityCategory
+                                //            {
+                                //                EntityCode = excelDto.Code,
+                                //                EntityObjectCategoryCode = excelDto.ProductClassificationCode,
+                                //                EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
+                                //            });
+                                //        }
+                                //        var relatedItems = result.Where(x => x.ParentCode == excelDto.Code).ToList();
+                                //        foreach (var chItem in relatedItems)
+                                //        {
+                                //            var childOrg = itemOrg.ParentFkList.FirstOrDefault(x => x.Code == chItem.Code);
+                                //            if (childOrg != null)
+                                //            {
+                                //                childOrg.Name = chItem.Name;
+                                //                childOrg.Description = chItem.ProductDescription;
+                                //                childOrg.EntityFk.EntityExtraData.Clear();
 
-                            //            }
-                            //        }
+                                //            }
+                                //        }
 
-                            //    }
+                                //    }
 
 
-                            //}
+                                //}
                             break;
                         case ExcelRecordRepeateHandler.CreateACopy: // override
                             string oldCode = excelDto.Code;
@@ -5397,8 +5422,7 @@ namespace onetouch.AppItems
                             break;
                     }
                 }
-                if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                    continue;
+                
 
 
                 string isDefault = "1";
@@ -5424,10 +5448,23 @@ namespace onetouch.AppItems
                     appItem.CreatorUserId = AbpSession.UserId;
                 }
                 appItem.Description = excelDto.ProductDescription;
+
+                if (string.IsNullOrEmpty(excelDto.Price))
+                    excelDto.Price = "0";
+
                 appItem.Price = decimal.Parse(excelDto.Price);
                 //XX
-                appItem.ItemPricesFkList = new List<AppItemPrices>();
-                if (appItem.Price > 0)
+                if (appItem.ItemPricesFkList == null)
+                    appItem.ItemPricesFkList = new List<AppItemPrices>();
+                else {
+                    if (appItem.ItemPricesFkList.Count>0) {
+                        foreach (var itmPrc in appItem.ItemPricesFkList)
+                        {
+                            itmPrc.IsDeleted = true;
+                        }
+                    }
+                }
+                //if (appItem.Price > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5446,8 +5483,10 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
+                if (string.IsNullOrEmpty(excelDto.PriceA))
+                    excelDto.PriceA = "0";
                 //MMT0311
-                if (!string.IsNullOrEmpty(excelDto.PriceA) && decimal.Parse(excelDto.PriceA) > 0)
+                if (!string.IsNullOrEmpty(excelDto.PriceA))// && decimal.Parse(excelDto.PriceA) > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5466,7 +5505,10 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
-                if (!string.IsNullOrEmpty(excelDto.PriceB) &&  decimal.Parse(excelDto.PriceB) > 0)
+                if (string.IsNullOrEmpty(excelDto.PriceB))
+                    excelDto.PriceB = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceB))// &&  decimal.Parse(excelDto.PriceB) > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5485,7 +5527,10 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
-                if (!string.IsNullOrEmpty(excelDto.PriceC) && decimal.Parse(excelDto.PriceC) > 0)
+                if (string.IsNullOrEmpty(excelDto.PriceC))
+                    excelDto.PriceC = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceC))// && decimal.Parse(excelDto.PriceC) > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5504,7 +5549,10 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
-                if (!string.IsNullOrEmpty(excelDto.PriceD) && decimal.Parse(excelDto.PriceD) > 0)
+                if (string.IsNullOrEmpty(excelDto.PriceD))
+                    excelDto.PriceD = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceD))// && decimal.Parse(excelDto.PriceD) > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5880,7 +5928,9 @@ namespace onetouch.AppItems
                         appItemSizeScalesHeader.NoOfDimensions = sizescale.Result.NoOfDimensions;
                         appItemSizeScalesHeader.Dimesion1Name = sizescale.Result.Dimesion1Name;
                         appItemSizeScalesHeader.ParentId = null;
-                        appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(sizescale.Result.AppSizeScalesDetails);
+                        //MMT ,1 T-SII-20240628.0001 07/11/2024[Start]
+                        appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesDetailDtoList.Where(z => z.DimensionName!=null));
+                        //MMT ,1 T-SII-20240628.0001 07/11/2024[End]
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
                         //appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
@@ -5950,7 +6000,7 @@ namespace onetouch.AppItems
                                 appSizeScaleRatioForEditDto.Dimesion1Name = sizescale.Result.Dimesion1Name;
                                 appSizeScaleRatioForEditDto.Name = (!string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Result.Name.TrimEnd() + " Ratio");
                                 string[] arraySizeRatio = new string[sizes.Count];
-                                Array.Fill(arraySizeRatio, "0");
+                                System.Array.Fill(arraySizeRatio, "0");
                                 if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
                                 {
                                     var arrayRatio = excelDto.SizeRatioValue.Split('=')[0];
@@ -5969,30 +6019,32 @@ namespace onetouch.AppItems
                                 //        SizeRatio = int.Parse(arraySizeRatio[pos])
                                 //    });
                                 //}
-                                var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
-                                var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
-                                var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
-                                if (sizesRatio != null)
-                                {
-                                    foreach (var sz in sizesRatio)
+                                if (!string.IsNullOrEmpty(excelDto.SizeRatioName) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[0]) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[1]))
                                     {
-                                        var posinArr = sizesList.IndexOf(sz.SizeCode);
-                                        if (posinArr >= 0)
+                                    var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
+                                    var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
+                                    var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+                                    if (sizesRatio != null)
+                                    {
+                                        foreach (var sz in sizesRatio)
                                         {
-                                            appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                            var posinArr = sizesList.IndexOf(sz.SizeCode);
+                                            if (posinArr >= 0)
                                             {
-                                                SizeCode = sz.SizeCode.TrimEnd(),
-                                                D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
-                                                SizeId = null,
-                                                D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
-                                                D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
-                                                SizeRatio = int.Parse(sizesRatios[posinArr])
-                                            });
+                                                appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                                {
+                                                    SizeCode = sz.SizeCode.TrimEnd(),
+                                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+                                                    SizeId = null,
+                                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
+                                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
+                                                    SizeRatio = int.Parse(sizesRatios[posinArr])
+                                                });
+                                            }
                                         }
+                                        appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
                                     }
-                                    appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
                                 }
-
                                 if (string.IsNullOrEmpty(excelDto.SizeRatioName) && (appSizeScaleRatioForEditDto.AppSizeScalesDetails == null || appSizeScaleRatioForEditDto.AppSizeScalesDetails.Count == 0))
                                 {
                                     foreach (var sz in appSizeScaleForEditDto.AppSizeScalesDetails)
@@ -6211,7 +6263,7 @@ namespace onetouch.AppItems
                     var appChildItem = new AppItem();
                     if (excelDto.Id != 0)
                     {
-                        var itemExist = appItem.ParentFkList.FirstOrDefault(x => x.Code == item.Code);
+                        var itemExist = appItem.ParentFkList.FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == item.Code.Replace(" ",string.Empty));
                         if (itemExist != null)
                         {
                             appChildItem = itemExist;
@@ -6277,8 +6329,21 @@ namespace onetouch.AppItems
 
                     }
                     //XX
-                    appChildItem.ItemPricesFkList = new List<AppItemPrices>();
-                    if (appChildItem.Price > 0)
+                    if (appChildItem.ItemPricesFkList == null)
+                        appChildItem.ItemPricesFkList = new List<AppItemPrices>();
+                    else {
+                        if (appChildItem.ItemPricesFkList.Count>0)
+                        {
+                            foreach (var prc in appChildItem.ItemPricesFkList)
+                            {
+                                prc.IsDeleted = true;
+                            }
+                        }
+                    }
+                    if (string.IsNullOrEmpty(appChildItem.Price.ToString()))
+                        appChildItem.Price = 0;
+
+                    //if (appChildItem.Price > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6298,7 +6363,10 @@ namespace onetouch.AppItems
                         });
                     }
                     //MMT0311
-                    if (!string.IsNullOrEmpty(item.PriceA) &&  decimal.Parse(item.PriceA) > 0)
+                    if (string.IsNullOrEmpty(item.PriceA))
+                        item.PriceA = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceA))// &&  decimal.Parse(item.PriceA) > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6317,7 +6385,10 @@ namespace onetouch.AppItems
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
                         });
                     }
-                    if (!string.IsNullOrEmpty(item.PriceB) && decimal.Parse(item.PriceB) > 0)
+                    if (string.IsNullOrEmpty(item.PriceB))
+                        item.PriceB = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceB))// && decimal.Parse(item.PriceB) > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6336,7 +6407,10 @@ namespace onetouch.AppItems
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
                         });
                     }
-                    if (!string.IsNullOrEmpty(item.PriceC) && decimal.Parse(item.PriceC) > 0)
+                    if (string.IsNullOrEmpty(item.PriceC))
+                        item.PriceC = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceC))// && decimal.Parse(item.PriceC) > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6355,7 +6429,10 @@ namespace onetouch.AppItems
                             CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
                         });
                     }
-                    if (!string.IsNullOrEmpty(item.PriceD) && decimal.Parse(item.PriceD) > 0)
+                    if (string.IsNullOrEmpty(item.PriceD))
+                        item.PriceD = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceD))// && decimal.Parse(item.PriceD) > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -7458,7 +7535,7 @@ namespace onetouch.AppItems
                 foreach (var variation in variationsList)
                 {
                     //xx
-                    if (variation.Id != 0)
+                    if (variation.Id != 0 && !string.IsNullOrEmpty(variation.Code))
                         continue;
                     List<AppEntityExtraDataDto> extrData = new List<AppEntityExtraDataDto>();
                     extrData.AddRange(variation.EntityExtraData);

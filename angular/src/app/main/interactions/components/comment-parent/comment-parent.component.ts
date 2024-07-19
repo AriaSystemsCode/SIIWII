@@ -67,9 +67,15 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             });
         }
 
+        reset(){
+            this.comments=[];
+            this.totalCount=0;
+            this.skipCount= 0
+            this.maxResultCount= 5
+        }
+        
     show(creatorUserId:number,entityId:number,parentId?:number,threadId?:number){
-        this.comments=[];
-        this.totalCount=0;
+     this.reset()
         this.creatorUserId = creatorUserId
         this.entityId = entityId
         if(parentId) this.parentId = parentId

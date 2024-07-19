@@ -242,6 +242,7 @@ export class AddCommentComponent extends AppComponentBase {
     reset(){
         this.hasText = false
         this.comment.init(CreateMessageInput.fromJS(this.commentObject))
+        this.CommentTextArea.nativeElement.innerHTML=null
     }
     hide(){
         this.active = false

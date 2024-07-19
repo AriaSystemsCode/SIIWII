@@ -42,6 +42,10 @@ namespace onetouch.Helpers
         {
             try
             {
+                if (uriName.ToLower().StartsWith("www."))
+                {
+                    uriName = "http://" + uriName;
+                }
                 Uri uriResult;
                 bool result = Uri.TryCreate(uriName, UriKind.Absolute, out uriResult)
                     && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);

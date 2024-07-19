@@ -43,7 +43,8 @@
                                     <p-checkbox name="variation" id="variation{{i}}"  [value]="variation.itemId" [(ngModel)]="selectedVariationsIds"  ></p-checkbox>
                                 </div>
                                 <div class="mr-3 flex-grow" >
-                                    <span *ngFor="let extraAttr of variation.variationSummary.selectedVariations | keyvalue;let last as last">
+                                    <span *ngFor="let extraAttr of variation.variationSummary.selectedVariations | keyvalue;let last as last"
+                                    [hidden]="extraAttr.key?.toUpperCase()!= 'COLOR' &&extraAttr.key?.toUpperCase() != 'SIZE' && extraAttr.key?.toUpperCase()!= 'CLOSURE'">
                                         <span class="extraAttr-label">{{extraAttr?.key | titlecase }}:</span>
                                         {{extraAttr?.value | arrayToString}}
                                         <ng-container *ngIf="!last">, </ng-container>

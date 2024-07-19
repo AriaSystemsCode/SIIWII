@@ -188,6 +188,7 @@ namespace onetouch.Web.Services
                         catch (Exception ex) { }
                     }
                     var longFileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
+                    Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId);
                     if (parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
                     {
                         report.ExportToPdf(longFileName);

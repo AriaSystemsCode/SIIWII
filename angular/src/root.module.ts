@@ -181,7 +181,22 @@ function registerLocales(resolve: (value?: boolean | Promise<boolean>) => void, 
     if (shouldLoadLocale()) {
         let angularLocale = convertAbpLocaleToAngularLocale(abp.localization.currentLanguage.name);
         // const moduleName = `/node_modules/@angular/common/locales/${angularLocale}.js`
-        
+    
+     
+    let localeModulePromise = import(/* webpackInclude: /(en|es|id)\.mjs$/ */
+    `/node_modules/@angular/common/locales/${angularLocale}.mjs`);
+
+    localeModulePromise.then(module => {
+        registerLocaleData(module.default);
+        NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales().then(_ => {
+            resolve(true);
+            spinnerService.hide();
+        });
+    }).catch(error => {
+        console.error('Failed to load locale module', error);
+        // Fallback to 'en' locale
+        abp.localization.currentLanguage.name ="en";
+        let angularLocale = convertAbpLocaleToAngularLocale(abp.localization.currentLanguage.name);
         import(/* webpackInclude: /(en|es|id)\.mjs$/ */
         `/node_modules/@angular/common/locales/${angularLocale}.mjs`)
             .then(module => {
@@ -191,7 +206,9 @@ function registerLocales(resolve: (value?: boolean | Promise<boolean>) => void, 
                     spinnerService.hide();
                 });
             }, reject);
-    } else {
+        });
+}
+else {
         NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales().then(_ => {
             resolve(true);
             spinnerService.hide();
