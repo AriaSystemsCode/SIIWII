@@ -30,7 +30,7 @@ using onetouch.AppMarketplaceAccounts;
 using onetouch.Accounts.Dtos;
 using onetouch.Accounts;
 using onetouch.AppContacts;
-
+using Abp.EntityFrameworkCore.Repositories;
 
 namespace onetouch.MarketplaceAccounts
 {
@@ -274,6 +274,7 @@ namespace onetouch.MarketplaceAccounts
         private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
         private readonly IRepository<AppMarketplaceAddress, long> _appAddressRepository;
         private readonly IRepository<AppContact, long> _appContactRepository;
+        private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
 
         private readonly IRepository<AppEntity, long> _appEntityRepository;
         private readonly Helper _helper;
@@ -285,7 +286,8 @@ namespace onetouch.MarketplaceAccounts
             , IAppEntitiesAppService appEntitiesAppService
             , IRepository<AppMarketplaceContactAddress, long> appContactAddressRepository
             , IRepository<AppMarketplaceAddress, long> appAddressRepository
-            , IRepository<AppContact, long> appContactRepository)
+            , IRepository<AppContact, long> appContactRepository
+            , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository)
         {
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _helper = helper;
@@ -294,7 +296,9 @@ namespace onetouch.MarketplaceAccounts
             _appEntitiesAppService = appEntitiesAppService;
             _appContactAddressRepository = appContactAddressRepository;
             _appAddressRepository = appAddressRepository;
+            _appEntityExtraDataRepository = appEntityExtraDataRepository;
         }
+
 
         public async Task<bool> HideAccount(string SSIN)
         {
@@ -314,18 +318,77 @@ namespace onetouch.MarketplaceAccounts
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var mainAccountID = input.Id;
-                var foundEntity = _appEntityRepository.GetAll().FirstOrDefault(e => e.Id == input.EntityId);
-                AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
+                var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                #region if sync remove old data
                 if (sync)
                 {
-                    appMarketplaceContact = await _appMarketplaceContactRepository.GetAll()
-                            .AsNoTracking().Include(x => x.ContactAddresses)
-                            .FirstOrDefaultAsync(x => x.TenantId == null
-                            && x.IsProfileData == true
-                            && x.OwnerId == AbpSession.TenantId
-                            && x.SSIN == input.SSIN);
-                    //should delete market place contact and its' children
+                    var FoundpublishContact = await _appMarketplaceContactRepository.GetAll()
+                                                   .AsNoTracking().Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
+                                                   .FirstOrDefaultAsync(x => x.TenantId == null
+                                                   && x.IsProfileData == true
+                                                   && x.OwnerId == input.TenantId
+                                                   && x.SSIN == input.SSIN);
+
+                    // if profile already published-and sync - delete old records
+                    if (FoundpublishContact != null && sync)
+                    {
+                        var personsInfoDelete = _appMarketplaceContactRepository.GetAll().
+                            Include(e => e.EntityExtraData)
+                        .Where(x => x.IsProfileData
+                               && x.AccountId == FoundpublishContact.Id
+                               && x.TenantId == null
+                               && x.EntityObjectTypeId == personEntityObjectTypeId).ToList();
+                        // First level of Persons
+                        foreach (var branchObj in personsInfoDelete)
+                        {
+                            if (branchObj.EntityExtraData.Count() > 0)
+                                _appEntityExtraDataRepository.RemoveRange(branchObj.EntityExtraData);
+                            _appEntityRepository.Delete(e => e.Id == branchObj.Id);
+                            _appMarketplaceContactRepository.Delete(e => e.Id == branchObj.Id);
+                        }
+                        await CurrentUnitOfWork.SaveChangesAsync();
+
+                        var branchInfoDelete = _appMarketplaceContactRepository.GetAll().
+                           Include(e => e.ContactAddresses).ThenInclude(e => e.AddressFk)
+                       .Where(x => x.IsProfileData
+                              && x.AccountId == FoundpublishContact.Id
+                              && x.TenantId == null
+                              
+                              && x.EntityObjectTypeId != personEntityObjectTypeId).ToList();
+                        // First level of branches
+                        foreach (var branchObj in branchInfoDelete)
+                        {
+                            if (branchObj.ContactAddresses.Count() > 0)
+                            {
+                                foreach (var contactAddress in branchObj.ContactAddresses)
+                                {
+                                    _appAddressRepository.Delete(e => e.Id == contactAddress.AddressId);
+                                    _appMarketplaceContactRepository.Delete(e => e.Id == contactAddress.Id);
+                                }
+                            }
+                            _appEntityRepository.Delete(e => e.Id == branchObj.Id);
+                            _appMarketplaceContactRepository.Delete(e => e.Id == branchObj.Id);
+                        }
+
+                        //delete main market place conatact
+                        if (FoundpublishContact.ContactAddresses.Count() > 0)
+                        {
+                            foreach (var contactAddress in FoundpublishContact.ContactAddresses)
+                            {
+                                _appAddressRepository.Delete(e => e.Id == contactAddress.AddressId);
+                                _appMarketplaceContactRepository.Delete(e => e.Id == contactAddress.Id);
+                            }
+                        }
+                        _appEntityRepository.Delete(e => e.Id == FoundpublishContact.Id);
+                        _appMarketplaceContactRepository.Delete(e => e.Id == FoundpublishContact.Id);
+                    }
                 }
+                #endregion if sync remove old data
+
+
+                var foundEntity = _appEntityRepository.GetAll().FirstOrDefault(e => e.Id == input.EntityId);
+                AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
+                
 
                 ObjectMapper.Map(input, appMarketplaceContact);
                 appMarketplaceContact.Id = 0;
@@ -359,7 +422,7 @@ namespace onetouch.MarketplaceAccounts
 
 
                 //HIA - share Account related branches [Start]
-                var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                
                 var branchInfo = _appContactRepository.GetAll()
                     .Where(x => x.IsProfileData
                            && x.AccountId == mainAccountID
@@ -385,6 +448,83 @@ namespace onetouch.MarketplaceAccounts
                     await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
                 }
                 return newId;
+            }
+
+        }
+
+
+        public async Task<long> DeleteMarketplaceAccount(long marketplaceAccount)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var mainAccountID = marketplaceAccount;
+                
+                #region if sync remove old data
+                
+                {
+                    var FoundpublishContact = await _appMarketplaceContactRepository.GetAll()
+                                                   .AsNoTracking().Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
+                                                   .FirstOrDefaultAsync(x => x.TenantId == null
+                                                   &&x.i);
+
+                    // if profile already published-and sync - delete old records
+                    if (FoundpublishContact != null && sync)
+                    {
+                        var personsInfoDelete = _appMarketplaceContactRepository.GetAll().
+                            Include(e => e.EntityExtraData)
+                        .Where(x => x.IsProfileData
+                               && x.AccountId == FoundpublishContact.Id
+                               && x.TenantId == null
+                               && x.EntityObjectTypeId == personEntityObjectTypeId).ToList();
+                        // First level of Persons
+                        foreach (var branchObj in personsInfoDelete)
+                        {
+                            if (branchObj.EntityExtraData.Count() > 0)
+                                _appEntityExtraDataRepository.RemoveRange(branchObj.EntityExtraData);
+                            _appEntityRepository.Delete(e => e.Id == branchObj.Id);
+                            _appMarketplaceContactRepository.Delete(e => e.Id == branchObj.Id);
+                        }
+                        await CurrentUnitOfWork.SaveChangesAsync();
+
+                        var branchInfoDelete = _appMarketplaceContactRepository.GetAll().
+                           Include(e => e.ContactAddresses).ThenInclude(e => e.AddressFk)
+                       .Where(x => x.IsProfileData
+                              && x.AccountId == FoundpublishContact.Id
+                              && x.TenantId == null
+
+                              && x.EntityObjectTypeId != personEntityObjectTypeId).ToList();
+                        // First level of branches
+                        foreach (var branchObj in branchInfoDelete)
+                        {
+                            if (branchObj.ContactAddresses.Count() > 0)
+                            {
+                                foreach (var contactAddress in branchObj.ContactAddresses)
+                                {
+                                    _appAddressRepository.Delete(e => e.Id == contactAddress.AddressId);
+                                    _appMarketplaceContactRepository.Delete(e => e.Id == contactAddress.Id);
+                                }
+                            }
+                            _appEntityRepository.Delete(e => e.Id == branchObj.Id);
+                            _appMarketplaceContactRepository.Delete(e => e.Id == branchObj.Id);
+                        }
+
+                        //delete main market place conatact
+                        if (FoundpublishContact.ContactAddresses.Count() > 0)
+                        {
+                            foreach (var contactAddress in FoundpublishContact.ContactAddresses)
+                            {
+                                _appAddressRepository.Delete(e => e.Id == contactAddress.AddressId);
+                                _appMarketplaceContactRepository.Delete(e => e.Id == contactAddress.Id);
+                            }
+                        }
+                        _appEntityRepository.Delete(e => e.Id == FoundpublishContact.Id);
+                        _appMarketplaceContactRepository.Delete(e => e.Id == FoundpublishContact.Id);
+                    }
+                }
+                #endregion if sync remove old data
+
+
+                return 0;
             }
 
         }

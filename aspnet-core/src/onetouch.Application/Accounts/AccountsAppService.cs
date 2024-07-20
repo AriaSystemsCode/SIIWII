@@ -1914,6 +1914,7 @@ namespace onetouch.Accounts
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
         public async Task DoPublishProfile(bool sync)
         {
+            sync = true;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var contact = await _appContactRepository.GetAll().AsNoTracking()
