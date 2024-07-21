@@ -1,6 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>    <text name="onetouch.AppSubScriptionPlan.AppTenantActivityLog">AppTenantActivityLog</text>
+	<texts>    <text name="AppSubscriptionPlans">App subscription plans</text>
+    <text name="AppTenantInvoice">App tenant invoice</text>
+    <text name="onetouch.AppSubscriptionPlans.AppTenantInvoice">AppTenantInvoice</text>
+    <text name="DueDate">Due date</text>
+    <text name="PayDate">Pay date</text>
+    <text name="AppTenantInvoicesHeaderInfo">App tenant invoices header info</text>
+    <text name="CreateNewAppTenantInvoice">Create new app tenant invoice</text>
+    <text name="EditAppTenantInvoice">Edit app tenant invoice</text>
+    <text name="DeleteAppTenantInvoice">Delete app tenant invoice</text>
+    <text name="AppTenantInvoices">App tenant invoices</text>
+    <text name="DueDateRange">Due date range</text>
+    <text name="PayDateRange">Pay date range</text>
+    <text name="onetouch.AppSubScriptionPlan.AppTenantActivityLog">AppTenantActivityLog</text>
     <text name="UserId">User id</text>
     <text name="ActivityType">Activity type</text>
     <text name="AppSubscriptionPlanHeaderId">App subscription plan header id</text>

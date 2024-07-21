@@ -486,6 +486,11 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "SIZESCALE");
             return obj.Id;
         }
+        public async Task<long> GetEntityObjectTypeARInvoice()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "ARINVOICE");
+            return obj.Id;
+        }
         public async Task<long> GetObjectScaleId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "SCALE");

@@ -63,6 +63,7 @@ namespace onetouch.AppSubScriptionPlan
         public virtual string FeatureCategory { get; set; }
 
         public virtual bool Trackactivity { get; set; }
+        public virtual bool IsAddOn { get; set; }
 
         [StringLength(AppSubscriptionPlanDetailConsts.MaxNotesLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinNotesLength)]
         public virtual string Notes { get; set; }
