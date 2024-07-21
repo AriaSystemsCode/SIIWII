@@ -167,6 +167,7 @@ export class ShoppingCartViewComponentComponent
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
+    this.appTransactionsForViewDto=null;
   }
 
   getColumns() {

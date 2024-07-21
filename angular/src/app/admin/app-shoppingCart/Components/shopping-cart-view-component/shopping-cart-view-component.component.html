@@ -155,7 +155,7 @@
                                         [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
-                                        (ontabChange)="ontabChange($event)"
+                                        (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
                                         [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"
                                         (generatOrderReport)="onGeneratOrderReport($event)"
                                         [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>

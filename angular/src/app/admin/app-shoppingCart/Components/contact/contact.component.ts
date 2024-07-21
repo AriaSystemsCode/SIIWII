@@ -373,7 +373,16 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
         return isValid;
     }
+    
+    
+    onChangeEmail($event){
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail;
 
+    }
+
+    onChangePhoneNumber($event){
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber;
+    }
 
     onChangeContact($event) {
         if (this.tempContact && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact) {
