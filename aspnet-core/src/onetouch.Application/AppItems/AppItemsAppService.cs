@@ -1732,6 +1732,37 @@ namespace onetouch.AppItems
                 return await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == sSIN).CountAsync() > 0;
             }
         }
+        public async Task<IList<string>> GetItemVariationsToDelete(long productId, List<string> sSINs)
+        {
+            List<string> returnList = new List<string>();
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                if (sSINs != null && sSINs.Count() > 0)
+                {
+                    foreach (var ssin in sSINs)
+                    {
+                        var ret = await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == ssin).CountAsync() > 0;
+                        if (!ret)
+                            returnList.Add(ssin);
+                    }
+                }
+                else
+                {
+                    var items = await _appItemRepository.GetAll().Where(z => z.ParentId == productId).ToListAsync();
+                    if (items != null && items.Count() > 0)
+                    {
+                        foreach (var item in items)
+                        {
+                            var ret = await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == item.SSIN).CountAsync() > 0;
+                            if (!ret)
+                                returnList.Add(item.SSIN);
+                        }
+                    }
+                }
+                //return await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == sSIN).CountAsync() > 0;
+            }
+            return returnList;
+        }
         //MmT
         [AbpAuthorize(AppPermissions.Pages_AppItems_Create)]
         protected virtual async Task<long> Create(CreateOrEditAppItemDto input)
