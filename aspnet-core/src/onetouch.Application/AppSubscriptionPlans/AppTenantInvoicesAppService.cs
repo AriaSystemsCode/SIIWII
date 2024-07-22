@@ -21,7 +21,8 @@ using onetouch.SycSegmentIdentifierDefinitions;
 namespace onetouch.AppSubscriptionPlans
 {
     [AbpAuthorize(AppPermissions.Pages_Administration_AppTenantInvoices)]
-    public class AppTenantInvoicesAppService : onetouchAppServiceBase, IAppTenantInvoicesAppService
+    public class AppTenantInvoicesAppService : onetouchAppServiceBase, 
+        IAppTenantInvoicesAppService
     {
         private readonly IRepository<AppTenantInvoice, long> _appTenantInvoiceRepository;
         private readonly IAppTenantInvoicesExcelExporter _appTenantInvoicesExcelExporter;

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>    <text name="AppSubscriptionPlans">App subscription plans</text>
+	<texts>
+    <text name="AppSubscriptionPlans">App subscription plans</text>
     <text name="AppTenantInvoice">App tenant invoice</text>
     <text name="onetouch.AppSubscriptionPlans.AppTenantInvoice">AppTenantInvoice</text>
     <text name="DueDate">Due date</text>
