@@ -26,7 +26,7 @@ import { MembersListComponent } from '@app/main/members-list/components/members-
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { Paginator } from 'primeng/paginator';
 import { Console, log } from 'console';
-import { AccountBillingComponent } from './accountBilling/AccountBilling/accountbilling.component'; 
+
 @Component({
     selector:'app-account-info',
     templateUrl:'./AccountInfo.component.html',
@@ -618,10 +618,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
               queryParamsHandling: 'merge', // remove to replace all query params by provided
             }
         );
-        if(number == this.accountInfoPageTabsEnum.AccountBilling)
-        {
-           this.__router.navigateByUrl('/accountbilling');
-        }
+        
     }
     triggerProfile($event?){
         if($event) $event.stopPropagation() //prevent event bubbling

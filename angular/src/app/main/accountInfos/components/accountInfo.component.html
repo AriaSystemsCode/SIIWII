@@ -168,8 +168,7 @@
                   </li>
                   <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile">
                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)">
-                      <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling" src="assets/payment/payment-icon-active.svg">
-                      <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.AccountBilling" src="assets/payment/payment-icon.svg">
+                      <img class="sidebar-menu-item-img"  src="assets/payment/payment-icon-active.svg">
                       <span>{{l("AccountBilling")}}</span>
                     </a>
                   </li>
@@ -698,6 +697,11 @@
                     (delete)="onDeleteMemberHandler($event)"
                 ></app-view-member-profile>
             </div>
+            <div class="tab8" *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling">
+                <app-accountbilling             
+                ></app-accountbilling>
+              </div>
+
           </div>
         </div>
       </div>
