@@ -49,18 +49,18 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   ngOnInit() {
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
-    apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+    apContactObj[0]?.companySSIN  && apContactObj[0]?.contactAddressDetail?.addressLine1 ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
     let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
-    arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
+    arContactObj[0]?.companySSIN  && arContactObj[0]?.contactAddressDetail?.addressLine1 ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
     this.loadpayTermsListListist();
   }
   ngOnChanges(changes: SimpleChanges) {
     if (this.appTransactionsForViewDto) {
       this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
       let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
-      apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+      apContactObj[0]?.companySSIN && apContactObj[0]?.contactAddressDetail?.addressLine1  ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
       let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
-      arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
+      arContactObj[0]?.companySSIN && arContactObj[0]?.contactAddressDetail?.addressLine1  ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
       this.loadpayTermsListListist();
     }
   }
@@ -91,8 +91,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     if (this.isContactsValid) {
       let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
       let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
-      apContactObj[0]?.contactAddressDetail ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
-      arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
+      apContactObj[0]?.contactAddressDetail  && apContactObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
+      arContactObj[0]?.contactAddressDetail  && arContactObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
 debugger
       if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) {   
         this.BillingInfoValid.emit(ShoppingCartoccordionTabs.BillingInfo);
@@ -119,9 +119,9 @@ debugger
       this.isContactsValid = value;
       if (this.isContactsValid) {
         if (sectionIndex == 1) {
-          apContactObj[0]?.contactAddressDetail ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
+          apContactObj[0]?.contactAddressDetail  && apContactObj[0]?.contactAddressDetail?.addressLine1  ? this.enableSAveApcontact = true : apContactObj[0]?.contactAddressId ? this.enableSAveApcontact = true : this.enableSAveApcontact = false;
         } else {
-          arContactObj[0]?.contactAddressDetail ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
+          arContactObj[0]?.contactAddressDetail   && arContactObj[0]?.contactAddressDetail?.addressLine1 ? this.enableSAveArcontact = true : arContactObj[0]?.contactAddressId ? this.enableSAveArcontact = true : this.enableSAveArcontact = false;
         }
         this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId ? this.isContactsValid = true : this.isContactsValid = false;    
         if (this.enableSAveArcontact && this.enableSAveApcontact && this.appTransactionsForViewDto.paymentTermsId) { 
@@ -230,7 +230,7 @@ debugger
 
     if (!this.apContactSelectedAdd) {
       let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
-      apContactObj[0]?.companySSIN ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
+      apContactObj[0]?.companySSIN  && apContactObj[0]?.contactAddressDetail?.addressLine1 ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
 
       if (apContactIndx >= 0)
         this.appTransactionsForViewDto.appTransactionContacts[apContactIndx].contactAddressId = this.apContactSelectedAdd?.id;
@@ -244,7 +244,7 @@ debugger
     }
     if (!this.arContactSelectedAdd) {
       let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
-      arContactObj[0]?.companySSIN ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
+      arContactObj[0]?.companySSIN   && arContactObj[0]?.contactAddressDetail?.addressLine1 ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
       if (arContactIndx >= 0)
         this.appTransactionsForViewDto.appTransactionContacts[arContactIndx].contactAddressId = this.arContactSelectedAdd?.id;
 

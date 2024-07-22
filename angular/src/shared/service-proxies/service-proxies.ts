@@ -32599,6 +32599,367 @@ export class SycCountersServiceProxy {
 }
 
 @Injectable()
+export class SycCurrencyExchangeRatesServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param currencyCodeFilter (optional) 
+     * @param baseCurrencyCodeFilter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(filter: string | null | undefined, currencyCodeFilter: string | null | undefined, baseCurrencyCodeFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/SycCurrencyExchangeRates/GetAll?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (currencyCodeFilter !== undefined && currencyCodeFilter !== null)
+            url_ += "CurrencyCodeFilter=" + encodeURIComponent("" + currencyCodeFilter) + "&";
+        if (baseCurrencyCodeFilter !== undefined && baseCurrencyCodeFilter !== null)
+            url_ += "BaseCurrencyCodeFilter=" + encodeURIComponent("" + baseCurrencyCodeFilter) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getSycCurrencyExchangeRatesForView(id: number | undefined): Observable<GetSycCurrencyExchangeRatesForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/SycCurrencyExchangeRates/GetSycCurrencyExchangeRatesForView?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSycCurrencyExchangeRatesForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSycCurrencyExchangeRatesForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetSycCurrencyExchangeRatesForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetSycCurrencyExchangeRatesForViewDto>;
+        }));
+    }
+
+    protected processGetSycCurrencyExchangeRatesForView(response: HttpResponseBase): Observable<GetSycCurrencyExchangeRatesForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetSycCurrencyExchangeRatesForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getSycCurrencyExchangeRatesForEdit(id: number | undefined): Observable<GetSycCurrencyExchangeRatesForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/SycCurrencyExchangeRates/GetSycCurrencyExchangeRatesForEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSycCurrencyExchangeRatesForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSycCurrencyExchangeRatesForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetSycCurrencyExchangeRatesForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetSycCurrencyExchangeRatesForEditOutput>;
+        }));
+    }
+
+    protected processGetSycCurrencyExchangeRatesForEdit(response: HttpResponseBase): Observable<GetSycCurrencyExchangeRatesForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetSycCurrencyExchangeRatesForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEdit(body: CreateOrEditSycCurrencyExchangeRatesDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/SycCurrencyExchangeRates/CreateOrEdit";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processCreateOrEdit(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/SycCurrencyExchangeRates/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param currencyCodeFilter (optional) 
+     * @param baseCurrencyCodeFilter (optional) 
+     * @return Success
+     */
+    getSycCurrencyExchangeRatesToExcel(filter: string | null | undefined, currencyCodeFilter: string | null | undefined, baseCurrencyCodeFilter: string | null | undefined): Observable<FileDto> {
+        let url_ = this.baseUrl + "/api/services/app/SycCurrencyExchangeRates/GetSycCurrencyExchangeRatesToExcel?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (currencyCodeFilter !== undefined && currencyCodeFilter !== null)
+            url_ += "CurrencyCodeFilter=" + encodeURIComponent("" + currencyCodeFilter) + "&";
+        if (baseCurrencyCodeFilter !== undefined && baseCurrencyCodeFilter !== null)
+            url_ += "BaseCurrencyCodeFilter=" + encodeURIComponent("" + baseCurrencyCodeFilter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSycCurrencyExchangeRatesToExcel(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSycCurrencyExchangeRatesToExcel(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileDto>;
+        }));
+    }
+
+    protected processGetSycCurrencyExchangeRatesToExcel(response: HttpResponseBase): Observable<FileDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FileDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class SycEntityLocalizationServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -51775,7 +52136,7 @@ export interface IAppContactPaymentMethodDto {
 
 export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     fileToken!: string | undefined;
-    tradeName!: string;
+    tradeName!: string | undefined;
     accountType!: string | undefined;
     accountTypeId!: number;
     ssin!: string | undefined;
@@ -51967,7 +52328,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
 
 export interface ICreateOrEditAccountInfoDto {
     fileToken: string | undefined;
-    tradeName: string;
+    tradeName: string | undefined;
     accountType: string | undefined;
     accountTypeId: number;
     ssin: string | undefined;
@@ -87728,6 +88089,298 @@ export class PagedResultDtoOfSycCounterSycSegmentIdentifierDefinitionLookupTable
 export interface IPagedResultDtoOfSycCounterSycSegmentIdentifierDefinitionLookupTableDto {
     totalCount: number;
     items: SycCounterSycSegmentIdentifierDefinitionLookupTableDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class SycCurrencyExchangeRatesDto implements ISycCurrencyExchangeRatesDto {
+    currencyCode!: string | undefined;
+    baseCurrencyCode!: string | undefined;
+    exchangeRate!: number;
+    currencyMethod!: string | undefined;
+    currencyUnit!: number;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ISycCurrencyExchangeRatesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.currencyCode = _data["currencyCode"];
+            this.baseCurrencyCode = _data["baseCurrencyCode"];
+            this.exchangeRate = _data["exchangeRate"];
+            this.currencyMethod = _data["currencyMethod"];
+            this.currencyUnit = _data["currencyUnit"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): SycCurrencyExchangeRatesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SycCurrencyExchangeRatesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["currencyCode"] = this.currencyCode;
+        data["baseCurrencyCode"] = this.baseCurrencyCode;
+        data["exchangeRate"] = this.exchangeRate;
+        data["currencyMethod"] = this.currencyMethod;
+        data["currencyUnit"] = this.currencyUnit;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ISycCurrencyExchangeRatesDto {
+    currencyCode: string | undefined;
+    baseCurrencyCode: string | undefined;
+    exchangeRate: number;
+    currencyMethod: string | undefined;
+    currencyUnit: number;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class GetSycCurrencyExchangeRatesForViewDto implements IGetSycCurrencyExchangeRatesForViewDto {
+    sycCurrencyExchangeRates!: SycCurrencyExchangeRatesDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetSycCurrencyExchangeRatesForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.sycCurrencyExchangeRates = _data["sycCurrencyExchangeRates"] ? SycCurrencyExchangeRatesDto.fromJS(_data["sycCurrencyExchangeRates"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetSycCurrencyExchangeRatesForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetSycCurrencyExchangeRatesForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["sycCurrencyExchangeRates"] = this.sycCurrencyExchangeRates ? this.sycCurrencyExchangeRates.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetSycCurrencyExchangeRatesForViewDto {
+    sycCurrencyExchangeRates: SycCurrencyExchangeRatesDto;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto implements IPagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto {
+    totalCount!: number;
+    items!: GetSycCurrencyExchangeRatesForViewDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(GetSycCurrencyExchangeRatesForViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfGetSycCurrencyExchangeRatesForViewDto {
+    totalCount: number;
+    items: GetSycCurrencyExchangeRatesForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class CreateOrEditSycCurrencyExchangeRatesDto implements ICreateOrEditSycCurrencyExchangeRatesDto {
+    currencyCode!: string;
+    baseCurrencyCode!: string;
+    exchangeRate!: number;
+    currencyMethod!: string | undefined;
+    currencyUnit!: number;
+    id!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateOrEditSycCurrencyExchangeRatesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.currencyCode = _data["currencyCode"];
+            this.baseCurrencyCode = _data["baseCurrencyCode"];
+            this.exchangeRate = _data["exchangeRate"];
+            this.currencyMethod = _data["currencyMethod"];
+            this.currencyUnit = _data["currencyUnit"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditSycCurrencyExchangeRatesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditSycCurrencyExchangeRatesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["currencyCode"] = this.currencyCode;
+        data["baseCurrencyCode"] = this.baseCurrencyCode;
+        data["exchangeRate"] = this.exchangeRate;
+        data["currencyMethod"] = this.currencyMethod;
+        data["currencyUnit"] = this.currencyUnit;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ICreateOrEditSycCurrencyExchangeRatesDto {
+    currencyCode: string;
+    baseCurrencyCode: string;
+    exchangeRate: number;
+    currencyMethod: string | undefined;
+    currencyUnit: number;
+    id: number | undefined;
+
+    [key: string]: any;
+}
+
+export class GetSycCurrencyExchangeRatesForEditOutput implements IGetSycCurrencyExchangeRatesForEditOutput {
+    sycCurrencyExchangeRates!: CreateOrEditSycCurrencyExchangeRatesDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetSycCurrencyExchangeRatesForEditOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.sycCurrencyExchangeRates = _data["sycCurrencyExchangeRates"] ? CreateOrEditSycCurrencyExchangeRatesDto.fromJS(_data["sycCurrencyExchangeRates"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetSycCurrencyExchangeRatesForEditOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetSycCurrencyExchangeRatesForEditOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["sycCurrencyExchangeRates"] = this.sycCurrencyExchangeRates ? this.sycCurrencyExchangeRates.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetSycCurrencyExchangeRatesForEditOutput {
+    sycCurrencyExchangeRates: CreateOrEditSycCurrencyExchangeRatesDto;
 
     [key: string]: any;
 }

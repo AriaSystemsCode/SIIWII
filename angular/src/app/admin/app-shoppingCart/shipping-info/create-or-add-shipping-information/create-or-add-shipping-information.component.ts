@@ -51,9 +51,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   ngOnInit() {
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-    shipFromObj[0]?.companySSIN ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
+    shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
     let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-    shipToObj[0]?.companySSIN ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
+    shipToObj[0]?.companySSIN && shipToObj[0]?.contactAddressDetail?.addressLine1  ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
     this.storeVal = this.appTransactionsForViewDto?.buyerStore;
     //this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
     this.loadShipViaList();
@@ -63,9 +63,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
     if (this.appTransactionsForViewDto) {
       this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
       let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-      shipFromObj[0]?.companySSIN ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
+      shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1  ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
       let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-      shipToObj[0]?.companySSIN ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
+      shipToObj[0]?.companySSIN  && shipToObj[0]?.contactAddressDetail?.addressLine1 ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
       this.storeVal = this.appTransactionsForViewDto?.buyerStore;
       this.loadShipViaList();
     }
@@ -96,8 +96,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
     if (this.shippingTabValid) {
       let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
       let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-      shipFromObj[0]?.contactAddressDetail ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
-      shipToObj[0]?.contactAddressDetail ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
+      shipFromObj[0]?.contactAddressDetail && shipFromObj[0]?.contactAddressDetail?.addressLine1  ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
+      shipToObj[0]?.contactAddressDetail  && shipToObj[0]?.contactAddressDetail?.addressLine1   ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
 
       if (this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId) { 
         this.shippingInfOValid.emit(ShoppingCartoccordionTabs.ShippingInfo);
@@ -133,7 +133,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
 
     if (!this.shipFromSelectedAdd) {
       let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
-      shipFromObj[0]?.companySSIN ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
+      shipFromObj[0]?.companySSIN   && shipFromObj[0]?.contactAddressDetail?.addressLine1  ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
 
       if (shipFromIndx >= 0)
         this.appTransactionsForViewDto.appTransactionContacts[shipFromIndx].contactAddressId = this.shipFromSelectedAdd?.id;
@@ -147,7 +147,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
 
     if (!this.shipToSelectedAdd) {
       let shipToObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipToContact);
-      shipToObj[0]?.companySSIN ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
+      shipToObj[0]?.companySSIN  && shipToObj[0]?.contactAddressDetail?.addressLine1 ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
       if (shipToIndx >= 0)
         this.appTransactionsForViewDto.appTransactionContacts[shipToIndx].contactAddressId = this.shipToSelectedAdd?.id;
     }
@@ -198,9 +198,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
       if (this.shippingTabValid) {
 
         if (sectionIndex == 1) {
-          shipFromObj[0]?.contactAddressDetail ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
+          shipFromObj[0]?.contactAddressDetail && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
         } else {
-          shipToObj[0]?.contactAddressDetail ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
+          shipToObj[0]?.contactAddressDetail && shipToObj[0]?.contactAddressDetail?.addressLine1 ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
         }
         this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId ? this.shippingTabValid = true : this.shippingTabValid = false;  
 

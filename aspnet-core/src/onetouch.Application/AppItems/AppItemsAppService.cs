@@ -5285,6 +5285,8 @@ namespace onetouch.AppItems
 
             foreach (var excelDto in result)
             {
+                if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                    continue;
                 AppItem itemOrg = new AppItem();
                 if (excelDto.Id != 0)
                 {
@@ -5444,8 +5446,7 @@ namespace onetouch.AppItems
                             break;
                     }
                 }
-                if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                    continue;
+                
 
 
                 string isDefault = "1";
@@ -5951,7 +5952,9 @@ namespace onetouch.AppItems
                         appItemSizeScalesHeader.NoOfDimensions = sizescale.Result.NoOfDimensions;
                         appItemSizeScalesHeader.Dimesion1Name = sizescale.Result.Dimesion1Name;
                         appItemSizeScalesHeader.ParentId = null;
-                        appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(sizescale.Result.AppSizeScalesDetails.Where(z => z.DimensionName!=null));
+                        //MMT ,1 T-SII-20240628.0001 07/11/2024[Start]
+                        appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesDetailDtoList.Where(z => z.DimensionName!=null));
+                        //MMT ,1 T-SII-20240628.0001 07/11/2024[End]
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
                         //appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);

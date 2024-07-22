@@ -33,7 +33,7 @@ namespace onetouch.AccountInfos.Dtos
 
         public string FileToken { get; set; }
 
-        [Required]
+        //[Required]
         [StringLength(AccountInfoTempConsts.MaxTradeNameLength, MinimumLength = AccountInfoTempConsts.MinTradeNameLength)]
         public string TradeName { get; set; }
 

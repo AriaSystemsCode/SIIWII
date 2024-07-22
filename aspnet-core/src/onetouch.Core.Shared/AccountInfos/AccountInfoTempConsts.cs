@@ -6,7 +6,7 @@
 		public const int MinCodeLength = 1;
 		public const int MaxCodeLength = 20;
 						
-		public const int MinTradeNameLength = 2;
+		public const int MinTradeNameLength = 0;
 		public const int MaxTradeNameLength = 100;
 						
 						

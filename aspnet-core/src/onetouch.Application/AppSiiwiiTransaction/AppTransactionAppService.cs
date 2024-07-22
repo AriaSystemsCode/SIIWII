@@ -58,6 +58,7 @@ using Twilio.Rest.Trunking.V1;
 using System.Net.Mail;
 using Abp.Net.Mail;
 using onetouch.EntityFrameworkCore.Repositories;
+using onetouch.SycSegmentIdentifierDefinitions.Dtos;
 
 
 //using NUglify.Helpers;
@@ -100,6 +101,7 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraData;
         private readonly IEmailSender _emailSender;
         private readonly IAppItemsAppService _appItemsAppService;
+        private readonly ISycEntityObjectTypesAppService _SycEntityObjectTypesAppService;
         //MMT37[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -119,8 +121,9 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionDetails, long> appMarketplaceTransctionDetailsRepository,
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionContacts, long> appMarketplaceTransctionContactsRepository,
              IRepository<AppEntitySharings, long> appEntitySharingsRepository, IMessageAppService messageAppService, IRepository<AppEntityAttachment, long> appEntityAttachment,
-             IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender, IAppItemsAppService appItemsAppService)
+             IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender, IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
         {
+            _SycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
             _MessagesRepository = messagesRepository;
             _appAddressRepository = appAddressRepository;
             _appEntityClassificationRepository = appEntityClassificationRepository;
@@ -2886,9 +2889,14 @@ namespace onetouch.AppSiiwiiTransaction
                     IList<VariationItemDto> variationListOrg = ObjectMapper.Map<IList<VariationItemDto>>(marketplaceItem.ParentFkList);
                     foreach (var vari in variationListOrg)
                         vari.Id = 0;
-                    var orgItem = await _appItems.GetAll().Where(z => z.SSIN == marketplaceItem.SSIN && z.TenantId == z.TenantOwner).FirstOrDefaultAsync();
-                    var variationList = await _appItemsAppService.GetVariationsCodes(long.Parse(orgItem.SycIdentifierId.ToString()), nextCode, variationListOrg, marketplaceItem.EntityObjectTypeId, tenantId);
-                    item.SycIdentifierId = orgItem.SycIdentifierId;
+                    var identifier =await GetProductTypeIdentifier(int.Parse(marketplaceItem.EntityObjectTypeId.ToString()), tenantId);
+                    if (identifier == null)
+                    {
+                        var orgItem = await _appItems.GetAll().Where(z => z.SSIN == marketplaceItem.SSIN && z.TenantId == z.TenantOwner).FirstOrDefaultAsync();
+                        identifier = orgItem.SycIdentifierId;
+                    }
+                    var variationList = await _appItemsAppService.GetVariationsCodes(long.Parse(identifier.ToString()), nextCode, variationListOrg, marketplaceItem.EntityObjectTypeId, tenantId);
+                    item.SycIdentifierId = identifier;
                     //}
 
                     item.EntityFk = entityMain;
@@ -3477,6 +3485,23 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         //MMT
                         viewTrans.IsOwnedByMe = (AbpSession.TenantId == viewTrans.TenantOwner);
+                        if (viewTrans.AppTransactionContacts!=null && viewTrans.AppTransactionContacts.Count>0)
+                        {
+                            foreach (var cont in viewTrans.AppTransactionContacts)
+                            {
+                                cont.ContactAddressDetail = new ContactAppAddressDto();
+                                cont.ContactAddressDetail.State = cont.ContactAddressState;
+                                cont.ContactAddressDetail.City = cont.ContactAddressCity;
+                                cont.ContactAddressDetail.CountryCode = cont.ContactAddressCountryCode;
+                                cont.ContactAddressDetail.CountryId = cont.ContactAddressCountryId;
+                                cont.ContactAddressDetail.AddressLine1 = cont.ContactAddressLine1;
+                                cont.ContactAddressDetail.AddressLine2 = cont.ContactAddressLine2;
+                                cont.ContactAddressDetail.ContactEmail = cont.ContactEmail;
+                                cont.ContactAddressDetail.ContactPhone = cont.ContactPhoneNumber;
+                                cont.ContactAddressDetail.PostalCode = cont.ContactAddressPostalCode;
+                                
+                            }
+                        }
                         return viewTrans;
                     }
 
@@ -3489,7 +3514,26 @@ namespace onetouch.AppSiiwiiTransaction
                 .Include(a => a.AppTransactionDetails).Where(a => a.Id == transactionId).FirstOrDefaultAsync();
             if (trans != null)
             {
-                return ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
+                var retTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
+                if (retTrans.AppTransactionContacts != null && retTrans.AppTransactionContacts.Count > 0)
+                {
+                    foreach (var cont in retTrans.AppTransactionContacts)
+                    {
+                        cont.ContactAddressDetail = new ContactAppAddressDto();
+                        cont.ContactAddressDetail.State = cont.ContactAddressState;
+                        cont.ContactAddressDetail.City = cont.ContactAddressCity;
+                        cont.ContactAddressDetail.CountryCode = cont.ContactAddressCountryCode;
+                        cont.ContactAddressDetail.CountryId = cont.ContactAddressCountryId;
+                        cont.ContactAddressDetail.AddressLine1 = cont.ContactAddressLine1;
+                        cont.ContactAddressDetail.AddressLine2 = cont.ContactAddressLine2;
+                        cont.ContactAddressDetail.ContactEmail = cont.ContactEmail;
+                        cont.ContactAddressDetail.ContactPhone = cont.ContactPhoneNumber;
+                        cont.ContactAddressDetail.PostalCode = cont.ContactAddressPostalCode;
+
+                    }
+                }
+                return retTrans;
+
             }
             return null;
         }
@@ -4980,6 +5024,40 @@ namespace onetouch.AppSiiwiiTransaction
 
         }
         //Iteration39[End]
+        //Get Product Type Related Identifier
+        private async Task<long?> GetProductTypeIdentifier(int productTypeId, long? tenantId)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                bool entityIdentifierFound = false;
+                long? returnCode = null;
+                if (productTypeId > 0)
+                {
+                    var productType = await _SycEntityObjectTypesAppService.GetSycEntityObjectTypeForView(productTypeId);
+                    if (productType != null)
+                    {
+                        var identifierId = productType.SycEntityObjectType.SycIdentifierDefinitionId;
+                        if (identifierId != null)
+                        {
+                            returnCode = identifierId;
+                            entityIdentifierFound = true;
+                        }
+                    }
+                    if (entityIdentifierFound == false)
+                    {
+                        //var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+                        var sydobject = _sydObjectRepository.FirstOrDefault(x => x.Code == "ITEM");
+                        if (sydobject != null)
+                        {
+                            var identifierId = sydobject.SycDefaultIdentifierId;
+                            returnCode = identifierId;
+                            entityIdentifierFound = true;
+                        }
+                    }
+                }
+                return returnCode;
+            }
+        }
     }
 
 }
