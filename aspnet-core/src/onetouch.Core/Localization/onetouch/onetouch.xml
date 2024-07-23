@@ -2539,6 +2539,6 @@
     <text name="MessageBody">Message body</text>
     <text name="InvalidEmailFormate">Invalid email formate</text>
     <text name="TransactionHasBeenSent">Transaction has been sent</text>
-    <text name="AccountBilling">Account Billing</text>
+    <text name="AccountBilling"> Account Billing</text>
   </texts>  
 </localizationDictionary>
