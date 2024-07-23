@@ -1,17 +1,32 @@
-<p>account-billing works!</p>
-<div class="btn-group dropdown" dropdown container="body">
-
-    <button class="btn btn-primary">
+<div  dropdown container="body" >
+    <p style="color: #1B101B;font-size: 24px;font-weight: 700;" >Account Billing</p>
+    <br/>
+    <br/>
+    <br/>    
+    <button class="btn btn-1bc5bd pull-right" (click)="openbillingpage(billingOptionsTabs.InvoicesOption)" style="margin-left:20px;background-color:white;color:#9E9E9E;font-size: 14px;font-weight: 500;">
+        Invoices
+    </button>
+    <button class="btn btn-1bc5bd pull-right" (click)="openbillingpage(billingOptionsTabs.ActivityLogOption)" style="margin-left:20px;background-color:white;color:#9E9E9E;font-size: 14px;font-weight: 500;">
+        Activity Log
+    </button>
+    <button class="btn btn-1bc5bd pull-right" (click)="openbillingpage(billingOptionsTabs.AddOnsOption)" style="margin-left:20px;background-color:white;color:#9E9E9E;font-size: 14px;font-weight: 500;">
+        Add-ons
+    </button>
+    <button class="btn btn-1bc5bd pull-right" (click)="openbillingpage(billingOptionsTabs.PlansOption)" style="margin-left:20px;background-color:white;color:#9E9E9E;font-size: 14px;font-weight: 500;">
         Plans
     </button>
     <br/>
-    <button class="btn btn-primary">
-        Add-ons
-    </button>
-    <button class="btn btn-primary">
-        Activity Log
-    </button>
-    <button class="btn btn-primary">
-        Invoices
-    </button>
-    </div>
+    <br/>
+    <br/> 
+     <div class="tab1" *ngIf="currentTab == billingOptionsTabs.PlansOption">
+        <app-plans></app-plans>
+      </div>
+      <div class="tab2" *ngIf="currentTab == billingOptionsTabs.AddOnsOption">
+        <app-add-ons></app-add-ons>
+      </div>
+      <div class="tab3" *ngIf="currentTab == billingOptionsTabs.ActivityLogOption">
+        <app-activity-log></app-activity-log>
+      </div>
+      <div class="tab4" *ngIf="currentTab == billingOptionsTabs.InvoicesOption">
+        <app-tenant-invoices></app-tenant-invoices>
+      </div>
