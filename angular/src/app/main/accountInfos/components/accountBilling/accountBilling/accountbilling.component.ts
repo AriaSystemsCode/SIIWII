@@ -17,6 +17,9 @@ currentTab: BillingOptionsPageTabs;
 openbillingpage(number:BillingOptionsPageTabs)
 {
   this.currentTab = number;
+  var button = document.getElementById('planbtn'); 
+   button.style.background= '#5A225A';
+   button.style.color = 'white'
   //this.__router.navigate(["add-ons"]);
 }
 }
