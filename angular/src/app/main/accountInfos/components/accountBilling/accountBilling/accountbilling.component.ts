@@ -14,12 +14,19 @@ export class AccountBillingComponent {
 billingOptionsTabs = BillingOptionsPageTabs;
 __router: Router;
 currentTab: BillingOptionsPageTabs;
-openbillingpage(number:BillingOptionsPageTabs)
+btnStyle:string;
+AccountBillingComponent()
+{
+  this.btnStyle="billing-option-btn";
+} 
+openbillingpage(number:BillingOptionsPageTabs,id:string)
 {
   this.currentTab = number;
-  var button = document.getElementById('planbtn'); 
-   button.style.background= '#5A225A';
-   button.style.color = 'white'
+  this.btnStyle="billing-option-btn-clicked";
+  /* var button = document.getElementById(id); 
+  if (button!=null)
+     button.setAttribute("style","billing-option-btn-clicked"); */
+   
   //this.__router.navigate(["add-ons"]);
 }
 }
