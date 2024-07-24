@@ -1733,10 +1733,12 @@ namespace onetouch.AppItems
                 return await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == sSIN).CountAsync() > 0;
             }
         }
-        public async Task<IList<ExpandoObject>> GetItemVariationsToDelete(long productId, List<string> sSINs)
+        public async Task<VariationListToDeleteDto> GetItemVariationsToDelete(long productId, List<string> sSINs)
         {
             //<VariationItemDto, bool>
-            List<ExpandoObject> returnList = new List<ExpandoObject>();
+            VariationListToDeleteDto returnDto = new VariationListToDeleteDto();
+            returnDto.VariationCanBeDeleted = new List<VariationItemDto>();
+            returnDto.VariationsInUse = new List<VariationItemDto>();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 if (sSINs != null && sSINs.Count() > 0)
@@ -1751,17 +1753,11 @@ namespace onetouch.AppItems
                         var ret = await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == ssin).CountAsync() > 0;
                         if (!ret)
                         {
-                            dynamic retObject = new ExpandoObject();
-                            retObject.variationItemDto = variationDto;
-                            retObject.CanbeDeleted = true;
-                            returnList.Add(retObject);
+                            returnDto.VariationCanBeDeleted.Add(variationDto);
                         }
                         else
                         {
-                            dynamic retObject = new ExpandoObject();
-                            retObject.variationItemDto = variationDto;
-                            retObject.CanbeDeleted = false;
-                            returnList.Add(retObject);
+                            returnDto.VariationsInUse.Add(variationDto);
                         }
                     }
                 }
@@ -1776,24 +1772,18 @@ namespace onetouch.AppItems
                             var ret = await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == item.SSIN).CountAsync() > 0;
                             if (!ret)
                             {
-                                dynamic retObject = new ExpandoObject();
-                                retObject.variationItemDto = variationDto;
-                                retObject.CanbeDeleted = true;
-                                returnList.Add(retObject);
+                                returnDto.VariationCanBeDeleted.Add(variationDto);
                             }
                             else
                             {
-                                dynamic retObject = new ExpandoObject();
-                                retObject.variationItemDto = variationDto;
-                                retObject.CanbeDeleted = false;
-                                returnList.Add(retObject);
+                                returnDto.VariationsInUse.Add(variationDto);
                             }
                         }
                     }
                 }
                 //return await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == sSIN).CountAsync() > 0;
             }
-            return returnList;
+            return returnDto;
         }
         //MmT
         [AbpAuthorize(AppPermissions.Pages_AppItems_Create)]
@@ -7932,6 +7922,6 @@ namespace onetouch.AppItems
             return returnList;
         }
     }
-
+    
     // MMT
 }

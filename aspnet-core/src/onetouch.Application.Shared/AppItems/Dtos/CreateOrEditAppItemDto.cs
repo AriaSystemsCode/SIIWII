@@ -409,4 +409,11 @@ namespace onetouch.AppItems.Dtos
         public bool SyncProductList { set; get; } = false;
     }
     //mmt33-2
+    //MMT-41
+    public class VariationListToDeleteDto
+    {
+        public IList<VariationItemDto> VariationsInUse { get; set; }
+        public IList<VariationItemDto> VariationCanBeDeleted { get; set; }
+    }
+    //MMT-41
 }
