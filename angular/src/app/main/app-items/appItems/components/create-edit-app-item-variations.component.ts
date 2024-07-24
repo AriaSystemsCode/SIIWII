@@ -1309,7 +1309,7 @@ export class CreateEditAppItemVariationsComponent
             return variation.ssin;
         });
         
-        this._appItemsServiceProxy.getItemVariationsToDelete(undefined,sSINs)
+        this._appItemsServiceProxy.getItemVariationsToDelete(this.appItem.id,sSINs)
         .subscribe((res:VariationListToDeleteDto) => {
             if (res && res?.variationsInUse?.length >0) {
                 Swal.fire({
@@ -1356,8 +1356,9 @@ export class CreateEditAppItemVariationsComponent
         });
     }
         this.selectedVaritaions = [];
-        this.setSelectionVariations();
         this.primengTableHelper.records = this.variationMatrices;
+        this.getExistingVariations();
+        this.setSelectionVariations();
 
         dropdown.hide();
         this.updateVaritaionAttachments();
@@ -2208,6 +2209,7 @@ export class CreateEditAppItemVariationsComponent
     }
 
 
+    
     getNewVariations(){
         this.activeExisttingVariation=false;
         this.activeNewVariation=true
