@@ -34,6 +34,7 @@ import {
     CurrencyInfoDto,
     LookupLabelDto,
     AppEntitiesServiceProxy,
+    VariationListToDeleteDto,
     
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
@@ -537,10 +538,34 @@ export class CreateOrEditAppItemComponent
         });
     }
     removeAllVariations() {
-        this.formTouched = true;
+    this.formTouched = true;
+    this._appItemsServiceProxy.getItemVariationsToDelete(this.id,undefined)
+    .subscribe((res:VariationListToDeleteDto) => {
+        if (res && res?.variationsInUse?.length >0) {
+            Swal.fire({
+                title: "",
+                text:  res?.variationsInUse?.length==1 ? "Variation '"+res?.variationsInUse[0]?.code?.toString() + "' Is in use" :  "More than one variation in use",
+                icon: "info",
+                confirmButtonText:
+                    "Ok",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                backdrop: true,
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class2",
+                },
+            });
+        }
+        else{
         this.appItem.variationItems = [];
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
         this.appItem.appItemSizesScaleInfo = [];
+        }
+    });
     }
     resetExtraData() {
         this.appItem.entityExtraData = [];

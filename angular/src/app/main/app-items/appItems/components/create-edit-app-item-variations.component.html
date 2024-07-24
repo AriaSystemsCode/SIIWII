@@ -126,7 +126,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="dropdown mr-4" *ngIf="listingMode === undefined && !activeNewVariation" dropdown #dropdown="bs-dropdown" [autoClose]="true"  [insideClick]="false">
+                                            <div class="dropdown mr-4" *ngIf="listingMode === undefined && !activeNewVariation && isExistingVariationsSelected()" dropdown #dropdown="bs-dropdown" [autoClose]="true"  [insideClick]="false">
                                                 <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2" style="border-radius: 5px;
                                                 background-color: white !important;
                                                 border: 1px solid #4A0D4A !important;

@@ -28,6 +28,7 @@ import {
     AppItemSizesScaleInfo,
     IAppItemSizesScaleInfo,
     AppEntityDto,
+    VariationListToDeleteDto,
 } from "@shared/service-proxies/service-proxies";
 import { BsDropdownDirective } from "ngx-bootstrap/dropdown";
 import { cloneDeep } from "lodash";
@@ -46,6 +47,7 @@ import { SelectItem } from "primeng/api";
 import { SelectAppItemTypeComponent } from "@app/app-item-type/select-app-item-type/select-app-item-type.component";
 import { table } from "console";
 import { CreateOrEditAppEntityDynamicModalComponent } from "@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component";
+import Swal from "sweetalert2";
 
 @Component({
     selector: "app-create-edit-app-item-variations",
@@ -1216,7 +1218,8 @@ export class CreateEditAppItemVariationsComponent
                 let newVariation: VariationItemDto =
                     VariationItemDto.fromJS(___varitation);
                     
-             const curentItem=oldAttributes.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0];
+            // const curentItem=oldAttributes.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0];
+             const curentItem=oldAttributes.filter((record)=>newVariation.code.replace(/\s+/g, '').replace(/-0+/g, '').includes(record.code.replace(/\s+/g, '').replace(/-0+/g, '')))[0];
              if(curentItem?.stockAvailability>0){
                 newVariation.stockAvailability=curentItem.stockAvailability;
             }
@@ -1290,6 +1293,7 @@ export class CreateEditAppItemVariationsComponent
     }
 
     deleteSelectedVariations(dropdown: BsDropdownDirective) {
+
         let sectedRecordsPositions: number[] = this.selectedVaritaions.reduce(
             (accum, variation) => {
                 accum.push(variation.position);
@@ -1297,13 +1301,68 @@ export class CreateEditAppItemVariationsComponent
             },
             []
         );
+
+      let selectedRecord=  this.variationMatrices.filter((variation) => {
+            return variation.ssin && sectedRecordsPositions.includes(variation.position)  ;
+        });
+        let sSINs=selectedRecord.map((variation) => {
+            return variation.ssin;
+        });
+        
+        this._appItemsServiceProxy.getItemVariationsToDelete(undefined,sSINs)
+        .subscribe((res:VariationListToDeleteDto) => {
+            if (res && res?.variationsInUse?.length >0) {
+                Swal.fire({
+                    title: "",
+                    text:  res?.variationsInUse?.length==1 ? "Variation '"+res?.variationsInUse[0]?.code?.toString() + "' Is in use" :  "More than one variation in use",
+                    icon: "info",
+                    confirmButtonText:
+                        "Ok",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    backdrop: true,
+                    customClass: {
+                        popup: "popup-class",
+                        icon: "icon-class",
+                        content: "content-class",
+                        actions: "actions-class",
+                        confirmButton: "confirm-button-class2",
+                    },
+                });
+
+
+                //// remove the res Ssisns
+                let sSINs=res?.variationCanBeDeleted.map((variation) => {
+                    return variation.ssin;
+                });
+
+                this.selectedVaritaions= this.variationMatrices.filter((variation) => { 
+                    return sSINs?.includes(variation.ssin)
+                });
+                let sectedRecordsPositions: number[] = this.selectedVaritaions.reduce(
+                    (accum, variation) => {
+                        accum.push(variation.position);
+                        return accum;
+                    },
+                    []
+                );
+                this.variationMatrices = this.variationMatrices.filter((variation) => {
+                    return !sectedRecordsPositions.includes(variation.position);
+                });
+            }
+        else{
         this.variationMatrices = this.variationMatrices.filter((variation) => {
             return !sectedRecordsPositions.includes(variation.position);
         });
+    }
         this.selectedVaritaions = [];
+        this.setSelectionVariations();
         this.primengTableHelper.records = this.variationMatrices;
+
         dropdown.hide();
         this.updateVaritaionAttachments();
+    
+});
     }
 
     saveVariations() {
@@ -2128,6 +2187,26 @@ export class CreateEditAppItemVariationsComponent
             return variation.ssin;
         });
     }
+    isExistingVariationsSelected():boolean{
+        let sectedRecordsPositions: number[] = this.selectedVaritaions.reduce(
+            (accum, variation) => {
+                accum.push(variation.position);
+                return accum;
+            },
+            []
+        );
+        let selectedRecord=  this.variationMatrices.filter((variation) => {
+            return variation.ssin &&  sectedRecordsPositions.includes(variation.position)  ;
+        });
+
+
+        if(selectedRecord && selectedRecord?.length>0) 
+           return true
+    else
+       return false
+
+    }
+
 
     getNewVariations(){
         this.activeExisttingVariation=false;

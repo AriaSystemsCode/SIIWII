@@ -11504,7 +11504,7 @@ export class AppItemsServiceProxy {
      * @param sSINs (optional) 
      * @return Success
      */
-    getItemVariationsToDelete(productId: number | undefined, sSINs: string[] | null | undefined): Observable<string[]> {
+    getItemVariationsToDelete(productId: number | undefined, sSINs: string[] | null | undefined): Observable<VariationListToDeleteDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetItemVariationsToDelete?";
         if (productId === null)
             throw new Error("The parameter 'productId' cannot be null.");
@@ -11529,14 +11529,14 @@ export class AppItemsServiceProxy {
                 try {
                     return this.processGetItemVariationsToDelete(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<string[]>;
+                    return _observableThrow(e) as any as Observable<VariationListToDeleteDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<string[]>;
+                return _observableThrow(response_) as any as Observable<VariationListToDeleteDto>;
         }));
     }
 
-    protected processGetItemVariationsToDelete(response: HttpResponseBase): Observable<string[]> {
+    protected processGetItemVariationsToDelete(response: HttpResponseBase): Observable<VariationListToDeleteDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -11547,14 +11547,7 @@ export class AppItemsServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(item);
-            }
-            else {
-                result200 = <any>null;
-            }
+            result200 = VariationListToDeleteDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -65202,6 +65195,74 @@ export interface ICreateOrEditAppItemDto {
     sycIdentifierId: number | undefined;
     nonLookupValues: LookupLabelDto[] | undefined;
     id: number;
+
+    [key: string]: any;
+}
+
+export class VariationListToDeleteDto implements IVariationListToDeleteDto {
+    variationsInUse!: VariationItemDto[] | undefined;
+    variationCanBeDeleted!: VariationItemDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IVariationListToDeleteDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["variationsInUse"])) {
+                this.variationsInUse = [] as any;
+                for (let item of _data["variationsInUse"])
+                    this.variationsInUse!.push(VariationItemDto.fromJS(item));
+            }
+            if (Array.isArray(_data["variationCanBeDeleted"])) {
+                this.variationCanBeDeleted = [] as any;
+                for (let item of _data["variationCanBeDeleted"])
+                    this.variationCanBeDeleted!.push(VariationItemDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): VariationListToDeleteDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new VariationListToDeleteDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.variationsInUse)) {
+            data["variationsInUse"] = [];
+            for (let item of this.variationsInUse)
+                data["variationsInUse"].push(item.toJSON());
+        }
+        if (Array.isArray(this.variationCanBeDeleted)) {
+            data["variationCanBeDeleted"] = [];
+            for (let item of this.variationCanBeDeleted)
+                data["variationCanBeDeleted"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IVariationListToDeleteDto {
+    variationsInUse: VariationItemDto[] | undefined;
+    variationCanBeDeleted: VariationItemDto[] | undefined;
 
     [key: string]: any;
 }
