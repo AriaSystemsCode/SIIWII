@@ -1347,12 +1347,13 @@ export class CreateEditAppItemVariationsComponent
                     []
                 );
                 this.variationMatrices = this.variationMatrices.filter((variation) => {
-                    return !sectedRecordsPositions.includes(variation.position);
+                    return !sectedRecordsPositions.includes(variation.position) || !variation.ssin ;   
+
                 });
             }
         else{
         this.variationMatrices = this.variationMatrices.filter((variation) => {
-            return !sectedRecordsPositions.includes(variation.position);
+            return !sectedRecordsPositions.includes(variation.position) || !variation.ssin ;   
         });
     }
         this.selectedVaritaions = [];
