@@ -42,7 +42,7 @@ namespace onetouch.AppItems
         Task<bool> IsVariationOrdered(string sSIN);
         Task<string> GenerateProductCode(int productId, bool lUpdateSeq, long? tenantId);
         Task<IList<VariationItemDto>> GetVariationsCodes(long identifierId, string productCode, IList<VariationItemDto> variationsList, long productTypeId, long? tenantId);
-        Task<IList<ExpandoObject>> GetItemVariationsToDelete(long productId, List<string> sSINs);
+        Task<VariationListToDeleteDto> GetItemVariationsToDelete(long productId, List<string> sSINs);
 
     }
 }
