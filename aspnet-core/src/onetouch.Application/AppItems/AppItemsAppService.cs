@@ -66,6 +66,7 @@ using Org.BouncyCastle.Utilities.Encoders;
 using onetouch.AppSiiwiiTransaction;
 using NPOI.HPSF;
 using NPOI.POIFS.NIO;
+using System.Dynamic;
 
 namespace onetouch.AppItems
 {
@@ -1732,18 +1733,36 @@ namespace onetouch.AppItems
                 return await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == sSIN).CountAsync() > 0;
             }
         }
-        public async Task<IList<string>> GetItemVariationsToDelete(long productId, List<string> sSINs)
+        public async Task<IList<ExpandoObject>> GetItemVariationsToDelete(long productId, List<string> sSINs)
         {
-            List<string> returnList = new List<string>();
+            //<VariationItemDto, bool>
+            List<ExpandoObject> returnList = new List<ExpandoObject>();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 if (sSINs != null && sSINs.Count() > 0)
                 {
                     foreach (var ssin in sSINs)
                     {
+                        VariationItemDto variationDto = new VariationItemDto();
+                        var item = await _appItemRepository.GetAll().Where(z => z.ParentId == productId && z.SSIN == ssin).FirstOrDefaultAsync();
+                        if (item != null)
+                           variationDto = ObjectMapper.Map<VariationItemDto>(item);
+
                         var ret = await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == ssin).CountAsync() > 0;
                         if (!ret)
-                            returnList.Add(ssin);
+                        {
+                            dynamic retObject = new ExpandoObject();
+                            retObject.variationItemDto = variationDto;
+                            retObject.CanbeDeleted = true;
+                            returnList.Add(retObject);
+                        }
+                        else
+                        {
+                            dynamic retObject = new ExpandoObject();
+                            retObject.variationItemDto = variationDto;
+                            retObject.CanbeDeleted = false;
+                            returnList.Add(retObject);
+                        }
                     }
                 }
                 else
@@ -1753,9 +1772,22 @@ namespace onetouch.AppItems
                     {
                         foreach (var item in items)
                         {
+                            VariationItemDto variationDto = ObjectMapper.Map<VariationItemDto>(item);
                             var ret = await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == item.SSIN).CountAsync() > 0;
                             if (!ret)
-                                returnList.Add(item.SSIN);
+                            {
+                                dynamic retObject = new ExpandoObject();
+                                retObject.variationItemDto = variationDto;
+                                retObject.CanbeDeleted = true;
+                                returnList.Add(retObject);
+                            }
+                            else
+                            {
+                                dynamic retObject = new ExpandoObject();
+                                retObject.variationItemDto = variationDto;
+                                retObject.CanbeDeleted = false;
+                                returnList.Add(retObject);
+                            }
                         }
                     }
                 }
