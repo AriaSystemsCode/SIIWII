@@ -819,7 +819,7 @@ namespace onetouch.Accounts
         public async Task Connect(long id)
         {
 
-
+            var cancelledStatus=  await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
             AppContact originalContact;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -827,7 +827,9 @@ namespace onetouch.Accounts
                 var originalContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
 
                 if (originalContactFortCurrTenant != null)
-                    originalPublishContactFortCurrTenant = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk).FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == originalContactFortCurrTenant.Id);
+                    originalPublishContactFortCurrTenant = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses)
+                        .ThenInclude(z => z.AddressFk)
+                        .FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == originalContactFortCurrTenant.Id && x.EntityFk.EntityObjectStatusId != cancelledStatus);
 
                 if (originalPublishContactFortCurrTenant == null)
                     throw new UserFriendlyException("Ooppps! please publish your account first.");
@@ -838,7 +840,7 @@ namespace onetouch.Accounts
                 if (originalContact != null && originalContact.TenantId != null)
                 {
                     originalContact = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
-                .FirstOrDefaultAsync(x => x.TenantId == null && x.PartnerId == id);
+                .FirstOrDefaultAsync(x => x.TenantId == null && x.PartnerId == id &&  x.EntityFk.EntityObjectStatusId != cancelledStatus);
                     id = originalContact.Id;
                 }
                 var existed = await _appContactRepository.GetAll()
@@ -1186,7 +1188,7 @@ namespace onetouch.Accounts
                     //Contact[start]
                      var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                     var contactsInfo = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
-                                 x.ParentId == id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null).ToList(); // First level of branches
+                                 x.ParentId == id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
                     foreach (var contactObj in contactsInfo)
                     {
@@ -1237,7 +1239,7 @@ namespace onetouch.Accounts
                     }
                     //Contacts[End]
                     var contactsInfo2 = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
-                                 x.ParentId == originalPublishContactFortCurrTenant.Id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null).ToList(); // First level of branches
+                                 x.ParentId == originalPublishContactFortCurrTenant.Id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
                     foreach (var contactObj in contactsInfo2)
                     {
@@ -1301,14 +1303,14 @@ namespace onetouch.Accounts
 
         protected async Task ConnectBranches(long branchesAccountId, long connectAccountId)
         {
-            // x.AccountId == branchesAccountId &&
+            var cancelledStatus = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             var branchesPublishedParentContact = new AppContact();
             var branchesParentContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.Id == branchesAccountId);
             if (branchesParentContact.TenantId != null)
             {
                 branchesPublishedParentContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.PartnerId == branchesAccountId
-                && x.TenantId == null);
+                && x.TenantId == null && x.EntityFk.EntityObjectStatusId != cancelledStatus);
             }
             else
             {
@@ -1321,7 +1323,7 @@ namespace onetouch.Accounts
             if (connectAccountContact.TenantId != null)
             {
                 publishedConnectContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.PartnerId == connectAccountId
-                && x.TenantId == null);
+                && x.TenantId == null && x.EntityFk.EntityObjectStatusId != cancelledStatus);
                 //Mariam[Start]
                 if (connectAccountContact != null)
                 {
@@ -1537,7 +1539,7 @@ namespace onetouch.Accounts
 
                 //Contact[start]
                 var contactsInfo = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
-                             x.ParentId == branchesAccountId && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null).ToList(); // First level of branches
+                             x.ParentId == branchesAccountId && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
                 foreach (var contactObj in contactsInfo)
                 {
@@ -1588,7 +1590,7 @@ namespace onetouch.Accounts
 
             }
             var branchInfo = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
-                           x.ParentId == branchesAccountId && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && x.PartnerId != null).ToList(); // First level of branches
+                           x.ParentId == branchesAccountId && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
             foreach (var branchObj in branchInfo)
             {
@@ -1978,6 +1980,22 @@ namespace onetouch.Accounts
                             publishedContactEntity.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
+                        //xx
+                        //XX
+                        
+                            var publishedbranchesandMemebers = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishedContact.Id &&
+                                         x.ParentId != null).ToList(); // First level of branches
+                            if (publishedbranchesandMemebers != null && publishedbranchesandMemebers.Count() > 0)
+                            {
+                                foreach (var publishedBranchMember in publishedbranchesandMemebers)
+                                {
+                                    publishedBranchMember.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                                }
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+                        
+                        //XX
+                        //xx
                     }
                 }
             }
@@ -2117,11 +2135,31 @@ namespace onetouch.Accounts
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
                     }
-
+                    
                     //Mariam -Publish Account related branches [Start]
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    
                     var branchInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.AccountId == contact.Id &&
                                      x.ParentId == contact.Id && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
+
+                    //XX
+                    if (publishContact != null)
+                    {
+                        var publishedbranches = _appContactRepository.GetAll().Include(z=>z.EntityFk).Where(x => x.TenantId==null && x.AccountId == publishContact.Id &&
+                                     x.ParentId == publishContact.Id && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
+                        if (publishedbranches!=null && publishedbranches.Count()>0)
+                        {
+                            foreach (var publishedBranch in publishedbranches)
+                            {
+                                var existingBranch = branchInfo.Where(z=>z.Code== publishedBranch.Code && z.SSIN == publishedBranch.SSIN).FirstOrDefault();
+                                if (existingBranch == null)
+                                {
+                                    publishedBranch.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                                }
+                            }
+                        }
+                    }
+                    //XX
 
                     foreach (var branchObj in branchInfo)
                     {
@@ -2181,6 +2219,7 @@ namespace onetouch.Accounts
                 {
                     contactDto.Id = publishContact.Id;
                     entityDto.Id = publishContact.EntityId;
+                    entityDto.EntityObjectStatusId = null;
                 }
                 // fix bug as per Mariam, 2022-08-14 entity tenant should be null 
                 entityDto.TenantId = null;
@@ -2342,6 +2381,7 @@ namespace onetouch.Accounts
             {
                 contactDto.Id = publishContact.Id;
                 entityDto.Id = publishContact.EntityId;
+                entityDto.EntityObjectStatusId = null;
             }
             if (entity.EntityAttachments != null)
             {
