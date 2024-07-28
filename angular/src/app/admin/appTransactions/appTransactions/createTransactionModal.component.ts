@@ -203,7 +203,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 }
             }); 
     }
-    getAllCompanies() {
+    getAllCompanies(transactionType?:string) {
         this._AppTransactionServiceProxy
             .getRelatedAccounts(
                 "",
@@ -225,7 +225,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 undefined,
                 undefined,
                 undefined,
-                undefined,true
+                undefined,
+                true,
+               // transactionType
             )
             .subscribe((res: any) => {
                 this.buyerCompanies = [...res.items];
@@ -323,6 +325,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             // this.buyerContacts = []
             //this.orderForm.reset();
         }
+
+        if (this.formType?.toUpperCase() == "PO")
+        this.getAllCompanies(this.formType?.toUpperCase());
     }
 
     handleBuyerCompanySearch(event: any) {
@@ -886,7 +891,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                              //////////////////////////
 
                              
-                    if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
+
+                             if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
                         location.reload();
                     else
                         this.router.navigateByUrl("app/main/marketplace/products");
