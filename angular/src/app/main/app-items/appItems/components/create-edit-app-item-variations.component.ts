@@ -1896,6 +1896,8 @@ export class CreateEditAppItemVariationsComponent
             subscription.subscribe((result) => {
                 extraAttr.lookupData=result;
                 extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+                this.appItem.nonLookupValue = modalRefData.nonLookupValues;
+                this.appItem.nonLookupValue .push(...this.appItem.nonLookupValue.filter(item => extraAttr.selectedValues.includes(item.value)));
             });
 
             let modalRefData: AppEntityListDynamicModalComponent =
