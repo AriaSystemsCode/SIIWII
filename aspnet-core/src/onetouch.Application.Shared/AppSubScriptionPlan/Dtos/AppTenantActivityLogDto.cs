@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Application.Services.Dto;
 
 namespace onetouch.AppSubScriptionPlan.Dtos
@@ -50,6 +51,12 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         public string Month { get; set; }
 
         public string Year { get; set; }
+        public virtual string? RelatedEntityCode { get; set; }
+
+        public virtual long? RelatedEntityObjectTypeId { get; set; }
+
+        public virtual long? RelatedEntityId { get; set; }
+     
 
     }
 }

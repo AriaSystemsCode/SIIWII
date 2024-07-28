@@ -7555,6 +7555,16 @@ namespace onetouch.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("RelatedEntityCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long?>("RelatedEntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedEntityObjectTypeId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("RemainingQty")
                         .HasColumnType("bigint");
 
@@ -7572,6 +7582,10 @@ namespace onetouch.Migrations
                     b.Property<string>("Year")
                         .HasMaxLength(4)
                         .HasColumnType("nvarchar(4)");
+
+                    b.HasIndex("RelatedEntityId");
+
+                    b.HasIndex("RelatedEntityObjectTypeId");
 
                     b.ToTable("AppTenantActivitiesLog", t =>
                         {
@@ -9108,6 +9122,18 @@ namespace onetouch.Migrations
                         .HasForeignKey("onetouch.AppSubScriptionPlan.AppTenantActivitiesLog", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", "RelatedEntityIdFk")
+                        .WithMany()
+                        .HasForeignKey("RelatedEntityId");
+
+                    b.HasOne("onetouch.SystemObjects.SycEntityObjectType", "RelatedEntityObjectTypeFk")
+                        .WithMany()
+                        .HasForeignKey("RelatedEntityObjectTypeId");
+
+                    b.Navigation("RelatedEntityIdFk");
+
+                    b.Navigation("RelatedEntityObjectTypeFk");
                 });
 
             modelBuilder.Entity("onetouch.AppSubScriptionPlan.AppTenantSubscriptionPlan", b =>

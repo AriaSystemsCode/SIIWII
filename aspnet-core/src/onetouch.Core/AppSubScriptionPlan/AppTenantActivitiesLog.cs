@@ -5,6 +5,8 @@ using Abp.Domain.Entities.Auditing;
 using Abp.Domain.Entities;
 using Abp.Auditing;
 using onetouch.AppEntities;
+using onetouch.SystemObjects;
+
 namespace onetouch.AppSubScriptionPlan
 {
     [Table("AppTenantActivitiesLog")]
@@ -73,6 +75,18 @@ namespace onetouch.AppSubScriptionPlan
         public virtual string Year { get; set; }
 
         public virtual long? CreditId { get; set; }
+
+        [StringLength(AppEntityConsts.MaxCodeLength, MinimumLength = AppEntityConsts.MinCodeLength)]
+        public virtual string? RelatedEntityCode { get; set; }
+
+        public virtual long? RelatedEntityObjectTypeId { get; set; }
+
+        [ForeignKey("RelatedEntityObjectTypeId")]
+        public SycEntityObjectType? RelatedEntityObjectTypeFk { get; set; }
+
+        public virtual long? RelatedEntityId { get; set; }
+        [ForeignKey("RelatedEntityId")]
+        public AppEntity? RelatedEntityIdFk { get; set; }
 
     }
 }
