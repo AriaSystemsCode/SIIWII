@@ -227,7 +227,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 undefined,
                 undefined,
                 true,
-               // transactionType
+                transactionType
             )
             .subscribe((res: any) => {
                 this.buyerCompanies = [...res.items];
