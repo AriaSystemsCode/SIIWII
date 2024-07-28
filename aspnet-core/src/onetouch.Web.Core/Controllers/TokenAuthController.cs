@@ -275,7 +275,7 @@ namespace onetouch.Web.Controllers
         {
             if (AbpSession.UserId != null)
             {
-                await _appTenantActivitiesLogAppService.AddUsageActivityLog("User Logged out", "User Logged out", 0);
+                await _appTenantActivitiesLogAppService.AddUsageActivityLog("User Logged out", "User Logged out",null,null,null, 0);
                 var tokenValidityKeyInClaims = User.Claims.First(c => c.Type == AppConsts.TokenValidityKey);
                 await _userManager.RemoveTokenValidityKeyAsync(_userManager.GetUser(AbpSession.ToUserIdentifier()), tokenValidityKeyInClaims.Value);
                 _cacheManager.GetCache(AppConsts.TokenValidityKey).Remove(tokenValidityKeyInClaims.Value);

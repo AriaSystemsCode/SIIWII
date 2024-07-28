@@ -333,7 +333,7 @@ namespace onetouch.AppSubScriptionPlan
                                     obj.TenantName = tenant.Name;
                                     obj.UserId = long.Parse(AbpSession.UserId.ToString());
                                     var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
-                                    obj.UserName = user.Name;
+                                    obj.UserName = user.UserName;
                                     obj.Month = DateTime.Now.Date.Month.ToString("00");
                                     obj.Year = DateTime.Now.Date.Year.ToString("0000");
                                     obj.FeatureCode = featureCode;
@@ -377,51 +377,51 @@ namespace onetouch.AppSubScriptionPlan
             return false;
         }
         [AllowAnonymous]
-        public async Task<bool> AddUsageActivityLog(string featureCode, string reference, int qty)
+        public async Task<bool> AddUsageActivityLog(string featureCode,string? relatedEntityCode, long? relatedEntityId, long? relatedEntityOvbjectTypeId, string reference, int qty)
         {
             
             var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(z=>z.AppSubscriptionPlanHeaderFk).Where(z => z.TenantId == AbpSession.TenantId &&
             (z.CurrentPeriodStartDate <= DateTime.Now.Date && DateTime.Now.Date <= z.CurrentPeriodEndDate)).FirstOrDefaultAsync();
             if (AbpSession.UserId !=null && AbpSession.UserId>0 && tenantPlan != null)
             {
-                if (featureCode.Contains("User Logged"))
-                {
-                    AppTenantActivitiesLog obj = new AppTenantActivitiesLog();
-                    obj.TenantId = AbpSession.TenantId;
-                    var tenant = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
-                    obj.TenantName = tenant.Name;
-                    obj.UserId = long.Parse(AbpSession.UserId.ToString());
-                    var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
-                    obj.UserName = user.Name;
-                    obj.Month = DateTime.Now.Date.Month.ToString("00");
-                    obj.Year = DateTime.Now.Date.Year.ToString("0000");
-                    obj.FeatureCode = featureCode;
-                    obj.FeatureName = featureCode;
-                    obj.ActivityDateTime = DateTime.Now.Date;
-                    obj.ActivityType = "Usage";
-                    obj.CreditOrUsage = "Usage";
-                    obj.Amount = 0;
-                    obj.Billable = false;
-                    obj.Invoiced = false;
-                    //obj.CreditId = long.Parse(creditId.ToString());
-                    obj.InvoiceNumber = "";
-                    obj.ConsumedQty = 0;
-                    obj.Qty = qty;
-                    obj.RemainingQty = 0;
-                    obj.Price = 0;
-                    obj.Reference = reference;
-                    obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;
-                    obj.AppSubscriptionPlanCode = tenantPlan.AppSubscriptionPlanHeaderFk.Code;
-                    obj.Name = user.Name.TrimEnd()+" "+featureCode;
-                    obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
-                    var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
-                    obj.EntityObjectTypeId = entityActivityObjectType.Id;
-                    obj.EntityObjectTypeCode = entityActivityObjectType.Code;
-                    obj.Code = featureCode.Trim()+" " + DateTime.Now.ToString();
+                //if (featureCode.Contains("User Logged"))
+                //{
+                //    AppTenantActivitiesLog obj = new AppTenantActivitiesLog();
+                //    obj.TenantId = AbpSession.TenantId;
+                //    var tenant = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
+                //    obj.TenantName = tenant.Name;
+                //    obj.UserId = long.Parse(AbpSession.UserId.ToString());
+                //    var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
+                //    obj.UserName = user.Name;
+                //    obj.Month = DateTime.Now.Date.Month.ToString("00");
+                //    obj.Year = DateTime.Now.Date.Year.ToString("0000");
+                //    obj.FeatureCode = featureCode;
+                //    obj.FeatureName = featureCode;
+                //    obj.ActivityDateTime = DateTime.Now.Date;
+                //    obj.ActivityType = "Usage";
+                //    obj.CreditOrUsage = "Usage";
+                //    obj.Amount = 0;
+                //    obj.Billable = false;
+                //    obj.Invoiced = false;
+                //    //obj.CreditId = long.Parse(creditId.ToString());
+                //    obj.InvoiceNumber = "";
+                //    obj.ConsumedQty = 0;
+                //    obj.Qty = qty;
+                //    obj.RemainingQty = 0;
+                //    obj.Price = 0;
+                //    obj.Reference = reference;
+                //    obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;
+                //    obj.AppSubscriptionPlanCode = tenantPlan.AppSubscriptionPlanHeaderFk.Code;
+                //    obj.Name = user.Name.TrimEnd()+" "+featureCode;
+                //    obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
+                //    var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
+                //    obj.EntityObjectTypeId = entityActivityObjectType.Id;
+                //    obj.EntityObjectTypeCode = entityActivityObjectType.Code;
+                //    obj.Code = featureCode.Trim()+" " + DateTime.Now.ToString();
                     
-                    await _appTenantActivityLogRepository.InsertAsync(obj);
-                    return true;
-                }
+                //    await _appTenantActivityLogRepository.InsertAsync(obj);
+                //    return true;
+                //}
                 var featureDetail = await _appSubscriptionPlanDetailRepository.GetAll().Where(z => z.AppSubscriptionPlanHeaderId == tenantPlan.AppSubscriptionPlanHeaderId &&
                z.FeatureCode == featureCode).FirstOrDefaultAsync();
                 if (featureDetail != null)
@@ -464,7 +464,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.TenantName = tenant.Name;
                     obj.UserId = long.Parse(AbpSession.UserId.ToString());
                     var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
-                    obj.UserName = user.Name;
+                    obj.UserName = user.UserName;
                     obj.Month = DateTime.Now.Date.Month.ToString("00");
                     obj.Year = DateTime.Now.Date.Year.ToString("0000");
                     obj.FeatureCode = featureCode;
@@ -490,8 +490,51 @@ namespace onetouch.AppSubScriptionPlan
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
                     obj.EntityObjectTypeId = entityActivityObjectType.Id;
                     obj.EntityObjectTypeCode = entityActivityObjectType.Code;
+                    obj.RelatedEntityCode = relatedEntityCode;
+                    obj.RelatedEntityId = relatedEntityId;
+                    obj.RelatedEntityObjectTypeId = relatedEntityOvbjectTypeId;
                     await _appTenantActivityLogRepository.InsertAsync(obj);
                 }
+                else
+                {
+                    AppTenantActivitiesLog obj = new AppTenantActivitiesLog();
+                    obj.TenantId = AbpSession.TenantId;
+                    var tenant = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
+                    obj.TenantName = tenant.Name;
+                    obj.UserId = long.Parse(AbpSession.UserId.ToString());
+                    var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
+                    obj.UserName = user.UserName;
+                    obj.Month = DateTime.Now.Date.Month.ToString("00");
+                    obj.Year = DateTime.Now.Date.Year.ToString("0000");
+                    obj.FeatureCode = featureCode;
+                    obj.FeatureName = "Not Found";
+                    obj.ActivityDateTime = DateTime.Now.Date;
+                    obj.ActivityType = "Usage";
+                    obj.CreditOrUsage = "Usage";
+                    obj.Amount = 0;
+                    obj.Billable = false;
+                    obj.Invoiced = false;
+                    //obj.CreditId = long.Parse(creditId.ToString());
+                    obj.InvoiceNumber = "";
+                    obj.ConsumedQty = 0;
+                    obj.Qty = qty;
+                    obj.RemainingQty = 0;
+                    obj.Price = 0;
+                    obj.Reference = reference;
+                    obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;
+                    obj.AppSubscriptionPlanCode = tenantPlan.AppSubscriptionPlanHeaderFk.Code;
+                    obj.Name = user.Name.TrimEnd() + " " + featureCode;
+                    obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
+                    var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
+                    obj.EntityObjectTypeId = entityActivityObjectType.Id;
+                    obj.EntityObjectTypeCode = entityActivityObjectType.Code;
+                    obj.Code = featureCode.Trim() + " " + DateTime.Now.ToString();
+                    obj.RelatedEntityCode = relatedEntityCode;
+                    obj.RelatedEntityId = relatedEntityId;
+                    obj.RelatedEntityObjectTypeId = relatedEntityOvbjectTypeId;
+                    await _appTenantActivityLogRepository.InsertAsync(obj);
+                }
+
             }
             return true;
         }

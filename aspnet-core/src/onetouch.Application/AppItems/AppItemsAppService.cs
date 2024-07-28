@@ -1717,9 +1717,7 @@ namespace onetouch.AppItems
             //{
             //    appItem.TenantId = (int)AbpSession.TenantId;
             //}
-            var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
-            if (available==true)
-            await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", input.Code, 1);
+
             //await _appItemRepository.InsertAsync(appItem);
             return await DoCreateOrEdit(input);
         }
@@ -2023,12 +2021,23 @@ namespace onetouch.AppItems
             appItem.EntityId = savedEntity;
 
             if (appItem.Id == 0)
+            {
                 appItem = await _appItemRepository.InsertAsync(appItem);
+
+                var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
+                //if (available == true)
+                {
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.Code, 1);
+                }
+            }
             //MMT
             else
             {
                 //await CurrentUnitOfWork.SaveChangesAsync();
                 appItem = await _appItemRepository.UpdateAsync(appItem);
+                var availableFeature = await _appTenantActivitiesLogAppService.IsFeatureAvailable("EDIT-PRODUCT");
+                //if (availableFeature == true)
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.Code, 1);
             }
             //MMT
 

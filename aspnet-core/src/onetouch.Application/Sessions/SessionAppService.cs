@@ -128,7 +128,7 @@ namespace onetouch.Sessions
 
             output.Tenant.SubscriptionDateString = GetTenantSubscriptionDateString(output);
             output.Tenant.CreationTimeString = output.Tenant.CreationTime.ToString("d");
-            await _appTenantActivitiesLogAppService.AddUsageActivityLog("User Logged in", "User Logged in", 0);
+            await _appTenantActivitiesLogAppService.AddUsageActivityLog("User Logged in", "User Logged in",null,null,null, 0);
             return output;
 
         }
