@@ -66,6 +66,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
     @Input() enableAddToLookup:boolean=true;
     @Input()  wantdisplaySaveSideBar :boolean=true;
     addToLookup:boolean=true;
+    @Output() addNonLookupValues: EventEmitter<any> = new EventEmitter<any>();
+    
     visual = {
         solid: true,
         image: false
@@ -233,8 +235,10 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 this.displaySaveSideBar = true;
 
                 else {
-                     this.saveDone.emit(true);
-                    this.hide();
+                        this.notify.info(this.l("SavedSuccessfully"));
+                        this.addNonLookupValues.emit(this.appEntity)
+                             this.saveDone.emit(true);
+                            this.hide();
                 }
             });
         }
