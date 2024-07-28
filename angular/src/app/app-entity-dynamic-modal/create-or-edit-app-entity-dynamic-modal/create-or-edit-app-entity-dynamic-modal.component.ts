@@ -218,6 +218,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
         }
 
         this.saving = true;
+
+        if(this.addToLookup){
         this._appEntitiesServiceProxy
             .saveEntity(this.appEntity)
             .pipe(
@@ -235,6 +237,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                     this.hide();
                 }
             });
+        }
     }
 
     getExtrAttributes() {
