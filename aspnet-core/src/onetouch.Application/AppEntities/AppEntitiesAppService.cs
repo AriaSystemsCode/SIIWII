@@ -39,6 +39,7 @@ using Twilio.Rest.Api.V2010.Account;
 using NPOI.Util;
 using Abp.Domain.Entities;
 using NPOI.SS.Formula.Functions;
+using NPOI.HPSF;
 
 namespace onetouch.AppEntities
 {
@@ -2213,10 +2214,15 @@ namespace onetouch.AppEntities
         }
         public async Task<LookupLabelDto> ConvertAppEntityDtoToLookupLabelDto(AppEntityDto input)
         {
+            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
             LookupLabelDto returnObject = new LookupLabelDto();
             returnObject.Code = input.Code;
             returnObject.Label = input.Name;
             returnObject.Value = input.Id;
+            returnObject.IsHostRecord = input.TenantId == null;
+            returnObject.HexaCode = (input.EntityExtraData != null && input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "";
+            returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().FileName != null) ?
+                          (imagesUrl + "-1" + @"/" + input.EntityAttachments.FirstOrDefault().FileName.ToString()) : "";
 
             return returnObject;
         }
