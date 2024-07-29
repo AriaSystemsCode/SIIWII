@@ -38,6 +38,7 @@ using onetouch.AppMarketplaceTransactions;
 using Twilio.Rest.Api.V2010.Account;
 using NPOI.Util;
 using Abp.Domain.Entities;
+using NPOI.SS.Formula.Functions;
 
 namespace onetouch.AppEntities
 {
@@ -2199,6 +2200,33 @@ namespace onetouch.AppEntities
             }
             return outputList;
         }
+        public async Task<bool> IsCodeExisting(AppEntityDto input)
+        {
+            
+            var entity = await _appEntityRepository.GetAll().Where(z => z.Code == input.Code && z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == input.EntityObjectTypeId &&
+            z.ObjectId == input.ObjectId).FirstOrDefaultAsync();
+            if (entity != null)
+                return true;
+            else
+                return false;
 
+        }
+        public async Task<LookupLabelDto> ConvertAppEntityDtoToLookupLabelDto(AppEntityDto input)
+        {
+            LookupLabelDto returnObject = new LookupLabelDto();
+            returnObject.Code = input.Code;
+            returnObject.Label = input.Name;
+            returnObject.Value = input.Id;
+
+            return returnObject;
+        }
+        public async Task<AppEntityDto> ConvertAppLookupLabelDtoToEntityDto(LookupLabelDto input)
+        {
+            AppEntityDto returnObject = new AppEntityDto();
+            returnObject.Code = input.Code;
+            returnObject.Id = input.Value;
+            returnObject.Name = input.Label;
+            return returnObject;
+        }
     }
 }
