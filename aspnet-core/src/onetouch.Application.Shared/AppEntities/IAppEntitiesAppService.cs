@@ -84,7 +84,10 @@ namespace onetouch.AppEntities
 		Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code);
 		Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode);
 		Task<List<ContactInformationOutputDto>> GetContactsToMention(long entityId, string? filter);
-        //MMT
+		//MMT
+		Task<bool> IsCodeExisting(AppEntityDto input);
+		Task<LookupLabelDto> ConvertAppEntityDtoToLookupLabelDto(AppEntityDto input);
+        Task<AppEntityDto> ConvertAppLookupLabelDtoToEntityDto(LookupLabelDto input);
 
     }
 }
