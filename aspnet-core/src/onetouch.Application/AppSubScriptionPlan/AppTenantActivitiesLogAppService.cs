@@ -377,7 +377,7 @@ namespace onetouch.AppSubScriptionPlan
             return false;
         }
         [AllowAnonymous]
-        public async Task<bool> AddUsageActivityLog(string featureCode,string? relatedEntityCode, long? relatedEntityId, long? relatedEntityOvbjectTypeId, string reference, int qty)
+        public async Task<bool> AddUsageActivityLog(string featureCode,string? relatedEntityCode, long? relatedEntityId, long? relatedEntityOvbjectTypeId,string? relatedEntityObjectTypeCode, string reference, int qty)
         {
             
             var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(z=>z.AppSubscriptionPlanHeaderFk).Where(z => z.TenantId == AbpSession.TenantId &&
@@ -493,6 +493,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.RelatedEntityCode = relatedEntityCode;
                     obj.RelatedEntityId = relatedEntityId;
                     obj.RelatedEntityObjectTypeId = relatedEntityOvbjectTypeId;
+                    obj.RelatedEntityObjectTypeCode = relatedEntityObjectTypeCode;
                     await _appTenantActivityLogRepository.InsertAsync(obj);
                 }
                 else
@@ -532,6 +533,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.RelatedEntityCode = relatedEntityCode;
                     obj.RelatedEntityId = relatedEntityId;
                     obj.RelatedEntityObjectTypeId = relatedEntityOvbjectTypeId;
+                    obj.RelatedEntityObjectTypeCode = relatedEntityObjectTypeCode;
                     await _appTenantActivityLogRepository.InsertAsync(obj);
                 }
 

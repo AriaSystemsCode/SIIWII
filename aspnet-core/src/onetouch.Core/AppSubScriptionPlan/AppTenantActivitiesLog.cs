@@ -80,6 +80,7 @@ namespace onetouch.AppSubScriptionPlan
         public virtual string? RelatedEntityCode { get; set; }
 
         public virtual long? RelatedEntityObjectTypeId { get; set; }
+        public virtual string? RelatedEntityObjectTypeCode { get; set; }
 
         [ForeignKey("RelatedEntityObjectTypeId")]
         public SycEntityObjectType? RelatedEntityObjectTypeFk { get; set; }

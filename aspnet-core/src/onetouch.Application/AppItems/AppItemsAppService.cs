@@ -2029,7 +2029,7 @@ namespace onetouch.AppItems
                 var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
                 //if (available == true)
                 {
-                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.Code, 1);
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
                 }
             }
             //MMT
@@ -2039,7 +2039,7 @@ namespace onetouch.AppItems
                 appItem = await _appItemRepository.UpdateAsync(appItem);
                 var availableFeature = await _appTenantActivitiesLogAppService.IsFeatureAvailable("EDIT-PRODUCT");
                 //if (availableFeature == true)
-                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.Code, 1);
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
             }
             //MMT
 
