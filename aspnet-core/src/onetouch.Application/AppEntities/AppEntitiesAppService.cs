@@ -2221,8 +2221,8 @@ namespace onetouch.AppEntities
             returnObject.Value = input.Id;
             returnObject.IsHostRecord = input.TenantId == null;
             returnObject.HexaCode = (input.EntityExtraData != null && input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "";
-            returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().FileName != null) ?
-                          (imagesUrl + "-1" + @"/" + input.EntityAttachments.FirstOrDefault().FileName.ToString()) : "";
+            returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().guid != null) ?
+                          (imagesUrl + input.TenantId.ToString() + @"/" + input.EntityAttachments.FirstOrDefault().guid.ToString()) : "";
 
             return returnObject;
         }
