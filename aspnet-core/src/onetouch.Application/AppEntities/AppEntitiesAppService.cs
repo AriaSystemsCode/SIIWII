@@ -2214,7 +2214,7 @@ namespace onetouch.AppEntities
         }
         public async Task<LookupLabelDto> ConvertAppEntityDtoToLookupLabelDto(AppEntityDto input)
         {
-            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+            string imagesUrl = _appConfiguration[$"Attachment:PathTemp"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
             LookupLabelDto returnObject = new LookupLabelDto();
             returnObject.Code = input.Code;
             returnObject.Label = input.Name;
