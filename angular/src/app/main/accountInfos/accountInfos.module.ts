@@ -46,6 +46,7 @@ import { AddOnsComponent } from './components/accountBilling/components/add-ons/
 import { ActivityLogComponent } from './components/accountBilling/components/activity-log/activity-log.component';
 import { TenantInvoicesComponent } from './components/accountBilling/components/tenant-invoices/tenant-invoices.component';
 import { PlansComponent } from './components/accountBilling/components/plans/plans.component';
+import { MainModule } from '../main.module';
 
 
 @NgModule({
@@ -64,7 +65,7 @@ import { PlansComponent } from './components/accountBilling/components/plans/pla
         AddOnsComponent,
         ActivityLogComponent,
         TenantInvoicesComponent,
-        PlansComponent,
+        PlansComponent
     ],
     imports: [
         CommonModule,
@@ -99,7 +100,7 @@ import { PlansComponent } from './components/accountBilling/components/plans/pla
         SelectAddressModule,
         MembersListSharedModule,
         AccountModule,
-        MyMembersModule
+        MyMembersModule,MainModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

@@ -18,6 +18,7 @@ import * as moment from 'moment';
 
 
 @Component({
+    selector:'app-tenantactivitieslog',
     templateUrl: './appTenantActivitiesLog.component.html',
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation()]
