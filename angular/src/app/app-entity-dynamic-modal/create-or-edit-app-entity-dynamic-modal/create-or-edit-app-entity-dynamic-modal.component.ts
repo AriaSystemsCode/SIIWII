@@ -233,14 +233,25 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 this.notify.info(this.l("SavedSuccessfully"));
                 if(this.wantdisplaySaveSideBar)
                 this.displaySaveSideBar = true;
-
-                else {
-                        this.notify.info(this.l("SavedSuccessfully"));
-                        this.addNonLookupValues.emit(this.appEntity)
-                             this.saveDone.emit(true);
-                            this.hide();
-                }
             });
+        }
+        else {
+            this._appEntitiesServiceProxy
+            .isCodeExisting(this.appEntity)
+            .subscribe((result:boolean) => {
+                if(!result){
+                this.notify.info(this.l("SavedSuccessfully"));
+                this.addNonLookupValues.emit(this.appEntity)
+                     this.saveDone.emit(true);
+                    this.hide();
+                }
+                else{
+                    this.notify.error(this.l("Code is already Exist"));
+                    this.saveDone.emit(true);
+
+                }
+
+                    });
         }
     }
 

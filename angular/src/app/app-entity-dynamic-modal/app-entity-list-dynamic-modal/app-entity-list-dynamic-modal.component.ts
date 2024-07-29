@@ -136,6 +136,8 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
                         this.displayedRecords.splice(index,1)
                         const indexInAllRecords = this.allRecords.findIndex(item=>item.value == id)
                         this.allRecords.splice(indexInAllRecords,1)
+                        const _indexInAllRecords = this.nonLookupValues.findIndex(item=>item.value == id)
+                        this.nonLookupValues.splice(_indexInAllRecords,1)
                         this.notify.success(this.l('SuccessfullyDeleted'));
                     });
                 }
@@ -152,10 +154,10 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
 
     onAddNonLookupValues($event:AppEntityDto){
-        /*  this._appEntitiesServiceProxy.converttoLookupLabelDto($event)
+         this._appEntitiesServiceProxy.convertAppEntityDtoToLookupLabelDto($event)
         .subscribe((nonLookupValue :LookupLabelDto) => {
             this.nonLookupValues.push(nonLookupValue);
-        });  */
+        });  
 
      /* var nonLookupValue : LookupLabelDto =new LookupLabelDto();
         nonLookupValue.code =  $event?.code;
