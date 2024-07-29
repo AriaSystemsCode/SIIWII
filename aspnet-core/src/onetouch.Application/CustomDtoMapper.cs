@@ -1,4 +1,6 @@
-﻿using onetouch.AppSubscriptionPlans.Dtos;
+﻿using onetouch.SycCurrencyExchangeRates.Dtos;
+using onetouch.SycCurrencyExchangeRates;
+using onetouch.AppSubscriptionPlans.Dtos;
 using onetouch.AppSubscriptionPlans;
 using onetouch.AppSubScriptionPlan.Dtos;
 using onetouch.AppSubScriptionPlan;
@@ -120,6 +122,8 @@ namespace onetouch
     {
         public static void CreateMappings(IMapperConfigurationExpression configuration)
         {
+            configuration.CreateMap<CreateOrEditSycCurrencyExchangeRatesDto, onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates>().ReverseMap();
+            configuration.CreateMap<SycCurrencyExchangeRatesDto, onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();
             configuration.CreateMap<AppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();

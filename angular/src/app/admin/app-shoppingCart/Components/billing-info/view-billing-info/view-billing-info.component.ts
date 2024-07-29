@@ -10,6 +10,7 @@ import { finalize } from 'rxjs';
 })
 export class ViewBillingInfoComponent   extends AppComponentBase{
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Input("createOrEditBillingInfo") createOrEditBillingInfo: boolean=false;
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;

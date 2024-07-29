@@ -40,6 +40,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     @Output("orderInfoValid") orderInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
     @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
     @Input("activeTab") activeTab: number;
+    @Input("currentTab") currentTab: number;
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     shoppingCartoccordionTabs = ShoppingCartoccordionTabs; 
     @Input("createOrEditorderInfo") createOrEditorderInfo: boolean ;

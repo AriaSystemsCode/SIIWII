@@ -24,6 +24,7 @@ using Microsoft.EntityFrameworkCore;
 using onetouch.EntityFrameworkCore;
 using Abp.EntityFrameworkCore.Uow;
 using Abp.Domain.Repositories;
+using AutoMapper.Internal.Mappers;
 
 namespace onetouch.AppItems
 {
@@ -34,11 +35,13 @@ namespace onetouch.AppItems
         private readonly Helper _helper;
         //private readonly IAppItemRepository _appItemRepository;
         private readonly IRepository<AppItem, long> _appItemRepository;
-        public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor, IRepository<AppItem, long> appItemRepository, Helper helper)
+        private readonly IAppItemsAppService _appItemsAppService;
+        public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor, IRepository<AppItem, long> appItemRepository, Helper helper,IAppItemsAppService appItemsAppService)
         {
             _appConfiguration = appConfigurationAccessor.Configuration;
             _helper = helper;
             _appItemRepository = appItemRepository;
+            _appItemsAppService = appItemsAppService;
         }
         public async Task<ExcelTemplateDto> GetExcelTemplate(long? TypeId)
         {
@@ -125,7 +128,9 @@ namespace onetouch.AppItems
             var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             
             List<AppItem> appItemModifyList = new List<AppItem>();
-
+            //XX1
+            List<AppItem> modifiedItems = new List<AppItem>();
+            //xx1
             foreach (var excelDto in result)
             {
                 AppItem appItem = new AppItem();
@@ -151,6 +156,36 @@ namespace onetouch.AppItems
             {
                 x.AppItems.UpdateRange(appItemModifyList);
                 await x.SaveChangesAsync();
+                //XX1
+                var parentCodes = result.Select(z => z.ParentCode).Distinct().ToList();
+                foreach (var parent in parentCodes)
+                {
+                    var parentItem = await _appItemRepository.GetAll()//.Include(z => z.EntityFk)
+                        .Include(z => z.ParentFkList.Where(x => string.IsNullOrEmpty(x.Code)))//.ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
+                        .Where(z => z.Code == parent && z.ItemType == 0).FirstOrDefaultAsync();
+                    if (parentItem != null)
+                    {
+                        var sumQty = parentItem.ParentFkList.Select(z => z.StockAvailability).Sum();
+                        //List<VariationItemDto> variations = ObjectMapper.Map<List<VariationItemDto>>(parentItem.ParentFkList);
+                        //var updatedVariations = await _appItemsAppService.GetVariationsCodes(long.Parse(parentItem.SycIdentifierId.ToString()), parentItem.Code, variations, parentItem.EntityFk.EntityObjectTypeId, AbpSession.TenantId);
+                        //foreach (var vari in parentItem.ParentFkList)
+                        {
+                          //  var item = await _appItemRepository.GetAll().Where(z => z.Id == vari.Id).FirstOrDefaultAsync();
+                            //if (item != null)
+                            {
+                                parentItem.StockAvailability = sumQty;
+                                modifiedItems.Add(parentItem);
+                            }
+                        }
+                    }
+                }
+                if (modifiedItems.Count > 0)
+                {
+                   // var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                    x.AppItems.UpdateRange(modifiedItems);
+                    await x.SaveChangesAsync();
+                }
+                //xx1
             }
             return excelResultsDTO.ExcelLogDTO;
         }
@@ -223,6 +258,38 @@ namespace onetouch.AppItems
                 #region Excel validation rules only.
                 List<string> RecordsCodes = result.Select(r => r.Code).ToList();
                 List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
+                //XX1
+                List<AppItem> modifiedItems = new List<AppItem>();
+                var parentCodes = result.Select(z => z.ParentCode).Distinct().ToList();
+                foreach (var parent in parentCodes)
+                {
+                    var parentItem = await _appItemRepository.GetAll().Include(z => z.EntityFk)
+                        .Include(z => z.ParentFkList.Where(x => string.IsNullOrEmpty(x.Code))).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
+                        .Where(z => z.Code == parent && z.ItemType == 0 && z.ParentFkList.Where(x => string.IsNullOrEmpty(x.Code)).Count() > 0).FirstOrDefaultAsync();
+                    if (parentItem != null)
+                    {
+                        List<VariationItemDto> variations = ObjectMapper.Map<List<VariationItemDto>>(parentItem.ParentFkList);
+                        var updatedVariations = await _appItemsAppService.GetVariationsCodes(long.Parse(parentItem.SycIdentifierId.ToString()), parentItem.Code, variations, parentItem.EntityFk.EntityObjectTypeId, AbpSession.TenantId);
+                        foreach (var vari in updatedVariations)
+                        {
+                            var item = await _appItemRepository.GetAll().Where(z => z.Id == vari.Id).FirstOrDefaultAsync();
+                            if (item != null)
+                            {
+                                item.Code = vari.Code;
+                                modifiedItems.Add(item);
+                            }
+                        }
+                    }
+                }
+                if (modifiedItems.Count > 0)
+                {
+                    var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                    x.AppItems.UpdateRange(modifiedItems);
+                    await x.SaveChangesAsync();
+                }
+                //xx1
+
+
                 //T-SII-20231103.0002,1 MMT 01/01/2024-Products - Import Available inventory program is very slow[Start]
                 var resJoin1 = from r in result
                                join i in _appItemRepository.GetAll().AsNoTracking().Include(x => x.ParentFk).Where(x => x.ItemType == 0)

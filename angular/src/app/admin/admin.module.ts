@@ -3,6 +3,10 @@ import { FileUploadModule as PrimeNgFileUploadModule } from 'primeng/fileupload'
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { SycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/sycCurrencyExchangeRates.component';
+import { ViewSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/view-sycCurrencyExchangeRates.component';
+import { CreateOrEditSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/create-or-edit-sycCurrencyExchangeRates.component';
+
 import { AppTenantInvoicesComponent } from './appSubscriptionPlans/appTenantInvoices/appTenantInvoices.component';
 import { ViewAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/view-appTenantInvoice.component';
 import { CreateOrEditAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/create-or-edit-appTenantInvoice.component';
@@ -245,6 +249,10 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
     ],
     declarations: [
+		SycCurrencyExchangeRatesComponent,
+
+		ViewSycCurrencyExchangeRatesComponent,
+		CreateOrEditSycCurrencyExchangeRatesComponent,
 		AppTenantInvoicesComponent,
 
 		ViewAppTenantInvoiceComponent,

@@ -1,5 +1,8 @@
 ﻿import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { SycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/sycCurrencyExchangeRates.component';
+import { CreateOrEditSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/create-or-edit-sycCurrencyExchangeRates.component';
+import { ViewSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/view-sycCurrencyExchangeRates.component';
 import { AppTenantInvoicesComponent } from './appSubscriptionPlans/appTenantInvoices/appTenantInvoices.component';
 import { CreateOrEditAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/create-or-edit-appTenantInvoice.component';
 import { ViewAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/view-appTenantInvoice.component';
@@ -61,6 +64,9 @@ import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/ap
             {
                 path: '',
                 children: [
+                    { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates', component: SycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates' }  },
+                    { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates/createOrEdit', component: CreateOrEditSycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates.Create' }  },
+                    { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates/view', component: ViewSycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates' }  },
                     { path: 'appSubscriptionPlans/appTenantInvoices', component: AppTenantInvoicesComponent, data: { permission: 'Pages.Administration.AppTenantInvoices' }  },
                     { path: 'appSubscriptionPlans/appTenantInvoices/createOrEdit', component: CreateOrEditAppTenantInvoiceComponent, data: { permission: 'Pages.Administration.AppTenantInvoices.Create' }  },
                     { path: 'appSubscriptionPlans/appTenantInvoices/view', component: ViewAppTenantInvoiceComponent, data: { permission: 'Pages.Administration.AppTenantInvoices' }  },

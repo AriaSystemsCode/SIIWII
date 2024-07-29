@@ -15,7 +15,7 @@
                 Continue
             </button>
             <button
-                *ngIf="!createOrEditorderInfo && canChange"
+                *ngIf="!createOrEditorderInfo &&  !showSaveBtn &&  canChange"
                 (click)="showEditMode()"
                 class="previewbtn text-center btn float-right"
             >
@@ -46,6 +46,7 @@
             class="w-100"
             [isCreateOrEdit]="createOrEditorderInfo"
                 [activeTab]="activeTab"
+                [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (formValidityChanged)="isContactFormValid($event)"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"

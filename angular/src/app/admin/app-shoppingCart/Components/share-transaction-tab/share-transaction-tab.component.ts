@@ -75,6 +75,7 @@ if(this.sharedWithUsers){
     if(this.sharingListForSave?.length==0&&!this.editMode)this.dasableShareBtn=true;
     if(this.sharingListForSave&&this.messageBody)this.dasableShareBtn=false;
     if(this.emailList&&this.messageBody)this.dasableShareBtn=false;
+    if(this.emailList&&this.messageBody)this.readyForSave=true
     if(this.readyForSave&&this.sharingListForSave?.length>0)this.dasableShareBtn=false;
   } 
   shareTransaction(){

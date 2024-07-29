@@ -1,0 +1,81 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+            				<span *ngIf="active && sycCurrencyExchangeRates.id">{{"EditSycCurrencyExchangeRates" }}</span>
+            				<span *ngIf="active && !sycCurrencyExchangeRates.id">{{l("CreateSycCurrencyExchangeRates")}}</span>
+            			</h3>
+            			<span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            			<div class="kt-subheader__breadcrumbs">
+            				<a [routerLink]="['/app/admin/sycCurrencyExchangeRates/sycCurrencyExchangeRates']"
+            					class="kt-subheader__breadcrumbs-home"><i
+            						class="flaticon2-shelter"></i>{{l("SycCurrencyExchangeRates")}}</a>
+            				<span class="kt-subheader__breadcrumbs-separator"></span>
+            				<a 
+            					class="kt-subheader__breadcrumbs-link kt-subheader__breadcrumbs-link--active">
+            					<span *ngIf="active && sycCurrencyExchangeRates.id">{{l("Edit")}}</span>
+            					<span *ngIf="active && !sycCurrencyExchangeRates.id">{{l("Create")}}</span>
+            				</a>
+            			</div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">              
+                
+                
+								<div class="form-group">
+									<label for="SycCurrencyExchangeRates_CurrencyCode">{{l("CurrencyCode")}} *</label>
+									<input type="text" #SycCurrencyExchangeRates_CurrencyCode="ngModel" id="SycCurrencyExchangeRates_CurrencyCode" class="form-control" [(ngModel)]="sycCurrencyExchangeRates.currencyCode" name="CurrencyCode"   minlength="3"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="SycCurrencyExchangeRates_CurrencyCode"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycCurrencyExchangeRates_BaseCurrencyCode">{{l("BaseCurrencyCode")}} *</label>
+									<input type="text" #SycCurrencyExchangeRates_BaseCurrencyCode="ngModel" id="SycCurrencyExchangeRates_BaseCurrencyCode" class="form-control" [(ngModel)]="sycCurrencyExchangeRates.baseCurrencyCode" name="BaseCurrencyCode"   minlength="3"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="SycCurrencyExchangeRates_BaseCurrencyCode"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycCurrencyExchangeRates_ExchangeRate">{{l("ExchangeRate")}}</label>
+									<input type="number" #SycCurrencyExchangeRates_ExchangeRate="ngModel" id="SycCurrencyExchangeRates_ExchangeRate" class="form-control" [(ngModel)]="sycCurrencyExchangeRates.exchangeRate" name="ExchangeRate"  />
+								    <validation-messages [formCtrl]="SycCurrencyExchangeRates_ExchangeRate"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycCurrencyExchangeRates_CurrencyMethod">{{l("CurrencyMethod")}}</label>
+									<input type="text" #SycCurrencyExchangeRates_CurrencyMethod="ngModel" id="SycCurrencyExchangeRates_CurrencyMethod" class="form-control" [(ngModel)]="sycCurrencyExchangeRates.currencyMethod" name="CurrencyMethod"   minlength="1"  maxlength="1" />
+								    <validation-messages [formCtrl]="SycCurrencyExchangeRates_CurrencyMethod"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="SycCurrencyExchangeRates_CurrencyUnit">{{l("CurrencyUnit")}}</label>
+									<input type="number" #SycCurrencyExchangeRates_CurrencyUnit="ngModel" id="SycCurrencyExchangeRates_CurrencyUnit" class="form-control" [(ngModel)]="sycCurrencyExchangeRates.currencyUnit" name="CurrencyUnit"  />
+								    <validation-messages [formCtrl]="SycCurrencyExchangeRates_CurrencyUnit"></validation-messages>
+								</div>
+					
+            </div>
+              <div class="kt-portlet__foot">
+				<div class="col-lg-12">
+					<button (click)="save()" class="btn btn-primary blue float-right"
+                        [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
+                        <span>{{l("Save")}}</span>
+                    </button>
+                    <button *ngIf="!this.sycCurrencyExchangeRates.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
+                        [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
+                        <span>{{l("SaveAndNew")}}</span>
+                    </button>
+				</div>
+		    </div>
+        </div>
+    </div>
+  </div>
+  
+</div>

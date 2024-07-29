@@ -35,5 +35,7 @@ namespace onetouch.AppSiiwiiTransaction
         Task<bool> UpdateByProductSSINColor(long orderId, long parentId, string colorCode, long colorId, Int32 qty);
         Task AddTransactionDetails(GetAppMarketplaceItemDetailForViewDto input, string transactionId, string transactionType);
         Task<string> GetUserDefaultRole(string transType);
+        Task<Byte[]> GetTransactionOrderConfirmation(long transactionId);
+
     }
 }
