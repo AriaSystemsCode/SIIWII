@@ -2222,7 +2222,7 @@ namespace onetouch.AppEntities
             returnObject.IsHostRecord = input.TenantId == null;
             returnObject.HexaCode = (input.EntityExtraData != null && input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "";
             returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().guid != null) ?
-                          (imagesUrl + input.TenantId.ToString() + @"/" + input.EntityAttachments.FirstOrDefault().guid.ToString()) : "";
+                          (imagesUrl + input.TenantId.ToString() + @"/" + input.EntityAttachments.FirstOrDefault().guid.ToString()+ input.EntityAttachments.FirstOrDefault().FileName.Split('.')[1]) : "";
 
             return returnObject;
         }
