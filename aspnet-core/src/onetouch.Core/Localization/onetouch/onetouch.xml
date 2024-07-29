@@ -18,7 +18,7 @@
     <text name="ActivityType">Activity type</text>
     <text name="AppSubscriptionPlanHeaderId">App subscription plan header id</text>
     <text name="AppSubscriptionPlanCode">App subscription plan code</text>
-    <text name="ActivityDateTime">Activity date time</text>
+    <text name="ActivityDateTime">Activity Date/Time</text>
     <text name="Invoiced">Invoiced</text>
     <text name="NotInvoiced">Not invoiced</text>
     <text name="Reference">Reference</text>

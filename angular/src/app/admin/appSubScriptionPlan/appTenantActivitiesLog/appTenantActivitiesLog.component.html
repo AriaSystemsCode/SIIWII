@@ -248,7 +248,11 @@
                                      [resizableColumns]="primengTableHelper.resizableColumns">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="width: 130px">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="activityDateTime">
+                                        {{l('ActivityDateTime')}}
+                                        <p-sortIcon field="appTenantActivityLog.activityDateTime"></p-sortIcon>
+                                    </th>
+                                    <!-- <th style="width: 130px">{{l('Actions')}}</th>  -->
                                     <th style="width: 150px" pSortableColumn="tenantId">
                                         {{l('TenantId')}}
                                         <p-sortIcon field="appTenantActivityLog.tenantId"></p-sortIcon>
@@ -273,10 +277,7 @@
                                         {{l('AppSubscriptionPlanCode')}}
                                         <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanCode"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="activityDateTime">
-                                        {{l('ActivityDateTime')}}
-                                        <p-sortIcon field="appTenantActivityLog.activityDateTime"></p-sortIcon>
-                                    </th>
+                                    
                                     <th style="width: 150px" pSortableColumn="userName">
                                         {{l('UserName')}}
                                         <p-sortIcon field="appTenantActivityLog.userName"></p-sortIcon>
@@ -345,8 +346,8 @@
                                 </tr>
                             </ng-template>                           
 							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
-                                <tr>
-                                    <td style="width: 130px">
+                                <tr>  
+                                  <!--  <td style="width: 130px">
                                        <div class="btn-group dropdown" dropdown container="body">
                                             <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
                                                 <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
@@ -374,6 +375,13 @@
                                                 </li>
                                             </ul>
                                         </div>
+                                    </td>!-->
+                                    <td style="width:150px">
+										<!-- <span class="ui-column-title"> {{l('ActivityDateTime')}}</span> -->
+                                        <span *ngIf="record.appTenantActivityLog.activityDateTime">
+											{{record.appTenantActivityLog.activityDateTime |  momentFormat:'L' }}
+                                        </span>
+                                        <span *ngIf="!record.appTenantActivityLog.activityDateTime">-</span>
                                     </td>
                                     <td style="width:150px">
 											<span class="ui-column-title"> {{l('TenantId')}}</span>
@@ -399,13 +407,7 @@
 											<span class="ui-column-title"> {{l('AppSubscriptionPlanCode')}}</span>
 											{{record.appTenantActivityLog.appSubscriptionPlanCode}}
 										</td>
-                                    <td style="width:150px">
-										<span class="ui-column-title"> {{l('ActivityDateTime')}}</span>
-                                        <span *ngIf="record.appTenantActivityLog.activityDateTime">
-											{{record.appTenantActivityLog.activityDateTime |  momentFormat:'L' }}
-                                        </span>
-                                        <span *ngIf="!record.appTenantActivityLog.activityDateTime">-</span>
-                                    </td>
+                                   
                                     <td style="width:150px">
 											<span class="ui-column-title"> {{l('UserName')}}</span>
 											{{record.appTenantActivityLog.userName}}
