@@ -67,6 +67,7 @@ using onetouch.AppSiiwiiTransaction;
 using NPOI.HPSF;
 using NPOI.POIFS.NIO;
 using System.Dynamic;
+using NPOI.OpenXmlFormats.Vml;
 
 namespace onetouch.AppItems
 {
@@ -2323,7 +2324,7 @@ namespace onetouch.AppItems
                                     if (colorImage != null)
                                     {
                                         var path = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString().Trim() + @"\" + colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
-                                        
+
                                         if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
@@ -2363,6 +2364,31 @@ namespace onetouch.AppItems
                                     {
                                         if (string.IsNullOrEmpty(colorSchv.AttributeValue))
                                             colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var extraNonLookup = input.NonLookupValues.FirstOrDefault(z=>z.Code== colorExtraAtt.AttributeCode);
+                                if (extraNonLookup != null)
+                                {
+                                    if (extraNonLookup.HexaCode != null)
+                                    {
+                                        colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                        if (colorHexa != null)
+                                        {
+                                            if (string.IsNullOrEmpty(colorHexa.AttributeValue))
+                                                colorHexa.AttributeValue = extraNonLookup.HexaCode;
+                                        }
+                                    }
+                                    if (!string.IsNullOrEmpty(extraNonLookup.Image))
+                                    {
+                                        colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                                        if (colorImage != null)
+                                        {
+                                            colorImage.AttributeValue = Path.GetFileName(extraNonLookup.Image);
+                                        }
+
                                     }
                                 }
                             }
