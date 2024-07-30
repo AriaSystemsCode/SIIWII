@@ -252,6 +252,48 @@
                                         {{l('ActivityDateTime')}}
                                         <p-sortIcon field="appTenantActivityLog.activityDateTime"></p-sortIcon>
                                     </th>
+                                    <th style="width: 150px" pSortableColumn="featureCode">
+                                        {{l('FeatureCode')}}
+                                        <p-sortIcon field="appTenantActivityLog.featureCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureName">
+                                        {{l('FeatureName')}}
+                                        <p-sortIcon field="appTenantActivityLog.featureName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="reference">
+                                        {{l('Reference')}}
+                                        <p-sortIcon field="appTenantActivityLog.reference"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="consumedQty">
+                                        {{l('ConsumedQty')}}
+                                        <p-sortIcon field="appTenantActivityLog.consumedQty"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="remainingQty">
+                                        {{l('RemainingQty')}}
+                                        <p-sortIcon field="appTenantActivityLog.remainingQty"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="billable">
+                                        {{l('Billable')}}
+                                        <p-sortIcon field="appTenantActivityLog.billable"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="price">
+                                        {{l('Price')}}
+                                        <p-sortIcon field="appTenantActivityLog.price"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="amount">
+                                        {{l('Amount')}}
+                                        <p-sortIcon field="appTenantActivityLog.amount"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="invoiceNumber">
+                                        {{l('InvoiceNumber')}}
+                                        <p-sortIcon field="appTenantActivityLog.invoiceNumber"></p-sortIcon>
+                                    </th>
+                                    
+                                    
+                                    <th style="width: 150px" pSortableColumn="invoiceDate">
+                                        {{l('InvoiceDate')}}
+                                        <p-sortIcon field="appTenantActivityLog.invoiceDate"></p-sortIcon>
+                                    </th>
                                     <!-- <th style="width: 130px">{{l('Actions')}}</th>  -->
                                     <th style="width: 150px" pSortableColumn="tenantId">
                                         {{l('TenantId')}}
@@ -282,54 +324,19 @@
                                         {{l('UserName')}}
                                         <p-sortIcon field="appTenantActivityLog.userName"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="featureCode">
-                                        {{l('FeatureCode')}}
-                                        <p-sortIcon field="appTenantActivityLog.featureCode"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="featureName">
-                                        {{l('FeatureName')}}
-                                        <p-sortIcon field="appTenantActivityLog.featureName"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="billable">
-                                        {{l('Billable')}}
-                                        <p-sortIcon field="appTenantActivityLog.billable"></p-sortIcon>
-                                    </th>
+                                    
+                                    
                                     <th style="width: 150px" pSortableColumn="invoiced">
                                         {{l('Invoiced')}}
                                         <p-sortIcon field="appTenantActivityLog.invoiced"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="reference">
-                                        {{l('Reference')}}
-                                        <p-sortIcon field="appTenantActivityLog.reference"></p-sortIcon>
-                                    </th>
+                                    
                                     <th style="width: 150px" pSortableColumn="qty">
                                         {{l('Qty')}}
                                         <p-sortIcon field="appTenantActivityLog.qty"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="consumedQty">
-                                        {{l('ConsumedQty')}}
-                                        <p-sortIcon field="appTenantActivityLog.consumedQty"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="remainingQty">
-                                        {{l('RemainingQty')}}
-                                        <p-sortIcon field="appTenantActivityLog.remainingQty"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="price">
-                                        {{l('Price')}}
-                                        <p-sortIcon field="appTenantActivityLog.price"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="amount">
-                                        {{l('Amount')}}
-                                        <p-sortIcon field="appTenantActivityLog.amount"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="invoiceDate">
-                                        {{l('InvoiceDate')}}
-                                        <p-sortIcon field="appTenantActivityLog.invoiceDate"></p-sortIcon>
-                                    </th>
-                                    <th style="width: 150px" pSortableColumn="invoiceNumber">
-                                        {{l('InvoiceNumber')}}
-                                        <p-sortIcon field="appTenantActivityLog.invoiceNumber"></p-sortIcon>
-                                    </th>
+                                   
+                                   
                                     <th style="width: 150px" pSortableColumn="creditOrUsage">
                                         {{l('CreditOrUsage')}}
                                         <p-sortIcon field="appTenantActivityLog.creditOrUsage"></p-sortIcon>
@@ -384,6 +391,50 @@
                                         <span *ngIf="!record.appTenantActivityLog.activityDateTime">-</span>
                                     </td>
                                     <td style="width:150px">
+                                        <!-- <span class="ui-column-title"> {{l('FeatureCode')}}</span> -->
+                                        {{record.appTenantActivityLog.featureCode}}
+                                    </td>
+                                    <td style="width:150px">
+                                        <!-- <span class="ui-column-title"> {{l('FeatureName')}}</span> -->
+                                        {{record.appTenantActivityLog.featureName}}
+                                    </td>
+                                    <td style="width:150px">
+                                        <!-- <span class="ui-column-title"> {{l('Reference')}}</span> -->
+                                        {{record.appTenantActivityLog.reference}}
+                                    </td>
+                                    <td style="width:150px">
+                                        <!-- <span class="ui-column-title"> {{l('ConsumedQty')}}</span> -->
+                                        {{record.appTenantActivityLog.consumedQty}}
+                                    </td>
+                                <td style="width:150px">
+                                        <!-- <span class="ui-column-title"> {{l('RemainingQty')}}</span> -->
+                                        {{record.appTenantActivityLog.remainingQty}}
+                                    </td>
+                                    <td style="width:150px">
+										<!-- <span class="ui-column-title"> {{l('Billable')}}</span> -->
+                                        <div *ngIf="record.appTenantActivityLog.billable" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appTenantActivityLog.billable" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+                                        <!-- <span class="ui-column-title"> {{l('Price')}}</span> -->
+                                        {{record.appTenantActivityLog.price}}
+                                    </td>
+                                    <td style="width:150px">
+                                        <!-- <span class="ui-column-title"> {{l('Amount')}}</span> -->
+                                        {{record.appTenantActivityLog.amount}}
+                                    </td>
+                                    <td style="width:150px">
+                                        <!-- <span class="ui-column-title"> {{l('InvoiceNumber')}}</span> -->
+                                        {{record.appTenantActivityLog.invoiceNumber}}
+                                    </td>
+                                <td style="width:150px">
+                                    <!-- <span class="ui-column-title"> {{l('InvoiceDate')}}</span> -->
+                                    <span *ngIf="record.appTenantActivityLog.invoiceDate">
+                                        {{record.appTenantActivityLog.invoiceDate |  momentFormat:'L' }}
+                                    </span>
+                                    <span *ngIf="!record.appTenantActivityLog.invoiceDate">-</span>
+                                </td>
+                                    <td style="width:150px">
 											<span class="ui-column-title"> {{l('TenantId')}}</span>
 											{{record.appTenantActivityLog.tenantId}}
 										</td>
@@ -412,59 +463,22 @@
 											<span class="ui-column-title"> {{l('UserName')}}</span>
 											{{record.appTenantActivityLog.userName}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('FeatureCode')}}</span>
-											{{record.appTenantActivityLog.featureCode}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('FeatureName')}}</span>
-											{{record.appTenantActivityLog.featureName}}
-										</td>
-                                    <td style="width:150px">
-										<span class="ui-column-title"> {{l('Billable')}}</span>
-                                        <div *ngIf="record.appTenantActivityLog.billable" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
-										<div *ngIf="!record.appTenantActivityLog.billable" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
-                                    </td>
+                                    
+                                    
                                     <td style="width:150px">
 										<span class="ui-column-title"> {{l('Invoiced')}}</span>
                                         <div *ngIf="record.appTenantActivityLog.invoiced" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
 										<div *ngIf="!record.appTenantActivityLog.invoiced" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
                                     </td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Reference')}}</span>
-											{{record.appTenantActivityLog.reference}}
-										</td>
+                                    
                                     <td style="width:150px">
 											<span class="ui-column-title"> {{l('Qty')}}</span>
 											{{record.appTenantActivityLog.qty}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('ConsumedQty')}}</span>
-											{{record.appTenantActivityLog.consumedQty}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('RemainingQty')}}</span>
-											{{record.appTenantActivityLog.remainingQty}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Price')}}</span>
-											{{record.appTenantActivityLog.price}}
-										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Amount')}}</span>
-											{{record.appTenantActivityLog.amount}}
-										</td>
-                                    <td style="width:150px">
-										<span class="ui-column-title"> {{l('InvoiceDate')}}</span>
-                                        <span *ngIf="record.appTenantActivityLog.invoiceDate">
-											{{record.appTenantActivityLog.invoiceDate |  momentFormat:'L' }}
-                                        </span>
-                                        <span *ngIf="!record.appTenantActivityLog.invoiceDate">-</span>
-                                    </td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('InvoiceNumber')}}</span>
-											{{record.appTenantActivityLog.invoiceNumber}}
-										</td>
+                                    
+                                   
+                                     
+                                    
                                     <td style="width:150px">
 											<span class="ui-column-title"> {{l('CreditOrUsage')}}</span>
 											{{record.appTenantActivityLog.creditOrUsage}}
