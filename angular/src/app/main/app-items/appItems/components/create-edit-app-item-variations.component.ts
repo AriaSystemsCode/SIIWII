@@ -1236,6 +1236,15 @@ export class CreateEditAppItemVariationsComponent
                     let attrOptionData: any = currentExtraAttr.lookupData.filter(
                         (item) => item.value == attrId
                     )[0];
+
+                    if(!attrOptionData)
+                    attrOptionData = currentExtraAttr.lookupData.filter(
+                        (item) => item.code == attrId
+                    )[0];
+
+                    if(!attrOptionData)
+                    attrOptionData=currentExtraAttr.displayedSelectedValues.filter( (item) => item.code== attrId)[0];
+
                     createNewVariation(
                         attrOptionData?.label,
                         attrOptionData?.code,
@@ -1879,7 +1888,7 @@ export class CreateEditAppItemVariationsComponent
             },
             selectedRecords: extraAttr.selectedValues,
             acceptMultiValues: extraAttr.acceptMultipleValues,
-            nonLookupValues:  this.appItem.nonLookupValues ? this.appItem.nonLookupValues : []
+            nonLookupValues:  this.appItem.nonLookupValue ? this.appItem.nonLookupValue : []
         };
         config.initialState = modalDefaultData;
         let modalRef: BsModalRef = this._BsModalService.show(
@@ -1895,18 +1904,18 @@ export class CreateEditAppItemVariationsComponent
     
             subscription.subscribe((result) => {
                 extraAttr.lookupData=result;
-                extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
-                this.appItem.nonLookupValue = modalRefData.nonLookupValues;
-                this.appItem.nonLookupValue .push(...this.appItem.nonLookupValue.filter(item => extraAttr.selectedValues.includes(item.value)));
             });
 
             let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
             if (modalRefData.selectionDone){
                 extraAttr.selectedValues = modalRefData.selectedRecords;
-                extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
-                this.appItem.nonLookupValue = modalRefData.nonLookupValues;
-                this.appItem.nonLookupValue .push(...this.appItem.nonLookupValue.filter(item => extraAttr.selectedValues.includes(item.value)));
+              this.appItem.nonLookupValue =   this.appItem.nonLookupValue ? this.appItem.nonLookupValue : [] ;
+               this.appItem.nonLookupValue?.push(...modalRefData.nonLookupValues?.filter(item => this.appItem.nonLookupValue.includes(item.code)));
+               extraAttr.lookupData.push(...this.appItem.nonLookupValue);
+                extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
+                //this.appItem.nonLookupValue?.push(...this.appItem.nonLookupValue?.filter(item => extraAttr.selectedValues.includes(item.code)));
+                extraAttr.displayedSelectedValues.push(...this.appItem.nonLookupValue?.filter(item => extraAttr.selectedValues.includes(item.code)));
 
             }
             if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
@@ -2161,12 +2170,28 @@ export class CreateEditAppItemVariationsComponent
             name: extraAttr.name,
             code: extraAttr.entityObjectTypeCode
         };
-        const appEntity : AppEntityDto = new AppEntityDto()
-        if(item) {
-            appEntity.id = item?.value
+        let appEntity : AppEntityDto = new AppEntityDto()
+
+        if(item){
+            if(item?.value ) {
+                appEntity.id = item.value;
+                this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+            }
+    
+            else {
+                this._appEntitiesServiceProxy.convertAppLookupLabelDtoToEntityDto(item)
+                .subscribe((result :AppEntityDto) => {
+                    appEntity=result;
+                    this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+                }); 
+            }
         }
+    
+        else
         this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
     }
+
+
    async onCreateOrEditDoneHandler(){
       
         const extraAttr =
@@ -2187,6 +2212,13 @@ export class CreateEditAppItemVariationsComponent
         this.selectedExtraAttributes[this.activeExtraAttributeIndex];
         extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues.filter(item => item.value !== event.value);
         extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.value);
+
+        this.appItem.nonLookupValue = this.appItem.nonLookupValue?.filter(x=>x.code!=event.code)
+      let deselectedVariations=  this.variationMatrices?.filter((variation) => {return variation.entityExtraData[0].attributeCode==event.code      });
+      if(deselectedVariations && deselectedVariations.length>0){     
+      this.variationMatrices = this.variationMatrices?.filter((variation) => {
+        return !deselectedVariations.includes(variation);
+    });}
     }
     getExistingVariations(){
         this.activeExisttingVariation=true;

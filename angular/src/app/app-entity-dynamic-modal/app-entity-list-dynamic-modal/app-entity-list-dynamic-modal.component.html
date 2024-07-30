@@ -21,10 +21,10 @@
                 *ngFor="let item of displayedRecords;index as i">
                 <div class="d-flex" style="align-items: center;" [ngClass]="{'t-checkbox-list':acceptMultiValues}">
                     <label class="pl-3 pt-3 pr-2" [ngClass]="acceptMultiValues ? 'kt-checkbox kt-checkbox--dark':'ml-3'"
-                    [for]="item.value">
-                    <p-checkbox *ngIf="acceptMultiValues" [value]="item.value" [id]="item.value"
+                    [for]="item.value ? item.value : item.code">
+                    <p-checkbox *ngIf="acceptMultiValues" [value]="item.value ? item.value : item.code" [id]="item.value ? item.value : item.code"
                         [(ngModel)]="selectedRecords" [name]="entityObjectType.name"></p-checkbox>
-                    <input type="radio" *ngIf="!acceptMultiValues" [value]="item.value" [id]="item.value"
+                    <input type="radio" *ngIf="!acceptMultiValues" [value]="item.value ? item.value : item.code" [id]="item.value ? item.value : item.code"
                         [(ngModel)]="selectedRecords" [name]="entityObjectType.name" />
                 </label>
 
@@ -62,7 +62,7 @@
                                 <a (click)="openCreateOrEditModal(item)">{{'Edit' | localize}}</a>
                             </li>
                             <li>
-                                <a (click)="deleteSycEntityObject(item.value,i)">{{'Delete' | localize}}</a>
+                                <a (click)="deleteSycEntityObject(item,i)">{{'Delete' | localize}}</a>
                             </li>
                         </ul>
                     </div>

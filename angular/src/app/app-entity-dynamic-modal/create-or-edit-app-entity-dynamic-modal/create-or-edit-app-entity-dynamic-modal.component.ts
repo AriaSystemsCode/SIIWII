@@ -241,6 +241,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             .subscribe((result:boolean) => {
                 if(!result){
                 this.notify.info(this.l("SavedSuccessfully"));
+                this.appEntity.tenantId=this.appSession.tenantId;
                 this.addNonLookupValues.emit(this.appEntity)
                      this.saveDone.emit(true);
                     this.hide();

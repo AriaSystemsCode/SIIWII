@@ -97,14 +97,31 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
     openCreateOrEditModal(entityLookup?:LookupLabelDto) : void {
 
-        const appEntity : AppEntityDto = new AppEntityDto()
-        if(entityLookup) {
-            appEntity.id = entityLookup.value
+        let appEntity : AppEntityDto = new AppEntityDto()
+        if(entityLookup){
+        if(entityLookup.value ) {
+            appEntity.id = entityLookup.value;
+            this.showCreateOreEditAppEntityModal(appEntity)
         }
+
+        else {
+            this._appEntitiesServiceProxy.convertAppLookupLabelDtoToEntityDto(entityLookup)
+            .subscribe((result :AppEntityDto) => {
+                appEntity=result;
+                this.showCreateOreEditAppEntityModal(appEntity)
+            }); 
+        }
+    }
+
+    else
+    this.showCreateOreEditAppEntityModal(appEntity);
+
+    }
+
+    showCreateOreEditAppEntityModal(appEntity) {
         this.createOreEditAppEntityModal.codeIsRequired = true
         this.createOreEditAppEntityModal.show(this.entityObjectType,appEntity)
         this.active = false
-
     }
 
     onCanceledHandler(){
@@ -125,12 +142,15 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
         this.currentModalRef.hide()
     }
 
-    deleteSycEntityObject(id: number,index:number): void {
+    deleteSycEntityObject(_item,index:number): void {
         var isConfirmed: Observable<boolean>;
         isConfirmed   = this.askToConfirm("","AreYouSure");
     
+       let  id=_item.value ? _item.value :0
+
        isConfirmed.subscribe((res)=>{
           if(res){
+            if(id){
                     this._appEntitiesServiceProxy.delete(id)
                     .subscribe(() => {
                         this.displayedRecords.splice(index,1)
@@ -141,6 +161,15 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
                         this.notify.success(this.l('SuccessfullyDeleted'));
                     });
                 }
+                else{
+                    this.displayedRecords.splice(index,1)
+                    const indexInAllRecords = this.allRecords.findIndex(item=>item.code == _item.code)
+                    this.allRecords.splice(indexInAllRecords,1)
+                    const _indexInAllRecords = this.nonLookupValues.findIndex(item=>item.code == _item.code)
+                    this.nonLookupValues.splice(_indexInAllRecords,1)
+                    this.notify.success(this.l('SuccessfullyDeleted'));
+                }
+            }
             }
         );
     }
