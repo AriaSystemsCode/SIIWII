@@ -16,8 +16,8 @@
                     <div class="kt-subheader__toolbar">
                         <div class="kt-subheader__wrapper">
             				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
-                <button (click)="createAppTenantActivityLog()" 
-            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantActivityLog")}}</button>
+               <!--  <button (click)="createAppTenantActivityLog()" 
+            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantActivityLog")}}</button> -->
                         </div>
                     </div>
                   </div>
@@ -295,27 +295,27 @@
                                         <p-sortIcon field="appTenantActivityLog.invoiceDate"></p-sortIcon>
                                     </th>
                                     <!-- <th style="width: 130px">{{l('Actions')}}</th>  -->
-                                    <th style="width: 150px" pSortableColumn="tenantId">
+                                    <th style="width: 150px" pSortableColumn="tenantId" *ngIf="isHostLogged">
                                         {{l('TenantId')}}
                                         <p-sortIcon field="appTenantActivityLog.tenantId"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="tenantName">
+                                    <th style="width: 150px" pSortableColumn="tenantName" *ngIf="isHostLogged">
                                         {{l('TenantName')}}
                                         <p-sortIcon field="appTenantActivityLog.tenantName"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="userId">
+                                    <th style="width: 150px" pSortableColumn="userId" *ngIf="isHostLogged">
                                         {{l('UserId')}}
                                         <p-sortIcon field="appTenantActivityLog.userId"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="activityType">
+                                    <th style="width: 150px" pSortableColumn="activityType" *ngIf="isHostLogged">
                                         {{l('ActivityType')}}
                                         <p-sortIcon field="appTenantActivityLog.activityType"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanHeaderId">
+                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanHeaderId" *ngIf="isHostLogged">
                                         {{l('AppSubscriptionPlanHeaderId')}}
                                         <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanHeaderId"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanCode">
+                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanCode" *ngIf="isHostLogged">
                                         {{l('AppSubscriptionPlanCode')}}
                                         <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanCode"></p-sortIcon>
                                     </th>
@@ -326,26 +326,26 @@
                                     </th>
                                     
                                     
-                                    <th style="width: 150px" pSortableColumn="invoiced">
+                                    <th style="width: 150px" pSortableColumn="invoiced" *ngIf="isHostLogged">
                                         {{l('Invoiced')}}
                                         <p-sortIcon field="appTenantActivityLog.invoiced"></p-sortIcon>
                                     </th>
                                     
-                                    <th style="width: 150px" pSortableColumn="qty">
+                                    <th style="width: 150px" pSortableColumn="qty" *ngIf="isHostLogged">
                                         {{l('Qty')}}
                                         <p-sortIcon field="appTenantActivityLog.qty"></p-sortIcon>
                                     </th>
                                    
                                    
-                                    <th style="width: 150px" pSortableColumn="creditOrUsage">
+                                    <th style="width: 150px" pSortableColumn="creditOrUsage" *ngIf="isHostLogged">
                                         {{l('CreditOrUsage')}}
                                         <p-sortIcon field="appTenantActivityLog.creditOrUsage"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="month">
+                                    <th style="width: 150px" pSortableColumn="month" *ngIf="isHostLogged">
                                         {{l('Month')}}
                                         <p-sortIcon field="appTenantActivityLog.month"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="year">
+                                    <th style="width: 150px" pSortableColumn="year" *ngIf="isHostLogged">
                                         {{l('Year')}}
                                         <p-sortIcon field="appTenantActivityLog.year"></p-sortIcon>
                                     </th>
@@ -434,61 +434,62 @@
                                     </span>
                                     <span *ngIf="!record.appTenantActivityLog.invoiceDate">-</span>
                                 </td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('TenantId')}}</span>
-											{{record.appTenantActivityLog.tenantId}}
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('TenantId')}}</span> -->
+											 {{record.appTenantActivityLog.tenantId}}
+                                     
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('TenantName')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('TenantName')}}</span> -->
 											{{record.appTenantActivityLog.tenantName}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('UserId')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('UserId')}}</span> -->
 											{{record.appTenantActivityLog.userId}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('ActivityType')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('ActivityType')}}</span> -->
 											{{record.appTenantActivityLog.activityType}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('AppSubscriptionPlanHeaderId')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('AppSubscriptionPlanHeaderId')}}</span> -->
 											{{record.appTenantActivityLog.appSubscriptionPlanHeaderId}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('AppSubscriptionPlanCode')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('AppSubscriptionPlanCode')}}</span> -->
 											{{record.appTenantActivityLog.appSubscriptionPlanCode}}
 										</td>
                                    
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('UserName')}}</span>
+                                    <td style="width:150px" >
+											<!-- <span class="ui-column-title"> {{l('UserName')}}</span> -->
 											{{record.appTenantActivityLog.userName}}
 										</td>
                                     
                                     
-                                    <td style="width:150px">
-										<span class="ui-column-title"> {{l('Invoiced')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+										<!-- <span class="ui-column-title"> {{l('Invoiced')}}</span> -->
                                         <div *ngIf="record.appTenantActivityLog.invoiced" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
 										<div *ngIf="!record.appTenantActivityLog.invoiced" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
                                     </td>
                                     
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Qty')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('Qty')}}</span> -->
 											{{record.appTenantActivityLog.qty}}
 										</td>
                                     
                                    
                                      
                                     
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('CreditOrUsage')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('CreditOrUsage')}}</span> -->
 											{{record.appTenantActivityLog.creditOrUsage}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Month')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged" >
+											<!-- <span class="ui-column-title"> {{l('Month')}}</span> -->
 											{{record.appTenantActivityLog.month}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('Year')}}</span>
+                                    <td style="width:150px" *ngIf="isHostLogged">
+											<!-- <span class="ui-column-title"> {{l('Year')}}</span> -->
 											{{record.appTenantActivityLog.year}}
 										</td>
 
