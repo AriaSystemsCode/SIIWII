@@ -40,6 +40,7 @@ using NPOI.Util;
 using Abp.Domain.Entities;
 using NPOI.SS.Formula.Functions;
 using NPOI.HPSF;
+using System.IO;
 
 namespace onetouch.AppEntities
 {
@@ -2232,6 +2233,22 @@ namespace onetouch.AppEntities
             returnObject.Code = input.Code;
             returnObject.Id = input.Value;
             returnObject.Name = input.Label;
+            if (!string.IsNullOrEmpty(input.Image))
+            {
+                returnObject.EntityAttachments = new List<AppEntityAttachmentDto>();
+                AppEntityAttachmentDto attach = new AppEntityAttachmentDto();
+                attach.FileName = Path.GetFileName(input.Image);
+                returnObject.EntityAttachments.Add(attach);
+            }
+            if (!string.IsNullOrEmpty(input.HexaCode))
+            {
+                returnObject.EntityExtraData = new List<AppEntityExtraDataDto>();
+                AppEntityExtraDataDto extra = new AppEntityExtraDataDto();
+                extra.AttributeId = 39;
+                extra.AttributeValue = input.HexaCode;
+                returnObject.EntityExtraData.Add(extra);
+
+            }
             return returnObject;
         }
     }
