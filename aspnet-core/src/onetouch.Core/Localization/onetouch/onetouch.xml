@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>    <text name="SycCurrencyExchangeRates">Currency Exchange Rate</text>
+	<texts>
+    <text name="SycCurrencyExchangeRates">Currency Exchange Rate</text>
     <text name="onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates">SycCurrencyExchangeRates</text>
     <text name="CurrencyCode">Currency code</text>
     <text name="BaseCurrencyCode">Base currency code</text>
