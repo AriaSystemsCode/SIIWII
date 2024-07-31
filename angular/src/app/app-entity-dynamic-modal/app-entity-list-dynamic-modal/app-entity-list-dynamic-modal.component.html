@@ -101,5 +101,5 @@
 
 
 <app-create-or-edit-app-entity-dynamic-modal #createOreEditAppEntityModal (cancel)="onCanceledHandler()"
-    (saveDone)="onCreateOrEditDoneHandler()" [enableAddToLookup]="true" (addNonLookupValues)="onAddNonLookupValues($event)">
+    (saveDone)="onCreateOrEditDoneHandler()" [enableAddToLookup]="entityObjectType.name.toUpperCase()== 'COLOR'  || entityObjectType.name.toUpperCase()=='CLOSURE'" (addNonLookupValues)="onAddNonLookupValues($event)">
 </app-create-or-edit-app-entity-dynamic-modal>

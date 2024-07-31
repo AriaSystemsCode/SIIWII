@@ -82,6 +82,7 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
 
             if( isFirstPage ) this.allRecords = []
             this.allRecords.push(...result.items);
+            this.nonLookupValues=this.nonLookupValues ? this.nonLookupValues : [] 
             this.allRecords.push(...this.nonLookupValues);
             this.displayedRecords = this.allRecords
             this.totalCount = result.totalCount;

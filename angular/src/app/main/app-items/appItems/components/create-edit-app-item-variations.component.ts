@@ -1911,14 +1911,13 @@ export class CreateEditAppItemVariationsComponent
             if (modalRefData.selectionDone){
                 extraAttr.selectedValues = modalRefData.selectedRecords;
               this.appItem.nonLookupValues =   this.appItem.nonLookupValues ? this.appItem.nonLookupValues : [] ;
-            //   this.appItem.nonLookupValues?.push(...modalRefData.nonLookupValues?.filter(item => this.appItem.nonLookupValues.includes(item.code)));
+               //this.appItem.nonLookupValues?.push(...modalRefData.nonLookupValues?.filter(item => this.appItem.nonLookupValues.includes(item.code)));
 
-               if (modalRefData?.nonLookupValues) {
-                const filteredItems = modalRefData.nonLookupValues.filter(item => 
-                    this.appItem.nonLookupValues.some(existingItem => existingItem.code === item.code)
-                );
-                this.appItem.nonLookupValues.push(...filteredItems);
-            }
+               let existingCodes = this.appItem.nonLookupValues.map(item => item.code);
+
+               let newCodes = modalRefData.nonLookupValues?.filter(item => !existingCodes.includes(item.code));
+               newCodes= newCodes ? newCodes : [] ;
+               this.appItem.nonLookupValues.push(...newCodes);
 
                extraAttr.lookupData.push(...this.appItem.nonLookupValues);
                 extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
@@ -2218,8 +2217,14 @@ export class CreateEditAppItemVariationsComponent
     deselectSelectedAttributesValue(event){
         const extraAttr =
         this.selectedExtraAttributes[this.activeExtraAttributeIndex];
+        if(event.value){
         extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues.filter(item => item.value !== event.value);
         extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.value);
+        }
+        else{
+            extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues.filter(item => item.code !== event.code);
+            extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.code);
+        }
 
         this.appItem.nonLookupValues = this.appItem.nonLookupValues?.filter(x=>x.code!=event.code)
       let deselectedVariations=  this.variationMatrices?.filter((variation) => {return variation.entityExtraData[0].attributeCode==event.code      });

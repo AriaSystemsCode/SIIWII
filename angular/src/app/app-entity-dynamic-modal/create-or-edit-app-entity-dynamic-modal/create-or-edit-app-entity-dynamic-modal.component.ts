@@ -103,6 +103,16 @@ export class CreateOrEditAppEntityDynamicModalComponent
                     this.loading = true;
                 });
         }
+
+        else{
+            if(this.appEntity?.code){
+                if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
+                this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
+                this.addToLookup=false;
+                this.adjustImageSrcsUrls();
+                this.loading = true;
+            }
+        }
             console.log("this.entityObjectType.code"+this.entityObjectType.code);
         this._sycAttachmentCategoriesServiceProxy.getAllByEntityObjectType(
             0,
@@ -542,7 +552,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
             },
             []
         );
-        if (attachments.length > 0) this.attachmentsSrcs = [];
+        attachments=attachments? attachments : [] ;
+        if (attachments?.length > 0) this.attachmentsSrcs = [];
         this.attachmentsSrcs.unshift(...attachments);
     }
     fileChange(
