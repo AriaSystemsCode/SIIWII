@@ -2311,6 +2311,10 @@ namespace onetouch.AppItems
                             }
                         }
                         var colorExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 101).FirstOrDefault();
+                        if (colorExtraAtt == null)
+                        {
+                            colorExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 100).FirstOrDefault();
+                        }
                         if (colorExtraAtt != null)
                         {
                             var colorExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
