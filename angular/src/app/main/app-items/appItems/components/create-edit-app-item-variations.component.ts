@@ -225,7 +225,6 @@ export class CreateEditAppItemVariationsComponent
     activeExisttingVariation=false;
     showNewVariation=false;
     activeNewVariation=false;
-
     constructor(
         injector: Injector,
         private _extraAttributeDataService: ExtraAttributeDataService,
@@ -538,7 +537,8 @@ export class CreateEditAppItemVariationsComponent
                         stockAvailability:0,
                         isHostRecord:false,
                         hexaCode:undefined,
-                        image:undefined
+                        image:undefined,
+                        id:0
                     })
                     extraAttr?.lookupData?.push(tempAtt)
                 }
@@ -938,7 +938,7 @@ export class CreateEditAppItemVariationsComponent
                 }
                 // reset input
                 event.target.value = null;
-                subs.unsubscribe();
+              //  subs.unsubscribe();
             });
         }
     }
@@ -1895,7 +1895,7 @@ export class CreateEditAppItemVariationsComponent
             AppEntityListDynamicModalComponent,
             config
         );
-        let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
+   const subs = this._BsModalService.onHidden.subscribe(() => {
             const  subscription=  this._extraAttributeDataService.getExtraAttributeLookupData(
                 extraAttr.entityObjectTypeCode,
                 extraAttr.lookupData,
@@ -1925,7 +1925,7 @@ export class CreateEditAppItemVariationsComponent
                 extraAttr.displayedSelectedValues.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
 
             }
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
     filterLookup($event) {
@@ -2180,7 +2180,7 @@ export class CreateEditAppItemVariationsComponent
         let appEntity : AppEntityDto = new AppEntityDto()
 
         if(item){
-            if(item?.value ) {
+            if(item?.id) {
                 appEntity.id = item.value;
                 this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
             }
@@ -2189,6 +2189,7 @@ export class CreateEditAppItemVariationsComponent
                 this._appEntitiesServiceProxy.convertAppLookupLabelDtoToEntityDto(item)
                 .subscribe((result :AppEntityDto) => {
                     appEntity=result;
+                    appEntity.id = 0;
                     this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
                 }); 
             }

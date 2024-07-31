@@ -88,6 +88,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         appEntity?: AppEntityDto
     ): void {
         this.entityObjectType = entityObjectType;
+        this.saving=false;
         if (appEntity) this.appEntity = appEntity;
         else appEntity = new AppEntityDto();
         this.appEntity.tenantId = -1;
@@ -106,6 +107,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
         else{
             if(this.appEntity?.code){
+                this.editMode = true;
                 if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
                 this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
                 this.addToLookup=false;
@@ -582,7 +584,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 }
                 // reset input
                 event.target.value = null;
-                subs.unsubscribe();
+            //  subs.unsubscribe();
             });
         }
     }

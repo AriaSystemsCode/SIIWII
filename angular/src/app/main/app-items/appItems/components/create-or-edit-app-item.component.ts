@@ -322,6 +322,7 @@ export class CreateOrEditAppItemComponent
                     entityDepartments: res.appItem.entityDepartments.items,
                     entityClassifications:
                         res.appItem.entityClassifications.items,
+                        nonLookupValues: res.nonLookupValues
                 });
                 this.categoriesTotalCount =
                     res.appItem.entityCategories.totalCount;
