@@ -184,20 +184,22 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
 
     onAddNonLookupValues($event:AppEntityDto){
+
          this._appEntitiesServiceProxy.convertAppEntityDtoToLookupLabelDto($event)
         .subscribe((nonLookupValues :LookupLabelDto) => {
+            if(!$event?.id)
             this.nonLookupValues.push(nonLookupValues);
-        });  
 
-     /* var nonLookupValues : LookupLabelDto =new LookupLabelDto();
-        nonLookupValues.code =  $event?.code;
-        nonLookupValues.label = $event?.name;
-        nonLookupValues.hexaCode =$event?.entityExtraData ?  $event?.entityExtraData[0]?.attributeValue : null ;
-        var imgName_Type = $event?.entityAttachments ?  $event?.entityAttachments[0]?.fileName?.split('.') : [];
-        var imgType =  imgName_Type.length  >0 ?  imgName_Type?.[imgName_Type.length - 1] : "" ;
-        nonLookupValues.image ="attachments/-1/" + $event?.entityAttachments[0]?.guid+"."+ imgType;   
-        nonLookupValues.value = $event?.objectId;      // ??????????????????????
-        nonLookupValues.isHostRecord =  false;
-        nonLookupValues.stockAvailability = null; */
+            else{
+                let x = this.nonLookupValues.filter(x=>x.code==nonLookupValues.code);
+                if(x && x.length>0)
+                 {
+                     x[0].hexaCode=nonLookupValues.hexaCode;
+                     x[0].image=nonLookupValues.image;
+                     x[0].label=nonLookupValues.label;
+                     x[0].value=nonLookupValues.value;
+                 }
+            }
+        }); 
     }
 }

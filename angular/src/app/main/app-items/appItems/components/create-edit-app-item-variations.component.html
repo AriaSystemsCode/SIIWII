@@ -773,5 +773,5 @@
 >
 </app-generic-form-modal> -->
 <app-create-or-edit-app-entity-dynamic-modal #createOreEditAppEntityModal 
-    (saveDone)="onCreateOrEditDoneHandler()" [enableAddToLookup]="true" [wantdisplaySaveSideBar]="false">
+    (saveDone)="onCreateOrEditDoneHandler()" [enableAddToLookup]="true" [wantdisplaySaveSideBar]="false"  (addNonLookupValues)="onAddNonLookupValues($event)">
 </app-create-or-edit-app-entity-dynamic-modal>

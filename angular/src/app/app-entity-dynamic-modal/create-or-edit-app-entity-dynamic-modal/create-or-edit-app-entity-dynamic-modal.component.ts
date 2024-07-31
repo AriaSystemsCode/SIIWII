@@ -102,6 +102,12 @@ export class CreateOrEditAppEntityDynamicModalComponent
                     console.log(">>", this.appEntity);
                     this.adjustImageSrcsUrls();
                     this.loading = true;
+
+
+                    if(!this.appEntity.entityAttachments)
+                    this.setSolid(true);
+                else
+                this.setSolid(false);
                 });
         }
 
@@ -113,6 +119,11 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 this.addToLookup=false;
                 this.adjustImageSrcsUrls();
                 this.loading = true;
+
+                if(!this.appEntity.entityAttachments)
+                this.setSolid(true);
+            else
+            this.setSolid(false);
             }
         }
             console.log("this.entityObjectType.code"+this.entityObjectType.code);
@@ -248,6 +259,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             });
         }
         else {
+            if(!this.appEntity.id){
             this._appEntitiesServiceProxy
             .isCodeExisting(this.appEntity)
             .subscribe((result:boolean) => {
@@ -260,11 +272,18 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 }
                 else{
                     this.notify.error(this.l("Code is already Exist"));
-                    this.saveDone.emit(true);
-
+                    this.saving = false;
                 }
 
                     });
+                }
+                else{
+                this.notify.info(this.l("SavedSuccessfully"));
+                this.appEntity.tenantId=this.appSession.tenantId;
+                this.addNonLookupValues.emit(this.appEntity)
+                     this.saveDone.emit(true);
+                    this.hide();
+                }
         }
     }
 

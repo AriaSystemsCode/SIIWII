@@ -124,6 +124,7 @@ export class CreateOrEditAppItemComponent
     defaultCurrencyMSRPPriceIndex = -1;
     showAdvancedPricing: boolean = false;
     PriceValidMsg: string = "";
+    oldnonLookupValues;
 
     constructor(
         injector: Injector,
@@ -324,6 +325,8 @@ export class CreateOrEditAppItemComponent
                         res.appItem.entityClassifications.items,
                         nonLookupValues: res.nonLookupValues
                 });
+
+                this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(this.appItem.nonLookupValues)) : [];
                 this.categoriesTotalCount =
                     res.appItem.entityCategories.totalCount;
                 this.departmentsTotalCount =
@@ -1392,6 +1395,7 @@ export class CreateOrEditAppItemComponent
     }
 
     applyVariations($event: ApplyVariationOutput) {
+        this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(this.appItem.nonLookupValues)) : [];
         this.appItem.variationItems = $event.variation;
         this.appItem.appItemSizesScaleInfo = $event.appItemSizesScaleInfo;
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
@@ -1436,6 +1440,7 @@ export class CreateOrEditAppItemComponent
         if ($event?.target?.files.length == 0)
             return;
         this.displayVariations = false;
+        this.appItem.nonLookupValues=this.oldnonLookupValues;
     }
 
     allCurrencies: CurrencyInfoDto[] = [];

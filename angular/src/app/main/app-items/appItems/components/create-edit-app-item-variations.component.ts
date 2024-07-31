@@ -1243,8 +1243,12 @@ export class CreateEditAppItemVariationsComponent
                     )[0];
 
                     if(!attrOptionData)
+                    attrOptionData=currentExtraAttr.displayedSelectedValues.filter( (item) => item.value== attrId)[0]
+
+                    if(!attrOptionData)
                     attrOptionData=currentExtraAttr.displayedSelectedValues.filter( (item) => item.code== attrId)[0];
 
+                    
                     createNewVariation(
                         attrOptionData?.label,
                         attrOptionData?.code,
@@ -1919,6 +1923,18 @@ export class CreateEditAppItemVariationsComponent
                newCodes= newCodes ? newCodes : [] ;
                this.appItem.nonLookupValues.push(...newCodes);
 
+               let x=extraAttr.lookupData?.filter(item => existingCodes.includes(item.code))
+               if(x && x.length >0)
+               {
+                for (let index = 0; index < x.length; index++) {
+                    const element = x[index];
+                let y=this.appItem.nonLookupValues.filter(item => item.code == element.code);
+                if(y && y.length>0)
+                      y[0].value=element.value
+               }
+            }
+
+               extraAttr.lookupData= extraAttr.lookupData?.filter(item => !existingCodes.includes(item.code))
                extraAttr.lookupData.push(...this.appItem.nonLookupValues);
                 extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
                 //this.appItem.nonLookupValues?.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
@@ -2027,6 +2043,22 @@ export class CreateEditAppItemVariationsComponent
         this.oldExtraAttributesData = [];
         this.extraAttributes.forEach((elem) => {
             if(elem.selected){
+                let existingCodes = this.appItem.nonLookupValues.map(item => item.code);
+                let x=elem.lookupData?.filter(item => existingCodes.includes(item.code))
+                if(x && x.length >0)
+                {
+                    for (let index = 0; index < x.length; index++) {
+                        const element = x[index];
+                 let y=this.appItem.nonLookupValues.filter(item => item.code == element.code);
+                 if(y && y.length>0)
+                       {
+                        element.hexaCode=y[0].hexaCode;
+                        element.image=y[0].image;
+                        y[0].value=element.value;
+                       }
+                    }
+                }
+
             elem.displayedSelectedValues =  elem.lookupData.filter(item => elem.selectedValues.includes(item.value))
             this.oldExtraAttributesData.push(cloneDeep(elem));
             }
@@ -2199,7 +2231,25 @@ export class CreateEditAppItemVariationsComponent
         this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
     }
 
+    onAddNonLookupValues($event:AppEntityDto){
+        this._appEntitiesServiceProxy.convertAppEntityDtoToLookupLabelDto($event)
+       .subscribe((nonLookupValues :LookupLabelDto) => {
+         //  this.nonLookupValues.push(nonLookupValues);
+         if(!$event?.id)
+         this.appItem.nonLookupValues.push(nonLookupValues);
 
+         else{
+             let x = this.appItem.nonLookupValues.filter(x=>x.code==nonLookupValues.code);
+             if(x && x.length>0)
+              {
+                  x[0].hexaCode=nonLookupValues.hexaCode;
+                  x[0].image=nonLookupValues.image;
+                  x[0].label=nonLookupValues.label;
+                  x[0].value=nonLookupValues.value;
+              }
+         }
+       });  
+    }
    async onCreateOrEditDoneHandler(){
       
         const extraAttr =
@@ -2211,7 +2261,7 @@ export class CreateEditAppItemVariationsComponent
         );
 
         subscription.subscribe((result) => {
-            extraAttr.displayedSelectedValues = result.filter(item => extraAttr.selectedValues.includes(item.value));
+            //extraAttr.displayedSelectedValues = result.filter(item => extraAttr.selectedValues.includes(item.value));
           });
     }
 
