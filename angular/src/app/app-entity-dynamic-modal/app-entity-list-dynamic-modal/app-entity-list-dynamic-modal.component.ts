@@ -184,19 +184,19 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
 
     onAddNonLookupValues($event:AppEntityDto){
          this._appEntitiesServiceProxy.convertAppEntityDtoToLookupLabelDto($event)
-        .subscribe((nonLookupValue :LookupLabelDto) => {
-            this.nonLookupValues.push(nonLookupValue);
+        .subscribe((nonLookupValues :LookupLabelDto) => {
+            this.nonLookupValues.push(nonLookupValues);
         });  
 
-     /* var nonLookupValue : LookupLabelDto =new LookupLabelDto();
-        nonLookupValue.code =  $event?.code;
-        nonLookupValue.label = $event?.name;
-        nonLookupValue.hexaCode =$event?.entityExtraData ?  $event?.entityExtraData[0]?.attributeValue : null ;
+     /* var nonLookupValues : LookupLabelDto =new LookupLabelDto();
+        nonLookupValues.code =  $event?.code;
+        nonLookupValues.label = $event?.name;
+        nonLookupValues.hexaCode =$event?.entityExtraData ?  $event?.entityExtraData[0]?.attributeValue : null ;
         var imgName_Type = $event?.entityAttachments ?  $event?.entityAttachments[0]?.fileName?.split('.') : [];
         var imgType =  imgName_Type.length  >0 ?  imgName_Type?.[imgName_Type.length - 1] : "" ;
-        nonLookupValue.image ="attachments/-1/" + $event?.entityAttachments[0]?.guid+"."+ imgType;   
-        nonLookupValue.value = $event?.objectId;      // ??????????????????????
-        nonLookupValue.isHostRecord =  false;
-        nonLookupValue.stockAvailability = null; */
+        nonLookupValues.image ="attachments/-1/" + $event?.entityAttachments[0]?.guid+"."+ imgType;   
+        nonLookupValues.value = $event?.objectId;      // ??????????????????????
+        nonLookupValues.isHostRecord =  false;
+        nonLookupValues.stockAvailability = null; */
     }
 }
