@@ -1085,6 +1085,7 @@ namespace onetouch.AppItems
                         //MMT I41[Start]
                         if (firstattributeCodes != null && firstattributeCodes.Count > 0)
                         {
+                            output.NonLookupValues = new List<LookupLabelDto>();
                             for (int cod=0; cod < firstattributeCodes.Count; cod++)
                             {
                                 var entity = await _appEntityRepository.GetAll()
