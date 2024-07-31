@@ -1695,7 +1695,14 @@ namespace onetouch.AppSiiwiiTransaction
                     var totalCount = await filteredAppTransactions.CountAsync();
                     var objList = await pagedAndFilteredAppTransactions.ToListAsync();
                     var appTrans = ObjectMapper.Map<List<GetAllAppTransactionsForViewDto>>(objList);
-
+                foreach (var tran in appTrans)
+                {
+                    if (tran.TenantOwner != null)
+                    {  
+                        var creatorTenant =await  TenantManager.GetByIdAsync(int.Parse(tran.TenantOwner.ToString()));
+                        tran.CreatorTenantName = creatorTenant.Name;
+                    }
+                }
                 return new PagedResultDto<GetAllAppTransactionsForViewDto>(
                     totalCount,
                     appTrans

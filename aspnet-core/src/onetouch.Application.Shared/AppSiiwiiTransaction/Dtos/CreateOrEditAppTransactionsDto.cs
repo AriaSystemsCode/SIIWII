@@ -86,6 +86,9 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual bool lFromPlaceOrder { set; get; } = false;
        
         public virtual decimal CurrencyExchangeRate { get; set; }
+        //Iteration#42[Start]
+        public virtual string? Reference { set; get; }
+        //Iteration#42[End]
     }
     public enum OrderCreatorRole
     { 

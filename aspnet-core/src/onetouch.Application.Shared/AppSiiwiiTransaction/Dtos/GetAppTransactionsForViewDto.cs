@@ -26,6 +26,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public byte[] OrderConfirmationFile { set; get; }
         public virtual List<ContactInformationOutputDto> SharedWithUsers{set; get;}
         public virtual bool IsOwnedByMe { set; get; }
+        public virtual string? CreatorTenantName{ set; get; }
     }
 
     //xx
