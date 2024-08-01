@@ -2240,12 +2240,23 @@ export class CreateEditAppItemVariationsComponent
 
          else{
              let x = this.appItem.nonLookupValues.filter(x=>x.code==nonLookupValues.code);
+             
+             let  extraAttr =
+             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
+             let y = extraAttr.displayedSelectedValues.filter(x=>x.code==nonLookupValues.code);
+
+
              if(x && x.length>0)
               {
                   x[0].hexaCode=nonLookupValues.hexaCode;
                   x[0].image=nonLookupValues.image;
                   x[0].label=nonLookupValues.label;
                   x[0].value=nonLookupValues.value;
+
+                  y[0].hexaCode=nonLookupValues.hexaCode;
+                  y[0].image=nonLookupValues.image;
+                  y[0].label=nonLookupValues.label;
+                  y[0].value=nonLookupValues.value;
               }
          }
        });  

@@ -325,8 +325,10 @@ export class CreateOrEditAppItemComponent
                         res.appItem.entityClassifications.items,
                         nonLookupValues: res.nonLookupValues
                 });
-
-                this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(this.appItem.nonLookupValues)) : [];
+let x=  this.appItem.nonLookupValues;
+               // this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(x)) : [];
+                this.oldnonLookupValues = this.appItem.nonLookupValues && this.appItem.nonLookupValues.length > 0 ? 
+    x.map(item => new LookupLabelDto(item)) : [];
                 this.categoriesTotalCount =
                     res.appItem.entityCategories.totalCount;
                 this.departmentsTotalCount =
@@ -1395,7 +1397,11 @@ export class CreateOrEditAppItemComponent
     }
 
     applyVariations($event: ApplyVariationOutput) {
-        this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(this.appItem.nonLookupValues)) : [];
+        let x=this.appItem.nonLookupValues;
+       // this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(x)) : [];
+        this.oldnonLookupValues = this.appItem.nonLookupValues && this.appItem.nonLookupValues.length > 0 ? 
+             x.map(item => new LookupLabelDto(item)) : [];
+
         this.appItem.variationItems = $event.variation;
         this.appItem.appItemSizesScaleInfo = $event.appItemSizesScaleInfo;
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
