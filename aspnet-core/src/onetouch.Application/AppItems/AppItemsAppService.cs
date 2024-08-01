@@ -1682,6 +1682,8 @@ namespace onetouch.AppItems
                                                   .Select(z => z.AttributeValue)).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
             if (firstattributeCodes != null && firstattributeCodes.Count > 0)
             {
+                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                
                 output.NonLookupValues = new List<LookupLabelDto>();
                 for (int cod = 0; cod < firstattributeCodes.Count; cod++)
                 {
@@ -1704,7 +1706,7 @@ namespace onetouch.AppItems
                             Code = firstattributeCodes[cod].AttributeCode,
                             Label = firstattributeValues[cod],
                             HexaCode = (hexa != null && hexa.AttributeValue != null) ? hexa.AttributeValue : "",
-                            Image = (img != null && img.AttributeValue != null) ? img.AttributeValue : ""
+                            Image = (img != null && img.AttributeValue != null) ? (imagesUrl + (itm.TenantId.HasValue ? itm.TenantId.ToString() : "-1") + @"/" + img.AttributeValue) : ""
                         });
                     }
                 }
@@ -2435,6 +2437,7 @@ namespace onetouch.AppItems
                                         if (colorImage != null)
                                         {
                                             colorImage.AttributeValue = Path.GetFileName(extraNonLookup.Image);
+                                            MoveFile(colorImage.AttributeValue, AbpSession.TenantId, AbpSession.TenantId);
                                         }
 
                                     }
