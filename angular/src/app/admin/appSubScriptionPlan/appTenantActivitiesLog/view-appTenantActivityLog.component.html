@@ -1,0 +1,131 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+            				<span>{{l("Entity_Name_Plural_Here")}} {{l("Details")}}</span>
+            			</h3>
+            			<span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            			<div class="kt-subheader__breadcrumbs">
+            				<a [routerLink]="['/app/admin/appSubScriptionPlan/appTenantActivitiesLog']"
+            					class="kt-subheader__breadcrumbs-home"><i
+            						class="flaticon2-shelter"></i>{{l("AppTenantActivityLog")}}</a>
+            				<span class="kt-subheader__breadcrumbs-separator"></span>
+            				<a 
+            					class="kt-subheader__breadcrumbs-link kt-subheader__breadcrumbs-link--active">
+            					<span>{{l("Details")}}</span>
+            				</a>
+            			</div>
+                    </div>
+                  </div>
+                </div>
+             
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <div class="row align-items-center">
+                                     <div class="col-6 mb-3">
+                        <h6>{{l("TenantId")}} :</h6>
+                        {{ item.appTenantActivityLog.tenantId }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("TenantName")}} :</h6>
+                        {{ item.appTenantActivityLog.tenantName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("UserId")}} :</h6>
+                        {{ item.appTenantActivityLog.userId }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("ActivityType")}} :</h6>
+                        {{ item.appTenantActivityLog.activityType }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("AppSubscriptionPlanHeaderId")}} :</h6>
+                        {{ item.appTenantActivityLog.appSubscriptionPlanHeaderId }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("AppSubscriptionPlanCode")}} :</h6>
+                        {{ item.appTenantActivityLog.appSubscriptionPlanCode }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("ActivityDateTime")}} :</h6>
+                        {{ item.appTenantActivityLog.activityDateTime |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("UserName")}} :</h6>
+                        {{ item.appTenantActivityLog.userName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureCode")}} :</h6>
+                        {{ item.appTenantActivityLog.featureCode }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("FeatureName")}} :</h6>
+                        {{ item.appTenantActivityLog.featureName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Billable")}} :</h6>
+                        <div *ngIf="item.appTenantActivityLog.billable" class="text-left"><i class="fa fa-check-circle kt--font-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.appTenantActivityLog.billable" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>                    <div class="col-6 mb-3">
+                        <h6>{{l("Invoiced")}} :</h6>
+                        <div *ngIf="item.appTenantActivityLog.invoiced" class="text-left"><i class="fa fa-check-circle kt--font-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.appTenantActivityLog.invoiced" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>                    <div class="col-6 mb-3">
+                        <h6>{{l("Reference")}} :</h6>
+                        {{ item.appTenantActivityLog.reference }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Qty")}} :</h6>
+                        {{ item.appTenantActivityLog.qty }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("ConsumedQty")}} :</h6>
+                        {{ item.appTenantActivityLog.consumedQty }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("RemainingQty")}} :</h6>
+                        {{ item.appTenantActivityLog.remainingQty }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Price")}} :</h6>
+                        {{ item.appTenantActivityLog.price }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Amount")}} :</h6>
+                        {{ item.appTenantActivityLog.amount }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("InvoiceDate")}} :</h6>
+                        {{ item.appTenantActivityLog.invoiceDate |  momentFormat:'YYYY-MM-DD HH:mm:ss' }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("InvoiceNumber")}} :</h6>
+                        {{ item.appTenantActivityLog.invoiceNumber }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("CreditOrUsage")}} :</h6>
+                        {{ item.appTenantActivityLog.creditOrUsage }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Month")}} :</h6>
+                        {{ item.appTenantActivityLog.month }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Year")}} :</h6>
+                        {{ item.appTenantActivityLog.year }}
+                    </div>
+
+                 
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>

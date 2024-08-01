@@ -1,4 +1,10 @@
-﻿using onetouch.AppMarketplaceContact.Dtos;
+using onetouch.SycCurrencyExchangeRates.Dtos;
+using onetouch.SycCurrencyExchangeRates;
+using onetouch.AppSubscriptionPlans.Dtos;
+using onetouch.AppSubscriptionPlans;
+using onetouch.AppSubScriptionPlan.Dtos;
+using onetouch.AppSubScriptionPlan;
+using onetouch.AppMarketplaceContact.Dtos;
 using onetouch.AppMarketplaceContact;
 using onetouch.Maintainances.Dtos;
 using onetouch.Maintainances;
@@ -110,6 +116,7 @@ using onetouch.AppSiiwiiTransaction;
 using onetouch.AppMarketplaceItems;
 using onetouch.AppMarketplaceItemLists;
 using onetouch.AppMarketplaceItems.Dtos;
+using onetouch.AppMarketplaceMessages;
 
 namespace onetouch
 {
@@ -119,6 +126,21 @@ namespace onetouch
         {
             configuration.CreateMap<CreateOrEditAppMarketplaceAppContactDto, AppMarketplaceAppContact>().ReverseMap();
             configuration.CreateMap<AppMarketplaceAppContactDto, AppMarketplaceAppContact>().ReverseMap();
+            configuration.CreateMap<CreateOrEditSycCurrencyExchangeRatesDto, onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates>().ReverseMap();
+            configuration.CreateMap<SycCurrencyExchangeRatesDto, onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();
+            configuration.CreateMap<AppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
+            configuration.CreateMap<AppTenantActivityLogDto, AppTenantActivitiesLog>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantActivityLogDto, oldAppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<AppTenantActivityLogDto, oldAppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantSubscriptionPlanDto, AppTenantSubscriptionPlan>().ReverseMap();
+            configuration.CreateMap<AppTenantSubscriptionPlanDto, AppTenantSubscriptionPlan>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
+            configuration.CreateMap<AppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap();
+            configuration.CreateMap<AppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap();
+
             configuration.CreateMap<CreateOrEditMaintainanceDto, Maintainance>().ReverseMap();
             configuration.CreateMap<MaintainanceDto, Maintainance>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppItemSelectorDto, AppItemSelector>().ReverseMap();
@@ -219,8 +241,8 @@ namespace onetouch
             configuration.CreateMap<AppItemsListDto, AppItemsList>().ReverseMap();
             configuration.CreateMap<CreateOrEditAutotaskQueueDto, AutotaskQueue>().ReverseMap();
             configuration.CreateMap<AutotaskQueueDto, AutotaskQueue>().ReverseMap();
-            configuration.CreateMap<CreateOrEditAppTenantsActivitiesLogDto, AppTenantsActivitiesLog>().ReverseMap();
-            configuration.CreateMap<AppTenantsActivitiesLogDto, AppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppTenantsActivitiesLogDto, oldAppTenantsActivitiesLog>().ReverseMap();
+            configuration.CreateMap<AppTenantsActivitiesLogDto, oldAppTenantsActivitiesLog>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantPlanDto, AppTenantPlan>().ReverseMap();
             configuration.CreateMap<AppTenantPlanDto, AppTenantPlan>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTransactionDto, AppTransaction>().ReverseMap();
@@ -461,6 +483,14 @@ namespace onetouch
             configuration.CreateMap<CreateMessageInput, AppMessage>().ReverseMap();
             configuration.CreateMap<CreateMessageInput, AppEntityDto>().ReverseMap();
             configuration.CreateMap<CreateMessageForRecieversInput, AppEntityDto>().ReverseMap();
+            configuration.CreateMap<CreateMessageInput, AppMarketplaceMessage>().ReverseMap();
+
+            configuration.CreateMap<MessagesDto, AppMarketplaceMessage>();
+            configuration.CreateMap<AppMarketplaceMessage, MessagesDto>()
+                .ForMember(d => d.SendDate, s => s.MapFrom(ss => ss.CreationTime))
+                .ForMember(d => d.ReceiveDate, s => s.MapFrom(ss => ss.CreationTime))
+                .ForMember(d => d.EntityObjectTypeCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectTypeFk.Code))//.EntityObjectTypeCode
+                .ForMember(d => d.EntityObjectStatusCode, s => s.MapFrom(ss => ss.EntityFk.EntityObjectStatusCode));
             //Esraa
             //configuration.CreateMap<AppContact, TreeNode<BranchDto>>()
             //    .ForMember(d => d.label, s => s.MapFrom(ss => ss.Name))
@@ -862,7 +892,8 @@ namespace onetouch
             configuration.CreateMap<AppTransactionContacts, onetouch.AppMarketplaceTransactions.AppMarketplaceTransactionContacts>().ReverseMap();
             configuration.CreateMap<AppEntity, AppTransactionHeaders>();
             configuration.CreateMap<AppEntity, AppTransactionDetails>();
-
+            configuration.CreateMap<CreateOrEditAppFeatureDto, AppFeature>().ReverseMap();
+            configuration.CreateMap<AppFeatureDto, AppFeature>().ReverseMap();
         }
     }
 }

@@ -11,18 +11,8 @@
     (onHide)="cancel()"
 >
     <div class="wrapper">
-        <div class="user d-flex align-items-center justify-content-between">
-            <div
-                class="enter d-flex align-items-center justify-content-start gap-2"
-            >
-                <span>Entered By</span>
-                <a href="http://" target="_blank" rel="noopener noreferrer">{{
-                    fullName
-                }}</a>
-            </div>
-            <span class="date">{{ dt }}</span>
-        </div>
-        <div class="w-50 my-4">
+
+        <div class="w-50 my-2">
             <p-dropdown
                 [options]="roles"
                 class="w-100"
@@ -30,12 +20,76 @@
                 optionLabel="name"
                 (onChange)="handleRoleChange($event)"
                 #Role
+                [(ngModel)]="roleDdval"
             ></p-dropdown>
             <small class="text-danger" *ngIf="isRoleExist">
                 Please Select Role
             </small>
         </div>
+<div class="orderInfo seller">
 
+    <div class="user d-flex align-items-center justify-content-between">
+        <div class="sellerHeader">
+            <span>Order Information</span>
+        </div>
+    </div>
+    <form  [formGroup]="orderForm" class="form mt-3">
+        <div class="row">
+            <div class="col-md-6 pt-4">
+                <div class="mb-3 pt-2">
+                    <div
+                    class="enter d-flex align-items-center justify-content-start gap-2"
+                >
+                    <span class="mr-2">Entered By :</span>
+                    <a href="http://" target="_blank" rel="noopener noreferrer">{{
+                        fullName
+                    }}</a>
+                </div>
+                <span class="date">{{ dt }}</span>
+                </div>
+                </div>
+           
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Start Date*</label>
+                        <p-calendar
+                        [appendTo]="'body'"
+                            formControlName="startDate"
+                            [showIcon]="true"
+                            (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
+                            [readonlyInput]="false"
+                        ></p-calendar>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Complete Date*</label>
+                        <p-calendar
+                        [appendTo]="'body'"
+                            formControlName="completeDate"
+                            [showIcon]="true"
+                            [minDate]="minStartDate"
+                            [readonlyInput]="false"
+                            (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
+                        ></p-calendar>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Available Date*</label>
+                        <p-calendar
+                        [appendTo]="'body'"
+                            formControlName="availableDate"
+                            [showIcon]="true"
+                            [readonlyInput]="false"
+                            [minDate]="minCompleteDate"
+                        ></p-calendar>
+                    </div>
+                </div>
+                
+                </div>
+    </form>
+</div>
         <div class="seller">
             <div class="sellerHeader">
                 <span>Buyer Information</span>
@@ -43,7 +97,7 @@
             <form [formGroup]="orderForm" class="form mt-3">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="flex align-items-center gap-1 my-2">
+                        <div class="flex align-items-center gap-1 my-2" *ngIf="formType?.toUpperCase() != 'PO'">
                             <!-- <p-checkbox
                                 value="Buyer"
                                 [disabled]="isBuyer"
@@ -89,7 +143,7 @@
                                     formControlName="buyerCompanyName"
                                     [filter]="true"
                                     optionLabel="name"
-                                    placeholder="Please Select Buyer Comapny Name"
+                                    placeholder="Please Select Buyer Company Name"
                                     (onFilter)="
                                         handleBuyerCompanySearch($event)
                                     "
@@ -159,7 +213,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >{{buyerPhoneLabel}}*
+                                >{{buyerPhoneLabel}}
                             </label>
                             <input
                                 type="text"
@@ -244,6 +298,38 @@
                         </div>
                     </div>
                     <!-- buyer email -->
+                    <!-- buyer company branch -->
+                <div class="col-md-6"  *ngIf="!isBuyerTempAccount">
+                    <div class="mb-3">
+                        <label for="" class="form-label"
+                            >Branch*</label
+                        >
+                            <div>
+                                <p-dropdown
+                                [virtualScroll]="true" [itemSize]="30"
+                                    [options]="buyerBranches"
+                                    formControlName="buyerCompanyBranch"
+                                    [filter]="true"
+                                    optionLabel="name"
+                                    placeholder="Please Select Branch"
+                                    [required]="!isBuyerTempAccount"
+                                ></p-dropdown>
+                            </div>
+            
+                                        <small
+                                            class="text-danger"
+                                            *ngIf="
+                                                submitted &&
+                                                orderForm
+                                                    .get('buyerCompanyBranch')
+                                                    ?.hasError('required')
+                                            "
+                                        >
+                                             Branch is required
+                                        </small>
+                                    </div>
+                                </div>
+                  <!-- buyer company branch -->
                 </div>
             </form>
         </div>
@@ -282,7 +368,7 @@
                                     formControlName="sellerCompanyName"
                                     [filter]="true"
                                     optionLabel="name"
-                                    placeholder="Please Select Seller Comapny Name"
+                                    placeholder="Please Select Seller Company Name"
                                     (onFilter)="
                                         handleSellerCompanySearch($event)
                                     "
@@ -343,7 +429,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"
-                                >{{sellerPhoneLabel}}*
+                                >{{sellerPhoneLabel}}
                             </label>
                             <input
                                 type="text"
@@ -426,7 +512,41 @@
                         </div>
                     </div>
                     <!-- Seller email -->
-
+                    <!-- buyer company branch -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"
+                                >Branch*</label
+                            >
+                                <div >
+                                    <p-dropdown
+                                    [virtualScroll]="true" [itemSize]="30"
+                                        [options]="sellerBranches"
+                                        formControlName="sellerCompanyBranch"
+                                        [filter]="true"
+                                        optionLabel="name"
+                                        placeholder="Please Select Branch"
+                                        (onFilter)="
+                                            handleBuyerCompanySearch($event)
+                                        "
+                                        required
+                                    ></p-dropdown>
+                                </div>
+                
+                                            <small
+                                                class="text-danger"
+                                                *ngIf="
+                                                    submitted &&
+                                                    orderForm
+                                                        .get('sellerCompanyBranch')
+                                                        ?.hasError('required')
+                                                "
+                                            >
+                                                Branch is required
+                                            </small>
+                                        </div>
+                                    </div>
+                      <!-- seller company branch -->
                     <div class="col-12 my-2">
                         <div *ngIf="areSame" class="alert alert-danger" role="alert">
                             <p class="mb-0">

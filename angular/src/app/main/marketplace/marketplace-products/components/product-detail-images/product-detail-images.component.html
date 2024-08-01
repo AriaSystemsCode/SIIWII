@@ -1,11 +1,11 @@
-<div class="wrapper">
+<div class="wrapper" *ngIf="productImages">
     <div
         class="d-flex align-items-start justify-content-center"
         style="gap: 10px"
     >
         <!-- hide images and show slider -->
         <div
-            *ngIf="productImages.length <= 7"
+            *ngIf="productImages?.length <= 7"
             class="slides d-flex align-items-lg-start justify-content-around flex-column"
         >
             <div
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div *ngIf="productImages.length > 7">
+        <div *ngIf="productImages?.length > 7">
             <div class="slider-container">
                 <div
                     class="slider"

@@ -46,24 +46,19 @@
                                 [ngStyle]="{
                                     'cursor': !appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType ? 'not-allowed' : 'pointer'}"  -->
                             <input placeholder="Phone Number..." type="text" class="form-control ml-3 w-100"
+                            (change)="onChangePhoneNumber($event)"
                                 [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber"
                                 #phoneNumberInput="ngModel"  name="phoneNumber" minlength="5" maxlength="20"
                                 pattern="[0-9]*" 
                                 />
                         </div>
                     </div>
-                    <div *ngIf="
-                            phoneNumberInput.invalid &&
-                            (phoneNumberInput.dirty || phoneNumberInput.touched)
-                        " class="text-danger">
-                        <small *ngIf="phoneNumberInput.errors.required">
-                            Phone number is required with length 5-20
-                        </small>
-                        <small *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber && (appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber?.length <5 || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber?.length>20 )">
-                            Phone number is required with length 5-20
-                        </small>
-                        <small *ngIf="phoneNumberInput.errors.pattern">
+                    <div *ngIf="phoneNumberInput.invalid && (phoneNumberInput.dirty || phoneNumberInput.touched)" class="text-danger">
+                        <small *ngIf="phoneNumberInput.errors?.pattern">
                             Phone number must contain only numbers.
+                        </small>
+                        <small *ngIf="!phoneNumberInput.errors?.pattern && (phoneNumberInput.value.length < 5 || phoneNumberInput.value.length > 20)">
+                            Phone number must be between 5 and 20 characters long.
                         </small>
                     </div>
                 </div>
@@ -98,9 +93,17 @@
             <div>
                 <label class="label">Email</label>
                 <input type="text" placeholder="Email..." class="form-control w-100"
-                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail"
+                (change)="onChangeEmail($event)"
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+                #emailInput="ngModel"
+                    [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail"
                     name="email" />
             </div>
+            <div *ngIf="emailInput.errors &&(emailInput.touched || emailInput.dirty)" class="text-danger">
+        <small >
+            Invalid  Email
+        </small>
+        </div>
         </div>
         <!-- Email -->
 
@@ -120,7 +123,7 @@
             <div>
                 <label class="label">Department</label>
                 <input type="text" placeholder="Department Name..." class="form-control w-100" name="DepartmentName"
-                    [(ngModel)]="appTransactionsForViewDto.buyerDepartment" #DepartmentName="ngModel" required />
+                    [(ngModel)]="appTransactionsForViewDto.buyerDepartment" #DepartmentName="ngModel"  />
                 <div *ngIf="
                     DepartmentName.invalid &&
                         (DepartmentName.dirty || DepartmentName.touched)

@@ -63,6 +63,8 @@ using Abp.EntityFrameworkCore.Uow;
 using onetouch.EntityFrameworkCore;
 using Twilio.Rest.Trunking.V1;
 using NUglify.Helpers;
+using Abp.Domain.Entities;
+using onetouch.Attachments;
 
 namespace onetouch.Accounts
 {
@@ -93,6 +95,8 @@ namespace onetouch.Accounts
         private const int MaxProfilPictureBytes = 5242880;
         private readonly IBinaryObjectManager _binaryObjectManager;
         //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
+        private readonly IRepository<AppEntityAttachment, long> _appEntityAttachmentRepository;
+        private readonly IRepository<AppAttachment, long> _appAttachmentRepository;
         private enum CardType
         {
             MasterCard, Visa, AmericanExpress, Discover, JCB
@@ -111,8 +115,10 @@ namespace onetouch.Accounts
             , ISycAttachmentCategoriesAppService sSycAttachmentCategoriesAppService
             , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository, UserManager userManager, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepo,
               SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager,
-              TenantManager tenantManager)
+              TenantManager tenantManager, IRepository<AppEntityAttachment, long> appEntityAttachmentRepository, IRepository<AppAttachment, long> appAttachmentRepository)
         {
+            _appAttachmentRepository = appAttachmentRepository;
+            _appEntityAttachmentRepository = appEntityAttachmentRepository;
             _tenantManager = tenantManager;
             _appContactRepository = appContactRepository;
             _appEntityRepository = appEntityRepository;
@@ -138,7 +144,36 @@ namespace onetouch.Accounts
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
 
         }
+        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
+        {
+            if (sourceTenantId == null) sourceTenantId = -1;
+            if (distinationTenantId == null) distinationTenantId = -1;
 
+            var tmpPath = _appConfiguration[$"Attachment:PathTemp"] + @"\" + sourceTenantId + @"\" + fileName;
+            var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + sourceTenantId + @"\" + fileName;
+            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + fileName;
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId);
+            }
+
+            try
+            {
+                System.IO.File.Copy(tmpPath.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    System.IO.File.Copy(pathSource.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+                }
+                catch (Exception ex1)
+                {
+
+                }
+            }
+        }
         public async Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -577,7 +612,7 @@ namespace onetouch.Accounts
                 var mainBranchSubtotal = _appContactRepository.GetAll()
                             .Include(e => e.ParentFk)
                             .Include(e => e.ParentFkList)
-                            .Where(x => x.IsProfileData)
+                          //  .Where(x => x.IsProfileData)
                             .Where(e => e.ParentId != null && e.ParentId == branch.Id && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).Count();
                 branchForViewDto.SubTotal = mainBranchSubtotal;
                 List<TreeNode<BranchForViewDto>> branches = new List<TreeNode<BranchForViewDto>>
@@ -788,7 +823,7 @@ namespace onetouch.Accounts
         public async Task Connect(long id)
         {
 
-
+            var cancelledStatus=  await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
             AppContact originalContact;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -796,18 +831,20 @@ namespace onetouch.Accounts
                 var originalContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
 
                 if (originalContactFortCurrTenant != null)
-                    originalPublishContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == originalContactFortCurrTenant.Id);
+                    originalPublishContactFortCurrTenant = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses)
+                        .ThenInclude(z => z.AddressFk)
+                        .FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == originalContactFortCurrTenant.Id && x.EntityFk.EntityObjectStatusId != cancelledStatus);
 
                 if (originalPublishContactFortCurrTenant == null)
                     throw new UserFriendlyException("Ooppps! please publish your account first.");
 
-                originalContact = await _appContactRepository.GetAll()
+                originalContact = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (originalContact != null && originalContact.TenantId != null)
                 {
-                    originalContact = await _appContactRepository.GetAll()
-                .FirstOrDefaultAsync(x => x.TenantId == null && x.PartnerId == id);
+                    originalContact = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
+                .FirstOrDefaultAsync(x => x.TenantId == null && x.PartnerId == id &&  x.EntityFk.EntityObjectStatusId != cancelledStatus);
                     id = originalContact.Id;
                 }
                 var existed = await _appContactRepository.GetAll()
@@ -846,9 +883,10 @@ namespace onetouch.Accounts
                     {
                         //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
 
-                        var entity = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Id == originalPublishContactFortCurrTenant.EntityId);
+                        var entity = await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk).FirstOrDefaultAsync(x => x.Id == originalPublishContactFortCurrTenant.EntityId);
                         AppEntityDto entityDto = new AppEntityDto();
                         ObjectMapper.Map(entity, entityDto);
+                        entityDto.EntityAttachments = null;
                         entityDto.Id = 0;
                         //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[Start]
                         entityDto.TenantId = profileContactofOtherTenant.TenantId;
@@ -871,20 +909,104 @@ namespace onetouch.Accounts
 
                         //temp solution to test 
                         entityDto.Code = System.Guid.NewGuid().ToString();
-
+                        
                         var savedEntity = await _appEntitiesAppService.SaveEntity(entityDto);
+                        //MMT24
+                        if (entity.EntityAttachments != null)
+                        {
+                            var entityEntityAttachments = new List<AppEntityAttachment>();
+                            entityEntityAttachments = ObjectMapper.Map<List<AppEntityAttachment>>(entity.EntityAttachments);
+                            foreach (var attach in entityEntityAttachments)
+                            {
 
+                                attach.Id = 0;
+                                attach.AttachmentId = 0;
+                                attach.AttachmentFk.Id = 0;
+                                attach.EntityId = savedEntity;
+                                attach.EntityFk = null;
+                                attach.AttachmentFk.TenantId = profileContactofOtherTenant.TenantId;
+                                MoveFile(attach.AttachmentFk.Attachment,  -1, profileContactofOtherTenant.TenantId);
+                                //entityEntityAttachments.Add(attach);
+                                var attachIns = await  _appAttachmentRepository.InsertAsync(attach.AttachmentFk);
+                                attach.AttachmentId = attachIns.Id;
+                                await _appEntityAttachmentRepository.InsertAsync(attach);
+                            }
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                            //var ent = await _appEntityRepository.GetAll().FirstOrDefaultAsync(z=>z.Id==savedEntity);
+                            //if (ent != null)
+                            //{
+                            //    ent.EntityAttachments = entityEntityAttachments;
+                            //    _appEntityRepository.UpdateAsync(ent);
+                            //}
+                        }
+                        //MMT24
                         contactDto.EntityId = savedEntity;
 
                         //temp solution to test 
                         contactDto.Code = System.Guid.NewGuid().ToString();
 
                         contactDto.Id = await _appEntitiesAppService.SaveContact(contactDto);
+                        //Copy Addresses[Start]
+                        if (originalPublishContactFortCurrTenant.AppContactAddresses!=null && originalPublishContactFortCurrTenant.AppContactAddresses.Count>0)
+                        {
+                            foreach (var contactAddress in originalPublishContactFortCurrTenant.AppContactAddresses)
+                            {
+                                AppAddress address = new AppAddress();
+                                var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+                                if (savedAddress != null)
+                                {
+                                    var addressCon = await _appAddressRepository.FirstOrDefaultAsync(z => z.TenantId == contactDto.TenantId &&
+                                    z.AccountId == contactDto.Id && z.Code == savedAddress.Code);
+
+                                    if (addressCon == null)
+                                    {
+                                        ObjectMapper.Map(savedAddress, address);
+                                        address.Id = 0;
+                                        address.AccountId = contactDto.Id;
+                                        address.TenantId = contactDto.TenantId;
+                                        address = await _appAddressRepository.InsertAsync(address);
+                                        await CurrentUnitOfWork.SaveChangesAsync();
+                                    }
+                                    else
+                                    {
+                                        address = addressCon;
+                                    }
+                                    AppContactAddress newContactAddress = new AppContactAddress();
+                                    newContactAddress.Id = 0;
+                                    newContactAddress.AddressId = address.Id;
+                                    newContactAddress.ContactId = contactDto.Id;
+                                    newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
+                                    newContactAddress.AddressCode = contactAddress.AddressCode;
+                                    newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
+                                    newContactAddress.ContactCode = contactAddress.ContactCode;
+
+                                    if (contactDto.ContactAddresses == null)
+                                    {
+                                        contactDto.ContactAddresses = new List<AppContactAddressDto>();
+                                    }
+                                        contactDto.ContactAddresses.Add(new AppContactAddressDto
+                                        {
+                                            AddressTypeId = contactAddress.AddressTypeId,
+                                            AddressTypeIdName = contactAddress.AddressTypeCode,
+                                            Code = address.Code,
+                                            AddressId = address.Id,
+                                            AccountId = contactDto.Id,
+                                            ContactId = contactDto.Id
+                                        });
+                                    
+                                   
+                                  //  contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
+                                    await _appContactAddressRepository.InsertAsync(newContactAddress);
+                                    await CurrentUnitOfWork.SaveChangesAsync();
+                                }
+                            }
+                        }
+                        //Copy Addresses [End]
                         //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[Start]
                     }
                     //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
                     // Add Data for the other Tenant
-                    var entity2 = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Id == originalContact.EntityId);
+                    var entity2 = await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk).FirstOrDefaultAsync(x => x.Id == originalContact.EntityId);
                     AppEntityDto entityDto2 = new AppEntityDto();
                     ObjectMapper.Map(entity2, entityDto2);
                     entityDto2.Id = 0;
@@ -904,14 +1026,93 @@ namespace onetouch.Accounts
                     entityDto2.Code = System.Guid.NewGuid().ToString();
 
                     var savedEntity2 = await _appEntitiesAppService.SaveEntity(entityDto2);
-
+                    //MMT24
+                    if (entity2.EntityAttachments != null)
+                    {
+                        var entityEntityAttachments = new List<AppEntityAttachment>();
+                        entityEntityAttachments = ObjectMapper.Map<List<AppEntityAttachment>>(entity2.EntityAttachments);
+                        foreach (var attach in entityEntityAttachments)
+                        {
+                            attach.Id = 0;
+                            attach.AttachmentId = 0;
+                            attach.AttachmentFk.Id = 0;
+                            attach.EntityId = savedEntity2;
+                            attach.EntityFk = null;
+                            attach.AttachmentFk.TenantId = AbpSession.TenantId;
+                            MoveFile(attach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                            //entityEntityAttachments.Add(attach);
+                            var attachIns = await _appAttachmentRepository.InsertAsync(attach.AttachmentFk);
+                            attach.AttachmentId = attachIns.Id;
+                            await _appEntityAttachmentRepository.InsertAsync(attach);
+                        }
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                        //var ent = await _appEntityRepository.GetAll().FirstOrDefaultAsync(z => z.Id == savedEntity2);
+                        //if (ent != null)
+                        //{
+                        //    ent.EntityAttachments = entityEntityAttachments;
+                        //    await _appEntityRepository.UpdateAsync(ent);
+                        //}
+                    }
+                    //MMT24
                     contactDto2.EntityId = savedEntity2;
 
                     //temp solution to test 
                     contactDto2.Code = System.Guid.NewGuid().ToString();
 
                     contactDto2.Id = await _appEntitiesAppService.SaveContact(contactDto2);
+                    //Copy Addresses[Start]
+                    if (originalContact.AppContactAddresses != null && originalContact.AppContactAddresses.Count > 0)
+                    {
+                        foreach (var contactAddress in originalContact.AppContactAddresses)
+                        {
+                            AppAddress address = new AppAddress();
+                            var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+                            if (savedAddress != null)
+                            {
+                                var addressCon = await _appAddressRepository.FirstOrDefaultAsync(z => z.TenantId == contactDto2.TenantId &&
+                                z.AccountId == contactDto2.Id && z.Code == savedAddress.Code);
 
+                                if (addressCon == null)
+                                {
+                                    ObjectMapper.Map(savedAddress, address);
+                                    address.Id = 0;
+                                    address.AccountId = contactDto2.Id;
+                                    address.TenantId = contactDto2.TenantId;
+                                    address = await _appAddressRepository.InsertAsync(address);
+                                    await CurrentUnitOfWork.SaveChangesAsync();
+                                }
+                                else
+                                {
+                                    address = addressCon;
+                                }
+                                if (contactDto2.ContactAddresses == null)
+                                    contactDto2.ContactAddresses = new List<AppContactAddressDto>();
+                                AppContactAddress newContactAddress = new AppContactAddress();
+                                newContactAddress.Id = 0;
+                                newContactAddress.AddressId = address.Id;
+                                newContactAddress.ContactId = contactDto2.Id;
+                                newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
+                                newContactAddress.AddressCode = contactAddress.AddressCode;
+                                newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
+                                newContactAddress.ContactCode = contactAddress.ContactCode;
+                                
+                                contactDto2.ContactAddresses.Add(new AppContactAddressDto
+                                {
+                                    AddressTypeId = contactAddress.AddressTypeId,
+                                    AddressTypeIdName = contactAddress.AddressTypeCode,
+                                    Code = address.Code,
+                                    AddressId = address.Id,
+                                    AccountId = contactDto2.Id,
+                                    ContactId = contactDto2.Id
+                                });
+
+                                // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto2.Id, ContactId = contactDto2.Id });
+                                await _appContactAddressRepository.InsertAsync(newContactAddress);
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    //Copy Addresses [End]
                     //MMT33-3
                     // var myAccountProfile = await _appContactRepository.GetAll().Where(e => e.TenantId == AbpSession.TenantId && e.PartnerId == null && e.ParentId == null && e.IsProfileData == true).FirstOrDefaultAsync();
                     // if (myAccountProfile != null)
@@ -991,7 +1192,7 @@ namespace onetouch.Accounts
                     //Contact[start]
                      var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                     var contactsInfo = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
-                                 x.ParentId == id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null).ToList(); // First level of branches
+                                 x.ParentId == id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
                     foreach (var contactObj in contactsInfo)
                     {
@@ -1042,7 +1243,7 @@ namespace onetouch.Accounts
                     }
                     //Contacts[End]
                     var contactsInfo2 = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
-                                 x.ParentId == originalPublishContactFortCurrTenant.Id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null).ToList(); // First level of branches
+                                 x.ParentId == originalPublishContactFortCurrTenant.Id && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
                     foreach (var contactObj in contactsInfo2)
                     {
@@ -1106,14 +1307,14 @@ namespace onetouch.Accounts
 
         protected async Task ConnectBranches(long branchesAccountId, long connectAccountId)
         {
-            // x.AccountId == branchesAccountId &&
+            var cancelledStatus = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             var branchesPublishedParentContact = new AppContact();
             var branchesParentContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.Id == branchesAccountId);
             if (branchesParentContact.TenantId != null)
             {
                 branchesPublishedParentContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.PartnerId == branchesAccountId
-                && x.TenantId == null);
+                && x.TenantId == null && x.EntityFk.EntityObjectStatusId != cancelledStatus);
             }
             else
             {
@@ -1126,7 +1327,7 @@ namespace onetouch.Accounts
             if (connectAccountContact.TenantId != null)
             {
                 publishedConnectContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.PartnerId == connectAccountId
-                && x.TenantId == null);
+                && x.TenantId == null && x.EntityFk.EntityObjectStatusId != cancelledStatus);
                 //Mariam[Start]
                 if (connectAccountContact != null)
                 {
@@ -1251,53 +1452,98 @@ namespace onetouch.Accounts
                 var addressesIds = contact.AppContactAddresses.Select(x => x.AddressId).Distinct().ToArray();
 
                 var addresses = _appAddressRepository.GetAll().Where(x => addressesIds.Contains(x.Id)).ToList();
-
-                foreach (var contactAddress in contact.AppContactAddresses)
+                //Copy Addresses[Start]
+                if (contact.AppContactAddresses!= null && contact.AppContactAddresses.Count>0)
                 {
-                    var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
-                    AppAddress address = new AppAddress();
-                    AppAddress existedInPublish = null;
-
-                   // if (contactDto.ContactAddresses != null)
-                        existedInPublish = await _appAddressRepository.FirstOrDefaultAsync(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == connectTenant);
-
-                    if (existedInPublish == null)
+                    foreach (var contactAddress in contact.AppContactAddresses)
                     {
-                        ObjectMapper.Map(savedAddress, address);
-                        address.Id = 0;
-                        //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[Start]
-                        address.TenantId = connectTenant;
-                        //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
-                        address = await _appAddressRepository.InsertAsync(address);
-                        await CurrentUnitOfWork.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        address.Id = existedInPublish.Id;
-                        address.Code = existedInPublish.Code;
-                    }
-
-
-                    AppContactAddress newContactAddress = new AppContactAddress();
-                    //ObjectMapper.Map(contactAddress, newContactAddress);
-                    newContactAddress.Id = 0;
-                    newContactAddress.AddressId = address.Id;
-                    newContactAddress.ContactId = contactDto.Id;
-                    newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
-                    if (contactDto.ContactAddresses == null)
-                        contactDto.ContactAddresses = new List<AppContactAddressDto>();
-                    
-                    contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id });
-                    //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
-                    //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
-                    await _appContactAddressRepository.InsertAsync(newContactAddress);
-
+                        var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+                        AppAddress address = new AppAddress();
+                        if (savedAddress != null)
+                        {
+                            var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z=>z.Code== savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == contactDto.Id);
+                            if (addressCon == null)
+                            {
+                                ObjectMapper.Map(savedAddress, address);
+                                address.Id = 0;
+                                address.AccountId = contactDto.Id;
+                                address.TenantId = contactDto.TenantId;
+                                address = await _appAddressRepository.InsertAsync(address);
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                            }
+                            else {
+                                address = addressCon;
+                            }
+                            AppContactAddress newContactAddress = new AppContactAddress();
+                            newContactAddress.Id = 0;
+                            newContactAddress.AddressId = address.Id;
+                            newContactAddress.ContactId = contactDto.Id;
+                            newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
+                            if (contactDto.ContactAddresses == null)
+                                contactDto.ContactAddresses = new List<AppContactAddressDto>();
+                            contactDto.ContactAddresses.Add(new AppContactAddressDto
+                                {
+                                    AddressTypeId = contactAddress.AddressTypeId,
+                                    AddressTypeIdName = contactAddress.AddressTypeCode,
+                                    Code = address.Code,
+                                    AddressId = address.Id,
+                                    AccountId = contactDto.Id,
+                                    ContactId = contactDto.Id
+                                });
+                            // 
+                           // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
+                            await _appContactAddressRepository.InsertAsync(newContactAddress);
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+                    } 
                 }
+                //Copy Addresses [End]
+                //foreach (var contactAddress in contact.AppContactAddresses)
+                //{
+                //    var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+                //    AppAddress address = new AppAddress();
+                //    AppAddress existedInPublish = null;
+
+                //   // if (contactDto.ContactAddresses != null)
+                //        existedInPublish = await _appAddressRepository.FirstOrDefaultAsync(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == connectTenant);
+
+                //    if (existedInPublish == null)
+                //    {
+                //        ObjectMapper.Map(savedAddress, address);
+                //        address.Id = 0;
+                //        //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[Start]
+                //        address.TenantId = connectTenant;
+                //        //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
+                //        address = await _appAddressRepository.InsertAsync(address);
+                //        await CurrentUnitOfWork.SaveChangesAsync();
+                //    }
+                //    else
+                //    {
+                //        address.Id = existedInPublish.Id;
+                //        address.Code = existedInPublish.Code;
+                //    }
+
+
+                //    AppContactAddress newContactAddress = new AppContactAddress();
+                //    //ObjectMapper.Map(contactAddress, newContactAddress);
+                //    newContactAddress.Id = 0;
+                //    newContactAddress.AddressId = address.Id;
+                //    newContactAddress.ContactId = contactDto.Id;
+                //    newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
+                //    if (contactDto.ContactAddresses == null)
+                //        contactDto.ContactAddresses = new List<AppContactAddressDto>();
+                    
+                //    contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id });
+                //    //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
+                //    //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
+                //    await _appContactAddressRepository.InsertAsync(newContactAddress);
+
+                //}
                 await CurrentUnitOfWork.SaveChangesAsync();
 
                 //Contact[start]
                 var contactsInfo = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
-                             x.ParentId == branchesAccountId && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null).ToList(); // First level of branches
+                             x.ParentId == branchesAccountId && x.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
                 foreach (var contactObj in contactsInfo)
                 {
@@ -1348,7 +1594,7 @@ namespace onetouch.Accounts
 
             }
             var branchInfo = _appContactRepository.GetAll().Where(x => x.TenantId == null && !x.IsProfileData &&
-                           x.ParentId == branchesAccountId && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && x.PartnerId != null).ToList(); // First level of branches
+                           x.ParentId == branchesAccountId && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && x.PartnerId != null && x.EntityFk.EntityObjectStatusId != cancelledStatus).ToList(); // First level of branches
 
             foreach (var branchObj in branchInfo)
             {
@@ -1403,6 +1649,7 @@ namespace onetouch.Accounts
                     {
                         await _appEntityRepository.DeleteAsync(contactRec.EntityId);
                         await _appContactRepository.DeleteAsync(contactRec.Id);
+                        await _appAddressRepository.DeleteAsync(z=>z.AccountId == existed.Id);
                     }
                     if (originalConnectRecordFortOtherTenant != null)
                     {
@@ -1411,6 +1658,7 @@ namespace onetouch.Accounts
                         {
                             await _appEntityRepository.DeleteAsync(contactRec.EntityId);
                             await _appContactRepository.DeleteAsync(contactRec.Id);
+                            await _appAddressRepository.DeleteAsync(z => z.AccountId == originalConnectRecordFortOtherTenant.Id);
                         }
                     }
                     //Mariam[End]
@@ -1704,7 +1952,9 @@ namespace onetouch.Accounts
                                     contactDto.ParentId = account.Id;
                                     contactDto.EntityObjectType = tenantObj.Edition.Name;
                                     //temp solution to test 
+                                    //T-SII-20240329.0005 as per Sam and Abdo
                                     contactDto.Code = System.Guid.NewGuid().ToString();
+                                    //contactDto.Code = "01";
                                     ContactDto savedContactDto = await CreateOrEditContact(contactDto);
 
                                 }
@@ -1736,6 +1986,22 @@ namespace onetouch.Accounts
                             publishedContactEntity.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
+                        //xx
+                        //XX
+                        
+                            var publishedbranchesandMemebers = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishedContact.Id &&
+                                         x.ParentId != null).ToList(); // First level of branches
+                            if (publishedbranchesandMemebers != null && publishedbranchesandMemebers.Count() > 0)
+                            {
+                                foreach (var publishedBranchMember in publishedbranchesandMemebers)
+                                {
+                                    publishedBranchMember.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                                }
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+                        
+                        //XX
+                        //xx
                     }
                 }
             }
@@ -1799,8 +2065,9 @@ namespace onetouch.Accounts
                         var publishAddressesIds = publishContact.AppContactAddresses.Select(x => x.AddressId).ToArray();
                         var publishContactAddressesIds = publishContact.AppContactAddresses.Select(x => x.Id).ToArray();
 
-                        await _appContactAddressRepository.DeleteAsync(x => publishContactAddressesIds.Contains(x.Id));
+                        await _appContactAddressRepository.DeleteAsync(x => x.ContactId == contactDto.Id); //  publishContactAddressesIds.Contains(x.Id));
                         await _appAddressRepository.DeleteAsync(x => publishAddressesIds.Contains(x.Id));
+                        await CurrentUnitOfWork.SaveChangesAsync();
                     }
 
                     // Add Addresses
@@ -1822,45 +2089,83 @@ namespace onetouch.Accounts
                     foreach (var contactAddress in contact.AppContactAddresses)
                     {
                         var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
-                        AppAddress address = new AppAddress();
-                        AppContactAddressDto existedInPublish = null;
-
-                        if (contactDto.ContactAddresses != null)
-                            existedInPublish = contactDto.ContactAddresses.FirstOrDefault(x => x.Code == contactAddress.AddressFk.Code);
-
-                        if (existedInPublish == null)
+                        if (savedAddress != null)
                         {
+                            AppAddress address = new AppAddress();
+
+                            AppAddress existedInPublish = null;
+
+                            //if (contactDto.ContactAddresses != null)
+                            existedInPublish = await _appAddressRepository.GetAll()
+                                .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null && x.AccountId == contactDto.Id).FirstOrDefaultAsync();
+
                             ObjectMapper.Map(savedAddress, address);
-                            address.Id = 0;
-                            address.AccountId = contactDto.Id;
-                            address = await _appAddressRepository.InsertAsync(address);
+                            if (existedInPublish == null)
+                            {
+                                //ObjectMapper.Map(savedAddress, address);
+                                address.Id = 0;
+                                address.AccountId = contactDto.Id;
+                                address.TenantId = null;
+                                address = await _appAddressRepository.InsertAsync(address);
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                address.TenantId = null;
+                                address.Id = existedInPublish.Id;
+                                address.Code = existedInPublish.Code;
+                                address.AccountId = contactDto.Id;
+                                var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                                x.ChangeTracker.Clear();
+                                await _appAddressRepository.UpdateAsync(address);
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                            }
+
+
+                            AppContactAddress newContactAddress = new AppContactAddress();
+                            //ObjectMapper.Map(contactAddress, newContactAddress);
+                            newContactAddress.Id = 0;
+                            newContactAddress.AddressId = address.Id;
+                            newContactAddress.ContactId = contactDto.Id;
+                            newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
+                            newContactAddress.AddressCode = contactAddress.AddressCode;
+                            newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
+                            newContactAddress.ContactCode = contactAddress.ContactCode;
+                            if (contactDto.ContactAddresses == null)
+                                contactDto.ContactAddresses = new List<AppContactAddressDto>();
+                            contactDto.ContactAddresses.Add(new AppContactAddressDto {AddressTypeId = contactAddress.AddressTypeId, 
+                                AddressTypeIdName = contactAddress.AddressTypeCode, Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
+                            //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
+                            //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
+                            await _appContactAddressRepository.InsertAsync(newContactAddress);
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
-                        else
-                        {
-                            address.Id = existedInPublish.AddressId;
-                            address.Code = existedInPublish.Code;
-                        }
-
-
-                        AppContactAddress newContactAddress = new AppContactAddress();
-                        //ObjectMapper.Map(contactAddress, newContactAddress);
-                        newContactAddress.Id = 0;
-                        newContactAddress.AddressId = address.Id;
-                        newContactAddress.ContactId = contactDto.Id;
-                        newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
-                        if (contactDto.ContactAddresses == null)
-                            contactDto.ContactAddresses = new List<AppContactAddressDto>();
-                        contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id });
-                        //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
-                        //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
-                        await _appContactAddressRepository.InsertAsync(newContactAddress);
                     }
-
+                    
                     //Mariam -Publish Account related branches [Start]
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    
                     var branchInfo = _appContactRepository.GetAll().Where(x => x.IsProfileData && x.AccountId == contact.Id &&
                                      x.ParentId == contact.Id && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
+
+                    //XX
+                    if (publishContact != null)
+                    {
+                        var publishedbranches = _appContactRepository.GetAll().Include(z=>z.EntityFk).Where(x => x.TenantId==null && x.AccountId == publishContact.Id &&
+                                     x.ParentId == publishContact.Id && x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).ToList(); // First level of branches
+                        if (publishedbranches!=null && publishedbranches.Count()>0)
+                        {
+                            foreach (var publishedBranch in publishedbranches)
+                            {
+                                var existingBranch = branchInfo.Where(z=>z.Code== publishedBranch.Code && z.SSIN == publishedBranch.SSIN).FirstOrDefault();
+                                if (existingBranch == null)
+                                {
+                                    publishedBranch.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                                }
+                            }
+                        }
+                    }
+                    //XX
 
                     foreach (var branchObj in branchInfo)
                     {
@@ -1920,6 +2225,7 @@ namespace onetouch.Accounts
                 {
                     contactDto.Id = publishContact.Id;
                     entityDto.Id = publishContact.EntityId;
+                    entityDto.EntityObjectStatusId = null;
                 }
                 // fix bug as per Mariam, 2022-08-14 entity tenant should be null 
                 entityDto.TenantId = null;
@@ -1948,39 +2254,82 @@ namespace onetouch.Accounts
                 {
                     var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
                     AppAddress address = new AppAddress();
-                    AppContactAddressDto existedInPublish = null;
 
-                    if (contactDto.ContactAddresses != null)
-                        existedInPublish = contactDto.ContactAddresses.FirstOrDefault(x => x.Code == contactAddress.AddressFk.Code);
+                    //AppContactAddressDto existedInPublish = null;
 
-                    if (existedInPublish == null)
+                    //if (contactDto.ContactAddresses != null)
+                    //    existedInPublish = contactDto.ContactAddresses.FirstOrDefault(x => x.Code == contactAddress.AddressFk.Code);
+
+                    //if (existedInPublish == null)
+                    //{
+                    //    ObjectMapper.Map(savedAddress, address);
+                    //    address.Id = 0;
+                    //    address.AccountId = publishedAccount.Id;
+                    //    address = await _appAddressRepository.InsertAsync(address);
+                    //    await CurrentUnitOfWork.SaveChangesAsync();
+                    //}
+                    //else
+                    //{
+                    //    address.Id = existedInPublish.AddressId;
+                    //    address.Code = existedInPublish.Code;
+                    //}
+                    if (savedAddress != null)
                     {
+                        AppAddress existedInPublish = null;
+
+                        existedInPublish = await _appAddressRepository.GetAll()
+                            .Where(x => x.Code == contactAddress.AddressFk.Code && x.TenantId == null && x.AccountId == contactDto.Id).FirstOrDefaultAsync();
+
                         ObjectMapper.Map(savedAddress, address);
-                        address.Id = 0;
-                        address.AccountId = publishedAccount.Id;
-                        address = await _appAddressRepository.InsertAsync(address);
+                        if (existedInPublish == null)
+                        {
+                            //ObjectMapper.Map(savedAddress, address);
+                            address.Id = 0;
+                            address.AccountId = contactDto.Id;
+                            address.TenantId = null;
+                            address = await _appAddressRepository.InsertAsync(address);
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            address.TenantId = null;
+                            address.Id = existedInPublish.Id;
+                            address.Code = existedInPublish.Code;
+                            address.AccountId = contactDto.Id;
+                            var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                            x.ChangeTracker.Clear();
+                            await _appAddressRepository.UpdateAsync(address);
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+
+                        AppContactAddress newContactAddress = new AppContactAddress();
+                        //ObjectMapper.Map(contactAddress, newContactAddress);
+                        newContactAddress.Id = 0;
+                        newContactAddress.AddressId = address.Id;
+                        newContactAddress.ContactId = contactDto.Id;
+                        newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
+                        newContactAddress.AddressCode = contactAddress.AddressCode;
+                        newContactAddress.AddressTypeCode = contactAddress.AddressTypeCode;
+                        newContactAddress.ContactCode = contactAddress.ContactCode;
+
+                        if (contactDto.ContactAddresses == null)
+                            contactDto.ContactAddresses = new List<AppContactAddressDto>();
+                        // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
+                        contactDto.ContactAddresses.Add(new AppContactAddressDto
+                        {
+                            AddressTypeId = contactAddress.AddressTypeId,
+                            AddressTypeIdName = contactAddress.AddressTypeCode,
+                            Code = address.Code,
+                            AddressId = address.Id,
+                            AccountId = contactDto.Id,
+                            ContactId = contactDto.Id
+                            
+                        });
+                        //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
+                        //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
+                        await _appContactAddressRepository.InsertAsync(newContactAddress);
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
-                    else
-                    {
-                        address.Id = existedInPublish.AddressId;
-                        address.Code = existedInPublish.Code;
-                    }
-
-
-                    AppContactAddress newContactAddress = new AppContactAddress();
-                    //ObjectMapper.Map(contactAddress, newContactAddress);
-                    newContactAddress.Id = 0;
-                    newContactAddress.AddressId = address.Id;
-                    newContactAddress.ContactId = contactDto.Id;
-                    newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
-                    if (contactDto.ContactAddresses == null)
-                        contactDto.ContactAddresses = new List<AppContactAddressDto>();
-                    contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id });
-                    //var aId = contact.AppContactAddresses.FirstOrDefault(x => x.AddressId == contactAddress.Id && x.ContactId ==);
-                    //await _appContactAddressRepository.InsertAsync(new AppContactAddress { AddressId = address.Id, ContactId = contactDto.Id, AddressTypeId = aId.AddressTypeId });
-                    await _appContactAddressRepository.InsertAsync(newContactAddress);
-
                 }
                 //Mariam - Publish Account related contacts[Start]
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
@@ -2038,6 +2387,7 @@ namespace onetouch.Accounts
             {
                 contactDto.Id = publishContact.Id;
                 entityDto.Id = publishContact.EntityId;
+                entityDto.EntityObjectStatusId = null;
             }
             if (entity.EntityAttachments != null)
             {
@@ -3558,7 +3908,10 @@ namespace onetouch.Accounts
                 var logoAttach = input.EntityAttachments.Where(x => x.AttachmentCategoryId == attPhotoId).FirstOrDefault();
                 if (logoAttach != null && !string.IsNullOrEmpty(logoAttach.FileName))
                 {
+                    if (!string.IsNullOrEmpty(logoAttach.guid))
                     await UpdateProfilePicture(logoAttach.guid + "." + logoAttach.FileName.Split('.')[1], long.Parse(input.UserId.ToString()));
+                    else
+                        await UpdateProfilePicture( logoAttach.FileName, long.Parse(input.UserId.ToString()));
                 }
             }
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
@@ -3761,7 +4114,9 @@ namespace onetouch.Accounts
             {
                 if (contact.AppContactAddresses.Count(x => x.AddressTypeId == item.AddressTypeId) == 0)
                 {
-                    contact.AppContactAddresses.Add(new AppContactAddress { ContactId = input.Id, AddressTypeId = item.AddressTypeId, AddressId = item.AddressId });
+                    contact.AppContactAddresses.Add(new AppContactAddress { ContactId = input.Id, AddressTypeId = item.AddressTypeId, AddressId = item.AddressId,
+                    AddressCode = item.Code,AddressTypeCode = item.AddressTypeIdName,ContactCode = input.Code
+                });
                 }
                 else
                 {
@@ -3863,7 +4218,7 @@ namespace onetouch.Accounts
                         .Include(e => e.ParentFkList)                        //MMT
                         .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
                         //MMT
-                        .Where(x => x.IsProfileData)
+                        //.Where(x => x.IsProfileData)
                         .Where(e => e.ParentId != null && e.ParentId == parentId && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId);
             var branches = from o in filteredBranches
                            join o2 in _appContactRepository.GetAll() on o.ParentId equals o2.Id into j2
@@ -4794,7 +5149,9 @@ namespace onetouch.Accounts
                     addressDto.City = address.City;
                     addressDto.State = address.State;
                     addressDto.PostalCode = address.PostalCode;
-                    addressDto.CountryId = GetTypeId(address.CountryIdName, countries);
+                    if (string.IsNullOrEmpty(address.CountryIdName)) address.CountryIdName = "USA";
+                    var countryId = GetTypeId(address.CountryIdName, countries);
+                    addressDto.CountryId = countryId == 0 ? null : countryId;
                     addressDto.AccountId = AccountId;
                     var appAddressDtoRet = await CreateOrEditAddress(addressDto);
                     address.AddressId = appAddressDtoRet.Id;
@@ -5102,9 +5459,9 @@ namespace onetouch.Accounts
                     accountContact.Phone1Ext = createOrEditAccountInfoDto.Phone1Ex;
                     accountContact.Phone2Ext = createOrEditAccountInfoDto.Phone2Ex;
                     accountContact.Phone3Ext = createOrEditAccountInfoDto.Phone3Ex;
-                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId;
-                    accountContact.Phone2TypeId = createOrEditAccountInfoDto.Phone2TypeId;
-                    accountContact.Phone3TypeId = createOrEditAccountInfoDto.Phone3TypeId;
+                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId == 0 ? null : createOrEditAccountInfoDto.Phone1TypeId; 
+                    accountContact.Phone2TypeId = createOrEditAccountInfoDto.Phone2TypeId == 0 ? null : createOrEditAccountInfoDto.Phone2TypeId;
+                    accountContact.Phone3TypeId = createOrEditAccountInfoDto.Phone3TypeId == 0 ? null : createOrEditAccountInfoDto.Phone3TypeId;
                     accountContact.PriceLevel = createOrEditAccountInfoDto.PriceLevel;
                     accountContact.Website = createOrEditAccountInfoDto.Website;
                     accountContact.EntityFk = new AppEntity();
@@ -5283,9 +5640,9 @@ namespace onetouch.Accounts
                             branchContact.Phone1Ext = branchDto.Phone1Ext;
                             branchContact.Phone2Ext = branchDto.Phone2Ext;
                             branchContact.Phone3Ext = branchDto.Phone3Ext;
-                            branchContact.Phone1TypeId = branchDto.Phone1TypeId;
-                            branchContact.Phone2TypeId = branchDto.Phone2TypeId;
-                            branchContact.Phone3TypeId = branchDto.Phone3TypeId;
+                            branchContact.Phone1TypeId = branchDto.Phone1TypeId == 0 ? null : branchDto.Phone1TypeId;
+                            branchContact.Phone2TypeId = branchDto.Phone2TypeId == 0 ? null : branchDto.Phone2TypeId;
+                            branchContact.Phone3TypeId = branchDto.Phone3TypeId == 0 ? null : branchDto.Phone3TypeId;
                             branchContact.PriceLevel = accountContact.PriceLevel;
                             branchContact.Website = branchDto.Website;
                             branchContact.EntityFk = new AppEntity();
@@ -5423,9 +5780,9 @@ namespace onetouch.Accounts
                                     teamContact.Phone1Ext = personDto.Phone1Ext;
                                     teamContact.Phone2Ext = personDto.Phone2Ext;
                                     teamContact.Phone3Ext = personDto.Phone3Ext;
-                                    teamContact.Phone1TypeId = personDto.Phone1TypeId;
-                                    teamContact.Phone2TypeId = personDto.Phone2TypeId;
-                                    teamContact.Phone3TypeId = personDto.Phone3TypeId;
+                                    teamContact.Phone1TypeId = personDto.Phone1TypeId == 0 ? null : personDto.Phone1TypeId;
+                                    teamContact.Phone2TypeId = personDto.Phone2TypeId == 0 ? null : personDto.Phone2TypeId;
+                                    teamContact.Phone3TypeId = personDto.Phone3TypeId == 0 ? null : personDto.Phone3TypeId;
                                     teamContact.PriceLevel = accountContact.PriceLevel;
                                     teamContact.Website = personDto.Website;
                                     teamContact.EntityFk = new AppEntity();
@@ -7542,7 +7899,7 @@ namespace onetouch.Accounts
             return appContactAddressDtos;
 
         }
-
+       
 
     }
 

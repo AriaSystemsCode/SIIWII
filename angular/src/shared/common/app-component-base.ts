@@ -261,13 +261,14 @@ export abstract class AppComponentBase {
 
         uploader.onSuccessItem = (item, response, status) => {
             const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-            if (ajaxResponse.success) {
+            if (ajaxResponse?.success) {
                 this.notify.info(this.l("UploadSuccessfully"));
                 if (success) {
                     success(ajaxResponse.result);
                 }
             } else {
-                this.message.error(ajaxResponse.error.message);
+                if(ajaxResponse?.error?.message)
+                this.message.error(ajaxResponse?.error?.message);
             }
         };
 
@@ -292,13 +293,14 @@ export abstract class AppComponentBase {
 
         uploader.onSuccessItem = (item, response, status) => {
             const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-            if (ajaxResponse.success) {
+            if (ajaxResponse?.success) {
                 this.notify.info(this.l("UploadSuccessfully"));
                 if (success) {
                     success(ajaxResponse.result);
                 }
             } else {
-                this.message.error(ajaxResponse.error.message);
+                if(ajaxResponse?.error?.message)
+                this.message.error(ajaxResponse?.error?.message);
             }
         };
 

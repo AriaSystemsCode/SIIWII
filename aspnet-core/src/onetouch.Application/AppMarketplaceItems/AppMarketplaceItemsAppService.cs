@@ -28,6 +28,7 @@ using onetouch.AppEntities;
 using onetouch.AppSiiwiiTransaction;
 using onetouch.Migrations;
 using NUglify.Helpers;
+using onetouch.Sessions.Dto;
 
 namespace onetouch.AppMarketplaceItems
 {
@@ -219,8 +220,10 @@ namespace onetouch.AppMarketplaceItems
                 //  .WhereIf(input.EntityObjectTypeId > 0, e => e.EntityFk.EntityObjectTypeId == input.EntityObjectTypeId)
                 .WhereIf(input.departmentFilters != null && input.departmentFilters.Count() > 0, e => e.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
                 // .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
-                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.ManufacturerCode.Contains(input.Filter) || e.Description.Contains(input.Filter) || e.EntityExtraData.Where(a => a.AttributeValue.Contains(input.Filter)).Count() > 0)
-                .Where(x => x.ParentId == null && (x.SharingLevel != 3 && x.SharingLevel != 4) &&
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+                e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.ManufacturerCode.Contains(input.Filter) || e.Description.Contains(input.Filter) ||
+                e.EntityExtraData.Where(a => a.AttributeValue.Contains(input.Filter)).Count() > 0 || e.ParentFkList.Where(z=>z.Code.Contains(input.Filter)).Count()>0)
+                .Where(x => x.ParentId == null &&
                 ((input.SharingLevel == SharingLevels.Public && x.SharingLevel == 1) ||
                  (input.SharingLevel == SharingLevels.SharedWithMe && x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0) ||
                 (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 ||
@@ -318,7 +321,7 @@ namespace onetouch.AppMarketplaceItems
                 var account = await _appContactRepository.GetAll().Include(a => a.EntityFk)
                     .ThenInclude(a => a.EntityAttachments.Where(a => a.AttachmentCategoryId == attPhotoId || a.AttachmentCategoryId == attBannerId))
                     .ThenInclude(a=>a.AttachmentFk)
-                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN);
+                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId==null);
                 GetAccountImagesOutputDto returnDto = new GetAccountImagesOutputDto();
                 if (account != null)
                 {
@@ -1426,7 +1429,7 @@ namespace onetouch.AppMarketplaceItems
         //                        foreach (var parentAttach in detParent.EntityAttachments)
         //                        {
         //                            parentAttach.Id = 0;
-                                    
+
         //                            parentAttach.EntityId = 0;
         //                            parentAttach.EntityFk = null;
         //                            parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
@@ -1508,7 +1511,7 @@ namespace onetouch.AppMarketplaceItems
         //                                    foreach (var parentAttach in det.EntityAttachments)
         //                                    {
         //                                        parentAttach.Id = 0;
-                                                
+
         //                                        parentAttach.EntityId = 0;
         //                                        parentAttach.EntityFk = null;
         //                                        parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
@@ -1529,7 +1532,7 @@ namespace onetouch.AppMarketplaceItems
         //                    }
         //                }
         //            }
-                   
+
         //            await CurrentUnitOfWork.SaveChangesAsync();
         //        }
         //    }
@@ -1564,5 +1567,34 @@ namespace onetouch.AppMarketplaceItems
         //        }
         //    }
         //}
+        //T-SII-20240628.0002 ,1 MMT 07/10/2024 Check if the currency has exchange rate[Start]
+        public async Task<bool> CheckCurrencyExchangeRate(CurrencyInfoDto inpurCurrencyCode)
+        {
+            //MMT1
+            //var currencyTenant = await TenantManager.GetTenantCurrency();
+            if (inpurCurrencyCode!=null && !string.IsNullOrEmpty(inpurCurrencyCode.Code)) // != null && currencyTenant != null && currencyTenant.Code != null && inpurCurrencyCode != currencyTenant.Code)
+            {
+                if (inpurCurrencyCode.Code != "USD")
+                {
+                    var TenantCurrency = await _sycCurrencyExchangeRateRepository.GetAll().FirstOrDefaultAsync(x => x.CurrencyCode == inpurCurrencyCode.Code);
+                    if (TenantCurrency == null)
+                    {
+                        return false;
+                    }
+                    else
+                        return true;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+        //T-SII-20240628.0002 ,1 MMT 07/10/2024 Check if the currency has exchange rate[End]
     }
 }

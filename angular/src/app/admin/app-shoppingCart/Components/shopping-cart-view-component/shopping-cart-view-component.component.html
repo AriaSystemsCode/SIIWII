@@ -100,7 +100,7 @@
                 <div class="p-4 text-right border-left">
                     <button type="button" class="btn btn-primary bgPurple border-0  ml-5 pl-4 pr-4"
                         style="height: 37px;" (click)="onContinueShopping()"
-                        [disabled]="!shoppingCartDetails?.detailsView"
+                        [disabled]="!shoppingCartDetails?.detailsView || !isOwnedByMe"
                         [ngClass]="{ disabled:!shoppingCartDetails?.detailsView}">
                         {{l("ContinueShopping")}}
                     </button>
@@ -118,7 +118,7 @@
                         <!-- order information tab -->
 
                         <!-- [ngClass]="{'shoppingCartAccordionNotValidTab':!orderInfoValid}" -->
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs" (click)="currentTab=0">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg" *ngIf="orderInfoValid" />
@@ -127,19 +127,19 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Information</h6>
                                 </div>
                             </ng-template>
-                            <ng-template pTemplate="content">
-                                <app-sales-order [activeTab]="activeIndex ?  activeIndex :0"
+                                <app-sales-order [activeTab]="0"
+                                [currentTab]="currentTab"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     (orderInfoValid)="ontabInfoValid($event)"
                                     [createOrEditorderInfo]="createOrEditorderInfo"
                                     [oldCreateOrEditorderInfo]="createOrEditorderInfo"
                                     (ontabChange)="ontabChange($event)"
-                                    (generatOrderReport)="onGeneratOrderReport($event)"></app-sales-order>
-                            </ng-template>
+                                    (generatOrderReport)="onGeneratOrderReport($event)"
+                                    [canChange]="canChange"></app-sales-order>
                         </p-accordionTab>
                         <!-- order information tab -->
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=1">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -149,20 +149,20 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
                                 </div>
                             </ng-template>
-                            <ng-template pTemplate="content">
                                 <div>
                                     <app-create-or-edit-buyer-seller-contact-info
-                                        [activeTab]="activeIndex ?  activeIndex :1"
+                                        [activeTab]="1"
+                                        [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
-                                        (ontabChange)="ontabChange($event)"
+                                        (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
                                         [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-buyer-seller-contact-info>
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
-                            </ng-template>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=2">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -172,20 +172,20 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Sellercontactinfo")}}</h6>
                                 </div>
                             </ng-template>
-                            <ng-template pTemplate="content">
                                 <div>
                                     <app-create-or-edit-buyer-seller-contact-info
-                                        [activeTab]="activeIndex ?  activeIndex :2"
+                                        [activeTab]="2"
+                                        [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)" [showSaveBtn]="showSaveBtn"
                                         [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-buyer-seller-contact-info>
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
-                            </ng-template>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=3">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -197,19 +197,20 @@
                                 </div>
                             </ng-template>
 
-                            <ng-template pTemplate="content">
+                           
                                 <div>
-                                    <app-create-or-edit-sales-rep-info [activeTab]="activeIndex ?  activeIndex :3"
+                                    <app-create-or-edit-sales-rep-info [activeTab]="3"
+                                    [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [showSaveBtn]="showSaveBtn"
                                         [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"></app-create-or-edit-sales-rep-info>
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange"></app-create-or-edit-sales-rep-info>
                                 </div>
-                            </ng-template>
                         </p-accordionTab>
 
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=4">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -220,18 +221,18 @@
                                     </h6>
                                 </div>
                             </ng-template>
-                            <ng-template pTemplate="content">
                                 <div>
-                                    <app-create-or-add-shipping-information [activeTab]="activeIndex ?  activeIndex :4"
+                                    <app-create-or-add-shipping-information [activeTab]="4"
+                                    [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [createOrEditshippingInfO]="createOrEditshippingInfO"
-                                        (generatOrderReport)="onGeneratOrderReport($event)">
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange">
                                     </app-create-or-add-shipping-information>
                                 </div>
-                            </ng-template>
                         </p-accordionTab>
-                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=5">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
@@ -241,16 +242,16 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
                                 </div>
                             </ng-template>
-                            <ng-template pTemplate="content">
                                 <div>
-                                    <app-create-or-edit-billing-info [activeTab]="activeIndex ?  activeIndex :5"
+                                    <app-create-or-edit-billing-info [activeTab]="5"
+                                    [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [createOrEditBillingInfo]="createOrEditBillingInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)">
+                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        [canChange]="canChange">
                                     </app-create-or-edit-billing-info>
                                 </div>
-                            </ng-template>
                         </p-accordionTab>
                         <p-accordionTab class="shoppingCartAccordionTabBG">
                             <ng-template pTemplate="header">
@@ -317,7 +318,7 @@
                                                     <!--  <th> <img
                                                     src="../../../../../assets/shoppingCart/Order-Details-Table-Action_Btn.svg" />
                                             </th> -->
-                                                    <th class="purpleColor">
+                                                    <th class="purpleColor" *ngIf="canChange">
                                                         {{l("Action")}}
                                                     </th>
                                                 </tr>
@@ -378,7 +379,7 @@
                                                         </label>
                                                     </td>
 
-                                                    <td class="p-treeTable">
+                                                    <td class="p-treeTable" *ngIf="canChange">
                                                         <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
                                                     class="imgIcon" (click)="onDelete(rowNode)" />
                                                 <img *ngIf="rowNode?.node?.data?.editQty" src=""
@@ -423,18 +424,18 @@
                             </div>
                         </p-accordionTab>
                         <!-- order Preview tab -->
-                        <p-accordionTab class="shoppingCartAccordionTabBG"
-                            *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" 
+                            *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
                                 </div>
-                            </ng-template>
+                            </ng-template> 
                             <ng-template pTemplate="content">
                                 <app-order-preview 
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     [transactionFormPath]="transactionFormPath"
-                                    [orderConfirmationFile]="orderConfirmationFile"></app-order-preview>
+                                    [orderId]="orderId"></app-order-preview>
                             </ng-template>
                         </p-accordionTab>
                         <!-- order Preview tab -->
@@ -449,8 +450,7 @@
                         <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor">
                             <div class="row w-100">
                                 <div class="col-6 font-weight-bold">{{l("TotalAmount")}}</div>
-                                <div class="font-weight-bold">{{currencySymbol}} {{shoppingCartDetails?.totalAmount ?
-                                    shoppingCartDetails?.totalAmount : '0.00' }}</div>
+                                <div class="font-weight-bold">{{currencySymbol}} {{shoppingCartDetails?.totalAmount   ? (shoppingCartDetails?.totalAmount | currency:' ') : '0.00' }}</div>
                             </div>
                             <div class="row w-100 mt-4 mb-4">
                                 <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
@@ -492,12 +492,14 @@
                             </div>
 
                         </div>
-
                     </ng-container>
-                    <div class="row mt-4">
+                    <div class="row mt-4" 
+                    [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
-                        <div class="w-100 comment-warper summarySection p-4 ml-2 mt-3 purpleColor">
-                            <app-comment-parent [cartStyle]="true" #commentParentComponent (newCommentAdded)="onGeneratOrderReport(true)">
+                        <div class="w-100 comment-warper  h-100 summarySection p-4 ml-2 mt-3 purpleColor">
+                            <app-comment-parent [addNewThread]="true" 
+                            [cartStyle]="true" #commentParentComponent 
+                            (newCommentAdded)="onGeneratOrderReport(true)">
                             </app-comment-parent>
                         </div>
 
@@ -517,7 +519,8 @@
                 <app-share-transaction-tab [orderId]="orderId" 
                 [sharedWithUsers]="appTransactionsForViewDto.sharedWithUsers"
                 (closeTranScreenEvent)="hide()"
-                    (offShareTransactionEvent)="offShareTransaction()"></app-share-transaction-tab>
+                    (offShareTransactionEvent)="offShareTransaction()"
+                    (onShareTransactionByMessage)="onShareTransactionByMessage($event)"></app-share-transaction-tab>
             </div>
         </div>
     </div>

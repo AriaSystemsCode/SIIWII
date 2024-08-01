@@ -12,6 +12,7 @@ import { finalize } from 'rxjs';
 
 export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("SalesRepInfoValid") SalesRepInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
@@ -22,6 +23,7 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   @Input("createOrEditSalesRepInfo") createOrEditSalesRepInfo: boolean = true;
   oldappTransactionsForViewDto;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input("canChange")  canChange:boolean=true;
 
   constructor(
     injector: Injector,

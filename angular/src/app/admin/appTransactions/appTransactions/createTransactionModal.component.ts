@@ -3,6 +3,7 @@ import {
     Component,
     OnInit,
     ViewEncapsulation,
+    OnChanges,
     Output,
     EventEmitter,
     Input,
@@ -29,6 +30,7 @@ import {
     ICreateOrEditAppTransactionsDto,
     TransactionType,
     ValidateTransaction,
+    AppMarketplaceItemsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
@@ -40,19 +42,23 @@ import { UserClickService } from "@shared/utils/user-click.service";
 import { AppConsts } from "@shared/AppConsts";
 import { get } from "http";
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
+import * as moment from "moment";
 
 @Component({
     templateUrl: "./createTransactionModal.component.html",
     selector: "createTransactionModal",
     styleUrls: ["./createTransactionModal.component.scss"],
+    providers:[AppMarketplaceItemsServiceProxy]
 })
-export class CreateTransactionModal extends AppComponentBase implements OnInit {
+export class CreateTransactionModal extends AppComponentBase implements OnInit,OnChanges {
     dt: string;
     public orderForm: FormGroup;
     submitted: boolean = false;
     salesOrderControls: ICreateOrEditAppTransactionsDto;
     selectedCar: number;
     buyerCompanies: any[];
+    buyerBranches: any[];
+    sellerBranches: any[];
     sellerCompanies: any[];
     buyerContacts: any[];
     sellerContacts: any[];
@@ -71,7 +77,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     isRoleExist: boolean = false;
     btnLoader: boolean = false;
     currencyCode: any = null;
-
+    byerBranchAutoselectFirst:boolean=false;
+    minDate:Date;
+    roleDdval:any;
     @Input() orderNo: string;
     @Input() fullName: string;
     @Input() display: boolean = false;
@@ -95,17 +103,24 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
     invokeAction = '/DXXRDV';
     reportUrl="";
     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
+    minCompleteDate:Date;
+    minStartDate:Date;
+    sellerCurrencyCode;
 
     constructor(
         injector: Injector,
         private fb: FormBuilder,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+        private _AppMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy,
         private userClickService: UserClickService,
         private router: Router
     ) {
         super(injector);
         this.orderForm = this.fb.group({
+            startDate: [ Date, [Validators.required]],
+            completeDate: ["", [Validators.required]],
+            availableDate: ["", [Validators.required]],
             sellerCompanyName: ["", [Validators.required]],
             sellerContactName: [""],
             sellerContactEMailAddress: ["", [Validators.email]],
@@ -114,11 +129,80 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             buyerContactName: [""],
             buyerContactEMailAddress: ["", [Validators.email]],
             buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyBranch:["", [Validators.required]],
+            sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
         });
+        this.orderForm.reset();
         this.getAllCompanies();
+        this.orderForm.controls['startDate'].setValue(new Date());
+        this.changeStartDate(this.orderForm.get('startDate'));
     }
+    ngOnChanges(){
+        this.orderForm = this.fb.group({
+            startDate: [ Date, [Validators.required]],
+            completeDate: ["", [Validators.required]],
+            availableDate: ["", [Validators.required]],
+            sellerCompanyName: ["", [Validators.required]],
+            sellerContactName: [""],
+            sellerContactEMailAddress: ["", [Validators.email]],
+            sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyName: ["", [Validators.required]],
+            buyerContactName: [""],
+            buyerContactEMailAddress: ["", [Validators.email]],
+            buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyBranch:["", [Validators.required]],
+            sellerCompanyBranch:["", [Validators.required]],
+            istemp: [false],
+        });
+        this.orderForm.reset();
+        this.orderForm.controls['startDate'].setValue(new Date());
+        this.changeStartDate(this.orderForm.get('startDate'));
+        this.getUserDefultRole();
 
+    }
+    getUserDefultRole(){
+       /* var transactionType: TransactionType;
+        if (this.formType.toUpperCase() == "SO")
+            transactionType = TransactionType.SalesOrder;
+        if (this.formType.toUpperCase() == "PO")
+            transactionType = TransactionType.PurchaseOrder;*/
+        this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result=>{
+            if (this.formType?.toUpperCase() == "SO"){
+                if(result.toLowerCase().includes('seller')){
+                  this.roleDdval=this.roles.filter(role=>role.code==1)[0];
+
+                }else{
+                    this.roleDdval=this.roles.filter(role=>role.code!==1)[0];
+                }
+            }else if (this.formType?.toUpperCase() == "PO"){
+                if(result.toLowerCase().includes('buyer')){
+                    this.roleDdval=this.roles.filter(role=>role.code==2)[0];
+
+                }else{
+                    this.roleDdval=this.roles.filter(role=>role.code!==2)[0];
+                }
+            }
+            this.handleRoleChange({value:this.roleDdval});
+        })
+    }
+    getBranches(accountSSIN,objectToChangeName) {
+            this._AppTransactionServiceProxy.getAccountBranches(accountSSIN).subscribe(result => {
+                if(objectToChangeName=='buyer'){
+                  this.buyerBranches=result;
+                   if(result.length==1){
+                    this.orderForm.controls['buyerCompanyBranch'].setValue(result[0]);
+
+                   }
+                }else{
+                    this.sellerBranches=result;
+                    if(result.length==1){
+                        this.orderForm.controls['sellerCompanyBranch'].setValue(result[0]);
+    
+                       }
+                }
+            }); 
+    }
     getAllCompanies() {
         this._AppTransactionServiceProxy
             .getRelatedAccounts(
@@ -158,15 +242,17 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
             this.orderForm.controls["buyerCompanyName"].reset();
+            
         }
     }
     selectTempSeller() {
         this.isSellerTempAccount = !this.isSellerTempAccount;
     }
     handleRoleChange(data: any) {
-        this.role = data.value.name;
+        
+        this.role = data?.value?.name;
         this.isRoleExist = false;
-        if (data.value.code === 1) {
+        if (data?.value?.code === 1) {
             // i'm a Seller
             this.isSeller = true;
             this.isBuyer = false;
@@ -182,13 +268,19 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     // add seller values
                     this.orderForm.get("sellerContactName").setValue(res.name);
                     this.orderForm.get("sellerCompanyName").setValue(res.name);
+                    this.orderForm.get('sellerContactPhoneNumber').setValue(res.phone)
+                    this.orderForm.get('sellerContactEMailAddress').setValue(res.email)
                     // remove buyer values
                     this.orderForm.get("buyerContactName").reset();
                     this.orderForm.get("buyerCompanyName").reset();
                     this.orderForm.get("buyerContactEMailAddress").reset();
                     this.orderForm.get("buyerContactPhoneNumber").reset();
+                    this.orderForm.get("sellerCompanyBranch").reset();
+                    this.orderForm.get("buyerCompanyBranch").reset();
+                    this.sellerBranches=[];
+                    this.getBranches(this.sellerCompanySSIN ,'seller')
                 });
-        } else if (data.value.code === 2) {
+        } else if (data?.value?.code === 2) {
             // i'm a buyer
             this.isSeller = false;
             this.isBuyer = true;
@@ -204,12 +296,19 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     this.handleBuyerNameSearch("");
                     this.orderForm.get("buyerContactName").setValue(res.name);
                     this.orderForm.get("buyerCompanyName").setValue(res.name);
+                    this.orderForm.get('buyerContactPhoneNumber').setValue(res.phone)
+                    this.orderForm.get('buyerContactEMailAddress').setValue(res.email)
 
                     // remove seller values
                     this.orderForm.get("sellerContactName").reset();
                     this.orderForm.get("sellerCompanyName").reset();
                     this.orderForm.get("sellerContactEMailAddress").reset();
                     this.orderForm.get("sellerContactPhoneNumber").reset();
+                    this.orderForm.get("sellerCompanyBranch").reset();
+                    this.orderForm.get("buyerCompanyBranch").reset();
+                    this.buyerBranches=[];
+                    this.getBranches(this.buyerCompanySSIN ,'buyer')
+
                 });
         } else {
             // i'm a sales rep
@@ -222,7 +321,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             // this.sellerCompanies = []
             // this.sellerContacts = []
             // this.buyerContacts = []
-            this.orderForm.reset();
+            //this.orderForm.reset();
         }
     }
 
@@ -253,6 +352,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     undefined,true
                 )
                 .subscribe((res: any) => {
+                    
                     this.buyerCompanies = [...res.items];
                     // this.sellerCompanies = [...res.items];
                 });
@@ -285,6 +385,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                     undefined,true
                 )
                 .subscribe((res: any) => {
+                    
                     this.sellerCompanies = [...res.items];
                 });
         }, 1000);
@@ -295,14 +396,24 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
         this.buyerCompanySSIN = event.value.accountSSIN;
         this.currencyCode = event.value.currencyCode;
         this.areSame = false
+        this.orderForm.get('buyerContactPhoneNumber').setValue(event.value.phone)
+        this.orderForm.get('buyerContactEMailAddress').setValue(event.value.email)
+
         this.handleBuyerNameSearch("");
+        this.buyerBranches=[];
+        this.getBranches(event.value.accountSSIN,'buyer')
     }
 
     handleSellerCompanyChange(event: any) {
         this.sellerCompanyId = event.value.id;
         this.sellerCompanySSIN = event.value.accountSSIN;
+        this.sellerCurrencyCode=event.value.currencyCode;
         this.areSame = false
+        this.orderForm.get('sellerContactPhoneNumber').setValue(event.value.phone)
+        this.orderForm.get('sellerContactEMailAddress').setValue(event.value.email)
         this.handleSellerNameSearch("");
+        this.sellerBranches=[];
+        this.getBranches(event.value.accountSSIN,'seller')
     }
 
     handleBuyerNameSearch(event: any) {
@@ -358,6 +469,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
 
     areSame: boolean = false;
     async getStarted() {
+
+        if(this.isBuyerTempAccount){
+        this.orderForm = this.fb.group({
+            buyerCompanyBranch:["", null]
+        }) 
+    }
+
         if ((!this.sellerCompanyId || !this.buyerComapnyId)  || (this.sellerCompanyId !== this.buyerComapnyId)) {
             this.areSame = false;
             this.submitted = true;
@@ -412,6 +530,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             if (this.invalidSellerPhoneNumber || this.invalidBuyerPhoneNumber || this.invalidBuyerContactEMailAddress || this.invalidSellerContactEMailAddress)
                 return;
             if (this.orderForm.invalid) {
+                Object.keys(this.orderForm.controls).forEach(key => {
+                    const control = this.orderForm.get(key);
+                    if (control.invalid) {
+                        console.log('Invalid control:', key, 'Value:', control.value);
+                    }
+                });
                 return;
             } else {
                 if (this.role === "") {
@@ -470,6 +594,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                         buyerContactSSIN: this.buyerContactSSIN,
                         sellerCompanySSIN: this.sellerCompanySSIN,
                         buyerCompanySSIN: this.buyerCompanySSIN,
+                        buyerBranchSSIN: this.orderForm.controls['buyerCompanyBranch']?.value?.ssin,
+                        buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
+                        sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
+                        sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
+                        completeDate: moment.utc(this.orderForm.controls['completeDate']?.value?.toLocaleString()),
+                        startDate: moment.utc(this.orderForm.controls['startDate']?.value?.toLocaleString()),
+                        availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString())
                     };
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,
@@ -506,13 +637,62 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
             this.areSame = true
         }
     }
+    changeStartDate(date){
+
+        const newDate = new Date();
+
+        let month = date?.value?.getMonth();
+        let year = date?.value?.getFullYear();
+        let day = date?.value?.getDate();
+
+        let monthVal = (month === 11) ? 0 : month + 1;
+        let yearVal = (monthVal === 0) ? year + 1 : year;
+        this.minDate = newDate;
+        this.minDate.setDate(day);
+        this.minDate.setMonth(monthVal);
+        this.minDate.setFullYear(yearVal);
+        const completeDateControl = this.orderForm.controls['completeDate'];
+        const availableDateControl = this.orderForm.controls['availableDate'];
+    
+
+
+        if (!completeDateControl?.value || completeDateControl?.value?.getTime() <= date?.value?.getTime()) {
+            this.orderForm.controls['completeDate'].setValue(this.minDate);
+        }
+
+        if (!availableDateControl?.value || availableDateControl?.value?.getTime() <= date?.value?.getTime()) {
+            this.orderForm.controls['availableDate'].setValue(this.minDate);
+        }
+
+        this.minCompleteDate = this.orderForm.get('completeDate')?.value;
+        this.minStartDate = this.orderForm.get('startDate')?.value;
+       //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
+    
+   
+
+    }
+
+    changeCompleteDate(event) {
+        const newDate = event.value;
+    
+        this.orderForm.controls['availableDate'].setValue(newDate);
+        this.minCompleteDate = newDate;
+        this.minStartDate = this.orderForm.get('startDate')?.value;
+
+        // Check if the new date is different from the current value to prevent infinite loops
+        if (newDate?.getTime() !== this.orderForm.controls['completeDate']?.value?.getTime()) 
+            this.orderForm.controls['completeDate'].setValue(newDate);
+    }
+
+
+   
 
     async validateShoppingCart() {
         this.showMainSpinner();
         var transactionType: TransactionType;
-        if (this.formType.toUpperCase() == "SO")
+        if (this.formType?.toUpperCase() == "SO")
             transactionType = TransactionType.SalesOrder;
-        if (this.formType.toUpperCase() == "PO")
+        if (this.formType?.toUpperCase() == "PO")
             transactionType = TransactionType.PurchaseOrder;
         let sellerCompanySSIN = "";
         if (this.sellerCompanySSIN)
@@ -661,7 +841,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                         );
 
                         
-                        if (this.formType.toUpperCase() == "PO")
+                        if (this.formType?.toUpperCase() == "PO")
                             this.currencyCode=  this.appSession.tenant.currencyInfoDto;
                             
                         localStorage.setItem(
@@ -669,6 +849,43 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
                             JSON.stringify(this.currencyCode)
                         );
                     }
+
+
+                     ////////////////////////////
+                    this._AppMarketplaceItemsServiceProxy
+                     .checkCurrencyExchangeRate(this.currencyCode)
+                     .subscribe((res: boolean) => {
+                         if(!res){
+                              Swal.fire({
+                                 title: "",
+                                 text: "Currency exchange rate hasn't been defined switching to seller currency",
+                                 icon: "info",
+                                 showCancelButton: false,
+                                 confirmButtonText:
+                                     "Ok",
+                                 allowOutsideClick: false,
+                                 allowEscapeKey: false,
+                                 backdrop: true,
+                                 customClass: {
+                                     popup: "popup-class",
+                                     icon: "icon-class",
+                                     content: "content-class",
+                                     actions: "actions-class",
+                                     confirmButton: "confirm-button-class2",
+                                 },
+                             });
+
+
+                             this.currencyCode=  this.sellerCurrencyCode ? this.sellerCurrencyCode :this.appSession.tenant.currencyInfoDto ;
+                             localStorage.setItem(
+                                 "currencyCode",
+                                 JSON.stringify(this.currencyCode)
+                             );
+                         }
+                         }); 
+                             //////////////////////////
+
+                             
                     if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
                         location.reload();
                     else
@@ -724,5 +941,15 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit {
 
     ngOnInit(): void {
         console.log(">> oninit", this.orderNo);
+        let today = new Date();
+        let month = today.getMonth();
+        let year = today.getFullYear();
+        let prevMonth = (month === 0) ? 11 : month -1;
+        let prevYear = (prevMonth === 11) ? year - 1 : year;
+        let nextMonth = (month === 11) ? 0 : month + 1;
+        let nextYear = (nextMonth === 0) ? year + 1 : year;
+        this.minDate = new Date();
+        this.minDate.setMonth(prevMonth);
+        this.minDate.setFullYear(prevYear);
     }
 }

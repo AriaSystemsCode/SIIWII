@@ -10,14 +10,19 @@ import { onetouchCommonModule } from '@shared/common/common.module';
 import { CommentsModule } from '../comments/comments.module';
 import { CommentParentComponent } from './components/comment-parent/comment-parent.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+//import { MessagesModule } from '../Messages/messages.module';
+import { SendDirectMessageComponent } from './components/send-direct-message/send-direct-message.component';
+import { AppCommonModule } from '@app/shared/common/app-common.module';
 
 @NgModule({
     declarations: [
         InteractionsComponent,
         CommentParentComponent,
+        SendDirectMessageComponent,
     ],
     imports: [
         CommonModule,
+       /// MessagesModule,
         UtilsModule,
         onetouchCommonModule,
         InteractionsRoutingModule,
@@ -25,12 +30,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
         SocializationStatsModule,
         CommentsModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        AppCommonModule
     ],
     exports:[
         InteractionsComponent,
         CommentParentComponent
     ],
-    providers:[ReactionsService]
+    providers:[ReactionsService]           
 })
 export class InteractionsModule { }

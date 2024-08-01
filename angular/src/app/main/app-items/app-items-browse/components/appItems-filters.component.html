@@ -1,6 +1,12 @@
+<div class="wrapper-filters border bg-white rounded w-100 p-3" style="
+    border-radius: 5px !important;
+    background-color: #FFFFFF !important;
+    border-color: white !important;
+">
+
 <form [formGroup]="filterForm" >
 
-    <div class="mb-4" *ngIf="filtersFlags?.appItemType">
+    <div class="mb-4 border-bottom pb-2" *ngIf="filtersFlags?.appItemType">
         <app-tree-single-selection-filter
             #AppItemTypeFilter
             [filterMetaData]="appItemTypeFilterMetaData"
@@ -14,7 +20,7 @@
     </div>
 
     <!--  T-SII-20231103.0007  -->
-    <div class="mb-4" *ngIf="filtersFlags?.appItemSizeScale">
+    <div class="mb-4 border-bottom pb-2" *ngIf="filtersFlags?.appItemSizeScale">
         <app-tree-multi-selection-filter
             #SizeScaleFilter
             [filterMetaData]="sizeScaleFilterMetaData"
@@ -26,7 +32,7 @@
     </div> 
 
 
-    <div class="mb-4" *ngIf="filtersFlags?.categories">
+    <div class="mb-4 border-bottom pb-2" *ngIf="filtersFlags?.categories">
         <app-tree-multi-selection-filter
             #CategoryFilter
             [filterMetaData]="categoriesFilterMetaData"
@@ -38,7 +44,7 @@
         </app-tree-multi-selection-filter>
     </div>
 
-    <div class="mb-4" *ngIf="filtersFlags?.classifications">
+    <div class="mb-4 border-bottom pb-2" *ngIf="filtersFlags?.classifications">
         <app-tree-multi-selection-filter
             #ClassificationFilter
             [filterMetaData]="classificationsFilterMetaData"
@@ -50,7 +56,7 @@
         </app-tree-multi-selection-filter>
     </div>
 
-    <div class="mb-4"  *ngIf="filtersFlags?.departments">
+    <div class="mb-4 border-bottom pb-2"  *ngIf="filtersFlags?.departments">
         <app-tree-multi-selection-filter
             #DepartmentFilter
             [filterMetaData]="departmentsFilterMetaData"
@@ -63,7 +69,7 @@
     </div>
 
      <ng-container *ngIf="filtersFlags?.extraAttributes">
-         <div class="mb-4" *ngFor="let extraAttr of extraAttributesMetaData; let i = index;">
+         <div class="mb-4 border-bottom pb-2" *ngFor="let extraAttr of extraAttributesMetaData; let i = index;">
              <app-multi-selection-filter
                 #ref
                 [filterMetaData]="extraAttr.filterMetaData"
@@ -78,7 +84,7 @@
 
 
 
-    <div class="mb-4" *ngIf="filtersFlags?.publishStatus" >
+    <div class="mb-4 border-bottom pb-2" *ngIf="filtersFlags?.publishStatus" >
         <app-single-selection-filter
             #publishStatusFilter
             [filterMetaData]="publishStatusFilterMetaData"
@@ -89,7 +95,7 @@
         </app-single-selection-filter>
     </div>
 
-    <!-- <div class="mb-4"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyListing && filtersFlags?.visibilityStatus">
+    <!-- <div class="mb-4 border-bottom pb-2"  *ngIf="mainFilterCtrl?.value?.value == ItemsFilterTypesEnum.MyListing && filtersFlags?.visibilityStatus">
         <app-single-selection-filter
             #visibilityStatusFilter
             [filterMetaData]="visibilityStatusFilterMetaData"
@@ -101,3 +107,6 @@
     </div> -->
 
 </form>
+
+
+</div>

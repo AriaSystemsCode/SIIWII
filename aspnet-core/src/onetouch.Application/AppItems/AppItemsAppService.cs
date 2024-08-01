@@ -63,6 +63,10 @@ using Abp.Extensions;
 using onetouch.Attachments;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Org.BouncyCastle.Utilities.Encoders;
+using onetouch.AppSiiwiiTransaction;
+using NPOI.HPSF;
+using NPOI.POIFS.NIO;
+using onetouch.AppSubScriptionPlan;
 
 namespace onetouch.AppItems
 {
@@ -101,6 +105,7 @@ namespace onetouch.AppItems
         private readonly IRepository<AppMarketplaceItemPrices, long> _appMarketplaceItemPricesRepository;
         //MMT33
         TimeZoneInfoAppService _timeZoneInfoAppService;
+        private readonly IRepository<AppTransactionDetails, long> _appTransactionDetails;
         //MMT
         private readonly IRepository<AppItemSelector, long> _appItemSelectorRepository;
         private readonly Helper _helper;
@@ -109,6 +114,7 @@ namespace onetouch.AppItems
         private readonly IRepository<SycSegmentIdentifierDefinition, long> _sycSegmentIdentifierDefinition;
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
+        private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, IAppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
@@ -132,10 +138,13 @@ namespace onetouch.AppItems
             IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
-            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService
+            IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
+            IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
             )
         {
+            _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             //MMT33-2
+            _appTransactionDetails = appTransactionDetails;
             _timeZoneInfoAppService = timeZoneInfoAppService;
             _appAttachmentRepository = appAttachmentRepository;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
@@ -186,26 +195,26 @@ namespace onetouch.AppItems
             //if (input.departmentFilters != null && input.departmentFilters.Count() > 0)
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                
+
                 List<long> listDept = new List<long>();
                 //foreach (var dept in input.departmentFilters)
                 //{
-                    var depts = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.ParentId == deptId && (z.TenantId==null || z.TenantId==AbpSession.TenantId)).Select(z => z.Id).ToListAsync();
-                    if (depts != null && depts.Count() > 0)
+                var depts = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.ParentId == deptId && (z.TenantId == null || z.TenantId == AbpSession.TenantId)).Select(z => z.Id).ToListAsync();
+                if (depts != null && depts.Count() > 0)
+                {
+                    listDept.AddRange(depts);
+                    foreach (var d in depts)
                     {
-                        listDept.AddRange(depts);
-                        foreach (var d in depts)
+                        var children = await LoadDepartmentChildern(d);
+                        if (children != null && children.Count() > 0)
                         {
-                           var children =await LoadDepartmentChildern(d);
-                    if (children != null && children.Count() > 0)
-                    {
-                        listDept.AddRange(children);
+                            listDept.AddRange(children);
 
-                    }
                         }
                     }
-               
-            return listDept;
+                }
+
+                return listDept;
             }
             //MMT
         }
@@ -254,12 +263,12 @@ namespace onetouch.AppItems
                     foreach (var dept in input.departmentFilters)
                     {
                         var children = await LoadDepartmentChildern(dept);
-                        if (children != null && children.Count>0)
+                        if (children != null && children.Count > 0)
                         {
                             listDept.AddRange(children);
-                        }            
-                     }
-                    foreach(var d in listDept)
+                        }
+                    }
+                    foreach (var d in listDept)
                         depts.AddIfNotContains(d);
                 }
                 //MMT
@@ -283,7 +292,12 @@ namespace onetouch.AppItems
                     input.ArrtibuteFilters = new List<ArrtibuteFilter>();
                 var attrs = input.ArrtibuteFilters.Select(r => r.ArrtibuteValueId).ToList();
                 #endregion
-                var filteredAppItems = _appItemRepository.GetAll().AsNoTracking().Include(x => x.ItemSizeScaleHeadersFkList).Select(x => new
+                var filteredAppItems = _appItemRepository.GetAll().AsNoTracking().Include(z=>z.EntityFk).ThenInclude(z=>z.EntityCategories).ThenInclude(z=>z.EntityObjectCategoryFk)
+                    .Include(z=>z.EntityFk).ThenInclude(z=>z.EntityClassifications).ThenInclude(z=>z.EntityObjectClassificationFk )
+                    //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
+                    .Include(z=>z.ItemPricesFkList.Where(z=>z.Code=="MSRP" && z.IsDefault))
+                    //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
+                    .Include(x => x.ItemSizeScaleHeadersFkList).Select(x => new
                 {
                     x.PublishedListingItemFkList,
                     x.TenantId,
@@ -302,9 +316,12 @@ namespace onetouch.AppItems
                     x.PublishedListingItemFk,
                     x.TenantOwner,
                     x.SSIN,
-                    x.ItemSizeScaleHeadersFkList
+                    x.ItemSizeScaleHeadersFkList,
+                    //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
+                    x.ItemPricesFkList
+                    //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
 
-                })
+                    })
                 .WhereIf(input.ArrtibuteFilters != null && input.ArrtibuteFilters.Count() > 0,
                 e =>
                 (e.EntityFk.EntityExtraData != null && e.EntityFk.EntityExtraData.Where(r => attrs.Contains(((long)r.AttributeValueId))).Count() > 0)
@@ -383,7 +400,10 @@ namespace onetouch.AppItems
                                        Code = d.Code,
                                        Name = d.Name,
                                        Description = d.EntityFk.Notes,
-                                       Price = d.Price,
+                                       //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
+                                       //Price = d.Price,
+                                       Price = d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault()!=null? d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price: d.Price,
+                                       //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                                        Id = d.Id,
 
                                        SSIN = d.SSIN,
@@ -395,7 +415,9 @@ namespace onetouch.AppItems
                                    (d.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + d.TenantId + "/" + d.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
                                    : "attachments/" + (d.TenantId.HasValue ? d.TenantId : -1) + "/" + d.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
                                    },
-                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(d.Id)) ? true : false
+                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(d.Id)) ? true : false,
+                                   EntityObjectCategoryNames = d.EntityFk.EntityCategories.Where(z => z.EntityObjectCategoryFk.TenantId != null).Select(z => z.EntityObjectCategoryFk.Name).ToList(),
+                                   EntityClassificationNames = d.EntityFk.EntityClassifications.Select(z => z.EntityObjectClassificationFk.Name).ToList()
 
                                };
                 }
@@ -417,7 +439,10 @@ namespace onetouch.AppItems
                                            Code = o.item.Code,
                                            Name = o.item.Name,
                                            Description = o.item.EntityFk.Notes,
-                                           Price = o.item.Price,
+                                           //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
+                                           //Price = o.item.Price,
+                                           Price = o.item.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault()!=null? o.item.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price: o.item.Price,
+                                           //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                                            Id = o.item.Id,
 
                                            SSIN = o.item.SSIN,
@@ -429,8 +454,9 @@ namespace onetouch.AppItems
                                             (o.item.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.item.TenantId + "/" + o.item.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
                                             : "attachments/" + (o.item.TenantId.HasValue ? o.item.TenantId : -1) + "/" + o.item.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
                                        },
-                                       Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.item.Id)) ? true : false
-
+                                       Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.item.Id)) ? true : false,
+                                       EntityObjectCategoryNames = o.item.EntityFk.EntityCategories.Where(z=>z.EntityObjectCategoryFk.TenantId!=null) .Select(z=>z.EntityObjectCategoryFk.Name).ToList(),
+                                       EntityClassificationNames = o.item.EntityFk.EntityClassifications.Select(z=>z.EntityObjectClassificationFk.Name).ToList()
                                    };
                     }
                     else
@@ -450,7 +476,10 @@ namespace onetouch.AppItems
                                            Code = d.Code,
                                            Name = d.Name,
                                            Description = d.EntityFk.Notes,
-                                           Price = d.Price,
+                                           //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
+                                           //Price = d.Price,
+                                           Price = d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault()!=null? d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).FirstOrDefault().Price : d.Price,
+                                           //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                                            Id = d.Id,
                                            //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                                            SSIN = d.SSIN,
@@ -462,8 +491,9 @@ namespace onetouch.AppItems
                                        (d.EntityFk.EntityAttachments.FirstOrDefault() == null ? "attachments/" + d.TenantId + "/" + d.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
                                        : "attachments/" + (d.TenantId.HasValue ? d.TenantId : -1) + "/" + d.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
                                        },
-                                       Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(d.Id)) ? true : false
-
+                                       Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(d.Id)) ? true : false,
+                                       EntityObjectCategoryNames = d.EntityFk.EntityCategories.Where(z => z.EntityObjectCategoryFk.TenantId != null).Select(z => z.EntityObjectCategoryFk.Name).ToList(),
+                                       EntityClassificationNames = d.EntityFk.EntityClassifications.Select(z => z.EntityObjectClassificationFk.Name).ToList()
                                    };
 
 
@@ -731,7 +761,7 @@ namespace onetouch.AppItems
                     .Where(x => x.ParentId == appItemId).ToListAsync();
                 if (appItems != null && appItems.Count > 0)
                 {
-                    var filteredItems = appItems.Where(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == attributeId && z.AttributeValue.ToUpper()== attributeCode.ToUpper()).Count() > 0).ToList();
+                    var filteredItems = appItems.Where(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == attributeId && z.AttributeValue.ToUpper() == attributeCode.ToUpper()).Count() > 0).ToList();
                     foreach (var item in filteredItems)
                     {
                         // item.ItemPricesFkList = await  _appItemPricesRepository.GetAll()
@@ -1023,7 +1053,7 @@ namespace onetouch.AppItems
                             //    (a.FirstOrDefault().AttributeCode.ToString() == null ? a.FirstOrDefault().AttributeValueId.ToString() : a.FirstOrDefault().AttributeCode.ToString()))
                             //    .ToList().Distinct().ToList().Distinct().ToList();
                             var secondAttributeValuesFor1st1 =
-                            secondAttributeValuesFor1st11.Select(a =>a.AttributeCode).ToList();
+                            secondAttributeValuesFor1st11.Select(a => a.AttributeCode+","+a.AttributeValue).ToList();
                             //(a.AttributeCode.ToString() == null ? a.AttributeValueId.ToString() : a.AttributeCode.ToString()))
                             //.ToList();
                             if (secondAttributeValuesFor1st1 != null && secondAttributeValuesFor1st1.Count > 0)
@@ -1626,7 +1656,7 @@ namespace onetouch.AppItems
                     bool llNewCodeFound = false;
                     while (!llNewCodeFound)
                     {
-                        var nextCode = await GenerateProductCode(int.Parse(input.EntityObjectTypeId.ToString()), true);
+                        var nextCode = await GenerateProductCode(int.Parse(input.EntityObjectTypeId.ToString()), true, AbpSession.TenantId);
                         if (!string.IsNullOrEmpty(nextCode))
                         {
                             var appItemExist = await _appItemRepository.GetAll().Where(r => r.Code == nextCode && r.ItemType == input.ItemType).FirstOrDefaultAsync();
@@ -1671,7 +1701,15 @@ namespace onetouch.AppItems
                 return await Update(input);
             }
         }
-
+        //MMT
+        public async Task<bool> IsVariationOrdered(string sSIN)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                return await _appTransactionDetails.GetAll().Where(z => z.ItemSSIN == sSIN).CountAsync() > 0;
+            }
+        }
+        //MmT
         [AbpAuthorize(AppPermissions.Pages_AppItems_Create)]
         protected virtual async Task<long> Create(CreateOrEditAppItemDto input)
         {
@@ -1694,7 +1732,7 @@ namespace onetouch.AppItems
             return await DoCreateOrEdit(input);
         }
         //MMT30[Start]
-        private async Task<IList<AppEntityExtraDataDto>> GetExtraAttributeData(long attributeId, int prdouctTypeId)
+        private async Task<IList<AppEntityExtraDataDto>> GetExtraAttributeData(string attributeCode,long entityObjectTypeId,long? tenantId, int prdouctTypeId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -1702,13 +1740,13 @@ namespace onetouch.AppItems
                 .Include(x => x.EntityExtraData).AsNoTracking()
                 .Include(x => x.EntityAttachments)
                 .ThenInclude(x => x.AttachmentFk)
-                .FirstOrDefaultAsync(x => x.Id == attributeId && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
+                .FirstOrDefaultAsync(x => x.Code == attributeCode && x.EntityObjectTypeId == entityObjectTypeId && (x.TenantId == tenantId || x.TenantId == null || x.TenantId== AbpSession.TenantId));
 
                 var entity = new GetAppEntityForEditOutput { AppEntity = ObjectMapper.Map<CreateOrEditAppEntityDto>(appEntity) };
 
 
                 // var entity = await _appEntitiesAppService.GetAppEntityForEdit(new EntityDto<long> { Id = attributeId });
-                if (entity != null)
+                if (entity != null && entity.AppEntity != null)
                 {
                     var EntityObjectType = await _SycEntityObjectTypesAppService.GetSycEntityObjectTypeForView(int.Parse(entity.AppEntity.EntityObjectTypeId.ToString()));
                     if (EntityObjectType != null)
@@ -1985,12 +2023,23 @@ namespace onetouch.AppItems
             appItem.EntityId = savedEntity;
 
             if (appItem.Id == 0)
+            {
                 appItem = await _appItemRepository.InsertAsync(appItem);
+
+                var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
+                //if (available == true)
+                {
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
+                }
+            }
             //MMT
             else
             {
                 //await CurrentUnitOfWork.SaveChangesAsync();
                 appItem = await _appItemRepository.UpdateAsync(appItem);
+                var availableFeature = await _appTenantActivitiesLogAppService.IsFeatureAvailable("EDIT-PRODUCT");
+                //if (availableFeature == true)
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
             }
             //MMT
 
@@ -2107,7 +2156,7 @@ namespace onetouch.AppItems
                                 EntityObjectTypeCode = "SIZE-NRF",
                                 AttributeId = 206,
                                 EntityId = childEntity.Id,
-                                AttributeValue =null
+                                AttributeValue = null
                             });
                         }
                         var sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
@@ -2133,7 +2182,7 @@ namespace onetouch.AppItems
                             });
                         }
                         var colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
-                        if (colorHexa ==null )
+                        if (colorHexa == null)
                         {
                             childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
                             {
@@ -2155,7 +2204,7 @@ namespace onetouch.AppItems
                             });
                         }
                         var colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
-                        if (colorSchv ==null)
+                        if (colorSchv == null)
                         {
                             childEntity.EntityExtraData.Add(new AppEntityExtraDataDto
                             {
@@ -2168,8 +2217,8 @@ namespace onetouch.AppItems
                         var sizeExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
                         if (sizeExtraAtt != null)
                         {
-                            var sizeExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code  == sizeExtraAtt.AttributeCode 
-                            && z.EntityObjectTypeCode =="SIZE").FirstOrDefaultAsync();
+                            var sizeExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == sizeExtraAtt.AttributeCode
+                            && z.EntityObjectTypeCode == "SIZE" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
                             if (sizeExtra != null)
                             {
                                 var sizeNRFEnt = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
@@ -2200,7 +2249,7 @@ namespace onetouch.AppItems
                         {
                             var colorExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
                                 .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR").FirstOrDefaultAsync();
+                                .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
                             if (colorExtra != null)
                             {
                                 if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
@@ -2208,7 +2257,9 @@ namespace onetouch.AppItems
                                     colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
                                     if (colorImage != null)
                                     {
-                                        if (string.IsNullOrEmpty(colorImage.AttributeValue))
+                                        var path = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString().Trim() + @"\" + colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
+                                        
+                                        if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
                                                 MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
@@ -2221,11 +2272,11 @@ namespace onetouch.AppItems
                                 {
                                     colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
                                     if (colorHexa != null)
-                                    { 
-                                        if ( string.IsNullOrEmpty(colorHexa.AttributeValue))
+                                    {
+                                        if (string.IsNullOrEmpty(colorHexa.AttributeValue))
                                             colorHexa.AttributeValue = colorHex.AttributeValue;
                                     }
-                                       
+
                                 }
 
                                 var colorNRFlook = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
@@ -2233,19 +2284,19 @@ namespace onetouch.AppItems
                                 {
                                     var colorNRFEnt = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
                                     if (colorNRFEnt != null)
-                                    { 
+                                    {
                                         if (string.IsNullOrEmpty(colorNRFEnt.AttributeValue))
                                             colorNRFEnt.AttributeValue = colorNRFlook.AttributeValue;
                                     }
-                                    
+
                                 }
                                 var colorSch = colorExtra.EntityExtraData.Where(z => z.AttributeId == 37).FirstOrDefault();
                                 if (colorSch != null && !string.IsNullOrEmpty(colorSch.AttributeValueId.ToString()))
                                 {
                                     colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
-                                    if (colorSchv != null) 
-                                    { 
-                                        if(string.IsNullOrEmpty(colorSchv.AttributeValue))
+                                    if (colorSchv != null)
+                                    {
+                                        if (string.IsNullOrEmpty(colorSchv.AttributeValue))
                                             colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
                                     }
                                 }
@@ -3044,6 +3095,38 @@ namespace onetouch.AppItems
             await ShareProduct(input);
 
         }
+        //MMT0303
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
+        public async Task<long> SyncSelectedProduct(Guid key)//long appItemId)
+        {
+            long returnCount = 0;
+            var apptemSelector = from o in _appItemSelectorRepository.GetAll().Where(e => e.Key == key)
+                                 join i in _appItemRepository.GetAll() on o.SelectedId equals i.Id into j
+                                 from j1 in j
+                                 select new { item = j1 };
+
+            var selectedItems = apptemSelector.ToList(); //3194a542-2d03-13c2-82f3-6914504839dd
+            if (selectedItems != null && selectedItems.Count > 0)
+            {
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+
+                    foreach (var itm in selectedItems)
+                    {
+                        if (itm.item.SSIN == null)
+                            continue;
+                        var sharedItem = _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefault();
+                        if (sharedItem != null && sharedItem.TimeStamp < itm.item.TimeStamp)
+                        {
+                            returnCount++;
+                            await SyncProduct(itm.item.Id);
+                        }
+                    }
+                }
+            }
+            return returnCount;
+        }
+        //MMT0303
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task UnHideProduct(long appItemId)
         {
@@ -3137,6 +3220,42 @@ namespace onetouch.AppItems
 
                 }
             }
+        }
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
+        public async Task<long> ShareSelectedProducts(Guid key)
+        {
+
+            long returnCount = 0;
+            var apptemSelector = from o in _appItemSelectorRepository.GetAll().Where(e => e.Key == key)
+                                 join i in _appItemRepository.GetAll() on o.SelectedId equals i.Id into j
+                                 from j1 in j
+                                 select new { item = j1 };
+
+            var selectedItems = apptemSelector.ToList(); //3194a542-2d03-13c2-82f3-6914504839dd
+            if (selectedItems != null && selectedItems.Count > 0)
+            {
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+
+                    foreach (var itm in selectedItems)
+                    {
+                        if (itm.item.SSIN == null)
+                            continue;
+                        var sharedItem = await _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefaultAsync();
+                        if (sharedItem == null)
+                        {
+                            returnCount++;
+                            SharingItemOptions shareOp = new SharingItemOptions();
+                            shareOp.AppItemId = itm.item.Id;
+                            shareOp.SharingLevel = 1;
+                            shareOp.SyncProduct = false;
+                            shareOp.ItemSharing = new List<ItemSharingDto>();
+                            await ShareProduct(shareOp);
+                        }
+                    }
+                }
+            }
+            return returnCount;
         }
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task ShareProduct(SharingItemOptions input)
@@ -3640,7 +3759,7 @@ namespace onetouch.AppItems
                         AppMarketplaceItems.AppMarketplaceItems publishChild = new AppMarketplaceItems.AppMarketplaceItems(); ;
                         if (publishedEntityId != 0)
                             publishChild = await _appMarketplaceItem.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Include(z => z.EntityExtraData)
+                                .Include(z => z.EntityExtraData).Include(z=>z.ItemPricesFkList)
                                 .Where(x => x.Code == child.SSIN).FirstOrDefaultAsync();
                         //marketplaceItem.ParentFkList.FirstOrDefault(x => x.Code == child.SSIN);
                         long publishId = 0;
@@ -3671,6 +3790,13 @@ namespace onetouch.AppItems
                         {
                             newSSIN = publishChild.SSIN;
                             //SS
+                            if (publishChild.ItemPricesFkList  != null)
+                            {
+                                foreach (var itemPrice in publishChild.ItemPricesFkList)
+                                {
+                                    await _appMarketplaceItemPricesRepository.DeleteAsync(a=>a.Id == itemPrice.Id);
+                                }
+                            }
                             if (publishChild.EntityExtraData != null)
                             {
                                 foreach (var parentExtrData in publishChild.EntityExtraData)
@@ -3690,6 +3816,7 @@ namespace onetouch.AppItems
                             //SS
                         }
                         ObjectMapper.Map(child, publishChild);
+
                         if (publishChild.EntityExtraData != null)
                         {
                             publishChild.EntityExtraData = null;
@@ -3766,6 +3893,8 @@ namespace onetouch.AppItems
                         publishChild.ParentId = marketplaceItem.Id;
                         publishChild.Notes = child.EntityFk.Notes;
                         publishChild.Name = child.Name;
+                        publishChild.Name = marketplaceItem.Name;
+                        publishChild.Notes = marketplaceItem.Notes;
                         //publishChild.ParentEntityId = publishItem.EntityId;
                         if (!input.SyncProduct)
                             publishChild.SharingLevel = input.SharingLevel;
@@ -3996,7 +4125,7 @@ namespace onetouch.AppItems
                 await _appItemPricesRepository.DeleteAsync(a => a.AppItemId == item.Id);
                 await _appItemSizeScalesHeaderRepository.DeleteAsync(a => a.AppItemId == item.Id);
                 //XX
-                
+
             }
         }
 
@@ -4452,12 +4581,14 @@ namespace onetouch.AppItems
                     var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
                     productTypeId = pdtyp.FirstOrDefault();
                 }
-                else {
+                else
+                {
                     var itemObjectId = await _helper.SystemTables.GetObjectItemId();
-                    var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z=>z.Code).FirstOrDefault();
+                    var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z => z.Code).FirstOrDefault();
                     if (defaultProductType == null)
                         throw new UserFriendlyException("No Product type is marked as default.");
-                    else {
+                    else
+                    {
                         var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
                         productTypeId = pdtyp.FirstOrDefault();
                         for (int cnt = 1; cnt < ds.Tables["Products"].Rows.Count; cnt++)
@@ -4642,7 +4773,7 @@ namespace onetouch.AppItems
                     itemExcelDto.rowNumber = rowNumber;
                     //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[Start]
                     //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code);
-                    var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code && x.ItemType == 0);
+                    var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
                     //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[End]
                     if (itemExists != null)
                     {
@@ -4849,7 +4980,7 @@ namespace onetouch.AppItems
                 {
                     rowNumber++;
                     //if (Sheet.Cell("B" + rowNumber.ToString()).Value == null)
-                      //  break;
+                    //  break;
 
                     if (Sheet.Cell("B" + rowNumber.ToString()).Value.ToString() == "Item")
                     {
@@ -5079,7 +5210,7 @@ namespace onetouch.AppItems
             long? defIdentfier = null;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-               
+
                 var productTypeVar = await _SycEntityObjectTypesAppService.GetSycEntityObjectTypeForView(int.Parse(productTypeId.Id.ToString()));
                 if (productTypeVar != null)
                 {
@@ -5095,8 +5226,8 @@ namespace onetouch.AppItems
                     else { defIdentfier = identifierId; }
                 }
             }
-                //MMT2024
-                var entityObjectExtraAttribute = _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString())).Result.ToList().FirstOrDefault();
+            //MMT2024
+            var entityObjectExtraAttribute = _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString())).Result.ToList().FirstOrDefault();
             if (entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null &&
                 entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes.Count > 0)
             {
@@ -5142,6 +5273,8 @@ namespace onetouch.AppItems
 
             foreach (var excelDto in result)
             {
+                if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                    continue;
                 AppItem itemOrg = new AppItem();
                 if (excelDto.Id != 0)
                 {
@@ -5157,7 +5290,7 @@ namespace onetouch.AppItems
                             //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
                             if (lNewVariation == true)
                             {
-                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z => z.ItemPricesFkList)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
@@ -5166,25 +5299,37 @@ namespace onetouch.AppItems
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .Include(x => x.ParentFkList).ThenInclude(z=>z.ItemPricesFkList)
                                .FirstOrDefault();
                                 break;
                             }
                             else
-                            //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
+                                //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
                                 continue;
                         case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                                                                  //createOrEditAccountInfoDto.Id = account.Id
 
-                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)
+                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               //.Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
                                .FirstOrDefault();
+                            if (itemOrg != null)
+                            {
+                                itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().Where(z => z.AppItemId == excelDto.Id).ToList();
+                                itemOrg.ParentFkList = _appItemRepository.GetAll()
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                               .Include(z => z.ItemPricesFkList).Where(z => z.ParentId == excelDto.Id).ToList();
+                            }
                             //itemOrg.ParentFkList.Clear();
                             //appItemDeleteList.Add(itemOrg);
                             //if (itemOrg.EntityFk.EntityExtraData != null && itemOrg.EntityFk.EntityExtraData.Count > 0)
@@ -5237,33 +5382,33 @@ namespace onetouch.AppItems
                             //            EntityObjectCategoryId = productTypeId.Id,
                             //            EntityObjectCategoryCode = productTypeId.DisplayName
 
-                            //        });
-                            //        if (excelDto.EntityObjectCategoryID.HasValue)
-                            //        {
-                            //            itemOrg.EntityFk.EntityCategories.Add(new AppEntityCategory
-                            //            {
-                            //                EntityCode = excelDto.Code,
-                            //                EntityObjectCategoryCode = excelDto.ProductClassificationCode,
-                            //                EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
-                            //            });
-                            //        }
-                            //        var relatedItems = result.Where(x => x.ParentCode == excelDto.Code).ToList();
-                            //        foreach (var chItem in relatedItems)
-                            //        {
-                            //            var childOrg = itemOrg.ParentFkList.FirstOrDefault(x => x.Code == chItem.Code);
-                            //            if (childOrg != null)
-                            //            {
-                            //                childOrg.Name = chItem.Name;
-                            //                childOrg.Description = chItem.ProductDescription;
-                            //                childOrg.EntityFk.EntityExtraData.Clear();
+                                //        });
+                                //        if (excelDto.EntityObjectCategoryID.HasValue)
+                                //        {
+                                //            itemOrg.EntityFk.EntityCategories.Add(new AppEntityCategory
+                                //            {
+                                //                EntityCode = excelDto.Code,
+                                //                EntityObjectCategoryCode = excelDto.ProductClassificationCode,
+                                //                EntityObjectCategoryId = long.Parse(excelDto.EntityObjectCategoryID.ToString())
+                                //            });
+                                //        }
+                                //        var relatedItems = result.Where(x => x.ParentCode == excelDto.Code).ToList();
+                                //        foreach (var chItem in relatedItems)
+                                //        {
+                                //            var childOrg = itemOrg.ParentFkList.FirstOrDefault(x => x.Code == chItem.Code);
+                                //            if (childOrg != null)
+                                //            {
+                                //                childOrg.Name = chItem.Name;
+                                //                childOrg.Description = chItem.ProductDescription;
+                                //                childOrg.EntityFk.EntityExtraData.Clear();
 
-                            //            }
-                            //        }
+                                //            }
+                                //        }
 
-                            //    }
+                                //    }
 
 
-                            //}
+                                //}
                             break;
                         case ExcelRecordRepeateHandler.CreateACopy: // override
                             string oldCode = excelDto.Code;
@@ -5289,8 +5434,7 @@ namespace onetouch.AppItems
                             break;
                     }
                 }
-                if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                    continue;
+                
 
 
                 string isDefault = "1";
@@ -5302,7 +5446,7 @@ namespace onetouch.AppItems
                 List<List<AppItemExtraDto>> restAttributteValues = new List<List<AppItemExtraDto>>();
 
                 AppItem appItem = new AppItem();
-                
+
                 if (excelDto.Id != 0)
                     appItem = itemOrg;
                 else
@@ -5316,10 +5460,23 @@ namespace onetouch.AppItems
                     appItem.CreatorUserId = AbpSession.UserId;
                 }
                 appItem.Description = excelDto.ProductDescription;
+
+                if (string.IsNullOrEmpty(excelDto.Price))
+                    excelDto.Price = "0";
+
                 appItem.Price = decimal.Parse(excelDto.Price);
                 //XX
-                appItem.ItemPricesFkList = new List<AppItemPrices>();
-                if (appItem.Price > 0)
+                if (appItem.ItemPricesFkList == null)
+                    appItem.ItemPricesFkList = new List<AppItemPrices>();
+                else {
+                    if (appItem.ItemPricesFkList.Count>0) {
+                        foreach (var itmPrc in appItem.ItemPricesFkList)
+                        {
+                            itmPrc.IsDeleted = true;
+                        }
+                    }
+                }
+                //if (appItem.Price > 0)
                 {
                     long? currId = null;
                     if (!string.IsNullOrEmpty(excelDto.Currency))
@@ -5338,6 +5495,95 @@ namespace onetouch.AppItems
                         CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
                     });
                 }
+                if (string.IsNullOrEmpty(excelDto.PriceA))
+                    excelDto.PriceA = "0";
+                //MMT0311
+                if (!string.IsNullOrEmpty(excelDto.PriceA))// && decimal.Parse(excelDto.PriceA) > 0)
+                {
+                    long? currId = null;
+                    if (!string.IsNullOrEmpty(excelDto.Currency))
+                    {
+                        var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+                        if (currObj != null)
+                            currId = currObj.Value;
+                    }
+                    appItem.ItemPricesFkList.Add(new AppItemPrices
+                    {
+                        AppItemCode = appItem.Code,
+                        Code = "A",
+                        Price = decimal.Parse(excelDto.PriceA),
+                        CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+                        TenantId = AbpSession.TenantId,
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                    });
+                }
+                if (string.IsNullOrEmpty(excelDto.PriceB))
+                    excelDto.PriceB = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceB))// &&  decimal.Parse(excelDto.PriceB) > 0)
+                {
+                    long? currId = null;
+                    if (!string.IsNullOrEmpty(excelDto.Currency))
+                    {
+                        var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+                        if (currObj != null)
+                            currId = currObj.Value;
+                    }
+                    appItem.ItemPricesFkList.Add(new AppItemPrices
+                    {
+                        AppItemCode = appItem.Code,
+                        Code = "B",
+                        Price = decimal.Parse(excelDto.PriceB),
+                        CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+                        TenantId = AbpSession.TenantId,
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                    });
+                }
+                if (string.IsNullOrEmpty(excelDto.PriceC))
+                    excelDto.PriceC = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceC))// && decimal.Parse(excelDto.PriceC) > 0)
+                {
+                    long? currId = null;
+                    if (!string.IsNullOrEmpty(excelDto.Currency))
+                    {
+                        var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+                        if (currObj != null)
+                            currId = currObj.Value;
+                    }
+                    appItem.ItemPricesFkList.Add(new AppItemPrices
+                    {
+                        AppItemCode = appItem.Code,
+                        Code = "C",
+                        Price = decimal.Parse(excelDto.PriceC),
+                        CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+                        TenantId = AbpSession.TenantId,
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                    });
+                }
+                if (string.IsNullOrEmpty(excelDto.PriceD))
+                    excelDto.PriceD = "0";
+
+                if (!string.IsNullOrEmpty(excelDto.PriceD))// && decimal.Parse(excelDto.PriceD) > 0)
+                {
+                    long? currId = null;
+                    if (!string.IsNullOrEmpty(excelDto.Currency))
+                    {
+                        var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == excelDto.Currency.ToUpper());
+                        if (currObj != null)
+                            currId = currObj.Value;
+                    }
+                    appItem.ItemPricesFkList.Add(new AppItemPrices
+                    {
+                        AppItemCode = appItem.Code,
+                        Code = "D",
+                        Price = decimal.Parse(excelDto.PriceD),
+                        CurrencyCode = string.IsNullOrEmpty(excelDto.Currency) ? currencyCode : excelDto.Currency,
+                        TenantId = AbpSession.TenantId,
+                        CurrencyId = !string.IsNullOrEmpty(excelDto.Currency) ? currId : currencyIDDef
+                    });
+                }
+                //MMT0311
                 //XX
                 appItem.Name = excelDto.Name;
 
@@ -5440,10 +5686,17 @@ namespace onetouch.AppItems
                         }
                     }
                 }
+                if (string.IsNullOrEmpty(appItem.SSIN))
+                {
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.EntityFk.SSIN = appItem.SSIN;
+                }
+                appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                appItem.EntityFk.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 //if (excelDto.Id == 0 || !reserAtt)
                 //{
                 if (excelDto.Id == 0)
-                appItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
+                    appItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
 
                 //}
                 if (!string.IsNullOrEmpty(excelDto.ImageType) && excelDto.Images != null && excelDto.Images.Count > 0)
@@ -5516,7 +5769,7 @@ namespace onetouch.AppItems
                     var ratioHeader = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == excelDto.SizeRatioName & x.ParentId != null).AsNoTracking().FirstOrDefault();
                     var scaleHeader = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == excelDto.SizeScaleName).AsNoTracking().FirstOrDefault();
                     if (scaleHeader == null || ratioHeader == null || (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.CreateACopy) ||
-                        (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords))
+                       (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords) || (excelDto.Id==0))
                     {
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[Start]
                         //var sizesArray = excelDto.ScaleSizesOrder.Split('|');
@@ -5592,16 +5845,16 @@ namespace onetouch.AppItems
                                    z.D1Position == (sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
                                    z.D2Position == (sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
                                    z.D3Position == (sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
-                                if (exist ==null)
-                                appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
-                                {
-                                    SizeCode = sz.SizeCode.TrimEnd(),
-                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : null,
-                                    SizeId = null,
-                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : null,
-                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : null,
-                                    SizeRatio = 0
-                                });
+                                if (exist == null)
+                                    appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
+                                    {
+                                        SizeCode = sz.SizeCode.TrimEnd(),
+                                        D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : null,
+                                        SizeId = null,
+                                        D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : null,
+                                        D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : null,
+                                        SizeRatio = 0
+                                    });
                             }
                         }
                         //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
@@ -5687,7 +5940,9 @@ namespace onetouch.AppItems
                         appItemSizeScalesHeader.NoOfDimensions = sizescale.Result.NoOfDimensions;
                         appItemSizeScalesHeader.Dimesion1Name = sizescale.Result.Dimesion1Name;
                         appItemSizeScalesHeader.ParentId = null;
-                        appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(sizescale.Result.AppSizeScalesDetails);
+                        //MMT ,1 T-SII-20240628.0001 07/11/2024[Start]
+                        appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesDetailDtoList.Where(z => z.DimensionName!=null));
+                        //MMT ,1 T-SII-20240628.0001 07/11/2024[End]
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
                         //appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
@@ -5718,7 +5973,7 @@ namespace onetouch.AppItems
                                         }
                                     }
                                 }
-                                else 
+                                else
                                 {
                                     foreach (var size in appItemSizeScalesHeader.AppItemSizeScalesDetails)
                                     {
@@ -5757,7 +6012,7 @@ namespace onetouch.AppItems
                                 appSizeScaleRatioForEditDto.Dimesion1Name = sizescale.Result.Dimesion1Name;
                                 appSizeScaleRatioForEditDto.Name = (!string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Result.Name.TrimEnd() + " Ratio");
                                 string[] arraySizeRatio = new string[sizes.Count];
-                                Array.Fill(arraySizeRatio, "0");
+                                System.Array.Fill(arraySizeRatio, "0");
                                 if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
                                 {
                                     var arrayRatio = excelDto.SizeRatioValue.Split('=')[0];
@@ -5776,31 +6031,33 @@ namespace onetouch.AppItems
                                 //        SizeRatio = int.Parse(arraySizeRatio[pos])
                                 //    });
                                 //}
-                                var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
-                                var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
-                                var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
-                                if (sizesRatio != null)
-                                {
-                                    foreach (var sz in sizesRatio)
+                                if (!string.IsNullOrEmpty(excelDto.SizeRatioName) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[0]) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[1]))
                                     {
-                                        var posinArr = sizesList.IndexOf(sz.SizeCode);
-                                        if (posinArr >= 0)
+                                    var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
+                                    var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
+                                    var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+                                    if (sizesRatio != null)
+                                    {
+                                        foreach (var sz in sizesRatio)
                                         {
-                                            appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                            var posinArr = sizesList.IndexOf(sz.SizeCode);
+                                            if (posinArr >= 0)
                                             {
-                                                SizeCode = sz.SizeCode.TrimEnd(),
-                                                D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
-                                                SizeId = null,
-                                                D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
-                                                D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
-                                                SizeRatio = int.Parse(sizesRatios[posinArr])
-                                            });
+                                                appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
+                                                {
+                                                    SizeCode = sz.SizeCode.TrimEnd(),
+                                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+                                                    SizeId = null,
+                                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
+                                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
+                                                    SizeRatio = int.Parse(sizesRatios[posinArr])
+                                                });
+                                            }
                                         }
+                                        appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
                                     }
-                                    appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesRatioDetailDtoList;
                                 }
-                               
-                                if (string.IsNullOrEmpty(excelDto.SizeRatioName) && (appSizeScaleRatioForEditDto.AppSizeScalesDetails==null || appSizeScaleRatioForEditDto.AppSizeScalesDetails.Count==0))
+                                if (string.IsNullOrEmpty(excelDto.SizeRatioName) && (appSizeScaleRatioForEditDto.AppSizeScalesDetails == null || appSizeScaleRatioForEditDto.AppSizeScalesDetails.Count == 0))
                                 {
                                     foreach (var sz in appSizeScaleForEditDto.AppSizeScalesDetails)
                                     {
@@ -5812,7 +6069,7 @@ namespace onetouch.AppItems
                                                 SizeCode = sz.SizeCode.TrimEnd(),
                                                 D3Position = sz.D3Position,
                                                 SizeId = null,
-                                                D1Position =sz.D1Position,
+                                                D1Position = sz.D1Position,
                                                 D2Position = sz.D2Position,
                                                 SizeRatio = 0
                                             });
@@ -5840,14 +6097,14 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = appItemSizeScalesHeaderRatio.Id);
                                 if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
                                 {
-                                    
+
                                     var sizeScaleH = itemScaleData.FirstOrDefault(x => x.ParentId != null);
                                     if (sizeScaleH != null)
                                     {
                                         var cnt = itemScaleData.Count(x => x.ParentId != null);
                                         if (cnt > 1)
                                         {
-                                            await _appItemSizeScalesHeaderRepository.DeleteAsync(x=> x.AppItemId == appItem.Id && x.Id != sizeScaleH.Id && x.ParentId != null);
+                                            await _appItemSizeScalesHeaderRepository.DeleteAsync(x => x.AppItemId == appItem.Id && x.Id != sizeScaleH.Id && x.ParentId != null);
                                         }
 
                                         if (sizeScaleH.AppItemSizeScalesDetails != null && sizeScaleH.AppItemSizeScalesDetails.Count > 0)
@@ -5882,7 +6139,7 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.ItemSizeScaleFK = appItemSizeScalesHeader;
                                 appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeaderRatio);
                             }
-                           
+
                         }
                         appItemSizeScalesHeader.AppItemId = appItem.Id;
 
@@ -6018,7 +6275,7 @@ namespace onetouch.AppItems
                     var appChildItem = new AppItem();
                     if (excelDto.Id != 0)
                     {
-                        var itemExist = appItem.ParentFkList.FirstOrDefault(x => x.Code == item.Code);
+                        var itemExist = appItem.ParentFkList.FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == item.Code.Replace(" ",string.Empty));
                         if (itemExist != null)
                         {
                             appChildItem = itemExist;
@@ -6084,8 +6341,21 @@ namespace onetouch.AppItems
 
                     }
                     //XX
-                    appChildItem.ItemPricesFkList = new List<AppItemPrices>();
-                    if (appChildItem.Price > 0)
+                    if (appChildItem.ItemPricesFkList == null)
+                        appChildItem.ItemPricesFkList = new List<AppItemPrices>();
+                    else {
+                        if (appChildItem.ItemPricesFkList.Count>0)
+                        {
+                            foreach (var prc in appChildItem.ItemPricesFkList)
+                            {
+                                prc.IsDeleted = true;
+                            }
+                        }
+                    }
+                    if (string.IsNullOrEmpty(appChildItem.Price.ToString()))
+                        appChildItem.Price = 0;
+
+                    //if (appChildItem.Price > 0)
                     {
                         long? currId = null;
                         if (!string.IsNullOrEmpty(item.Currency))
@@ -6104,6 +6374,96 @@ namespace onetouch.AppItems
                             TenantId = AbpSession.TenantId
                         });
                     }
+                    //MMT0311
+                    if (string.IsNullOrEmpty(item.PriceA))
+                        item.PriceA = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceA))// &&  decimal.Parse(item.PriceA) > 0)
+                    {
+                        long? currId = null;
+                        if (!string.IsNullOrEmpty(item.Currency))
+                        {
+                            var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+                            if (currObj != null)
+                                currId = currObj.Value;
+                        }
+                        appChildItem.ItemPricesFkList.Add(new AppItemPrices
+                        {
+                            AppItemCode = appChildItem.Code,
+                            Code = "A",
+                            Price = decimal.Parse(item.PriceA),
+                            CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+                            TenantId = AbpSession.TenantId,
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                        });
+                    }
+                    if (string.IsNullOrEmpty(item.PriceB))
+                        item.PriceB = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceB))// && decimal.Parse(item.PriceB) > 0)
+                    {
+                        long? currId = null;
+                        if (!string.IsNullOrEmpty(item.Currency))
+                        {
+                            var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+                            if (currObj != null)
+                                currId = currObj.Value;
+                        }
+                        appChildItem.ItemPricesFkList.Add(new AppItemPrices
+                        {
+                            AppItemCode = appChildItem.Code,
+                            Code = "B",
+                            Price = decimal.Parse(item.PriceB),
+                            CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+                            TenantId = AbpSession.TenantId,
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                        });
+                    }
+                    if (string.IsNullOrEmpty(item.PriceC))
+                        item.PriceC = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceC))// && decimal.Parse(item.PriceC) > 0)
+                    {
+                        long? currId = null;
+                        if (!string.IsNullOrEmpty(item.Currency))
+                        {
+                            var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+                            if (currObj != null)
+                                currId = currObj.Value;
+                        }
+                        appChildItem.ItemPricesFkList.Add(new AppItemPrices
+                        {
+                            AppItemCode = appChildItem.Code,
+                            Code = "C",
+                            Price = decimal.Parse(item.PriceC),
+                            CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+                            TenantId = AbpSession.TenantId,
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                        });
+                    }
+                    if (string.IsNullOrEmpty(item.PriceD))
+                        item.PriceD = "0";
+
+                    if (!string.IsNullOrEmpty(item.PriceD))// && decimal.Parse(item.PriceD) > 0)
+                    {
+                        long? currId = null;
+                        if (!string.IsNullOrEmpty(item.Currency))
+                        {
+                            var currObj = currencyIds.FirstOrDefault(x => x.Code.ToUpper() == item.Currency.ToUpper());
+                            if (currObj != null)
+                                currId = currObj.Value;
+                        }
+                        appChildItem.ItemPricesFkList.Add(new AppItemPrices
+                        {
+                            AppItemCode = appChildItem.Code,
+                            Code = "D",
+                            Price = decimal.Parse(item.PriceD),
+                            CurrencyCode = string.IsNullOrEmpty(item.Currency) ? currencyCode : item.Currency,
+                            TenantId = AbpSession.TenantId,
+                            CurrencyId = !string.IsNullOrEmpty(item.Currency) ? currId : currencyIDDef
+                        });
+                    }
+                    //MMT0311
                     //XX
                     //MMT30[End]
                     appChildItem.TimeStamp = timeStamp;
@@ -6115,8 +6475,8 @@ namespace onetouch.AppItems
                     }
                     appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;
                     //MMT30[End]
-                    if (appChildItem.Id==0)
-                    appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+                    if (appChildItem.Id == 0)
+                        appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
                     var entityExtraData = new List<AppEntityExtraData>();
                     if (item.ExtraAttributesValues != null)
                     {
@@ -6128,7 +6488,7 @@ namespace onetouch.AppItems
                             var AttributeInfoObj = extrattributesLists.FirstOrDefault(x => x.Key.Name.ToUpper() == item.ExtraAttributes[etx].Name.ToUpper());
                             //if (AttributeInfoObj.Key == null) continue;
 
-                            var AttributeInfo = AttributeInfoObj.Key != null? AttributeInfoObj.Value:null;
+                            var AttributeInfo = AttributeInfoObj.Key != null ? AttributeInfoObj.Value : null;
                             //if (AttributeInfo != null)
                             //{
                             //    AttributeValueId =  AttributeInfo.FirstOrDefault(x => x.Code == item.ExtraAttributesValues[etx].Code) == null ? 0: AttributeInfo.FirstOrDefault(x => x.Code == item.ExtraAttributesValues[etx].Code).Value ;
@@ -6158,7 +6518,8 @@ namespace onetouch.AppItems
 
                             //});
                             try
-                            {   if (appChildItem.Id == 0)
+                            {
+                                if (appChildItem.Id == 0)
                                     appChildItem.EntityFk.EntityExtraData.Add(extra);
                                 else
                                 {
@@ -6172,7 +6533,7 @@ namespace onetouch.AppItems
                                         ext.AttributeValueId = null;
                                         ext.EntityObjectTypeName = item.ExtraAttributes[etx].Name;
                                         //AttributeId = item.ExtraAttributes[etx].AttributeId,
-                                        ext.EntityObjectTypeId = AttributeInfoObj.Key != null ? AttributeInfoObj.Key.Id:null;
+                                        ext.EntityObjectTypeId = AttributeInfoObj.Key != null ? AttributeInfoObj.Key.Id : null;
                                         ext.EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode;
                                         ext.EntityCode = appChildItem.Code;
                                     }
@@ -6301,7 +6662,7 @@ namespace onetouch.AppItems
                         if (sizeExtraAtt != null)
                         {
                             var sizeExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == sizeExtraAtt.AttributeCode
-                            && z.EntityObjectTypeCode == "SIZE").FirstOrDefaultAsync();
+                            && z.EntityObjectTypeCode == "SIZE" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
                             if (sizeExtra != null)
                             {
                                 var sizeNRF = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
@@ -6323,7 +6684,7 @@ namespace onetouch.AppItems
                         {
                             var colorExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
                                 .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR").FirstOrDefaultAsync();
+                                .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
                             if (colorExtra != null)
                             {
                                 if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
@@ -6398,7 +6759,7 @@ namespace onetouch.AppItems
 
                 appItem.Variations = variation;
                 #endregion concatenate variation lists
-                if (appItem.SycIdentifierId==null)
+                if (appItem.SycIdentifierId == null)
                     appItem.SycIdentifierId = defIdentfier;
 
                 if (excelDto.Id == 0)
@@ -6945,7 +7306,7 @@ namespace onetouch.AppItems
         //}
         //Mariam[End]
         //MMT30[Start]
-        public async Task<string> GenerateProductCode(int productId, bool lUpdateSeq)
+        public async Task<string> GenerateProductCode(int productId, bool lUpdateSeq, long? tenantId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -6966,7 +7327,7 @@ namespace onetouch.AppItems
                                 if (identifierDefDet != null)
                                 {
                                     var productCodeSegment = identifierDefDet.SycSegmentIdentifierDefinitions.FirstOrDefault(z => z.SegmentNumber == 1);
-                                    returnCode = await GetProductCode(productCodeSegment, lUpdateSeq);
+                                    returnCode = await GetProductCode(productCodeSegment, lUpdateSeq, tenantId);
                                     entityIdentifierFound = true;
                                 }
                             }
@@ -6990,7 +7351,7 @@ namespace onetouch.AppItems
                                     var sycSegmentIdentifierDefinitions = _sycSegmentIdentifierDefinition.GetAll().Where(e => e.SycIdentifierDefinitionId == identifierId).ToList();
                                     var sycSegmentIdentifierDefinitionList = ObjectMapper.Map<List<SycSegmentIdentifierDefinitionDto>>(sycSegmentIdentifierDefinitions);
                                     var productCodeSegment = sycSegmentIdentifierDefinitionList.FirstOrDefault(z => z.SegmentNumber == 1);
-                                    returnCode = await GetProductCode(productCodeSegment, lUpdateSeq);
+                                    returnCode = await GetProductCode(productCodeSegment, lUpdateSeq, tenantId);
                                     entityIdentifierFound = true;
                                     //}
                                 }
@@ -7001,12 +7362,15 @@ namespace onetouch.AppItems
                 return returnCode;
             }
         }
-        public async Task<string> GetProductCode(SycSegmentIdentifierDefinitionDto segment, bool lUpdateSequence)
+        public async Task<string> GetProductCode(SycSegmentIdentifierDefinitionDto segment, bool lUpdateSequence, long? tenantId)
         {
+            if (tenantId == null)
+                tenantId = AbpSession.TenantId;
+
             string returnString = "";
             if (segment.IsAutoGenerated & segment.SegmentType == "Sequence")
             {
-                var sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == AbpSession.TenantId).FirstOrDefault();
+                var sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == tenantId).FirstOrDefault();
                 if (sycCounter == null)
                 {
                     if (lUpdateSequence)
@@ -7016,7 +7380,7 @@ namespace onetouch.AppItems
                         sycCounter.Counter = segment.CodeStartingValue + 1;
                         if (AbpSession.TenantId != null)
                         {
-                            sycCounter.TenantId = (int?)AbpSession.TenantId;
+                            sycCounter.TenantId = (int?)tenantId;
                         }
                         await _sycCounter.InsertAsync(sycCounter);
                         await CurrentUnitOfWork.SaveChangesAsync();
@@ -7155,7 +7519,7 @@ namespace onetouch.AppItems
             return returnVariationTypeList;
         }
         [Microsoft.AspNetCore.Mvc.HttpPost]
-        public async Task<IList<VariationItemDto>> GetVariationsCodes(long identifierId, string productCode, IList<VariationItemDto> variationsList, long productTypeId)
+        public async Task<IList<VariationItemDto>> GetVariationsCodes(long identifierId, string productCode, IList<VariationItemDto> variationsList, long productTypeId,long? tenantId)
         {
             string productCodeMask = "";
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -7183,15 +7547,22 @@ namespace onetouch.AppItems
                 foreach (var variation in variationsList)
                 {
                     //xx
-                    if (variation.Id != 0)
+                    if (variation.Id != 0 && !string.IsNullOrEmpty(variation.Code))
                         continue;
                     List<AppEntityExtraDataDto> extrData = new List<AppEntityExtraDataDto>();
                     extrData.AddRange(variation.EntityExtraData);
                     foreach (var attr in variation.EntityExtraData)
                     {
-                        if (attr.AttributeValueId != null && attr.AttributeValueId != 0)
+                        if (attr.EntityObjectTypeId != null && attr.EntityObjectTypeCode == null)
                         {
-                            var attRelated = await GetExtraAttributeData(long.Parse(attr.AttributeValueId.ToString()), int.Parse(productTypeId.ToString()));
+                            var attrObjEnt = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == attr.EntityObjectTypeId).FirstOrDefaultAsync();
+                            if (attrObjEnt != null)
+                                attr.EntityObjectTypeCode = attrObjEnt.Code;
+                        }
+
+                        if (attr.AttributeCode != null && attr.EntityObjectTypeId !=null && attr.EntityObjectTypeId != 0)
+                        {
+                            var attRelated = await GetExtraAttributeData(attr.AttributeCode.ToString(),long.Parse(attr.EntityObjectTypeId.ToString()), tenantId, int.Parse(productTypeId.ToString()));
                             if (attRelated != null & attRelated.Count > 0)
                             {
                                 extrData.AddRange(attRelated);
@@ -7415,7 +7786,10 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.D3Pos, act => act.MapFrom(src => src["Dimension3Position"].ToString()));
             mappingExpression.ForMember(dest => dest.SizeCode, act => act.MapFrom(src => src["SIZEcode"].ToString()));
             //T-SII-20230328.0002,1 MMT 06/01/2023 Import multi-dimension size scale[End]
-
+            mappingExpression.ForMember(dest => dest.PriceA, act => act.MapFrom(src => src["PriceA"].ToString().TrimEnd()));
+            mappingExpression.ForMember(dest => dest.PriceB, act => act.MapFrom(src => src["PriceB"].ToString().TrimEnd()));
+            mappingExpression.ForMember(dest => dest.PriceC, act => act.MapFrom(src => src["PriceC"].ToString().TrimEnd()));
+            mappingExpression.ForMember(dest => dest.PriceD, act => act.MapFrom(src => src["PriceD"].ToString().TrimEnd()));
             //if (extraAttributes != null && extraAttributes.Count > 0)
             //{
             //    //mappingExpression.ForMember(dest => dest.ExtraAttributes, act => act.co

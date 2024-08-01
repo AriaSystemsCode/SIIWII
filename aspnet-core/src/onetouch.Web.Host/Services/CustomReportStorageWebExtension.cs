@@ -148,12 +148,24 @@ namespace onetouch.Web.Services
                         try
                         { 
 
-                            if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null)
+                            if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null
+                                
+                                || (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE" &&
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "roleType") != null))
                             {
-                                report.Parameters[parameterName].Value = Convert.ChangeType(
-                                parameters.Get(parameterName), report.Parameters[parameterName].Type);
 
+                                if (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE")
+                                {
+                                    report.Parameters["roleType"].Value = Convert.ChangeType(
+                                    parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
 
+                                }
+                                else
+                                {
+                                    report.Parameters[parameterName].Value = Convert.ChangeType(
+                                  parameters.Get(parameterName), report.Parameters[parameterName].Type);
+
+                                }
 
                                 if (parameterName.ToUpper() == "TRANSACTIONID")
                                 {
@@ -176,6 +188,7 @@ namespace onetouch.Web.Services
                         catch (Exception ex) { }
                     }
                     var longFileName = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId + @"\" + fileName;
+                    Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId);
                     if (parameters.AllKeys.Contains("saveToPDF") && parameters.Get("saveToPDF").ToString().ToUpper() == "TRUE")
                     {
                         report.ExportToPdf(longFileName);

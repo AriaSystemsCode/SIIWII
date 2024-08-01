@@ -1,0 +1,88 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #appSubscriptionPlanHeaderForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="appSubscriptionPlanHeader.id">{{l("EditAppSubscriptionPlanHeader")}}</span>
+                        <span *ngIf="!appSubscriptionPlanHeader.id">{{l("CreateNewAppSubscriptionPlanHeader")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                 
+
+
+								<div class="form-group">
+									<label for="AppSubscriptionPlanHeader_Description">{{l("Description")}}</label>
+									<input type="text" #AppSubscriptionPlanHeader_Description="ngModel" id="AppSubscriptionPlanHeader_Description" class="form-control" [(ngModel)]="appSubscriptionPlanHeader.description" name="Description"   minlength="1"  maxlength="250" />
+								    <validation-messages [formCtrl]="AppSubscriptionPlanHeader_Description"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="AppSubscriptionPlanHeader_IsStandard" class="kt-checkbox">
+										<input id="AppSubscriptionPlanHeader_IsStandard" #AppSubscriptionPlanHeader_IsStandard="ngModel" type="checkbox" name="IsStandard" [(ngModel)]="appSubscriptionPlanHeader.isStandard"> 
+										{{l("IsStandard")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppSubscriptionPlanHeader_IsStandard"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="AppSubscriptionPlanHeader_IsBillable" class="kt-checkbox">
+										<input id="AppSubscriptionPlanHeader_IsBillable" #AppSubscriptionPlanHeader_IsBillable="ngModel" type="checkbox" name="IsBillable" [(ngModel)]="appSubscriptionPlanHeader.isBillable"> 
+										{{l("IsBillable")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppSubscriptionPlanHeader_IsBillable"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanHeader_Discount">{{l("Discount")}}</label>
+									<input type="number" #AppSubscriptionPlanHeader_Discount="ngModel" id="AppSubscriptionPlanHeader_Discount" class="form-control" [(ngModel)]="appSubscriptionPlanHeader.discount" name="Discount"   />
+									<validation-messages [formCtrl]="AppSubscriptionPlanHeader_Discount"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanHeader_BillingCode">{{l("BillingCode")}}</label>
+									<input type="text" #AppSubscriptionPlanHeader_BillingCode="ngModel" id="AppSubscriptionPlanHeader_BillingCode" class="form-control" [(ngModel)]="appSubscriptionPlanHeader.billingCode" name="BillingCode"   minlength="1"  maxlength="50" />
+								    <validation-messages [formCtrl]="AppSubscriptionPlanHeader_BillingCode"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanHeader_MonthlyPrice">{{l("MonthlyPrice")}}</label>
+									<input type="number" #AppSubscriptionPlanHeader_MonthlyPrice="ngModel" id="AppSubscriptionPlanHeader_MonthlyPrice" class="form-control" [(ngModel)]="appSubscriptionPlanHeader.monthlyPrice" name="MonthlyPrice"   />
+									<validation-messages [formCtrl]="AppSubscriptionPlanHeader_MonthlyPrice"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanHeader_YearlyPrice">{{l("YearlyPrice")}}</label>
+									<input type="number" #AppSubscriptionPlanHeader_YearlyPrice="ngModel" id="AppSubscriptionPlanHeader_YearlyPrice" class="form-control" [(ngModel)]="appSubscriptionPlanHeader.yearlyPrice" name="YearlyPrice"   />
+									<validation-messages [formCtrl]="AppSubscriptionPlanHeader_YearlyPrice"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanHeader_Code">{{l("Code")}} *</label>
+									<input type="text" #AppSubscriptionPlanHeader_Code="ngModel" id="AppSubscriptionPlanHeader_Code" class="form-control" [(ngModel)]="appSubscriptionPlanHeader.code" name="Code"   minlength="1"  maxlength="30"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanHeader_Code"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanHeader_Name">{{l("Name")}} *</label>
+									<input type="text" #AppSubscriptionPlanHeader_Name="ngModel" id="AppSubscriptionPlanHeader_Name" class="form-control" [(ngModel)]="appSubscriptionPlanHeader.name" name="Name"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanHeader_Name"></validation-messages>
+								</div>
+					
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!appSubscriptionPlanHeaderForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

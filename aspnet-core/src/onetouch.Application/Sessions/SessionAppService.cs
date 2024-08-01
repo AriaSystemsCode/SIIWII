@@ -16,6 +16,7 @@ using onetouch.AppEntities;
 using Abp.Domain.Repositories;
 using onetouch.Accounts;
 using onetouch.AppContacts;
+using onetouch.AppSubScriptionPlan;
 
 namespace onetouch.Sessions
 {
@@ -30,13 +31,13 @@ namespace onetouch.Sessions
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
         private readonly IRepository<AppContact, long> _appContactRepository;
         //Mariam[End]
-
+        private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         public SessionAppService(
             IUiThemeCustomizerFactory uiThemeCustomizerFactory,
             ISubscriptionPaymentRepository subscriptionPaymentRepository,
             IUserDelegationConfiguration userDelegationConfiguration, Helper helper,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
-            IRepository<AppContact, long> appContactRepository)
+            IRepository<AppContact, long> appContactRepository, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService)
         {
             _uiThemeCustomizerFactory = uiThemeCustomizerFactory;
             _subscriptionPaymentRepository = subscriptionPaymentRepository;
@@ -45,8 +46,9 @@ namespace onetouch.Sessions
             _helper = helper;
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _appContactRepository = appContactRepository;
-              //MAriam
-        }
+            _appTenantActivitiesLogAppService= appTenantActivitiesLogAppService;
+        //MAriam
+    }
 
         [DisableAuditing]
         public async Task<GetCurrentLoginInformationsOutput> GetCurrentLoginInformations()
@@ -126,7 +128,7 @@ namespace onetouch.Sessions
 
             output.Tenant.SubscriptionDateString = GetTenantSubscriptionDateString(output);
             output.Tenant.CreationTimeString = output.Tenant.CreationTime.ToString("d");
-
+            await _appTenantActivitiesLogAppService.AddUsageActivityLog("User Logged in", "User Logged in",null,null,null, null, 0);
             return output;
 
         }

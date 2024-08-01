@@ -21,6 +21,10 @@ namespace onetouch.AppItems.Dtos
         public string ProductCategoryCode { get; set; }
         public string ProductCategoryDescription { get; set; }
         public string Price { get; set; }
+        public string PriceA { get; set; }
+        public string PriceB { get; set; }
+        public string PriceC { get; set; }
+        public string PriceD { get; set; }
         public string Currency { get; set; }
         public string ParentCode { get; set; }
         public string ImageType { get; set; }

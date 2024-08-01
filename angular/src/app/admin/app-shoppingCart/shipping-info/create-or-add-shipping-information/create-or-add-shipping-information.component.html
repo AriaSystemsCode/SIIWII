@@ -1,11 +1,11 @@
 <div class="position-relative tab-cont thin-scroll">
-<div *ngIf="createOrEditshippingInfO">
-    <div class="container-fluid pt-1 mb-3 " >
+<div >
+    <div class="container-fluid pt-1 mb-3 " *ngIf="createOrEditshippingInfO">
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
             <button 
             [disabled]="!(shippingTabValid)" (click)="createOrEditTransaction()" 
-            class="continuebtn text-center btn float-right" [disabled]="(!shipingTabVaild)"  *ngIf="!showSaveBtn ">
+            class="continuebtn text-center btn float-right"  *ngIf="!showSaveBtn ">
                  {{l("Continue")}}
             </button>
             <button *ngIf="showSaveBtn" (click)="save()"
@@ -32,13 +32,19 @@
                 (loadAddressComponent)="reloadAddresscomponentShipFrom($event)"
                 [isCreateOrEdit]="createOrEditshippingInfO"
                 [activeTab]="activeTab"
+                [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                 (formValidityChanged)="isContactFormValid($event,1)"
             ></app-contact>
             </div>
         </div>
+        
+    </div>
+
+    <div   [ngClass]="createOrEditshippingInfO ?  'd-block' : 'd-none'"> 
         <hr class="my-2" />
+
         <app-address 
         [appTransactionsForViewDto]="appTransactionsForViewDto"
         [isCreateOredit]="createOrEditshippingInfO"
@@ -46,10 +52,10 @@
         (updateSelectedAddress)="updateShipFromAddress($event)"
         [selectedAddressDetails]="shipFromSelectedAdd"
         [showAddressType]="false"
+        [canChange]="canChange"
         ></app-address>
-        
     </div>
-    <div class="container-fluid pt-1">
+    <div class="container-fluid pt-1" *ngIf="createOrEditshippingInfO">
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
             <!--<button [disabled]="(!enableSAveShipTo)" (click)="createOrEditTransaction()"
@@ -66,22 +72,30 @@
                 (loadAddressComponent)="reloadAddresscomponentShipTo($event)"
                 [isCreateOrEdit]="createOrEditshippingInfO"
                 [activeTab]="activeTab"
+                [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                 (formValidityChanged)="isContactFormValid($event,2)"
             ></app-contact>
             </div>
         </div>
-        <hr class="my-2" />
-        <app-address 
-        [appTransactionsForViewDto]="appTransactionsForViewDto"
-        [isCreateOredit]="createOrEditshippingInfO"
-        [contactId]="contactIdShipTo"
-        (updateSelectedAddress)="updateShipToAddress($event)"
-        [selectedAddressDetails]="shipToSelectedAdd"
-        [showAddressType]="false"
-        ></app-address>
-<div class="row edit-mode ">
+       
+   </div>
+   
+   <div   [ngClass]="createOrEditshippingInfO ?  'd-block' : 'd-none'">
+    <hr class="my-2" />
+   <app-address 
+   [appTransactionsForViewDto]="appTransactionsForViewDto"
+   [isCreateOredit]="createOrEditshippingInfO"
+   [contactId]="contactIdShipTo"
+   (updateSelectedAddress)="updateShipToAddress($event)"
+   [selectedAddressDetails]="shipToSelectedAdd"
+   [showAddressType]="false"
+   [canChange]="canChange"
+   ></app-address>
+</div>
+
+<div class="row edit-mode " *ngIf="createOrEditshippingInfO">
     <div class="col-6 mb-4">
         <label class="label mt-1 mb-1">{{l("Store")}}</label>
 <input type="text" class="form-control w-100" (input)="enterStore()"  [(ngModel)]="storeVal" #store/>
@@ -99,16 +113,22 @@
         [placeholder]="'PleaseSelect' | localize"
     >
     </p-dropdown>
+    <p class="text-danger" *ngIf="!appTransactionsForViewDto.shipViaId">
+       <small>
+         Please select ship via option
+       </small>
+    </p>
     </div>
 </div>
 
-    </div>
+    
 </div>
 
 
 <div *ngIf="!createOrEditshippingInfO">
     <app-view-shipping-information
     [activeTab]="activeTab"
+    [currentTab]="currentTab" 
     (showShippingEditMode)="onshowShippingEditMode($event)"
      (onshowSaveBtn)="onshowSaveBtn($event)"
     [contactIdFrom]="contactIdShipFrom"
@@ -116,7 +136,10 @@
     [selectedAddressDetailsFrom]="shipFromSelectedAdd"
     [selectedAddressDetailsTo]="shipToSelectedAdd"
     [appTransactionsForViewDto]="appTransactionsForViewDto"
-    [createOrEditshippingInfO]="createOrEditshippingInfO">
+    [createOrEditshippingInfO]="createOrEditshippingInfO" 
+    [canChange]="canChange"
+    (isContactsValid_1)="isContactFormValid($event,1)"
+    (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-shipping-information>
 </div>
 </div>

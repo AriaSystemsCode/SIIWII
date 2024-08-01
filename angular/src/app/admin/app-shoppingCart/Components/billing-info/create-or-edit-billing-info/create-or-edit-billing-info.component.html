@@ -1,19 +1,11 @@
 <div class="position-relative tab-cont thin-scroll">
 
-    <div *ngIf="createOrEditBillingInfo">
-    <div class="container-fluid pt-1 mb-3 ">
+    <div>
+    <div class="container-fluid pt-1 mb-3 "  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
                  {{l("Continue")}}
-            </button>
-            <button
-                *ngIf="!createOrEditBillingInfo" 
-                (click)="showEditMode()"
-                class="previewbtn text-center btn float-right"
-            >
-                Change
-                <i class="pi pi-pencil"></i>
             </button>
             <button
             *ngIf="showSaveBtn"
@@ -43,23 +35,27 @@
                 (loadAddressComponent)="reloadAddresscomponentAPContact($event)"
                 [isCreateOrEdit]="createOrEditBillingInfo"
                 [activeTab]="activeTab"
+                [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                 (formValidityChanged)="isContactFormValid($event,1)"
             ></app-contact>
             </div>
         </div>
+    </div>
         <hr class="my-2" />
+        <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <app-address 
         [isCreateOredit]="createOrEditBillingInfo"
         [contactId]="contactIdApContact"
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
         [showAddressType]="false"
+        [canChange]="canChange"
         ></app-address>
-        
     </div>
-    <div class="container-fluid pt-1">
+    
+    <div class="container-fluid pt-1"  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">  {{l("ARContact")}} : </span></h6>
         </div>
@@ -72,6 +68,7 @@
                 (loadAddressComponent)="reloadAddresscomponentARContact($event)"
                 [isCreateOrEdit]="createOrEditBillingInfo"
                 [activeTab]="activeTab"
+                [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                 (formValidityChanged)="isContactFormValid($event,2)"
@@ -79,18 +76,21 @@
             </div>
         </div>
         <hr class="my-2" />
-        <app-address 
-        [isCreateOredit]="createOrEditBillingInfo"
-        [contactId]="contactIdARContact"
-        (updateSelectedAddress)="updateArContact($event)"
-        [selectedAddressDetails]="arContactSelectedAdd"
-        [showAddressType]="false"
-
-        ></app-address>
+      
 
 
     </div>
-    <div class="container-fluid pt-1 mb-3 mt-3">
+    <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+    <app-address  
+    [isCreateOredit]="createOrEditBillingInfo"
+    [contactId]="contactIdARContact"
+    (updateSelectedAddress)="updateArContact($event)"
+    [selectedAddressDetails]="arContactSelectedAdd"
+    [showAddressType]="false"
+    [canChange]="canChange"
+    ></app-address>
+</div>
+    <div class="container-fluid pt-1 mb-3 mt-3"  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
         </div>
@@ -105,9 +105,14 @@
                 [required]="true"
                 [placeholder]="'PleaseSelect' | localize"
                 (onChange)="onchangePayment($event)"
-                [(ngModel)]="this.appTransactionsForViewDto.paymentTermsId"
+                [(ngModel)]="appTransactionsForViewDto.paymentTermsId"
             >
             </p-dropdown>
+            <p class="text-danger" *ngIf="!appTransactionsForViewDto.paymentTermsId">
+                <small>
+                    Please select payment terms option
+                </small>
+            </p>
             </div>
         </div>
         </div>
@@ -119,12 +124,16 @@
     (showBillingEditMode)="onshowBillingEditMode($event)"
     (onshowSaveBtn)="onshowSaveBtn($event)"
     [activeTab]="activeTab"
+    [currentTab]="currentTab" 
     [contactIdApContact]="contactIdApContact"
     [contactIdARContact]="contactIdARContact"
     [createOrEditBillingInfo]="createOrEditBillingInfo"
     [selectedAddressDetailsAp]="apContactSelectedAdd"
     [selectedAddressDetailsAr]="arContactSelectedAdd"
-    [appTransactionsForViewDto]="appTransactionsForViewDto">
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [canChange]="canChange"
+    (isContactsValid_1)="isContactFormValid($event,1)"
+    (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-billing-info>
 </div>
 </div>

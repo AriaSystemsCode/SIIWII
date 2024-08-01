@@ -1,0 +1,305 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+                            <span>{{l("AppFeatures")}}</span>
+                        </h3>
+                        <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                        <span class="kt-subheader__desc">
+                            {{l("AppFeaturesHeaderInfo")}}
+                        </span>
+                    </div>
+                    <div class="kt-subheader__toolbar">
+                        <div class="kt-subheader__wrapper">
+            				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+                <button *ngIf="isGranted('Pages.Administration.AppFeatures.Create')" (click)="createAppFeature()" 
+            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppFeature")}}</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <form class="kt-form" autocomplete="off">
+                    <div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-12">
+                                <div class="form-group m-form__group align-items-center">
+                                    <div class="input-group">
+                                        <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
+                                        <span class="input-group-btn">
+                                            <button (click)="getAppFeatures()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						 <div class="row" [hidden]="!advancedFiltersAreShown">
+						 	<div class="col-md-12">
+						         <div class="kt-separator kt-separator--border-dashed"></div>
+						     </div>
+
+
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="CodeFilter">{{l("Code")}}</label>
+									<input type="text" class="form-control" id="CodeFilter" name="codeFilter" [(ngModel)]="codeFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="NameFilter">{{l("Name")}}</label>
+									<input type="text" class="form-control" id="NameFilter" name="nameFilter" [(ngModel)]="nameFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="DescriptionFilter">{{l("Description")}}</label>
+									<input type="text" class="form-control" id="DescriptionFilter" name="descriptionFilter" [(ngModel)]="descriptionFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="UnitOfMeasurementCodeFilter">{{l("UnitOfMeasurementCode")}}</label>
+									<input type="text" class="form-control" id="UnitOfMeasurementCodeFilter" name="unitOfMeasurementCodeFilter" [(ngModel)]="unitOfMeasurementCodeFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="UnitOfMeasurementNameFilter">{{l("UnitOfMeasurementName")}}</label>
+									<input type="text" class="form-control" id="UnitOfMeasurementNameFilter" name="unitOfMeasurementNameFilter" [(ngModel)]="unitOfMeasurementNameFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeaturePeriodLimitFilter">{{l("FeaturePeriodLimit")}}</label>
+									<input type="text" class="form-control" id="FeaturePeriodLimitFilter" name="featurePeriodLimitFilter" [(ngModel)]="featurePeriodLimitFilter">
+								</div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="BillableFilterSelect">{{l("Billable")}}</label>
+								<select class="form-control" name="BillableFilter" id="BillableFilterSelect" [(ngModel)]="billableFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="BillingCodeFilter">{{l("BillingCode")}}</label>
+									<input type="text" class="form-control" id="BillingCodeFilter" name="billingCodeFilter" [(ngModel)]="billingCodeFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinUnitPriceFilter">{{l("MinMax")}} {{l("UnitPrice")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinUnitPriceFilter" [(ngModel)]="minUnitPriceFilter" placeholder="{{l('MinValue')}}" name="minUnitPriceFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxUnitPriceFilter" placeholder="{{l('MaxValue')}}" name="maxUnitPriceFilter" />
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="CategoryFilter">{{l("Category")}}</label>
+									<input type="text" class="form-control" id="CategoryFilter" name="categoryFilter" [(ngModel)]="categoryFilter">
+								</div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="TrackActivityFilterSelect">{{l("TrackActivity")}}</label>
+								<select class="form-control" name="TrackActivityFilter" id="TrackActivityFilterSelect" [(ngModel)]="trackActivityFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-12">
+                                <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row align-items-center">
+                    <!--<Primeng-Datatable-Start>-->
+                    <div class="primeng-datatable-container col-12"
+                         [busyIf]="primengTableHelper.isLoading">
+                        <p-table #dataTable
+                                     (onLazyLoad)="getAppFeatures($event)"
+                                     [value]="primengTableHelper.records"
+                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                     [paginator]="false"
+                                     [lazy]="true"
+                                     [scrollable]="true"
+                                     ScrollWidth="100%"
+                                     [responsive]="primengTableHelper.isResponsive"
+                                     [resizableColumns]="primengTableHelper.resizableColumns">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 130px" [hidden]="!isGrantedAny('Pages.Administration.AppFeatures.Edit', 'Pages.Administration.AppFeatures.Delete')">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="code">
+                                        {{l('Code')}}
+                                        <p-sortIcon field="appFeature.code"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="name">
+                                        {{l('Name')}}
+                                        <p-sortIcon field="appFeature.name"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="description">
+                                        {{l('Description')}}
+                                        <p-sortIcon field="appFeature.description"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="unitOfMeasurementCode">
+                                        {{l('UnitOfMeasurementCode')}}
+                                        <p-sortIcon field="appFeature.unitOfMeasurementCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="unitOfMeasurementName">
+                                        {{l('UnitOfMeasurementName')}}
+                                        <p-sortIcon field="appFeature.unitOfMeasurementName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featurePeriodLimit">
+                                        {{l('FeaturePeriodLimit')}}
+                                        <p-sortIcon field="appFeature.featurePeriodLimit"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="billable">
+                                        {{l('Billable')}}
+                                        <p-sortIcon field="appFeature.billable"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="billingCode">
+                                        {{l('BillingCode')}}
+                                        <p-sortIcon field="appFeature.billingCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="unitPrice">
+                                        {{l('UnitPrice')}}
+                                        <p-sortIcon field="appFeature.unitPrice"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="category">
+                                        {{l('Category')}}
+                                        <p-sortIcon field="appFeature.category"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="trackActivity">
+                                        {{l('TrackActivity')}}
+                                        <p-sortIcon field="appFeature.trackActivity"></p-sortIcon>
+                                    </th>
+
+                                </tr>
+                            </ng-template>                           
+							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                <tr>
+                                    <td style="width: 130px"
+                                        [hidden]="!isGrantedAny('Pages.Administration.AppFeatures.Edit', 'Pages.Administration.AppFeatures.Delete')">
+                                       <div class="btn-group dropdown" dropdown container="body">
+                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
+                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
+                                            </button>
+												<ul class="dropdown-menu"  *dropdownMenu>
+										    <li>
+                                                <a *ngIf="permission.isGranted('Pages.Administration.AppFeatures.Edit')" 
+			[routerLink]="['/app/admin/appSubScriptionPlan/appFeatures/view']" [queryParams]="{id: record.appFeature.id}">
+  {{l('View')}}	
+</a>
+                                            </li>
+												<li>
+                                                 <a *ngIf="permission.isGranted('Pages.Administration.AppFeatures.Edit')" 
+			[routerLink]="['/app/admin/appSubScriptionPlan/appFeatures/createOrEdit']" [queryParams]="{id: record.appFeature.id}">
+  {{l('Edit')}}	
+</a>												
+                                                </li>
+												<li>
+											        <a  href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.AppFeatures.Delete')"
+														(click)="deleteAppFeature(record.appFeature)">{{l('Delete')}}</a>
+												</li>
+                                                <li>
+                                                    <a href="javascript:;" *ngIf="entityHistoryEnabled"  
+                                                       (click)="showHistory(record.appFeature)">{{l('History')}}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Code')}}</span>
+											{{record.appFeature.code}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Name')}}</span>
+											{{record.appFeature.name}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Description')}}</span>
+											{{record.appFeature.description}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('UnitOfMeasurementCode')}}</span>
+											{{record.appFeature.unitOfMeasurementCode}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('UnitOfMeasurementName')}}</span>
+											{{record.appFeature.unitOfMeasurementName}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeaturePeriodLimit')}}</span>
+											{{record.appFeature.featurePeriodLimit}}
+										</td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('Billable')}}</span>
+                                        <div *ngIf="record.appFeature.billable" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appFeature.billable" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('BillingCode')}}</span>
+											{{record.appFeature.billingCode}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('UnitPrice')}}</span>
+											{{record.appFeature.unitPrice}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Category')}}</span>
+											{{record.appFeature.category}}
+										</td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('TrackActivity')}}</span>
+                                        <div *ngIf="record.appFeature.trackActivity" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appFeature.trackActivity" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+
+                                </tr>
+                               
+                            </ng-template>
+                        </p-table>
+						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            {{l('NoData')}}
+                        </div>
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getAppFeatures($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                                         [showCurrentPageReport]="true"
+                                         [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
+                            >
+                            </p-paginator>
+                        </div>
+                    </div>
+                    <!--<Primeng-Datatable-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    
+     <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
+  </div>
+</div>

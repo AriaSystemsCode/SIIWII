@@ -41,7 +41,7 @@ export class PostCardComponent
     @Output() _editPost = new EventEmitter<GetAppPostForViewDto>();
     @Output() _viewEvent = new EventEmitter<number>();
     @Output() videoClicked: EventEmitter<any> = new EventEmitter<any>();
-
+    addNewThread:boolean=true;
     linkUrl: string = null;
     PostType = PostType;
     profilePicture: string;

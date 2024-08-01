@@ -12,6 +12,7 @@ import { ShoppingCartoccordionTabs } from '../shopping-cart-view-component/Shopp
 export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBase
   implements OnInit, OnChanges {
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("buyer_seller_contactInfoValid") buyer_seller_contactInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
@@ -26,6 +27,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   oldappTransactionsForViewDto;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
+  @Input("canChange")  canChange:boolean=true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy

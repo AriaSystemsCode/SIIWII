@@ -36,6 +36,10 @@ namespace onetouch.AppItems
         Task<FileDto> GetAppItemsToExcel(GetAllAppItemsForExcelInput input);
         Task ShareProduct(SharingItemOptions input);
 
-
+        Task<long> ShareSelectedProducts(Guid key);
+        Task<long> SyncSelectedProduct(Guid key);
+        Task<bool> IsVariationOrdered(string sSIN);
+        Task<string> GenerateProductCode(int productId, bool lUpdateSeq, long? tenantId);
+        Task<IList<VariationItemDto>> GetVariationsCodes(long identifierId, string productCode, IList<VariationItemDto> variationsList, long productTypeId, long? tenantId);
     }
 }

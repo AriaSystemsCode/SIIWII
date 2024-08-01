@@ -40,8 +40,9 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     @Output("orderInfoValid") orderInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
     @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
     @Input("activeTab") activeTab: number;
+    @Input("currentTab") currentTab: number;
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
-    shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+    shoppingCartoccordionTabs = ShoppingCartoccordionTabs; 
     @Input("createOrEditorderInfo") createOrEditorderInfo: boolean ;
     @Input("oldCreateOrEditorderInfo") oldCreateOrEditorderInfo: boolean ;
 
@@ -52,6 +53,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     showSaveBtn: boolean = false;
     oldappTransactionsForViewDto;
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Input("canChange") canChange: boolean = true;
 
     constructor(
         injector: Injector,
@@ -109,8 +111,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
     // get parent categories
     getParentCategories() {
-       // let apiMethod = "getAllWithChildsForProductWithPaging";
-         let apiMethod ="getAllWithChildsForTransactionWithPaging";
+        // let apiMethod = "getAllWithChildsForProductWithPaging";
+        let apiMethod ="getAllWithChildsForTransactionWithPaging";
         const subs = this._sycEntityObjectCategoriesServiceProxy[apiMethod](
             undefined,
             undefined,
@@ -145,7 +147,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
 
     getParentClassifications() {
-      // let apiMethod = "getAllWithChildsForProductWithPaging";
+        // let apiMethod = "getAllWithChildsForProductWithPaging";
         let apiMethod ="getAllWithChildsForTransactionWithPaging";
         const subs = this._sycEntityObjectClassificationsServiceProxy[
             apiMethod
@@ -397,19 +399,44 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
     onChangeDate() {
         //Dates
-        this.appTransactionsForViewDto.enteredDate = moment(this.enteredDate);
-        this.appTransactionsForViewDto.startDate = moment(this.startDate);
-        this.appTransactionsForViewDto.availableDate = moment(this.availableDate);
-        this.appTransactionsForViewDto.completeDate = moment(this.completeDate);
+
+       
+    
+        if ( !this.completeDate || this.completeDate <=  this.startDate) {
+            this.completeDate=this.startDate;
+        }
+    
+        if ( !this.availableDate ||  this.availableDate <= this.startDate) {
+            this.availableDate=this.startDate;
+        }
+
+        let enteredDate = this.enteredDate.toLocaleString();
+        let startDate = this.startDate.toLocaleString();
+        let availableDate = this.availableDate.toLocaleString();
+        let completeDate = this.completeDate.toLocaleString();
+
+
+        this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+        this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+        this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+        this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+    }
+    changeCompleteDate(date) {
+        const selectedDate = date;
+    
+        this.completeDate = selectedDate;
+        this.availableDate=selectedDate;
+        this.onChangeDate()
     }
 
     createOrEditTransaction() {
         this.showMainSpinner();
+        this.onChangeDate();
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
-            .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
-            .subscribe((res) => {
+        .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
+        .subscribe((res) => {
                 if (res) {
                     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
 
@@ -430,13 +457,13 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     isContactFormValid(value) {
         if(this.activeTab==this.shoppingCartoccordionTabs.orderInfo)
         {
-        this.isContactsValid = value;
-        if (value) {
-            this.isContactsValid = true;
-            if (this.isSalesOrderValidForm())
-                this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
+            this.isContactsValid = value;
+            if (value) {
+                this.isContactsValid = true;
+                if (this.isSalesOrderValidForm())
+                    this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
+            }
         }
-    }
     }
 
     showEditMode() {

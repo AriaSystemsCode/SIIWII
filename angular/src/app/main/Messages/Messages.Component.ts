@@ -27,7 +27,7 @@ import { AppConsts } from "@shared/AppConsts";
 import { DomSanitizer } from "@angular/platform-browser";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { finalize } from "rxjs/operators";
-
+import { AddCommentComponent } from "../comments/components/add-comment/add-comment.component";
 @Component({
     templateUrl: "./Messages.component.html",
     styleUrls: ["./Messages.component.scss"],
@@ -38,6 +38,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     scrolltop: number = null;
     @ViewChild("container", { static: true }) container;
     @ViewChild("messageEl") containerdetails: ElementRef;
+    @ViewChild('AddCommentComponent',{static:false}) addCommentComponent :AddCommentComponent
 
     @ViewChild("SendMessageModal", { static: true })
     longmsgId: any = false;
@@ -64,13 +65,14 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     totalUnread: number;
     totalPrimaryUnread: number;
     totalUpdatesUnread: number;
+    totalMentionUnRead: number;
     isFullListDisplayed: boolean = false;
     messageId: any;
     entityAttachments = [];
     RecipientsName = [];
     highlightFirstMsg: boolean;
     displayMessageDetails: boolean = false;
-    messageCategoryFilter: string = "PRIMARYMESSAGE";
+    messageCategoryFilter: string = "MESSAGE";
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -88,7 +90,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.highlightFirstMsg = true;
         this.displayMessageDetails = false;
         this.selectMessagetype(1, this.l("Inbox"));
-        this.messageCategoryFilter = "PRIMARYMESSAGE";
+        this.messageCategoryFilter = "MESSAGE";
+        document.getElementById('firstTabBtn')?.focus();
+
         this._sycEntityObjectClassificationsServiceProxy
             .getAllChildsForLables()
             .subscribe((result) => {
@@ -105,7 +109,9 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.containerdetails.nativeElement.scrollHeight;
         } catch (err) {}
     } */
-
+    newCommentAddedHandler(event){
+        this.selectMessage(this.messagesDetails[0].messages)
+    }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
         this.messageTypeIndex = messagetypeIndex;
@@ -137,6 +143,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.skipCount,
                 this.maxResultCount
             )
+            .pipe(finalize(() => {  this.hideMainSpinner(); }))
             .subscribe((result) => {
                 if (search == true) {
                     this.messages = [];
@@ -198,14 +205,16 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                     this.totalCount = result.totalCount;
 
                     // this.totalUnread = result.totalUnread
-                    this._MessageServiceProxy.getUnreadCounts('PRIMARYMESSAGE').subscribe((result) => {
+                    this._MessageServiceProxy.getUnreadCounts('MESSAGE').subscribe((result) => {
                         this.totalPrimaryUnread = result;
                     });
 
-                    this._MessageServiceProxy.getUnreadCounts('UPDATEMESSAGE').subscribe((result) => {
+                    this._MessageServiceProxy.getUnreadCounts('THREAD').subscribe((result) => {
                         this.totalUpdatesUnread = result;
                     });
-
+                    this._MessageServiceProxy.getUnreadCounts('MENTION').subscribe((result) => {
+                        this.totalMentionUnRead = result;
+                    });
                     this.itemsToShow = this.messages.slice(
                         0,
                         this.noOfItemsToShowInitially
@@ -224,18 +233,38 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
     }
 
-    getPrimaryMessage() {
-        this.messageCategoryFilter = "PRIMARYMESSAGE";
+    getPrimaryMessage(event) {
+        this.clearActiveTab();
+        event.target.closest('button').classList.add('active-tab');
+        this.messageCategoryFilter = "MESSAGE";
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();
     }
 
-    getUpdatesMessage() {
-        this.messageCategoryFilter = "UPDATEMESSAGE";
+    
+    getUpdatesMessage(event, messageType) {
+        this.showMainSpinner();
+        this.clearActiveTab();
+        event.target.closest('button').classList.add('active-tab');
+        this.messageCategoryFilter = messageType;
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();
+    }
+    
+    getMentionsMessage(event) {
+        this.clearActiveTab();
+        event.target.closest('button').classList.add('active-tab');
+        this.messageCategoryFilter = "MENTION";
+        this.messages = [];
+        this.messagesDetails = null;
+        this.getMesssage();
+    }
+    clearActiveTab() {
+        Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
+            element.classList.remove("active-tab");
+        });
     }
 
     onScroll(): void {
@@ -253,7 +282,16 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     clickEventLongMsg(event) {
         this.longmsgId = event;
     }
+    focusAddComment(){
+    if(this.addCommentComponent){
+        this.addCommentComponent.focusCommentTextArea()
+        this.messagesDetails[0].messages.parentId=this.messagesDetails[0].messages.threadId
+        this.messagesDetails[0].messages.mesasgeObjectType=1;
 
+        this.addCommentComponent.show(this.messagesDetails[0].messages) 
+    }
+        
+    }
     selectMessage(message: MessagesDto): void {
         this.showMainSpinner();
         this.showSideBar=false;
@@ -267,6 +305,25 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             .pipe(finalize(() => { this.displayMessageDetails = true; this.hideMainSpinner(); }))
             .subscribe((result) => {
                 this.messagesDetails = result;
+                // set message Subject [Start]
+                for (let i = 0; i < this.messagesDetails.length; i++) {
+                    let msgSubject = this.messagesDetails[i].messages.subject;
+                    if((this.messageCategoryFilter=='THREAD' || this.messageCategoryFilter=='MENTION') &&(message.entityObjectTypeCode=="COMMENT"))
+                     msgSubject="Comment by "+ message.senderName+ " on "+ message.relatedEntityObjectTypeCode +" '" +
+                    (message.relatedEntityObjectTypeCode=="transaction"? message.relatedEntityObjectTypeDescription : message.relatedEntityObjectTypeDescription.substring(0,30))
+                    + "..' Created by "+message.relatedEntityCreatorName  ; 
+
+                    this.messagesDetails[i].messages.subject=msgSubject;
+                }
+
+// set message Subject [End]
+                
+                if(this.messageCategoryFilter=='MENTION'){
+                    setTimeout(()=>{
+                        this.focusAddComment();
+
+                    },1000)
+                }
                 for (var i = 0; i < result.length; i++) {
 
                     const message = result[i].messages
@@ -288,10 +345,12 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 if (message.entityObjectStatusCode == "UNREAD") {
                     this._MessageServiceProxy.read(message.id).subscribe(() => {
                         this.totalUnread = this.totalUnread - 1;
-                        if (this.messageCategoryFilter == "PRIMARYMESSAGE")
+                        if (this.messageCategoryFilter == "MESSAGE")
                             this.totalPrimaryUnread = this.totalPrimaryUnread - 1;
-                        else if (this.messageCategoryFilter == "UPDATEMESSAGE")
+                        else if (this.messageCategoryFilter == "THREAD")
                             this.totalUpdatesUnread = this.totalUpdatesUnread - 1;
+                            else if (this.messageCategoryFilter == "MENTION")
+                            this.totalMentionUnRead = this.totalMentionUnRead - 1;
                         this.readMessage(true);
                     });
                     //xxx

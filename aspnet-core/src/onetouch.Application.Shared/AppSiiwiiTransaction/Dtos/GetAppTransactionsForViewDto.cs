@@ -25,6 +25,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public long CreatorUserId { set; get; }
         public byte[] OrderConfirmationFile { set; get; }
         public virtual List<ContactInformationOutputDto> SharedWithUsers{set; get;}
+        public virtual bool IsOwnedByMe { set; get; }
     }
 
     //xx
@@ -173,6 +174,17 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 
         public IList<TransactionSharingDto> TransactionSharing { get; set; }
 
+    }
+    public class ShareTransactionByMessageResultDto {
+        public bool Result { get; set; }
+        public List<TenantTransactionInfo> TenantTransactionInfos { set; get; }
+    }
+    public class TenantTransactionInfo
+    { 
+        public long TenantId { set; get; }
+        public long TransactionId { set; get; }
+        public string Code { set; get; }
+        public string TransactionType { set; get; }
     }
     public class SharingTransactionEmail
     {

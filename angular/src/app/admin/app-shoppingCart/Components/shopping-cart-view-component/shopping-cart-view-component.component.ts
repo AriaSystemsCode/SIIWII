@@ -3,7 +3,7 @@ import {
   , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -70,12 +70,18 @@ export class ShoppingCartViewComponentComponent
   currencySymbol: string = "";
   transactionCode:string="";
   transactionFormPath:string="";
+  _transactionFormPath:string="";
   onshare:boolean=false;
-  orderConfirmationFile;
+  //orderConfirmationFile;
   printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams();
   reportUrl: string = "";
   invokeAction = '/DXXRDV';
   @ViewChild('reportViewerContainer', { read: ViewContainerRef }) reportViewerContainer: ViewContainerRef;
+  isOwnedByMe:boolean=true;
+  canChange:boolean=true;
+  companeyNames:GetAccountInformationOutputDto[];
+  currentTab:number
+  shareDone:boolean=false;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -88,10 +94,11 @@ export class ShoppingCartViewComponentComponent
 
   }
   ngOnInit(): void {
+   
   }
   loadCommentsList() {
     // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
-    this.commentParentComponent.first.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+    this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
   }
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
@@ -101,6 +108,7 @@ export class ShoppingCartViewComponentComponent
     this.showCarousel = showCarousel;
     this.validateOrder = validateOrder;
     this.shoppingCartMode = shoppingCartMode;
+    this.onshare = false;
 
     if (shoppingCartMode == ShoppingCartMode.createOrEdit) {
       this.showTabs = false;
@@ -125,7 +133,7 @@ export class ShoppingCartViewComponentComponent
     this.getShoppingCartData();
   }
 
-  resetTabValidation() {
+ /*  resetTabValidation() {
     var valid: boolean = false;
 
     if (this.shoppingCartDetails?.entityStatusCode?.toUpperCase() == 'OPEN')
@@ -137,10 +145,10 @@ export class ShoppingCartViewComponentComponent
     this.SalesRepInfoValid = valid;
     this.shippingInfOValid = valid;
     this.BillingInfoValid = valid;
-  }
+  } */
 
   resetData() {
-    this.resetTabValidation();
+   // this.resetTabValidation();
     this.activeIndex = 0;
     this.transactionNum = 0;
     this.productCode = undefined;
@@ -159,6 +167,7 @@ export class ShoppingCartViewComponentComponent
     this.createOrEditSalesRepInfo = true;
     this.createOrEditshippingInfO = true;
     this.createOrEditBillingInfo = true;
+    this.appTransactionsForViewDto=null;
   }
 
   getColumns() {
@@ -177,54 +186,90 @@ export class ShoppingCartViewComponentComponent
     //header
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
-        this.appTransactionsForViewDto = res;
-        this.transactionCode=res?.code;
-        if (res?.entityAttachments?.length > 0)
-          this.transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
-
-        this.orderConfirmationFile = res.orderConfirmationFile;
-        this.loadCommentsList()
-
-        //lines
         this._AppTransactionServiceProxy
-          .getOrderDetailsForView(
-            this.orderId,
-            this.showVariations,
-            this.colorFilter,
-            this.sizeFilter,
-            this.productCode
-          )
-          .subscribe((res) => {
-            this.shoppingCartDetails = res;
-            this.resetTabValidation();
-
-            this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
-
-            this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-            if (res.transactionType == TransactionType.PurchaseOrder)
-              this.transactionType = "Purchase Order";
-
-            if (res.transactionType == TransactionType.SalesOrder)
-              this.transactionType = "Sales Order";
-
-            if (!temp) this.shoppingCartTreeNodes = res.detailsView;
-            else this.shoppingCartTreeNodes = temp;
-
-            this.colors = res.colors;
-            this.sizes = res.sizes;
-
-
-          });
-
-
-          //Currency
-            this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
-                .subscribe((res: CurrencyInfoDto) => {
-                    this.currencySymbol = res.symbol ? res.symbol : res.code  ;
-                });
-        this.modal.hide();
-        this.modal.show();
-        this.hideMainSpinner();
+        .getRelatedAccounts(
+            "",
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            0,
+            30,false
+        )
+        .subscribe((res2: PagedResultDtoOfGetAccountInformationOutputDto) => {
+          this.companeyNames= [...res2.items];
+         res.companeyNames=this.companeyNames;
+          this.appTransactionsForViewDto = res;
+          this.isOwnedByMe= res.isOwnedByMe;
+          this.canChange= this.isOwnedByMe
+           this.transactionCode=res?.code;
+          
+           this.loadCommentsList()
+   
+           //lines
+           this._AppTransactionServiceProxy
+             .getOrderDetailsForView(
+               this.orderId,
+               this.showVariations,
+               this.colorFilter,
+               this.sizeFilter,
+               this.productCode
+             )
+             .pipe(finalize(() => {
+              if (res?.entityAttachments?.length > 0)
+             this._transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
+   
+          
+              this.modal.hide();
+              this.modal.show();
+              this.hideMainSpinner();
+             }))
+             .subscribe((res) => {
+               this.shoppingCartDetails = res;
+              // this.resetTabValidation();
+   
+               this.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
+   
+               this.userClickService.userClicked("refreshShoppingInfoInTopbar");
+               if (res.transactionType == TransactionType.PurchaseOrder)
+                 this.transactionType = "Purchase Order";
+   
+               if (res.transactionType == TransactionType.SalesOrder)
+                 this.transactionType = "Sales Order";
+   
+                 this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : true ;
+   
+   
+               if (!temp) this.shoppingCartTreeNodes = res.detailsView;
+               else this.shoppingCartTreeNodes = temp;
+   
+               this.colors = res.colors;
+               this.sizes = res.sizes;
+   
+             });
+   
+   
+             //Currency
+               this._AppEntitiesServiceProxy.getCurrencyInfo(res.currencyCode)
+                   .subscribe((res: CurrencyInfoDto) => {
+                       this.currencySymbol = res.symbol ? res.symbol : res.code  ;
+                   });
+        });
+          
+    
       });
   }
 
@@ -401,8 +446,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                this.getShoppingCartData();
-                this.hideMainSpinner();
+                  this.onGeneratOrderReport(true,undefined,false,true);
               });
             break;
 
@@ -417,8 +461,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                this.getShoppingCartData();
-                this.hideMainSpinner();
+                  this.onGeneratOrderReport(true,undefined,false,true);
               });
             break;
 
@@ -431,8 +474,7 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                this.getShoppingCartData();
-                this.hideMainSpinner();
+                  this.onGeneratOrderReport(true,undefined,false,true);
               });
             break;
 
@@ -457,9 +499,8 @@ export class ShoppingCartViewComponentComponent
           )
           .subscribe((res) => {
             if (res) this.notify.info("Successfully Updated.");
-            this.getShoppingCartData();
+            this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
-            this.hideMainSpinner();
           });
         break;
 
@@ -543,7 +584,9 @@ export class ShoppingCartViewComponentComponent
     this.showMainSpinner();
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
+        res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
+        this.onGeneratOrderReport(true,undefined,false,true);
         this.hideMainSpinner();
         this.showTabs = true;
       });
@@ -625,9 +668,11 @@ export class ShoppingCartViewComponentComponent
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
+            this.onGeneratOrderReport(true,undefined,true,true);
             this.hideMainSpinner();
-            this.hide();
-          }
+         //   this.hide();
+         this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+        }
           ))
           .subscribe((res) => {
             if (res) {
@@ -703,11 +748,12 @@ export class ShoppingCartViewComponentComponent
   }
 
   onChangeAppTransactionsForViewDto($event) {
+    $event.companeyNames=this.companeyNames;
     this.appTransactionsForViewDto = $event;
   }
 
   printTransaction() {
-    var page = window.open(this.transactionFormPath);
+    var page = window.open(this._transactionFormPath);
     page.print();
   }
 
@@ -717,9 +763,12 @@ export class ShoppingCartViewComponentComponent
   offShareTransaction() {
     this.onshare = false;
   }
-  onGeneratOrderReport($event) {
-    if ($event) {
+  async onGeneratOrderReport($event,printInfoParam?: ProductCatalogueReportParams, FromPlaceOrder?:boolean,refreshData:boolean=true) {
+    if (($event && this.shoppingCartDetails?.entityStatusCode?.toUpperCase()!='DRAFT') || ($event && FromPlaceOrder)) {
       this.reportUrl="";
+      if(printInfoParam)
+      this.printInfoParam=printInfoParam;
+    else{
       this.printInfoParam= new ProductCatalogueReportParams();
       this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
       this.printInfoParam.TransactionId = this.orderId.toString();
@@ -728,25 +777,60 @@ export class ShoppingCartViewComponentComponent
       this.printInfoParam.saveToPDF = true;
       this.printInfoParam.tenantId = this.appSession?.tenantId
       this.printInfoParam.userId = this.appSession?.userId
-      this.reportUrl = this.printInfoParam.getReportUrl()
+    }
+     this.reportUrl = this.printInfoParam.getReportUrl()
+
+     if(refreshData)
+        this.getShoppingCartData();
+
       this.createReportViewer();
     }
-
   }
-    createReportViewer(){
-      this.reportViewerContainer.clear();
 
-      // Resolve the factory for ReportViewerComponent
-      const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
-  
-      // Create the component and set input properties
-      const componentRef = this.reportViewerContainer.createComponent(factory);
-      const instance = componentRef.instance as ReportViewerComponent;
-      instance.reportUrl = this.reportUrl;
-      instance.invokeAction = this.invokeAction;
-      const componentNativeElement = componentRef.location.nativeElement as HTMLElement;
-       componentNativeElement.classList.add('d-none');
+  getOrderConfirmation(){
+    this.transactionFormPath="";
+     this.transactionFormPath=this._transactionFormPath;
+   }
 
-    
+  onShareTransactionByMessage($event:TenantTransactionInfo[])
+  {
+    let printInfoParam= new ProductCatalogueReportParams();
+    //printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
+    printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+    printInfoParam.saveToPDF = true;
+    printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+    printInfoParam.userId = this.appSession?.userId
+
+    for (let i = 0; i < $event.length; i++) {
+      printInfoParam.TransactionId = $event[i].transactionId.toString();
+      printInfoParam.tenantId =$event[i].tenantId;
+      this.onGeneratOrderReport(true,printInfoParam,false,false);
     }
+  }
+  createReportViewer() {
+    // Resolve the factory for ReportViewerComponent
+    const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
+
+    // Create a new container for the report viewer
+    const containerRef = this.reportViewerContainer.createComponent(factory);
+
+    // Ensure the containerRef is valid
+    if (!containerRef) {
+        console.error("Failed to create reportViewerContainer.");
+        return;
+    }
+
+    // Set input properties for the container
+    const instance = containerRef.instance as ReportViewerComponent;
+    instance.reportUrl = this.reportUrl;
+    instance.invokeAction = this.invokeAction;
+
+    // Add a class to hide the component initially
+    const containerNativeElement = containerRef.location.nativeElement as HTMLElement;
+    if (containerNativeElement) {
+        containerNativeElement.classList.add('d-none');
+    } else {
+        console.error("Native element of reportViewerContainer is not available.");
+    }
+}
 }

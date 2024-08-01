@@ -298,6 +298,6 @@ export class AppitemsActionsMenuComponent extends AppComponentBase  {
         this.eventTriggered.emit({event:AppItemBrowseEvents.AddToList, data:true})
 
         this.itemListSelectionModal.resetState();
-        this.askToPublishProductList();
+        //this.askToPublishProductList();
     }
 }

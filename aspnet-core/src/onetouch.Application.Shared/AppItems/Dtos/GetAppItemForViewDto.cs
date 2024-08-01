@@ -6,6 +6,10 @@ namespace onetouch.AppItems.Dtos
     {
         public AppItemDto AppItem { get; set; }
         public bool Selected { get; set; }
+        //MMT
+        public virtual IList<string> EntityObjectCategoryNames { get; set; }
+        public virtual IList<string> EntityClassificationNames { get; set; }
+        //MMT
     }
 
     public class GetAppItemDetailForViewDto

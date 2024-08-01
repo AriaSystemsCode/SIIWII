@@ -15,7 +15,7 @@
                 Continue
             </button>
             <button
-                *ngIf="!createOrEditorderInfo"
+                *ngIf="!createOrEditorderInfo &&  !showSaveBtn &&  canChange"
                 (click)="showEditMode()"
                 class="previewbtn text-center btn float-right"
             >
@@ -46,6 +46,7 @@
             class="w-100"
             [isCreateOrEdit]="createOrEditorderInfo"
                 [activeTab]="activeTab"
+                [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (formValidityChanged)="isContactFormValid($event)"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
@@ -210,11 +211,15 @@
                 <div class="col-md-6 my-3">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Entered Date</label>
-                        <p-calendar
-                            [(ngModel)]="enteredDate"
-                            [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
-                        ></p-calendar>
+                        <div class="read-only-calendar">
+                            <p-calendar
+                            appendTo="body"
+                                [(ngModel)]="enteredDate"
+                                [showIcon]="true"
+                                (ngModelChange)="onChangeDate()"
+                            ></p-calendar>
+                            <div class="overlay"></div>
+                        </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
@@ -222,7 +227,7 @@
                         >
                             <h6 class="previewTitle  m-0 p-0 col-4 my-2">Entered Date :</h6>
                             <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "dd/MM/yy " }}
+                                {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "MM/dd/yyyy  " }}
                             </p>
                         </div>
                     </div>
@@ -231,6 +236,7 @@
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Start Date</label>
                         <p-calendar
+                        appendTo="body"
                             [(ngModel)]="startDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
@@ -242,7 +248,7 @@
                         >
                             <h6 class="previewTitle  m-0 p-0 col-4 my-2">Start Date :</h6>
                             <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "dd/MM/yy "}}
+                                {{ appTransactionsForViewDto?.startDate?.toString() | date : "MM/dd/yyyy "}}
                             </p>
                         </div>
                     </div>
@@ -251,9 +257,11 @@
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Avaialable Date</label>
                         <p-calendar
+                        appendTo="body"
                             [(ngModel)]="availableDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
+                            [minDate]="completeDate"
                         ></p-calendar>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
@@ -264,7 +272,7 @@
                                 Avaialable Date :
                             </h6>
                             <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "dd/MM/yy " }}
+                                {{ appTransactionsForViewDto?.availableDate?.toString() | date : "MM/dd/yyyy " }}
                             </p>
                         </div>
                     </div>
@@ -273,9 +281,12 @@
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Complete Date</label>
                         <p-calendar
+                        appendTo="body"
                             [(ngModel)]="completeDate"
                             [showIcon]="true"
-                            (ngModelChange)="onChangeDate()"
+                            (onSelect)="changeCompleteDate(completeDate)"
+                            (ngModelChange)="changeCompleteDate(completeDate)"
+                            [minDate]="startDate"
                         ></p-calendar>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
@@ -286,7 +297,7 @@
                                 Complete Date :
                             </h6>
                             <p class="previewValue  m-0 p-0 col-4 my-2">
-                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "dd/MM/yy " }}
+                                {{ appTransactionsForViewDto?.completeDate?.toString() | date : "MM/dd/yyyy " }}
                             </p>
                         </div>
                     </div>

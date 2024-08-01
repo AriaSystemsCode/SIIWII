@@ -32,6 +32,12 @@ using onetouch.AppPosts.Dtos;
 using onetouch.Build;
 using Microsoft.AspNetCore.SignalR;
 using onetouch.AppEvents;
+using onetouch.AppSiiwiiTransaction.Dtos;
+using onetouch.AppSiiwiiTransaction;
+using onetouch.AppMarketplaceTransactions;
+using Twilio.Rest.Api.V2010.Account;
+using NPOI.Util;
+using Abp.Domain.Entities;
 
 namespace onetouch.AppEntities
 {
@@ -63,7 +69,8 @@ namespace onetouch.AppEntities
         //MMT
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
         private readonly IAppNotifier _appNotifier;
-
+        private readonly IRepository<AppMarketplaceTransactionContacts, long> _appMarketplaceTransactionContactsRepository;
+        private readonly IRepository<AppTransactionContacts, long> _appTransactionContactsRepository;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
 
         public AppEntitiesAppService(IRepository<AppEntity, long> appEntityRepository
@@ -85,7 +92,8 @@ namespace onetouch.AppEntities
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount,
             IRepository<AppEntityUserReactions, long> appEntityUserReactions,
             IRepository<AppPost, long> appPostRepository, IProfileAppService iProfileAppService, IAppNotifier appNotifier
-            , IRepository<AppEntityState, long> appEntityStateRepository
+            , IRepository<AppEntityState, long> appEntityStateRepository, IRepository<AppMarketplaceTransactionContacts, long> appMarketplaceTransactionContactsRepository
+            , IRepository<AppTransactionContacts, long> appTransactionContactsRepository
             )
         {
              
@@ -113,6 +121,8 @@ namespace onetouch.AppEntities
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
             _appNotifier = appNotifier;
+            _appMarketplaceTransactionContactsRepository = appMarketplaceTransactionContactsRepository;
+            _appTransactionContactsRepository = appTransactionContactsRepository;
             //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
         }
 
@@ -842,6 +852,10 @@ namespace onetouch.AppEntities
 
                 entity.ObjectId = input.ObjectId;
                 entity.EntityObjectStatusId = input.EntityObjectStatusId;
+                
+                if (entity.EntityObjectStatusId == null)
+                    entity.EntityObjectStatusCode = null;
+
                 entity.EntityObjectTypeId = input.EntityObjectTypeId;
                 entity.Name = input.Name;
                 entity.Code = input.Code;
@@ -1724,8 +1738,27 @@ namespace onetouch.AppEntities
         [AbpAllowAnonymous]
         public async Task<AppEntityUserReactionsCountDto> GetUsersReactionsCount(long entityId)
         {
+           
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //MMT
+                if (entityId != null && entityId != 0)
+                {
+                    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == entityId).FirstOrDefaultAsync();
+                    if (entity != null && (entity.EntityObjectTypeCode == "SALESORDER" || entity.EntityObjectTypeCode == "PURCHASEORDER"))
+                    {
+                        var transactionSSIN = entity.SSIN;
+                        if (!string.IsNullOrEmpty(transactionSSIN))
+                        {
+                            var entityShared = await _appEntityRepository.GetAll().Where(z => z.SSIN == transactionSSIN && z.TenantId == null).FirstOrDefaultAsync();
+                            if (entityShared != null)
+                            {
+                                entityId = entityShared.Id;
+                            }
+                        }
+                    }
+                }
+                //MMT
                 var countReactionObj = await _appEntityReactionsCount.GetAll().FirstOrDefaultAsync(x => x.EntityId == entityId);
                 if (countReactionObj != null)
                 {
@@ -2029,5 +2062,132 @@ namespace onetouch.AppEntities
             }
             return "";
         }
+        public async Task<List<ContactInformationOutputDto>> GetContactsToMention(long entityId,string? filter)
+        {
+
+            List<ContactInformationOutputDto> outputList = new List<ContactInformationOutputDto>();
+            var entity = await _appEntityRepository.GetAll().Where(a => a.Id == entityId).FirstOrDefaultAsync();
+            if (entity != null)
+            {
+                if (entity.EntityObjectTypeCode.ToUpper() == "SALESORDER" || entity.EntityObjectTypeCode.ToUpper() == "PURCHASEORDER")
+                {
+                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                    {
+                        var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+
+                        var transactionContacts = _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == entityId && z.CompanySSIN != null && z.ContactSSIN!=null); //&& z.CompanySSIN !=null
+
+                        /*var appEntities = _appEntityRepository.GetAll().Include(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                                  .Where(z => z.TenantId == null && z.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantOwner != null);*/
+
+                        var contactsList = _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                                  .Where(z => z.TenantId == null && z.ParentId != null && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
+
+
+                        var contact = from t in transactionContacts
+                                      join
+                                      c in contactsList
+                                      on t.ContactSSIN equals c.SSIN into j
+                                      from e in j.DefaultIfEmpty()
+                                      select new { e.AccountId };
+
+                        var transactionContactsList =await  contact.Distinct().ToListAsync();
+                        
+                        /*var newContact = from x in contact
+                                         join y in appEntities
+                                         on x.contact.TenantOwner equals y.TenantOwner into j1
+                                         from z in j1.DefaultIfEmpty()
+                                         select new { contact = z };*/
+                        foreach (var acc in transactionContactsList)
+                        {
+                            var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                                .Where(z => z.TenantId == null &&  z.AccountId==acc.AccountId).ToListAsync();
+                            //await newContact.WhereIf(!string.IsNullOrEmpty(filter), z => z.contact.Name.Contains(filter)).OrderBy(z => z.contact.Id).ToListAsync();
+
+                            if (contacts != null && contacts.Count() > 0)
+                            {
+
+                                foreach (var con in contacts)
+                                {
+                                    if (con == null || con.EntityFk.EntityExtraData == null || con.EntityFk.EntityExtraData.Count == 0 || 
+                                        con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue == null)
+
+                                        continue;
+
+                                    try
+                                    {
+                                        var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
+                                        if (user != null)
+                                        {
+                                            //ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
+                                            var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
+                                            if (outputList.FirstOrDefault(z => z.UserId == long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue)) == null)
+                                                outputList.Add(new ContactInformationOutputDto
+                                                {
+                                                    Id = con.Id,
+                                                    Email = con.EMailAddress,
+                                                    Name = con.Name,
+                                                    UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
+                                                    UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
+                                                    UserName = user.UserName,
+                                                    TenantId = int.Parse(user.TenantId.ToString()),
+                                                    TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
+                                                    // CanBeRemoved = (role == ContactRoleEnum.Creator || role == ContactRoleEnum.Seller || role == ContactRoleEnum.Buyer) ? false : true
+                                                });
+
+                                        }
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                 .WhereIf(!string.IsNullOrEmpty(filter), z => z.Name.Contains(filter))
+                .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
+
+                    if (contacts != null && contacts.Count() > 0)
+                    {
+                        foreach (var con in contacts)
+                        {
+                            if (con.EntityFk.EntityExtraData != null && con.EntityFk.EntityExtraData.FirstOrDefault() != null && con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue != null)
+                            {
+                                try
+                                {
+                                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                                    {
+                                        var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
+                                        if (user != null)
+                                        {
+                                            var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
+                                            outputList.Add(new ContactInformationOutputDto
+                                            {
+                                                Id = con.Id,
+                                                Email = con.EMailAddress,
+                                                Name = con.Name,
+                                                UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
+                                                UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
+                                                UserName = user.UserName,
+                                                TenantId = int.Parse(user.TenantId.ToString()),
+                                                TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
+                                            });
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                { }
+                            }
+                        }
+
+                    }
+                }
+            }
+            return outputList;
+        }
+
     }
 }

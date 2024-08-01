@@ -313,7 +313,7 @@ export class TopBarComponent
         this.userName = this.appSession.user.userName;
         this.name = this.appSession.user.name;
         this.fullName =
-            this.appSession.user.name + this.appSession.user.surname;
+            this.appSession.user.name +' '+ this.appSession.user.surname;
         console.log(">>", this.appSession.user);
     }
     closeModal(value: boolean) {
@@ -507,6 +507,9 @@ export class TopBarComponent
                 if (!this.shoppingCartSummary.buyerLogo)
                     this.defaultBuyerLogo = "../../../assets/shoppingCart/Order-Details-Byer-logo.svg";
 
+
+                  if(this.shoppingCartSummary?.amount)
+                  this.shoppingCartSummary?.amount % 1 ==0?this.shoppingCartSummary.amount=parseFloat(Math.round(this.shoppingCartSummary.amount * 100 / 100).toFixed(2)):null; 
 
                 if (openShoppingCart)
                     this.shoppingCartModal.show(this.shoppingCartSummary?.shoppingCartId, false);

@@ -3,10 +3,12 @@
 body {
     .purple-selection.p-inputswitch {
         &.p-inputswitch-checked .p-inputswitch-slider {
-            background-color: $purple;
+           // background-color: $purple;
+           background-color: #2DC74F !important;
         }
         &.p-inputswitch-checked.p-inputswitch-focus .p-inputswitch-slider {
-            background-color: $purple;
+            //background-color: $purple;
+            background-color: #2DC74F !important;
         }
     }
 }

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Injector,Output,Input, OnInit, OnChanges, SimpleChanges  } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppConsts } from '@shared/AppConsts';
-import { AppTransactionServiceProxy, AppPostsServiceProxy, SharingTransactionOptions, TransactionSharingDto} from '@shared/service-proxies/service-proxies';
+import { AppTransactionServiceProxy, AppPostsServiceProxy, SharingTransactionOptions, TransactionSharingDto, TenantTransactionInfo} from '@shared/service-proxies/service-proxies';
 import { filter } from 'lodash';
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
@@ -35,6 +35,7 @@ export class ShareTransactionTabComponent  extends AppComponentBase {
   messageBody:string;
   contactsToBeSharedWith:TransactionSharingDto[];
   dasableShareBtn:boolean=true;
+  @Output() onShareTransactionByMessage = new EventEmitter<TenantTransactionInfo[]>();
   constructor(
     injector: Injector,
     private _postService: AppPostsServiceProxy,
@@ -74,6 +75,7 @@ if(this.sharedWithUsers){
     if(this.sharingListForSave?.length==0&&!this.editMode)this.dasableShareBtn=true;
     if(this.sharingListForSave&&this.messageBody)this.dasableShareBtn=false;
     if(this.emailList&&this.messageBody)this.dasableShareBtn=false;
+    if(this.emailList&&this.messageBody)this.readyForSave=true
     if(this.readyForSave&&this.sharingListForSave?.length>0)this.dasableShareBtn=false;
   } 
   shareTransaction(){
@@ -102,10 +104,10 @@ if(this.sharedWithUsers){
       shareTranOptionsDto['subject']=undefined;
       this.showMainSpinner();
      this._AppTransactionServiceProxy.shareTransactionByMessage(shareTranOptionsDto).subscribe(result=>{
-      if(result){
+      if(result.result){
         this.notify.success(this.l("TransactionHasBeenSent"));
         this.closeTransPopup();
-
+         this.onShareTransactionByMessage.emit(result.tenantTransactionInfos)
       }
        this.hideMainSpinner();
         }) 

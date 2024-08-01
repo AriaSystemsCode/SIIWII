@@ -1,4 +1,6 @@
-﻿using onetouch.AppMarketplaceContact;
+using onetouch.AppSubscriptionPlans;
+using onetouch.AppSubScriptionPlan;
+using onetouch.AppMarketplaceContact;
 using onetouch.Maintainances;
 using onetouch.AppItemSelectors;
 using onetouch.SycIdentifierDefinitions;
@@ -51,12 +53,27 @@ using onetouch.AppMarketplaceItemLists;
 using onetouch.SycCurrencyExchangeRates;
 using onetouch.AppMarketplaceAccountsPriceLevels;
 using onetouch.AppMarketplaceTransactions;
+using onetouch.AppMarketplaceMessages;
 
 namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
         public virtual DbSet<AppMarketplaceAppContact> AppMarketplaceAppContacts { get; set; }
+
+        public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
+
+        public virtual DbSet<AppTenantActivitiesLog> AppTenantActivitiesLog { get; set; }
+
+        // public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLog { get; set; }
+
+        public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
+
+        public virtual DbSet<AppSubscriptionPlanHeader> AppSubscriptionPlanHeaders { get; set; }
+
+        public virtual DbSet<AppSubscriptionPlanDetail> AppSubscriptionPlanDetails { get; set; }
+
+        public virtual DbSet<AppFeature> AppFeatures { get; set; }
 
         public virtual DbSet<Maintainance> Maintainances { get; set; }
 
@@ -98,7 +115,7 @@ namespace onetouch.EntityFrameworkCore
 
         public virtual DbSet<AppItemSharing> AppItemSharings { get; set; }
 
-        public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLogs { get; set; }
+        public virtual DbSet<oldAppTenantsActivitiesLog> AppTenantsActivitiesLogs { get; set; }
 
         public virtual DbSet<AppTenantPlan> AppTenantPlans { get; set; }
 
@@ -124,6 +141,7 @@ namespace onetouch.EntityFrameworkCore
         public virtual DbSet<AppItem> AppItems { get; set; }
 
         //MMT33-2
+        public virtual DbSet<AppMarketplaceMessage> AppMarketplaceMessage { set; get; }
         public virtual DbSet<AppEntitySharings> AppEntitySharings { get; set; }
         public virtual DbSet<AppMarketplaceItems.AppMarketplaceItems> AppMarketplaceItems { get; set; }
         public virtual DbSet<AppMarketplaceItemPrices> AppMarketplaceItemPrices { get; set; }
@@ -317,7 +335,7 @@ namespace onetouch.EntityFrameworkCore
             {
                 a.HasIndex(e => new { e.TenantId });
             });
-            modelBuilder.Entity<AppTenantsActivitiesLog>(a =>
+            modelBuilder.Entity<oldAppTenantsActivitiesLog>(a =>
                        {
                            a.HasIndex(e => new { e.TenantId });
                        });

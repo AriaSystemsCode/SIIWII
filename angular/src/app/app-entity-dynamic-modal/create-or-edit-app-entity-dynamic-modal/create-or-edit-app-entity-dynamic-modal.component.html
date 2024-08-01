@@ -114,7 +114,7 @@
                                                          [(ngModel)]="extraAttr.selectedValues">
                                                        <div class="border rounded" class="w-25 " *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  " >
                                                         <input (colorPickerChange)="onColorChange($event, extraAttr)"
-                                                        *ngIf="extraAttr.name === 'Color HEXA Code' "
+                                                        *ngIf="extraAttr.name === 'Color HEXA Code' || extraAttr.name === 'Color HEX Code'"
                                                           class="picker" [(colorPicker)]="extraAttr.selectedValues"
                                                          [style.background]="extraAttr.selectedValues || '#09c' "/>
                                                        </div>

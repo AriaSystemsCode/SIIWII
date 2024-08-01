@@ -14,12 +14,16 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
 
     @Input("isCreateOrEdit") isCreateOrEdit: boolean;
     @Input("activeTab") activeTab: number;
+    @Input("currentTab") currentTab: number;
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
     @Output("showBuyer_sellerEditMode") showBuyer_sellerEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
     @Output("onshowSaveBtn") onshowSaveBtn: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output("isContactsValid") isContactsValid: EventEmitter<boolean> = new EventEmitter<boolean>()
+    
 
+    @Input("canChange")  canChange:boolean=true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy
@@ -56,7 +60,9 @@ export class ViewBuyerSellerContactInfoComponent extends AppComponentBase
         }
       });
   }
-
-
+  isContactFormValid(value) {
+    if(this.activeTab==this.shoppingCartoccordionTabs.BuyerContactInfo ||this.activeTab==this.shoppingCartoccordionTabs.SellerContactInfo)
+      this.isContactsValid.emit(value)
+  }
   
 }

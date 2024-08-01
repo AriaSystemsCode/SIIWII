@@ -18,7 +18,7 @@ namespace onetouch.AppSiiwiiTransaction
         public const int MaxEMailLength = 100;
         public const int MinCodeLength = 1;
         public const int MaxCodeLength = 50;
-        public const int MinPhoneNumberLength = 5;
+        public const int MinPhoneNumberLength =0 ;
         public const int MaxPhoneNumberLength = 20;
         public const int MinItemCodeLength = 1;
         public const int MaxItemCodeLength = 50;

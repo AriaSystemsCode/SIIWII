@@ -19,15 +19,20 @@
     box-shadow: none !important;
     //width: 300px !important;
 }
+.reply-w-direct-message{
+    position: absolute;
+    bottom: 0;
 
+}
 .MessageDialog .Header {
     // width: 534px;
     height: 41px;
-    background: #700066 0% 0% no-repeat padding-box;
-    box-shadow: 0px 3px 16px #e1e1ef41;
-    border-radius: 6px 6px 0px 0px;
+    background: #4A0D4A 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 16px rgba(225, 225, 239, 0.2549019608);
+    border-radius: 12px;
     opacity: 1;
     margin: -2px;
+    font-weight: bold;
 }
 
 .MessageDialog .Header label {
@@ -57,13 +62,13 @@
     text-decoration: underline !important;
 }
 
-.MessageDialog .sendBtn {
+ .sendBtn {
     align-items: center;
     border-radius: 4px;
     box-sizing: border-box;
-    height: 36px;
+    height: 46px;
     min-width: 80px;
-    background-color: #700066;
+    background-color: #4A0D4A; 
     color: #fff;
     border: none;
     cursor: pointer;
@@ -80,6 +85,7 @@
 .Input {
     border: none !important;
     height: 9px !important;
+    background-color: transparent !important;
 }
 .group-input {
     // height: 33px !important;
@@ -153,6 +159,7 @@
 }
 .modal-footer {
     position: unset !important;
+    justify-content: flex-end !important;
 }
 .modal-title span {
     color: #ffffff;

@@ -15,6 +15,7 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
 
   @Input("createOrEditSalesRepInfo") createOrEditSalesRepInfo: boolean;
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
   @Output("showSalesRepEditMode") showSalesRepEditMode: EventEmitter<boolean> = new EventEmitter<boolean>() 
@@ -22,6 +23,7 @@ export class ViewSalesRepInfoComponent extends AppComponentBase
   salesRepIndex = 1;
   salesReps: any[];
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input("canChange")  canChange:boolean=true;
 
   constructor(
     injector: Injector,
