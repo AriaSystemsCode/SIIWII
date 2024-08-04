@@ -10,9 +10,16 @@
     background-color: #e4e4e4;
     color: #b6b7b9;
 }
-
+.summary-sec {
+    padding-left: 30px;
+}
+.details-sec {
+    border-radius: 12px;
+}
 .imageSlides {
-    width: 50px;
+    width: 85px;
+    height: 57px;
+    border-radius: 6px 6px 0 0 ;
     margin-right :10px;
     cursor: pointer;
 }
@@ -34,7 +41,7 @@ td {
 .showRoomLink{
     width: 257px;
     height: 46px;
-    border-radius: 6px 0px 0px 0px;
+    border-radius: 6px ;
     padding: 11px 20px 11px 20px !important;
     background-color: #4A0D4A;
     color: white;
@@ -78,11 +85,15 @@ td {
 }
 
 .summary {
+    border-radius:12px ;
+
     .header {
         background-color: #F8F8F8;
         color: black;
         font-weight: bold;
         padding: 8px 12px;
+        border-top-left-radius:12px ;
+        border-top-right-radius:12px ;
     }
     .totals {
         color: black;
@@ -104,6 +115,7 @@ td {
     .orderedSummary {
         height: 500px;
         overflow-y: scroll;
+        padding: 20px;
         background-color: #fff;
         .default {
             background-color: #F8F8F8;
@@ -184,4 +196,29 @@ table th{
 }
 .summaryTables td {
     color: #9E9E9E !important;
+}
+.p-tabview .p-tabview-nav {
+    margin-bottom: 10px;
+}
+.p-tabview .p-tabview-nav li{
+    margin: 0 !important;
+    // border: none !important;
+}
+::ng-deep {
+
+.p-tabview .p-tabview-panels {
+    padding: 0 !important;
+    border: none !important;
+    margin-top: 10px !important
+}
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link{
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 4px !important;
+    border: 1px solid black;
+}
+
+.p-tabview .p-tabview-panels {
+    margin-top: 8px !important;
 }

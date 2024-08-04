@@ -50,8 +50,9 @@
                 </div>
                 <div class="p-4 row col-4">
                     <label class="pt-2 font-weight-bold purpleColor"> {{l("Status")}} </label>
-                    <div class="status ml-3 pl-4 pt-2">
-                        {{shoppingCartDetails?.entityStatusCode}}
+                    <div class="status ml-3  pt-2">
+                        <p> {{shoppingCartDetails?.entityStatusCode}}</p>
+                       
                     </div>
 
                 </div>
@@ -448,7 +449,7 @@
                 <div class="col-4  p-4">
                     <div class="row">
                         <h4 class="purpleColor font-weight-bold col-12"> {{l("Order Summary")}} </h4>
-                        <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor">
+                        <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor order-summary">
                             <div class="row w-100">
                                 <div class="col-6 font-weight-bold">{{l("TotalAmount")}}</div>
                                 <div class="font-weight-bold">{{currencySymbol}} {{shoppingCartDetails?.totalAmount   ? (shoppingCartDetails?.totalAmount | currency:' ') : '0.00' }}</div>
@@ -485,7 +486,7 @@
 
                     <ng-container *ngIf="loadNotesComp;">
 
-                        <div class="row mt-4">
+                        <div class="row mt-4 m-1">
                             <div class="col-12">
 
                                 <!-- app Notes shared component-->
@@ -497,7 +498,7 @@
                     </ng-container>
                     <div class="row mt-4">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
-                        <div class="w-100 comment-warper  h-100 summarySection p-4 ml-2 mt-3 purpleColor">
+                        <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
                             <app-comment-parent [addNewThread]="true" 
                             [cartStyle]="true" #commentParentComponent 
                             (newCommentAdded)="onGeneratOrderReport(true)">

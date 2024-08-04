@@ -5,9 +5,14 @@
 
 .summarySection {
     opacity: 1;
-    background-color: #F2F3F8;
-}
+    // background-color: #F2F3F8;
 
+}
+.order-summary {
+    border-radius: 10px;
+    background: #F8F8F8;
+
+}
 .shoppingCartAccordionTabBG {
     background: #f1f2f3;
 }
@@ -149,8 +154,51 @@ button[disabled] {
     }
 }
 
-.p-treeTable {
-    border: none !important;
+
+::ng-deep {
+    .p-treetable-thead {
+
+        br {
+            display: none !important;
+        }
+    
+    }
+    .p-accordion-tab , .p-treetable-scrollable-wrapper ,.p-treetable-thead  ,.p-treetable .p-treetable-thead > tr > th ,.p-treetable .p-treetable-tbody > tr > td{
+        border: 1px solid #E5E5E5 !important;
+        border-radius: 10px 10px 0px 0px !important;
+    }
+    .p-treetable-scrollable-header-box {
+        padding: 0 !important;
+    }
+    .p-accordion {
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 5px;
+          }
+        
+          /* Track */
+          ::-webkit-scrollbar-track {
+            background: #D9D9D9;
+          }
+        
+          /* Handle */
+          ::-webkit-scrollbar-thumb {
+        
+        background: #FFFFFF;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        border-radius: 20px;
+        border: 1px solid #D9D9D9 !important;
+        
+        
+          }
+          .p-accordion  {
+            margin-bottom: 20px !important;
+          }
+    }
+    .p-icon-wrapper {
+        position: absolute !important;
+        right: 10px !important;
+    }
 }
 
 .imgIcon {
@@ -179,10 +227,13 @@ button[disabled] {
 }
 
 .status {
-    background-color: #868995;
-    width: 104px;
+    border-radius: 4px;
+    background: #D0D0D0;
+    width: 85px;
     height: 35px;
     color: white;
+    display: flex;
+    justify-content: center;
 }
 
 input::-webkit-outer-spin-button,

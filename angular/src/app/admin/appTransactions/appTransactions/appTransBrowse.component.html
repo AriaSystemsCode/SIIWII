@@ -1,5 +1,5 @@
 ﻿<div [@routerTransition]>
-    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor transPage transBrow">
 
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
             <div class="kt-portlet kt-portlet--mobile">
@@ -8,7 +8,7 @@
                         style=" border-bottom: solid 2px #e5e2e2;">
                         <div>
 
-                            <div class="row mb-3 justify-content-between">
+                            <div class="row mb-3 ">
                                 <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                         *ngIf="showMainFiltersOptions">
@@ -55,22 +55,43 @@
                                         {{ mainFilterCtrl?.value?.displayName | localize }}
                                     </div>
                                 </div>
-                                <div class="mb-4 col-4 mb-md-0 list-toolbar-search">
+                           
+                            </div>
+                            <div class="top-sec">
+                            <div class="row justify-content-between">
+                            <div class="mb-4 col-4 mb-md-0 list-toolbar-search">
                                     <div class="form-group m-form__group align-items-center">
                                         <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button (click)="getAppTransactions()" class="searchBtn" type="submit">
+                                                    <img 
+                                                        src="../../../assets/landingPage/Search.png" />
+                                                    </button>
+                                            </span>
                                             <input [(ngModel)]="filterText" formControlName="search" autoFocus
                                                 class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
                                                 type="text" >
-                                            <span class="input-group-btn">
-                                                <button (click)="getAppTransactions()" class="searchBtn" type="submit">
-                                                    <img style="width: 30px; height: 30px"
-                                                        src="../../../assets/landingPage/Iconionic-md-search.png" /></button>
-                                            </span>
+                                         
                                         </div>
                                     </div>
                                 </div>
-                                <div class="list-toolbar-divider" *ngIf="showAddButton"></div>
-                                <div class="mb-4 mb-md-0 text-center">
+                                <div class="col-4"></div>
+                                <!-- <div class="list-toolbar-divider" *ngIf="showAddButton"></div> -->
+                          
+                                <!-- <div class="list-toolbar-divider"></div> -->
+<div class="col-4 d-flex justify-content-end">
+                                <div class="text-center mr-2">
+                                    <a style="
+                                        padding-right: 4px;
+                                        padding-left: 10px;
+                                    " [title]="'ResetData' | localize"
+                                        class="btn  font-weight-normal text-center text-primary toolbar-btn"
+                                        (click)="resetList()">
+                                        <i class="d-inline-block w-100 flaticon2-reload icon-center purpleColor"></i>
+                                    </a>
+
+                                </div>
+                                <div class="mb-3 mb-md-0 text-center">
 
                                     <ng-container *ngIf="showAddButton">
                                         <div class="btn-group" dropdown>
@@ -93,20 +114,8 @@
                                         </div>
                                     </ng-container>
                                 </div>
-                                <div class="list-toolbar-divider"></div>
-
-                                <div class="text-center">
-                                    <a style="
-                                        padding-right: 4px;
-                                        padding-left: 10px;
-                                    " [title]="'ResetData' | localize"
-                                        class="btn  font-weight-normal text-center text-primary toolbar-btn"
-                                        (click)="resetList()">
-                                        <i class="d-inline-block w-100 flaticon2-reload icon-center purpleColor"></i>
-                                    </a>
-
-                                </div>
                             </div>
+                        </div>
                             <div class="row " [hidden]="!advancedFiltersAreShown">
                                 <div class="col-md-12">
                                     <div class="kt-separator kt-separator--border-dashed"></div>
@@ -192,8 +201,8 @@
 
                             </div>
 
-                            <div class="row mb-2">
-                                <div class="col-sm-12">
+                            <div class="row mb-2 ">
+                                <div class="col-sm-12 d-flex justify-content-end">
                                     <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown"
                                         (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
                                             class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
@@ -202,6 +211,7 @@
                                             class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </form>
 

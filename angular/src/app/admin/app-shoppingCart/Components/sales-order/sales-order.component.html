@@ -208,7 +208,7 @@
                 <!-- categories -->
 
                 <!-- dates -->
-                <div class="col-md-6 my-3">
+                <div class="col-md-6 my-3 relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Entered Date</label>
                         <div class="read-only-calendar">
@@ -219,6 +219,8 @@
                                 (ngModelChange)="onChangeDate()"
                             ></p-calendar>
                             <div class="overlay"></div>
+                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+
                         </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">

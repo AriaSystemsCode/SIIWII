@@ -3,7 +3,7 @@
     overflow: hidden;
 
     .logo-name {
-        background-color: #87878a;
+        // background-color: #87878a;
         color: #fff;
         display: flex;
         align-items: center;
@@ -12,10 +12,12 @@
         height: 300px;
 
         img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
+            width: 130px;
+            height: 130px;
+            border-radius: 20px;
+            border: 2px solid #FFFFFF;
             object-fit: cover;
+
         }
     }
 
