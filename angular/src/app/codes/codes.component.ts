@@ -28,6 +28,7 @@ export class CodesComponent extends AppComponentBase implements OnInit {
   @Input() styles ;
   @Input() readonly: boolean=false ;
   @Input() classes: string="" ;
+  @Input() maxlength
 
   constructor(
     injector: Injector,
@@ -37,7 +38,7 @@ export class CodesComponent extends AppComponentBase implements OnInit {
 
   }
   OnGetCodeValue(nameInput: any) {
-    this.code = nameInput.target.value;
+    this.code = nameInput.target.value.toUpperCase();
     this.getCodeValue.emit(this.code);
   }
 

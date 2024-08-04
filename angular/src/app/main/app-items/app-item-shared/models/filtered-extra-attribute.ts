@@ -13,6 +13,7 @@ export class FilteredExtraAttribute<SelecTedValueType=any>  extends ExtraAttribu
     selectedValues?: SelecTedValueType
     isSelectedOnVariation? :boolean
     paginationSetting : PaginationSettings = new PaginationSettings()
+    displayedSelectedValues:LookupLabelDto[]
     constructor(
         data?:IFilteredExtraAttribute,
     ){

@@ -82,9 +82,11 @@
             </div>
         </div>
         <div class="align-items-center buttons-list col-2 d-flex flex-column" *ngIf="!readOnly">
-            <button class="btn btn-primary w-100" (click)="openSelectSizeScaleModal()">{{'SelectSizeScale' | localize}}</button>
-            <button class="btn btn-primary w-100" (click)="createOrEdit(false)" [disabled]="!appSizeScaleDto?.sizeScaleId">{{'SaveSizeScale' | localize}}</button>
-            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" style="background-color: #eba461 !important;
+            <button class="btn  w-100" (click)="openSelectSizeScaleModal()"  style="background-color: #4A0D4A !important; color:white !important;
+            border: none !important;">{{'SelectSizeScale' | localize}}</button>
+            <button class="btn  w-100" (click)="createOrEdit(false)" [disabled]="!appSizeScaleDto?.sizeScaleId" style="background-color: #EEEEEE !important;
+            border: none !important;">{{'SaveSizeScale' | localize}}</button>
+            <button class="btn  w-100" (click)="createOrEdit(true)" style="background-color: #eba461 !important;
             border: none !important;">{{'SaveAsNewSizeScale' | localize}}</button>
         </div>
     </div>
