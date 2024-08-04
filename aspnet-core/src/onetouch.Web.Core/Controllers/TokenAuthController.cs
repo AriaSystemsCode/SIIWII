@@ -48,6 +48,7 @@ using onetouch.Web.Common;
 using onetouch.Authorization.Delegation;
 using System.Threading;
 using Abp.Localization;
+using onetouch.AppSubScriptionPlan;
 
 namespace onetouch.Web.Controllers
 {
@@ -79,7 +80,7 @@ namespace onetouch.Web.Controllers
         private readonly AbpUserClaimsPrincipalFactory<User, Role> _claimsPrincipalFactory;
         public IRecaptchaValidator RecaptchaValidator { get; set; }
         private readonly IUserDelegationManager _userDelegationManager;
-
+        private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         public TokenAuthController(
             LogInManager logInManager,
             ITenantCache tenantCache,
@@ -102,7 +103,7 @@ namespace onetouch.Web.Controllers
             ISettingManager settingManager,
             IJwtSecurityStampHandler securityStampHandler,
             AbpUserClaimsPrincipalFactory<User, Role> claimsPrincipalFactory, 
-            IUserDelegationManager userDelegationManager)
+            IUserDelegationManager userDelegationManager, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService)
         {
             _logInManager = logInManager;
             _tenantCache = tenantCache;
@@ -127,6 +128,7 @@ namespace onetouch.Web.Controllers
             _claimsPrincipalFactory = claimsPrincipalFactory;
             RecaptchaValidator = NullRecaptchaValidator.Instance;
             _userDelegationManager = userDelegationManager;
+            _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
         }
 
         [HttpPost]
@@ -273,6 +275,7 @@ namespace onetouch.Web.Controllers
         {
             if (AbpSession.UserId != null)
             {
+                await _appTenantActivitiesLogAppService.AddUsageActivityLog("User Logged out", "User Logged out",null,null,null,null, 0);
                 var tokenValidityKeyInClaims = User.Claims.First(c => c.Type == AppConsts.TokenValidityKey);
                 await _userManager.RemoveTokenValidityKeyAsync(_userManager.GetUser(AbpSession.ToUserIdentifier()), tokenValidityKeyInClaims.Value);
                 _cacheManager.GetCache(AppConsts.TokenValidityKey).Remove(tokenValidityKeyInClaims.Value);

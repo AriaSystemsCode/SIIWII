@@ -1,7 +1,7 @@
 <div class="orderForm  position-relative">
     <div class="container-fluid orderInfoForm thin-scroll">
 
-        <div class="row">
+        <div class="row"  [ngClass]="showReport ?  'd-block' : 'd-none'">
             <iframe id="pdfViewer" class="w-100 pt-4" [ngStyle]="{
                 'height':
                 !loadingError ?

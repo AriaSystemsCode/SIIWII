@@ -6,6 +6,46 @@
     /// </summary>
     public static class AppPermissions
     {
+        public const string Pages_Administration_AppTenantInvoices = "Pages.Administration.AppTenantInvoices";
+        public const string Pages_Administration_AppTenantInvoices_Create = "Pages.Administration.AppTenantInvoices.Create";
+        public const string Pages_Administration_AppTenantInvoices_Edit = "Pages.Administration.AppTenantInvoices.Edit";
+        public const string Pages_Administration_AppTenantInvoices_Delete = "Pages.Administration.AppTenantInvoices.Delete";
+
+        public const string Pages_Administration_AppTenantActivitiesLog = "Pages.Administration.AppTenantActivitiesLog";
+        public const string Pages_Administration_AppTenantActivitiesLog_Create = "Pages.Administration.AppTenantActivitiesLog.Create";
+        public const string Pages_Administration_AppTenantActivitiesLog_Edit = "Pages.Administration.AppTenantActivitiesLog.Edit";
+        public const string Pages_Administration_AppTenantActivitiesLog_Delete = "Pages.Administration.AppTenantActivitiesLog.Delete";
+
+        public const string Pages_AppTenantActivitiesLog = "Pages.AppTenantActivitiesLog";
+        public const string Pages_AppTenantActivitiesLog_Create = "Pages.AppTenantActivitiesLog.Create";
+        public const string Pages_AppTenantActivitiesLog_Edit = "Pages.AppTenantActivitiesLog.Edit";
+        public const string Pages_AppTenantActivitiesLog_Delete = "Pages.AppTenantActivitiesLog.Delete";
+
+        public const string Pages_Administration_AppTenantSubscriptionPlans = "Pages.Administration.AppTenantSubscriptionPlans";
+        public const string Pages_Administration_AppTenantSubscriptionPlans_Create = "Pages.Administration.AppTenantSubscriptionPlans.Create";
+        public const string Pages_Administration_AppTenantSubscriptionPlans_Edit = "Pages.Administration.AppTenantSubscriptionPlans.Edit";
+        public const string Pages_Administration_AppTenantSubscriptionPlans_Delete = "Pages.Administration.AppTenantSubscriptionPlans.Delete";
+
+        public const string Pages_AppSubscriptionPlanHeaders = "Pages.AppSubscriptionPlanHeaders";
+        public const string Pages_AppSubscriptionPlanHeaders_Create = "Pages.AppSubscriptionPlanHeaders.Create";
+        public const string Pages_AppSubscriptionPlanHeaders_Edit = "Pages.AppSubscriptionPlanHeaders.Edit";
+        public const string Pages_AppSubscriptionPlanHeaders_Delete = "Pages.AppSubscriptionPlanHeaders.Delete";
+
+        public const string Pages_Administration_AppSubscriptionPlanDetails = "Pages.Administration.AppSubscriptionPlanDetails";
+        public const string Pages_Administration_AppSubscriptionPlanDetails_Create = "Pages.Administration.AppSubscriptionPlanDetails.Create";
+        public const string Pages_Administration_AppSubscriptionPlanDetails_Edit = "Pages.Administration.AppSubscriptionPlanDetails.Edit";
+        public const string Pages_Administration_AppSubscriptionPlanDetails_Delete = "Pages.Administration.AppSubscriptionPlanDetails.Delete";
+
+        public const string Pages_Administration_AppFeatures = "Pages.Administration.AppFeatures";
+        public const string Pages_Administration_AppFeatures_Create = "Pages.Administration.AppFeatures.Create";
+        public const string Pages_Administration_AppFeatures_Edit = "Pages.Administration.AppFeatures.Edit";
+        public const string Pages_Administration_AppFeatures_Delete = "Pages.Administration.AppFeatures.Delete";
+
+        public const string Pages_Administration_SycCurrencyExchangeRates = "Pages.Administration.SycCurrencyExchangeRates";
+        public const string Pages_Administration_SycCurrencyExchangeRates_Create = "Pages.Administration.SycCurrencyExchangeRates.Create";
+        public const string Pages_Administration_SycCurrencyExchangeRates_Edit = "Pages.Administration.SycCurrencyExchangeRates.Edit";
+        public const string Pages_Administration_SycCurrencyExchangeRates_Delete = "Pages.Administration.SycCurrencyExchangeRates.Delete";
+
         public const string Pages_Administration_Maintainances = "Pages.Administration.Maintainances";
         public const string Pages_Administration_Maintainances_Create = "Pages.Administration.Maintainances.Create";
         public const string Pages_Administration_Maintainances_Edit = "Pages.Administration.Maintainances.Edit";
@@ -125,7 +165,7 @@
         public const string Pages_AppItems_EditListing = "Pages.AppItems.EditListing";
         public const string Pages_AppItems_DeleteListing = "Pages.AppItems.DeleteListing";
         public const string Pages_AppItems_Publish = "Pages.AppItems.Publish";
-        
+
         public const string Pages_AppSiiwiiTransactions = "Pages.AppSiiwiiTransactions";
 
         public const string Pages_Accounts = "Pages.Accounts";

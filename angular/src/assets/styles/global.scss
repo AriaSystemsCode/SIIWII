@@ -72,6 +72,9 @@ body {
 .swal-icon {
     margin-left: 40% !important;
 }
+.swal2-container.swal2-center {
+    z-index: 99999999;
+}
 
 .carouselChangePosArrow .carousel-inner,
 .carouselChangePosArrow .item carousel-item,
@@ -651,3 +654,6 @@ border: 1px solid #4A0D4A !important;
 
 
 
+.p-datepicker:not(.p-datepicker-inline) {
+    z-index: 2000 !important;
+}

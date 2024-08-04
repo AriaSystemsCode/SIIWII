@@ -18,17 +18,8 @@
             </div>
             <div class="col-md-6 bg-white details-sec">
                 <div class="details mx-3 d-flex flex-column">
-                  
-                    <div
-                        class="ssin_price my-3  align-items-center justify-content-between"
-                    >
-                        <div class="d-flex mb-3 justify-content-between">
-
-                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
-                                {{ productDetails?.manufacturerCode }}
-                            </h5>
-                      
-                               <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData.sellerSSIN"
+                    <div class="d-flex mb-3">
+                    <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
                     >
                         <a
                             style="text-decoration: none"
@@ -37,9 +28,14 @@
                             >Visit the vitrual showroom</a
                         >
                     </button>
-                        </div>
-                        <div class="product-name mb-2 d-flex">
-                            <h3 style="color: black !important; margin-right: 10px;">{{ productDetails?.name }}</h3>
+                    </div>
+                    <div
+                        class="ssin_price align-items-center justify-content-between"
+                    >
+                        <div class="d-flex mb-3">
+                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
+                                {{ productDetails?.manufacturerCode }}
+                            </h5>
                             <h6 class="type ml-1">
                                 {{
                                     productDetails?.orderByPrePack === false
@@ -91,13 +87,13 @@
                                 <h5> /EAC </h5>
                             </div>
                             <div 
-                          
-                            class="msrp d-flex align-items-baseline justify-content-between"
+                            *ngIf="productDetails?.minSpecialPrice "
+                            class="msrp d-flex"
                         >
                         <div   *ngIf="productDetails?.minSpecialPrice">
                             <div class="msrp d-flex align-items-baseline ">
                             <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
-                            <h5>
+                            <h5 *ngIf="showEditSpecialPrice"> 
                                 <!-- {{
                                     productDetails?.appItemPriceInfos[0]
                                         .currencySymbol
@@ -111,7 +107,7 @@
                             <span
                                 *ngIf="
                                     productDetails?.minSpecialPrice !==
-                                    productDetails?.maxSpecialPrice
+                                    productDetails?.maxSpecialPrice && showEditSpecialPrice
                                 "
                             >
                                 -
@@ -119,8 +115,8 @@
                             <h5
                                 *ngIf="
                                 productDetails?.minSpecialPrice !==
-                                productDetails?.maxSpecialPrice
-                                "
+                                productDetails?.maxSpecialPrice  && showEditSpecialPrice"
+                                
                             >
                                 <!-- {{
                                     productDetails?.appItemPriceInfos[0]
@@ -132,7 +128,7 @@
                                     
                                 {{ productDetails?.maxSpecialPrice }}
                             </h5>
-                            <!-- <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" />
+                            <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" />
                             
                             <label class="ml-3"
                             *ngIf="!showEditSpecialPrice">
@@ -164,12 +160,14 @@
                                   </div>
                             </div>
 
-                        </label> -->
+                        </label>
 
+                        
                         </div>
-                            </div>
-                               
-                    <div class="description  ">
+                        </div>
+                    </div>
+                   
+                    <div class="description d-flex">
                         <button
                             (click)="scrollToTargetDiv()"
                             class="btn text-primary m-0 p-0"
@@ -245,7 +243,7 @@
                         <!-- color selection -->
 
                         <!-- color slider -->
-                        <div class="d-flex" *ngIf="colorsData?.length > 8">
+                        <div class="d-flex" style="height: 70px;" *ngIf="colorsData?.length > 8">
                             <button
                             (click)="slideToPreviousImage()"
                             class="mr-4 indicator-btns"
@@ -405,8 +403,15 @@
                             </tbody>
                         </table>
 
-                        <p-tabView *ngIf="productDetails?.orderByPrePack">
-                            <p-tabPanel header="Order By Prepack">
+                       
+                        <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"   class="p-4 font-weight-bold" style="color:black !important" >Order by prepack</span>
+                          <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack" class="switch switch-container my-4 font-weight-bold" >
+                            <input type="checkbox" [(ngModel)]="chk_Order_by_prepack" checked (change)="onChangechk_Order_by_prepack()">
+                            <span class="slider round"></span>
+                        </label>
+
+                        <p-tabView *ngIf="productDetails?.orderByPrePack" [activeIndex]="chk_Order_by_prepack? 0 : 1">
+                            <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack" >
                                 <table
                                     *ngIf="productDetails?.orderByPrePack"
                                     class="table text-center table-bordered table-white"
@@ -430,6 +435,7 @@
                                             </td>
                                             <td>
                                                 <p-inputNumber
+                                                [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack)"
                                                     [(ngModel)]="
                                                         colorsData[currentIndex]
                                                             ?.sizes[0]
@@ -455,7 +461,7 @@
                                     </tbody>
                                 </table>
                             </p-tabPanel>
-                            <p-tabPanel header="View Ordered Quantity By Size ">
+                            <p-tabPanel [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack)  ? 'Order By Size' : 'View Ordered Quantity By Size'" >
                                 <table
                                     class="table text-center table-bordered table-white"
                                 >
@@ -480,18 +486,15 @@
                                                 {{ size.stockAvailability }}
                                             </td>
                                             <td>
+                                                
                                                 <p-inputNumber
-                                                    [(ngModel)]="
-                                                        size.sizeRatio *
-                                                        colorsData[currentIndex]
-                                                            ?.sizes[0]
-                                                            .orderedPrePacks
-                                                    "
+                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? (size.sizeRatio * colorsData[currentIndex]?.sizes[0].orderedPrePacks) : colorsData[currentIndex]?.sizes[i].orderedPrePacks"
+                                                   
                                                     mode="decimal"
                                                     [showButtons]="true"
                                                     inputId="minmax-buttons"
                                                     [min]="0"
-                                                    [disabled]="true"
+                                                    [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack)"
                                                     (ngModelChange)="
                                                         onNumberChange(
                                                             $event,
@@ -665,18 +668,30 @@
                                                 <td>{{ size.label }}</td>
                                                 <td>
                                                     {{
-                                                        size.sizeRatio *
+                                                        !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                            size.sizeRatio *
                                                             order.color.sizes[0]
                                                                 .orderedPrePacks
+
+                                                                :  order.color.sizes[i]
+                                                                .orderedPrePacks
+
                                                     }}
                                                 </td>
                                                 <td>{{ size.price | currency:' '}}</td>
                                                 <td>
                                                     {{
-                                                        size.sizeRatio *
+                                                        !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                       ( size.sizeRatio *
                                                             order.color.sizes[0]
                                                                 .orderedPrePacks *
                                                             size.price | currency:' '
+                                                            ) 
+                                                            : (order.color.sizes[i]
+                                                            .orderedPrePacks *
+                                                        size.price | currency:' '
+                                                    )
+
                                                     }}
                                                 </td>
                                             </tr>

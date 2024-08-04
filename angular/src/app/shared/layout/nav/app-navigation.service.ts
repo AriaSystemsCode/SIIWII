@@ -63,15 +63,24 @@ export class AppNavigationService {
             // new AppMenuItem('DemoUiComponents', 'Pages.DemoUiComponents', 'flaticon-shapes', '/app/admin/demo-ui-components')
         )
         let adminMenu = new AppMenuItem('Administration', '', 'flaticon-interface-8', '', [], [])
-        if (!this.isHost) {
+        let AppSubscriptionPlanHeaders=   new AppMenuItem('Subscriptions Plan', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders')
+        let AppSubscriptionPlanDetail=  new AppMenuItem('Subscription Plan Details', 'Pages.Administration.AppSubscriptionPlanDetails', 'flaticon-more', '/app/admin/appSubScriptionPlan/appSubscriptionPlanDetails')
+        let AppTenantSubscriptionPlan = new AppMenuItem('Tenant Subscription Plans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans')
+        let AppTenantActivityLog = new AppMenuItem('Tenant Activities Log', '', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantActivitiesLog')
+
+            if (!this.isHost) {
             adminMenu.items.push(
                 new AppMenuItem('AccountProfile', 'Pages.Accounts', 'flaticon-more', '/app/main/account')
             )
         }
         adminMenu.items.push(
                 // new AppMenuItem('Merge/Convert Accounts', '', 'flaticon-interface-8', '/app/main/accounts/accounts/merge-convert-accounts-tool'),
+                
+                    AppSubscriptionPlanHeaders,
+                    AppSubscriptionPlanDetail,
+                    AppTenantSubscriptionPlan,
+                    AppTenantActivityLog,
                 new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [
-                new AppMenuItem('AppTenantsActivitiesLog', 'Pages.Administration.AppTenantsActivitiesLogs', 'flaticon-more', '/app/admin/appTenantsActivitiesLogs/appTenantsActivitiesLogs'),
                 new AppMenuItem('AppTenantPlans', 'Pages.Administration.AppTenantPlans', 'flaticon-more', '/app/admin/appTenantPlans/appTenantPlans'),
                 new AppMenuItem('AppTransactions', 'Pages.Administration.AppTransactions', 'flaticon-more', '/app/admin/appTransactions/appTransactions'),
                 new AppMenuItem('SycPlanServices', 'Pages.Administration.SycPlanServices', 'flaticon-more', '/app/admin/sycPlanServices/sycPlanServices'),
@@ -83,6 +92,17 @@ export class AppNavigationService {
             new AppMenuItem('OrganizationUnits', 'Pages.Administration.OrganizationUnits', 'flaticon-map', '/app/admin/organization-units'),
             new AppMenuItem('Roles', 'Pages.Administration.Roles', 'flaticon-suitcase', '/app/admin/roles'),
             new AppMenuItem('Users', 'Pages.Administration.Users', 'flaticon-users', '/app/admin/users'),
+            new AppMenuItem('SycCurrencyExchangeRates', 'Pages.Administration.SycCurrencyExchangeRates', 'flaticon-more', '/app/admin/sycCurrencyExchangeRates/sycCurrencyExchangeRates'),
+            
+            new AppMenuItem('AppTenantInvoices', 'Pages.Administration.AppTenantInvoices', 'flaticon-more', '/app/admin/appSubscriptionPlans/appTenantInvoices'),
+            
+
+            
+            //new AppMenuItem('AppTenantSubscriptionPlans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans'),
+            
+            
+            new AppMenuItem('AppFeatures', 'Pages.Administration.AppFeatures', 'flaticon-more', '/app/admin/appSubScriptionPlan/appFeatures'),
+            
             new AppMenuItem('Maintainances', 'Pages.Administration.Maintainances', 'flaticon-more', '/app/admin/maintainances/maintainances'),
             
             new AppMenuItem('SycIdentifierDefinitions', 'Pages.Administration.SycIdentifierDefinitions', 'flaticon-more', '/app/admin/sycIdentifierDefinitions/sycIdentifierDefinitions'),

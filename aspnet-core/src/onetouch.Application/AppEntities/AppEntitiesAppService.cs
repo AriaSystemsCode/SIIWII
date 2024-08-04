@@ -852,6 +852,10 @@ namespace onetouch.AppEntities
 
                 entity.ObjectId = input.ObjectId;
                 entity.EntityObjectStatusId = input.EntityObjectStatusId;
+                
+                if (entity.EntityObjectStatusId == null)
+                    entity.EntityObjectStatusCode = null;
+
                 entity.EntityObjectTypeId = input.EntityObjectTypeId;
                 entity.Name = input.Name;
                 entity.Code = input.Code;

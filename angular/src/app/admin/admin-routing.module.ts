@@ -1,5 +1,18 @@
 ﻿import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { SycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/sycCurrencyExchangeRates.component';
+import { CreateOrEditSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/create-or-edit-sycCurrencyExchangeRates.component';
+import { ViewSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/view-sycCurrencyExchangeRates.component';
+import { AppTenantInvoicesComponent } from './appSubscriptionPlans/appTenantInvoices/appTenantInvoices.component';
+import { CreateOrEditAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/create-or-edit-appTenantInvoice.component';
+import { ViewAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/view-appTenantInvoice.component';
+import { AppTenantActivitiesLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/appTenantActivitiesLog.component';
+import { CreateOrEditAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/create-or-edit-appTenantActivityLog.component';
+import { ViewAppTenantActivityLogComponent } from './appSubScriptionPlan/appTenantActivitiesLog/view-appTenantActivityLog.component';
+import { AppSubscriptionPlanDetailsComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetails.component';
+import { AppFeaturesComponent } from './appSubScriptionPlan/appFeatures/appFeatures.component';
+import { CreateOrEditAppFeatureComponent } from './appSubScriptionPlan/appFeatures/create-or-edit-appFeature.component';
+import { ViewAppFeatureComponent } from './appSubScriptionPlan/appFeatures/view-appFeature.component';
 import { MaintainancesComponent } from './maintainances/maintainances/maintainances.component';
 import { SycIdentifierDefinitionsComponent } from './sycIdentifierDefinitions/sycIdentifierDefinitions/sycIdentifierDefinitions.component';
 import { SycSegmentIdentifierDefinitionsComponent } from './sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions.component';
@@ -9,7 +22,6 @@ import { CreateOrEditAppAdvertisementComponent } from './appAdvertisements/appAd
 import { ViewAppAdvertisementComponent } from './appAdvertisements/appAdvertisements/view-appAdvertisement.component';
 import { TicketNotesComponent } from './autoTaskTicketNotes/ticketNotes/ticketNotes.component';
 import { TicketsComponent } from './autoTaskTickets/tickets/tickets.component';
-import { AppTenantsActivitiesLogsComponent } from './appTenantsActivitiesLogs/appTenantsActivitiesLogs/appTenantsActivitiesLogs.component';
 import { AppTenantPlansComponent } from './appTenantPlans/appTenantPlans/appTenantPlans.component';
 import { AppTransactionsComponent } from './appTransactions/appTransactions/appTransactions.component';
 import { AppTransactionsBrowseComponent } from './appTransactions/appTransactions/appTransBrowse.component';
@@ -37,6 +49,9 @@ import { UsersComponent } from './users/users.component';
 import { WebhookSubscriptionComponent } from './webhook-subscription/webhook-subscription.component';
 import { WebhookSubscriptionDetailComponent } from './webhook-subscription/webhook-subscription-detail.component';
 import { WebhookEventDetailComponent } from './webhook-subscription/webhook-event-detail.component';
+import { AppTenantSubscriptionPlansComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/appTenantSubscriptionPlans.component';
+import { CreateOrEditAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
+import { ViewAppTenantSubscriptionPlanComponent } from './appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
 // import { DynamicParameterComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter.component';
 // import { DynamicParameterDetailComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-detail.component';
 // import { EntityDynamicParameterComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter.component';
@@ -49,6 +64,22 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
             {
                 path: '',
                 children: [
+                    { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates', component: SycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates' }  },
+                    { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates/createOrEdit', component: CreateOrEditSycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates.Create' }  },
+                    { path: 'sycCurrencyExchangeRates/sycCurrencyExchangeRates/view', component: ViewSycCurrencyExchangeRatesComponent, data: { permission: 'Pages.Administration.SycCurrencyExchangeRates' }  },
+                    { path: 'appSubscriptionPlans/appTenantInvoices', component: AppTenantInvoicesComponent, data: { permission: 'Pages.Administration.AppTenantInvoices' }  },
+                    { path: 'appSubscriptionPlans/appTenantInvoices/createOrEdit', component: CreateOrEditAppTenantInvoiceComponent, data: { permission: 'Pages.Administration.AppTenantInvoices.Create' }  },
+                    { path: 'appSubscriptionPlans/appTenantInvoices/view', component: ViewAppTenantInvoiceComponent, data: { permission: 'Pages.Administration.AppTenantInvoices' }  },
+                    { path: 'appSubScriptionPlan/appTenantActivitiesLog', component: AppTenantActivitiesLogComponent  },
+                    { path: 'appSubScriptionPlan/appTenantActivitiesLog/createOrEdit', component: CreateOrEditAppTenantActivityLogComponent   },
+                    { path: 'appSubScriptionPlan/appTenantActivitiesLog/view', component: ViewAppTenantActivityLogComponent  },
+                    { path: 'appSubScriptionPlan/appSubscriptionPlanDetails', component: AppSubscriptionPlanDetailsComponent, data: { permission: 'Pages.Administration.AppSubscriptionPlanDetails' }  },
+                    { path: 'appSubScriptionPlan/appTenantSubscriptionPlans', component: AppTenantSubscriptionPlansComponent, data: { permission: 'Pages.Administration.AppTenantSubscriptionPlans' }  },
+                    { path: 'appSubScriptionPlan/appTenantSubscriptionPlans/createOrEdit', component: CreateOrEditAppTenantSubscriptionPlanComponent },
+                    { path: 'appSubScriptionPlan/appTenantSubscriptionPlans/view', component: ViewAppTenantSubscriptionPlanComponent, data: { permission: 'Pages.Administration.AppTenantSubscriptionPlans' }  },
+                    { path: 'appSubScriptionPlan/appFeatures', component: AppFeaturesComponent, data: { permission: 'Pages.Administration.AppFeatures' }  },
+                    { path: 'appSubScriptionPlan/appFeatures/createOrEdit', component: CreateOrEditAppFeatureComponent, data: { permission: 'Pages.Administration.AppFeatures.Create' }  },
+                    { path: 'appSubScriptionPlan/appFeatures/view', component: ViewAppFeatureComponent, data: { permission: 'Pages.Administration.AppFeatures' }  },
                     { path: 'maintainances/maintainances', component: MaintainancesComponent, data: { permission: 'Pages.Administration.Maintainances' }  },
                     { path: 'sycIdentifierDefinitions/sycIdentifierDefinitions', component: SycIdentifierDefinitionsComponent, data: { permission: 'Pages.Administration.SycIdentifierDefinitions' }  },
                     { path: 'sycSegmentIdentifierDefinitions/sycSegmentIdentifierDefinitions', component: SycSegmentIdentifierDefinitionsComponent, data: { permission: 'Pages.Administration.SycSegmentIdentifierDefinitions' }  },
@@ -56,7 +87,7 @@ import { WebhookEventDetailComponent } from './webhook-subscription/webhook-even
                     { path: 'appAdvertisements/appAdvertisements', component: AppAdvertisementsComponent, data: { permission: 'Pages.Administration.AppAdvertisements' }  },
                     { path: 'appAdvertisements/appAdvertisements/createOrEdit', component: CreateOrEditAppAdvertisementComponent, data: { permission: 'Pages.Administration.AppAdvertisements.Create' }  },
                     { path: 'appAdvertisements/appAdvertisements/view', component: ViewAppAdvertisementComponent, data: { permission: 'Pages.Administration.AppAdvertisements' }  },
-                    { path: 'appTenantsActivitiesLogs/appTenantsActivitiesLogs', component: AppTenantsActivitiesLogsComponent, data: { permission: 'Pages.Administration.AppTenantsActivitiesLogs' }  },
+                   { path: 'appTenantsActivitiesLogs/appTenantsActivitiesLogs', component: AppTenantActivitiesLogComponent , data: { permission: 'Pages.Administration.AppTenantsActivitiesLogs' }  },
                     { path: 'appTenantPlans/appTenantPlans', component: AppTenantPlansComponent, data: { permission: 'Pages.Administration.AppTenantPlans' }  },
                     { path: 'appTransactions/appTransactions', component: AppTransactionsComponent, data: { permission: 'Pages.Administration.AppTransactions' }  },
                     { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent , data: { permission: 'Pages.AppSiiwiiTransactions' } } ,

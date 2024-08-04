@@ -156,7 +156,7 @@
                                         [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
-                                        (ontabChange)="ontabChange($event)"
+                                        (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
                                         [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"
                                         (generatOrderReport)="onGeneratOrderReport($event)"
                                         [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
@@ -425,8 +425,8 @@
                             </div>
                         </p-accordionTab>
                         <!-- order Preview tab -->
-                        <p-accordionTab class="shoppingCartAccordionTabBG"
-                            *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" 
+                            *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
@@ -436,7 +436,6 @@
                                 <app-order-preview 
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     [transactionFormPath]="transactionFormPath"
-                                    [orderConfirmationFile]="orderConfirmationFile"
                                     [orderId]="orderId"></app-order-preview>
                             </ng-template>
                         </p-accordionTab>
@@ -494,9 +493,9 @@
                             </div>
 
                         </div>
-
                     </ng-container>
-                    <div class="row mt-4">
+                    <div class="row mt-4" 
+                    [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                         <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
                             <app-comment-parent [addNewThread]="true" 
