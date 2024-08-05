@@ -6,7 +6,21 @@
     background-color: #f5f5f5 ;
     color: #707070 ;
 }
+@media only screen and (min-width: 992px) {
+    .search-in {
+width: 380px !important;
+    }
+}
+@media only screen and (max-width: 992px) {
+    .search-in {
+width: 200px !important;
+    }
+}
 
+@media only screen and (min-width: 576px) {
+    .app-seller {
+        margin-top: 70px;
+    }
 .web {
     display: block;
 }
@@ -14,10 +28,14 @@
 .mobile {
     display: none;
 }
+}
 ::ng-deep{
     .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
         background:  #4A0D4A !important;
     
+    }  
+    .p-inputswitch.p-focus .p-inputswitch-slider {
+        box-shadow: none !important;
     }
     .p-dropdown {
         border: 2px solid #D9D9D9 !important;
@@ -28,7 +46,10 @@
     }
 }
 
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 576px) {
+    .app-seller {
+        margin-top: 70px;
+    }
     .web {
         display: none !important;
     }

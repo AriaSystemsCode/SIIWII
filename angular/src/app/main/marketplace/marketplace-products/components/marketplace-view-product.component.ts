@@ -156,6 +156,9 @@ export class MarketplaceViewProductComponent
                     )
                     .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
                         this.productDetails = res.appItem;
+                        
+                        console.log(this.productDetails,'helllllooooo')
+                        console.log(this.orderSummary,'orderSummary')
                         this.updatedSpecialPrice = this.productDetails.minSpecialPrice;
                         this.productDetails?.minMSRP % 1 == 0 ? this.productDetails.minMSRP = Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2) : null;
                         this.productDetails?.maxMSRP % 1 == 0 ? this.productDetails.maxMSRP = Math.round(this.productDetails.maxMSRP * 100 / 100).toFixed(2) : null;

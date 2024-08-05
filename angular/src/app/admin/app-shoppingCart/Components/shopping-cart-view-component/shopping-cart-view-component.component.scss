@@ -229,8 +229,9 @@ button[disabled] {
 .status {
     border-radius: 4px;
     background: #D0D0D0;
-    width: 85px;
-    height: 35px;
+    width: 50px;
+    height: 30px;
+    font-weight: 600;
     color: white;
     display: flex;
     justify-content: center;
@@ -329,5 +330,89 @@ input.ng-invalid.ng-touched {
     height: 95vh;
 }
 
+// handle responsive screens
 
+@media only screen and (max-width: 992px) {
+    .web {
+        display: none;
+    }
+    .tablet {
+        display: block;
+        .tabview-custom {
+   
+       
+           }
+    }
 
+}
+::ng-deep .tablet {
+    .p-tabview .p-tabview-nav li {
+        border-radius: 0 !important;
+        border: 0.5px solid #eee !important;
+
+    }
+    .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        background-color: white !important; 
+        color: #777 !important;
+        border-bottom: 1px solid #eee !important;
+        border-radius: 0 !important;
+        padding: 10px 20px;
+         width: 175px  !important;
+         height: 100px !important;
+         .tab-header {
+            background-color: #4A0D4A !important;
+            border-radius: 6px !important;
+            color: white !important;
+            padding: 5px !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            svg {
+                fill: #fff !important;
+            }
+        }
+    }
+    .tab-header{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 82px;
+        height: 82px;
+    }
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+        box-shadow: none !important;
+    }
+    .p-tabview-nav-link {
+        border-top: none !important;
+        border-left: none !important;
+        border-width: 1px !important;
+        border-color: #c8c8c8 !important;
+         background: #FFF !important;
+        color: #777 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        font-size: 14px !important;
+        width: 175px  !important;
+        border-right: 1px solid #eee !important ;
+        border-bottom: 1px solid #eee !important ;
+        height: 99px !important;
+        align-items: center !important;
+        fill:#777777 !important;
+        svg{
+            fill: #777 !important;
+
+        }
+    }
+    .p-accordion {
+        padding: 12px !important;
+    }
+
+}
+@media only screen and (min-width: 992px) {
+    .web {
+        display: flex;
+    }
+    .tablet {
+        display: none;
+    }
+}
