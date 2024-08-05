@@ -2008,7 +2008,7 @@ namespace onetouch.AppItems
             appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
             if (string.IsNullOrEmpty(appItem.SSIN))
             {
-                appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(entity));
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
@@ -2318,7 +2318,7 @@ namespace onetouch.AppItems
                     appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appItemChild.SSIN))
                     {
-                        appItemChild.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        appItemChild.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(childEntity));
                         childEntity.SSIN = appItemChild.SSIN;
                     }
                     childEntity.TenantOwner = appItemChild.TenantOwner;
@@ -5688,7 +5688,7 @@ namespace onetouch.AppItems
                 }
                 if (string.IsNullOrEmpty(appItem.SSIN))
                 {
-                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appItem.EntityFk));
                     appItem.EntityFk.SSIN = appItem.SSIN;
                 }
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
@@ -5758,7 +5758,7 @@ namespace onetouch.AppItems
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 if (string.IsNullOrEmpty(appItem.SSIN))
                 {
-                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appItem.EntityFk));
                     appItem.EntityFk.SSIN = appItem.SSIN;
                 }
                 appItem.EntityFk.TenantOwner = appItem.TenantOwner;
@@ -6470,7 +6470,7 @@ namespace onetouch.AppItems
                     appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appChildItem.SSIN))
                     {
-                        appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appChildItem.EntityFk));
                         appChildItem.EntityFk.SSIN = appItem.SSIN;
                     }
                     appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;
