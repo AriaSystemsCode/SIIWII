@@ -358,6 +358,7 @@ export class CreateEditAppItemVariationsComponent
 
     async getNeededDataForEditMode() {
         // get extraatributes data by product type id
+        this.showMainSpinner();
         await this.getItemTypeDataAndExtraAttributes();
         this.deepCloneVariations();
 
@@ -386,6 +387,8 @@ export class CreateEditAppItemVariationsComponent
 
         if(this.extraVariations?.length>0)
         this.handleAttrChange(this.extraVariations[0]?.id)
+
+        this.hideMainSpinner();
     }
 
     deepCloneVariations() {
@@ -478,6 +481,7 @@ export class CreateEditAppItemVariationsComponent
 
     }
     async getItemTypeDataAndExtraAttributes() {
+        this.showMainSpinner();
         return new Promise(async (resolve, reject) => {
             this.extraAttributes =
                 this._extraAttributeDataService.getIsVariationFilteredAttributes(
@@ -497,6 +501,7 @@ export class CreateEditAppItemVariationsComponent
             });
             let responses = await Promise.all(requests);
             console.log(">> size", responses);
+            this.showMainSpinner();
             this.siwiSizes = responses[1];
             if (responses) {
                 this.extraAttributes.forEach((extraAttr, index) => {
@@ -507,10 +512,13 @@ export class CreateEditAppItemVariationsComponent
                 });
                 this.tempAddNewAttributes()
                 resolve(true);
+                this.hideMainSpinner()
             } else {
                 reject(false);
                 this.notify.error(this.l("FailedToGetAttibutesValues"));
+                this.hideMainSpinner()
             }
+            this.hideMainSpinner();
         });
     }
     getUniqueId = function(uniqueTempIds : Set<number>) : number { 
@@ -574,7 +582,7 @@ export class CreateEditAppItemVariationsComponent
     }
 
     saveExtraAtrributeSelection() {
-
+this.showMainSpinner();
         const oldVariations = this.variationMatrices;
         this.editVariationsOpend=false;
         if(!this.appItem?.id)
@@ -622,7 +630,7 @@ export class CreateEditAppItemVariationsComponent
             } 
             return var_
         })
-        this.showMainSpinner();
+        
 
         this._appItemsServiceProxy
             .getVariationsCodes(
@@ -645,6 +653,7 @@ export class CreateEditAppItemVariationsComponent
                 this.primengTableHelper.records = response;
             //    this.selectedVaritaions = [...this.primengTableHelper.records];
                 this.variationMatrices = response;
+                
 
                 if(this.appItem?.id)
                 this.getExistingVariations()
@@ -702,7 +711,7 @@ export class CreateEditAppItemVariationsComponent
                     varRow.entityExtraData.filter(
                         (extrData) =>
                             extrData.attributeId ==
-                            this.defaultExtraAttrForAttachments.attributeId
+                            this.defaultExtraAttrForAttachments?.attributeId
                     )[0];
                 if (currentRowDefaultAttachmentEntityExtraData) {
                     varRow.entityAttachments =
@@ -717,23 +726,23 @@ export class CreateEditAppItemVariationsComponent
         }
         if (
             newVariationsExtraAttrs?.includes(
-                this.defaultExtraAttrForAttachments.attributeId
+                this.defaultExtraAttrForAttachments?.attributeId
             )
         ) {
             const oldAttachmentObject =
-                this.defaultExtraAttrForAttachments.selectedValuesAttachments;
+                this.defaultExtraAttrForAttachments?.selectedValuesAttachments;
             this.defaultExtraAttrForAttachments.selectedValuesAttachments = {};
             let attachmentObj: { [key: number]: IVaritaionAttachment } =
-                this.defaultExtraAttrForAttachments.selectedValuesAttachments;
+                this.defaultExtraAttrForAttachments?.selectedValuesAttachments;
             (
-                this.defaultExtraAttrForAttachments.selectedValues as number[]
+                this.defaultExtraAttrForAttachments?.selectedValues as number[]
             ).forEach((elem) => {
                 // this.defaultExtraAttrForAttachments = selectedExtraAttr[currentExtraDataIndex]
                 if (oldAttachmentObject[elem]) {
                     attachmentObj[elem] = oldAttachmentObject[elem];
                 } else {
                     let selectedValue: SelectItem =
-                        this.defaultExtraAttrForAttachments.lookupData.filter(
+                        this.defaultExtraAttrForAttachments?.lookupData.filter(
                             (item) => item.value == elem
                         )[0];
                     attachmentObj[elem] = {
@@ -977,7 +986,7 @@ export class CreateEditAppItemVariationsComponent
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
         att.index = index;
         att.fileName = file.name;
-        let extraAttrId = this.defaultExtraAttrForAttachments.attributeId;
+        let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
        // let optionValue = this.activeAttachmentOption.lookupData.value;
        let optionValue;
        if('code' in  this.activeAttachmentOption?.lookupData)
@@ -1219,7 +1228,23 @@ export class CreateEditAppItemVariationsComponent
                     VariationItemDto.fromJS(___varitation);
                     
             // const curentItem=oldAttributes.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0];
-             const curentItem=oldAttributes.filter((record)=>newVariation.code.replace(/\s+/g, '').replace(/-0+/g, '').includes(record.code.replace(/\s+/g, '').replace(/-0+/g, '')))[0];
+            let curentItem;
+            let repCode = newVariation;
+             if(!this.appItem?.id) {
+                curentItem = this.variationMatrices.filter((record) => {
+                const repCodeNormalized = repCode.code.replace(/\s+/g, '').replace(/-0+/g, '');
+                const recordNormalized = record.code.replace(/\s+/g, '').replace(/-0+/g, '');
+                return repCodeNormalized.includes(recordNormalized);
+            })[0];
+            }
+            else{
+                curentItem = oldAttributes.filter((record) => {
+                    const repCodeNormalized = repCode.code.replace(/\s+/g, '').replace(/-0+/g, '');
+                    const recordNormalized = record.code.replace(/\s+/g, '').replace(/-0+/g, '');
+                    return repCodeNormalized.includes(recordNormalized);
+                })[0];
+            }
+
              if(curentItem?.stockAvailability>0){
                 newVariation.stockAvailability=curentItem.stockAvailability;
             }
@@ -1243,10 +1268,10 @@ export class CreateEditAppItemVariationsComponent
                     )[0];
 
                     if(!attrOptionData)
-                    attrOptionData=currentExtraAttr.displayedSelectedValues.filter( (item) => item.value== attrId)[0]
+                    attrOptionData=currentExtraAttr.displayedSelectedValues?.filter( (item) => item.value== attrId)[0]
 
                     if(!attrOptionData)
-                    attrOptionData=currentExtraAttr.displayedSelectedValues.filter( (item) => item.code== attrId)[0];
+                    attrOptionData=currentExtraAttr.displayedSelectedValues?.filter( (item) => item.code== attrId)[0];
 
                     
                     createNewVariation(
@@ -1442,7 +1467,7 @@ export class CreateEditAppItemVariationsComponent
 
     updateVaritaionAttachments() {
         let defaultExtraAttrId =
-            this.defaultExtraAttrForAttachments.attributeId;
+            this.defaultExtraAttrForAttachments?.attributeId;
 
         this.variationAttachmentsSrcs = [];
 
@@ -1463,7 +1488,7 @@ export class CreateEditAppItemVariationsComponent
                     extraAttrValue.attributeValueId;
 
              currentOptionAttachments =
-                this.defaultExtraAttrForAttachments.selectedValuesAttachments[
+                this.defaultExtraAttrForAttachments?.selectedValuesAttachments[
                     optionValue
                 ];
             }
@@ -1471,13 +1496,13 @@ export class CreateEditAppItemVariationsComponent
                 optionValue=this.defaultExtraAttrForAttachments?.lookupData?.find(x=>x.code==extraAttrValue.attributeCode)?.value;
 
              currentOptionAttachments =
-                this.defaultExtraAttrForAttachments.selectedValuesAttachments
+                this.defaultExtraAttrForAttachments?.selectedValuesAttachments
                 [
                     optionValue
                 ];
             }
             // if(!currentOptionAttachments) {
-            //     this.defaultExtraAttrForAttachments.selectedValuesAttachments[optionValue] = {
+            //     this.defaultExtraAttrForAttachments?.selectedValuesAttachments[optionValue] = {
             //         attachmentSrcs : [""],
             //         entityAttachments : [],
             //         defaultImageIndex : -1,
@@ -1732,13 +1757,13 @@ export class CreateEditAppItemVariationsComponent
                 (elem) => elem.defaultForAttachment
             )[0];
         let firstValueSelected =
-            this.defaultExtraAttrForAttachments.selectedValues[0];
+            this.defaultExtraAttrForAttachments?.selectedValues[0];
         this.activeAttachmentOption =
-            this.defaultExtraAttrForAttachments.selectedValuesAttachments[
+            this.defaultExtraAttrForAttachments?.selectedValuesAttachments[
                 firstValueSelected
             ];
 
-            this.firstAttachSelection= this.defaultExtraAttrForAttachments.selectedValuesAttachments[firstValueSelected];
+            this.firstAttachSelection= this.defaultExtraAttrForAttachments?.selectedValuesAttachments[firstValueSelected];
                 
          this.updateVaritaionAttachments();
         this.showVariationPhotos = true;
@@ -1938,7 +1963,7 @@ export class CreateEditAppItemVariationsComponent
                extraAttr.lookupData.push(...this.appItem.nonLookupValues);
                 extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
                 //this.appItem.nonLookupValues?.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
-                extraAttr.displayedSelectedValues.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
+                extraAttr.displayedSelectedValues?.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
 
             }
             if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
@@ -1955,7 +1980,7 @@ export class CreateEditAppItemVariationsComponent
 
 
             if(search){
-            extraAttr.displayedSelectedValues= extraAttr.displayedSelectedValues.filter((item) => {  
+            extraAttr.displayedSelectedValues= extraAttr.displayedSelectedValues?.filter((item) => {  
                   const itemLabel = (item.label as string)?.trim().toLowerCase();  
                     const searchValue = (search ?? '').trim().toLowerCase();   
                      return itemLabel.includes(searchValue);}
@@ -2243,7 +2268,7 @@ export class CreateEditAppItemVariationsComponent
              
              let  extraAttr =
              this.selectedExtraAttributes[this.activeExtraAttributeIndex];
-             let y = extraAttr.displayedSelectedValues.filter(x=>x.code==nonLookupValues.code);
+             let y = extraAttr.displayedSelectedValues?.filter(x=>x.code==nonLookupValues.code);
 
 
              if(x && x.length>0)
@@ -2280,11 +2305,11 @@ export class CreateEditAppItemVariationsComponent
         const extraAttr =
         this.selectedExtraAttributes[this.activeExtraAttributeIndex];
         if(event.value){
-        extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues.filter(item => item.value !== event.value);
+        extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues?.filter(item => item.value !== event.value);
         extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.value);
         }
         else{
-            extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues.filter(item => item.code !== event.code);
+            extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues?.filter(item => item.code !== event.code);
             extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.code);
         }
 

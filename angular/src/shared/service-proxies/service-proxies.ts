@@ -64954,6 +64954,7 @@ export interface IAppItemForEditDto {
 
 export class GetAppItemForEditOutput implements IGetAppItemForEditOutput {
     appItem!: AppItemForEditDto;
+    nonLookupValues!: LookupLabelDto[] | undefined;
 
     [key: string]: any;
 
@@ -64973,6 +64974,11 @@ export class GetAppItemForEditOutput implements IGetAppItemForEditOutput {
                     this[property] = _data[property];
             }
             this.appItem = _data["appItem"] ? AppItemForEditDto.fromJS(_data["appItem"]) : <any>undefined;
+            if (Array.isArray(_data["nonLookupValues"])) {
+                this.nonLookupValues = [] as any;
+                for (let item of _data["nonLookupValues"])
+                    this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
+            }
         }
     }
 
@@ -64990,12 +64996,18 @@ export class GetAppItemForEditOutput implements IGetAppItemForEditOutput {
                 data[property] = this[property];
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
+        if (Array.isArray(this.nonLookupValues)) {
+            data["nonLookupValues"] = [];
+            for (let item of this.nonLookupValues)
+                data["nonLookupValues"].push(item.toJSON());
+        }
         return data;
     }
 }
 
 export interface IGetAppItemForEditOutput {
     appItem: AppItemForEditDto;
+    nonLookupValues: LookupLabelDto[] | undefined;
 
     [key: string]: any;
 }
