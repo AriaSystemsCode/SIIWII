@@ -1915,7 +1915,10 @@ this.showMainSpinner();
                 name: extraAttr.name,
                 code: extraAttr.entityObjectTypeCode, //to be discussed with Farag
             },
-            selectedRecords:extraAttr.displayedSelectedValues.map(item => item.value ? item.value : item.code ),
+            selectedRecords:extraAttr.displayedSelectedValues.map(item => {
+                const codeExistsInNonLookupValues = this.appItem.nonLookupValues.some(nonLookupItem => nonLookupItem.code === item.code);
+                return codeExistsInNonLookupValues ? item.code : item.value;
+              }),
             acceptMultiValues: extraAttr.acceptMultipleValues,
             nonLookupValues:  this.appItem.nonLookupValues ? this.appItem.nonLookupValues : []
         };
@@ -2311,7 +2314,7 @@ this.showMainSpinner();
             
             if(!(this.appItem?.nonLookupValues.filter(nonLookup =>nonLookup.code==item.code)?.length >=1)) {
                 appEntity.id = item.value;
-                this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+                this.createOreEditAppEntityModal.show(entityObjectType,appEntity,false)
             }
     
             else {
@@ -2319,13 +2322,13 @@ this.showMainSpinner();
                 .subscribe((result :AppEntityDto) => {
                     appEntity=result;
                     appEntity.id = 0;
-                    this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+                    this.createOreEditAppEntityModal.show(entityObjectType,appEntity,true)
                 }); 
             }
         }
     
         else
-        this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+        this.createOreEditAppEntityModal.show(entityObjectType,appEntity,false)
     }
 
     onAddNonLookupValues($event:AppEntityDto){

@@ -96,6 +96,14 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
         this.skipCount += this.maxResultCount
         this.getAllEntityValuesList()
     }
+
+    isNonLookupValue(itemCode){
+        if(this?.nonLookupValues.filter(nonLookup =>nonLookup.code==itemCode)?.length >=1)
+        return true;
+
+        else
+        return false;
+    }
     openCreateOrEditModal(entityLookup?:LookupLabelDto) : void {
 
         let appEntity : AppEntityDto = new AppEntityDto()
@@ -103,26 +111,26 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
        // if(entityLookup.value ) {
             if(!(this?.nonLookupValues.filter(nonLookup =>nonLookup.code==entityLookup.code)?.length >=1)) {
             appEntity.id = entityLookup.value;
-            this.showCreateOreEditAppEntityModal(appEntity)
+            this.showCreateOreEditAppEntityModal(appEntity,false)
         }
 
         else {
             this._appEntitiesServiceProxy.convertAppLookupLabelDtoToEntityDto(entityLookup)
             .subscribe((result :AppEntityDto) => {
                 appEntity=result;
-                this.showCreateOreEditAppEntityModal(appEntity)
+                this.showCreateOreEditAppEntityModal(appEntity,true)
             }); 
         }
     }
 
     else
-    this.showCreateOreEditAppEntityModal(appEntity);
+    this.showCreateOreEditAppEntityModal(appEntity,false);
 
     }
 
-    showCreateOreEditAppEntityModal(appEntity) {
+    showCreateOreEditAppEntityModal(appEntity,nonlookup) {
         this.createOreEditAppEntityModal.codeIsRequired = true
-        this.createOreEditAppEntityModal.show(this.entityObjectType,appEntity)
+        this.createOreEditAppEntityModal.show(this.entityObjectType,appEntity,nonlookup)
         this.active = false
     }
 
