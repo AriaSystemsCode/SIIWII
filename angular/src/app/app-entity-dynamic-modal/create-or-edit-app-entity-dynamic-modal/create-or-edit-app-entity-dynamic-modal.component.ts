@@ -94,6 +94,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         this.appEntity.tenantId = -1;
         if (this?.appEntity?.id) {
             this.editMode = true;
+            this.addToLookup=true;
             this._appEntitiesServiceProxy
                 .getAppEntityForEdit(this.appEntity.id)
                 .subscribe((res) => {
@@ -256,6 +257,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 this.notify.info(this.l("SavedSuccessfully"));
                 if(this.wantdisplaySaveSideBar)
                 this.displaySaveSideBar = true;
+                this.saveDone.emit(true);
+                this.hide();
             });
         }
         else {
@@ -547,7 +550,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 modalRef.content;
             if (modalRefData.selectionDone)
                 extraAttr.selectedValues = modalRefData.selectedRecords;
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+           // if (!modalRef.content.isHiddenToCreateOrEdit)
+            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
     productImageCategory: GetSycAttachmentCategoryForViewDto =

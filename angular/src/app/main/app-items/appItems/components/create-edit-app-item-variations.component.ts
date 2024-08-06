@@ -2237,7 +2237,8 @@ this.showMainSpinner();
         let appEntity : AppEntityDto = new AppEntityDto()
 
         if(item){
-            if(item?.id) {
+            
+            if(!(this.appItem?.nonLookupValues.filter(nonLookup =>nonLookup.code==item.code)?.length >=1)) {
                 appEntity.id = item.value;
                 this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
             }
@@ -2297,6 +2298,17 @@ this.showMainSpinner();
         );
 
         subscription.subscribe((result) => {
+            let y=result.filter(item =>extraAttr.selectedValues?.includes(item.value));
+
+            for (let index = 0; index < y.length; index++) {
+                const element = y[index];
+                let displayedSelectedValues=extraAttr.displayedSelectedValues.find(x=>x.code==element.code)
+                displayedSelectedValues.hexaCode =element.hexaCode;
+                displayedSelectedValues.image=element.image;
+                displayedSelectedValues.label =element.label;
+                displayedSelectedValues.value   =element.value;
+            }
+           
             //extraAttr.displayedSelectedValues = result.filter(item => extraAttr.selectedValues.includes(item.value));
           });
     }
