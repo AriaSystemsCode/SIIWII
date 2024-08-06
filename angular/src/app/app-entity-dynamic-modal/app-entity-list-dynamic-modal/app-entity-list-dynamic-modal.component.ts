@@ -19,7 +19,7 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     createOrEditModalRef : BsModalRef
     allRecords : LookupLabelDto[]= []
     displayedRecords : LookupLabelDto[]= []
-    selectedRecords: number[] = []
+    selectedRecords: (string | number)[] = []
     active : boolean = false;
     loading : boolean;
     entityObjectType : { code:string, name:string }
