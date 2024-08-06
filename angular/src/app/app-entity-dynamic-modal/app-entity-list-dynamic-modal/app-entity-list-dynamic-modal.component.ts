@@ -100,7 +100,8 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
 
         let appEntity : AppEntityDto = new AppEntityDto()
         if(entityLookup){
-        if(entityLookup.value ) {
+       // if(entityLookup.value ) {
+            if(!(this?.nonLookupValues.filter(nonLookup =>nonLookup.code==entityLookup.code)?.length >=1)) {
             appEntity.id = entityLookup.value;
             this.showCreateOreEditAppEntityModal(appEntity)
         }
