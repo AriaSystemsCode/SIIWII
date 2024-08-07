@@ -46,8 +46,8 @@ namespace onetouch.AppSubscriptionPlans
                         .WhereIf(input.MinDueDateFilter != null, e => e.DueDate >= input.MinDueDateFilter)
                         .WhereIf(input.MaxDueDateFilter != null, e => e.DueDate <= input.MaxDueDateFilter)
                         .WhereIf(input.MinPayDateFilter != null, e => e.PayDate >= input.MinPayDateFilter)
-                        .WhereIf(input.MaxPayDateFilter != null, e => e.PayDate <= input.MaxPayDateFilter);
-
+                        .WhereIf(input.MaxPayDateFilter != null, e => e.PayDate <= input.MaxPayDateFilter)
+                        .WhereIf(input.TenantId != null, e => e.TenantId== input.TenantId); 
             var pagedAndFilteredAppTenantInvoices = filteredAppTenantInvoices
                 .OrderBy(input.Sorting ?? "id asc")
                 .PageBy(input);

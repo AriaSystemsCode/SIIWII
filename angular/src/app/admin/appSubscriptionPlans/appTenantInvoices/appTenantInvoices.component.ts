@@ -76,6 +76,7 @@ export class AppTenantInvoicesComponent extends AppComponentBase {
         this.primengTableHelper.showLoadingIndicator();
 
         this._appTenantInvoicesServiceProxy.getAll(
+            null,
             this.filterText,
             this.invoiceNumberFilter,
             this.maxInvoiceDateFilter === undefined ? this.maxInvoiceDateFilter : moment(this.maxInvoiceDateFilter).endOf('day'),

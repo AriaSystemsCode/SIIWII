@@ -156,7 +156,7 @@ namespace onetouch.Authorization
 
             var administration = pages.CreateChildPermission(AppPermissions.Pages_Administration, L("Administration"));
 
-            var appTenantInvoices = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices, L("AppTenantInvoices"), multiTenancySides: MultiTenancySides.Host);
+            var appTenantInvoices = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices, L("AppTenantInvoices"));
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Create, L("CreateNewAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Edit, L("EditAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Delete, L("DeleteAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);
