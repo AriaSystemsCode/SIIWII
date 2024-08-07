@@ -2243,6 +2243,7 @@ namespace onetouch.AppEntities
                 AppEntityAttachmentDto attach = new AppEntityAttachmentDto();
                 attach.FileName = Path.GetFileName(input.Image);
                 attach.Url = input.Image;
+                attach.guid =  Path.GetFileNameWithoutExtension(input.Image);
                 returnObject.EntityAttachments.Add(attach);
             }
             if (!string.IsNullOrEmpty(input.HexaCode))

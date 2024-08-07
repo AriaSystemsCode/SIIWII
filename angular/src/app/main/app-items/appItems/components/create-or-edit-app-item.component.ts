@@ -704,7 +704,8 @@ let x=  this.appItem.nonLookupValues;
         );
         let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
             this.selectCategoriesHandler(modalRef);
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit)subs.unsubscribe();
         });
     }
     removeCategory(
@@ -928,7 +929,8 @@ let x=  this.appItem.nonLookupValues;
         );
         let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
             this.selectClassificationsHandler(modalRef);
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+          if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
 
@@ -1591,7 +1593,8 @@ let x=  this.appItem.nonLookupValues;
             //     }
             // }
 
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
     askToPublish() {

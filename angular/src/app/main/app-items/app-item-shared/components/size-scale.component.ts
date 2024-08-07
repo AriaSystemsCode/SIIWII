@@ -199,7 +199,8 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
        
        
        
-        if(!modalRef.content.isHiddenToCreateOrEdit)  subs.unsubscribe()
+       // if(!modalRef.content.isHiddenToCreateOrEdit) 
+        if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe()
     })
   }
   adjustRows(modalRefData :AppEntityListDynamicModalComponent){

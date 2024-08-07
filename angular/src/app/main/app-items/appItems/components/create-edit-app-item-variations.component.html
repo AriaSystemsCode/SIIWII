@@ -658,7 +658,7 @@
                                             <div class="p-2 mb-2">
                                                 <div class="btn-group dropdown" dropdown >
                                                     <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 avoidClick" 
-                                                        dropdownToggle> {{defaultExtraAttrForAttachments.name | localize}}
+                                                        dropdownToggle> {{defaultExtraAttrForAttachments?.name | localize}}
                                                     </button>
                                                     <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
                                                         <li *ngFor="let extraAttr of selectedExtraAttributes;let i = index"  [hidden]=" extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE' && extraAttr?.entityObjectTypeCode!=='CLOSURE'">
@@ -683,14 +683,14 @@
                                         <div>
                                             <!-- <a
                                             class="mr-4 aria-tag p-2"
-                                            *ngFor="let attachmentObj of defaultExtraAttrForAttachments.selectedValuesAttachments | keyvalue"
+                                            *ngFor="let attachmentObj of defaultExtraAttrForAttachments?.selectedValuesAttachments | keyvalue"
                                             (click)="activeAttachmentOption = attachmentObj.value"
                                             [ngClass]="{'active':activeAttachmentOption == attachmentObj.value}"
                                             >
                                                 {{attachmentObj?.value?.lookupData?.label | localize}}
                                             </a> -->
 
-<p-dropdown [options]="defaultExtraAttrForAttachments.selectedValuesAttachments | keyvalue" 
+<p-dropdown [options]="defaultExtraAttrForAttachments?.selectedValuesAttachments | keyvalue" 
             optionLabel="value.lookupData.label"
             optionValue="value"
             (onChange)="onAttachmentOptionChange($event)"
