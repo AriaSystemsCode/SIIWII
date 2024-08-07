@@ -1,3 +1,5 @@
+﻿using onetouch.AppSubscriptionPlans;
+using onetouch.AppSubScriptionPlan;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.SycCounters;
@@ -25,6 +27,13 @@ namespace onetouch.EntityHistory
 
         public static readonly Type[] HostSideTrackedTypes =
         {
+            typeof(AppTenantInvoice),
+            typeof(AppTenantActivitiesLog),
+            typeof(oldAppTenantsActivitiesLog),
+            typeof(AppTenantSubscriptionPlan),
+            typeof(AppSubscriptionPlanHeader),
+            typeof(AppSubscriptionPlanDetail),
+            typeof(AppFeature),
             typeof(SycIdentifierDefinition),
             typeof(SycSegmentIdentifierDefinition),
             typeof(SycCounter),

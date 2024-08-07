@@ -1,5 +1,6 @@
-import { NgModule } from "@angular/core";
+﻿import { NgModule } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import { AppSubscriptionPlanHeadersComponent } from './appSubScriptionPlan/appSubscriptionPlanHeaders/appSubscriptionPlanHeaders.component';
 import { SycAttachmentTypesComponent } from './systemObjects/sycAttachmentTypes/sycAttachmentTypes.component';
 import { DashboardComponent } from "./dashboard/dashboard.component";
 
@@ -11,6 +12,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                 // component: MainComponent,
 
                 children: [
+                    { path: 'appSubScriptionPlan/appSubscriptionPlanHeaders', component: AppSubscriptionPlanHeadersComponent, data: { permission: 'Pages.AppSubscriptionPlanHeaders' }  },
                     { path: 'systemObjects/sycAttachmentTypes', component: SycAttachmentTypesComponent, data: { permission: 'Pages.SycAttachmentTypes' }  },
                     //Iteration13
                     {

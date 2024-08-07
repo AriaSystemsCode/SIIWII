@@ -66,6 +66,7 @@ using Org.BouncyCastle.Utilities.Encoders;
 using onetouch.AppSiiwiiTransaction;
 using NPOI.HPSF;
 using NPOI.POIFS.NIO;
+using onetouch.AppSubScriptionPlan;
 
 namespace onetouch.AppItems
 {
@@ -113,7 +114,7 @@ namespace onetouch.AppItems
         private readonly IRepository<SycSegmentIdentifierDefinition, long> _sycSegmentIdentifierDefinition;
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
-
+        private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, IAppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
@@ -138,9 +139,10 @@ namespace onetouch.AppItems
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
             IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
-            IRepository<AppTransactionDetails, long> appTransactionDetails
+            IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
             )
         {
+            _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             //MMT33-2
             _appTransactionDetails = appTransactionDetails;
             _timeZoneInfoAppService = timeZoneInfoAppService;
@@ -2006,7 +2008,7 @@ namespace onetouch.AppItems
             appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
             if (string.IsNullOrEmpty(appItem.SSIN))
             {
-                appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(entity));
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
@@ -2021,12 +2023,23 @@ namespace onetouch.AppItems
             appItem.EntityId = savedEntity;
 
             if (appItem.Id == 0)
+            {
                 appItem = await _appItemRepository.InsertAsync(appItem);
+
+                var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
+                //if (available == true)
+                {
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
+                }
+            }
             //MMT
             else
             {
                 //await CurrentUnitOfWork.SaveChangesAsync();
                 appItem = await _appItemRepository.UpdateAsync(appItem);
+                var availableFeature = await _appTenantActivitiesLogAppService.IsFeatureAvailable("EDIT-PRODUCT");
+                //if (availableFeature == true)
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
             }
             //MMT
 
@@ -2305,7 +2318,7 @@ namespace onetouch.AppItems
                     appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appItemChild.SSIN))
                     {
-                        appItemChild.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        appItemChild.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(childEntity));
                         childEntity.SSIN = appItemChild.SSIN;
                     }
                     childEntity.TenantOwner = appItemChild.TenantOwner;
@@ -5675,7 +5688,7 @@ namespace onetouch.AppItems
                 }
                 if (string.IsNullOrEmpty(appItem.SSIN))
                 {
-                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appItem.EntityFk));
                     appItem.EntityFk.SSIN = appItem.SSIN;
                 }
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
@@ -5745,7 +5758,7 @@ namespace onetouch.AppItems
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 if (string.IsNullOrEmpty(appItem.SSIN))
                 {
-                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appItem.EntityFk));
                     appItem.EntityFk.SSIN = appItem.SSIN;
                 }
                 appItem.EntityFk.TenantOwner = appItem.TenantOwner;
@@ -6457,7 +6470,7 @@ namespace onetouch.AppItems
                     appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appChildItem.SSIN))
                     {
-                        appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                        appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appChildItem.EntityFk));
                         appChildItem.EntityFk.SSIN = appItem.SSIN;
                     }
                     appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;

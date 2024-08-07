@@ -12,6 +12,8 @@ using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.AppEntities.Dtos;
 using onetouch.SycCurrencyExchangeRates;
 using onetouch.SycIdentifierDefinitions;
+using onetouch.AppEntities;
+using Microsoft.EntityFrameworkCore;
 
 namespace onetouch.Helpers
 {
@@ -28,14 +30,16 @@ namespace onetouch.Helpers
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRate;
         //MMT30[End]
-
+        private readonly IRepository<AppEntity, long> _appEntityRepository;
         public SystemTables(IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             
             IRepository<SycAttachmentCategory, long> sycAttachmentCategory, IRepository<SycEntityObjectClassification, long> SycEntityObjectClassifications,
            
             IRepository<SycEntityObjectStatus, long> sycEntityObjectStatus, IRepository<SycCounter, long> sycCounter, IRepository<SycIdentifierDefinition, long> sycIdentifierDefinitions,
-            IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate)
+            IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition,
+            IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate, IRepository<AppEntity, long> appEntityRepository)
         {
+            _appEntityRepository = appEntityRepository;
             _sydObjectRepository = sydObjectRepository;
             _sycEntityObjectType = sycEntityObjectType;
             _sycAttachmentCategory = sycAttachmentCategory;
@@ -93,7 +97,48 @@ namespace onetouch.Helpers
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "ITEM");
             return obj.Id;
         }
-
+        //MMT -I43
+        public async Task<long> GetEntityObjectTypeFeatureId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
+            return obj.Id;
+        }
+        public async Task<long> GetObjectStandardFeatureId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
+            return obj.Id;
+        }
+        //public async Task<long> GetObjectActivityLogId()
+        //{
+        //    var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "TENANTACTIVITYLOG");
+        //    return obj.Id;
+        //}
+        public async Task<long> GetObjectStandardSubscriptionPlanId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "STANDARDSUBSCRIPTIONPLAN");
+            return obj.Id;
+        }
+        public async Task<SycEntityObjectType> GetObjectStandardSubscriptionPlan()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDSUBSCRIPTIONPLAN");
+            return obj;
+        }
+        public async Task<SycEntityObjectType> GetEntityObjectTypeFeature()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "STANDARDFEATURE");
+            return obj;
+        }
+        public async Task<long> GetObjectTenantActivityLogId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "TENANTACTIVITYLOG");
+            return obj.Id;
+        }
+        public async Task<SycEntityObjectType> GetEntityObjectTypeActLog()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "TENANTACTIVITYLOG");
+            return obj;
+        }
+        //MMT -I43
         public async Task<long> GetObjectListingId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "LISTING");
@@ -451,6 +496,11 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "SIZESCALE");
             return obj.Id;
         }
+        public async Task<long> GetEntityObjectTypeARInvoice()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "ARINVOICE");
+            return obj.Id;
+        }
         public async Task<long> GetObjectScaleId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "SCALE");
@@ -585,6 +635,14 @@ namespace onetouch.Helpers
                         }
                     }
                 }
+                //MMT
+                if (appEntity != null)
+                {
+                    var appEntityObj = await _appEntityRepository.GetAll().Where(x => x.SSIN.Contains(returnString) && x.TenantId == appEntity.TenantId && x.ObjectId == appEntity.ObjectId).FirstOrDefaultAsync();
+                    if (appEntityObj != null)
+                        returnString = await this.GenerateSSIN(objectTypeId, appEntity);
+                }
+                //MMT
                 return returnString;
             }
         }

@@ -1,0 +1,507 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+                            <span>{{l("AppTenantActivitiesLog")}}</span>
+                        </h3>
+                        <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                        <span class="kt-subheader__desc">
+                            {{l("AppTenantActivitiesLogHeaderInfo")}}
+                        </span>
+                    </div>
+                    <div class="kt-subheader__toolbar">
+                        <div class="kt-subheader__wrapper">
+            				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+                <button (click)="createAppTenantActivityLog()" 
+            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantActivityLog")}}</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <form class="kt-form" autocomplete="off">
+                    <div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-12">
+                                <div class="form-group m-form__group align-items-center">
+                                    <div class="input-group">
+                                        <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
+                                        <span class="input-group-btn">
+                                            <button (click)="getAppTenantActivitiesLog()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						 <div class="row" [hidden]="!advancedFiltersAreShown">
+						 	<div class="col-md-12">
+						         <div class="kt-separator kt-separator--border-dashed"></div>
+						     </div>
+
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinTenantIdFilter">{{l("MinMax")}} {{l("TenantId")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinTenantIdFilter" [(ngModel)]="minTenantIdFilter" placeholder="{{l('MinValue')}}" name="minTenantIdFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxTenantIdFilter" placeholder="{{l('MaxValue')}}" name="maxTenantIdFilter" />
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="TenantNameFilter">{{l("TenantName")}}</label>
+									<input type="text" class="form-control" id="TenantNameFilter" name="tenantNameFilter" [(ngModel)]="tenantNameFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinUserIdFilter">{{l("MinMax")}} {{l("UserId")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinUserIdFilter" [(ngModel)]="minUserIdFilter" placeholder="{{l('MinValue')}}" name="minUserIdFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxUserIdFilter" placeholder="{{l('MaxValue')}}" name="maxUserIdFilter" />
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="ActivityTypeFilter">{{l("ActivityType")}}</label>
+									<input type="text" class="form-control" id="ActivityTypeFilter" name="activityTypeFilter" [(ngModel)]="activityTypeFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinAppSubscriptionPlanHeaderIdFilter">{{l("MinMax")}} {{l("AppSubscriptionPlanHeaderId")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinAppSubscriptionPlanHeaderIdFilter" [(ngModel)]="minAppSubscriptionPlanHeaderIdFilter" placeholder="{{l('MinValue')}}" name="minAppSubscriptionPlanHeaderIdFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxAppSubscriptionPlanHeaderIdFilter" placeholder="{{l('MaxValue')}}" name="maxAppSubscriptionPlanHeaderIdFilter" />
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="AppSubscriptionPlanCodeFilter">{{l("AppSubscriptionPlanCode")}}</label>
+									<input type="text" class="form-control" id="AppSubscriptionPlanCodeFilter" name="appSubscriptionPlanCodeFilter" [(ngModel)]="appSubscriptionPlanCodeFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label  for="MinActivityDateTimeFilter">{{l("ActivityDateTimeRange")}}</label>
+									<div class="input-group">
+                                        <input class="form-control m-input" id="MinActivityDateTimeFilter" name="MinActivityDateTimeFilter" type="datetime" bsDatepicker  placeholder="{{l('MinValue')}}" [(ngModel)]="minActivityDateTimeFilter">
+			                            <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
+                                        <input class="form-control m-input" id="MaxActivityDateTimeFilter" name="MaxActivityDateTimeFilter" type="datetime" bsDatepicker  placeholder="{{l('MaxValue')}}" [(ngModel)]="maxActivityDateTimeFilter">
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="UserNameFilter">{{l("UserName")}}</label>
+									<input type="text" class="form-control" id="UserNameFilter" name="userNameFilter" [(ngModel)]="userNameFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeatureCodeFilter">{{l("FeatureCode")}}</label>
+									<input type="text" class="form-control" id="FeatureCodeFilter" name="featureCodeFilter" [(ngModel)]="featureCodeFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeatureNameFilter">{{l("FeatureName")}}</label>
+									<input type="text" class="form-control" id="FeatureNameFilter" name="featureNameFilter" [(ngModel)]="featureNameFilter">
+								</div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="BillableFilterSelect">{{l("Billable")}}</label>
+								<select class="form-control" name="BillableFilter" id="BillableFilterSelect" [(ngModel)]="billableFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>	
+							<div class="col-md-3">
+								<label for="InvoicedFilterSelect">{{l("Invoiced")}}</label>
+								<select class="form-control" name="InvoicedFilter" id="InvoicedFilterSelect" [(ngModel)]="invoicedFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="ReferenceFilter">{{l("Reference")}}</label>
+									<input type="text" class="form-control" id="ReferenceFilter" name="referenceFilter" [(ngModel)]="referenceFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinQtyFilter">{{l("MinMax")}} {{l("Qty")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinQtyFilter" [(ngModel)]="minQtyFilter" placeholder="{{l('MinValue')}}" name="minQtyFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxQtyFilter" placeholder="{{l('MaxValue')}}" name="maxQtyFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinConsumedQtyFilter">{{l("MinMax")}} {{l("ConsumedQty")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinConsumedQtyFilter" [(ngModel)]="minConsumedQtyFilter" placeholder="{{l('MinValue')}}" name="minConsumedQtyFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxConsumedQtyFilter" placeholder="{{l('MaxValue')}}" name="maxConsumedQtyFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinRemainingQtyFilter">{{l("MinMax")}} {{l("RemainingQty")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinRemainingQtyFilter" [(ngModel)]="minRemainingQtyFilter" placeholder="{{l('MinValue')}}" name="minRemainingQtyFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxRemainingQtyFilter" placeholder="{{l('MaxValue')}}" name="maxRemainingQtyFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinPriceFilter">{{l("MinMax")}} {{l("Price")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinPriceFilter" [(ngModel)]="minPriceFilter" placeholder="{{l('MinValue')}}" name="minPriceFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxPriceFilter" placeholder="{{l('MaxValue')}}" name="maxPriceFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinAmountFilter">{{l("MinMax")}} {{l("Amount")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinAmountFilter" [(ngModel)]="minAmountFilter" placeholder="{{l('MinValue')}}" name="minAmountFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxAmountFilter" placeholder="{{l('MaxValue')}}" name="maxAmountFilter" />
+									</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label  for="MinInvoiceDateFilter">{{l("InvoiceDateRange")}}</label>
+									<div class="input-group">
+                                        <input class="form-control m-input" id="MinInvoiceDateFilter" name="MinInvoiceDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MinValue')}}" [(ngModel)]="minInvoiceDateFilter">
+			                            <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
+                                        <input class="form-control m-input" id="MaxInvoiceDateFilter" name="MaxInvoiceDateFilter" type="datetime" bsDatepicker  placeholder="{{l('MaxValue')}}" [(ngModel)]="maxInvoiceDateFilter">
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="InvoiceNumberFilter">{{l("InvoiceNumber")}}</label>
+									<input type="text" class="form-control" id="InvoiceNumberFilter" name="invoiceNumberFilter" [(ngModel)]="invoiceNumberFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="CreditOrUsageFilter">{{l("CreditOrUsage")}}</label>
+									<input type="text" class="form-control" id="CreditOrUsageFilter" name="creditOrUsageFilter" [(ngModel)]="creditOrUsageFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="MonthFilter">{{l("Month")}}</label>
+									<input type="text" class="form-control" id="MonthFilter" name="monthFilter" [(ngModel)]="monthFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="YearFilter">{{l("Year")}}</label>
+									<input type="text" class="form-control" id="YearFilter" name="yearFilter" [(ngModel)]="yearFilter">
+								</div>
+                            </div>
+
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-12">
+                                <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row align-items-center">
+                    <!--<Primeng-Datatable-Start>-->
+                    <div class="primeng-datatable-container col-12"
+                         [busyIf]="primengTableHelper.isLoading">
+                        <p-table #dataTable
+                                     (onLazyLoad)="getAppTenantActivitiesLog($event)"
+                                     [value]="primengTableHelper.records"
+                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                     [paginator]="false"
+                                     [lazy]="true"
+                                     [scrollable]="true"
+                                     ScrollWidth="100%"
+                                     [responsive]="primengTableHelper.isResponsive"
+                                     [resizableColumns]="primengTableHelper.resizableColumns">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 130px">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="tenantId">
+                                        {{l('TenantId')}}
+                                        <p-sortIcon field="appTenantActivityLog.tenantId"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="tenantName">
+                                        {{l('TenantName')}}
+                                        <p-sortIcon field="appTenantActivityLog.tenantName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="userId">
+                                        {{l('UserId')}}
+                                        <p-sortIcon field="appTenantActivityLog.userId"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="activityType">
+                                        {{l('ActivityType')}}
+                                        <p-sortIcon field="appTenantActivityLog.activityType"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanHeaderId">
+                                        {{l('AppSubscriptionPlanHeaderId')}}
+                                        <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanHeaderId"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanCode">
+                                        {{l('AppSubscriptionPlanCode')}}
+                                        <p-sortIcon field="appTenantActivityLog.appSubscriptionPlanCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="activityDateTime">
+                                        {{l('ActivityDateTime')}}
+                                        <p-sortIcon field="appTenantActivityLog.activityDateTime"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="userName">
+                                        {{l('UserName')}}
+                                        <p-sortIcon field="appTenantActivityLog.userName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureCode">
+                                        {{l('FeatureCode')}}
+                                        <p-sortIcon field="appTenantActivityLog.featureCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureName">
+                                        {{l('FeatureName')}}
+                                        <p-sortIcon field="appTenantActivityLog.featureName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="billable">
+                                        {{l('Billable')}}
+                                        <p-sortIcon field="appTenantActivityLog.billable"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="invoiced">
+                                        {{l('Invoiced')}}
+                                        <p-sortIcon field="appTenantActivityLog.invoiced"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="reference">
+                                        {{l('Reference')}}
+                                        <p-sortIcon field="appTenantActivityLog.reference"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="qty">
+                                        {{l('Qty')}}
+                                        <p-sortIcon field="appTenantActivityLog.qty"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="consumedQty">
+                                        {{l('ConsumedQty')}}
+                                        <p-sortIcon field="appTenantActivityLog.consumedQty"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="remainingQty">
+                                        {{l('RemainingQty')}}
+                                        <p-sortIcon field="appTenantActivityLog.remainingQty"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="price">
+                                        {{l('Price')}}
+                                        <p-sortIcon field="appTenantActivityLog.price"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="amount">
+                                        {{l('Amount')}}
+                                        <p-sortIcon field="appTenantActivityLog.amount"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="invoiceDate">
+                                        {{l('InvoiceDate')}}
+                                        <p-sortIcon field="appTenantActivityLog.invoiceDate"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="invoiceNumber">
+                                        {{l('InvoiceNumber')}}
+                                        <p-sortIcon field="appTenantActivityLog.invoiceNumber"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="creditOrUsage">
+                                        {{l('CreditOrUsage')}}
+                                        <p-sortIcon field="appTenantActivityLog.creditOrUsage"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="month">
+                                        {{l('Month')}}
+                                        <p-sortIcon field="appTenantActivityLog.month"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="year">
+                                        {{l('Year')}}
+                                        <p-sortIcon field="appTenantActivityLog.year"></p-sortIcon>
+                                    </th>
+
+                                </tr>
+                            </ng-template>                           
+							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                <tr>
+                                    <td style="width: 130px">
+                                       <div class="btn-group dropdown" dropdown container="body">
+                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
+                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
+                                            </button>
+												<ul class="dropdown-menu"  *dropdownMenu>
+										    <li>
+                                                <a
+			[routerLink]="['/app/admin/appSubScriptionPlan/appTenantActivitiesLog/view']" [queryParams]="{id: record.appTenantActivityLog.id}">
+  {{l('View')}}	
+</a>
+                                            </li>
+												<li>
+                                                 <a
+			[routerLink]="['/app/admin/appSubScriptionPlan/appTenantActivitiesLog/createOrEdit']" [queryParams]="{id: record.appTenantActivityLog.id}">
+  {{l('Edit')}}	
+</a>												
+                                                </li>
+												<li>
+											        <a  href="javascript:;"
+														(click)="deleteAppTenantActivityLog(record.appTenantActivityLog)">{{l('Delete')}}</a>
+												</li>
+                                                <li>
+                                                    <a href="javascript:;" *ngIf="entityHistoryEnabled"  
+                                                       (click)="showHistory(record.appTenantActivityLog)">{{l('History')}}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('TenantId')}}</span>
+											{{record.appTenantActivityLog.tenantId}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('TenantName')}}</span>
+											{{record.appTenantActivityLog.tenantName}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('UserId')}}</span>
+											{{record.appTenantActivityLog.userId}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('ActivityType')}}</span>
+											{{record.appTenantActivityLog.activityType}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('AppSubscriptionPlanHeaderId')}}</span>
+											{{record.appTenantActivityLog.appSubscriptionPlanHeaderId}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('AppSubscriptionPlanCode')}}</span>
+											{{record.appTenantActivityLog.appSubscriptionPlanCode}}
+										</td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('ActivityDateTime')}}</span>
+                                        <span *ngIf="record.appTenantActivityLog.activityDateTime">
+											{{record.appTenantActivityLog.activityDateTime |  momentFormat:'L' }}
+                                        </span>
+                                        <span *ngIf="!record.appTenantActivityLog.activityDateTime">-</span>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('UserName')}}</span>
+											{{record.appTenantActivityLog.userName}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureCode')}}</span>
+											{{record.appTenantActivityLog.featureCode}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureName')}}</span>
+											{{record.appTenantActivityLog.featureName}}
+										</td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('Billable')}}</span>
+                                        <div *ngIf="record.appTenantActivityLog.billable" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appTenantActivityLog.billable" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('Invoiced')}}</span>
+                                        <div *ngIf="record.appTenantActivityLog.invoiced" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appTenantActivityLog.invoiced" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Reference')}}</span>
+											{{record.appTenantActivityLog.reference}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Qty')}}</span>
+											{{record.appTenantActivityLog.qty}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('ConsumedQty')}}</span>
+											{{record.appTenantActivityLog.consumedQty}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('RemainingQty')}}</span>
+											{{record.appTenantActivityLog.remainingQty}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Price')}}</span>
+											{{record.appTenantActivityLog.price}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Amount')}}</span>
+											{{record.appTenantActivityLog.amount}}
+										</td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('InvoiceDate')}}</span>
+                                        <span *ngIf="record.appTenantActivityLog.invoiceDate">
+											{{record.appTenantActivityLog.invoiceDate |  momentFormat:'L' }}
+                                        </span>
+                                        <span *ngIf="!record.appTenantActivityLog.invoiceDate">-</span>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('InvoiceNumber')}}</span>
+											{{record.appTenantActivityLog.invoiceNumber}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('CreditOrUsage')}}</span>
+											{{record.appTenantActivityLog.creditOrUsage}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Month')}}</span>
+											{{record.appTenantActivityLog.month}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Year')}}</span>
+											{{record.appTenantActivityLog.year}}
+										</td>
+
+                                </tr>
+                               
+                            </ng-template>
+                        </p-table>
+						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            {{l('NoData')}}
+                        </div>
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getAppTenantActivitiesLog($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                                         [showCurrentPageReport]="true"
+                                         [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
+                            >
+                            </p-paginator>
+                        </div>
+                    </div>
+                    <!--<Primeng-Datatable-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    
+     <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
+  </div>
+</div>

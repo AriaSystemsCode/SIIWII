@@ -1,0 +1,394 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+                            <span>{{l("AppSubscriptionPlanDetails")}}</span>
+                        </h3>
+                        <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                        <span class="kt-subheader__desc">
+                            {{l("AppSubscriptionPlanDetailsHeaderInfo")}}
+                        </span>
+                    </div>
+                    <div class="kt-subheader__toolbar">
+                        <div class="kt-subheader__wrapper">
+            				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+                <button *ngIf="isGranted('Pages.Administration.AppSubscriptionPlanDetails.Create')" (click)="createAppSubscriptionPlanDetail()" 
+            			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppSubscriptionPlanDetail")}}</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">
+                <form class="kt-form" autocomplete="off">
+                    <div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-12">
+                                <div class="form-group m-form__group align-items-center">
+                                    <div class="input-group">
+                                        <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
+                                        <span class="input-group-btn">
+                                            <button (click)="getAppSubscriptionPlanDetails()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						 <div class="row" [hidden]="!advancedFiltersAreShown">
+						 	<div class="col-md-12">
+						         <div class="kt-separator kt-separator--border-dashed"></div>
+						     </div>
+
+
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeatureCodeFilter">{{l("FeatureCode")}}</label>
+									<input type="text" class="form-control" id="FeatureCodeFilter" name="featureCodeFilter" [(ngModel)]="featureCodeFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeatureNameFilter">{{l("FeatureName")}}</label>
+									<input type="text" class="form-control" id="FeatureNameFilter" name="featureNameFilter" [(ngModel)]="featureNameFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="AvailabilityFilter">{{l("Availability")}}</label>
+									<input type="text" class="form-control" id="AvailabilityFilter" name="availabilityFilter" [(ngModel)]="availabilityFilter">
+								</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinFeatureLimitFilter">{{l("MinMax")}} {{l("FeatureLimit")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinFeatureLimitFilter" [(ngModel)]="minFeatureLimitFilter" placeholder="{{l('MinValue')}}" name="minFeatureLimitFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxFeatureLimitFilter" placeholder="{{l('MaxValue')}}" name="maxFeatureLimitFilter" />
+									</div>
+                                </div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="RollOverFilterSelect">{{l("RollOver")}}</label>
+								<select class="form-control" name="RollOverFilter" id="RollOverFilterSelect" [(ngModel)]="rollOverFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+									<label for="MinUnitPriceFilter">{{l("MinMax")}} {{l("UnitPrice")}}</label>
+									<div class="input-group">
+                                        <input type="number" class="form-control" id="MinUnitPriceFilter" [(ngModel)]="minUnitPriceFilter" placeholder="{{l('MinValue')}}" name="minUnitPriceFilter" />
+                                        <input type="number" class="form-control" [(ngModel)]="maxUnitPriceFilter" placeholder="{{l('MaxValue')}}" name="maxUnitPriceFilter" />
+									</div>
+                                </div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeaturePeriodLimitFilter">{{l("FeaturePeriodLimit")}}</label>
+									<input type="text" class="form-control" id="FeaturePeriodLimitFilter" name="featurePeriodLimitFilter" [(ngModel)]="featurePeriodLimitFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="CategoryFilter">{{l("Category")}}</label>
+									<input type="text" class="form-control" id="CategoryFilter" name="categoryFilter" [(ngModel)]="categoryFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeatureDescriptionFilter">{{l("FeatureDescription")}}</label>
+									<input type="text" class="form-control" id="FeatureDescriptionFilter" name="featureDescriptionFilter" [(ngModel)]="featureDescriptionFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeatureStatusFilter">{{l("FeatureStatus")}}</label>
+									<input type="text" class="form-control" id="FeatureStatusFilter" name="featureStatusFilter" [(ngModel)]="featureStatusFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="UnitOfMeasurementNameFilter">{{l("UnitOfMeasurementName")}}</label>
+									<input type="text" class="form-control" id="UnitOfMeasurementNameFilter" name="unitOfMeasurementNameFilter" [(ngModel)]="unitOfMeasurementNameFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="UnitOfMeasurmentCodeFilter">{{l("UnitOfMeasurmentCode")}}</label>
+									<input type="text" class="form-control" id="UnitOfMeasurmentCodeFilter" name="unitOfMeasurmentCodeFilter" [(ngModel)]="unitOfMeasurmentCodeFilter">
+								</div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="IsFeatureBillableFilterSelect">{{l("IsFeatureBillable")}}</label>
+								<select class="form-control" name="IsFeatureBillableFilter" id="IsFeatureBillableFilterSelect" [(ngModel)]="isFeatureBillableFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeatureBillingCodeFilter">{{l("FeatureBillingCode")}}</label>
+									<input type="text" class="form-control" id="FeatureBillingCodeFilter" name="featureBillingCodeFilter" [(ngModel)]="featureBillingCodeFilter">
+								</div>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="FeatureCategoryFilter">{{l("FeatureCategory")}}</label>
+									<input type="text" class="form-control" id="FeatureCategoryFilter" name="featureCategoryFilter" [(ngModel)]="featureCategoryFilter">
+								</div>
+                            </div>	
+							<div class="col-md-3">
+								<label for="TrackactivityFilterSelect">{{l("Trackactivity")}}</label>
+								<select class="form-control" name="TrackactivityFilter" id="TrackactivityFilterSelect" [(ngModel)]="trackactivityFilter">
+								<option value="-1">{{l("All")}}</option>
+								<option value="0">{{l("False")}}</option>
+								<option value="1">{{l("True")}}</option>
+								</select>
+                            </div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label for="AppSubscriptionPlanHeaderFilter">({{l("AppSubscriptionPlanHeader")}}) {{l("")}}</label>
+									<input type="text" class="form-control" id="AppSubscriptionPlanHeaderFilter" name="appSubscriptionPlanHeaderFilter" [(ngModel)]="appSubscriptionPlanHeaderFilter">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-12">
+                                <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row align-items-center">
+                    <!--<Primeng-Datatable-Start>-->
+                    <div class="primeng-datatable-container col-12"
+                         [busyIf]="primengTableHelper.isLoading">
+                        <p-table #dataTable
+                                     (onLazyLoad)="getAppSubscriptionPlanDetails($event)"
+                                     [value]="primengTableHelper.records"
+                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                     [paginator]="false"
+                                     [lazy]="true"
+                                     [scrollable]="true"
+                                     ScrollWidth="100%"
+                                     [responsive]="primengTableHelper.isResponsive"
+                                     [resizableColumns]="primengTableHelper.resizableColumns">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 130px" [hidden]="!isGrantedAny('Pages.Administration.AppSubscriptionPlanDetails.Edit', 'Pages.Administration.AppSubscriptionPlanDetails.Delete')">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanHeaderFk.">
+                                        {{l('')}}
+                                        <p-sortIcon field="appSubscriptionPlanHeader"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureCode">
+                                        {{l('FeatureCode')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.featureCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureName">
+                                        {{l('FeatureName')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.featureName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="availability">
+                                        {{l('Availability')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.availability"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureLimit">
+                                        {{l('FeatureLimit')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.featureLimit"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="rollOver">
+                                        {{l('RollOver')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.rollOver"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="unitPrice">
+                                        {{l('UnitPrice')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.unitPrice"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featurePeriodLimit">
+                                        {{l('FeaturePeriodLimit')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.featurePeriodLimit"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="category">
+                                        {{l('Category')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.category"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureDescription">
+                                        {{l('FeatureDescription')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.featureDescription"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureStatus">
+                                        {{l('FeatureStatus')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.featureStatus"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="unitOfMeasurementName">
+                                        {{l('UnitOfMeasurementName')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.unitOfMeasurementName"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="unitOfMeasurmentCode">
+                                        {{l('UnitOfMeasurmentCode')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.unitOfMeasurmentCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="isFeatureBillable">
+                                        {{l('IsFeatureBillable')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.isFeatureBillable"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureBillingCode">
+                                        {{l('FeatureBillingCode')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.featureBillingCode"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="featureCategory">
+                                        {{l('FeatureCategory')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.featureCategory"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="trackactivity">
+                                        {{l('Trackactivity')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.trackactivity"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="isaddon">
+                                        {{l('AddOn')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.isaddon"></p-sortIcon>
+                                    </th>
+                                </tr>
+                            </ng-template>                           
+							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                <tr>
+                                    <td style="width: 130px"
+                                        [hidden]="!isGrantedAny('Pages.Administration.AppSubscriptionPlanDetails.Edit', 'Pages.Administration.AppSubscriptionPlanDetails.Delete')">
+                                       <div class="btn-group dropdown" dropdown container="body">
+                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
+                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
+                                            </button>
+												<ul class="dropdown-menu"  *dropdownMenu>
+												<li>
+													<a href="javascript:;" 
+														(click)="viewAppSubscriptionPlanDetailModal.show(record)">{{l('View')}}</a>
+												</li>
+												<li>
+                                                <a href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.AppSubscriptionPlanDetails.Edit')" 
+														(click)="createOrEditAppSubscriptionPlanDetailModal.show(record.appSubscriptionPlanDetail.id)">{{l('Edit')}}</a>												
+                                                </li>
+												<li>
+											        <a  href="javascript:;" *ngIf="permission.isGranted('Pages.Administration.AppSubscriptionPlanDetails.Delete')"
+														(click)="deleteAppSubscriptionPlanDetail(record.appSubscriptionPlanDetail)">{{l('Delete')}}</a>
+												</li>
+                                                <li>
+                                                    <a href="javascript:;" *ngIf="entityHistoryEnabled"  
+                                                       (click)="showHistory(record.appSubscriptionPlanDetail)">{{l('History')}}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td style="width:150px">
+												<span class="ui-column-title"> {{l('')}}</span>
+												{{record.appSubscriptionPlanHeader}}
+											</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureCode')}}</span>
+											{{record.appSubscriptionPlanDetail.featureCode}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureName')}}</span>
+											{{record.appSubscriptionPlanDetail.featureName}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Availability')}}</span>
+											{{record.appSubscriptionPlanDetail.availability}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureLimit')}}</span>
+											{{record.appSubscriptionPlanDetail.featureLimit}}
+										</td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('RollOver')}}</span>
+                                        <div *ngIf="record.appSubscriptionPlanDetail.rollOver" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appSubscriptionPlanDetail.rollOver" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('UnitPrice')}}</span>
+											{{record.appSubscriptionPlanDetail.unitPrice}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeaturePeriodLimit')}}</span>
+											{{record.appSubscriptionPlanDetail.featurePeriodLimit}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('Category')}}</span>
+											{{record.appSubscriptionPlanDetail.category}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureDescription')}}</span>
+											{{record.appSubscriptionPlanDetail.featureDescription}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureStatus')}}</span>
+											{{record.appSubscriptionPlanDetail.featureStatus}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('UnitOfMeasurementName')}}</span>
+											{{record.appSubscriptionPlanDetail.unitOfMeasurementName}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('UnitOfMeasurmentCode')}}</span>
+											{{record.appSubscriptionPlanDetail.unitOfMeasurmentCode}}
+										</td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('IsFeatureBillable')}}</span>
+                                        <div *ngIf="record.appSubscriptionPlanDetail.isFeatureBillable" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appSubscriptionPlanDetail.isFeatureBillable" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureBillingCode')}}</span>
+											{{record.appSubscriptionPlanDetail.featureBillingCode}}
+										</td>
+                                    <td style="width:150px">
+											<span class="ui-column-title"> {{l('FeatureCategory')}}</span>
+											{{record.appSubscriptionPlanDetail.featureCategory}}
+										</td>
+                                    <td style="width:150px">
+										<span class="ui-column-title"> {{l('Trackactivity')}}</span>
+                                        <div *ngIf="record.appSubscriptionPlanDetail.trackactivity" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
+										<div *ngIf="!record.appSubscriptionPlanDetail.trackactivity" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
+                                    </td>
+
+                                </tr>
+                               
+                            </ng-template>
+                        </p-table>
+						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            {{l('NoData')}}
+                        </div>
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getAppSubscriptionPlanDetails($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                                         [showCurrentPageReport]="true"
+                                         [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
+                            >
+                            </p-paginator>
+                        </div>
+                    </div>
+                    <!--<Primeng-Datatable-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditAppSubscriptionPlanDetailModal #createOrEditAppSubscriptionPlanDetailModal (modalSave)="getAppSubscriptionPlanDetails()"></createOrEditAppSubscriptionPlanDetailModal>    
+    <viewAppSubscriptionPlanDetailModal #viewAppSubscriptionPlanDetailModal></viewAppSubscriptionPlanDetailModal>
+     <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
+  </div>
+</div>

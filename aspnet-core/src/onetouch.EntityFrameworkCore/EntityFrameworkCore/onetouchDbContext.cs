@@ -1,4 +1,6 @@
-﻿using onetouch.Maintainances;
+﻿using onetouch.AppSubscriptionPlans;
+using onetouch.AppSubScriptionPlan;
+using onetouch.Maintainances;
 using onetouch.AppItemSelectors;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.SycSegmentIdentifierDefinitions;
@@ -56,9 +58,23 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
+
+        public virtual DbSet<AppTenantActivitiesLog> AppTenantActivitiesLog { get; set; }
+
+        // public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLog { get; set; }
+
+        public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
+
+        public virtual DbSet<AppSubscriptionPlanHeader> AppSubscriptionPlanHeaders { get; set; }
+
+        public virtual DbSet<AppSubscriptionPlanDetail> AppSubscriptionPlanDetails { get; set; }
+
+        public virtual DbSet<AppFeature> AppFeatures { get; set; }
+
         public virtual DbSet<Maintainance> Maintainances { get; set; }
 
-        public virtual DbSet<SycEntityLocalization> SycEntityLocalizations { set; get;}
+        public virtual DbSet<SycEntityLocalization> SycEntityLocalizations { set; get; }
         public virtual DbSet<AppItemPrices> AppItemPrices { get; set; }
         public virtual DbSet<AppItemSizeScalesDetails> AppItemSizeScalesDetails { get; set; }
         public virtual DbSet<AppItemSizeScalesHeader> AppItemSizeScalesHeaders { get; set; }
@@ -96,7 +112,7 @@ namespace onetouch.EntityFrameworkCore
 
         public virtual DbSet<AppItemSharing> AppItemSharings { get; set; }
 
-        public virtual DbSet<AppTenantsActivitiesLog> AppTenantsActivitiesLogs { get; set; }
+        public virtual DbSet<oldAppTenantsActivitiesLog> AppTenantsActivitiesLogs { get; set; }
 
         public virtual DbSet<AppTenantPlan> AppTenantPlans { get; set; }
 
@@ -312,7 +328,7 @@ namespace onetouch.EntityFrameworkCore
             {
                 a.HasIndex(e => new { e.TenantId });
             });
-            modelBuilder.Entity<AppTenantsActivitiesLog>(a =>
+            modelBuilder.Entity<oldAppTenantsActivitiesLog>(a =>
                        {
                            a.HasIndex(e => new { e.TenantId });
                        });

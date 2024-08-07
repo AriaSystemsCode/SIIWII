@@ -285,13 +285,56 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Transaction);
                 _context.SaveChanges();
             }
+            //STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG
+            var sydObjects_StandardFeature = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+       r => r.Code == "STANDARDFEATURE");
+            if (sydObjects_StandardFeature == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            {
+                sydObjects_StandardFeature = new SystemObjects.SydObject
+                {
+                    Code = "STANDARDFEATURE",
+                    Name = "Standard Feature",
+                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
+                    ObjectTypeId = ObjectTypeCodeEntity.Id
+                };
+                _context.SydObjects.Add(sydObjects_StandardFeature);
+                _context.SaveChanges();
+            }
+            var sydObjects_StandardSubscriptionPlan = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+      r => r.Code == "STANDARDSUBSCRIPTIONPLAN");
+            if (sydObjects_StandardSubscriptionPlan == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            {
+                sydObjects_StandardSubscriptionPlan = new SystemObjects.SydObject
+                {
+                    Code = "STANDARDSUBSCRIPTIONPLAN",
+                    Name = "Standard Subscription Plan",
+                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
+                    ObjectTypeId = ObjectTypeCodeEntity.Id
+                };
+                _context.SydObjects.Add(sydObjects_StandardSubscriptionPlan);
+                _context.SaveChanges();
+            }
+            var sydObjects_TenantActivityLog = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+      r => r.Code == "TENANTACTIVITYLOG");
+            if (sydObjects_TenantActivityLog == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            {
+                sydObjects_TenantActivityLog = new SystemObjects.SydObject
+                {
+                    Code = "TENANTACTIVITYLOG",
+                    Name = "Tenant Activity Log",
+                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
+                    ObjectTypeId = ObjectTypeCodeEntity.Id
+                };
+                _context.SydObjects.Add(sydObjects_TenantActivityLog);
+                _context.SaveChanges();
+            }
             //MMT33[End]
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via".Split(',');
+            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION".ToUpper().Split(',');
+            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE".ToUpper().Split(',');
+            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
