@@ -12,6 +12,7 @@ using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.AppEntities.Dtos;
 using onetouch.SycCurrencyExchangeRates;
 using onetouch.SycIdentifierDefinitions;
+using onetouch.AppEntities;
 
 namespace onetouch.Helpers
 {
@@ -28,13 +29,14 @@ namespace onetouch.Helpers
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRate;
         //MMT30[End]
-
+        private readonly IRepository<AppEntity, long> _appEntityRepository;
         public SystemTables(IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             
             IRepository<SycAttachmentCategory, long> sycAttachmentCategory, IRepository<SycEntityObjectClassification, long> SycEntityObjectClassifications,
            
             IRepository<SycEntityObjectStatus, long> sycEntityObjectStatus, IRepository<SycCounter, long> sycCounter, IRepository<SycIdentifierDefinition, long> sycIdentifierDefinitions,
-            IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate)
+            IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate,
+            IRepository<AppEntity, long> appEntityRepository)
         {
             _sydObjectRepository = sydObjectRepository;
             _sycEntityObjectType = sycEntityObjectType;
@@ -47,6 +49,7 @@ namespace onetouch.Helpers
             _sycCurrencyExchangeRate = sycCurrencyExchangeRate;
             _sycSegmentIdentifierDefinition = sycSegmentIdentifierDefinition;
             //MMT30[End]
+            _appEntityRepository = appEntityRepository;
         }
 
         public async Task< long> GetObjectContactId()
@@ -585,6 +588,14 @@ namespace onetouch.Helpers
                         }
                     }
                 }
+                //MMT
+                if (appEntity != null)
+                {
+                    var appEntityObj = _appEntityRepository.GetAll().Where(x => x.SSIN.Contains(returnString) && x.TenantId == appEntity.TenantId && x.ObjectId == appEntity.ObjectId).FirstOrDefault ();
+                    if (appEntityObj != null)
+                        returnString = await this.GenerateSSIN(objectTypeId, appEntity);
+                }
+                //MMT
                 return returnString;
             }
         }

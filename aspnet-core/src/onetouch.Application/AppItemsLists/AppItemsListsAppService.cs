@@ -640,7 +640,7 @@ namespace onetouch.AppItemsLists
             appItemlist.TimeStamp = timeStamp;
             if (string.IsNullOrEmpty(appItemlist.SSIN))
             {
-                appItemlist.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
+                appItemlist.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(entity));
                 entity.SSIN = appItemlist.SSIN;
             }
             entity.TenantOwner = int.Parse(AbpSession.TenantId.ToString()); 
