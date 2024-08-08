@@ -14,13 +14,13 @@
                               {{l("AppTenantInvoicesHeaderInfo")}}
                           </span>
                       </div>
-                      <div class="kt-subheader__toolbar">
+                      <!-- <div class="kt-subheader__toolbar">
                           <div class="kt-subheader__wrapper">
                               <button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
-                 <!--  <button *ngIf="isGranted('Pages.Administration.AppTenantInvoices.Create')" (click)="createAppTenantInvoice()" 
-                          class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantInvoice")}}</button> -->
+                   <button *ngIf="isGranted('Pages.Administration.AppTenantInvoices.Create')" (click)="createAppTenantInvoice()" 
+                          class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewAppTenantInvoice")}}</button> 
                           </div>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
               
@@ -202,8 +202,9 @@
                                         <td style="width: 130px">
                                          <div  container="body">
                                              
-                                              <button class="btn download-btn">
-                                                <img src="assets/accounts/download.svg"/>
+                                              <button class="btn download-btn" 
+                                              (click)="downloadFile(record.appTenantInvoice.attachment, record.appTenantInvoice.displayName)">
+                                                <img src="assets/accounts/download.svg" (click)="downloadFile(record.appTenantInvoice.attachment, record.appTenantInvoice.displayName)"/>
                                                 {{l("Download")}}
                                               </button>
                                               </div>

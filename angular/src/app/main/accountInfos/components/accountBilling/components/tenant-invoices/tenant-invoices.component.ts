@@ -3,14 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistory/entity-type-history-modal.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppTenantInvoiceDto, AppTenantInvoicesServiceProxy, TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
-import { FileDownloadService } from '@shared/utils/file-download.service';
+//import { FileDownloadService } from '@shared/utils/file-download.service';
 import { NotifyService } from 'abp-ng2-module';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
-
+import { FileDownloadService } from "@shared/download/fileDownload.service" ;
 @Component({
   selector: 'app-tenant-invoices',
   templateUrl: './tenant-invoices.component.html',
@@ -46,7 +46,8 @@ export class TenantInvoicesComponent extends AppComponentBase {
       private _tokenAuth: TokenAuthServiceProxy,
       private _activatedRoute: ActivatedRoute,
       private _fileDownloadService: FileDownloadService,
-    private _router: Router
+      private _router: Router,
+      private _downloadService: FileDownloadService,
   ) {
       super(injector);
   }
@@ -59,11 +60,15 @@ export class TenantInvoicesComponent extends AppComponentBase {
       let customSettings = (abp as any).custom;
       return this.isGrantedAny('Pages.Administration.AuditLogs') && customSettings.EntityHistory && customSettings.EntityHistory.isEnabled && _.filter(customSettings.EntityHistory.enabledEntities, entityType => entityType === this._entityTypeFullName).length === 1;
   } 
-
+  downloadFile(url, name) {
+    let attach = "AppConsts.attachmentBaseUrl";
+    let fullURL = `${attach}/${url}`;
+    this._downloadService.downloadFile(fullURL,name,false);
+}
   getAppTenantInvoices(event?: LazyLoadEvent) {
       if (this.primengTableHelper.shouldResetPaging(event)) {
           this.paginator.changePage(0);
-          return;
+          //return;
       }
 
       this.primengTableHelper.showLoadingIndicator();
@@ -121,8 +126,8 @@ export class TenantInvoicesComponent extends AppComponentBase {
       );
   }
 
-  exportToExcel(): void {
-      this._appTenantInvoicesServiceProxy.getAppTenantInvoicesToExcel(
+  //exportToExcel(): void {
+     /*  this._appTenantInvoicesServiceProxy.getAppTenantInvoicesToExcel(
       this.filterText,
           this.invoiceNumberFilter,
           this.maxInvoiceDateFilter === undefined ? this.maxInvoiceDateFilter : moment(this.maxInvoiceDateFilter).endOf('day'),
@@ -134,7 +139,7 @@ export class TenantInvoicesComponent extends AppComponentBase {
       )
       .subscribe(result => {
           this._fileDownloadService.downloadTempFile(result);
-       });
+       }); */
 
-}
+   // }
 }
