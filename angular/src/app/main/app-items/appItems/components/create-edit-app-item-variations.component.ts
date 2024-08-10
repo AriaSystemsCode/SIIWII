@@ -890,7 +890,8 @@ this.showMainSpinner();
             return this.notify.info(
                 "Please set another image as default first"
             );
-            var index= this.activeAttachmentOption.entityAttachments.findIndex(x=>x.fileName == (this.activeAttachmentOption.attachmentSrcs[i].split('/').pop() || ''));
+            
+            var index =this.activeAttachmentOption.entityAttachments.findIndex(y=>y?.url ===this.activeAttachmentOption.attachmentSrcs[i] )
 
             this.activeAttachmentOption.attachmentSrcs.splice(i, 1);
                 if(index>=0)
@@ -932,7 +933,7 @@ this.showMainSpinner();
         });
     }
 
-    fileChange(event, index: number) {
+    fileChange(event) {
         if (event.target.value) {
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
@@ -943,11 +944,11 @@ this.showMainSpinner();
             );
             let subs = onCropDone.subscribe((res) => {
                 if (data.isCropDone) {
-                    this.tempUploadImage(event, data, index);
+                    this.tempUploadImage(event, data);
                 }
                 // reset input
                 event.target.value = null;
-              //  subs.unsubscribe();
+              subs.unsubscribe();
             });
         }
     }
@@ -968,8 +969,7 @@ this.showMainSpinner();
 
     tempUploadImage(
         event: Event,
-        croppedImageContent: ImageCropperComponent,
-        index: number
+        croppedImageContent: ImageCropperComponent
     ) {
         const file = (event.target as HTMLInputElement).files[0];
         // this.attachmentCategory.imgURL = croppedImageContent.croppedImageAsBase64 as string
@@ -984,7 +984,7 @@ this.showMainSpinner();
         let guid = this.guid();
         // create app attachment entity
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-        att.index = index;
+      //  att.index = index;
         att.fileName = file.name;
         let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
        // let optionValue = this.activeAttachmentOption.lookupData.value;
@@ -1001,9 +1001,18 @@ this.showMainSpinner();
         att.url = croppedImageContent.croppedImageAsBase64 as string;
 
         // save image as a base64
-        this.activeAttachmentOption.attachmentSrcs[index] =
-            croppedImageContent.croppedImageAsBase64 as string;
+        // this.activeAttachmentOption.attachmentSrcs[index] =
+        //     croppedImageContent.croppedImageAsBase64 as string;
+
+       // this.activeAttachmentOption.attachmentSrcs= this.activeAttachmentOption.attachmentSrcs?  this.activeAttachmentOption.attachmentSrcs : [];
+       if (!this.activeAttachmentOption.attachmentSrcs) {
+        this.activeAttachmentOption.attachmentSrcs = [];
+    }
+        this.activeAttachmentOption.attachmentSrcs.push(croppedImageContent.croppedImageAsBase64 as string);
+let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAttachmentOption.attachmentSrcs?.length-1 : 0;
         this.activeAttachmentOption.entityAttachments[index] = att;
+        att.index = index;
+
         if (this.activeAttachmentOption.entityAttachments.length == 1) {
             this.setDefaultImage(0);
         }
@@ -1465,6 +1474,7 @@ this.showMainSpinner();
         this.applyVariations.emit(body);
     }
 
+    
     updateVaritaionAttachments() {
         let defaultExtraAttrId =
             this.defaultExtraAttrForAttachments?.attributeId;
