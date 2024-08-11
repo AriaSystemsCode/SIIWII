@@ -1,14 +1,33 @@
 .tab-cont {
-    background-color: #f1f2f3;
+    background-color: #fff;
     padding: 10px;
+    .header{
+        border-radius: 10px 10px 0px 0px;
+        border: 1px solid #E5E5E5;
+        
+        background: #F8F8F8;
+    }
     .mainheadertxt{
-        color: #4a0d4a;
+        color: #1B101B;
+        font-size: 28px;
+font-style: normal;
+font-weight: 700;
+    }
+    label {
+        color: #1B101B;
+font-size: 16px;
+font-style: normal;
+font-weight: 600;
+    }
+    .custom-sec {
+        border-radius: 10px 10px 0px 0px;
+        border: 1px solid #E5E5E5;
     }
     .shareSectionCont{
         background-color: #fff;
     }
     .addContBtn{
-        background-color: #f6851d;
+        background-color: #4A0D4A;
         color: #fff;
     }
     .selected-contact-list{
@@ -20,14 +39,27 @@
         align-content: flex-start;
     }
 }
+.orderForm .header span {
+    color: #1B101B;
+
+font-size: 20px;
+font-style: normal;
+font-weight: 700;
+}
 .removeShare{
     color: #4a0d4a;
     cursor: pointer;
 }
+::ng-deep {
+    .p-autocomplete .p-autocomplete-multiple-container:not(.p-disabled).p-focus {
+        box-shadow:  none !important;
+        border: 1px solid #4A0D4A !important;
+    }
+}
 .reloadContact{
     color: #fff;
     cursor: pointer;
-    background-color: #f6851d;
+    background-color: #4A0D4A;
     border-radius: 50%;
     font-size: 9px; 
     padding: 4px;
@@ -37,8 +69,11 @@
     text-decoration: line-through;
 
 }
+h6{
+    margin: 8px;
+}
 :host ::ng-deep div.p-chip.removedContact{
-    border:1px solid #f6851d;
+    border:1px solid #4A0D4A;
 
 }
 :host ::ng-deep div.p-chip{

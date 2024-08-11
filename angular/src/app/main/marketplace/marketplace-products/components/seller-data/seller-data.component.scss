@@ -9,7 +9,9 @@
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        height: 300px;
+        height: 150px;
+        top: 85px;
+    
 
         img {
             width: 130px;
@@ -54,19 +56,28 @@
             background-position: top center !important;
             background-size: cover !important;
             background-repeat: no-repeat !important;
-            height: 100px;
+            height: 135px;
             background-color: #b1b1b1 !important;
+            margin: 12px !important;
+            border-radius: 6px !important;
         }
         .mobile-logo {
             position: absolute;
-            top: 55%;
-            left: 10px;
+            top: 15%;
+            left: 30px;
             img {
                 width: 80px;
                 height: 80px;
-                border-radius: 50%;
+                border-radius: 6px;
+                border: 1px solid white;
                 object-fit: cover;
             }
+        }
+        h5 {
+            position: absolute;
+            bottom: 3px;
+            left: 50px;
+            color: white;
         }
     }
 }

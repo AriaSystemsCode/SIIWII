@@ -1,10 +1,10 @@
 ...<!-- Navbar -->
 <nav
-    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5"
+    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5 ml-0"
     [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
 >
     <!-- Container wrapper -->
-    <div class="container ml-0">
+    <div class="container ml-0 position-md-absolute position-lg-static">
         <!-- Navbar brand -->
 
         <!--  <a
@@ -39,6 +39,7 @@
         <!-- test nav -->
         <a
             class="navbar-brand pt-0"
+            style="margin-left: 25px;"
             [routerLink]="['/app/main/Home']"
             routerLinkActive="header-link-active"
             (click)="userClick('Home')"
@@ -49,7 +50,7 @@
             />
         </a>
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form d-md-block d-none">
+        <form class="input-group pt-3 input-group-form d-lg-block d-none">
             <div class="position-relative search-bar w-100" *ngIf="showSearch">
                 <div class="input-group mb-3">
                     <div
@@ -134,7 +135,7 @@
         </a>
 
         <!-- Collapsible wrapper -->
-        <div class="ml-4 d-md-block d-none navbar-collapse">
+        <div class="ml-4 d-md-flex d-none navbar-collapse " style="justify-content: space-evenly;margin-left: 35px;">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -154,18 +155,18 @@
                         }}</span>
                     </a>
                 </li>
-                <li  class="border-left ml-2 nav-item text-white pt-3 pl-3" *ngIf="shoppingCartSummary?.shoppingCartId >0 && transactionType">
+                <li  class="border-left ml-2 nav-item text-white pt-3 pl-3 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0 && transactionType">
                 <div class="orderType"> {{transactionType}}</div> 
                   </li>
 
-                <li  class="ml-2 nav-item pt-2" *ngIf="shoppingCartSummary?.shoppingCartId >0">
+                <li  class="ml-2 nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
                         [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' +  shoppingCartSummary?.sellerLogo  : defaultSellerLogo "
                         onerror="this.onerror=null;this.src=defaultSellerLogo"
                         class="navbar-brand"
                     />
                   </li>
-                  <li  class="nav-item pt-2" *ngIf="shoppingCartSummary?.shoppingCartId >0">
+                  <li  class="nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
                     [src]="shoppingCartSummary?.buyerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.buyerLogo : defaultBuyerLogo"
                     onerror="this.onerror=null;this.src=defaultBuyerLogo"
@@ -174,7 +175,7 @@
                   </li>
                   </ul>
 
-            <div class="position-relative pt-3">
+            <div class="position-relative pt-3" style="width: 20px;">
                 <span
                     class="kt-header__topbar-icon kt-header__topbar-icon--primary"
                 >
@@ -198,15 +199,15 @@
                     </div>
                 </span>
             </div>
-            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.amount" class="ml-3 mt-2 pt-3"> 
+            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.amount" class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
                 <h5 class="text-white"> {{currencySymbol }} {{shoppingCartSummary?.amount | currency:' ' }}</h5>  
             </div>
 
             <!-- Left links -->
         </div>
 
-        <div class="rightList d-md-block d-none ml-4 ml-lg-0 navbar-collapse">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2">
+        <div class="rightList ml-4 ml-lg-0 navbar-collapse d-md-block d-none">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-md-flex d-none " style="justify-content: space-around;">
                 <li class="nav-item pl-3 pt-2">
                     <a
                         class="nav-link active d-flex flex-column text-center"
@@ -259,8 +260,8 @@
                     <a class="nav-link active d-flex flex-column text-center">
                         <div
                             dropdown
-                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-3 pr-3"
-                            style="width: 40px; height: 40px; color: white"
+                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3"
+                            style=" height: 40px; color: white"
                         >
                             <div
                                 dropdownToggle

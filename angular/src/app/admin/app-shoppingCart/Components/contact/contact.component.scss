@@ -6,3 +6,21 @@ img {
     bottom: 24px;
 
 }
+
+::ng-deep {
+    .aria-select-primeng.p-dropdown {
+        min-width: 5.5em !important;
+    }
+}
+
+.previewTitle {
+    color: #1B101B;
+font-style: normal;
+font-weight: 600;
+}
+.previewValue {
+    color: #9E9E9E;
+
+    font-style: normal;
+    font-weight: 600;
+}

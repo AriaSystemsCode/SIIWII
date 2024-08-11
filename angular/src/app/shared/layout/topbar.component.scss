@@ -1,7 +1,7 @@
 .topbar {
     background-color: #4a0d4a;
     height: 70px;
-    margin-right: 13px !important;
+    // margin-right: 13px !important;
 }
 
 .navbar-brand {
@@ -64,7 +64,26 @@
         flex-basis: unset !important;
     }
 }
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .position-md-absolute {
+        position: absolute;
+    }
+}
+
+@media (min-width: 992px) {
+    .position-lg-static {
+        position: static;
+    }
+}
 @media only screen and (max-width: 767px) {
+    .navbar-nav {
+        -webkit-box-orient: horizontal !important;
+        display: flex !important;
+        flex-direction: row !important;
+    }
+    .container-tab {
+        position: absolute !important;
+    }
     .input-group-form {
         width: 64%;
     }

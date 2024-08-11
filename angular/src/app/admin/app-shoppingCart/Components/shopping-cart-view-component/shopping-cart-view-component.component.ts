@@ -28,6 +28,7 @@ export class ShoppingCartViewComponentComponent
   implements OnInit {
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
   @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
+  @ViewChildren(CommentParentComponent) commentParentComponentMob!: QueryList<CommentParentComponent>;
   @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   orderInfoValid: boolean = false;
@@ -82,6 +83,7 @@ export class ShoppingCartViewComponentComponent
   companeyNames:GetAccountInformationOutputDto[];
   currentTab:number
   shareDone:boolean=false;
+  openActions:boolean =false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -94,11 +96,23 @@ export class ShoppingCartViewComponentComponent
 
   }
   ngOnInit(): void {
-   
+   console.log(this.openActions, "openActions")
   }
   loadCommentsList() {
+    const screenWidth = window.innerWidth;
+    const tabletWidth = 768; // iPads and tablets
     // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
+    if(screenWidth <= tabletWidth){
     this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+    }
+  }
+
+  loadCommentsListMob() {
+    const screenWidth = window.innerWidth;
+    const tabletWidth = 768; // iPads and tablets
+    if(screenWidth > tabletWidth) {
+    this.commentParentComponentMob?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+    }
   }
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
@@ -217,7 +231,11 @@ export class ShoppingCartViewComponentComponent
           this.canChange= this.isOwnedByMe
            this.transactionCode=res?.code;
           
-           this.loadCommentsList()
+   
+
+        this.loadCommentsList()
+        this.loadCommentsListMob()
+      
    
            //lines
            this._AppTransactionServiceProxy

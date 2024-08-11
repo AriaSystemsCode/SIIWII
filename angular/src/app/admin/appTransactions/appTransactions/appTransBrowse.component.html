@@ -59,7 +59,7 @@
                             </div>
                             <div class="top-sec">
                             <div class="row justify-content-between">
-                            <div class="mb-4 col-4 mb-md-0 list-toolbar-search">
+                            <div class="mb-0 col-md-4 col-12 mb-md-0 list-toolbar-search">
                                     <div class="form-group m-form__group align-items-center">
                                         <div class="input-group">
                                             <span class="input-group-btn">
@@ -79,7 +79,7 @@
                                 <!-- <div class="list-toolbar-divider" *ngIf="showAddButton"></div> -->
                           
                                 <!-- <div class="list-toolbar-divider"></div> -->
-<div class="col-4 d-flex justify-content-end">
+<div class="col-md-4 col-12 d-flex justify-content-md-end justify-content-start">
                                 <div class="text-center mr-2">
                                     <a style="
                                         padding-right: 4px;
@@ -95,8 +95,9 @@
 
                                     <ng-container *ngIf="showAddButton">
                                         <div class="btn-group" dropdown>
-                                            <button dropdownToggle type="button"
-                                                class="btn btn-primary bgPurple border-0" data-toggle="dropdown"
+                                            <button dropdownToggle type="button" style="    width: 146px;
+    height: 48px;"
+                                                class="btn  bgPurpleM border-0" data-toggle="dropdown"
                                                 aria-haspopup="true" aria-expanded="false">
                                                 {{"Create new" | localize}} <i class="fa fa-plus pl-2"></i>
                                             </button>
@@ -303,6 +304,34 @@
                                             <!-- <p-columnFilter type="date" field="completeDate" display="menu"
                                                 class="ml-auto"></p-columnFilter> -->
                                         </th>
+                                        <th style="width: 150px" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('Reference #')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 165px" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('CreatorTenantName')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        
+                                
+
+                                        <th style="width: 150px;white-space: nowrap;" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('TotalQuantity')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 150px" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('TotalAmount')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
@@ -353,6 +382,34 @@
                                                 {{record.completeDate | momentFormat:'L' }}
                                             </span>
                                             <span *ngIf="!record.completeDate">-</span>
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('Reference #')}}</span>
+                                            <span >
+                                                {{record.reference }}
+                                            </span>
+                                            <span *ngIf="!record.reference">-</span>
+                                        </td>
+                                        <td style="width:165px ;">
+                                            <span class="p-column-title" style="white-space: nowrap;"> {{l('CreatorTenantName')}}</span>
+                                            <span >
+                                                {{record.creatorTenantName }}
+                                            </span>
+                                            <!-- <span *ngIf="!record.creatorTenantName">-</span> -->
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('TotalQuantity')}}</span>
+                                            <span >
+                                                {{record.totalQuantity }}
+                                            </span>
+                                            <!-- <span *ngIf="!record.totalQuantity">-</span> -->
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('TotalAmount')}}</span>
+                                            <span >
+                                                {{record.totalAmount }}
+                                            </span>
+                                            <!-- <span *ngIf="!record.totalAmount">-</span> -->
                                         </td>
                                     </tr>
 

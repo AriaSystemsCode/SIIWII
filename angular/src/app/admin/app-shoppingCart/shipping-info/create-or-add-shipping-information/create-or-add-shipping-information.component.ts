@@ -228,7 +228,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
     this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
       .subscribe((res) => {
         this.shipViaList = res;
-        debugger
+        // debugger
         if(!this.appTransactionsForViewDto.shipViaId&&this.shipViaList.length==1){
             this.shipViaValue=this.shipViaList[0];
             this.appTransactionsForViewDto.shipViaId = this.shipViaValue?.value;

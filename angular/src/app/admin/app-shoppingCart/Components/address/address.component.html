@@ -86,9 +86,11 @@
             </li>
         </ul>
         <label class="noAddressMsg" *ngIf="savedAddressesList.length==0"> No Addresses found</label>
+        <div class="d-flex justify-content-end">
         <button class=" mb-3 ml-2 add-new-add-btn" (click)="openAddAddressForm()">
             <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
         </button>
+    </div>
         </div>
 </div>
 

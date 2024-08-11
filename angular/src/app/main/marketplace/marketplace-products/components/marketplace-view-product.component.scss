@@ -102,6 +102,7 @@ td {
 
 .summary {
     border-radius:12px ;
+    background-color: white;
 
     .header {
         background-color: #F8F8F8;
@@ -131,7 +132,7 @@ td {
     .orderedSummary {
         height: 500px;
         overflow-y: scroll;
-        padding: 20px;
+        padding: 7px;
         background-color: #fff;
         .default {
             background-color: #F8F8F8;
@@ -346,4 +347,103 @@ display: none;
     .summaryTab{
                 display: none;
                     }
+}
+h4 , h5 {
+    color: #1B101B;
+font-weight: 500;
+
+}
+h6 {
+    color: #1B101B;
+font-size: 14px;
+font-style: normal;
+font-weight: 600;
+}
+::ng-deep {
+@media only screen and (max-width: 567px) {
+    table th{
+        white-space: nowrap !important;
+        font-size: 11px !important;
+    }
+    .p-tabview .p-tabview-nav {
+        padding: 8px 14px !important;
+        border: 1px solid #E2E2E2 !important;
+        border-top-left-radius: 6px !important;
+        border-top-right-radius: 6px !important;
+        padding: 5px !important;
+        background: #FFF !important;
+        .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+            border-radius: 12px !important;
+            fill: white !important;
+        }
+    }
+    .p-tabview .p-tabview-panels {
+        padding: 5px !important;
+    }
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+        width: 80px !important;
+        height: 66px !important;
+        padding: 0 !important;
+        border: none !important;
+        svg {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 10px !important;
+            margin-top: 10px !important;
+        }
+    }
+     .p-tabview .p-tabview-nav li {
+        width: 25% !important;
+        height: 66px !important;
+        border-right:  1px solid #eee !important;
+    }
+    .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        // background-color: white !important; 
+        color: #777 !important;
+        border: none!important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+         width: 66px  !important;
+         height: 66px !important;
+         margin-top: 3px !important;
+         .tab-header {
+            background-color: #4A0D4A !important;
+            border-radius: 6px !important;
+            color: white !important;
+            padding: 2px 5px !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            svg {
+                fill: #fff !important;
+                width: 24px;
+                height:  24px;
+            }
+        }
+    }
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+        box-shadow: none !important;
+    }
+    .p-tabview-nav-link {
+        border-top: none !important;
+        border-left: none !important;
+        border-width: 1px !important;
+        border-color: #c8c8c8 !important;
+         background: #FFF !important;
+        color: #777 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        font-size: 14px !important;
+        width: 140px  !important;
+        // border-right: 1px solid #eee !important ;
+        // border-bottom: 1px solid #eee !important ;
+        height: 99px !important;
+        align-items: center !important;
+        fill:#777777 !important;
+        svg{
+            fill: #777 !important;
+
+        }
+    }
+}
 }

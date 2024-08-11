@@ -76,7 +76,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
             this.savedAddressesList=null;
             this.savedAddressesList=result;
             this.refSavedAddressesList=result;
-            debugger
+            // debugger
             if(this.savedAddressesList.length==0&&!this.selectedAddress){
                 this.openAddNewAddForm=true;
                 this.showAddList=false;
