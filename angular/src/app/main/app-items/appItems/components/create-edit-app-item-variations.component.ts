@@ -1267,12 +1267,12 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             // if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
                 currentExtraAttr.selectedValues.forEach((attrId) => {
                     // if(attrId || attrId>=0){
-                    let attrOptionData: any = currentExtraAttr.lookupData.filter(
+                    let attrOptionData: any = currentExtraAttr?.lookupData?.filter(
                         (item) => item.value == attrId
                     )[0];
 
                     if(!attrOptionData)
-                    attrOptionData = currentExtraAttr.lookupData.filter(
+                    attrOptionData = currentExtraAttr?.lookupData?.filter(
                         (item) => item.code == attrId
                     )[0];
 
@@ -2016,16 +2016,16 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
 
        extraAttr.lookupData= extraAttr.lookupData?.filter(item => !existingCodes.includes(item.code))
        extraAttr.lookupData.push(...this.appItem.nonLookupValues);
-       const filteredItems1 = extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
+       const filteredItems1 = extraAttr.lookupData?.filter(item => extraAttr.selectedValues?.includes(item.value));
      
        filteredItems1.forEach(item => {
-        let codeExists = extraAttr.displayedSelectedValues.some(displayedItem => displayedItem.code === item.code);
+        let codeExists = extraAttr?.displayedSelectedValues?.some(displayedItem => displayedItem.code === item.code);
         if (!codeExists) 
-            extraAttr.displayedSelectedValues.push(item);
+            extraAttr?.displayedSelectedValues?.push(item);
         
             else{
-                let lookupData=extraAttr.lookupData.find(displayedItem => displayedItem.code === item.code);
-                let index = extraAttr.displayedSelectedValues.findIndex(displayedItem => displayedItem.code === item.code);
+                let lookupData=extraAttr?.lookupData?.find(displayedItem => displayedItem.code === item.code);
+                let index = extraAttr?.displayedSelectedValues?.findIndex(displayedItem => displayedItem.code === item.code);
 
                 if (index !== -1) 
                     extraAttr.displayedSelectedValues[index] = lookupData;
@@ -2033,17 +2033,17 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         
     });
 
-    const filteredItems2 = this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code));
+    const filteredItems2 = this.appItem.nonLookupValues?.filter(item => extraAttr?.selectedValues?.includes(item.code));
      
     filteredItems2.forEach(item => {
-     let codeExists = extraAttr.displayedSelectedValues.some(displayedItem => displayedItem.code === item.code);
+     let codeExists = extraAttr?.displayedSelectedValues?.some(displayedItem => displayedItem.code === item.code);
      
      if (!codeExists) 
-         extraAttr.displayedSelectedValues.push(item);
+         extraAttr?.displayedSelectedValues?.push(item);
      
      else{
         let nonLookupValues=this.appItem.nonLookupValues.find(displayedItem => displayedItem.code === item.code);
-        let index = extraAttr.displayedSelectedValues.findIndex(displayedItem => displayedItem.code === item.code);
+        let index = extraAttr?.displayedSelectedValues?.findIndex(displayedItem => displayedItem.code === item.code);
 
         if (index !== -1) 
             extraAttr.displayedSelectedValues[index] = nonLookupValues;
@@ -2062,7 +2062,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         const extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
 
-            extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+            extraAttr.displayedSelectedValues =  extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item.value))
 
 
             if(search){
