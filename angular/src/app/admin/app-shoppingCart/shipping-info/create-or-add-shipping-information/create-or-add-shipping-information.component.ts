@@ -57,6 +57,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
     this.storeVal = this.appTransactionsForViewDto?.buyerStore;
     //this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
     this.loadShipViaList();
+    console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
 
   }
   ngOnChanges(changes: SimpleChanges) {
