@@ -156,16 +156,13 @@ export class MarketplaceViewProductComponent
                     )
                     .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
                         this.productDetails = res.appItem;
-                        
-                        console.log(this.productDetails,'helllllooooo')
-                        console.log(this.orderSummary,'orderSummary')
                         this.updatedSpecialPrice = this.productDetails.minSpecialPrice;
                         this.productDetails?.minMSRP % 1 == 0 ? this.productDetails.minMSRP = Math.round(this.productDetails.minMSRP * 100 / 100).toFixed(2) : null;
                         this.productDetails?.maxMSRP % 1 == 0 ? this.productDetails.maxMSRP = Math.round(this.productDetails.maxMSRP * 100 / 100).toFixed(2) : null;
                         this.productImages = res.appItem.entityAttachments;
                         this.productVarImages = res?.appItem?.variations;
                         let colorVariation: any[] = res.appItem.variations.filter(
-                            (variation: any) => variation.extraAttrName === "COLOR"
+                            (variation: any) => variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName
                         );
                         let selectedValues = [
                             ...colorVariation.map(
@@ -249,7 +246,7 @@ export class MarketplaceViewProductComponent
         }
         if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
             this.productDetails.variations.map((variation: any) => {
-                if (variation.extraAttrName === "COLOR") {
+                if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
                     variation.selectedValues.forEach((value) => {
                         if (
                             value.value ===
@@ -487,7 +484,7 @@ export class MarketplaceViewProductComponent
                 /////
                 if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
                     this.productDetails.variations.map((variation: any) => {
-                        if (variation.extraAttrName === "COLOR") {
+                        if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
                             variation.selectedValues.forEach((value) => {
                                 value.edRestAttributes.forEach((attr) => {
                                     if (attr.extraAttrName === "SIZE") {
@@ -572,7 +569,7 @@ export class MarketplaceViewProductComponent
         }).then((result) => {
             if (result.isConfirmed) {
                 this.productDetails.variations.map((variation: any) => {
-                    if (variation.extraAttrName === "COLOR") {
+                    if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
                         variation.selectedValues.forEach((value) => {
                             value.edRestAttributes.forEach((attr) => {
                                 if (attr.extraAttrName === "SIZE") {

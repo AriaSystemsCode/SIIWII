@@ -474,6 +474,7 @@
                                             : ''
                                     "
                                 ></div>
+                                <div>
                                 <img
                                     *ngIf="
                                         (color.colorImg === null &&
@@ -493,6 +494,17 @@
                                             : ''
                                     "
                                 />
+                                <div class="card-body">
+                              
+                                   
+                                    <p class="card-text desc fw-bold" >
+                                        {{   color.colorCode }}
+                                    </p>
+                                    <p class="seller" >{{ color.colorName  }}</p> 
+                            
+                                 
+                                </div>
+                                </div>
                             </div>
                         </div>
                         <!-- color selection -->
