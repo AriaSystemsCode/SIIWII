@@ -1583,9 +1583,11 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             const currentExtraDataIndex = extraAttrIds.indexOf(
                 elem.attributeId
             );
+            if(currentExtraDataIndex>=0){
             this.extraAttributes[currentExtraDataIndex].selected = true;
             this.extraAttributes[currentExtraDataIndex].selectedValues = [];
             this.extraAttributes[currentExtraDataIndex].displayedSelectedValues=[];
+            }
         });
 
         let selectedExtraAttrIds = this.selectedExtraAttributes.map(
