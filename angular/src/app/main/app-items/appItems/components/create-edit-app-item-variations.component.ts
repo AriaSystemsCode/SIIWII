@@ -508,7 +508,11 @@ export class CreateEditAppItemVariationsComponent
                     let lookupData = responses[index];
                     extraAttr.lookupData = lookupData;
                     extraAttr.displayedLookupData = extraAttr.lookupData;
-                    extraAttr.displayedSelectedValues = extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item?.value))
+                 //   extraAttr.displayedSelectedValues = extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item?.value))
+                  
+                   extraAttr.displayedSelectedValues =  Array.isArray(extraAttr?.selectedValues) ?  extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item?.value)) :  
+                      extraAttr.lookupData?.filter(item => item.value == extraAttr?.selectedValues)
+
                 });
                 this.tempAddNewAttributes()
                 resolve(true);
@@ -2016,7 +2020,8 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
 
        extraAttr.lookupData= extraAttr.lookupData?.filter(item => !existingCodes.includes(item.code))
        extraAttr.lookupData.push(...this.appItem.nonLookupValues);
-       const filteredItems1 = extraAttr.lookupData?.filter(item => extraAttr.selectedValues?.includes(item.value));
+      //const filteredItems1 = extraAttr.lookupData?.filter(item => extraAttr.selectedValues?.includes(item.value));
+       const filteredItems1 =   Array.isArray(extraAttr.selectedValues) ?  extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item.value))  :  extraAttr?.lookupData?.filter(item => item.value == extraAttr?.selectedValues)
      
        filteredItems1.forEach(item => {
         let codeExists = extraAttr?.displayedSelectedValues?.some(displayedItem => displayedItem.code === item.code);
@@ -2033,7 +2038,10 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         
     });
 
-    const filteredItems2 = this.appItem.nonLookupValues?.filter(item => extraAttr?.selectedValues?.includes(item.code));
+    //const filteredItems2 = this.appItem.nonLookupValues?.filter(item => extraAttr?.selectedValues?.includes(item.code));
+    const filteredItems2 =  Array.isArray(extraAttr?.selectedValues)     ? this.appItem.nonLookupValues?.filter(item => extraAttr?.selectedValues?.includes(item.code))   : 
+    this.appItem.nonLookupValues?.filter(item => item.code == extraAttr?.selectedValues) ; 
+
      
     filteredItems2.forEach(item => {
      let codeExists = extraAttr?.displayedSelectedValues?.some(displayedItem => displayedItem.code === item.code);
@@ -2062,7 +2070,9 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         const extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
 
-            extraAttr.displayedSelectedValues =  extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item.value))
+            //extraAttr.displayedSelectedValues =  extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item.value))
+            extraAttr.displayedSelectedValues = Array.isArray(extraAttr?.selectedValues) ?    extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item.value))   : 
+            extraAttr?.lookupData?.filter(item =>  item.value == extraAttr?.selectedValues)  ;
 
 
             if(search){
