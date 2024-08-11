@@ -85,17 +85,19 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
     show(
         entityObjectType: { name: string; code: string },
-        appEntity?: AppEntityDto
+        appEntity?: AppEntityDto,
+        nonlookup:boolean=false
     ): void {
         this.entityObjectType = entityObjectType;
         this.saving=false;
         if (appEntity) this.appEntity = appEntity;
         else appEntity = new AppEntityDto();
         this.appEntity.tenantId = -1;
-        if (this?.appEntity?.id) {
+        if(this.appEntity?.id && !nonlookup)
+                {
             this.editMode = true;
             this.addToLookup=true;
-            this._appEntitiesServiceProxy
+                this._appEntitiesServiceProxy
                 .getAppEntityForEdit(this.appEntity.id)
                 .subscribe((res) => {
                     this.appEntity = AppEntityDto.fromJS(res.appEntity);
@@ -105,13 +107,14 @@ export class CreateOrEditAppEntityDynamicModalComponent
                     this.loading = true;
 
 
-                    if(!this.appEntity.entityAttachments)
+                    if(!(this.appEntity.entityAttachments && this.appEntity.entityAttachments ?.length>0) )
                     this.setSolid(true);
                 else
                 this.setSolid(false);
                 });
+             
+          
         }
-
         else{
             if(this.appEntity?.code){
                 this.editMode = true;
@@ -121,12 +124,14 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 this.adjustImageSrcsUrls();
                 this.loading = true;
 
-                if(!this.appEntity.entityAttachments)
+                if(!(this.appEntity.entityAttachments && this.appEntity.entityAttachments ?.length>0))
                 this.setSolid(true);
             else
             this.setSolid(false);
             }
         }
+
+       
             console.log("this.entityObjectType.code"+this.entityObjectType.code);
         this._sycAttachmentCategoriesServiceProxy.getAllByEntityObjectType(
             0,

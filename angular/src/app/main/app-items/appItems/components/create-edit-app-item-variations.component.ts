@@ -890,7 +890,8 @@ this.showMainSpinner();
             return this.notify.info(
                 "Please set another image as default first"
             );
-            var index= this.activeAttachmentOption.entityAttachments.findIndex(x=>x.fileName == (this.activeAttachmentOption.attachmentSrcs[i].split('/').pop() || ''));
+            
+            var index =this.activeAttachmentOption.entityAttachments.findIndex(y=>y?.url ===this.activeAttachmentOption.attachmentSrcs[i] )
 
             this.activeAttachmentOption.attachmentSrcs.splice(i, 1);
                 if(index>=0)
@@ -932,7 +933,7 @@ this.showMainSpinner();
         });
     }
 
-    fileChange(event, index: number) {
+    fileChange(event) {
         if (event.target.value) {
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
@@ -943,11 +944,11 @@ this.showMainSpinner();
             );
             let subs = onCropDone.subscribe((res) => {
                 if (data.isCropDone) {
-                    this.tempUploadImage(event, data, index);
+                    this.tempUploadImage(event, data);
                 }
                 // reset input
                 event.target.value = null;
-              //  subs.unsubscribe();
+              subs.unsubscribe();
             });
         }
     }
@@ -968,8 +969,7 @@ this.showMainSpinner();
 
     tempUploadImage(
         event: Event,
-        croppedImageContent: ImageCropperComponent,
-        index: number
+        croppedImageContent: ImageCropperComponent
     ) {
         const file = (event.target as HTMLInputElement).files[0];
         // this.attachmentCategory.imgURL = croppedImageContent.croppedImageAsBase64 as string
@@ -984,7 +984,7 @@ this.showMainSpinner();
         let guid = this.guid();
         // create app attachment entity
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-        att.index = index;
+      //  att.index = index;
         att.fileName = file.name;
         let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
        // let optionValue = this.activeAttachmentOption.lookupData.value;
@@ -1001,9 +1001,18 @@ this.showMainSpinner();
         att.url = croppedImageContent.croppedImageAsBase64 as string;
 
         // save image as a base64
-        this.activeAttachmentOption.attachmentSrcs[index] =
-            croppedImageContent.croppedImageAsBase64 as string;
+        // this.activeAttachmentOption.attachmentSrcs[index] =
+        //     croppedImageContent.croppedImageAsBase64 as string;
+
+       // this.activeAttachmentOption.attachmentSrcs= this.activeAttachmentOption.attachmentSrcs?  this.activeAttachmentOption.attachmentSrcs : [];
+       if (!this.activeAttachmentOption.attachmentSrcs) {
+        this.activeAttachmentOption.attachmentSrcs = [];
+    }
+        this.activeAttachmentOption.attachmentSrcs.push(croppedImageContent.croppedImageAsBase64 as string);
+let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAttachmentOption.attachmentSrcs?.length-1 : 0;
         this.activeAttachmentOption.entityAttachments[index] = att;
+        att.index = index;
+
         if (this.activeAttachmentOption.entityAttachments.length == 1) {
             this.setDefaultImage(0);
         }
@@ -1465,6 +1474,7 @@ this.showMainSpinner();
         this.applyVariations.emit(body);
     }
 
+    
     updateVaritaionAttachments() {
         let defaultExtraAttrId =
             this.defaultExtraAttrForAttachments?.attributeId;
@@ -1915,7 +1925,10 @@ this.showMainSpinner();
                 name: extraAttr.name,
                 code: extraAttr.entityObjectTypeCode, //to be discussed with Farag
             },
-            selectedRecords: extraAttr.selectedValues,
+            selectedRecords:extraAttr.displayedSelectedValues.map(item => {
+                const codeExistsInNonLookupValues = this.appItem.nonLookupValues.some(nonLookupItem => nonLookupItem.code === item.code);
+                return codeExistsInNonLookupValues ? item.code : item.value;
+              }),
             acceptMultiValues: extraAttr.acceptMultipleValues,
             nonLookupValues:  this.appItem.nonLookupValues ? this.appItem.nonLookupValues : []
         };
@@ -1931,11 +1944,19 @@ this.showMainSpinner();
                 extraAttr
             );
     
+        this.showMainSpinner();
             subscription.subscribe((result) => {
                 extraAttr.lookupData=result;
+                let modalRefData: AppEntityListDynamicModalComponent =
+                modalRef.content;
+                if (modalRefData.selectionDone)
+                this.onselectionDone(modalRefData,extraAttr);
+                if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+           
+                this.hideMainSpinner();
             });
 
-            let modalRefData: AppEntityListDynamicModalComponent =
+          /*   let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
             if (modalRefData.selectionDone){
                 extraAttr.selectedValues = modalRefData.selectedRecords;
@@ -1965,9 +1986,72 @@ this.showMainSpinner();
                 //this.appItem.nonLookupValues?.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
                 extraAttr.displayedSelectedValues?.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
 
-            }
-            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+            } */
         });
+    }
+
+   onselectionDone(modalRefData: AppEntityListDynamicModalComponent,extraAttr) {
+   
+        extraAttr.selectedValues = modalRefData.selectedRecords;
+      this.appItem.nonLookupValues =   this.appItem.nonLookupValues ? this.appItem.nonLookupValues : [] ;
+
+       let existingCodes = this.appItem.nonLookupValues.map(item => item.code);
+
+       let newCodes = modalRefData.nonLookupValues?.filter(item => !existingCodes.includes(item.code));
+       newCodes= newCodes ? newCodes : [] ;
+       this.appItem.nonLookupValues.push(...newCodes);
+
+       let x=extraAttr.lookupData?.filter(item => existingCodes.includes(item.code))
+       if(x && x.length >0)
+       {
+        for (let index = 0; index < x.length; index++) {
+            const element = x[index];
+        let y=this.appItem.nonLookupValues.filter(item => item.code == element.code);
+        if(y && y.length>0)
+              y[0].value=element.value
+       }
+    }
+
+       extraAttr.lookupData= extraAttr.lookupData?.filter(item => !existingCodes.includes(item.code))
+       extraAttr.lookupData.push(...this.appItem.nonLookupValues);
+       const filteredItems1 = extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
+     
+       filteredItems1.forEach(item => {
+        let codeExists = extraAttr.displayedSelectedValues.some(displayedItem => displayedItem.code === item.code);
+        if (!codeExists) 
+            extraAttr.displayedSelectedValues.push(item);
+        
+            else{
+                let lookupData=extraAttr.lookupData.find(displayedItem => displayedItem.code === item.code);
+                let index = extraAttr.displayedSelectedValues.findIndex(displayedItem => displayedItem.code === item.code);
+
+                if (index !== -1) 
+                    extraAttr.displayedSelectedValues[index] = lookupData;
+             }
+        
+    });
+
+    const filteredItems2 = this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code));
+     
+    filteredItems2.forEach(item => {
+     let codeExists = extraAttr.displayedSelectedValues.some(displayedItem => displayedItem.code === item.code);
+     
+     if (!codeExists) 
+         extraAttr.displayedSelectedValues.push(item);
+     
+     else{
+        let nonLookupValues=this.appItem.nonLookupValues.find(displayedItem => displayedItem.code === item.code);
+        let index = extraAttr.displayedSelectedValues.findIndex(displayedItem => displayedItem.code === item.code);
+
+        if (index !== -1) 
+            extraAttr.displayedSelectedValues[index] = nonLookupValues;
+        }
+     
+
+ });
+
+        //extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
+       //extraAttr.displayedSelectedValues?.push(...this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code)));
     }
     filterLookup($event) {
         const search = $event.target.value;
@@ -2240,7 +2324,7 @@ this.showMainSpinner();
             
             if(!(this.appItem?.nonLookupValues.filter(nonLookup =>nonLookup.code==item.code)?.length >=1)) {
                 appEntity.id = item.value;
-                this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+                this.createOreEditAppEntityModal.show(entityObjectType,appEntity,false)
             }
     
             else {
@@ -2248,13 +2332,13 @@ this.showMainSpinner();
                 .subscribe((result :AppEntityDto) => {
                     appEntity=result;
                     appEntity.id = 0;
-                    this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+                    this.createOreEditAppEntityModal.show(entityObjectType,appEntity,true)
                 }); 
             }
         }
     
         else
-        this.createOreEditAppEntityModal.show(entityObjectType,appEntity)
+        this.createOreEditAppEntityModal.show(entityObjectType,appEntity,false)
     }
 
     onAddNonLookupValues($event:AppEntityDto){

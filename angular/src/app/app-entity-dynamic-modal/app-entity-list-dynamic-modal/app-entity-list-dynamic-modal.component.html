@@ -21,10 +21,10 @@
                 *ngFor="let item of displayedRecords;index as i">
                 <div class="d-flex" style="align-items: center;" [ngClass]="{'t-checkbox-list':acceptMultiValues}">
                     <label class="pl-3 pt-3 pr-2" [ngClass]="acceptMultiValues ? 'kt-checkbox kt-checkbox--dark':'ml-3'"
-                    [for]="item.value ? item.value : item.code">
-                    <p-checkbox *ngIf="acceptMultiValues" [value]="item.value ? item.value : item.code" [id]="item.value ? item.value : item.code"
+                    [for]="!isNonLookupValue(item.code) ? item.value : item.code">
+                    <p-checkbox *ngIf="acceptMultiValues" [value]="!isNonLookupValue(item.code) ? item.value : item.code" [id]="!isNonLookupValue(item.code) ? item.value : item.code"
                         [(ngModel)]="selectedRecords" [name]="entityObjectType.name"></p-checkbox>
-                    <input type="radio" *ngIf="!acceptMultiValues" [value]="item.value ? item.value : item.code" [id]="item.value ? item.value : item.code"
+                    <input type="radio" *ngIf="!acceptMultiValues" [value]="!isNonLookupValue(item.code) ? item.value : item.code" [id]="!isNonLookupValue(item.code) ? item.value : item.code"
                         [(ngModel)]="selectedRecords" [name]="entityObjectType.name" />
                 </label>
 

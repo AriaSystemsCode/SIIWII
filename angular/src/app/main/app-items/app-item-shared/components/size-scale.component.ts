@@ -205,7 +205,7 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
   }
   adjustRows(modalRefData :AppEntityListDynamicModalComponent){
     // remove unselected values
-let selectedRecords:number[] ; 
+let selectedRecords:(string | number)[] ; 
 selectedRecords=modalRefData.selectedRecords;
     const unselectedItemsIndeces = []
     this.rows.forEach((row,index)=> {
@@ -244,7 +244,7 @@ selectedRecords=modalRefData.selectedRecords;
   }
   adjustCols(modalRefData:AppEntityListDynamicModalComponent){
     // remove unselected values
-let selectedRecords:number[] ; 
+let selectedRecords:(string | number)[] ; 
 selectedRecords=modalRefData.selectedRecords;
     const unselectedItemsIndeces = []
     this.cols.columns.forEach((col,index)=> {
