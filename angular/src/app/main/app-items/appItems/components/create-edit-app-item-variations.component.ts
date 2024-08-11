@@ -508,7 +508,7 @@ export class CreateEditAppItemVariationsComponent
                     let lookupData = responses[index];
                     extraAttr.lookupData = lookupData;
                     extraAttr.displayedLookupData = extraAttr.lookupData;
-                    extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+                    extraAttr.displayedSelectedValues = extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item?.value))
                 });
                 this.tempAddNewAttributes()
                 resolve(true);
