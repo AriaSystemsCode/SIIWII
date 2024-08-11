@@ -844,6 +844,10 @@ namespace onetouch.AppItems
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
+               //MMTCAT
+               .Include(x => x.EntityFk).ThenInclude(z => z.EntityCategories).ThenInclude(z=>z.EntityObjectCategoryFk)
+               .Include(x => x.EntityFk).ThenInclude(z => z.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
+               //MMTCAT
                .Include(x => x.ListingItemFkList)
                .Include(x => x.PublishedListingItemFkList)
                //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
@@ -1282,13 +1286,14 @@ namespace onetouch.AppItems
                     //output.AppItem.EntityCategoriesNames = await GetAppItemCategoriesNamesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount, Sorting = input.GetAppItemAttributesInputForCategories.Sorting });
                     output.AppItem.EntityCategoriesNames = new PagedResultDto<string>
                     {
-                        Items = (await GetAppItemCategoriesFullNamesWithPaging(new GetAppItemAttributesWithPagingInput
-                        {
-                            ItemEntityId = appItem.EntityId,
-                            MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount,
-                            SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount,
-                            Sorting = input.GetAppItemAttributesInputForCategories.Sorting
-                        })).Items.Select(z => z.EntityObjectCategoryName).ToList()
+                        Items = GetAppItemCategoriesFullNames(appItem.EntityFk.EntityCategories).Select(z => z.EntityObjectCategoryName).ToList()
+                        //Items = (await GetAppItemCategoriesFullNamesWithPaging(new GetAppItemAttributesWithPagingInput
+                        //{
+                        //    ItemEntityId = appItem.EntityId,
+                        //    MaxResultCount = input.GetAppItemAttributesInputForCategories.MaxResultCount,
+                        //    SkipCount = input.GetAppItemAttributesInputForCategories.SkipCount,
+                        //    Sorting = input.GetAppItemAttributesInputForCategories.Sorting
+                        //})).Items.Select(z => z.EntityObjectCategoryName).ToList()
                     };
                     //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
                     if (input.GetAppItemAttributesInputForClassifications == null)
@@ -1297,20 +1302,22 @@ namespace onetouch.AppItems
                     //output.AppItem.EntityClassificationsNames = await GetAppItemClassificationsNamesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount, Sorting = input.GetAppItemAttributesInputForClassifications.Sorting });
                     output.AppItem.EntityClassificationsNames = new PagedResultDto<string>
                     {
-                        Items = (await GetAppItemClassificationsFullNamesWithPaging(new GetAppItemAttributesWithPagingInput
-                        {
-                            ItemEntityId = appItem.EntityId,
-                            MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount,
-                            SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount,
-                            Sorting = input.GetAppItemAttributesInputForClassifications.Sorting
-                        })).Items.Select(z => z.EntityObjectClassificationName).ToList()
+                        Items = GetAppItemClassificationsFullNames(appItem.EntityFk.EntityClassifications).Select(z=>z.EntityObjectClassificationName).ToList()
+                        //Items = (await GetAppItemClassificationsFullNamesWithPaging(new GetAppItemAttributesWithPagingInput
+                        //{
+                        //    ItemEntityId = appItem.EntityId,
+                        //    MaxResultCount = input.GetAppItemAttributesInputForClassifications.MaxResultCount,
+                        //    SkipCount = input.GetAppItemAttributesInputForClassifications.SkipCount,
+                        //    Sorting = input.GetAppItemAttributesInputForClassifications.Sorting
+                        //})).Items.Select(z => z.EntityObjectClassificationName).ToList()
                     };
                     //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
                     if (input.GetAppItemAttributesInputForDepartments == null)
                         input.GetAppItemAttributesInputForDepartments = new GetAppItemAttributesInput();
                     //MMT30
                     //output.AppItem.EntityDepartmentsNames = await GetAppItemDepartmentsNamesWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForDepartments.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForDepartments.SkipCount, Sorting = input.GetAppItemAttributesInputForDepartments.Sorting });
-                    output.AppItem.EntityDepartmentsNames = new PagedResultDto<string> { Items = (await GetAppItemDepartmentsWithFullNameWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForDepartments.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForDepartments.SkipCount, Sorting = input.GetAppItemAttributesInputForDepartments.Sorting })).Items.Select(a => a.EntityObjectCategoryName).ToList() };
+                    // output.AppItem.EntityDepartmentsNames = new PagedResultDto<string> { Items = (await GetAppItemDepartmentsWithFullNameWithPaging(new GetAppItemAttributesWithPagingInput { ItemEntityId = appItem.EntityId, MaxResultCount = input.GetAppItemAttributesInputForDepartments.MaxResultCount, SkipCount = input.GetAppItemAttributesInputForDepartments.SkipCount, Sorting = input.GetAppItemAttributesInputForDepartments.Sorting })).Items.Select(a => a.EntityObjectCategoryName).ToList() };
+                    output.AppItem.EntityDepartmentsNames = new PagedResultDto<string> { Items = (GetAppItemDepartmentFullNames(appItem.EntityFk.EntityCategories)).Select(z => z.EntityObjectCategoryName).ToList() };
                     //MMT30
                 }
                 //MMT
@@ -1356,7 +1363,60 @@ namespace onetouch.AppItems
                 return new PagedResultDto<AppEntityClassificationDto>(0, new List<AppEntityClassificationDto>());
             }
         }
+        //MMTACT
+        private List<AppEntityCategoryDto> GetAppItemDepartmentFullNames(List<AppEntityCategory> input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                List<AppEntityCategoryDto> returnRes = new List<AppEntityCategoryDto>();
+                foreach (var cat in input.OrderBy(z => z.EntityObjectCategoryCode))
+                {
+                    if (cat.EntityObjectCategoryFk.TenantId == null)
+                    {
+                        AppEntityCategoryDto ret = ObjectMapper.Map<AppEntityCategoryDto>(cat);
+                        ret.EntityObjectCategoryName = GetDepartmentName(cat.EntityObjectCategoryId);
+                        returnRes.Add(ret);
+                    }
+                }
+                return returnRes;
+            }
+        }
+        public List<AppEntityClassificationDto> GetAppItemClassificationsFullNames(List<AppEntityClassification> input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                List<AppEntityClassificationDto> returnRes = new List<AppEntityClassificationDto>();
 
+                //var returnRes = ret;
+                foreach (var cat in input.OrderBy(z => z.EntityObjectClassificationCode))
+                {
+                    var retObj = ObjectMapper.Map<AppEntityClassificationDto>(cat);
+                    retObj.EntityObjectClassificationName = cat.EntityObjectClassificationFk.Name;
+                    returnRes.Add(retObj);
+                }
+                return returnRes;
+            }
+        }
+        private List<AppEntityCategoryDto> GetAppItemCategoriesFullNames(List<AppEntityCategory> input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                List<AppEntityCategoryDto> returnRes = new List<AppEntityCategoryDto>();
+               
+                //var returnRes = ret;
+                foreach (var cat in input.OrderBy(z=>z.EntityObjectCategoryCode))
+                {
+                    if (cat.EntityObjectCategoryFk.TenantId != null)
+                    {
+                        AppEntityCategoryDto ret = ObjectMapper.Map<AppEntityCategoryDto>(cat);
+                        ret.EntityObjectCategoryName = cat.EntityObjectCategoryFk.Name; //GetDepartmentName(cat.EntityObjectCategoryId);
+                        returnRes.Add(ret);
+                    }
+                }
+                return returnRes;
+            }
+        }
+        //MMTCAT
         public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppItemDepartmentsWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
