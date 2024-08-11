@@ -203,7 +203,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 }
             }); 
     }
-    getAllCompanies(transactionType?:string) {
+    getAllCompanies() {
         this._AppTransactionServiceProxy
             .getRelatedAccounts(
                 "",
@@ -227,7 +227,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 undefined,
                 undefined,
                 true,
-                transactionType
+                this.formType?.toUpperCase()
             )
             .subscribe((res: any) => {
                 this.buyerCompanies = [...res.items];
@@ -326,8 +326,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             //this.orderForm.reset();
         }
 
-        if (this.formType?.toUpperCase() == "PO")
-        this.getAllCompanies(this.formType?.toUpperCase());
+       // if (this.formType?.toUpperCase() == "PO")
+        this.getAllCompanies();
     }
 
     handleBuyerCompanySearch(event: any) {
@@ -354,7 +354,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,
                     undefined,
                     undefined,
-                    undefined,true
+                    undefined,true,this.formType?.toUpperCase()
                 )
                 .subscribe((res: any) => {
                     
@@ -387,7 +387,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,
                     undefined,
                     undefined,
-                    undefined,true
+                    undefined,true,this.formType?.toUpperCase()
                 )
                 .subscribe((res: any) => {
                     
