@@ -731,7 +731,7 @@ namespace onetouch.AppItems
                              .Where(e => e.ManufacturerCode == appentity.Code && e.TenantId == AbpSession.TenantId
                              && (e.IsDeleted == false)).ToListAsync().Result;
                         if (_appMarketplaceItemsList != null)
-                        { _appMarketplaceItemsList.ForEach(e => { e.SSIN = item.SSIN; e.Code = item.SSIN   } ); }
+                        { _appMarketplaceItemsList.ForEach(e => { e.SSIN = item.SSIN; e.Code = item.SSIN;  } ); }
 
                         var _appMarketplaceItemsListDetailsList = _appMarketplaceItemsListDetails.GetAll()
                             .Where(e => e.ItemCode == appentity.Code && e.AppMarketplaceItemId == item.Id).ToListAsync().Result;

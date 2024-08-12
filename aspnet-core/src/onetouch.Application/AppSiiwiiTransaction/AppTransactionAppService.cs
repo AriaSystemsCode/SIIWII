@@ -1518,7 +1518,7 @@ namespace onetouch.AppSiiwiiTransaction
                 trans.EntityObjectStatusId = null;
                 trans.EntityObjectTypeId = objectRec.Id;
                 var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
-                trans.SSIN = await _helper.SystemTables.GenerateSSIN(transactionObjectId, ObjectMapper.Map<AppEntityDto>(trans));
+                trans.SSIN = tranType+"-"+await _helper.SystemTables.GenerateSSIN(transactionObjectId, ObjectMapper.Map<AppEntityDto>(trans));
                 await _appTransactionsHeaderRepository.InsertAsync(trans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 //XX
