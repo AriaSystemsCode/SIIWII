@@ -57,7 +57,7 @@
                             type="text"
                             class="form-control"
                             placeholder="Enter Transaction Reference #"
-                            formControlName="buyerContactPhoneNumber"
+                            formControlName="reference"
                             minlength="5"
                             maxlength="20"
                         />
@@ -73,8 +73,8 @@
                         [appendTo]="'body'"
                             formControlName="startDate"
                             [showIcon]="true"
-                            (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
-                            [readonlyInput]="false"
+                            (ngModelChange)="changeStartDate(orderForm.get('enDate'))"
+                            [readonlyInput]="true"
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
 

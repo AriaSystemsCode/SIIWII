@@ -35,13 +35,15 @@
             <div *ngIf="createOrEditorderInfo" class="formGroup  col-md-6 col-12">
                 <label class="label">Reference #</label>
                 <input
-                [readonly]="appTransactionsForViewDto?.currencyExchangeRate && appTransactionsForViewDto?.currencyExchangeRate >0"
+                
                     type="text"
-                    placeholder="Exchange Rate..."
+                    placeholder="Reference Number"
                     class="form-control "
                     style="width: 95% !important;"
-                    [(ngModel)]="appTransactionsForViewDto.currencyExchangeRate"
+                    [(ngModel)]="reference"
                 />
+             
+           
             </div>
         </div>
         <hr   *ngIf="!createOrEditorderInfo " class="my-2" />
@@ -59,6 +61,18 @@
             ></app-contact>
 
             <div class="row">
+                <div *ngIf="!createOrEditorderInfo" class="col-md-6 col-12 mt-3">
+                 
+                        <div
+                            class="d-flex align-items-center   w-100"
+                        >
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">Reference Number:</h6>
+                            <p class="previewValue  m-0 p-0 col-6 my-2">
+                                {{ appTransactionsForViewDto?.reference }}
+                            </p>
+                        </div>
+                  
+</div>
                 <!-- classification -->
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">

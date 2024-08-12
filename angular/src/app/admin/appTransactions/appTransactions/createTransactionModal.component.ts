@@ -132,6 +132,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            reference:[""],
+
         });
         this.orderForm.reset();
         this.getAllCompanies();
@@ -154,6 +156,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            reference:[""],
+
+            
         });
         this.orderForm.reset();
         this.orderForm.controls['startDate'].setValue(new Date());
@@ -600,7 +605,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
                         completeDate: moment.utc(this.orderForm.controls['completeDate']?.value?.toLocaleString()),
                         startDate: moment.utc(this.orderForm.controls['startDate']?.value?.toLocaleString()),
-                        availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString())
+                        availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString()),
+                        reference: this.orderForm.controls['reference']?.value
                     };
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,

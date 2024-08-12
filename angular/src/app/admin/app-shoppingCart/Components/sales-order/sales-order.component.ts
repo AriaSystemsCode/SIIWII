@@ -50,6 +50,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     startDate = new Date();
     availableDate = new Date();
     completeDate = new Date();
+    reference: any 
     showSaveBtn: boolean = false;
     oldappTransactionsForViewDto;
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -79,8 +80,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
         this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
         this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
+        this.reference = this.appTransactionsForViewDto?.reference;
         this.classificationItemPath = [];
         this.categoriesItemPath = [];
+        console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
 
     }
 
@@ -92,6 +95,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             this.startDate = this.appTransactionsForViewDto?.startDate?.toDate();
             this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
             this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
+        this.reference = this.appTransactionsForViewDto?.reference;
+
             if (!this.selectedCurrency)
                 this.selectedCurrency = this.appTransactionsForViewDto?.currencyId;
             this.showSaveBtn = false;
@@ -99,6 +104,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
             this.selectedClassification = this.appTransactionsForViewDto?.entityClassifications;
         }
+        console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
 
 
     }
@@ -432,6 +438,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     createOrEditTransaction() {
         this.showMainSpinner();
         this.onChangeDate();
+         this.appTransactionsForViewDto.reference = this.reference;
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
@@ -439,6 +446,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         .subscribe((res) => {
                 if (res) {
                     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+                    console.log(this.appTransactionsForViewDto,'this.appTransactionsForViewDto')
+                    console.log(this.oldappTransactionsForViewDto,'this.oldappTransactionsForViewDto')
 
                     // this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
 
