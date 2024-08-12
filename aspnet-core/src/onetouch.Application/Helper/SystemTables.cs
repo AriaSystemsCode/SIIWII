@@ -543,8 +543,7 @@ namespace onetouch.Helpers
                     //var ssinId = long.Parse(objectRec.ParentCode);
                     if (ssinId != null)
                     {
-                        var identifierHeader = _sycIdentifierDefinition.GetAll().FirstOrDefault(z=>z.Id== ssinId);
-                        
+                        var identifierHeader = _sycIdentifierDefinition.GetAll().FirstOrDefault(z => z.Id == ssinId);
                         var sycSegmentIdentifierDefinitions = _sycSegmentIdentifierDefinition.GetAll().Where(e => e.SycIdentifierDefinitionId == ssinId).OrderBy(x => x.SegmentNumber).ToList();
                         if (sycSegmentIdentifierDefinitions != null && sycSegmentIdentifierDefinitions.Count > 0)
                         {
@@ -557,10 +556,8 @@ namespace onetouch.Helpers
                                         sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == AbpSession.TenantId).FirstOrDefault();
                                     else
                                         sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == null).FirstOrDefault();
-
                                     if (appEntity != null && appEntity.IsHostRecord == true)
                                     { sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == null).FirstOrDefault(); }
-
                                     if (sycCounter == null)
                                     {
                                         sycCounter = new SycCounter();
@@ -568,7 +565,6 @@ namespace onetouch.Helpers
                                         sycCounter.Counter = segment.CodeStartingValue + 1;
                                         if (appEntity != null && appEntity.IsHostRecord == true)
                                         { //sycCounter.TenantId = -1;
-                                          
                                         }
                                         else
                                         {
@@ -578,11 +574,10 @@ namespace onetouch.Helpers
                                             }
                                             else
                                                 sycCounter.TenantId = null;
-
                                         }
                                         await _sycCounter.InsertAsync(sycCounter);
                                         await CurrentUnitOfWork.SaveChangesAsync();
-                                        returnString = string.IsNullOrEmpty(returnString)? returnString: returnString+"-";
+                                        returnString = string.IsNullOrEmpty(returnString) ? returnString : returnString + "-";
                                         if (segment.SegmentLength > 0)
                                         { returnString += segment.CodeStartingValue.ToString().Trim().PadLeft(segment.SegmentLength, '0'); }
                                     }
@@ -591,11 +586,9 @@ namespace onetouch.Helpers
                                         returnString = string.IsNullOrEmpty(returnString) ? returnString : returnString + "-";
                                         if (segment.SegmentLength > 0)
                                         { returnString += sycCounter.Counter.ToString().Trim().PadLeft(segment.SegmentLength, '0'); }
-
                                         sycCounter.Counter += 1;
                                         await _sycCounter.UpdateAsync(sycCounter);
                                         await CurrentUnitOfWork.SaveChangesAsync();
-
                                     }
                                 }
                                 else
@@ -605,12 +598,10 @@ namespace onetouch.Helpers
                                         if (segment.LookOrFieldName.ToUpper() == "TENANTID")
                                         {
                                             returnString = string.IsNullOrEmpty(returnString) ? returnString : returnString + "-";
-
                                             string _segmentValue = AbpSession.TenantId.ToString();
                                             if (segment.SegmentLength > 0)
                                             { _segmentValue = _segmentValue.PadLeft(segment.SegmentLength, '0'); }
                                             returnString += _segmentValue;
-
                                             //returnString += AbpSession.TenantId.ToString().PadLeft(segment.SegmentLength, '0');
                                         }
                                         else
@@ -625,7 +616,6 @@ namespace onetouch.Helpers
                                                     if (segment.SegmentLength > 0)
                                                     { _segmentFieldValue = _segmentFieldValue.PadLeft(segment.SegmentLength, '0'); }
                                                     returnString += _segmentFieldValue;
-
                                                 }
                                             }
                                         }
@@ -638,7 +628,7 @@ namespace onetouch.Helpers
                 //MMT
                 if (appEntity != null)
                 {
-                    var appEntityObj = await _appEntityRepository.GetAll().Where(x => x.SSIN.Contains(returnString) && x.TenantId == appEntity.TenantId && x.ObjectId == appEntity.ObjectId).FirstOrDefaultAsync();
+                    var appEntityObj = _appEntityRepository.GetAll().Where(x => x.SSIN.Contains(returnString) && x.TenantId == appEntity.TenantId && x.ObjectId == appEntity.ObjectId).FirstOrDefault();
                     if (appEntityObj != null)
                         returnString = await this.GenerateSSIN(objectTypeId, appEntity);
                 }
@@ -646,7 +636,122 @@ namespace onetouch.Helpers
                 return returnString;
             }
         }
-        // MMT30[End]
+        //public async Task<string> GenerateSSIN(long objectTypeId, AppEntityDto appEntity = null)
+        //{
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+        //        string returnString = "";
+        //        var objectRec = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Id == objectTypeId);
+        //        if (objectRec != null)
+        //        {
+        //            var ssinId = objectRec.SSINIdentifierId;
+        //            //var ssinId = long.Parse(objectRec.ParentCode);
+        //            if (ssinId != null)
+        //            {
+        //                var identifierHeader = _sycIdentifierDefinition.GetAll().FirstOrDefault(z=>z.Id== ssinId);
+
+        //                var sycSegmentIdentifierDefinitions = _sycSegmentIdentifierDefinition.GetAll().Where(e => e.SycIdentifierDefinitionId == ssinId).OrderBy(x => x.SegmentNumber).ToList();
+        //                if (sycSegmentIdentifierDefinitions != null && sycSegmentIdentifierDefinitions.Count > 0)
+        //                {
+        //                    foreach (var segment in sycSegmentIdentifierDefinitions)
+        //                    {
+        //                        if (segment.IsAutoGenerated && segment.SegmentType == "Sequence")
+        //                        {
+        //                            SycCounter sycCounter = null;
+        //                            if (identifierHeader != null && identifierHeader.IsTenantLevel)
+        //                                sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == AbpSession.TenantId).FirstOrDefault();
+        //                            else
+        //                                sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == null).FirstOrDefault();
+
+        //                            if (appEntity != null && appEntity.IsHostRecord == true)
+        //                            { sycCounter = _sycCounter.GetAll().Where(e => e.SycSegmentIdentifierDefinitionId == segment.Id && e.TenantId == null).FirstOrDefault(); }
+
+        //                            if (sycCounter == null)
+        //                            {
+        //                                sycCounter = new SycCounter();
+        //                                sycCounter.SycSegmentIdentifierDefinitionId = segment.Id;
+        //                                sycCounter.Counter = segment.CodeStartingValue + 1;
+        //                                if (appEntity != null && appEntity.IsHostRecord == true)
+        //                                { //sycCounter.TenantId = -1;
+
+        //                                }
+        //                                else
+        //                                {
+        //                                    if (identifierHeader != null && identifierHeader.IsTenantLevel && AbpSession.TenantId != null)
+        //                                    {
+        //                                        sycCounter.TenantId = (int?)AbpSession.TenantId;
+        //                                    }
+        //                                    else
+        //                                        sycCounter.TenantId = null;
+
+        //                                }
+        //                                await _sycCounter.InsertAsync(sycCounter);
+        //                                await CurrentUnitOfWork.SaveChangesAsync();
+        //                                returnString = string.IsNullOrEmpty(returnString)? returnString: returnString+"-";
+        //                                if (segment.SegmentLength > 0)
+        //                                { returnString += segment.CodeStartingValue.ToString().Trim().PadLeft(segment.SegmentLength, '0'); }
+        //                            }
+        //                            else
+        //                            {
+        //                                returnString = string.IsNullOrEmpty(returnString) ? returnString : returnString + "-";
+        //                                if (segment.SegmentLength > 0)
+        //                                { returnString += sycCounter.Counter.ToString().Trim().PadLeft(segment.SegmentLength, '0'); }
+
+        //                                sycCounter.Counter += 1;
+        //                                await _sycCounter.UpdateAsync(sycCounter);
+        //                                await CurrentUnitOfWork.SaveChangesAsync();
+
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            if (segment.SegmentType == "Field")
+        //                            {
+        //                                if (segment.LookOrFieldName.ToUpper() == "TENANTID")
+        //                                {
+        //                                    returnString = string.IsNullOrEmpty(returnString) ? returnString : returnString + "-";
+
+        //                                    string _segmentValue = AbpSession.TenantId.ToString();
+        //                                    if (segment.SegmentLength > 0)
+        //                                    { _segmentValue = _segmentValue.PadLeft(segment.SegmentLength, '0'); }
+        //                                    returnString += _segmentValue;
+
+        //                                    //returnString += AbpSession.TenantId.ToString().PadLeft(segment.SegmentLength, '0');
+        //                                }
+        //                                else
+        //                                {
+        //                                    if (appEntity != null)
+        //                                    {
+        //                                        var prop = appEntity.GetType().GetProperty(segment.LookOrFieldName);
+        //                                        if (prop != null)
+        //                                        {
+        //                                            returnString = string.IsNullOrEmpty(returnString) ? returnString : returnString + "-";
+        //                                            string _segmentFieldValue = prop.GetValue(appEntity).ToString();
+        //                                            if (segment.SegmentLength > 0)
+        //                                            { _segmentFieldValue = _segmentFieldValue.PadLeft(segment.SegmentLength, '0'); }
+        //                                            returnString += _segmentFieldValue;
+
+        //                                        }
+        //                                    }
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        //MMT
+        //        if (appEntity != null)
+        //        {
+        //            var appEntityObj = await _appEntityRepository.GetAll().Where(x => x.SSIN.Contains(returnString) && x.TenantId == appEntity.TenantId && x.ObjectId == appEntity.ObjectId).FirstOrDefaultAsync();
+        //            if (appEntityObj != null)
+        //                returnString = await this.GenerateSSIN(objectTypeId, appEntity);
+        //        }
+        //        //MMT
+        //        return returnString;
+        //    }
+        //}
+        //// MMT30[End]
         //MMT33[Start]
         public async Task<long> GetEntityObjectStatusDraftTransaction()
         {
