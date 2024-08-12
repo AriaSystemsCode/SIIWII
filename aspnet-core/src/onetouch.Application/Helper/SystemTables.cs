@@ -13,6 +13,7 @@ using onetouch.AppEntities.Dtos;
 using onetouch.SycCurrencyExchangeRates;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.AppEntities;
+using onetouch.AppEntities;
 using Microsoft.EntityFrameworkCore;
 
 namespace onetouch.Helpers
@@ -36,6 +37,8 @@ namespace onetouch.Helpers
             IRepository<SycAttachmentCategory, long> sycAttachmentCategory, IRepository<SycEntityObjectClassification, long> SycEntityObjectClassifications,
            
             IRepository<SycEntityObjectStatus, long> sycEntityObjectStatus, IRepository<SycCounter, long> sycCounter, IRepository<SycIdentifierDefinition, long> sycIdentifierDefinitions,
+            IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate,
+            IRepository<AppEntity, long> appEntityRepository)
             IRepository<SycSegmentIdentifierDefinition, long> sycSegmentIdentifierDefinition,
             IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRate, IRepository<AppEntity, long> appEntityRepository)
         {
@@ -51,6 +54,7 @@ namespace onetouch.Helpers
             _sycCurrencyExchangeRate = sycCurrencyExchangeRate;
             _sycSegmentIdentifierDefinition = sycSegmentIdentifierDefinition;
             //MMT30[End]
+            _appEntityRepository = appEntityRepository;
         }
 
         public async Task< long> GetObjectContactId()
@@ -635,6 +639,14 @@ namespace onetouch.Helpers
                         }
                     }
                 }
+                //MMT
+                if (appEntity != null)
+                {
+                    var appEntityObj = _appEntityRepository.GetAll().Where(x => x.SSIN.Contains(returnString) && x.TenantId == appEntity.TenantId && x.ObjectId == appEntity.ObjectId).FirstOrDefault ();
+                    if (appEntityObj != null)
+                        returnString = await this.GenerateSSIN(objectTypeId, appEntity);
+                }
+                //MMT
                 //MMT
                 if (appEntity != null)
                 {
