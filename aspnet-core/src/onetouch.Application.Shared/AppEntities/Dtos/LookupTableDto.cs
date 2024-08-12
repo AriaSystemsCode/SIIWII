@@ -20,6 +20,10 @@ namespace onetouch.AppEntities.Dtos
         public long? StockAvailability { get; set; }
         //MMT
         public bool? IsHostRecord { get; set; }
+        //Iteration41[Start]
+        public string? HexaCode { set; get; }
+        public string? Image { set; get; }
+        //Iteration41[End]
     }
 
     public class LookupLabelWithAttachmentDto: LookupLabelDto

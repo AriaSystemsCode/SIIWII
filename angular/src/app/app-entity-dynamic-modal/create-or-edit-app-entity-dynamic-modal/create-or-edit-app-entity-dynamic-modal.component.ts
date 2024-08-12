@@ -3,6 +3,7 @@ import {
     Component,
     EventEmitter,
     Injector,
+    Input,
     Output,
     ViewChild,
 } from "@angular/core";
@@ -27,6 +28,7 @@ import { Observable, Subscription } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { AppEntityListDynamicModalComponent } from "../app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component";
 import { throws } from "assert";
+import { SelectItem } from "primeng/api";
 
 @Component({
     selector: "app-create-or-edit-app-entity-dynamic-modal",
@@ -61,6 +63,15 @@ export class CreateOrEditAppEntityDynamicModalComponent
     SelectedVal: any;
     attCategoriesShow:boolean=false;
     attCategories: GetSycAttachmentCategoryForViewDto [];
+    @Input() enableAddToLookup:boolean=true;
+    @Input()  wantdisplaySaveSideBar :boolean=true;
+    addToLookup:boolean=true;
+    @Output() addNonLookupValues: EventEmitter<any> = new EventEmitter<any>();
+    
+    visual = {
+        solid: true,
+        image: false
+    };
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -77,6 +88,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         appEntity?: AppEntityDto
     ): void {
         this.entityObjectType = entityObjectType;
+        this.saving=false;
         if (appEntity) this.appEntity = appEntity;
         else appEntity = new AppEntityDto();
         this.appEntity.tenantId = -1;
@@ -90,7 +102,29 @@ export class CreateOrEditAppEntityDynamicModalComponent
                     console.log(">>", this.appEntity);
                     this.adjustImageSrcsUrls();
                     this.loading = true;
+
+
+                    if(!this.appEntity.entityAttachments)
+                    this.setSolid(true);
+                else
+                this.setSolid(false);
                 });
+        }
+
+        else{
+            if(this.appEntity?.code){
+                this.editMode = true;
+                if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
+                this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
+                this.addToLookup=false;
+                this.adjustImageSrcsUrls();
+                this.loading = true;
+
+                if(!this.appEntity.entityAttachments)
+                this.setSolid(true);
+            else
+            this.setSolid(false);
+            }
         }
             console.log("this.entityObjectType.code"+this.entityObjectType.code);
         this._sycAttachmentCategoriesServiceProxy.getAllByEntityObjectType(
@@ -209,6 +243,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
         }
 
         this.saving = true;
+
+        if(this.addToLookup){
         this._appEntitiesServiceProxy
             .saveEntity(this.appEntity)
             .pipe(
@@ -218,8 +254,37 @@ export class CreateOrEditAppEntityDynamicModalComponent
             )
             .subscribe(() => {
                 this.notify.info(this.l("SavedSuccessfully"));
+                if(this.wantdisplaySaveSideBar)
                 this.displaySaveSideBar = true;
             });
+        }
+        else {
+            if(!this.appEntity.id){
+            this._appEntitiesServiceProxy
+            .isCodeExisting(this.appEntity)
+            .subscribe((result:boolean) => {
+                if(!result){
+                this.notify.info(this.l("SavedSuccessfully"));
+                this.appEntity.tenantId=this.appSession.tenantId;
+                this.addNonLookupValues.emit(this.appEntity)
+                     this.saveDone.emit(true);
+                    this.hide();
+                }
+                else{
+                    this.notify.error(this.l("Code is already Exist"));
+                    this.saving = false;
+                }
+
+                    });
+                }
+                else{
+                this.notify.info(this.l("SavedSuccessfully"));
+                this.appEntity.tenantId=this.appSession.tenantId;
+                this.addNonLookupValues.emit(this.appEntity)
+                     this.saveDone.emit(true);
+                    this.hide();
+                }
+        }
     }
 
     getExtrAttributes() {
@@ -508,7 +573,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
             },
             []
         );
-        if (attachments.length > 0) this.attachmentsSrcs = [];
+        attachments=attachments? attachments : [] ;
+        if (attachments?.length > 0) this.attachmentsSrcs = [];
         this.attachmentsSrcs.unshift(...attachments);
     }
     fileChange(
@@ -537,7 +603,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 }
                 // reset input
                 event.target.value = null;
-                subs.unsubscribe();
+            //  subs.unsubscribe();
             });
         }
     }
@@ -612,4 +678,9 @@ export class CreateOrEditAppEntityDynamicModalComponent
     getCodeValue(code: string) {
         this.appEntity.code = code;
     }
+    setSolid(value:boolean){
+        this.visual.solid=value;
+        this.visual.image=!value;
+    }
 }
+

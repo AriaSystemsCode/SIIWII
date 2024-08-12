@@ -455,6 +455,35 @@ color: #700066 !important;
     border: none;
 }
 
+
+tabset .nav-link.active{
+    background-color: #4A0D4A !important;
+}
+
+tabset .nav-link.active span {
+    color: white !important;
+}
+.text-primary {
+    color: #4A0D4A !important;
+}
+
+input[type="radio"], input[type="checkbox"] {
+    accent-color: #4A0D4A !important;
+}
+
+p-tree[selectionmode=single] .p-treenode-content.p-treenode-selectable.p-highlight .p-treenode-label{
+    background-color: #4A0D4A !important;
+}
+
+.p-checkbox-box.p-highlight .p-checkbox-icon {
+    color: white !important;
+}
+.p-checkbox-box.p-highlight {
+    background-color: #4A0D4A !important;
+    border-color: #4A0D4A !important;
+}
+button.dropdown-toggle.btn.btn-sm.btn-action {
+    background-color: transparent !important;
 .selectedContact{
     color: rgb(248 128 17);
     padding: 6px 4px;
@@ -493,4 +522,4 @@ span.p-tabview-title {
 }
 .p-datepicker:not(.p-datepicker-inline) {
     z-index: 2000 !important;
-}
+}}

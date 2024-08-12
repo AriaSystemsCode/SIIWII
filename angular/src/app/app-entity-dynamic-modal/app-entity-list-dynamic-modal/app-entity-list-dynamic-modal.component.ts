@@ -32,6 +32,7 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     showMoreListDataButton : boolean
     searchQuery:string
     searchSubj:Subject<string>=new Subject<string>()
+    nonLookupValues:LookupLabelDto[];
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -81,6 +82,8 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
 
             if( isFirstPage ) this.allRecords = []
             this.allRecords.push(...result.items);
+            this.nonLookupValues=this.nonLookupValues ? this.nonLookupValues : [] 
+            this.allRecords.push(...this.nonLookupValues);
             this.displayedRecords = this.allRecords
             this.totalCount = result.totalCount;
             this.showMoreListDataButton = !isLastPage
@@ -95,14 +98,31 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
     openCreateOrEditModal(entityLookup?:LookupLabelDto) : void {
 
-        const appEntity : AppEntityDto = new AppEntityDto()
-        if(entityLookup) {
-            appEntity.id = entityLookup.value
+        let appEntity : AppEntityDto = new AppEntityDto()
+        if(entityLookup){
+        if(entityLookup.value ) {
+            appEntity.id = entityLookup.value;
+            this.showCreateOreEditAppEntityModal(appEntity)
         }
+
+        else {
+            this._appEntitiesServiceProxy.convertAppLookupLabelDtoToEntityDto(entityLookup)
+            .subscribe((result :AppEntityDto) => {
+                appEntity=result;
+                this.showCreateOreEditAppEntityModal(appEntity)
+            }); 
+        }
+    }
+
+    else
+    this.showCreateOreEditAppEntityModal(appEntity);
+
+    }
+
+    showCreateOreEditAppEntityModal(appEntity) {
         this.createOreEditAppEntityModal.codeIsRequired = true
         this.createOreEditAppEntityModal.show(this.entityObjectType,appEntity)
         this.active = false
-
     }
 
     onCanceledHandler(){
@@ -123,20 +143,34 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
         this.currentModalRef.hide()
     }
 
-    deleteSycEntityObject(id: number,index:number): void {
+    deleteSycEntityObject(_item,index:number): void {
         var isConfirmed: Observable<boolean>;
         isConfirmed   = this.askToConfirm("","AreYouSure");
     
+       let  id=_item.value ? _item.value :0
+
        isConfirmed.subscribe((res)=>{
           if(res){
+            if(id){
                     this._appEntitiesServiceProxy.delete(id)
                     .subscribe(() => {
                         this.displayedRecords.splice(index,1)
                         const indexInAllRecords = this.allRecords.findIndex(item=>item.value == id)
                         this.allRecords.splice(indexInAllRecords,1)
+                        const _indexInAllRecords = this.nonLookupValues.findIndex(item=>item.value == id)
+                        this.nonLookupValues.splice(_indexInAllRecords,1)
                         this.notify.success(this.l('SuccessfullyDeleted'));
                     });
                 }
+                else{
+                    this.displayedRecords.splice(index,1)
+                    const indexInAllRecords = this.allRecords.findIndex(item=>item.code == _item.code)
+                    this.allRecords.splice(indexInAllRecords,1)
+                    const _indexInAllRecords = this.nonLookupValues.findIndex(item=>item.code == _item.code)
+                    this.nonLookupValues.splice(_indexInAllRecords,1)
+                    this.notify.success(this.l('SuccessfullyDeleted'));
+                }
+            }
             }
         );
     }
@@ -147,5 +181,25 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     submitSelection(){
         this.selectionDone = true
         this.currentModalRef.hide()
+    }
+
+    onAddNonLookupValues($event:AppEntityDto){
+
+         this._appEntitiesServiceProxy.convertAppEntityDtoToLookupLabelDto($event)
+        .subscribe((nonLookupValues :LookupLabelDto) => {
+            if(!$event?.id)
+            this.nonLookupValues.push(nonLookupValues);
+
+            else{
+                let x = this.nonLookupValues.filter(x=>x.code==nonLookupValues.code);
+                if(x && x.length>0)
+                 {
+                     x[0].hexaCode=nonLookupValues.hexaCode;
+                     x[0].image=nonLookupValues.image;
+                     x[0].label=nonLookupValues.label;
+                     x[0].value=nonLookupValues.value;
+                 }
+            }
+        }); 
     }
 }

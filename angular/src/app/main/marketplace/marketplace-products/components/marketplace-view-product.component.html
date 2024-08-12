@@ -187,7 +187,11 @@
 
                     <div class="color-selection">
                         <h5 class="my-2" style="text-decoration: none;color:black  !important">
-                            Colors
+                            {{
+                                productDetails
+                                    ?.variations[0]
+                                    .extraAttrName
+                            }}
                         </h5>
                         <!-- color selections -->
                         <div
