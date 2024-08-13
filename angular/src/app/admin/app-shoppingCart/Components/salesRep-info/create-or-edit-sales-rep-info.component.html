@@ -52,6 +52,6 @@
         [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
             (showSalesRepEditMode)="onShowSalesRepEditMode($event)" (onshowSaveBtn)="onshowSaveBtn($event)"
             [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"
-            [canChange]="canChange"></app-view-sales-rep-info>
+            [canChange]="canChange" (isContactsValid)="isContactFormValid($event)"></app-view-sales-rep-info>
     </div>
 </div>
