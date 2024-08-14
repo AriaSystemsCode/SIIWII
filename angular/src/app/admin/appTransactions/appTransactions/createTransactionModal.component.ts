@@ -96,7 +96,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     invalidSellerContactEMailAddress = "";
     sellerPhoneLabel: string = "Phone Number";
     buyerPhoneLabel: string = "Phone Number";
-
+    showAdd:boolean = false
 
     body: any;
     setCurrentUserActiveTransaction: boolean = false;
@@ -106,7 +106,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     minCompleteDate:Date;
     minStartDate:Date;
     sellerCurrencyCode;
-
+    emptyMessage: string = 'No results found';
+    searchTerm: string = '';
+    filteredBuyerContacts: any[] ; 
+    today = new Date()
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -422,16 +425,43 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
     handleBuyerNameSearch(event: any) {
+        console.log(event,'event')
+        console.log(event.filter,'event.filter')
+if (event.filter != '' || event.filter != undefined){
+    this.searchTerm = event.filter;
+
+}
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {
             this._AppTransactionServiceProxy
                 .getAccountRelatedContacts(this.buyerComapnyId, event.filter)
                 .subscribe((res: any) => {
-                    this.buyerContacts = [...res];
+                    console.log(this.buyerContacts,'this.buyerContacts')
+                    if(this.buyerContacts?.length == 0  && event.filter != undefined) {
+                        this.emptyMessage = ` Click to add "${this.searchTerm}".`;
+                        this.buyerContacts.push({ name: ` add as text "${this.searchTerm}".`, id: this.buyerContacts.length + 1 });
+                        // console.log(`Added new buyer: ${'kk'}`);
+                    }
+                    else {
+                        this.buyerContacts = [...res];
+
+                    }
+              
 
                 });
         }, 500);
     }
+    addNewBuyer() {
+     
+         if (this.searchTerm) {
+      const newBuyer = { name: this.searchTerm, id: this.buyerContacts.length + 1 };
+      this.buyerContacts.push(newBuyer);
+
+      console.log(`Added new buyer: ${this.searchTerm}`);
+    }
+         
+      
+      }
     handleSellerNameSearch(event: any) {
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {

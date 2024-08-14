@@ -45,7 +45,7 @@
         
     </div>
 
-    <div *ngIf="createOrEditshippingInfO && appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER'  "   [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
+    <div *ngIf="createOrEditshippingInfO"   [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
         <hr class="my-2" />
 
         <app-address 
@@ -56,6 +56,7 @@
         [selectedAddressDetails]="shipFromSelectedAdd"
         [showAddressType]="false"
         [canChange]="canChange"
+        [showAddBtn]=" appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER'  ? true: false "
         ></app-address>
     </div>
     <div class="container-fluid pt-1" *ngIf="createOrEditshippingInfO">
@@ -85,8 +86,7 @@
        
    </div>
    
-   <div *ngIf="(createOrEditshippingInfO && (appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER')) || (
-    createOrEditshippingInfO && (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER') && appTransactionsForViewDto?.isHostRecord)"   [ngClass]="createOrEditshippingInfO  ?  'd-block' : 'd-none'">
+   <div *ngIf="createOrEditshippingInfO "   [ngClass]="createOrEditshippingInfO  ?  'd-block' : 'd-none'">
     <hr class="my-2" />
    <app-address 
    [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -96,6 +96,8 @@
    [selectedAddressDetails]="shipToSelectedAdd"
    [showAddressType]="false"
    [canChange]="canChange"
+   [showAddBtn]=" appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER'  ? false: true "
+
    ></app-address>
 </div>
 

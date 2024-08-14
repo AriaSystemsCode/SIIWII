@@ -6,6 +6,7 @@ import {
     AppEntityClassification,
     AppEntityClassificationDto,
     AppTransactionServiceProxy,
+    CreateOrEditSycEntityObjectCategoryDto,
     CurrencyInfoDto,
     GetAppTransactionForViewDto,
     GetAppTransactionsForViewDto,
@@ -27,13 +28,15 @@ import { forEach } from "lodash";
 export class SalesOrderComponent extends AppComponentBase implements OnInit, OnChanges {
     fullName: string;
     companeyNames: any[];
+    nodes: any[];
 
+    selectedNodes: any;
 
     classificationsFiles: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
     categoriesFiles: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
     loading: boolean = false;
     selectedClassification: any[] = [];
-    selectedCategories: any[] = [];
+    selectedCategories: any[] = ['kkkkk'];
     currencies: any[];
     selectedCurrency;
     selectedCurrrency: any;
@@ -51,22 +54,26 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     availableDate = new Date();
     completeDate = new Date();
     reference: any 
+    category :any;
     showSaveBtn: boolean = false;
+    showCatBtn: boolean = false;
     oldappTransactionsForViewDto;
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input("canChange") canChange: boolean = true;
+    sycEntityObjectCategory: CreateOrEditSycEntityObjectCategoryDto = new CreateOrEditSycEntityObjectCategoryDto();
 
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _sycEntityObjectClassificationsServiceProxy: SycEntityObjectClassificationsServiceProxy,
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     ) {
         super(injector);
         this.getParentCategories();
         this.getParentClassifications();
         this.getAllCurrencies();
+      
     }
     ngOnInit(): void {
         // DepartmentFlag: false
@@ -74,6 +81,53 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // Sorting: name
         // SkipCount: 0
         // MaxResultCount: 10
+        this.nodes = [
+            {
+                label: 'Electronics',
+                data: '1',
+                children: [
+                    {
+                        label: 'Mobile Phones',
+                        data: '1.1',
+                        children: [
+                            { label: 'Apple', data: '1.1.1' },
+                            { label: 'Samsung', data: '1.1.2' },
+                        ]
+                    },
+                    {
+                        label: 'Laptops',
+                        data: '1.2',
+                        children: [
+                            { label: 'HP', data: '1.2.1' },
+                            { label: 'Dell', data: '1.2.2' },
+                        ]
+                    }
+                ]
+            },
+            {
+                label: 'Furniture',
+                data: '2',
+                children: [
+                    {
+                        label: 'Tables',
+                        data: '2.1',
+                        children: [
+                            { label: 'Dining Table', data: '2.1.1' },
+                            { label: 'Coffee Table', data: '2.1.2' },
+                        ]
+                    },
+                    {
+                        label: 'Chairs',
+                        data: '2.2',
+                        children: [
+                            { label: 'Office Chair', data: '2.2.1' },
+                            { label: 'Dining Chair', data: '2.2.2' },
+                        ]
+                    }
+                ]
+            }
+
+        ];
         this.fullName =
             this.appSession.user.name + this.appSession.user.surname;
         this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
@@ -81,6 +135,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
         this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
         this.reference = this.appTransactionsForViewDto?.reference;
+        // this.category = this.appTransactionsForViewDto.entityCategories
         this.classificationItemPath = [];
         this.categoriesItemPath = [];
         console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
@@ -438,7 +493,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     createOrEditTransaction() {
         this.showMainSpinner();
         this.onChangeDate();
+    
+        //  this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
          this.appTransactionsForViewDto.reference = this.reference;
+
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
@@ -474,7 +532,36 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             }
         }
     }
+saveCat(){
+    let cat  = {
+        code: '13',
+        name: this.category,
+        objectId: null,
+        parentId: null,
+        id:null
+ 
+//         entityObjectCategoryId :null,
+//         entityObjectCategoryName : this.category,
+// entityObjectCategoryCode: '',
 
+//         id:null
+    }
+    // this.sycEntityObjectCategory = {...cat}
+    this._sycEntityObjectCategoriesServiceProxy.createOrEdit(cat)
+    .pipe(finalize(() => { 
+        // this.saving = false;
+    }))
+    .subscribe(() => {
+       this.notify.info(this.l('SavedSuccessfully'));
+
+    });
+    this.showCatBtn = false
+
+    
+        this.selectedCategories[0] = {...cat};
+        console.log(this.selectedCategories,'selectedCategories')
+    
+}
     showEditMode() {
         this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
         this.selectedClassification = this.appTransactionsForViewDto?.entityClassifications; this.selectedCategories

@@ -72,7 +72,7 @@
                     <input *ngIf="!selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
                       name="selectedAdd"  [id]="address.id"/> 
                  <label>{{address.name}}</label>
-                 <div class="pull-right">
+                 <div class="pull-right"  *ngIf="showAddBtn">
                     <button (click)="editAddress(address.id)">
                         {{l("Edit")}}
                         <i class="fas fa-edit ml-1 mr-1"></i>
@@ -86,7 +86,7 @@
             </li>
         </ul>
         <label class="noAddressMsg" *ngIf="savedAddressesList.length==0"> No Addresses found</label>
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-end" *ngIf="showAddBtn">
         <button class=" mb-3 ml-2 add-new-add-btn" (click)="openAddAddressForm()">
             <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
         </button>

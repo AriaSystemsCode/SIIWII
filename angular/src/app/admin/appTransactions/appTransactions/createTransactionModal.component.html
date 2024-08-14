@@ -89,10 +89,19 @@
                             [showIcon]="true"
                             (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
                             [readonlyInput]="false"
-                          
+                          [minDate]="today"
 
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                        <small
+                        class="text-danger"
+                        *ngIf="
+                           
+                        submitted &&  today
+                        "
+                    >
+                    start date Can’t be after the Entered date 
+                    </small>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -106,8 +115,16 @@
                             [readonlyInput]="false"
                             (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
-
+                        <img src="../../../../../assets/icons/calendar.png" [ngClass]="  submitted &&  minStartDate ? 'err':'img'"   alt="" srcset="">
+                        <small
+                        class="text-danger"
+                        *ngIf="
+                           
+                        submitted &&  minStartDate
+                        "
+                    >
+                    Complete date Can’t be after the Start date 
+                    </small>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -121,8 +138,17 @@
                             [minDate]="minCompleteDate"
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
-
+                      
                     </div>
+                    <small
+                    class="text-danger"
+                    *ngIf="
+                       
+                    submitted &&  minCompleteDate
+                    "
+                >
+                Available date Can’t be after the complete date 
+                </small>
                 </div>
                 
                 </div>
@@ -221,17 +247,44 @@
                                 formControlName="buyerContactName"
                                 *ngIf="isBuyerTempAccount"
                             />
+                            <!-- <p-dropdown
+                            *ngIf="!isBuyerTempAccount"
+                            [options]="buyerContacts"
+                            formControlName="buyerContactName"
+                            [filter]="true"
+                            optionLabel="name"
+                            filterBy="name"
+                            [disabled]="buyerComapnyId === 0"
+                            placeholder="Please Select Buyer Name"
+                            (onFilter)="handleBuyerNameSearch($event)"
+                            (onChange)="handleBuyerNameChange($event)"
+                            emptyMessage="  add new."
+                            (onClick)="addNewBuyer()">
+                        </p-dropdown> -->
+                        <div >
                             <p-dropdown
-                                *ngIf="!isBuyerTempAccount"
                                 [options]="buyerContacts"
                                 formControlName="buyerContactName"
                                 [filter]="true"
                                 optionLabel="name"
+                                filterBy="name"
                                 [disabled]="buyerComapnyId === 0"
                                 placeholder="Please Select Buyer Name"
                                 (onFilter)="handleBuyerNameSearch($event)"
-                                (onChange)="handleBuyerNameChange($event)"
-                            ></p-dropdown>
+                                [emptyMessage]="emptyMessage != '' ? emptyMessage : ''"
+                                (onChange)="handleBuyerNameChange($event)" 
+                                >
+                                
+                            </p-dropdown>
+                        </div>
+                        
+                        <!-- <ng-template *ngIf="buyerContacts?.length == 0;">
+                            <div>
+                               
+                                <button pButton type="button" label="Add New Buyer" (click)="addNewBuyer()"></button>
+                            </div>
+                        </ng-template> -->
+                     
                             <small
                                 class="text-danger"
                                 *ngIf="

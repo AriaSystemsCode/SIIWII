@@ -15,6 +15,8 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("selectedAddressDetails") selectedAddressDetails;
     @Input("showAddressType") showAddressType:boolean=true;
+    @Input("showAddBtn") showAddBtn:boolean=false;
+
     showAddList:boolean=false;
     addressCode: string;
     addressName: string;

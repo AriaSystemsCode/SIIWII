@@ -174,11 +174,68 @@ font-weight: 600;
     cursor: not-allowed; /* Change cursor to indicate non-interactivity */
     z-index: 1; /* Ensure it overlays the calendar */
 }
+::ng-deep .treeSel {
+    width: 75% !important;
+    .three-dots:after {
+        cursor: pointer;
+        color: rgb(75, 68, 68);
+        content: "\2807";
+        font-size: 20px;
+        padding: 0 5px;
+    }
+    .p-icon-wrapper {
+        right: 3px !important;
+    }
+    .pointer {
+        padding: 12px;
+    }
+    .nav-link.dropdown-toggle:after, .btn.dropdown-toggle:after {
+        display: none !important;
+    }
+    .p-tree .p-tree-container .p-treenode .p-treenode-content .p-checkbox .p-indeterminate .p-checkbox-icon {
+        background-color: #4A0D4A !important;
 
+    }
+    .btn-secondary {
+        border: none !important;
+    }
+    .p-treeselect-items-wrapper {
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        
+    }
+    .p-treeselect:not(.p-disabled).p-focus {
+        box-shadow: none !important;
+    }
+     .p-treeselect .p-component .p-inputwrapper .p-treeselect-chip {
+        border-radius: 10px !important;
+    border: 1px solid #D9D9D9 !important;
+    height: 46px !important;
+     }
+    .dropdown-menu.show {
+        left: -161px !important;
+    }
+.p-checkbox-box .p-highlight, .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
+        background-color: #4A0D4A !important;
+    }
+    .p-treeselect-panel {
+        width: 100% !important;
+    }
+    .p-treenode-label {
+        width: 100% !important;
+
+    }
+}
 .cat{
     border: 1px solid #E6E6E6 ;
     margin-left: 42px;
     color: #4A0D4A;
+    padding-top: 10px;
+    text-align: center;
+    height: 46px;
+    font-size: 14px;
+font-style: normal;
+font-weight: 700;
 }
 
 img {
