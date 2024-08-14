@@ -225,7 +225,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 undefined,
                 undefined,
                 undefined,
-                undefined,true
+                undefined,
+                true,
+                this.formType?.toUpperCase()
             )
             .subscribe((res: any) => {
                 this.buyerCompanies = [...res.items];
@@ -323,6 +325,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             // this.buyerContacts = []
             //this.orderForm.reset();
         }
+
+       // if (this.formType?.toUpperCase() == "PO")
+        this.getAllCompanies();
     }
 
     handleBuyerCompanySearch(event: any) {
@@ -349,7 +354,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,
                     undefined,
                     undefined,
-                    undefined,true
+                    undefined,true,this.formType?.toUpperCase()
                 )
                 .subscribe((res: any) => {
                     
@@ -382,7 +387,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     undefined,
                     undefined,
                     undefined,
-                    undefined,true
+                    undefined,true,this.formType?.toUpperCase()
                 )
                 .subscribe((res: any) => {
                     
@@ -886,7 +891,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                              //////////////////////////
 
                              
-                    if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
+
+                             if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
                         location.reload();
                     else
                         this.router.navigateByUrl("app/main/marketplace/products");
