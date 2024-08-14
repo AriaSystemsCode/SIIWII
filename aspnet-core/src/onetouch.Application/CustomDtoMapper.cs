@@ -4,8 +4,8 @@ using onetouch.AppSubscriptionPlans.Dtos;
 using onetouch.AppSubscriptionPlans;
 using onetouch.AppSubScriptionPlan.Dtos;
 using onetouch.AppSubScriptionPlan;
-using onetouch.AppMarketplaceContact.Dtos;
-using onetouch.AppMarketplaceContact;
+//using onetouch.AppMarketplaceContact.Dtos;
+using onetouch.AppMarketplaceContacts;
 using onetouch.Maintainances.Dtos;
 using onetouch.Maintainances;
 using onetouch.AppItemSelectors.Dtos;
@@ -124,8 +124,8 @@ namespace onetouch
     {
         public static void CreateMappings(IMapperConfigurationExpression configuration)
         {
-            configuration.CreateMap<CreateOrEditAppMarketplaceAppContactDto, AppMarketplaceAppContact>().ReverseMap();
-            configuration.CreateMap<AppMarketplaceAppContactDto, AppMarketplaceAppContact>().ReverseMap();
+            //configuration.CreateMap<CreateOrEditAppMarketplaceAppContactDto, AppMarketplaceAppContact>().ReverseMap();
+            //configuration.CreateMap<AppMarketplaceAppContactDto, AppMarketplaceAppContact>().ReverseMap();
             configuration.CreateMap<CreateOrEditSycCurrencyExchangeRatesDto, onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates>().ReverseMap();
             configuration.CreateMap<SycCurrencyExchangeRatesDto, onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppTenantInvoiceDto, AppTenantInvoice>().ReverseMap();

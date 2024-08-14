@@ -1,6 +1,6 @@
 using onetouch.AppSubscriptionPlans;
 using onetouch.AppSubScriptionPlan;
-using onetouch.AppMarketplaceContact;
+using onetouch.AppMarketplaceContacts;
 using onetouch.Maintainances;
 using onetouch.AppItemSelectors;
 using onetouch.SycIdentifierDefinitions;
@@ -59,7 +59,7 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
-        public virtual DbSet<AppMarketplaceAppContact> AppMarketplaceAppContacts { get; set; }
+        //public virtual DbSet<AppMarketplaceAppContact> AppMarketplaceAppContacts { get; set; }
 
         public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
 
@@ -245,10 +245,10 @@ namespace onetouch.EntityFrameworkCore
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<AppMarketplaceAppContact>(a =>
-            {
-                a.HasIndex(e => new { e.TenantId });
-            });
+            //modelBuilder.Entity<AppMarketplaceAppContact>(a =>
+            //{
+            //    a.HasIndex(e => new { e.TenantId });
+            //});
             modelBuilder.Entity<AppItemSelector>(a =>
                        {
                            a.HasIndex(e => new { e.TenantId });
