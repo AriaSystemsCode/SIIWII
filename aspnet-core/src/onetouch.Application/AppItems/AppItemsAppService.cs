@@ -113,6 +113,7 @@ namespace onetouch.AppItems
         private readonly IRepository<SycSegmentIdentifierDefinition, long> _sycSegmentIdentifierDefinition;
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
+        private readonly IRepository<AppMarketplaceItemsListDetails, long> _appMarketplaceItemsListDetails;
 
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
@@ -138,11 +139,12 @@ namespace onetouch.AppItems
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
             IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
-            IRepository<AppTransactionDetails, long> appTransactionDetails
+            IRepository<AppTransactionDetails, long> appTransactionDetails, IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails
             )
         {
             //MMT33-2
-            _appTransactionDetails = appTransactionDetails;
+             _appMarketplaceItemsListDetails= appMarketplaceItemsListDetails;
+             _appTransactionDetails = appTransactionDetails;
             _timeZoneInfoAppService = timeZoneInfoAppService;
             _appAttachmentRepository = appAttachmentRepository;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
