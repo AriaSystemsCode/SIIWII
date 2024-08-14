@@ -28,7 +28,6 @@ export class ShoppingCartViewComponentComponent
   implements OnInit {
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
   @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
-  @ViewChildren(CommentParentComponent) commentParentComponentMob!: QueryList<CommentParentComponent>;
   @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   orderInfoValid: boolean = false;
@@ -102,17 +101,12 @@ export class ShoppingCartViewComponentComponent
     const screenWidth = window.innerWidth;
     const tabletWidth = 768; // iPads and tablets
     // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
-    if(screenWidth <= tabletWidth){
+   //if(screenWidth <= tabletWidth)
     this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
-    }
-  }
-
-  loadCommentsListMob() {
-    const screenWidth = window.innerWidth;
-    const tabletWidth = 768; // iPads and tablets
-    if(screenWidth > tabletWidth) {
-    this.commentParentComponentMob?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
-    }
+    
+    //else 
+      this.commentParentComponent?.last?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+      
   }
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
@@ -234,7 +228,6 @@ export class ShoppingCartViewComponentComponent
    
 
         this.loadCommentsList()
-        this.loadCommentsListMob()
       
    
            //lines
