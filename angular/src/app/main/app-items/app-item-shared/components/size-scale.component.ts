@@ -259,7 +259,7 @@ selectedRecords=modalRefData.selectedRecords;
     let recordSelectItem : MatrixGridSelectItem;
     recordSelectItem = modalRefData.allRecords.filter(item=>item.value == record)[0];
     if(!recordSelectItem)
-     recordSelectItem =  this.extraAttr.lookupData.filter(item=>item.value == record)[0];
+     recordSelectItem =  this.extraAttr?.lookupData?.filter(item=>item.value == record)[0];
     
 
       const existIndex = this.cols.columns.findIndex(col=>col.value == record)

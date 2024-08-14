@@ -28,7 +28,7 @@ export class CodesComponent extends AppComponentBase implements OnInit {
   @Input() styles ;
   @Input() readonly: boolean=false ;
   @Input() classes: string="" ;
-  @Input() maxlength
+  @Input() maxlength  =10
 
   constructor(
     injector: Injector,

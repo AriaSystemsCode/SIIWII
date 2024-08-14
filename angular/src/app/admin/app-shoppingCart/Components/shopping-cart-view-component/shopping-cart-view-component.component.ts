@@ -207,7 +207,7 @@ export class ShoppingCartViewComponentComponent
             undefined,
             undefined,
             0,
-            30,false
+            30,false, null
         )
         .subscribe((res2: PagedResultDtoOfGetAccountInformationOutputDto) => {
           this.companeyNames= [...res2.items];
