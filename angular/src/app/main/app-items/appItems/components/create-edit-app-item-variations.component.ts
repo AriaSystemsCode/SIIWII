@@ -178,7 +178,12 @@ export class CreateEditAppItemVariationsComponent
     }
     get variationPossibilities() {
         var count = 0;
+
         this.selectedExtraAttributes?.forEach((extraAttr) => {
+
+            if(extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE' && extraAttr?.entityObjectTypeCode !=='CLOSURE')
+            return;
+
             let extraAttrSelectedValues: number;
             // if (
             //     this.sizeExtraAttrCode ==
@@ -191,6 +196,7 @@ export class CreateEditAppItemVariationsComponent
             // }
             if (count == 0 && extraAttrSelectedValues > 0) count = 1;
             if (extraAttrSelectedValues) count *= extraAttrSelectedValues;
+            
         });
         return count;
     }
