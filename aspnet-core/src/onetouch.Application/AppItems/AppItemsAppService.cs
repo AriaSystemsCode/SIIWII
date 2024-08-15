@@ -839,27 +839,42 @@ namespace onetouch.AppItems
             //MMY
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var appItem = await _appItemRepository.GetAll()
+                //XX
+                var allItems = await _appItemRepository.GetAll()
                .Include(x => x.ItemPricesFkList).ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
                .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
-               .Include(x => x.ListingItemFkList)
-               .Include(x => x.PublishedListingItemFkList)
-               //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
-               .AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.ItemId);
+               //MMTCAT
+               .Include(x => x.EntityFk).ThenInclude(z => z.EntityCategories).ThenInclude(z => z.EntityObjectCategoryFk)
+               .Include(x => x.EntityFk).ThenInclude(z => z.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
+               .AsNoTracking().Where(x => x.Id == input.ItemId || x.ParentId == input.ItemId).ToListAsync();
+                //XX
+                var appItem = allItems.Where(z => z.Id == input.ItemId).FirstOrDefault();
+                var varAppItems = allItems.Where(z => z.ParentId == input.ItemId).ToList();
+                // var appItem = await _appItemRepository.GetAll()
+                //.Include(x => x.ItemPricesFkList).ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
+                //.Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
+                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
+                //.Include(x => x.ListingItemFkList)
+                //.Include(x => x.PublishedListingItemFkList)
+                ////.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
+                //.AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.ItemId);
 
-                var varAppItems = await _appItemRepository.GetAll().Include(x => x.ItemPricesFkList)
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
-                .Include(x => x.ListingItemFkList)
-                .Include(x => x.PublishedListingItemFkList)
-                .Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk).ThenInclude(x => x.EntityExtraData)
-                .AsNoTracking().Where(x => x.ParentId == input.ItemId).ToListAsync();
+                // var varAppItems = await _appItemRepository.GetAll().Include(x => x.ItemPricesFkList)
+                // .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                // .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                // .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                // .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
+                // .Include(x => x.ListingItemFkList)
+                // .Include(x => x.PublishedListingItemFkList)
+                // .Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk).ThenInclude(x => x.EntityExtraData)
+                // .AsNoTracking().Where(x => x.ParentId == input.ItemId).ToListAsync();
 
 
 
