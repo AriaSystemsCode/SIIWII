@@ -7804,7 +7804,7 @@ namespace onetouch.AppItems
 
                         //#3
                         var _appMarketplaceItemsList = _appMarketplaceItem.GetAll()
-                             .Where(e => e.ManufacturerCode == appentity.Code && e.TenantId == AbpSession.TenantId
+                             .Where(e => e.ManufacturerCode == appentity.Code && e.TenantOwner == AbpSession.TenantId
                              && (e.IsDeleted == false)).ToListAsync().Result;
                         if (_appMarketplaceItemsList != null)
                         { _appMarketplaceItemsList.ForEach(e => { e.SSIN = item.SSIN; e.Code = item.SSIN; }); }
