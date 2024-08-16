@@ -7740,6 +7740,14 @@ namespace onetouch.AppItems
             }
         }
         //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
+        public async Task<string> EmptySSIN()
+        {
+            var itemsList = _appItemRepository.GetAll().Where(e => (e.TenantId == AbpSession.TenantId) && (e.IsDeleted == false)).ToListAsync().Result;
+
+            itemsList.ForEach(e => e.SSIN = "");
+            return "No of SSIN items Cleared - " + itemsList.Count.ToString();
+        }
+
         public async Task<string> UpdateDouplicatedSSIN(int takeNo = 1, int skipNo = 0)
         {
             //reset syccounters
