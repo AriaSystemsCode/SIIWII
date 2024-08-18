@@ -461,7 +461,7 @@ export class MarketplaceViewProductComponent
 
         Swal.fire({
             title: "",
-            text: "Are you sure Want to add ordered qunatities to you cart ?",
+            text: "Are you sure you want to add ordered quantities to you cart ?",
             icon: "info",
             showCancelButton: true,
             confirmButtonText:
@@ -581,6 +581,8 @@ export class MarketplaceViewProductComponent
 
                         });
                     }
+
+                    this.calculateTotalOrderPriceAndQty(this.orderSummary);
                 });
 
                 this.productDetails.minSpecialPrice = updatedSpecialPrice;

@@ -199,6 +199,7 @@ export class CreateEditAppItemVariationsComponent
     }
     get variationPossibilities() {
         var count = 0;
+
         this.selectedExtraAttributes?.forEach((extraAttr) => {
             if(extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE' && extraAttr?.entityObjectTypeCode !=='CLOSURE')
             return;
@@ -214,6 +215,7 @@ export class CreateEditAppItemVariationsComponent
             // }
             if (count == 0 && extraAttrSelectedValues > 0) count = 1;
             if (extraAttrSelectedValues) count *= extraAttrSelectedValues;
+            
         });
         return count;
     }
@@ -1264,10 +1266,11 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                 newVariation.stockAvailability=curentItem.stockAvailability;
             }
 
-            if(!curentItem){
+            let item = this.variationMatrices?.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')));
+            if(!item || ! (item?.length>0) )
                 this.variationMatrices.push(newVariation);
                 this.showNewVariation=true;
-            }
+            
             }
         };
             // if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
