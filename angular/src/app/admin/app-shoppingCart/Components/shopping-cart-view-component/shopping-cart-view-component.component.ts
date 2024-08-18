@@ -506,12 +506,17 @@ export class ShoppingCartViewComponentComponent
 
       case 1:
         this.showMainSpinner();
+        // let moduleQty =
+        //   rowNode.node.data.updatedQty %
+        //   rowNode.node.data.noOfPrePacks;
+
         let moduleQty =
-          rowNode.node.data.updatedQty %
-          rowNode.node.data.noOfPrePacks;
-        let qty =
-          rowNode.node.data.updatedQty /
-          rowNode.node.data.noOfPrePacks;
+        rowNode.node.data.updatedQty % (
+        rowNode.node.data.qty/  rowNode.node.data.noOfPrePacks);
+        // let qty =
+        //   rowNode.node.data.updatedQty /
+        //   rowNode.node.data.noOfPrePacks 
+        let qty=rowNode.node.data.updatedQty ;
         if (moduleQty == 0) {
           this._AppTransactionServiceProxy
             .updateByProductSSINColor(
@@ -528,10 +533,11 @@ export class ShoppingCartViewComponentComponent
               this.hideMainSpinner();
             });
         } else {
-          rowNode.node.data.invalidUpdatedQty =
-            "The quantity must be divisible by the prepack (" +
-            rowNode.node.data.noOfPrePacks +
-            ")";
+          // rowNode.node.data.invalidUpdatedQty =
+          //   "The quantity must be divisible by the prepack (" +
+          //   rowNode.node.data.noOfPrePacks +
+          //   ")";
+          rowNode.node.data.invalidUpdatedQty = "The quantity must be divisible by the prepack qty";
           this.hideMainSpinner();
         }
 
