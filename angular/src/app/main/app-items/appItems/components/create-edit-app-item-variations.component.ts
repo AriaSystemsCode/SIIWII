@@ -1150,6 +1150,9 @@ export class CreateEditAppItemVariationsComponent
              if(curentItem?.stockAvailability>0){
                 newVariation.stockAvailability=curentItem.stockAvailability;
             }
+
+            let item = this.variationMatrices?.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')));
+            if(!item || ! (item?.length>0) )
                 this.variationMatrices.push(newVariation);
             }
         };
