@@ -53537,6 +53537,7 @@ export class ContactDto implements IContactDto {
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     useDTOTenant!: boolean;
+    ssin!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -53610,6 +53611,7 @@ export class ContactDto implements IContactDto {
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.useDTOTenant = _data["useDTOTenant"];
+            this.ssin = _data["ssin"];
             this.id = _data["id"];
         }
     }
@@ -53681,6 +53683,7 @@ export class ContactDto implements IContactDto {
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["useDTOTenant"] = this.useDTOTenant;
+        data["ssin"] = this.ssin;
         data["id"] = this.id;
         return data;
     }
@@ -53733,6 +53736,7 @@ export interface IContactDto {
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     useDTOTenant: boolean;
+    ssin: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -64950,6 +64954,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     appItemSizesScaleInfo!: AppItemSizesScaleInfo[] | undefined;
     originalCode!: string | undefined;
     sycIdentifierId!: number | undefined;
+    ssin!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -65084,6 +65089,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             }
             this.originalCode = _data["originalCode"];
             this.sycIdentifierId = _data["sycIdentifierId"];
+            this.ssin = _data["ssin"];
             this.id = _data["id"];
         }
     }
@@ -65216,6 +65222,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         }
         data["originalCode"] = this.originalCode;
         data["sycIdentifierId"] = this.sycIdentifierId;
+        data["ssin"] = this.ssin;
         data["id"] = this.id;
         return data;
     }
@@ -65261,6 +65268,7 @@ export interface ICreateOrEditAppItemDto {
     appItemSizesScaleInfo: AppItemSizesScaleInfo[] | undefined;
     originalCode: string | undefined;
     sycIdentifierId: number | undefined;
+    ssin: string | undefined;
     id: number;
 
     [key: string]: any;
