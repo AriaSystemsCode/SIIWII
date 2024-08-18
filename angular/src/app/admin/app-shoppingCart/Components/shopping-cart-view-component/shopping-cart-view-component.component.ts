@@ -17,6 +17,7 @@ import { ShoppingCartoccordionTabs } from './ShoppingCartoccordionTabs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
+import { AppConsts } from '@shared/AppConsts';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -315,7 +316,12 @@ export class ShoppingCartViewComponentComponent
         "transNO",
         this.shoppingCartDetails.code
       );
-      this.router.navigateByUrl("app/main/marketplace/products");
+     // this.router.navigateByUrl("app/main/marketplace/products");
+
+      if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
+                        location.reload();
+                    else
+                        this.router.navigateByUrl("app/main/marketplace/products");
     }
     this.hide();
   }

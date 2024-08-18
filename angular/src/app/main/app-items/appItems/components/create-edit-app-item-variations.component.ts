@@ -178,7 +178,12 @@ export class CreateEditAppItemVariationsComponent
     }
     get variationPossibilities() {
         var count = 0;
+
         this.selectedExtraAttributes?.forEach((extraAttr) => {
+
+            if(extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE' && extraAttr?.entityObjectTypeCode !=='CLOSURE')
+            return;
+
             let extraAttrSelectedValues: number;
             // if (
             //     this.sizeExtraAttrCode ==
@@ -191,6 +196,7 @@ export class CreateEditAppItemVariationsComponent
             // }
             if (count == 0 && extraAttrSelectedValues > 0) count = 1;
             if (extraAttrSelectedValues) count *= extraAttrSelectedValues;
+            
         });
         return count;
     }
@@ -1144,6 +1150,9 @@ export class CreateEditAppItemVariationsComponent
              if(curentItem?.stockAvailability>0){
                 newVariation.stockAvailability=curentItem.stockAvailability;
             }
+
+            let item = this.variationMatrices?.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')));
+            if(!item || ! (item?.length>0) )
                 this.variationMatrices.push(newVariation);
             }
         };
