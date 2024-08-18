@@ -77,6 +77,7 @@ namespace onetouch.AppItems.Dtos
         public List<AppItemSizesScaleInfo> AppItemSizesScaleInfo { get; set;}
         public string OriginalCode { get; set; }
         public long? SycIdentifierId { get; set; }
+        public string? SSIN { set; get; }
         //MMT
     }
     //MMT

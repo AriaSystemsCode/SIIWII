@@ -1950,12 +1950,14 @@ namespace onetouch.AppItems
                                                            // .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk).AsNoTracking()
                 .Where(r => r.Id == input.Id)
                 .FirstOrDefaultAsync();
-
+                var orgSSIN = appItem.SSIN;
                 ObjectMapper.Map(input, appItem);
+                appItem.SSIN = orgSSIN;
             }
             AppEntityDto entity = new AppEntityDto();
             ObjectMapper.Map(input, entity);
             entity.Id = 0;
+            entity.SSIN = appItem.SSIN;
             entity.Code = input.Code;
             entity.ObjectId = itemObjectId;
             entity.TenantId = AbpSession.TenantId;
@@ -2024,6 +2026,10 @@ namespace onetouch.AppItems
             if (string.IsNullOrEmpty(appItem.SSIN))
             {
                 appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(entity));
+                entity.SSIN = appItem.SSIN;
+            }
+            else
+            {
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
