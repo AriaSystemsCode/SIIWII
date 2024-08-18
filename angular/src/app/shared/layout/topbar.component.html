@@ -4,7 +4,7 @@
     [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
 >
     <!-- Container wrapper -->
-    <div class="container ml-0 position-md-absolute position-lg-static">
+    <div class="container ml-0 position-md-absolute position-lg-static p-2">
         <!-- Navbar brand -->
 
         <!--  <a
@@ -26,6 +26,18 @@
             iconPos="right"
             class="Create-New me-2"
         ></button> -->
+        <a
+        class="navbar-brand pt-0"
+        style="margin-left: 25px;"
+        [routerLink]="['/app/main/Home']"
+        routerLinkActive="header-link-active"
+        (click)="userClick('Home')"
+    >
+        <img
+            src="../../../assets/landingPage/Logo_Main.png"
+            class="navbar-brand"
+        />
+    </a>
         <button
             type="button"
             (click)="menu.toggle($event)"
@@ -37,20 +49,9 @@
         </button>
 
         <!-- test nav -->
-        <a
-            class="navbar-brand pt-0"
-            style="margin-left: 25px;"
-            [routerLink]="['/app/main/Home']"
-            routerLinkActive="header-link-active"
-            (click)="userClick('Home')"
-        >
-            <img
-                src="../../../assets/landingPage/Logo_Main.png"
-                class="navbar-brand"
-            />
-        </a>
+ 
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form d-lg-block d-none">
+        <form class="input-group pt-3 input-group-form d-lg-block d-md-none">
             <div class="position-relative search-bar w-100" *ngIf="showSearch">
                 <div class="input-group mb-3">
                     <div
@@ -208,6 +209,7 @@
 
         <div class="rightList ml-4 ml-lg-0 navbar-collapse d-md-block d-none">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-md-flex d-none " style="justify-content: space-around;">
+                <div class="border-left text-white  d-md-block d-lg-none"></div>
                 <li class="nav-item pl-3 pt-2">
                     <a
                         class="nav-link active d-flex flex-column text-center"
@@ -256,7 +258,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item pl-3">
+                <li class="nav-item pl-3 ">
                     <a class="nav-link active d-flex flex-column text-center">
                         <div
                             dropdown
@@ -543,7 +545,9 @@
                         </div>
                     </a>
                 </li>
+               
             </ul>
+           
         </div>
         <!-- Collapsible wrapper -->
 
@@ -582,7 +586,32 @@
                         />
                     </a>
                 </li>
-
+<li  class="nav-item pt-1">
+    <div class="position-relative pt-3" >
+        <span
+            class="kt-header__topbar-icon kt-header__topbar-icon--primary"
+        >
+            <img
+                src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
+                style="width: 20px; height: 20px; cursor: pointer;"
+                class="m-auto"
+                (click)="getShoppingCartInfo(true)"
+                *ngIf="shoppingCartSummary?.shoppingCartId >0"
+            />
+            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
+                <span
+                    class="kt-badge kt-badge--primary unread-notification-count"
+                    style="
+                        top: 5px !important;
+                        right: -15px !important;
+                    "
+                >
+                    {{ shoppingCartSummary?.qty }}
+                </span>
+            </div>
+        </span>
+    </div>
+</li>
                 <li class="nav-item pt-2">
                     <a
                         class="nav-link active d-flex flex-column text-center"

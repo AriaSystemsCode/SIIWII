@@ -65,7 +65,7 @@
 
                 <div class="py-4 px-3 text-right border-left row  d-lg-flex
                 d-none">
-                    <button type="button" class="btn btn-primary bgPurple border-0  shareBtn"
+                    <button type="button" class="btn   border-0  shareBtn"
                         [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
                         [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
                         style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
@@ -74,7 +74,7 @@
                     </button>
                     <button type="button" [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
                         [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
-                        class="btn btn-primary bgPurple border-0 d-lg-block d-none" (click)="printTransaction()" style="width: 85px;
+                        class="btn  bgPurple border-0 d-lg-block d-none" (click)="printTransaction()" style="width: 85px;
                     height: 37px;
                     border-radius: 4px;">
                         <img src="../../../../../assets/shoppingCart/print.svg" />
@@ -167,14 +167,14 @@
                     </div>
                 </div>
                 <div class="p-4 text-right border-left d-flex">
-                    <button type="button" class="btn btn-primary bgPurple border-0  "
+                    <button type="button" class="btn  bgPurple border-0  "
                         style="height: 37px;white-space: nowrap;" (click)="onContinueShopping()"
                         [disabled]="!shoppingCartDetails?.detailsView || !isOwnedByMe"
                         [ngClass]="{ disabled:!shoppingCartDetails?.detailsView}">
                         {{l("ContinueShopping")}}
                     </button>
 
-                    <button  *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'" type="button" class="btn btn-primary bgPurple border-0  discartBtn"
+                    <button  *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'" type="button" class="btn  border-0  discartBtn"
                     style="height: 37px;white-space: nowrap;" (click)="onDiscardShopping()">
                         {{l("DiscardShopping")}}
                     </button>
@@ -530,7 +530,7 @@
                             <div class=" row w-100 mt-4 ml-1">
                                 <button type="button"
                                 [disabled]="shoppingCartDetails?.totalAmount<=0"
-                                    class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
+                                    class="btn bgPurple border-0 w-100 pointer Proceedtocheckout"
                                     style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
                                     {{l("Proceedtocheckout")}}
                                 </button>
@@ -540,7 +540,7 @@
                                     [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}">
                                     {{l("Placeyourorder")}}
                                 </button> -->
-                                <button type="button" class="btn btn-primary bgPurple border-0 w-100 pointer"
+                                <button type="button" class="btn  bgPurple border-0 w-100 pointer"
                                     style="height: 37px;"
                                     *ngIf="showTabs && shoppingCartDetails?.entityStatusCode?.toUpperCase()=='DRAFT'"
                                     [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
@@ -1127,7 +1127,7 @@ height: 48px;"
                             <div class=" row w-100 mt-4 ml-1">
                                 <button type="button"
                                 [disabled]="shoppingCartDetails?.totalAmount<=0"
-                                    class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
+                                    class="btn  bgPurple border-0 w-100 pointer Proceedtocheckout"
                                     style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
                                     {{l("Proceedtocheckout")}}
                                 </button>
@@ -1137,7 +1137,7 @@ height: 48px;"
                                     [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}">
                                     {{l("Placeyourorder")}}
                                 </button> -->
-                                <button type="button" class="btn btn-primary bgPurple border-0 w-100 pointer"
+                                <button type="button" class="btn  bgPurple border-0 w-100 pointer"
                                     style="height: 37px;"
                                     *ngIf="showTabs && shoppingCartDetails?.entityStatusCode?.toUpperCase()=='DRAFT'"
                                     [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
@@ -1185,7 +1185,7 @@ height: 48px;"
                         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                         <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
                             <app-comment-parent [addNewThread]="true" 
-                            [cartStyle]="true" #commentParentComponent
+                            [cartStyle]="true" #commentParentComponentMob 
                             (newCommentAdded)="onGeneratOrderReport(true)">
                             </app-comment-parent>
                         </div>

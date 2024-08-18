@@ -251,6 +251,8 @@
                                 </div>
                             </div>
                         </div>
+            <div class="p-3">
+
                         <button
                             [disabled]="orderSummary.length == 0"
                             (click)="addToShoppingCart()"
@@ -258,6 +260,7 @@
                         >
                             Add To Shopping Cart
                         </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -269,7 +272,7 @@
                     >
                     <div class="mt-4">
                         <div class="d-flex  justify-content-between">
-                            <div class="d-flex mb-3">
+                            <div class="d-flex ">
                                 <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
                                     {{ productDetails?.manufacturerCode }}
                                 </h5>
@@ -288,7 +291,7 @@
                     </div>
                      
                         <div class="d-flex">
-                            <p style="color: #1B101B; font-size: 16px;font-weight: 500;">{{productDetails?.name}}</p>
+                            <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;">{{productDetails?.name}}</p>
                             <h6 class="type ml-1 pt-2 text-center">
                                 {{
                                     productDetails?.orderByPrePack === false
@@ -468,13 +471,13 @@
                                     class="colorBox"
                                     [ngStyle]="{'background-color':color.colorCode}"
                                     (click)="setSizes(i)"
-                                    [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-white '
-                                            : ''
-                                    "
+                               
                                 ></div>
-                                <div>
+                                <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
+                                        i === currentIndex
+                                            ? 'border border-primary '
+                                            : ''
+                                    ">
                                 <img
                                     *ngIf="
                                         (color.colorImg === null &&
@@ -488,11 +491,7 @@
                                     alt="images slides"
                                     class="imageSlides"
                                     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                    [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-white '
-                                            : ''
-                                    "
+                              
                                 />
                                 <div class="card-body">
                               
@@ -543,7 +542,7 @@
                                             (click)="setSizes(i)"
                                             [ngClass]="
                                                 i === currentIndex
-                                                    ? 'border border-white '
+                                                    ? 'border border-primary '
                                                     : ''
                                             "
                                         ></div>
@@ -563,10 +562,10 @@
                                             class="imageSlides"
                                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                             [ngClass]="
-                                                i === currentIndex
-                                                    ? 'border border-white '
-                                                    : ''
-                                            "
+                                            i === currentIndex
+                                                ? 'border border-primary '
+                                                : ''
+                                        "
                                         />
                                     </div>
                                 </div>
@@ -1018,13 +1017,16 @@
                     </div>
                 </div>
             </div>
-            <button
+            <div class="p-3">
+                <button
                 [disabled]="orderSummary.length == 0"
                 (click)="addToShoppingCart()"
                 class="btn m-0 add-btn"
             >
                 Add To Shopping Cart
             </button>
+            </div>
+          
         </div>
     </div>
             </div>
@@ -1102,8 +1104,8 @@
                                 >
                                 <div class="mt-4">
                                     <div class="d-flex  justify-content-between">
-                                        <div class="d-flex mb-3">
-                                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
+                                        <div class="d-flex ">
+                                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 18px;margin-top: 8px;">
                                                 {{ productDetails?.manufacturerCode }}
                                             </h5>
                                      
@@ -1121,7 +1123,7 @@
                                 </div>
                                  
                                     <div class="d-flex">
-                                        <p style="color: #1B101B; font-size: 16px;font-weight: 500;">{{productDetails?.name}}</p>
+                                        <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;">{{productDetails?.name}}</p>
                                         <h6 class="type ml-1 pt-2 text-center">
                                             {{
                                                 productDetails?.orderByPrePack === false
@@ -1303,29 +1305,42 @@
                                                 (click)="setSizes(i)"
                                                 [ngClass]="
                                                     i === currentIndex
-                                                        ? 'border border-white '
+                                                        ? 'border border-primary '
                                                         : ''
                                                 "
                                             ></div>
-                                            <img
-                                                *ngIf="
-                                                    (color.colorImg === null &&
-                                                        color.colorCode === null) ||
-                                                    color.colorImg !== null
-                                                "
-                                                (click)="setSizes(i)"
-                                                [src]="
-                                                    attachmentBaseUrl + '/' + color.colorImg
-                                                "
-                                                alt="images slides"
-                                                class="imageSlides"
-                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                                [ngClass]="
-                                                    i === currentIndex
-                                                        ? 'border border-white '
-                                                        : ''
-                                                "
-                                            />
+                                            
+                                          <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
+                                        i === currentIndex
+                                            ? 'border border-primary '
+                                            : ''
+                                    ">
+                                <img
+                                    *ngIf="
+                                        (color.colorImg === null &&
+                                            color.colorCode === null) ||
+                                        color.colorImg !== null
+                                    "
+                                    (click)="setSizes(i)"
+                                    [src]="
+                                        attachmentBaseUrl + '/' + color.colorImg
+                                    "
+                                    alt="images slides"
+                                    class="imageSlides"
+                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                              
+                                />
+                                <div class="card-body">
+                              
+                                   
+                                    <p class="card-text desc fw-bold" >
+                                        {{   color.colorCode }}
+                                    </p>
+                                    <p class="seller" >{{ color.colorName  }}</p> 
+                            
+                                 
+                                </div>
+                                </div>
                                         </div>
                                     </div>
                                     <!-- color selection -->
@@ -1364,7 +1379,7 @@
                                                         (click)="setSizes(i)"
                                                         [ngClass]="
                                                             i === currentIndex
-                                                                ? 'border border-white '
+                                                                ? 'border border-primary '
                                                                 : ''
                                                         "
                                                     ></div>
@@ -1385,7 +1400,7 @@
                                                         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                         [ngClass]="
                                                             i === currentIndex
-                                                                ? 'border border-white '
+                                                                ? 'border border-primary '
                                                                 : ''
                                                         "
                                                     />
@@ -1855,6 +1870,8 @@
                                     </div>
                                 </div>
                             </div>
+            <div class="p-3">
+
                             <button
                                 [disabled]="orderSummary.length == 0"
                                 (click)="addToShoppingCart()"
@@ -1862,6 +1879,7 @@
                             >
                                 Add To Shopping Cart
                             </button>
+            </div>
                         </div>
                     </div>
                     <div class="col-12">

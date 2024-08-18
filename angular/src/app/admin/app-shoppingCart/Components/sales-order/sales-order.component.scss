@@ -31,7 +31,7 @@
     // top: 5px;
     // right: 20px;
     // z-index: 9999;
-    margin-left: 8px;
+    // margin-left: 8px;
  
 
     width: 99px;
@@ -225,10 +225,15 @@ font-weight: 600;
         width: 100% !important;
 
     }
+    .p-treeselect {
+    border: 1px solid #E6E6E6 !important;
+    border-radius: 10px !important;
+    height: 43px !important;
+    }
 }
 .cat{
     border: 1px solid #E6E6E6 ;
-    margin-left: 42px;
+    margin-left: 17px;
     color: #4A0D4A;
     padding-top: 10px;
     text-align: center;
@@ -236,6 +241,7 @@ font-weight: 600;
     font-size: 14px;
 font-style: normal;
 font-weight: 700;
+white-space: nowrap;
 }
 
 img {

@@ -109,7 +109,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     emptyMessage: string = 'No results found';
     searchTerm: string = '';
     filteredBuyerContacts: any[] ; 
-    today = new Date()
+    today: Date ;
+    startDateMsg:boolean = false
+    comtDateMsg:boolean = false
+    avalabletDateMsg:boolean = false
+    showAddTextBtn:boolean = false
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -121,6 +125,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     ) {
         super(injector);
         this.orderForm = this.fb.group({
+            enteredDate: [new Date()],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],
@@ -141,10 +146,15 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.reset();
         this.getAllCompanies();
         this.orderForm.controls['startDate'].setValue(new Date());
+        this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
+        this.orderForm.controls['enteredDate'].disable();
+       
     }
+
     ngOnChanges(){
         this.orderForm = this.fb.group({
+            enteredDate: [new Date()],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],
@@ -165,10 +175,21 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         });
         this.orderForm.reset();
         this.orderForm.controls['startDate'].setValue(new Date());
+        this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
+        this.orderForm.controls['enteredDate'].disable();
+    
 
     }
+    // minDateValidator(minDate: Date) {
+    //     return (control: any) => {
+    //       const selectedDate = new Date(control.value);
+    //       return selectedDate && selectedDate < minDate
+    //         ? { minDate: true }
+    //         : null;
+    //     };
+    //   }
     getUserDefultRole(){
        /* var transactionType: TransactionType;
         if (this.formType.toUpperCase() == "SO")
@@ -439,7 +460,8 @@ if (event.filter != '' || event.filter != undefined){
                     console.log(this.buyerContacts,'this.buyerContacts')
                     if(this.buyerContacts?.length == 0  && event.filter != undefined) {
                         this.emptyMessage = ` Click to add "${this.searchTerm}".`;
-                        this.buyerContacts.push({ name: ` add as text "${this.searchTerm}".`, id: this.buyerContacts.length + 1 });
+                        // this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+                        this.showAddTextBtn = true
                         // console.log(`Added new buyer: ${'kk'}`);
                     }
                     else {
@@ -452,13 +474,17 @@ if (event.filter != '' || event.filter != undefined){
         }, 500);
     }
     addNewBuyer() {
+        console.log(`helloooooo`);
+        console.log(`Added new buyer: ${this.searchTerm}`);
+                this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+                console.log(this.buyerContacts,`this.buyerContacts`);
      
-         if (this.searchTerm) {
-      const newBuyer = { name: this.searchTerm, id: this.buyerContacts.length + 1 };
-      this.buyerContacts.push(newBuyer);
+    //      if (this.searchTerm) {
+    //   const newBuyer = { name: this.searchTerm, id: this.buyerContacts.length + 1 };
+    //   this.buyerContacts.push(newBuyer);
 
-      console.log(`Added new buyer: ${this.searchTerm}`);
-    }
+    //   console.log(`Added new buyer: ${this.searchTerm}`);
+    // }
          
       
       }
@@ -673,6 +699,7 @@ if (event.filter != '' || event.filter != undefined){
             this.areSame = true
         }
     }
+
     changeStartDate(date){
 
         const newDate = new Date();
@@ -689,6 +716,8 @@ if (event.filter != '' || event.filter != undefined){
         this.minDate.setFullYear(yearVal);
         const completeDateControl = this.orderForm.controls['completeDate'];
         const availableDateControl = this.orderForm.controls['availableDate'];
+       const startDateControl = this.orderForm.controls['startDate'];
+        
     
 
 
@@ -704,8 +733,30 @@ if (event.filter != '' || event.filter != undefined){
         this.minStartDate = this.orderForm.get('startDate')?.value;
        //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
     
-   
+       const selectedStartDate = new Date(startDateControl.value);
+       if (selectedStartDate < this.today) {
+         this.startDateMsg = true
+         startDateControl.setErrors({ minDate: true });
+       } else {
 
+        this.startDateMsg = false
+         startDateControl.setErrors(null); 
+       }
+
+
+
+
+    //    const selectedavailableDate = new Date(availableDateControl.value);
+    //    if (selectedavailableDate < selectedCompliteDate) {
+    //      this.avalabletDateMsg = true
+    //      availableDateControl.setErrors({ minDate: true });
+    //    } else {
+
+    //     this.avalabletDateMsg = false
+    //     availableDateControl.setErrors(null); 
+    //    }
+
+       
     }
 
     changeCompleteDate(event) {
@@ -718,6 +769,32 @@ if (event.filter != '' || event.filter != undefined){
         // Check if the new date is different from the current value to prevent infinite loops
         if (newDate?.getTime() !== this.orderForm.controls['completeDate']?.value?.getTime()) 
             this.orderForm.controls['completeDate'].setValue(newDate);
+
+        const selectedCompliteDate = new Date(this.orderForm.controls['completeDate']?.value);
+        if (selectedCompliteDate < this.orderForm.get('startDate')?.value) {
+          this.comtDateMsg = true
+          this.orderForm.controls['completeDate']?.setErrors({ minDate: true });
+        } else {
+ 
+         this.comtDateMsg = false
+         this.orderForm.controls['completeDate']?.setErrors(null); 
+        }
+        
+    }
+
+
+    changeAvailbeDate(event) {
+        const selectedavailableDate = new Date(this.orderForm.controls['availableDate']?.value);
+        if (selectedavailableDate < this.orderForm.get('completeDate')?.value) {
+            this.avalabletDateMsg = true
+          this.orderForm.controls['availableDate']?.setErrors({ minDate: true });
+        } else {
+ 
+         this.avalabletDateMsg = false
+         this.orderForm.controls['availableDate']?.setErrors(null); 
+        }
+
+     
     }
 
 
@@ -976,6 +1053,27 @@ if (event.filter != '' || event.filter != undefined){
     }
 
     ngOnInit(): void {
+        this.today = new Date()
+        this.orderForm = this.fb.group({
+            enteredDate: [new Date()],
+            startDate: [ Date, [Validators.required]],
+            completeDate: ["", [Validators.required]],
+            availableDate: ["", [Validators.required]],
+            sellerCompanyName: ["", [Validators.required]],
+            sellerContactName: [""],
+            sellerContactEMailAddress: ["", [Validators.email]],
+            sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyName: ["", [Validators.required]],
+            buyerContactName: [""],
+            buyerContactEMailAddress: ["", [Validators.email]],
+            buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyBranch:["", [Validators.required]],
+            sellerCompanyBranch:["", [Validators.required]],
+            istemp: [false],
+            reference:[""],
+
+            
+        });
         console.log(">> oninit", this.orderNo);
         let today = new Date();
         let month = today.getMonth();
@@ -987,5 +1085,8 @@ if (event.filter != '' || event.filter != undefined){
         this.minDate = new Date();
         this.minDate.setMonth(prevMonth);
         this.minDate.setFullYear(prevYear);
+        this.orderForm.controls['enteredDate'].setValue(new Date());
+        this.orderForm.controls['enteredDate'].disable();
+
     }
 }

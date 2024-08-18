@@ -1,6 +1,6 @@
 .modal-content {
     max-height: 950px;
-    overflow: hidden scroll;
+    // overflow: hidden scroll;
 }
 
 .summarySection {
@@ -156,6 +156,15 @@ button[disabled] {
 
 
 ::ng-deep {
+    .form-control , .form-control:focus, .form-control:active {
+        background: #FFF !important;
+        border-radius: 8px !important;
+        font-size: 14px;
+// font-style: normal;
+// font-weight: 600;
+color: #9E9E9E !important;
+// border: 1px #D9D9D9  !important;
+    }
     .p-treetable-thead {
 
         br {
@@ -347,13 +356,28 @@ input.ng-invalid.ng-touched {
     }
 
 }
+
 ::ng-deep .tablet {
+
+    @media  (min-width: 567px) and  (max-width: 678px) {
+        .p-tabview .p-tabview-nav li {
+            border-radius: 0 !important;
+            // border: 0.5px solid #eee !important;
+            border-bottom: 1px solid #E2E2E2 !important;
+    
+           
+    
+        }
+    }
+    
     .p-treetable .p-treetable-thead > tr > th {
         white-space:  nowrap !important;
     }
-    .p-tabview .p-tabview-nav li {
-        border-radius: 0 !important;
+ 
+    .p-tabview .p-tabview-nav  {
+       
         // border: 0.5px solid #eee !important;
+        border: 1px solid #E2E2E2 !important;
 
     }
   
@@ -365,6 +389,9 @@ input.ng-invalid.ng-touched {
         white-space:  nowrap !important;
         font-size: 11px !important;
     }
+    .p-tabview .p-tabview-nav li {
+        margin: 5px;
+    }
     .tab-header{
         display: flex;
         flex-direction: column;
@@ -374,13 +401,15 @@ input.ng-invalid.ng-touched {
     }
     .p-tabview .p-tabview-nav li .p-tabview-nav-link {
         border: none !important;
+        border-right: 1px solid #E2E2E2 !important;
+
     }
     .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
         background-color: white !important; 
         color: #777 !important;
         // border-bottom: 1px solid #eee !important;
         border-radius: 0 !important;
-        padding: 10px 20px;
+        padding: 0;
          width: 140px  !important;
          height: 100px !important;
          .tab-header {
@@ -405,7 +434,11 @@ input.ng-invalid.ng-touched {
         left: -70px !important;
         width: 81% !important;
     }
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+        border: none !important;
+       
 
+    }
     @media only screen and (max-width: 567px) {
 
     .handleMob {
@@ -594,6 +627,7 @@ input.ng-invalid.ng-touched {
 }
 
 .bgPurple {
-    background:  #4A0D4A;
+    background:  #4A0D4A !important;
+    color: white;
 
 }

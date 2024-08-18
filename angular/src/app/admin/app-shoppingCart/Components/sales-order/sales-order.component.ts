@@ -57,6 +57,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     category :any;
     showSaveBtn: boolean = false;
     showCatBtn: boolean = false;
+    hideCatBtn: boolean = true;
     oldappTransactionsForViewDto;
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input("canChange") canChange: boolean = true;

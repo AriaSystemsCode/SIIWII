@@ -33,6 +33,11 @@
 
 ::ng-deep  {
     // .p-element {
+        .btn-group > .btn:not(:last-child):not(.dropdown-toggle), .btn-group > .btn-group:not(:last-child) > .btn {
+            
+            border-radius: 6px !important;
+
+        }
     .bgPurpleM {
         border-radius: 10px;
 background: #4A0D4A !important;

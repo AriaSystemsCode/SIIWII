@@ -1,5 +1,6 @@
 .card {
-    border-radius: 10.82px !important;
+    border-top-left-radius: 10.82px !important;
+    border-top-right-radius: 10.82px !important;
     width: 15rem;
     cursor: pointer;
     // height:285px;
@@ -69,7 +70,7 @@ font-weight: 700;
 
 @media only screen and (max-width: 600px) {
     .card {
-        border-radius: 0% !important;
+        // border-radius: 0% !important;
         width: 100%;
     }
 }

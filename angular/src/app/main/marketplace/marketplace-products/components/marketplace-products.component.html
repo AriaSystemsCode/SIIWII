@@ -28,13 +28,7 @@
                             class="sarch d-flex align-items-center justify-content-center"
                             style="gap: 5px"
                         >
-                            <p-dropdown
-                                [options]="currencies"
-                                [(ngModel)]="selectedCurrrency"
-                                optionLabel="code"
-                                class="w-50"
-                                (onChange)="handleCurrencyChange($event)"
-                            ></p-dropdown>
+                         
                             <span class="p-input-icon-right w-100">
                                 <i class="pi pi-search"></i>
                                 <input
@@ -48,33 +42,53 @@
                                     (keyup)="handleProductSearchText()"
                                 />
                             </span>
+                            <p-dropdown
+                            [options]="currencies"
+                            [(ngModel)]="selectedCurrrency"
+                            optionLabel="code"
+                            class="w-50 mr-2"
+                            (onChange)="handleCurrencyChange($event)"
+                        ></p-dropdown>
                         </div>
                         <div
-                            class="sort d-flex align-items-center justify-content-end"
+                            class="sort d-flex align-items-center justify-content-between"
                             style="gap: 5px ; white-space: nowrap;"
                         >
-                            <p-button
-                                icon="pi pi-sliders-h"
-                                [label]="
-                                    isFilterHidden
-                                        ? 'Show Filters '
-                                        : 'Hide Filters'
-                                "
-                                (click)="toggleFilters()"
-                                styleClass="p-button-outlined p-button-secondary"
-                            ></p-button>
+                         
 
                             <p-dropdown
                                 [options]="sortingData"
                                 [(ngModel)]="selectedSort"
                                 placeholder="Sort by"
                                 optionLabel="label"
+                                class="sortBy"
                                 (onChange)="handleSortingChange($event)"
                             ></p-dropdown>
+                            <p-button
+                            icon="pi pi-sliders-h"
+                            [label]="
+                                isFilterHidden
+                                    ? 'Show Filters '
+                                    : 'Hide Filters'
+                            "
+                            (click)="toggleFilters()"
+                            class="filterBtn d-lg-block d-md-none"
+                            styleClass="p-button-outlined p-button-secondary"
+                           
+                        ></p-button>
+                        <p-button
+                        icon="pi pi-sliders-h"
+                   
+                        (click)="toggleFilters()"
+                        class="filterBtn d-lg-none d-md-block"
+                        styleClass="p-button-outlined p-button-secondary"
+                       
+                    ></p-button>
                             <p-button
                                 icon="pi pi-refresh"
                                 (click)="resetProducts($event)"
                                 styleClass="p-button-outlined p-button-secondary"
+                                class="resBtn"
                             ></p-button>
                         </div>
                     </div>
@@ -142,13 +156,8 @@
     <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
     <div class="container-fluid">
         <div class="quickFilters">
-            <button
-                (click)="openFiltersDialog('Shared With Me and Public')"
-                class="filter-btn"
-            >
-                Shared With Me and Public
-            </button>
-            <span class="p-input-icon-right w-100">
+        
+            <span class="p-input-icon-right " style="width: 40%;">
                 <i class="pi pi-search"></i>
                 <input
                     type="text"
@@ -159,6 +168,12 @@
                     (keyup)="handleProductSearchText()"
                 />
             </span>
+            <button style="width: 60%;"
+            (click)="openFiltersDialog('Shared With Me and Public')"
+            class="filter-btn"
+        >
+            Shared With Me and Public
+        </button>
         </div>
         <div class="btn-filters">
             <button
@@ -168,21 +183,31 @@
                 {{ selectedCurrrency.code }}
             </button>
             <button
+            class="filter-btn w-50"
+            (click)="openFiltersDialog('Sort By')"
+        >
+            Sort By
+        </button>
+        <p-button
+        icon="pi pi-sliders-h"
+   
+        (click)="openFiltersDialog('Filter By')"
+        class="filterBtn "
+        styleClass="p-button-outlined p-button-secondary"
+       
+    ></p-button>
+            <!-- <button
                 class="filter-btn w-50"
                 (click)="openFiltersDialog('Filter By')"
             >
                 Filter By
-            </button>
-            <button
-                class="filter-btn w-25"
-                (click)="openFiltersDialog('Sort By')"
-            >
-                Sort By
-            </button>
+            </button> -->
+       
             <p-button
                 icon="pi pi-refresh"
                 (click)="resetProducts($event)"
-                styleClass="p-button-outlined p-button-secondary"
+                styleClass=" "
+                class="resBtn"
             ></p-button>
         </div>
         <!-- list All products -->
@@ -216,13 +241,14 @@
     [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
     [baseZIndex]="10000"
     [modal]="true"
-    [header]="filterType"
+    
     [(visible)]="displayFitlers"
     [draggable]="false"
     [closable]="true"
     position="bottom"
-    (onHide)="cancel()"
+   
 >
+<!-- (onHide)="cancel()" -->
     <!-- sharing option filters -->
     <div
         class="flex flex-column gap-3"
@@ -300,7 +326,7 @@
         ></app-product-filters>
     </div>
 
-    <div class="w-100 text-center">
+    <!-- <div class="w-100 text-center">
         <button class="apply" (click)="applyFilters()">Apply filters</button>
-    </div>
+    </div> -->
 </p-dialog>

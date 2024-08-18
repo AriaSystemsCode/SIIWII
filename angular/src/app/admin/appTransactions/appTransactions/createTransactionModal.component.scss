@@ -4,17 +4,25 @@
     }
     .p-dropdown .p-dropdown-label.p-placeholder {
         color:#9E9E9E  !important;
+        font-size: 14px !important;
+font-style: normal;
+font-weight: 600 !important;
     }
     .p-calendar .p-inputtext {
         color: #9E9E9E !important;
+        font-size: 14px;
+font-style: normal !important;
+font-weight: 600 !important;
     }
     .p-menu .p-submenu-header {
         display: none !important;
     }
+    .transM {
     .p-dialog .p-dialog-header {
         background-color: #fff !important;
         color: #f6851d !important ;
     }
+}
     .p-dialog .p-dialog-content {
         text-align: left !important;
 
@@ -28,6 +36,21 @@
     }
     .p-dropdown-filter-icon{
         top: 16px !important;
+    }
+    .addTextBtn{
+        border-radius: 6px;
+border: 1px solid rgba(238, 238, 238, 0.93);
+background: #FFF;
+box-shadow: 2px 2px 6px 0px rgba(22, 22, 22, 0.05);
+color: #4a0d4a;
+    }
+    .p-button:enabled:hover{
+        background: #FFF !important;
+
+        color: #4a0d4a !important;
+
+        border: 1px solid rgba(238, 238, 238, 0.93) !important;
+
     }
 }
 
@@ -106,23 +129,27 @@
 }
 
 
-.img {
+img {
     width: 24px;
     height: 24px;
     position: absolute;
-    right: 22px;
-    bottom: 24px;
+    right: 12px;
+    bottom: 12px;
 
 }
-.err {
-    width: 24px;
-    height: 24px;
-    position: absolute;
-    right: 22px;
-    bottom: 40px;
-
+p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
+    border: 1px solid #a80000 !important;
 }
+.enteredDate {
+    .p-disabled, .p-component:disabled {
+        opacity: 1 !important;
+    color: #1B101B !important;
+    }
+    .p-calendar-w-btn .p-datepicker-trigger {
+        background: #808080 !important;
 
+    }
+}
 
 }
 

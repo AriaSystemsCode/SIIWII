@@ -1,14 +1,13 @@
 .type {
-    background-color: #949090;
-    color: #fff;
-    padding: 2px 5px;
-    Width: 106px;
-    Height: 32px;
+    background-color: #F8F8F8;
+    padding: 8px 5px;
+
     border-radius: 6px;
     border: 1px;
-    Padding: 6px 16px 6px 16px;
-    background-color: #e4e4e4;
-    color: #b6b7b9;
+    color: #9E9E9E;
+    Width: 134px;
+    min-Width: 120px;
+    Height: 35px;
 }
 .summary-sec {
     padding-left: 30px;
@@ -20,7 +19,7 @@
     width: 85px;
     height: 57px;
     border-radius: 6px 6px 0 0 ;
-    margin-right :10px;
+   
     cursor: pointer;
 }
 .showRoomLink[disabled]{

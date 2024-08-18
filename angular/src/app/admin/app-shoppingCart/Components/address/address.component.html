@@ -95,7 +95,7 @@
 </div>
 
 <div class="address-wrapper p-2 add-edit-mode" *ngIf="openAddNewAddForm">
-    <div class="address-form">
+    <div class="address-form" *ngIf="showAddBtn">
         <div class="adrress-title">
             <h3 *ngIf="!addressIdForEdit">{{l("AddNewAddressDetails")}}</h3>
             <h3 *ngIf="addressIdForEdit">{{l("EditAddress")}}</h3>

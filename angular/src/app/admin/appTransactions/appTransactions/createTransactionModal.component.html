@@ -9,6 +9,7 @@
     [draggable]="false"
     [closable]="true"
     (onHide)="cancel()"
+    class="transM"
 >
     <div class="wrapper">
 
@@ -66,23 +67,27 @@
                     
                     </div>
                 </div>
-                <div class="col-md-6 relative">
-                    <div class="mb-3">
+                <div class="col-md-6 ">
+                    <div class="mb-3 enteredDate">
                         <label class="form-label">Entered Date*</label>
+                        <div class="position-relative">
+                        
                         <p-calendar
                         [appendTo]="'body'"
-                            formControlName="startDate"
+                            formControlName="enteredDate"
                             [showIcon]="true"
-                            (ngModelChange)="changeStartDate(orderForm.get('enDate'))"
+                            [disabled]="true"
                             [readonlyInput]="true"
+                         
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
-
+                           </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="mb-3 relative">
+                    <div class="mb-3 ">
                         <label class="form-label">Start Date*</label>
+                        <div class="position-relative">
                         <p-calendar
                         [appendTo]="'body'"
                             formControlName="startDate"
@@ -93,11 +98,15 @@
 
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                       
+                        
+                    </div>
+                
                         <small
                         class="text-danger"
                         *ngIf="
                            
-                        submitted &&  today
+                        submitted &&  startDateMsg
                         "
                     >
                     start date Can’t be after the Entered date 
@@ -107,6 +116,8 @@
                 <div class="col-md-6">
                     <div class="mb-3 relative">
                         <label class="form-label">Complete Date*</label>
+                        <div class="position-relative">
+
                         <p-calendar
                         [appendTo]="'body'"
                             formControlName="completeDate"
@@ -115,12 +126,13 @@
                             [readonlyInput]="false"
                             (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png" [ngClass]="  submitted &&  minStartDate ? 'err':'img'"   alt="" srcset="">
+                        <img src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
+                        </div>
                         <small
                         class="text-danger"
                         *ngIf="
                            
-                        submitted &&  minStartDate
+                        submitted &&  comtDateMsg
                         "
                     >
                     Complete date Can’t be after the Start date 
@@ -128,23 +140,27 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="mb-3 relative">
+                    <div class="mb-3 ">
                         <label class="form-label">Available Date*</label>
+                        <div class="position-relative">
+
                         <p-calendar
                         [appendTo]="'body'"
                             formControlName="availableDate"
                             [showIcon]="true"
                             [readonlyInput]="false"
+                            (ngModelChange)="changeAvailbeDate(orderForm.get('availableDate'))"
+
                             [minDate]="minCompleteDate"
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
-                      
+                       </div>
                     </div>
                     <small
                     class="text-danger"
                     *ngIf="
                        
-                    submitted &&  minCompleteDate
+                    submitted &&  avalabletDateMsg
                     "
                 >
                 Available date Can’t be after the complete date 
@@ -261,7 +277,7 @@
                             emptyMessage="  add new."
                             (onClick)="addNewBuyer()">
                         </p-dropdown> -->
-                        <div >
+                        <div>
                             <p-dropdown
                                 [options]="buyerContacts"
                                 formControlName="buyerContactName"
@@ -272,18 +288,23 @@
                                 placeholder="Please Select Buyer Name"
                                 (onFilter)="handleBuyerNameSearch($event)"
                                 [emptyMessage]="emptyMessage != '' ? emptyMessage : ''"
-                                (onChange)="handleBuyerNameChange($event)" 
-                                >
-                                
+                                (onChange)="handleBuyerNameChange($event)"
+                            >
+                                <!-- Custom template for when no matching results are found -->
+                                <ng-template let-item pTemplate="item">
+                                    {{ item.name }}
+                                </ng-template>
+                        
+                                <ng-template pTemplate="empty">
+                                    <div class="d-flex justify-content-between">
+                                        <span>{{searchTerm}} </span>
+                                        <button  pButton type="button" class="addTextBtn" label="Add New" (click)="addNewBuyer()"></button>
+                                    </div>
+                                </ng-template>
                             </p-dropdown>
                         </div>
                         
-                        <!-- <ng-template *ngIf="buyerContacts?.length == 0;">
-                            <div>
-                               
-                                <button pButton type="button" label="Add New Buyer" (click)="addNewBuyer()"></button>
-                            </div>
-                        </ng-template> -->
+                 
                      
                             <small
                                 class="text-danger"
