@@ -208,7 +208,7 @@ export class ShoppingCartViewComponentComponent
             undefined,
             undefined,
             0,
-            30,false, TransactionType.SalesOrder ? "SO" : "PO" 
+            30,false, null
         )
         .subscribe((res2: PagedResultDtoOfGetAccountInformationOutputDto) => {
           this.companeyNames= [...res2.items];

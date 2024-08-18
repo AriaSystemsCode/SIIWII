@@ -455,7 +455,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                     undefined,
                     undefined,
                     undefined,
-                    undefined,false,this.appTransactionsForViewDto.transactionType == TransactionType.SalesOrder ? "SO" : "PO"
+                    undefined,false,null
                 )
                 .subscribe((res: any) => {
                     this.companeyNames = [...res.items];
