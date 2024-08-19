@@ -180,7 +180,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
       });
   }
   selectShipVia($event) {
-    var index = this.shipViaList.findIndex(x => x.value = $event?.value)
+    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
     if (index >= 0) {
       this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
       this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
