@@ -229,6 +229,7 @@ export class CreateEditAppItemVariationsComponent
     activeExisttingVariation=false;
     showNewVariation=false;
     activeNewVariation=false;
+    deselectedValues=[];
     constructor(
         injector: Injector,
         private _extraAttributeDataService: ExtraAttributeDataService,
@@ -1299,6 +1300,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                     );
                   //  }
                 });
+                
             // } else {
             //     // size condition
             //     console.log(">>", this.appSizeRatios.appSizeScalesDetails);
@@ -1958,6 +1960,8 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         this.showMainSpinner();
             subscription.subscribe((result) => {
                 extraAttr.lookupData=result;
+                extraAttr.displayedSelectedValues = 
+                   extraAttr.displayedSelectedValues.filter(item => {    const isDeselected = this.deselectedValues.includes(item.code) || this.deselectedValues.includes(item.value);    return !isDeselected;});
                 let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
                 if (modalRefData.selectionDone)
@@ -2407,6 +2411,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                 displayedSelectedValues.hexaCode =element.hexaCode;
                 displayedSelectedValues.image=element.image;
                 displayedSelectedValues.label =element.label;
+
                 displayedSelectedValues.value   =element.value;
             }
            
@@ -2420,10 +2425,12 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         if(event.value){
         extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues?.filter(item => item.value !== event.value);
         extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.value);
+        this.deselectedValues?.push(event?.value);
         }
         else{
             extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues?.filter(item => item.code !== event.code);
             extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.code);
+            this.deselectedValues?.push(event?.code);
         }
 
         this.appItem.nonLookupValues = this.appItem.nonLookupValues?.filter(x=>x.code!=event.code)
@@ -2432,6 +2439,8 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
       this.variationMatrices = this.variationMatrices?.filter((variation) => {
         return !deselectedVariations.includes(variation);
     });}
+
+  
     }
     getExistingVariations(){
         this.activeExisttingVariation=true;
