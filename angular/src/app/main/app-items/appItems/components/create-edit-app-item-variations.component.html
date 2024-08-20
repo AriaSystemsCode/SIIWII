@@ -187,8 +187,8 @@
                                                     <th *ngFor="let extraAttr of selectedExtraAttributes" [hidden]="extraAttr.entityObjectTypeCode !== 'COLOR' && extraAttr.entityObjectTypeCode !== 'SIZE' && extraAttr?.entityObjectTypeCode!=='CLOSURE'">
                                                         {{extraAttr.name | localize}} {{"Code" | localize}}
                                                     </th>
-                                                    <th *ngFor="let extraAttr of selectedExtraAttributes">
-                                                      <div *ngIf="extraAttr?.entityObjectTypeCode!=='CLOSURE'"> SIWII Marketplace  {{extraAttr.name | localize}}</div> 
+                                                    <th *ngFor="let extraAttr of selectedExtraAttributes" [hidden]="extraAttr.entityObjectTypeCode !== 'COLOR' && extraAttr.entityObjectTypeCode !== 'SIZE'">
+                                                      <div> SIWII Marketplace  {{extraAttr.name | localize}}</div> 
                                                     </th>
                                                     <th>
                                                         {{ "VariationCode" | localize }}
