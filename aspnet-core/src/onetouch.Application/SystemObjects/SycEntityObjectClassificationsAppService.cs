@@ -504,7 +504,22 @@ namespace onetouch.SystemObjects
                 await Update(input);
             }
         }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[Start]
+        public async Task CreateOrEditForObjectTransaction(CreateOrEditSycEntityObjectClassificationDto input)
+        {
+            input.ObjectId = await _helper.SystemTables.GetObjectTransactionId();
 
+            if (input.Id == null)
+            {
+                await Create(input);
+            }
+            else
+            {
+                await Update(input);
+            }
+
+        }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[End]
         public async Task CreateOrEditForObjectProduct(CreateOrEditSycEntityObjectClassificationDto input)
         {
             input.ObjectId = await _helper.SystemTables.GetObjectItemId();

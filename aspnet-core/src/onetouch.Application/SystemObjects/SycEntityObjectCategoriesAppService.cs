@@ -545,7 +545,22 @@ namespace onetouch.SystemObjects
                 _sycEntityLocalizeAppService.CreateOrUpdateLocalization(cat.Id, sycEntityObjectCategory.Id, "ENG", "Name", input.Name);
             //xx
         }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[Start]
+        public async Task CreateOrEditForObjectTransaction(CreateOrEditSycEntityObjectCategoryDto input)
+        {
+            input.ObjectId = await _helper.SystemTables.GetObjectTransactionId();
 
+            if (input.Id == null)
+            {
+                await Create(input);
+            }
+            else
+            {
+                await Update(input);
+            }
+
+        }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[End]
         public async Task CreateOrEditForObjectProduct(CreateOrEditSycEntityObjectCategoryDto input)
         {
             input.ObjectId = await _helper.SystemTables.GetObjectItemId();

@@ -2448,6 +2448,23 @@ namespace onetouch.AppSiiwiiTransaction
                 return true;
             }
         }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[Start]
+        public async Task<bool> IsManualCompany(string companySSIN)
+        {
+            var contact = await _appContactRepository.GetAll().Where(z => z.SSIN == companySSIN).FirstOrDefaultAsync();
+            if (contact != null)
+            {
+                if (!string.IsNullOrEmpty(contact.PartnerId.ToString()))
+                    return false;
+                else
+                    return true;
+            }
+            else
+            { 
+                return false;
+            }
+        }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[End]
 
         [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
         public async Task AddTransactionDetails(GetAppMarketplaceItemDetailForViewDto input, string transactionId, string transactionType)
