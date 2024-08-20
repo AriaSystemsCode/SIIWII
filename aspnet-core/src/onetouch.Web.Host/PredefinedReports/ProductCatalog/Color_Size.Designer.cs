@@ -36,6 +36,8 @@
             DevExpress.DataAccess.Sql.QueryParameter queryParameter4 = new DevExpress.DataAccess.Sql.QueryParameter();
             DevExpress.DataAccess.Sql.QueryParameter queryParameter5 = new DevExpress.DataAccess.Sql.QueryParameter();
             DevExpress.DataAccess.Sql.QueryParameter queryParameter6 = new DevExpress.DataAccess.Sql.QueryParameter();
+            DevExpress.XtraPrinting.BarCode.QRCodeGenerator qrCodeGenerator2 = new DevExpress.XtraPrinting.BarCode.QRCodeGenerator();
+            DevExpress.XtraPrinting.BarCode.QRCodeGenerator qrCodeGenerator1 = new DevExpress.XtraPrinting.BarCode.QRCodeGenerator();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Color_Size));
             this.ItemId = new DevExpress.XtraReports.Parameters.Parameter();
             this.attachmentBaseUrl2 = new DevExpress.XtraReports.Parameters.Parameter();
@@ -69,6 +71,8 @@
             this.itemlistid = new DevExpress.XtraReports.Parameters.Parameter();
             this.mimimumInStockQty = new DevExpress.XtraReports.Parameters.Parameter();
             this.onlyInStockColors = new DevExpress.XtraReports.Parameters.Parameter();
+            this.barCode1 = new DevExpress.XtraReports.UI.XRBarCode();
+            this.xrBarCode1 = new DevExpress.XtraReports.UI.XRBarCode();
             ((System.ComponentModel.ISupportInitialize)(this.table2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
@@ -103,8 +107,11 @@
             // 
             // BottomMargin
             // 
+            this.BottomMargin.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.xrBarCode1,
+            this.barCode1});
             this.BottomMargin.Dpi = 254F;
-            this.BottomMargin.HeightF = 0F;
+            this.BottomMargin.HeightF = 2606.956F;
             this.BottomMargin.Name = "BottomMargin";
             // 
             // Detail
@@ -116,7 +123,7 @@
             this.Detail.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "BackColor", "Iif([DataSource.CurrentRowIndex] != 21, \nIif([DataSource.CurrentRowIndex] % 2 = 0" +
                     ", \'grey\', \'white\'), \'red\')")});
-            this.Detail.HeightF = 39.89917F;
+            this.Detail.HeightF = 624.2742F;
             this.Detail.HierarchyPrintOptions.Indent = 50.8F;
             this.Detail.KeepTogether = true;
             this.Detail.KeepTogetherWithDetailReports = true;
@@ -139,7 +146,7 @@
             this.table2.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
             this.tableRow2});
             this.table2.Scripts.OnBeforePrint = "table2_BeforePrint";
-            this.table2.SizeF = new System.Drawing.SizeF(1299F, 39.60747F);
+            this.table2.SizeF = new System.Drawing.SizeF(1299F, 624.2742F);
             this.table2.StylePriority.UseBackColor = false;
             this.table2.StylePriority.UseTextAlignment = false;
             this.table2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
@@ -506,6 +513,44 @@
             this.onlyInStockColors.Type = typeof(bool);
             this.onlyInStockColors.ValueInfo = "False";
             // 
+            // barCode1
+            // 
+            this.barCode1.Alignment = DevExpress.XtraPrinting.TextAlignment.TopCenter;
+            this.barCode1.AutoModule = true;
+            this.barCode1.Dpi = 254F;
+            this.barCode1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[ssin]")});
+            this.barCode1.LocationFloat = new DevExpress.Utils.PointFloat(1239.19F, 2107.271F);
+            this.barCode1.Module = 5.08F;
+            this.barCode1.Name = "barCode1";
+            this.barCode1.Padding = new DevExpress.XtraPrinting.PaddingInfo(26, 26, 0, 0, 254F);
+            this.barCode1.ShowText = false;
+            this.barCode1.SizeF = new System.Drawing.SizeF(367.7708F, 442.0205F);
+            this.barCode1.StylePriority.UseTextAlignment = false;
+            qrCodeGenerator2.ErrorCorrectionLevel = DevExpress.XtraPrinting.BarCode.QRCodeErrorCorrectionLevel.H;
+            qrCodeGenerator2.Version = DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version5;
+            this.barCode1.Symbology = qrCodeGenerator2;
+            this.barCode1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.BottomCenter;
+            // 
+            // xrBarCode1
+            // 
+            this.xrBarCode1.Alignment = DevExpress.XtraPrinting.TextAlignment.TopCenter;
+            this.xrBarCode1.AutoModule = true;
+            this.xrBarCode1.Dpi = 254F;
+            this.xrBarCode1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[ssin]")});
+            this.xrBarCode1.LocationFloat = new DevExpress.Utils.PointFloat(1307.167F, 60.9832F);
+            this.xrBarCode1.Module = 5.08F;
+            this.xrBarCode1.Name = "xrBarCode1";
+            this.xrBarCode1.Padding = new DevExpress.XtraPrinting.PaddingInfo(26, 26, 0, 0, 254F);
+            this.xrBarCode1.ShowText = false;
+            this.xrBarCode1.SizeF = new System.Drawing.SizeF(367.7708F, 442.0205F);
+            this.xrBarCode1.StylePriority.UseTextAlignment = false;
+            qrCodeGenerator1.ErrorCorrectionLevel = DevExpress.XtraPrinting.BarCode.QRCodeErrorCorrectionLevel.H;
+            qrCodeGenerator1.Version = DevExpress.XtraPrinting.BarCode.QRCodeVersion.Version5;
+            this.xrBarCode1.Symbology = qrCodeGenerator1;
+            this.xrBarCode1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.BottomCenter;
+            // 
             // Color_Size
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -519,9 +564,9 @@
             this.Dpi = 254F;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Landscape = true;
-            this.Margins = new DevExpress.Drawing.DXMargins(0F, 0F, 3F, 0F);
+            this.Margins = new DevExpress.Drawing.DXMargins(0F, 0F, 3F, 2606.956F);
             this.PageHeight = 2159;
-            this.PageWidth = 1349;
+            this.PageWidth = 1823;
             this.PaperKind = System.Drawing.Printing.PaperKind.Custom;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.ItemId, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
@@ -592,5 +637,7 @@
         private DevExpress.XtraReports.Parameters.Parameter itemlistid;
         private DevExpress.XtraReports.Parameters.Parameter mimimumInStockQty;
         private DevExpress.XtraReports.Parameters.Parameter onlyInStockColors;
+        private DevExpress.XtraReports.UI.XRBarCode xrBarCode1;
+        private DevExpress.XtraReports.UI.XRBarCode barCode1;
     }
 }
