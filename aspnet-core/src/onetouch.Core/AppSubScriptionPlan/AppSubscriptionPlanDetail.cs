@@ -69,9 +69,12 @@ namespace onetouch.AppSubScriptionPlan
         public virtual string Notes { get; set; }
 
         public virtual long AppSubscriptionPlanHeaderId { get; set; }
+        public virtual long? AppFeatureId { get; set; }
 
         [ForeignKey("AppSubscriptionPlanHeaderId")]
         public AppSubscriptionPlanHeader AppSubscriptionPlanHeaderFk { get; set; }
+        [ForeignKey("AppFeatureId")]
+        public AppFeature AppFeatureFk { get; set; }
 
     }
 }

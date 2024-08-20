@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using onetouch.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    partial class onetouchDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240820103524_UpdateActivityLogStructure")]
+    partial class UpdateActivityLogStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -7371,9 +7374,6 @@ namespace onetouch.Migrations
                 {
                     b.HasBaseType("onetouch.AppEntities.AppEntity");
 
-                    b.Property<long?>("AppFeatureId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("AppSubscriptionPlanHeaderId")
                         .HasColumnType("bigint");
 
@@ -7445,8 +7445,6 @@ namespace onetouch.Migrations
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
-
-                    b.HasIndex("AppFeatureId");
 
                     b.HasIndex("AppSubscriptionPlanHeaderId");
 
@@ -9097,10 +9095,6 @@ namespace onetouch.Migrations
 
             modelBuilder.Entity("onetouch.AppSubScriptionPlan.AppSubscriptionPlanDetail", b =>
                 {
-                    b.HasOne("onetouch.AppSubScriptionPlan.AppFeature", "AppFeatureFk")
-                        .WithMany()
-                        .HasForeignKey("AppFeatureId");
-
                     b.HasOne("onetouch.AppSubScriptionPlan.AppSubscriptionPlanHeader", "AppSubscriptionPlanHeaderFk")
                         .WithMany()
                         .HasForeignKey("AppSubscriptionPlanHeaderId")
@@ -9112,8 +9106,6 @@ namespace onetouch.Migrations
                         .HasForeignKey("onetouch.AppSubScriptionPlan.AppSubscriptionPlanDetail", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AppFeatureFk");
 
                     b.Navigation("AppSubscriptionPlanHeaderFk");
                 });

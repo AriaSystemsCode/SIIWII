@@ -39,6 +39,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
 
         public long AppSubscriptionPlanHeaderId { get; set; }
         public bool IsAddOn { get; set; }
+        public virtual long? AppFeatureId { get; set; }
 
     }
 }
