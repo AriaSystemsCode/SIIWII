@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="22.2.4.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Color_Size" ScriptsSource="&#xD;&#xA;private void tableCell24_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void tableCell52_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;&#xD;&#xA; &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Color_Size_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;Color_Size.Width = 1000;    &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Detail_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA; &#xD;&#xA;&#xD;&#xA;        &#xD;&#xA;                &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Detail_BeforePrint_1(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA; &#xD;&#xA;&#xD;&#xA;    &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void table2_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;    table2.WidthF=1200;&#xD;&#xA;    &#xD;&#xA;}&#xD;&#xA;" SnapGridSize="25" ReportUnit="TenthsOfAMillimeter" Landscape="true" Margins="0, 0, 3, 0" PaperKind="Custom" PageWidth="1349" PageHeight="2159" Version="22.2" DataMember="Color_Sizes" DataSource="#Ref-0" Dpi="254" Font="Arial, 9.75pt">
+  <Extensions>
+    <Item1 Ref="2" Key="VSReportExtInfo" Value=".repx" />
+  </Extensions>
+  <Parameters>
+    <Item1 Ref="4" ValueInfo="0" Name="ItemId" Type="#Ref-3" />
+    <Item2 Ref="6" Description="productListId" ValueInfo="0" Name="productListId" Type="#Ref-5" />
+    <Item3 Ref="8" Name="attachmentBaseUrl2" />
+    <Item4 Ref="9" ValueInfo="0" Name="tenantId2" Type="#Ref-3" />
+    <Item5 Ref="10" Description="showNo" ValueInfo="2" Name="showNo" Type="#Ref-5" />
+    <Item6 Ref="11" ValueInfo="0" Name="itemlistid" Type="#Ref-3" />
+    <Item7 Ref="12" Description="mimimumInStockQty" ValueInfo="0" Name="mimimumInStockQty" Type="#Ref-5" />
+    <Item8 Ref="14" Description="onlyInStockColors" ValueInfo="False" Name="onlyInStockColors" Type="#Ref-13" />
+  </Parameters>
+  <Bands>
+    <Item1 Ref="15" ControlType="TopMarginBand" Name="TopMargin" HeightF="3" Dpi="254" />
+    <Item2 Ref="16" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="0" Dpi="254" />
+    <Item3 Ref="17" ControlType="DetailBand" Name="Detail" KeepTogetherWithDetailReports="true" HeightF="906.6701" KeepTogether="true" Dpi="254" BackColor="DarkKhaki">
+      <HierarchyPrintOptions Ref="18" Indent="50.8" />
+      <Controls>
+        <Item1 Ref="19" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="201.083328,185.128326" LocationFloat="15.4166746,552.5625" Dpi="254">
+          <ExpressionBindings>
+            <Item1 Ref="20" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[Attachment]" />
+            <Item2 Ref="21" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] &gt;0 and [DataSource.CurrentRowIndex] &lt;20&#xA;" />
+          </ExpressionBindings>
+        </Item1>
+        <Item2 Ref="22" ControlType="XRTable" Name="table2" TextAlignment="MiddleCenter" SizeF="1299,830.7117" LocationFloat="0,0" Dpi="254" EvenStyleName="DetailData3_Odd" BackColor="Transparent">
+          <Rows>
+            <Item1 Ref="23" ControlType="XRTableRow" Name="tableRow2" Weight="11.683999633789062" Dpi="254">
+              <Cells>
+                <Item1 Ref="24" ControlType="XRTableCell" Name="xrTableCell2" Weight="0.032332563510392612" Multiline="true" Text="xrTableCell2" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254" Borders="None">
+                  <ExpressionBindings>
+                    <Item1 Ref="25" EventName="BeforePrint" PropertyName="Text" Expression="iif([DataSource.CurrentRowIndex] =0&#xA;,[Attachment],'')&#xA;" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="26" UseFont="false" UsePadding="false" UseBorders="false" />
+                </Item1>
+                <Item2 Ref="27" ControlType="XRTableCell" Name="tableCell25" Weight="0.0676674364896074" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254" Borders="None">
+                  <ExpressionBindings>
+                    <Item1 Ref="28" EventName="BeforePrint" PropertyName="Text" Expression="iif(len(trim([AttributeValue]))&gt;7 and [DataSource.CurrentRowIndex] &gt; 0, Substring([AttributeValue],0 ,6 )+'...',[AttributeValue])" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="29" UseFont="false" UsePadding="false" UseBorders="false" />
+                </Item2>
+                <Item3 Ref="30" ControlType="XRTableCell" Name="tableCell26" Weight="0.060046189376443418" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="31" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeValue3]" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="32" UseFont="false" UsePadding="false" />
+                </Item3>
+                <Item4 Ref="33" ControlType="XRTableCell" Name="xrTableCell1" Weight="0.039953810623556588" CanGrow="false" TextFitMode="ShrinkOnly" Text="xrTableCell1" TextAlignment="MiddleRight" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 8pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="34" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=0,[Total] ,Iif(Min(?showNo, [counter])=1, [Size1],[Size1] ) )" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="35" UseFont="false" UsePadding="false" UseTextAlignment="false" />
+                </Item4>
+                <Item5 Ref="36" ControlType="XRTableCell" Name="tableCell27" Weight="0.05" CanGrow="false" TextFitMode="ShrinkOnly" TextAlignment="MiddleRight" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="37" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=1,[Total] ,Iif(Min(?showNo, [counter])=2, [Size2],[Size2] ) )&#xA;" />
+                    <Item2 Ref="38" EventName="BeforePrint" PropertyName="Visible" Expression="Min(?showNo, [counter])&gt;0" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="39" UseFont="false" UsePadding="false" UseTextAlignment="false" />
+                </Item5>
+                <Item6 Ref="40" ControlType="XRTableCell" Name="tableCell28" Weight="0.05" CanGrow="false" TextFitMode="ShrinkOnly" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="41" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=2,[Total] ,Iif(Min(?showNo, [counter])=3, [Size3],[Size3] ) )&#xA;&#xA;" />
+                    <Item2 Ref="42" EventName="BeforePrint" PropertyName="Visible" Expression="Min(?showNo, [counter])&gt;1" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="43" UseFont="false" UsePadding="false" />
+                </Item6>
+                <Item7 Ref="44" ControlType="XRTableCell" Name="tableCell29" Weight="0.05" CanGrow="false" TextFitMode="ShrinkOnly" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="45" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=3,[Total] ,Iif(Min(?showNo, [counter])=4, [Size4],[Size4] ) )&#xA;&#xA;" />
+                    <Item2 Ref="46" EventName="BeforePrint" PropertyName="Visible" Expression="Min(?showNo, [counter])&gt;2" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="47" UseFont="false" UsePadding="false" />
+                </Item7>
+                <Item8 Ref="48" ControlType="XRTableCell" Name="tableCell30" Weight="0.05" CanGrow="false" TextFitMode="ShrinkOnly" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="49" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=4,[Total] ,Iif(Min(?showNo, [counter])=5, [Size5],[Size5] ) )&#xA;&#xA;" />
+                    <Item2 Ref="50" EventName="BeforePrint" PropertyName="Visible" Expression="Min(?showNo, [counter])&gt;3" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="51" UseFont="false" UsePadding="false" />
+                </Item8>
+                <Item9 Ref="52" ControlType="XRTableCell" Name="tableCell31" Weight="0.05" CanGrow="false" TextFitMode="ShrinkOnly" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="53" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=5,[Total] ,Iif(Min(?showNo, [counter])=6, [Size6],[Size6] ) )" />
+                    <Item2 Ref="54" EventName="BeforePrint" PropertyName="Visible" Expression="Min(?showNo, [counter])&gt;4" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="55" UseFont="false" UsePadding="false" />
+                </Item9>
+                <Item10 Ref="56" ControlType="XRTableCell" Name="tableCell32" Weight="0.05" CanGrow="false" TextFitMode="ShrinkOnly" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="57" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=6,[Total] ,Iif(Min(?showNo, [counter])=7, [Size7],[Size7] ) )" />
+                    <Item2 Ref="58" EventName="BeforePrint" PropertyName="Visible" Expression="Min(?showNo, [counter])&gt;5" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="59" UseFont="false" UsePadding="false" />
+                </Item10>
+                <Item11 Ref="60" ControlType="XRTableCell" Name="tableCell33" Weight="0.05" CanGrow="false" TextFitMode="ShrinkOnly" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="61" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=7,[Total] ,Iif(Min(?showNo, [counter])=8, [Size8],[Size8] ) )" />
+                    <Item2 Ref="62" EventName="BeforePrint" PropertyName="Visible" Expression="Min(?showNo, [counter])&gt;6" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="63" UseFont="false" UsePadding="false" />
+                </Item11>
+                <Item12 Ref="64" ControlType="XRTableCell" Name="tableCell34" Weight="0.05" CanGrow="false" TextFitMode="ShrinkOnly" TextAlignment="MiddleCenter" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 7pt" Padding="1,1,0,0,254">
+                  <ExpressionBindings>
+                    <Item1 Ref="65" EventName="BeforePrint" PropertyName="Text" Expression="Iif(Min(?showNo, [counter])=8,[Total] ,Iif(Min(?showNo, [counter])=9, [Size9],[Size9] ) )" />
+                    <Item2 Ref="66" EventName="BeforePrint" PropertyName="Visible" Expression="Min(?showNo, [counter])&gt;7" />
+                  </ExpressionBindings>
+                  <StylePriority Ref="67" UseFont="false" UsePadding="false" UseTextAlignment="false" />
+                </Item12>
+              </Cells>
+            </Item1>
+          </Rows>
+          <ExpressionBindings>
+            <Item1 Ref="68" EventName="BeforePrint" PropertyName="WidthF" Expression="iif(?showNo=0,600,iif(Min([counter],?showNo)&lt;5,1100,iif(Min([counter],?showNo)&lt;6,1250,1250)))" />
+            <Item2 Ref="69" EventName="BeforePrint" PropertyName="LeftF" Expression="iif(?showNo=0,0,iif(Min([counter],?showNo)&lt;5,300,iif(Min([counter],?showNo)&lt;6,150,0)))" />
+          </ExpressionBindings>
+          <StylePriority Ref="70" UseBackColor="false" UseTextAlignment="false" />
+          <Scripts Ref="71" OnBeforePrint="table2_BeforePrint" />
+        </Item2>
+      </Controls>
+      <ExpressionBindings>
+        <Item1 Ref="72" EventName="BeforePrint" PropertyName="BackColor" Expression="Iif([DataSource.CurrentRowIndex] != 21, &#xA;Iif([DataSource.CurrentRowIndex] % 2 = 0, 'grey', 'white'), 'red')" />
+      </ExpressionBindings>
+      <StylePriority Ref="73" UseBackColor="false" UseTextAlignment="false" />
+    </Item3>
+  </Bands>
+  <Scripts Ref="74" OnBeforePrint="Color_Size_BeforePrint" />
+  <StyleSheet>
+    <Item1 Ref="75" Name="Title" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 14.25pt" ForeColor="255,64,70,80" BackColor="Transparent" BorderColor="Black" Sides="None" StringFormat="Near;Near;0;None;Character;GenericDefault" BorderWidthSerializable="1" />
+    <Item2 Ref="76" Name="DetailCaption1" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 8.25pt, style=Bold" ForeColor="255,64,70,80" BackColor="White" BorderColor="White" Sides="Left" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="2" />
+    <Item3 Ref="77" Name="DetailData1" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 8.25pt" ForeColor="Black" BorderColor="Transparent" Sides="Left" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="2" />
+    <Item4 Ref="78" Name="DetailData3_Odd" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 8.25pt" ForeColor="Black" BackColor="255,243,245,248" BorderColor="Transparent" Sides="None" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="1" />
+    <Item5 Ref="79" Name="PageInfo" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 8.25pt, style=Bold" ForeColor="255,64,70,80" StringFormat="Near;Near;0;None;Character;GenericDefault" />
+  </StyleSheet>
+  <ReportPrintOptions Ref="80" PrintOnEmptyDataSource="false" />
+  <ParameterPanelLayoutItems>
+    <Item1 Ref="81" LayoutItemType="Parameter" Parameter="#Ref-4" />
+    <Item2 Ref="82" LayoutItemType="Parameter" Parameter="#Ref-6" />
+    <Item3 Ref="83" LayoutItemType="Parameter" Parameter="#Ref-8" />
+    <Item4 Ref="84" LayoutItemType="Parameter" Parameter="#Ref-9" />
+    <Item5 Ref="85" LayoutItemType="Parameter" Parameter="#Ref-10" />
+    <Item6 Ref="86" LayoutItemType="Parameter" Parameter="#Ref-11" />
+    <Item7 Ref="87" LayoutItemType="Parameter" Parameter="#Ref-12" />
+    <Item8 Ref="88" LayoutItemType="Parameter" Parameter="#Ref-14" />
+  </ParameterPanelLayoutItems>
+  <ComponentStorage>
+    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v22.2" Name="sqlDataSource1" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxDb25uZWN0aW9uIE5hbWU9IlJlcG9ydHMiIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlN0b3JlZFByb2NRdWVyeSIgTmFtZT0iQ29sb3JfU2l6ZXMiPjxQYXJhbWV0ZXIgTmFtZT0iQEl0ZW1JZCIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uSW50NjQpKD9JdGVtSWQpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAYXR0YWNobWVudEJhc2VVcmwiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLlN0cmluZykoP2F0dGFjaG1lbnRCYXNlVXJsMik8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBzaG93Tm8iIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDY0KSg/c2hvd05vKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHByb2R1Y3RMaXN0SWQiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDY0KSg/aXRlbWxpc3RpZCk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBvbmx5SW5TdG9ja0NvbG9ycyIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uQm9vbGVhbikoP29ubHlJblN0b2NrQ29sb3JzKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQG1pbWltdW1JblN0b2NrUXR5IiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5JbnQ2NCkoP21pbWltdW1JblN0b2NrUXR5KTwvUGFyYW1ldGVyPjxQcm9jTmFtZT5Db2xvcl9TaXplczI8L1Byb2NOYW1lPjwvUXVlcnk+PFJlc3VsdFNjaGVtYT48RGF0YVNldCBOYW1lPSJzcWxEYXRhU291cmNlMSI+PFZpZXcgTmFtZT0iQ29sb3JfU2l6ZXMiIC8+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
+  </ComponentStorage>
+  <ObjectStorage>
+    <Item1 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v22.2" Ref="3" Content="System.Int64" Type="System.Type" />
+    <Item2 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v22.2" Ref="5" Content="System.Int32" Type="System.Type" />
+    <Item3 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v22.2" Ref="13" Content="System.Boolean" Type="System.Type" />
+  </ObjectStorage>
+</XtraReportsLayoutSerializer>
