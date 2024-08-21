@@ -30,6 +30,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         public string UnitOfMeasurmentCode { get; set; }
 
         public bool IsFeatureBillable { get; set; }
+        public bool IsAddOn { get; set; }
 
         public string FeatureBillingCode { get; set; }
 
@@ -38,8 +39,8 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         public bool Trackactivity { get; set; }
 
         public long AppSubscriptionPlanHeaderId { get; set; }
-        public bool IsAddOn { get; set; }
-        public virtual long? AppFeatureId { get; set; }
+
+        public long? AppFeatureId { get; set; }
 
     }
 }

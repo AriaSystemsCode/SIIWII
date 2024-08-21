@@ -6,5 +6,7 @@
 
         public string AppSubscriptionPlanHeader { get; set; }
 
+        public string AppFeatureDescription { get; set; }
+
     }
 }

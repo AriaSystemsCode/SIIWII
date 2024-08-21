@@ -6,7 +6,6 @@ import { NotifyService } from 'abp-ng2-module';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
 import { CreateOrEditAppSubscriptionPlanDetailModalComponent } from './create-or-edit-appSubscriptionPlanDetail-modal.component';
-
 import { ViewAppSubscriptionPlanDetailModalComponent } from './view-appSubscriptionPlanDetail-modal.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Table } from 'primeng/table';
@@ -58,6 +57,7 @@ export class AppSubscriptionPlanDetailsComponent extends AppComponentBase {
     featureCategoryFilter = '';
     trackactivityFilter = -1;
         appSubscriptionPlanHeaderFilter = '';
+        appFeatureDescriptionFilter = '';
 
 
     _entityTypeFullName = 'onetouch.AppSubScriptionPlan.AppSubscriptionPlanDetail';
@@ -87,6 +87,7 @@ export class AppSubscriptionPlanDetailsComponent extends AppComponentBase {
 
     getAppSubscriptionPlanDetails(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
@@ -114,7 +115,7 @@ export class AppSubscriptionPlanDetailsComponent extends AppComponentBase {
             this.featureCategoryFilter,
             this.trackactivityFilter,
             this.appSubscriptionPlanHeaderFilter,
-                    undefined,
+            this.appFeatureDescriptionFilter,
             this.primengTableHelper.getSorting(this.dataTable),
             this.primengTableHelper.getSkipCount(this.paginator, event),
             this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -180,7 +181,7 @@ export class AppSubscriptionPlanDetailsComponent extends AppComponentBase {
             this.featureCategoryFilter,
             this.trackactivityFilter,
             this.appSubscriptionPlanHeaderFilter,
-                    undefined,
+            this.appFeatureDescriptionFilter,
         )
         .subscribe(result => {
             this._fileDownloadService.downloadTempFile(result);

@@ -27,6 +27,19 @@
                     </div>
                     <input class="form-control" name="appSubscriptionPlanDetail.appSubscriptionPlanHeaderId" [(ngModel)]="appSubscriptionPlanDetail.appSubscriptionPlanHeaderId" type="text" required hidden>
 		 
+					<div class="form-group m-form__group">
+                        <label for="AppFeatureDescription">{{l("AppFeature")}}</label>
+                        <div class="input-group">
+                            <input class="form-control" id="AppFeatureDescription" name="appFeatureDescription" [(ngModel)]="appFeatureDescription" type="text" disabled>     
+                            <div class="input-group-append">
+                                <button class="btn btn-primary blue" (click)="openSelectAppFeatureModal()" type="button"><i class="fa fa-search"></i> {{l("Pick")}}</button>
+                            </div> <div class="input-group-prepend">
+                                <button class="btn btn-danger btn-icon" type="button" (click)="setAppFeatureIdNull()"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <input class="form-control" name="appSubscriptionPlanDetail.appFeatureId" [(ngModel)]="appSubscriptionPlanDetail.appFeatureId" type="text"  hidden>
+		 
 
 								<div class="form-group">
 									<label for="AppSubscriptionPlanDetail_FeatureCode">{{l("FeatureCode")}} *</label>
@@ -149,5 +162,6 @@
         </div>
     </div>
 <appSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModal #appSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModal (modalSave)="getNewAppSubscriptionPlanHeaderId()"></appSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModal>
+<appSubscriptionPlanDetailAppFeatureLookupTableModal #appSubscriptionPlanDetailAppFeatureLookupTableModal (modalSave)="getNewAppFeatureId()"></appSubscriptionPlanDetailAppFeatureLookupTableModal>
 		 
 </div>

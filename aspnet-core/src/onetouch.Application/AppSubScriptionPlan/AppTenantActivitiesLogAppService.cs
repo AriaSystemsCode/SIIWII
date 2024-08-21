@@ -353,7 +353,7 @@ namespace onetouch.AppSubScriptionPlan
                                     obj.Reference = "Overage";
                                     obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;
                                     obj.AppSubscriptionPlanCode = tenantPlan.AppSubscriptionPlanHeaderFk.Code;
-                                    obj.Code = featureDetail.Code.TrimEnd()+" "+DateTime.Now.ToString();
+                                    obj.Code = featureDetail.FeatureCode.TrimEnd()+" "+DateTime.Now.ToString();
                                     obj.Name = obj.Code;
                                     obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
@@ -566,7 +566,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.Reference = reference;
                     obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderId;
                     obj.AppSubscriptionPlanCode = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderFk.Code;
-                    obj.Code = featureDetail.Code.TrimEnd() + " " + DateTime.Now.ToString();
+                    obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString();
                     obj.Name = obj.Code;
                     obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
@@ -668,8 +668,8 @@ namespace onetouch.AppSubScriptionPlan
                         //obj.CreditId = long.Parse(creditId.ToString());
                         obj.InvoiceNumber = "";
                         obj.ConsumedQty = 0;
-                        obj.Qty = det.FeatureLimit+ rolledOverQty;
-                        obj.RemainingQty = det.FeatureLimit;
+                        obj.Qty = long.Parse(det.FeatureLimit.ToString())+ rolledOverQty;
+                        obj.RemainingQty = long.Parse(det.FeatureLimit.ToString());
                         obj.Price = det.UnitPrice;
                         obj.Reference = "Plan Renewal Credit";
                         obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;

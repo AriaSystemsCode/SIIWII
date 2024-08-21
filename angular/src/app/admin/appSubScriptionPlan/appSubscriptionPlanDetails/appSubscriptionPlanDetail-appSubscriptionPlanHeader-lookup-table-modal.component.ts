@@ -44,7 +44,8 @@ export class AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalC
             return;
         }
 
-        if (this.primengTableHelper.shouldResetPaging(event)) {
+        if ( this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
