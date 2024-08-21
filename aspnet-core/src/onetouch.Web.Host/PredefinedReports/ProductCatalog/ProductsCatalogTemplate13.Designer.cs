@@ -36,9 +36,13 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.panel2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPanel>("panel2");
             this.subreport1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRSubreport>("subreport1");
             this.subreport1.ReportSource = new onetouch.Web.PredefinedReports.ProductCatalog.Color_Size();
-            this.panel1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPanel>("panel1");
             this.label19 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label19");
             this.pictureBox2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox2");
+            this.label12 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label12");
+            this.label10 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label10");
+            this.GroupHeader2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupHeaderBand>("GroupHeader2");
+            this.GroupHeader3 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupHeaderBand>("GroupHeader3");
+            this.panel1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPanel>("panel1");
             this.label7 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label7");
             this.label15 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label15");
             this.label14 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label14");
@@ -51,8 +55,6 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
             this.label4 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label4");
             this.label6 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label6");
             this.label5 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label5");
-            this.label12 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label12");
-            this.label10 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label10");
 
             // Parameters
             this.to = reportInitializer.GetParameter("to");
@@ -117,21 +119,8 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.UI.XRPageInfo pageInfo2;
         private DevExpress.XtraReports.UI.XRPanel panel2;
         private DevExpress.XtraReports.UI.XRSubreport subreport1;
-        private DevExpress.XtraReports.UI.XRPanel panel1;
         private DevExpress.XtraReports.UI.XRLabel label19;
         private DevExpress.XtraReports.UI.XRPictureBox pictureBox2;
-        private DevExpress.XtraReports.UI.XRLabel label7;
-        private DevExpress.XtraReports.UI.XRLabel label15;
-        private DevExpress.XtraReports.UI.XRLabel label14;
-        private DevExpress.XtraReports.UI.XRBarCode barCode1;
-        private DevExpress.XtraReports.UI.XRLabel label8;
-        private DevExpress.XtraReports.UI.XRLabel label1;
-        private DevExpress.XtraReports.UI.XRLabel label3;
-        private DevExpress.XtraReports.UI.XRLabel label2;
-        private DevExpress.XtraReports.UI.XRLabel label11;
-        private DevExpress.XtraReports.UI.XRLabel label4;
-        private DevExpress.XtraReports.UI.XRLabel label6;
-        private DevExpress.XtraReports.UI.XRLabel label5;
         private DevExpress.XtraReports.UI.XRLabel label12;
         private DevExpress.XtraReports.UI.XRLabel label10;
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
@@ -173,5 +162,20 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog {
         private DevExpress.XtraReports.Parameters.Parameter selectedKey;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
         private DevExpress.XtraReports.Parameters.Parameter attributeTypeId;
+        private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader2;
+        private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader3;
+        private DevExpress.XtraReports.UI.XRPanel panel1;
+        private DevExpress.XtraReports.UI.XRLabel label7;
+        private DevExpress.XtraReports.UI.XRLabel label15;
+        private DevExpress.XtraReports.UI.XRLabel label14;
+        private DevExpress.XtraReports.UI.XRBarCode barCode1;
+        private DevExpress.XtraReports.UI.XRLabel label8;
+        private DevExpress.XtraReports.UI.XRLabel label1;
+        private DevExpress.XtraReports.UI.XRLabel label3;
+        private DevExpress.XtraReports.UI.XRLabel label2;
+        private DevExpress.XtraReports.UI.XRLabel label11;
+        private DevExpress.XtraReports.UI.XRLabel label4;
+        private DevExpress.XtraReports.UI.XRLabel label6;
+        private DevExpress.XtraReports.UI.XRLabel label5;
     }
 }
