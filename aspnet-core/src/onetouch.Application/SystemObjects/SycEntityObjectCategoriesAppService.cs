@@ -242,6 +242,31 @@ namespace onetouch.SystemObjects
             return allParents;
 
         }
+        //Iteration#42,1 MMT 08/21/2024 Add API to get all categories with children[Start]
+        [AbpAllowAnonymous]
+        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsForTransaction()
+        {
+            GetAllSycEntityObjectCategoriesInput tmpInput = new GetAllSycEntityObjectCategoriesInput
+            {
+                MaxResultCount = 9999,
+                SkipCount = 0,
+                ObjectId = await _helper.SystemTables.GetObjectTransactionId(),
+                DepartmentFlag = false
+            };
+
+            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> allParents = await GetAll(tmpInput);
+            foreach (var item in allParents.Items)
+            {
+                if (!item.Leaf)
+                {
+                    await LoadChilds(item);
+                }
+            }
+
+            return allParents;
+
+        }
+        //Iteration#42,1 MMT 08/21/2024 Add API to get all categories with children[End]
 
         [AbpAllowAnonymous]
         public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsForProductWithPaging(GetAllSycEntityObjectCategoriesInput tmpInput)
