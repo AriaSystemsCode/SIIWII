@@ -458,6 +458,9 @@ export class ShoppingCartViewComponentComponent
                 if (res)
                   this.notify.info("Successfully deleted.");
                   this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  // rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -472,7 +475,10 @@ export class ShoppingCartViewComponentComponent
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -486,6 +492,9 @@ export class ShoppingCartViewComponentComponent
                 if (res)
                   this.notify.info("Successfully deleted.");
                   this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  // rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -511,19 +520,19 @@ export class ShoppingCartViewComponentComponent
           .subscribe((res) => {
             if (res) this.notify.info("Successfully Updated.");
             this.onGeneratOrderReport(true,undefined,false,true);
-            rowNode.node.data.showEditQty = false;
+            this.getShoppingCartData();
+            // rowNode.node.data.showEditQty = false;
+            this.hideMainSpinner();
           });
         break;
 
       case 1:
         this.showMainSpinner();
         let moduleQty =
-          rowNode.node.data.updatedQty %
-          rowNode.node.data.noOfPrePacks;
-        let qty =
-          rowNode.node.data.updatedQty /
-          rowNode.node.data.noOfPrePacks;
-        if (moduleQty == 0) {
+        rowNode.node.data.updatedQty %
+       ( rowNode.node.data.qty / rowNode.node.data.noOfPrePacks )
+       let qty = rowNode.node.data.updatedQty 
+        if (moduleQty != 0) {
           this._AppTransactionServiceProxy
             .updateByProductSSINColor(
               this.orderId,
@@ -534,8 +543,9 @@ export class ShoppingCartViewComponentComponent
             )
             .subscribe((res) => {
               if (res) this.notify.info("Successfully Updated.");
+              this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
-              rowNode.node.data.showEditQty = false;
+              // rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
             });
         } else {

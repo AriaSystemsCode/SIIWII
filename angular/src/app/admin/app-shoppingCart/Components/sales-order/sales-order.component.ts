@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
     AppEntitiesServiceProxy,
@@ -12,13 +12,16 @@ import {
     GetAppTransactionsForViewDto,
     SycEntityObjectCategoriesServiceProxy,
     SycEntityObjectClassificationsServiceProxy,
+    SycEntityObjectTypesServiceProxy,
     TreeNodeOfGetSycEntityObjectCategoryForViewDto,
+    TreeNodeOfGetSycEntityObjectTypeForViewDto,
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "express-serve-static-core";
 import { finalize } from "rxjs";
 import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import * as moment from "moment";
 import { forEach } from "lodash";
+import { TreeSelect } from "primeng/treeselect";
 
 @Component({
     selector: "app-sales-order",
@@ -29,14 +32,15 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     fullName: string;
     companeyNames: any[];
     nodes: any[];
+    category : CreateOrEditSycEntityObjectCategoryDto
 
-    selectedNodes: any;
+    selectedCategories: any;
 
     classificationsFiles: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
-    categoriesFiles: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
+    categoriesFiles: any[];
     loading: boolean = false;
     selectedClassification: any[] = [];
-    selectedCategories: any[] = ['kkkkk'];
+    // selectedCategories: any[] = ['kkkkk'];
     currencies: any[];
     selectedCurrency;
     selectedCurrrency: any;
@@ -54,35 +58,57 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     availableDate = new Date();
     completeDate = new Date();
     reference: any 
-    category :any;
+
     showSaveBtn: boolean = false;
     showCatBtn: boolean = false;
     hideCatBtn: boolean = true;
+    showSelectedCat: boolean = true;
+    
     oldappTransactionsForViewDto;
+    @ViewChild(TreeSelect) treeSelect!: TreeSelect;
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input("canChange") canChange: boolean = true;
     sycEntityObjectCategory: CreateOrEditSycEntityObjectCategoryDto = new CreateOrEditSycEntityObjectCategoryDto();
-
+    entityObjectType:string ="CATEGORY"
+    sortBy: string = "name";
+    skipCount: number = 0;
+    maxResultCount: number = 10;
+    allRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
+    parentCat : any;
+    addSubCat: boolean = false;
+    editSubCat: boolean = false;
+    openDropDown: boolean = false;
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _sycEntityObjectClassificationsServiceProxy: SycEntityObjectClassificationsServiceProxy,
         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+        private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy
     ) {
+
+        
         super(injector);
+        // this.getAppTransactionList();
+
         this.getParentCategories();
         this.getParentClassifications();
         this.getAllCurrencies();
       
     }
     ngOnInit(): void {
+        this.getAppTransactionList();
+
+        if(!this.category) {
+            this.category = new CreateOrEditSycEntityObjectCategoryDto()
+        }
+
         // DepartmentFlag: false
         // EntityId: 165420
         // Sorting: name
         // SkipCount: 0
         // MaxResultCount: 10
-        this.nodes = [
+        this.categoriesFiles = [
             {
                 label: 'Electronics',
                 data: '1',
@@ -144,6 +170,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        
         if (this.appTransactionsForViewDto) {
             this.createOrEditorderInfo=this.oldCreateOrEditorderInfo;
             this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
@@ -164,12 +191,31 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
 
     }
+    toggleDropDown (){
+        this.openDropDown  = !this.openDropDown
+    }
     getAllCurrencies() {
         this._AppEntitiesServiceProxy
             .getAllCurrencyForTableDropdown()
             .subscribe((res: any) => {
                 this.currencies = res;
             });
+    }
+
+    onNodeToggle(event: any, isExpanded: boolean) {
+    const node = event.node;
+    if (isExpanded) {
+        console.log('Node expanded:', node);
+        // Custom logic when a node is expanded
+    } else {
+        console.log('Node collapsed:', node);
+        // Custom logic when a node is collapsed
+    }
+}
+
+
+    getCodeValue(code: string) {
+        this.category.code= code;
     }
     // get parent categories
     getParentCategories() {
@@ -195,14 +241,14 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
                 items: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
                 totalCount: number;
             }) => {
-                this.categoriesFiles = res.items;
+                // this.categoriesFiles = res.items;
 
 
                 this.categoriesItemPath?.forEach(item => {
                     const filteredCategoriesFiles = this.categoriesFiles.filter(function (_item) {
                         return (_item?.data?.sycEntityObjectCategory?.id != item?.data?.sycEntityObjectCategory?.id);
                     });
-                    this.categoriesFiles = filteredCategoriesFiles;
+                    // this.categoriesFiles = filteredCategoriesFiles;
                 });
             }
         );
@@ -298,7 +344,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
                 .pipe(finalize(() => (this.loading = false)))
                 .subscribe((res: any) => {
                     value.node.children = res.items;
-                    this.categoriesFiles = [...this.categoriesFiles];
+                    // this.categoriesFiles = [...this.categoriesFiles];
                 });
         }
     }
@@ -345,34 +391,124 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.getParentClassifications();
 
     }
-    categoriesItemPath: any[] = [];
+
+
+    // categoriesNodeSelect(event: any) {
+
+    
+          
+    //     // Reset the selected categories for each selection
+    //     this.selectedCategories = [];
+    
+    //     if (!this.appTransactionsForViewDto?.entityCategories) {
+    //         this.appTransactionsForViewDto.entityCategories = [];
+    //     }
+    
+    //     // Add the selected path to categoriesItemPath
+    //     // this.categoriesItemPath.push(event.node);
+    
+    //     this.categoriesItemPath.forEach((item) => {
+            
+    //         let index = this.appTransactionsForViewDto.entityCategories.findIndex(
+    //             (x) => x.entityObjectCategoryId === item.data.sycEntityObjectCategory.id
+    //         );
+    
+    //         if (index < 0) {
+    //             const appEntityCategoryDto : AppEntityCategoryDto = {
+    //                 entityObjectCategoryCode: item.data.sycEntityObjectCategory.code,
+    //                 entityObjectCategoryId: item.data.sycEntityObjectCategory.id,
+    //                 entityObjectCategoryName: item.data.sycEntityObjectCategory.name,
+    //                 id: 0,
+    //                 init: undefined,
+    //                 toJSON:undefined
+    //             };
+    //             this.appTransactionsForViewDto.entityCategories.push(appEntityCategoryDto);
+    //         }
+    //     });
+    
+    //     // Set selectedCategories to the newly updated entityCategories
+    //     this.selectedCategories = [...this.appTransactionsForViewDto.entityCategories];
+    //     console.log(this.selectedCategories, 'Selected Categories');
+    // }
+
+
     categoriesNodeSelect(event: any) {
-        // this.categoriesItemPath.push(this.getCategoriesPath(event.node));
-        this.getCategoriesPath(event.node);
-
-        if (!this.appTransactionsForViewDto?.entityCategories || this.appTransactionsForViewDto?.entityCategories?.length == 0)
+        // Preserve default selection behavior
+        const selectedNode = event.node;
+        
+        // Add custom logic here, if needed
+        if (!this.appTransactionsForViewDto?.entityCategories) {
             this.appTransactionsForViewDto.entityCategories = [];
-
-        this.categoriesItemPath.forEach(item => {
-            let indx = this.appTransactionsForViewDto.entityCategories.findIndex(x => x.entityObjectCategoryId == item?.data?.sycEntityObjectCategory?.id);
-            if (indx < 0) {
-                let appEntityCategoryDto = new AppEntityCategoryDto();
-                appEntityCategoryDto.entityObjectCategoryCode = item?.data?.sycEntityObjectCategory?.code;
-                appEntityCategoryDto.entityObjectCategoryId = item?.data?.sycEntityObjectCategory?.id;
-                appEntityCategoryDto.entityObjectCategoryName = item?.data?.sycEntityObjectCategory?.name;
-                this.appTransactionsForViewDto.entityCategories.push(appEntityCategoryDto);
-            }
-
-            const filteredCategoriesFiles = this.categoriesFiles.filter(function (_item) {
-                return (_item?.data?.sycEntityObjectCategory?.id != item?.data?.sycEntityObjectCategory?.id);
-            });
-
-            this.categoriesFiles = filteredCategoriesFiles;
-
+        }
+    
+        const newCategory = new AppEntityCategoryDto({
+            entityObjectCategoryCode: selectedNode.data.sycEntityObjectCategory?.code,
+            entityObjectCategoryId: selectedNode.data.sycEntityObjectCategory?.id,
+            entityObjectCategoryName: selectedNode.data.sycEntityObjectCategory?.name,
+            id: 0,
+            init: undefined,
+            toJSON:undefined
         });
-
-        this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
+    
+        // Ensure no duplicate categories are added
+        const categoryExists = this.appTransactionsForViewDto.entityCategories
+            .some(cat => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId);
+    
+        if (!categoryExists) {
+            this.appTransactionsForViewDto.entityCategories.push(newCategory);
+        }
+    console.log(categoryExists,'categoryExists')
+    console.log( this.appTransactionsForViewDto.entityCategories,' this.appTransactionsForViewDto.entityCategories')
+        // Sync the selected categories with `appTransactionsForViewDto.entityCategories`
+        this.selectedCategories = [...this.appTransactionsForViewDto.entityCategories];
     }
+    
+    onLabelClick(event: Event) {
+        event.stopPropagation(); // Prevent selection on label click
+      }
+
+    toggleSelectAll(event: any) {
+        if (event.target.checked) {
+            this.selectedCategories = [...this.allRecords]; // Select all nodes
+        } else {
+            this.selectedCategories = []; // Deselect all nodes
+        }
+    }
+    
+    collapseAll() {
+        this.allRecords.forEach(node => {
+            node.expanded = false;
+        });
+    }
+    categoriesItemPath: any[] = [];
+    
+    // categoriesNodeSelect(event: any) {
+    //     // this.categoriesItemPath.push(this.getCategoriesPath(event.node));
+    //     // this.getCategoriesPath(event.node);
+
+    //     if (!this.appTransactionsForViewDto?.entityCategories || this.appTransactionsForViewDto?.entityCategories?.length == 0)
+    //         this.appTransactionsForViewDto.entityCategories = [];
+
+    //     this.categoriesItemPath.forEach(item => {
+    //         let indx = this.appTransactionsForViewDto.entityCategories.findIndex(x => x.entityObjectCategoryId == item?.data?.sycEntityObjectCategory?.id);
+    //         if (indx < 0) {
+    //             let appEntityCategoryDto = new AppEntityCategoryDto();
+    //             appEntityCategoryDto.entityObjectCategoryCode = item?.data?.sycEntityObjectCategory?.code;
+    //             appEntityCategoryDto.entityObjectCategoryId = item?.data?.sycEntityObjectCategory?.id;
+    //             appEntityCategoryDto.entityObjectCategoryName = item?.data?.sycEntityObjectCategory?.name;
+    //             this.appTransactionsForViewDto.entityCategories.push(appEntityCategoryDto);
+    //         }
+
+    //         const filteredCategoriesFiles = this.categoriesFiles.filter(function (_item) {
+    //             return (_item?.data?.sycEntityObjectCategory?.id != item?.data?.sycEntityObjectCategory?.id);
+    //         });
+
+    //         // this.categoriesFiles = filteredCategoriesFiles;
+
+    //     });
+
+    //     this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
+    // }
     categoriesNodeUnSelect(event: any) {
         let indx = this.appTransactionsForViewDto.entityCategories.findIndex(x => x.entityObjectCategoryId == event?.entityObjectCategoryId);
         if (indx >= 0)
@@ -402,7 +538,36 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
         this.categoriesItemPath.push(item);
     }
+    addAsNewChild(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
+        this.showCatBtn = true
+        this.addSubCat = true
+     this.parentCat = {
+        // name: node.data.sycEntityObjectCategory,
+        
+        code: node.data.sycEntityObjectCategory.code,
+        parentId: node.data.sycEntityObjectCategory.id,
+ }
+  
+    }
+    
 
+
+    EditCat(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
+        this.showCatBtn = true
+        this.editSubCat = true
+     this.parentCat = {
+        name: node.data.sycEntityObjectCategory.name,
+        
+        code: node.data.sycEntityObjectCategory.code,
+        parentId: node.data.sycEntityObjectCategory.id,
+ }
+ this.category.name =  this.parentCat.name
+ console.log(node,'node')
+ console.log(this.parentCat,'this.parentCat')
+ console.log(this.category.name ,'this.category.name ')
+
+    }
+    
     getClassificationPath(item: any): any {
         if (item.children && item.children?.length > 0) {
             item.children.forEach(child => {
@@ -492,21 +657,22 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
 
     createOrEditTransaction() {
-        this.showMainSpinner();
+        // this.showMainSpinner();
         this.onChangeDate();
     
-        //  this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
+         this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
          this.appTransactionsForViewDto.reference = this.reference;
+         console.log(this.appTransactionsForViewDto.entityCategories,'this.appTransactionsForViewDto.entityCategories')
 
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
-        .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
+        .pipe(finalize(() =>  {
+            this.generatOrderReport.emit(true)}))
         .subscribe((res) => {
                 if (res) {
                     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-                    console.log(this.appTransactionsForViewDto,'this.appTransactionsForViewDto')
-                    console.log(this.oldappTransactionsForViewDto,'this.oldappTransactionsForViewDto')
+                   
 
                     // this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
 
@@ -533,39 +699,82 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             }
         }
     }
-saveCat(){
-    let cat  = {
-        code: '13',
-        name: this.category,
-        objectId: null,
-        parentId: null,
-        id:null
- 
-//         entityObjectCategoryId :null,
-//         entityObjectCategoryName : this.category,
-// entityObjectCategoryCode: '',
-
-//         id:null
+    saveSelection() {
+        // Implement your save logic here
+        this.showSelectedCat = true
+        console.log(this.selectedCategories ,'this.selectedCategories ')
+        this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
+        console.log(this.appTransactionsForViewDto.entityCategories,'this.appTransactionsForViewDto.entityCategories')
+        // this.notify.info('Selection saved successfully!');
     }
+    
+    cancelSelection() {
+        // Implement your cancel logic here
+        // this.selectedCategories = []; // Or any logic to reset selection
+        this.closeDropdown();
+        this.notify.info('Selection canceled.');
+    }
+    closeDropdown() {
+        if (this.treeSelect) {
+          this.treeSelect.hide(); // Close the dropdown (make sure this method exists in your TreeSelect version)
+        }
+      }
+    
+saveCat(category:any){
+    console.log(category,'category') 
+    let cat = new CreateOrEditSycEntityObjectCategoryDto({
+        code: this.editSubCat ? this.parentCat.code: this.category.code,
+        name: category.name,
+        objectId: undefined,
+        parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
+        id: undefined
+    });
+
+
+    
+    // edit
+    // let cat = new CreateOrEditSycEntityObjectCategoryDto({
+    //     code: this.editSubCat ? this.parentCat.code: this.category.code,
+    //     name: category.name,
+    //     objectId: undefined,
+    //     parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
+    //     id:this.editSubCat?  this.parentCat.parentId : undefined
+    // });
+
+
+
+
+
     // this.sycEntityObjectCategory = {...cat}
-    this._sycEntityObjectCategoriesServiceProxy.createOrEdit(cat)
+    // this._sycEntityObjectCategoriesServiceProxy.createOrEdit(cat)
+    // .pipe(finalize(() => { 
+    //     // this.saving = false;
+    // }))
+    // .subscribe(() => {
+    //    this.notify.info(this.l('SavedSuccessfully'));
+
+    // });
+    // this.showCatBtn = false
+
+    
+        // this.sycEntityObjectCategory = {...cat}
+    this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
     .pipe(finalize(() => { 
         // this.saving = false;
     }))
     .subscribe(() => {
        this.notify.info(this.l('SavedSuccessfully'));
+       this.getAppTransactionList()
 
     });
     this.showCatBtn = false
-
-    
         this.selectedCategories[0] = {...cat};
         console.log(this.selectedCategories,'selectedCategories')
     
 }
     showEditMode() {
         this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
-        this.selectedClassification = this.appTransactionsForViewDto?.entityClassifications; this.selectedCategories
+        this.selectedClassification = this.appTransactionsForViewDto?.entityClassifications; 
         this.createOrEditorderInfo = true;
         this.showSaveBtn = true;
         this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
@@ -584,4 +793,66 @@ saveCat(){
     onUpdateAppTransactionsForViewDto($event) {
         this.appTransactionsForViewDto = $event;
     }
+
+
+    loadedChildrenRecords: TreeNodeOfGetSycEntityObjectTypeForViewDto[] = [];
+    // lastSelectedRecord: TreeNodeOfGetSycEntityObjectTypeForViewDto;
+    getAppTransactionList(searchQuery?: string) {
+        console.log(">>", searchQuery)
+        // this.loading = true;
+        const subs = this._sycEntityObjectCategoriesServiceProxy
+            .getAllWithChildsForTransactionWithPaging(
+                searchQuery,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                false,
+                undefined,
+                undefined,
+                this.sortBy,
+                this.skipCount,
+                this.maxResultCount
+            )
+            .pipe(finalize(() => (this.loading = false)))
+            .subscribe((result) => {
+                console.log(result.items,'result.items')
+
+                if (searchQuery !== undefined) this.allRecords = [];
+                result.items.map((record) => {
+              
+                    // const cachedItem : TreeNodeOfGetSycEntityObjectTypeForViewDto = this.loadedChildrenRecords.filter((selectedRecord:TreeNodeOfGetSycEntityObjectTypeForViewDto)=>{
+                    //     const isCached : boolean = selectedRecord.data.sycEntityObjectType.id == record.data.sycEntityObjectType.id
+                    //     return isCached
+                    // })[0]
+                    // const isCached : boolean = !!cachedItem
+
+                    // if(isCached){
+                    //     record.children = cachedItem.children
+                    //     record.expanded = cachedItem.expanded
+                    //     record.totalChildrenCount = cachedItem.totalChildrenCount;
+                    //     (record as any).partialSelected = (cachedItem as any).partialSelected
+                    // }
+
+                    // this.checkItemSelection(record);
+
+                    return record;
+                });
+                this.allRecords.push(...result.items);
+                console.log(this.allRecords,'this.allRecords')
+                // this.lastSelectedRecord = this.selectedRecord;
+                // this.selectedRecord = undefined;
+                // this.displayedRecords = this.allRecords;
+                // this.totalCount = result.totalCount;
+                // this.showMoreListDataButton =
+                //     this.allRecords.length < this.totalCount;
+                // this.active = true;
+                // this.loading = false;
+            });
+        this.subscriptions.push(subs);
+    }
+
 }
