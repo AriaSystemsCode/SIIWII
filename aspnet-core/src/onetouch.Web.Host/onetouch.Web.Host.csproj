@@ -47,6 +47,7 @@
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate12.repx" />
+    <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate13.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate2.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate3.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate4.vsrepx" />
@@ -102,6 +103,7 @@
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate12.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate13.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate7.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate5.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate4.vsrepx" />
@@ -180,6 +182,12 @@
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate12.Designer.cs">
       <DependentUpon>ProductsCatalogTemplate12.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate13.cs">
+      <DependentUpon>ProductsCatalogTemplate13.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate13.Designer.cs">
+      <DependentUpon>ProductsCatalogTemplate13.repx</DependentUpon>
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate2.cs">
       <DependentUpon>ProductsCatalogTemplate2.vsrepx</DependentUpon>
