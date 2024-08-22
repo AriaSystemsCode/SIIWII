@@ -250,7 +250,13 @@ export class CreateOrEditAppEntityDynamicModalComponent
 
         this.saving = true;
 
+        if(this.visual.image) 
+            this.appEntity.entityExtraData=[];
+           else
+           this.appEntity.entityAttachments=[];
+        
         if(this.addToLookup){
+
         this._appEntitiesServiceProxy
             .saveEntity(this.appEntity)
             .pipe(
@@ -267,6 +273,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
             });
         }
         else {
+
+
             if(!this.appEntity.id){
             this._appEntitiesServiceProxy
             .isCodeExisting(this.appEntity)

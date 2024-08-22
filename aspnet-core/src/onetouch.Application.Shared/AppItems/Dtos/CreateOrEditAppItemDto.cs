@@ -254,6 +254,8 @@ namespace onetouch.AppItems.Dtos
         public virtual List<AppEntityAttachmentDto> EntityAttachments { get; set; }
         public virtual AppEntityAttachmentDto DefaultEntityAttachment { get; set; }
         public virtual List<EDRestAttributes> EDRestAttributes { get; set; }
+        public virtual string ColorImage { set; get; }
+        public virtual string ColorHexaCode { set; get; }
     }
 
     public class ExtraDataFirstAttributeValuesDto

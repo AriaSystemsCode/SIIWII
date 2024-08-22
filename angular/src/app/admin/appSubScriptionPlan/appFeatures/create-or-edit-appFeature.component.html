@@ -1,0 +1,129 @@
+﻿<div [@routerTransition]>
+  <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+  
+  
+                <div class="kt-subheader kt-grid__item">
+                  <div [class]="containerClass">
+                    <div class="kt-subheader__main">
+                        <h3 class="kt-subheader__title">
+            				<span *ngIf="active && appFeature.id">{{"EditAppFeature" }}</span>
+            				<span *ngIf="active && !appFeature.id">{{l("CreateAppFeature")}}</span>
+            			</h3>
+            			<span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            			<div class="kt-subheader__breadcrumbs">
+            				<a [routerLink]="['/app/admin/appSubScriptionPlan/appFeatures']"
+            					class="kt-subheader__breadcrumbs-home"><i
+            						class="flaticon2-shelter"></i>{{l("AppFeature")}}</a>
+            				<span class="kt-subheader__breadcrumbs-separator"></span>
+            				<a 
+            					class="kt-subheader__breadcrumbs-link kt-subheader__breadcrumbs-link--active">
+            					<span *ngIf="active && appFeature.id">{{l("Edit")}}</span>
+            					<span *ngIf="active && !appFeature.id">{{l("Create")}}</span>
+            				</a>
+            			</div>
+                    </div>
+                  </div>
+                </div>
+            
+    
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__body">              
+                
+                
+								<div class="form-group">
+									<label for="AppFeature_Id">{{l("Id")}}</label>
+									<input type="number" #AppFeature_Id="ngModel" id="AppFeature_Id" class="form-control" [(ngModel)]="appFeature.id" name="Id"  />
+								    <validation-messages [formCtrl]="AppFeature_Id"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_Code">{{l("Code")}} *</label>
+									<input type="text" #AppFeature_Code="ngModel" id="AppFeature_Code" class="form-control" [(ngModel)]="appFeature.code" name="Code"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppFeature_Code"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_Name">{{l("Name")}} *</label>
+									<input type="text" #AppFeature_Name="ngModel" id="AppFeature_Name" class="form-control" [(ngModel)]="appFeature.name" name="Name"   minlength="1"  maxlength="250"  required/>
+								    <validation-messages [formCtrl]="AppFeature_Name"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_Description">{{l("Description")}} *</label>
+									<input type="text" #AppFeature_Description="ngModel" id="AppFeature_Description" class="form-control" [(ngModel)]="appFeature.description" name="Description"   minlength="0"  maxlength="250"  required/>
+								    <validation-messages [formCtrl]="AppFeature_Description"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_UnitOfMeasurementCode">{{l("UnitOfMeasurementCode")}} *</label>
+									<input type="text" #AppFeature_UnitOfMeasurementCode="ngModel" id="AppFeature_UnitOfMeasurementCode" class="form-control" [(ngModel)]="appFeature.unitOfMeasurementCode" name="UnitOfMeasurementCode"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppFeature_UnitOfMeasurementCode"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_UnitOfMeasurementName">{{l("UnitOfMeasurementName")}} *</label>
+									<input type="text" #AppFeature_UnitOfMeasurementName="ngModel" id="AppFeature_UnitOfMeasurementName" class="form-control" [(ngModel)]="appFeature.unitOfMeasurementName" name="UnitOfMeasurementName"   minlength="1"  maxlength="250"  required/>
+								    <validation-messages [formCtrl]="AppFeature_UnitOfMeasurementName"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_FeaturePeriodLimit">{{l("FeaturePeriodLimit")}} *</label>
+									<input type="text" #AppFeature_FeaturePeriodLimit="ngModel" id="AppFeature_FeaturePeriodLimit" class="form-control" [(ngModel)]="appFeature.featurePeriodLimit" name="FeaturePeriodLimit"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppFeature_FeaturePeriodLimit"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="AppFeature_Billable" class="kt-checkbox">
+										<input #AppFeature_Billable="ngModel" id="AppFeature_Billable" type="checkbox" name="Billable" [(ngModel)]="appFeature.billable"> 
+										{{l("Billable")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppFeature_Billable"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_BillingCode">{{l("BillingCode")}}</label>
+									<input type="text" #AppFeature_BillingCode="ngModel" id="AppFeature_BillingCode" class="form-control" [(ngModel)]="appFeature.billingCode" name="BillingCode"   minlength="0"  maxlength="50" />
+								    <validation-messages [formCtrl]="AppFeature_BillingCode"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_UnitPrice">{{l("UnitPrice")}}</label>
+									<input type="number" #AppFeature_UnitPrice="ngModel" id="AppFeature_UnitPrice" class="form-control" [(ngModel)]="appFeature.unitPrice" name="UnitPrice"  />
+								    <validation-messages [formCtrl]="AppFeature_UnitPrice"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppFeature_Category">{{l("Category")}} *</label>
+									<input type="text" #AppFeature_Category="ngModel" id="AppFeature_Category" class="form-control" [(ngModel)]="appFeature.category" name="Category"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppFeature_Category"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="AppFeature_TrackActivity" class="kt-checkbox">
+										<input #AppFeature_TrackActivity="ngModel" id="AppFeature_TrackActivity" type="checkbox" name="TrackActivity" [(ngModel)]="appFeature.trackActivity"> 
+										{{l("TrackActivity")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppFeature_TrackActivity"></validation-messages>
+								</div>
+					
+            </div>
+              <div class="kt-portlet__foot">
+				<div class="col-lg-12">
+					<button (click)="save()" class="btn btn-primary blue float-right"
+                        [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
+                        <span>{{l("Save")}}</span>
+                    </button>
+                    <button *ngIf="!this.appFeature.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
+                        [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
+                        <span>{{l("SaveAndNew")}}</span>
+                    </button>
+				</div>
+		    </div>
+        </div>
+    </div>
+  </div>
+  
+</div>

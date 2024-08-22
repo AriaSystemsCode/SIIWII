@@ -1,0 +1,139 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #appSubscriptionPlanDetailForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="appSubscriptionPlanDetail.id">{{l("EditAppSubscriptionPlanDetail")}}</span>
+                        <span *ngIf="!appSubscriptionPlanDetail.id">{{l("CreateNewAppSubscriptionPlanDetail")}}</span>
+                    </h4>
+                    <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                 
+
+
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_FeatureCode">{{l("FeatureCode")}} *</label>
+									<input type="text" #AppSubscriptionPlanDetail_FeatureCode="ngModel" id="AppSubscriptionPlanDetail_FeatureCode" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureCode" name="FeatureCode"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureCode"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_FeatureName">{{l("FeatureName")}} *</label>
+									<input type="text" #AppSubscriptionPlanDetail_FeatureName="ngModel" id="AppSubscriptionPlanDetail_FeatureName" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureName" name="FeatureName"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureName"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_Availability">{{l("Availability")}} *</label>
+									<input type="text" #AppSubscriptionPlanDetail_Availability="ngModel" id="AppSubscriptionPlanDetail_Availability" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.availability" name="Availability"   minlength="1"  maxlength="30"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_Availability"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_FeatureLimit">{{l("FeatureLimit")}}</label>
+									<input type="number" #AppSubscriptionPlanDetail_FeatureLimit="ngModel" id="AppSubscriptionPlanDetail_FeatureLimit" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureLimit" name="FeatureLimit"   />
+									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureLimit"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="AppSubscriptionPlanDetail_RollOver" class="kt-checkbox">
+										<input id="AppSubscriptionPlanDetail_RollOver" #AppSubscriptionPlanDetail_RollOver="ngModel" type="checkbox" name="RollOver" [(ngModel)]="appSubscriptionPlanDetail.rollOver"> 
+										{{l("RollOver")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_RollOver"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_UnitPrice">{{l("UnitPrice")}}</label>
+									<input type="number" #AppSubscriptionPlanDetail_UnitPrice="ngModel" id="AppSubscriptionPlanDetail_UnitPrice" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.unitPrice" name="UnitPrice"   />
+									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_UnitPrice"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_FeaturePeriodLimit">{{l("FeaturePeriodLimit")}} *</label>
+									<input type="text" #AppSubscriptionPlanDetail_FeaturePeriodLimit="ngModel" id="AppSubscriptionPlanDetail_FeaturePeriodLimit" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featurePeriodLimit" name="FeaturePeriodLimit"   minlength="1"  maxlength="30"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeaturePeriodLimit"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_Category">{{l("Category")}} *</label>
+									<input type="text" #AppSubscriptionPlanDetail_Category="ngModel" id="AppSubscriptionPlanDetail_Category" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.category" name="Category"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_Category"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_FeatureDescription">{{l("FeatureDescription")}}</label>
+									<input type="text" #AppSubscriptionPlanDetail_FeatureDescription="ngModel" id="AppSubscriptionPlanDetail_FeatureDescription" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureDescription" name="FeatureDescription"   minlength="0"  maxlength="50" />
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureDescription"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_FeatureStatus">{{l("FeatureStatus")}}</label>
+									<input type="text" #AppSubscriptionPlanDetail_FeatureStatus="ngModel" id="AppSubscriptionPlanDetail_FeatureStatus" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureStatus" name="FeatureStatus"   minlength="1"  maxlength="30" />
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureStatus"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_UnitOfMeasurementName">{{l("UnitOfMeasurementName")}} *</label>
+									<input type="text" #AppSubscriptionPlanDetail_UnitOfMeasurementName="ngModel" id="AppSubscriptionPlanDetail_UnitOfMeasurementName" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.unitOfMeasurementName" name="UnitOfMeasurementName"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_UnitOfMeasurementName"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_UnitOfMeasurmentCode">{{l("UnitOfMeasurmentCode")}} *</label>
+									<input type="text" #AppSubscriptionPlanDetail_UnitOfMeasurmentCode="ngModel" id="AppSubscriptionPlanDetail_UnitOfMeasurmentCode" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.unitOfMeasurmentCode" name="UnitOfMeasurmentCode"   minlength="1"  maxlength="30"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_UnitOfMeasurmentCode"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="AppSubscriptionPlanDetail_IsFeatureBillable" class="kt-checkbox">
+										<input id="AppSubscriptionPlanDetail_IsFeatureBillable" #AppSubscriptionPlanDetail_IsFeatureBillable="ngModel" type="checkbox" name="IsFeatureBillable" [(ngModel)]="appSubscriptionPlanDetail.isFeatureBillable"> 
+										{{l("IsFeatureBillable")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_IsFeatureBillable"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_FeatureBillingCode">{{l("FeatureBillingCode")}}</label>
+									<input type="text" #AppSubscriptionPlanDetail_FeatureBillingCode="ngModel" id="AppSubscriptionPlanDetail_FeatureBillingCode" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureBillingCode" name="FeatureBillingCode"   minlength="1"  maxlength="50" />
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureBillingCode"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_FeatureCategory">{{l("FeatureCategory")}}</label>
+									<input type="text" #AppSubscriptionPlanDetail_FeatureCategory="ngModel" id="AppSubscriptionPlanDetail_FeatureCategory" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureCategory" name="FeatureCategory"   minlength="0"  maxlength="50" />
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureCategory"></validation-messages>
+								</div>
+					
+								<br/><div class="m-checkbox-list">
+									<label for="AppSubscriptionPlanDetail_Trackactivity" class="kt-checkbox">
+										<input id="AppSubscriptionPlanDetail_Trackactivity" #AppSubscriptionPlanDetail_Trackactivity="ngModel" type="checkbox" name="Trackactivity" [(ngModel)]="appSubscriptionPlanDetail.trackactivity"> 
+										{{l("Trackactivity")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_Trackactivity"></validation-messages>
+								</div>
+					
+								<div class="form-group">
+									<label for="AppSubscriptionPlanDetail_Notes">{{l("Notes")}}</label>
+									<input type="text" #AppSubscriptionPlanDetail_Notes="ngModel" id="AppSubscriptionPlanDetail_Notes" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.notes" name="Notes"   minlength="0"  maxlength="250" />
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_Notes"></validation-messages>
+								</div>
+					
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!appSubscriptionPlanDetailForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

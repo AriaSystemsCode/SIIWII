@@ -8,6 +8,12 @@ import { ZeroTemplateHttpConfigurationService } from './zero-template-http-confi
 @NgModule({
     providers: [
         ApiServiceProxies.SycCurrencyExchangeRatesServiceProxy,        
+        ApiServiceProxies.AppTenantInvoicesServiceProxy,        
+        ApiServiceProxies.AppTenantActivitiesLogServiceProxy,        
+        ApiServiceProxies.AppTenantSubscriptionPlansServiceProxy,        
+        ApiServiceProxies.AppSubscriptionPlanHeadersServiceProxy,        
+        ApiServiceProxies.AppSubscriptionPlanDetailsServiceProxy,        
+        ApiServiceProxies.AppFeaturesServiceProxy,        
         ApiServiceProxies.MaintainancesServiceProxy,        
         ApiServiceProxies.SycIdentifierDefinitionsServiceProxy,        
         ApiServiceProxies.SycSegmentIdentifierDefinitionsServiceProxy,        

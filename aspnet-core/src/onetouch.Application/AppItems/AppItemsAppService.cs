@@ -68,6 +68,7 @@ using NPOI.HPSF;
 using NPOI.POIFS.NIO;
 using System.Dynamic;
 using NPOI.OpenXmlFormats.Vml;
+using onetouch.AppSubScriptionPlan;
 
 namespace onetouch.AppItems
 {
@@ -117,6 +118,7 @@ namespace onetouch.AppItems
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
         private readonly IRepository<AppMarketplaceItemsListDetails, long> _appMarketplaceItemsListDetails;
 
+        private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, IAppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
@@ -141,9 +143,11 @@ namespace onetouch.AppItems
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
             IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
+            IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
             IRepository<AppTransactionDetails, long> appTransactionDetails, IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails
             )
         {
+            _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             //MMT33-2
              _appMarketplaceItemsListDetails= appMarketplaceItemsListDetails;
              _appTransactionDetails = appTransactionDetails;
@@ -1165,6 +1169,32 @@ namespace onetouch.AppItems
                                 extraDataSelectedValues.value = varItem;
                                 extraDataSelectedValues.DefaultEntityAttachment = new AppEntityAttachmentDto();
                                 //YYY
+                                //41
+                                //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[Start]
+                                var codeItemVar = varAppItems.Where(x => x.EntityFk.EntityExtraData
+                                                                                 .Where(a => a.AttributeValue == varItem.ToString() &&
+                                                                                 a.AttributeId == firstAttributeIdLong
+                                                                                 ).Any()).FirstOrDefault();
+                                if (codeItemVar != null)
+                                {
+                                    var varColor = codeItemVar.EntityFk.EntityExtraData.Where(x => x.AttributeId == 201).FirstOrDefault();
+                                    if (varColor != null && !string.IsNullOrEmpty(varColor.AttributeValue))
+                                        extraDataSelectedValues.ColorHexaCode = varColor.AttributeValue;
+                                    else
+                                        extraDataSelectedValues.ColorHexaCode = "";
+
+                                    var varColorImage = codeItemVar.EntityFk.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
+                                    if (varColorImage != null && !string.IsNullOrEmpty(varColorImage.AttributeValue))
+                                    {
+                                        string tenantId = null;
+                                        extraDataSelectedValues.ColorImage = imagesUrl + (tenantId == null ? "-1" : tenantId.ToString()) + @"/" + varColorImage.AttributeValue;
+                                    }
+                                    else
+                                    {
+                                        extraDataSelectedValues.ColorImage = "";
+                                    }
+                                }
+                                //41
                                 var tenantIdvar = AbpSession.TenantId;
                                 if (appItem.TenantId != AbpSession.TenantId)
                                 {
@@ -1175,7 +1205,7 @@ namespace onetouch.AppItems
                                 }
                                 //YYY
                                 //extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + firstattributeDefaultImages[imageLoopCounter];
-                                if (firstattributeDefaultImages.Count > imageLoopCounter && firstattributeDefaultImages[imageLoopCounter] != null)
+                                if (firstattributeDefaultImages.Count > imageLoopCounter && firstattributeDefaultImages[imageLoopCounter]!=null && !string.IsNullOrEmpty(firstattributeDefaultImages[imageLoopCounter].ToString()))
                                     extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (tenantIdvar == null ? "-1" : tenantIdvar.ToString()) + @"/" + firstattributeDefaultImages[imageLoopCounter].ToString();
                                 //extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + firstattributeDefaultImages[imageLoopCounter].ToString();
 
@@ -2169,12 +2199,23 @@ namespace onetouch.AppItems
             appItem.EntityId = savedEntity;
 
             if (appItem.Id == 0)
+            {
                 appItem = await _appItemRepository.InsertAsync(appItem);
+
+                var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
+                //if (available == true)
+                {
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
+                }
+            }
             //MMT
             else
             {
                 //await CurrentUnitOfWork.SaveChangesAsync();
                 appItem = await _appItemRepository.UpdateAsync(appItem);
+                var availableFeature = await _appTenantActivitiesLogAppService.IsFeatureAvailable("EDIT-PRODUCT");
+                //if (availableFeature == true)
+                    await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
             }
             //MMT
 

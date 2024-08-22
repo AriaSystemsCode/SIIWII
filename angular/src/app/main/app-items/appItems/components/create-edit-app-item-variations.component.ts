@@ -201,10 +201,8 @@ export class CreateEditAppItemVariationsComponent
         var count = 0;
 
         this.selectedExtraAttributes?.forEach((extraAttr) => {
-
             if(extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE' && extraAttr?.entityObjectTypeCode !=='CLOSURE')
             return;
-
             let extraAttrSelectedValues: number;
             // if (
             //     this.sizeExtraAttrCode ==
@@ -231,6 +229,7 @@ export class CreateEditAppItemVariationsComponent
     activeExisttingVariation=false;
     showNewVariation=false;
     activeNewVariation=false;
+    deselectedValues=[];
     constructor(
         injector: Injector,
         private _extraAttributeDataService: ExtraAttributeDataService,
@@ -514,7 +513,11 @@ export class CreateEditAppItemVariationsComponent
                     let lookupData = responses[index];
                     extraAttr.lookupData = lookupData;
                     extraAttr.displayedLookupData = extraAttr.lookupData;
-                    extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+                 //   extraAttr.displayedSelectedValues = extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item?.value))
+                  
+                   extraAttr.displayedSelectedValues =  Array.isArray(extraAttr?.selectedValues) ?  extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item?.value)) :  
+                      extraAttr.lookupData?.filter(item => item.value == extraAttr?.selectedValues)
+
                 });
                 this.tempAddNewAttributes()
                 resolve(true);
@@ -1267,6 +1270,11 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             let item = this.variationMatrices?.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')));
             if(!item || ! (item?.length>0) )
                 this.variationMatrices.push(newVariation);
+
+        else
+            this.variationMatrices.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0].entityExtraData = newVariation?.entityExtraData;
+        
+
                 this.showNewVariation=true;
             
             }
@@ -1274,12 +1282,12 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             // if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
                 currentExtraAttr.selectedValues.forEach((attrId) => {
                     // if(attrId || attrId>=0){
-                    let attrOptionData: any = currentExtraAttr.lookupData.filter(
+                    let attrOptionData: any = currentExtraAttr?.lookupData?.filter(
                         (item) => item.value == attrId
                     )[0];
 
                     if(!attrOptionData)
-                    attrOptionData = currentExtraAttr.lookupData.filter(
+                    attrOptionData = currentExtraAttr?.lookupData?.filter(
                         (item) => item.code == attrId
                     )[0];
 
@@ -1297,6 +1305,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                     );
                   //  }
                 });
+                
             // } else {
             //     // size condition
             //     console.log(">>", this.appSizeRatios.appSizeScalesDetails);
@@ -1590,9 +1599,11 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             const currentExtraDataIndex = extraAttrIds.indexOf(
                 elem.attributeId
             );
+            if(currentExtraDataIndex>=0){
             this.extraAttributes[currentExtraDataIndex].selected = true;
             this.extraAttributes[currentExtraDataIndex].selectedValues = [];
             this.extraAttributes[currentExtraDataIndex].displayedSelectedValues=[];
+            }
         });
 
         let selectedExtraAttrIds = this.selectedExtraAttributes.map(
@@ -1954,6 +1965,8 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         this.showMainSpinner();
             subscription.subscribe((result) => {
                 extraAttr.lookupData=result;
+                extraAttr.displayedSelectedValues = 
+                   extraAttr.displayedSelectedValues.filter(item => {    const isDeselected = this.deselectedValues.includes(item.code) || this.deselectedValues.includes(item.value);    return !isDeselected;});
                 let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
                 if (modalRefData.selectionDone)
@@ -2021,16 +2034,17 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
 
        extraAttr.lookupData= extraAttr.lookupData?.filter(item => !existingCodes.includes(item.code))
        extraAttr.lookupData.push(...this.appItem.nonLookupValues);
-       const filteredItems1 = extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value));
+      //const filteredItems1 = extraAttr.lookupData?.filter(item => extraAttr.selectedValues?.includes(item.value));
+       const filteredItems1 =   Array.isArray(extraAttr.selectedValues) ?  extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item.value))  :  extraAttr?.lookupData?.filter(item => item.value == extraAttr?.selectedValues)
      
        filteredItems1.forEach(item => {
-        let codeExists = extraAttr.displayedSelectedValues.some(displayedItem => displayedItem.code === item.code);
+        let codeExists = extraAttr?.displayedSelectedValues?.some(displayedItem => displayedItem.code === item.code);
         if (!codeExists) 
-            extraAttr.displayedSelectedValues.push(item);
+            extraAttr?.displayedSelectedValues?.push(item);
         
             else{
-                let lookupData=extraAttr.lookupData.find(displayedItem => displayedItem.code === item.code);
-                let index = extraAttr.displayedSelectedValues.findIndex(displayedItem => displayedItem.code === item.code);
+                let lookupData=extraAttr?.lookupData?.find(displayedItem => displayedItem.code === item.code);
+                let index = extraAttr?.displayedSelectedValues?.findIndex(displayedItem => displayedItem.code === item.code);
 
                 if (index !== -1) 
                     extraAttr.displayedSelectedValues[index] = lookupData;
@@ -2038,17 +2052,20 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         
     });
 
-    const filteredItems2 = this.appItem.nonLookupValues?.filter(item => extraAttr.selectedValues.includes(item.code));
+    //const filteredItems2 = this.appItem.nonLookupValues?.filter(item => extraAttr?.selectedValues?.includes(item.code));
+    const filteredItems2 =  Array.isArray(extraAttr?.selectedValues)     ? this.appItem.nonLookupValues?.filter(item => extraAttr?.selectedValues?.includes(item.code))   : 
+    this.appItem.nonLookupValues?.filter(item => item.code == extraAttr?.selectedValues) ; 
+
      
     filteredItems2.forEach(item => {
-     let codeExists = extraAttr.displayedSelectedValues.some(displayedItem => displayedItem.code === item.code);
+     let codeExists = extraAttr?.displayedSelectedValues?.some(displayedItem => displayedItem.code === item.code);
      
      if (!codeExists) 
-         extraAttr.displayedSelectedValues.push(item);
+         extraAttr?.displayedSelectedValues?.push(item);
      
      else{
         let nonLookupValues=this.appItem.nonLookupValues.find(displayedItem => displayedItem.code === item.code);
-        let index = extraAttr.displayedSelectedValues.findIndex(displayedItem => displayedItem.code === item.code);
+        let index = extraAttr?.displayedSelectedValues?.findIndex(displayedItem => displayedItem.code === item.code);
 
         if (index !== -1) 
             extraAttr.displayedSelectedValues[index] = nonLookupValues;
@@ -2067,7 +2084,9 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         const extraAttr =
             this.selectedExtraAttributes[this.activeExtraAttributeIndex];
 
-            extraAttr.displayedSelectedValues =  extraAttr.lookupData.filter(item => extraAttr.selectedValues.includes(item.value))
+            //extraAttr.displayedSelectedValues =  extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item.value))
+            extraAttr.displayedSelectedValues = Array.isArray(extraAttr?.selectedValues) ?    extraAttr?.lookupData?.filter(item => extraAttr?.selectedValues?.includes(item.value))   : 
+            extraAttr?.lookupData?.filter(item =>  item.value == extraAttr?.selectedValues)  ;
 
 
             if(search){
@@ -2397,6 +2416,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                 displayedSelectedValues.hexaCode =element.hexaCode;
                 displayedSelectedValues.image=element.image;
                 displayedSelectedValues.label =element.label;
+
                 displayedSelectedValues.value   =element.value;
             }
            
@@ -2410,10 +2430,12 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         if(event.value){
         extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues?.filter(item => item.value !== event.value);
         extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.value);
+        this.deselectedValues?.push(event?.value);
         }
         else{
             extraAttr.displayedSelectedValues =extraAttr.displayedSelectedValues?.filter(item => item.code !== event.code);
             extraAttr.selectedValues=extraAttr.selectedValues.filter(item => item !== event.code);
+            this.deselectedValues?.push(event?.code);
         }
 
         this.appItem.nonLookupValues = this.appItem.nonLookupValues?.filter(x=>x.code!=event.code)
@@ -2422,6 +2444,8 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
       this.variationMatrices = this.variationMatrices?.filter((variation) => {
         return !deselectedVariations.includes(variation);
     });}
+
+  
     }
     getExistingVariations(){
         this.activeExisttingVariation=true;

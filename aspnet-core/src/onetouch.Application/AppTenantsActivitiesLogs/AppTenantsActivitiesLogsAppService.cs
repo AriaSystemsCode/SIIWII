@@ -19,13 +19,14 @@ using Abp.Extensions;
 using Abp.Authorization;
 using Microsoft.EntityFrameworkCore;
 using onetouch.MultiTenancy;
+using onetouch.AppSubScriptionPlan;
 
 namespace onetouch.AppTenantsActivitiesLogs
 {
     [AbpAuthorize(AppPermissions.Pages_Administration_AppTenantsActivitiesLogs)]
     public class AppTenantsActivitiesLogsAppService : onetouchAppServiceBase, IAppTenantsActivitiesLogsAppService
     {
-        private readonly IRepository<AppTenantsActivitiesLog> _appTenantsActivitiesLogRepository;
+        private readonly IRepository<oldAppTenantsActivitiesLog> _appTenantsActivitiesLogRepository;
         private readonly IAppTenantsActivitiesLogsExcelExporter _appTenantsActivitiesLogsExcelExporter;
         private readonly IRepository<SycService, int> _lookup_sycServiceRepository;
         private readonly IRepository<SycApplication, int> _lookup_sycApplicationRepository;
@@ -33,7 +34,7 @@ namespace onetouch.AppTenantsActivitiesLogs
         private readonly IRepository<SycPlan, int> _lookup_sycPlanRepository;
         private readonly IRepository<Tenant, int> _lookup_TenantRepository;
 
-        public AppTenantsActivitiesLogsAppService(IRepository<AppTenantsActivitiesLog> appTenantsActivitiesLogRepository, IAppTenantsActivitiesLogsExcelExporter appTenantsActivitiesLogsExcelExporter, IRepository<SycService, int> lookup_sycServiceRepository, IRepository<SycApplication, int> lookup_sycApplicationRepository, IRepository<AppTransaction, int> lookup_appTransactionRepository, IRepository<SycPlan, int> lookup_sycPlanRepository, IRepository<Tenant, int> lookup_TenantRepository)
+        public AppTenantsActivitiesLogsAppService(IRepository<oldAppTenantsActivitiesLog> appTenantsActivitiesLogRepository, IAppTenantsActivitiesLogsExcelExporter appTenantsActivitiesLogsExcelExporter, IRepository<SycService, int> lookup_sycServiceRepository, IRepository<SycApplication, int> lookup_sycApplicationRepository, IRepository<AppTransaction, int> lookup_appTransactionRepository, IRepository<SycPlan, int> lookup_sycPlanRepository, IRepository<Tenant, int> lookup_TenantRepository)
         {
             _appTenantsActivitiesLogRepository = appTenantsActivitiesLogRepository;
             _appTenantsActivitiesLogsExcelExporter = appTenantsActivitiesLogsExcelExporter;
@@ -218,7 +219,7 @@ namespace onetouch.AppTenantsActivitiesLogs
         [AbpAuthorize(AppPermissions.Pages_Administration_AppTenantsActivitiesLogs_Create)]
         protected virtual async Task Create(CreateOrEditAppTenantsActivitiesLogDto input)
         {
-            var appTenantsActivitiesLog = ObjectMapper.Map<AppTenantsActivitiesLog>(input);
+            var appTenantsActivitiesLog = ObjectMapper.Map<oldAppTenantsActivitiesLog>(input);
 
             if (AbpSession.TenantId != null)
             {

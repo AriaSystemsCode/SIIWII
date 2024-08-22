@@ -453,6 +453,9 @@ export class ShoppingCartViewComponentComponent
                 if (res)
                   this.notify.info("Successfully deleted.");
                   this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -468,6 +471,9 @@ export class ShoppingCartViewComponentComponent
                 if (res)
                   this.notify.info("Successfully deleted.");
                   this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -481,6 +487,9 @@ export class ShoppingCartViewComponentComponent
                 if (res)
                   this.notify.info("Successfully deleted.");
                   this.onGeneratOrderReport(true,undefined,false,true);
+                  this.getShoppingCartData();
+                  rowNode.node.data.showEditQty = false;
+                  this.hideMainSpinner();
               });
             break;
 
@@ -492,11 +501,11 @@ export class ShoppingCartViewComponentComponent
   }
   onEditQty(rowNode) {
     rowNode.node.data.invalidUpdatedQty = "";
+    this.showMainSpinner();
 
     switch (rowNode.level) {
       case 0:
       case 2:
-        this.showMainSpinner();
         this._AppTransactionServiceProxy
           .updateByProductLineId(
             this.orderId,
@@ -507,6 +516,8 @@ export class ShoppingCartViewComponentComponent
             if (res) this.notify.info("Successfully Updated.");
             this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
+            this.getShoppingCartData();
+            this.hideMainSpinner();
           });
         break;
 
