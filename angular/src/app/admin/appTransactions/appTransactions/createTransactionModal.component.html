@@ -293,8 +293,8 @@
                                 [emptyMessage]="emptyMessage != '' ? emptyMessage : ''"
                                 (onChange)="handleBuyerNameChange($event)"
                             >
-                                <!-- Custom template for when no matching results are found -->
-                                <ng-template let-item pTemplate="item">
+                              
+                                <!-- <ng-template let-item pTemplate="item">
                                     {{ item.name }}
                                 </ng-template>
                         
@@ -312,7 +312,7 @@
                                         <span>{{searchTerm}} </span>
                                         <button  pButton type="button" class="addTextBtn" label="Add New" (click)="addNewBuyer();orderForm.controls['buyerContactName']?.setValue(searchTerm) "></button>
                                     </div>
-                                </ng-template>
+                                </ng-template> -->
                             </p-dropdown>
                         </div>
                         
@@ -534,7 +534,7 @@
                                 (onFilter)="handleSellerNameSearch($event)"
                                 (onChange)="handleSellerNameChange($event)"
                             >
-                               <ng-template let-itemS pTemplate="itemS">
+                               <!-- <ng-template let-itemS pTemplate="itemS">
                                 {{ itemS.name }}
                             </ng-template>
                     
@@ -543,16 +543,16 @@
                                 <div *ngIf="sellerContacts.length === 0 && searchTermSeller == undefined" class="no-data">
                                     No data found
                                 </div>
-                            </ng-template>
+                            </ng-template> -->
 
 
-                            <ng-template class="" pTemplate="footer">
+                            <!-- <ng-template class="" pTemplate="footer">
                              
                                 <div *ngIf="searchTermSeller != undefined && showAddSellBtn" class="d-flex justify-content-between tem-footer">
                                     <span>{{searchTermSeller}} </span>
                                     <button  pButton type="button" class="addTextBtn" label="Add New" (click)="addNewSeller();"></button>
                                 </div>
-                            </ng-template>
+                            </ng-template> -->
 
                         </p-dropdown>
 
