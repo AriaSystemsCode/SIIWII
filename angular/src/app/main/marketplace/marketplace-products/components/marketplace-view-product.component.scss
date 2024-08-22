@@ -1,19 +1,25 @@
 .type {
-    background-color: #949090;
-    color: #fff;
-    padding: 2px 5px;
-    Width: 106px;
-    Height: 32px;
+    background-color: #F8F8F8;
+    padding: 8px 5px;
+
     border-radius: 6px;
     border: 1px;
-    Padding: 6px 16px 6px 16px;
-    background-color: #e4e4e4;
-    color: #b6b7b9;
+    color: #9E9E9E;
+    Width: 134px;
+    min-Width: 120px;
+    Height: 35px;
 }
-
+.summary-sec {
+    padding-left: 30px;
+}
+.details-sec {
+    border-radius: 12px;
+}
 .imageSlides {
-    width: 50px;
-    margin-right :10px;
+    width: 85px;
+    height: 57px;
+    border-radius: 6px 6px 0 0 ;
+   
     cursor: pointer;
 }
 .showRoomLink[disabled]{
@@ -32,9 +38,9 @@ td {
 }
 
 .showRoomLink{
-    width: 257px;
-    height: 46px;
-    border-radius: 6px 0px 0px 0px;
+    max-width: 257px;
+    max-height: 40px;
+    border-radius: 6px ;
     padding: 11px 20px 11px 20px !important;
     background-color: #4A0D4A;
     color: white;
@@ -57,7 +63,7 @@ td {
 }
 .slider-container {
     position: relative;
-    overflow: hidden;
+    overflow: scroll;
     width: 100%; /* Set the height of the slider as needed */
 }
 
@@ -69,9 +75,24 @@ td {
 }
 
 .indicator-btns {
-    background-color: #b9b3b3;
-    border: 0.5px solid #09c;
-    color: #ffff;
+    background-color: transparent;
+    border: 1px solid #EEE ;
+   
+    width: 32px;
+    height: 32px;
+    margin-top: 14px;
+    border-radius: 8px;
+    color: #4A0D4A;
+}
+.indicator-btns:hover {
+    background-color: #4A0D4A;
+    border: 1px solid ;
+   
+    width: 32px;
+    height: 32px;
+    margin-top: 14px;
+    border-radius: 8px;
+    color: #fff;
 }
 
 .table {
@@ -79,11 +100,16 @@ td {
 }
 
 .summary {
+    border-radius:12px ;
+    background-color: white;
+
     .header {
         background-color: #F8F8F8;
         color: black;
         font-weight: bold;
         padding: 8px 12px;
+        border-top-left-radius:12px ;
+        border-top-right-radius:12px ;
     }
     .totals {
         color: black;
@@ -105,6 +131,7 @@ td {
     .orderedSummary {
         height: 500px;
         overflow-y: scroll;
+        padding: 7px;
         background-color: #fff;
         .default {
             background-color: #F8F8F8;
@@ -186,6 +213,31 @@ table th{
 .summaryTables td {
     color: #9E9E9E !important;
 }
+.p-tabview .p-tabview-nav {
+    margin-bottom: 10px;
+}
+.p-tabview .p-tabview-nav li{
+    margin: 0 !important;
+    // border: none !important;
+}
+::ng-deep {
+
+.p-tabview .p-tabview-panels {
+    padding: 0 !important;
+    border: none !important;
+    margin-top: 10px !important
+}
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link{
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 4px !important;
+    border: 1px solid black;
+}
+
+.p-tabview .p-tabview-panels {
+    margin-top: 8px !important;
+}
 
 
 input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
@@ -265,4 +317,149 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+@media only screen and (max-width: 992px) {
+    .web {
+        margin-top: 5px;
+    }
+    .summaryWeb{
+display: none;
+    }
+    .summaryTab{
+        display: block;
+        margin-top: 25px;
+            }
+            .p-tabview-title {
+                font-size: 11px;
+            }
+}
+
+
+@media only screen and (min-width: 992px) {
+    .web {
+        margin-top: -50px;
+    }
+
+    .summaryWeb{
+        display: block;
+            }
+    .summaryTab{
+                display: none;
+                    }
+}
+h4 , h5 {
+    color: #1B101B;
+font-weight: 500;
+
+}
+h6 {
+    color: #1B101B;
+font-size: 14px;
+font-style: normal;
+font-weight: 600;
+}
+::ng-deep {
+@media only screen and (max-width: 567px) {
+    table th{
+        white-space: nowrap !important;
+        font-size: 11px !important;
+    }
+    .p-tabview .p-tabview-nav {
+        padding: 8px 14px !important;
+        border: 1px solid #E2E2E2 !important;
+        border-top-left-radius: 6px !important;
+        border-top-right-radius: 6px !important;
+        padding: 5px !important;
+        background: #FFF !important;
+        .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+            border-radius: 12px !important;
+            fill: white !important;
+        }
+    }
+    .p-tabview .p-tabview-panels {
+        padding: 5px !important;
+    }
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+        width: 80px !important;
+        height: 66px !important;
+        padding: 0 !important;
+        border: none !important;
+        svg {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 10px !important;
+            margin-top: 10px !important;
+        }
+    }
+     .p-tabview .p-tabview-nav li {
+        width: 25% !important;
+        height: 66px !important;
+        border-right:  1px solid #eee !important;
+    }
+    .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        // background-color: white !important; 
+        color: #777 !important;
+        border: none!important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+         width: 66px  !important;
+         height: 66px !important;
+         margin-top: 3px !important;
+         .tab-header {
+            background-color: #4A0D4A !important;
+            border-radius: 6px !important;
+            color: white !important;
+            padding: 2px 5px !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            svg {
+                fill: #fff !important;
+                width: 24px;
+                height:  24px;
+            }
+        }
+    }
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+        box-shadow: none !important;
+    }
+    .p-tabview-nav-link {
+        border-top: none !important;
+        border-left: none !important;
+        border-width: 1px !important;
+        border-color: #c8c8c8 !important;
+         background: #FFF !important;
+        color: #777 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        font-size: 14px !important;
+        width: 140px  !important;
+        // border-right: 1px solid #eee !important ;
+        // border-bottom: 1px solid #eee !important ;
+        height: 99px !important;
+        align-items: center !important;
+        fill:#777777 !important;
+        svg{
+            fill: #777 !important;
+
+        }
+    }
+}
+}
+.card-body {
+    padding: 2px 6px !important;
+    border-bottom-left-radius: 10.82px !important;
+    border-bottom-right-radius: 10.82px !important;
+    height: 50px;
+    text-align: center;
+    width: 85px;
+    border: 1px solid #EEE;
+}
+.seller {
+    font-size: 10px !important;
+    color: #9E9E9E;
+
+}
+.card-text {
+    font-size: 10px;
 }

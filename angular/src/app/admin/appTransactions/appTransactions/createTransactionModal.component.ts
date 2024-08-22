@@ -96,7 +96,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     invalidSellerContactEMailAddress = "";
     sellerPhoneLabel: string = "Phone Number";
     buyerPhoneLabel: string = "Phone Number";
-
+    showAdd:boolean = false
 
     body: any;
     setCurrentUserActiveTransaction: boolean = false;
@@ -106,7 +106,14 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     minCompleteDate:Date;
     minStartDate:Date;
     sellerCurrencyCode;
-
+    emptyMessage: string = 'No results found';
+    searchTerm: string = '';
+    filteredBuyerContacts: any[] ; 
+    today: Date ;
+    startDateMsg:boolean = false
+    comtDateMsg:boolean = false
+    avalabletDateMsg:boolean = false
+    showAddTextBtn:boolean = false
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -118,6 +125,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     ) {
         super(injector);
         this.orderForm = this.fb.group({
+            enteredDate: [new Date()],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],
@@ -132,14 +140,21 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            reference:[""],
+
         });
         this.orderForm.reset();
         this.getAllCompanies();
         this.orderForm.controls['startDate'].setValue(new Date());
+        this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
+        this.orderForm.controls['enteredDate'].disable();
+       
     }
+
     ngOnChanges(){
         this.orderForm = this.fb.group({
+            enteredDate: [new Date()],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],
@@ -154,13 +169,27 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            reference:[""],
+
+            
         });
         this.orderForm.reset();
         this.orderForm.controls['startDate'].setValue(new Date());
+        this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
+        this.orderForm.controls['enteredDate'].disable();
+    
 
     }
+    // minDateValidator(minDate: Date) {
+    //     return (control: any) => {
+    //       const selectedDate = new Date(control.value);
+    //       return selectedDate && selectedDate < minDate
+    //         ? { minDate: true }
+    //         : null;
+    //     };
+    //   }
     getUserDefultRole(){
        /* var transactionType: TransactionType;
         if (this.formType.toUpperCase() == "SO")
@@ -422,16 +451,48 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
     handleBuyerNameSearch(event: any) {
+        console.log(event,'event')
+        console.log(event.filter,'event.filter')
+if (event.filter != '' || event.filter != undefined){
+    this.searchTerm = event.filter;
+
+}
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {
             this._AppTransactionServiceProxy
                 .getAccountRelatedContacts(this.buyerComapnyId, event.filter)
                 .subscribe((res: any) => {
-                    this.buyerContacts = [...res];
+                    console.log(this.buyerContacts,'this.buyerContacts')
+                    if(this.buyerContacts?.length == 0  && event.filter != undefined) {
+                        this.emptyMessage = ` Click to add "${this.searchTerm}".`;
+                        // this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+                        this.showAddTextBtn = true
+                        // console.log(`Added new buyer: ${'kk'}`);
+                    }
+                    else {
+                        this.buyerContacts = [...res];
+
+                    }
+              
 
                 });
         }, 500);
     }
+    addNewBuyer() {
+        console.log(`helloooooo`);
+        console.log(`Added new buyer: ${this.searchTerm}`);
+                this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+                console.log(this.buyerContacts,`this.buyerContacts`);
+     
+    //      if (this.searchTerm) {
+    //   const newBuyer = { name: this.searchTerm, id: this.buyerContacts.length + 1 };
+    //   this.buyerContacts.push(newBuyer);
+
+    //   console.log(`Added new buyer: ${this.searchTerm}`);
+    // }
+         
+      
+      }
     handleSellerNameSearch(event: any) {
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {
@@ -605,7 +666,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
                         completeDate: moment.utc(this.orderForm.controls['completeDate']?.value?.toLocaleString()),
                         startDate: moment.utc(this.orderForm.controls['startDate']?.value?.toLocaleString()),
-                        availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString())
+                        availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString()),
+                        reference: this.orderForm.controls['reference']?.value
                     };
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,
@@ -642,6 +704,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             this.areSame = true
         }
     }
+
     changeStartDate(date){
 
         const newDate = new Date();
@@ -658,6 +721,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.minDate.setFullYear(yearVal);
         const completeDateControl = this.orderForm.controls['completeDate'];
         const availableDateControl = this.orderForm.controls['availableDate'];
+       const startDateControl = this.orderForm.controls['startDate'];
+        
     
 
 
@@ -673,8 +738,30 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.minStartDate = this.orderForm.get('startDate')?.value;
        //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
     
-   
+       const selectedStartDate = new Date(startDateControl.value);
+       if (selectedStartDate < this.today) {
+         this.startDateMsg = true
+         startDateControl.setErrors({ minDate: true });
+       } else {
 
+        this.startDateMsg = false
+         startDateControl.setErrors(null); 
+       }
+
+
+
+
+    //    const selectedavailableDate = new Date(availableDateControl.value);
+    //    if (selectedavailableDate < selectedCompliteDate) {
+    //      this.avalabletDateMsg = true
+    //      availableDateControl.setErrors({ minDate: true });
+    //    } else {
+
+    //     this.avalabletDateMsg = false
+    //     availableDateControl.setErrors(null); 
+    //    }
+
+       
     }
 
     changeCompleteDate(event) {
@@ -687,6 +774,32 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         // Check if the new date is different from the current value to prevent infinite loops
         if (newDate?.getTime() !== this.orderForm.controls['completeDate']?.value?.getTime()) 
             this.orderForm.controls['completeDate'].setValue(newDate);
+
+        const selectedCompliteDate = new Date(this.orderForm.controls['completeDate']?.value);
+        if (selectedCompliteDate < this.orderForm.get('startDate')?.value) {
+          this.comtDateMsg = true
+          this.orderForm.controls['completeDate']?.setErrors({ minDate: true });
+        } else {
+ 
+         this.comtDateMsg = false
+         this.orderForm.controls['completeDate']?.setErrors(null); 
+        }
+        
+    }
+
+
+    changeAvailbeDate(event) {
+        const selectedavailableDate = new Date(this.orderForm.controls['availableDate']?.value);
+        if (selectedavailableDate < this.orderForm.get('completeDate')?.value) {
+            this.avalabletDateMsg = true
+          this.orderForm.controls['availableDate']?.setErrors({ minDate: true });
+        } else {
+ 
+         this.avalabletDateMsg = false
+         this.orderForm.controls['availableDate']?.setErrors(null); 
+        }
+
+     
     }
 
 
@@ -946,6 +1059,27 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
     ngOnInit(): void {
+        this.today = new Date()
+        this.orderForm = this.fb.group({
+            enteredDate: [new Date()],
+            startDate: [ Date, [Validators.required]],
+            completeDate: ["", [Validators.required]],
+            availableDate: ["", [Validators.required]],
+            sellerCompanyName: ["", [Validators.required]],
+            sellerContactName: [""],
+            sellerContactEMailAddress: ["", [Validators.email]],
+            sellerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyName: ["", [Validators.required]],
+            buyerContactName: [""],
+            buyerContactEMailAddress: ["", [Validators.email]],
+            buyerContactPhoneNumber: ["", [Validators.pattern("^[0-9]*$")]],
+            buyerCompanyBranch:["", [Validators.required]],
+            sellerCompanyBranch:["", [Validators.required]],
+            istemp: [false],
+            reference:[""],
+
+            
+        });
         console.log(">> oninit", this.orderNo);
         let today = new Date();
         let month = today.getMonth();
@@ -957,5 +1091,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.minDate = new Date();
         this.minDate.setMonth(prevMonth);
         this.minDate.setFullYear(prevYear);
+        this.orderForm.controls['enteredDate'].setValue(new Date());
+        this.orderForm.controls['enteredDate'].disable();
+
     }
 }

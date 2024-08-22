@@ -11,6 +11,7 @@ export class ImageDisplayComponent {
     @Input() sycAttachmentCategory : SycAttachmentCategoryDto
     @Input() staticWidth:number
     @Input() staticHeight:number
+    @Input() staticeRadius:number
     @Input() classList:string
     @Input() alt:string
     
@@ -18,7 +19,7 @@ export class ImageDisplayComponent {
 
     ngOnChanges(changes: SimpleChanges): void {
         if(this.sycAttachmentCategory){
-            let [width,height] = this.sycAttachmentCategory.aspectRatio.split(':')
+            let [width,height,border] = this.sycAttachmentCategory.aspectRatio.split(':')
             let acceptedAspectRatio = Number(width) / Number(height)
             if(this.staticWidth){
                 this.staticHeight =  this.staticWidth / acceptedAspectRatio

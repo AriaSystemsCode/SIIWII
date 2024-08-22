@@ -1,26 +1,160 @@
 ::ng-deep .shares .ui-dropdown-panel {
     width: 300px !important ; /* Adjust the width value as per your requirement */
+
 }
 
 ::ng-deep .p-dialog .p-dialog-header {
     background-color: #f5f5f5 ;
     color: #707070 ;
 }
-
-.web {
-    display: block;
+@media only screen and (min-width: 992px) {
+    .search-in {
+width: 380px !important;
+    }
+    .share {
+        width: 23.5%;
+        // border: 2px solid #D9D9D9 !important;
+        border-radius: 10px;
+        
+    
+    }
 }
+.resBtn {
+    .pi {
+        color: #fff;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .search-in {
+width: 200px !important;
+    }
+    .hide-label {
+        display: none;
+    }
+    .share {
+        width: 48%;
+        margin-right: 10px;
+        // border: 2px solid #D9D9D9 !important;
+        border-radius: 10px;
+        
+    
+    }
+
+}
+
+@media only screen and (min-width: 576px) {
+    .app-seller {
+        margin-top: 70px;
+    }
+
 
 .mobile {
     display: none;
 }
+}
+::ng-deep{
+    .web {
+        .sortBy {
+            width: 47%;
+            margin-right: 13px;
+        }
+        .filterBtn {
+            // width: 65%;
+    color: #1B101B;
+            .p-button.p-button-secondary.p-button-outlined {
+                // width: 92% !important;
+                border-radius: 6px !important;
+    border: 1px solid #EBEBEB !important;
+    background: #FFF !important;
+    box-shadow: 1px 1px 6px 0px rgba(22, 22, 22, 0.05) !important;
+    color: #1B101B !important;
+    
+            }
+            .sortBy {
+                // width: 40%;
+            }
+        }
+    }
+    .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+        background:  #4A0D4A !important;
+    
+    }  
+    .p-inputswitch.p-focus .p-inputswitch-slider {
+        box-shadow: none !important;
+    }
+    .p-dropdown {
+        border-radius: 8px !important;
+        // border: 1px #D9D9D9 !important ;
+        
+        background: #FFF !important;
 
-@media only screen and (max-width: 900px) {
+    }
+    .p-dropdown .p-dropdown-label {
+        border-radius: 8px !important;
+        // border: 1px #D9D9D9 !important ;
+        
+        background: #FFF !important;
+    }
+    .p-dropdown:not(.p-disabled):hover{
+     
+        border-radius: 8px !important;
+        border: 1px solid #D9D9D9 !important ;
+        
+        background: #FFF !important;
+    }
+}
+.resBtn {
+    .p-button.p-button-secondary.p-button-outlined, .p-buttonset.p-button-secondary > .p-button.p-button-outlined, .p-splitbutton.p-button-secondary > .p-button.p-button-outlined {
+        color: #fff !important; 
+        border:none !important;
+        background-color: #4A0D4A;
+        border-radius: 6px;
+    }
+   
+   
+}
+@media only screen and (max-width: 576px) {
+    .p-dialog .p-dialog-header {
+        display: none !important;
+    }
+    .app-seller {
+        margin-top: 70px;
+    }
     .web {
         display: none !important;
     }
+ 
+     .mobile {
+        .resBtn {
+            .p-ripple .p-element .p-button .p-component .p-button-icon-only{
+                background: #4A0D4A !important;
+        color: white !important;
+            }
+        }
+     
+        .p-button.p-button-secondary.p-button-outlined, .p-buttonset.p-button-secondary > .p-button.p-button-outlined, .p-splitbutton.p-button-secondary > .p-button.p-button-outlined {
+            background-color: #fff !important;
+            color: #4A0D4A;
+            border: 1px solid #D9D9D9 !important;
+        }
+        .p-input-icon-right > .p-inputtext {
+            border-radius: 10px;
+            border: 1px solid #D9D9D9;
+            color: #9E9E9E;
+            background: #FFF;
+        }
+        .p-dialog {
+            border-radius: 12px !important;
+border: 1px solid #E7E7E7 !important;
+margin: 0 !important;
 
-    .mobile {
+background: #FFF;
+        }
+   
+        .hide-label {
+            display: none;
+        }
         display: block !important;
         overflow: hidden;
         background-color: #fff !important;
@@ -39,11 +173,10 @@
             margin-bottom: 10px;
         }
         .filter-btn {
-            background-color: #f3f3f3;
-            border: solid 1px rgb(162, 162, 162);
-            font-size: 10px;
-            color: rgb(162, 162, 162);
-            border-radius: 3px;
+            border-radius: 10px;
+            border: 1px solid #D9D9D9;
+            color: #9E9E9E;
+            background: #FFF;
         }
         .products {
             display: flex;
@@ -51,6 +184,18 @@
             gap: 8px;
         }
     }
+}
+.sort {
+    width: 36%;
+
+}
+
+.share {
+ 
+    // border: 2px solid #D9D9D9 !important;
+    border-radius: 10px;
+    
+
 }
 
 .apply{
@@ -63,3 +208,48 @@
     width: 80%;
     margin: 25px 0px
 }
+
+
+/* Overlay */
+.filter-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1049;
+  }
+  
+  /* Filter Modal */
+  .filter-modal {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    z-index: 1050;
+    transition: bottom 0.3s ease-in-out;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 12px 12px 0 0;
+  }
+  
+  /* Open State */
+  .filter-modal.open {
+    bottom: 0;
+  }
+  
+  /* Filter Modal Content */
+  .filter-modal-content {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 70vh;
+  }
+  
+  /* Close Button */
+  .close-modal {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+  }
+  

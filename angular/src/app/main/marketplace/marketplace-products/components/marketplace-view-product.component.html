@@ -1,42 +1,298 @@
 <div
     [@routerTransition]
-    style="margin-top: -50px"
+   
     class="wrapper kt-container web"
 >
     <div
         class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
     >
         <h6 class="pageHeader mt-3">Marketplace Product Detail View</h6>
-        <div class="row mt-2">
-            <div class="col-md-4">
+        <div class="d-md-block d-none">
+        <div class="row mt-lg-2 mt-8">
+            <div class="col-lg-3 col-6">
                 <app-product-detail-images
                     [productImages]="productImages"
                     [colorAttachmentForMainIamge]="colorAttachmentForMainIamge"
                     [colorView]="isColorView"
                     (setColorView)="setColorView($event)"
                 ></app-product-detail-images>
-            </div>
-            <div class="col-md-5">
-                <div class="details mx-3 d-flex flex-column">
-                    <div class="d-flex mb-3">
-                    <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
-                    >
-                        <a
-                            style="text-decoration: none"
-                          (click)="goToShowroom()"
-                            rel="noopener noreferrer"
-                            >Visit the vitrual showroom</a
+                <div class=" summary-sec summaryTab">
+                    <div class="summary border">
+                        <div class="header">
+                            <h6 class="p-0 m-0" style=" font-weight: bold;">Ordered Summary</h6>
+                        </div>
+                        <div class="totals">
+                            <p class="p-0 m-0">qty {{ totalOrderQTY  }}</p>
+                            <p class="p-0 m-0">
+                                 <!-- {{
+                                productDetails?.appItemPriceInfos[0]
+                                    .currencySymbol
+                            }} -->
+                            {{
+                                currencySymbol
+                             }}
+                            
+                                {{ totlaOrderPrices| currency:' ' }}
+                               
+                            </p>
+                        </div>
+                        <div class="orderedSummary">
+                            <div *ngIf="orderSummary.length === 0" class="default">
+                                Product Order Summary
+                            </div>
+            
+                            <div
+                                *ngIf="orderSummary.length !== 0"
+                                class="summaryTables"
+                            >
+                                <div
+                                    *ngFor="
+                                        let order of orderSummary;
+                                        let orderIndex = index
+                                    "
+                                >
+                                    <div
+                                        class="orderHeader m-2 d-flex align-items-center justify-content-between"
+                                    >
+                                        <div
+                                            class="d-flex align-items-center justify-content-lg-start"
+                                            style="gap: 5px"
+                                        >
+                                            <!-- <img
+                                                 [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                alt="colorImg"
+                                                style="width: 40px"
+                                            /> -->
+                                            <!-- <p class="ml-2">
+                                                Color {{ order.color.colorName }}
+                                            </p> -->
+                                        </div>
+                                        <button
+                                            (click)="removeColor(order, orderIndex)"
+                                            type="button"
+                                            class="btn close border rounded-circle m-0 p-0"
+                                        >
+                                            <i class="fas fa-times p-0 m-0"></i>
+                                        </button>
+                                    </div>
+                                    <!-- order by size summary table -->
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Color</th>
+                                                <th>Size</th>
+                                                <th>QTY</th>
+                                                <th>Price</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody
+                                            *ngIf="!productDetails?.orderByPrePack"
+                                        >
+                                            <ng-container
+                                                *ngFor="
+                                                    let size of order.color.sizes;
+                                                    let i = index
+                                                "
+                                            >
+                                                <tr *ngIf="size.orderedQty !== 0">
+                                                    <td>
+                                                            <img
+                                                            style="width: 24px; height: 24px; border-radius: 6px;"
+                                                       
+                                                    
+                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                   
+                                                    
+                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                    
+                                                    />
+                                                </td>
+                                                    <td>{{ size.label }}</td>
+                                                    <td>{{ size.orderedQty }}</td>
+                                                    <td>{{ size.price| currency:' ' }}</td>
+                                                    <td>
+                                                        {{
+                                                            (size.orderedQty *
+                                                                size.price) | currency:' '
+                                                        }}
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            type="button"
+                                                            (click)="
+                                                                removeSize(
+                                                                    i,
+                                                                    size,
+                                                                    order,
+                                                                    orderIndex
+                                                                )
+                                                            "
+                                                            class="btn"
+                                                        >
+                                                            <i
+                                                                class="fas fa-times p-0 m-0"
+                                                            ></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </ng-container>
+                                            <tr
+                                                *ngIf="
+                                                    calculateOrderedQTYSum(
+                                                        order.color.sizes
+                                                    ) !== 0
+                                                "
+                                            >
+                                                <th colspan="2" class="text-center">Total</th>
+                                                <th style=" color: #9E9E9E !important;">
+                                                    {{
+                                                        calculateOrderedQTYSum(
+                                                            order.color.sizes
+                                                        )
+                                                    }}
+                                                </th>
+                                                <th></th>
+                                                <th  style=" color: #9E9E9E !important;">
+                                                    {{
+                                                        calculatePriceSum(
+                                                            order.color.sizes
+                                                        )| currency:' '
+                                                    }}
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                        <tbody
+                                            *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
+                                                order.color.sizes,
+                                                orderIndex
+                                            )"
+                                        >
+                                            <ng-container
+                                                *ngFor="
+                                                    let size of order.color.sizes;
+                                                    let i = index
+                                                "
+                                            >
+                                                <tr>
+                                                    <td>
+                                                        <img
+                                                        style="width: 24px; height: 24px; border-radius: 6px;"
+                                                   
+                                                
+                                                    [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                    alt=" {{ order.color.colorName }}"
+                                               
+                                                
+                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                              
+                                                />
+                                            </td>
+                                                    <td>{{ size.label }}</td>
+                                                    <td>
+                                                        {{
+                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                                size.sizeRatio *
+                                                                order.color.sizes[0]
+                                                                    .orderedPrePacks
+            
+                                                                    :  order.color.sizes[i]
+                                                                    .orderedPrePacks
+            
+                                                        }}
+                                                    </td>
+                                                    <td>{{ size.price | currency:' '}}</td>
+                                                    <td>
+                                                        {{
+                                                            !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                           ( size.sizeRatio *
+                                                                order.color.sizes[0]
+                                                                    .orderedPrePacks *
+                                                                size.price | currency:' '
+                                                                ) 
+                                                                : (order.color.sizes[i]
+                                                                .orderedPrePacks *
+                                                            size.price | currency:' '
+                                                        )
+            
+                                                        }}
+                                                    </td>
+                                                </tr>
+                                            </ng-container>
+                                            <tr>
+                                                <th colspan="2" class="text-center" >Total</th>
+                                                <th>
+                                                    {{
+                                                        calculatePrepackOrderedQTYSum(
+                                                            order.color.sizes,
+                                                            orderIndex
+                                                        )
+                                                    }}
+                                                </th>
+                                                <th></th>
+                                                <th>
+                                                    {{
+                                                        getTotalPrepackSizeAmount(
+                                                            order.color.sizes,
+                                                            orderIndex
+                                                        )| currency:' '
+                                                    }}
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <!-- order by size summary table -->
+                                    <hr
+                                        style="
+                                            border-top: 2px solid #aaaaaa !important;
+                                        "
+                                    />
+                                </div>
+                            </div>
+                        </div>
+            <div class="p-3">
+
+                        <button
+                            [disabled]="orderSummary.length == 0"
+                            (click)="addToShoppingCart()"
+                            class="btn m-0 add-btn"
                         >
-                    </button>
+                            Add To Shopping Cart
+                        </button>
+                        </div>
                     </div>
+                </div>
+            </div>
+            <div class="col-6 bg-white details-sec">
+                <div class="details mx-3 d-flex flex-column">
+                 
                     <div
                         class="ssin_price align-items-center justify-content-between"
                     >
-                        <div class="d-flex mb-3">
-                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
-                                {{ productDetails?.manufacturerCode }}
-                            </h5>
-                            <h6 class="type ml-1">
+                    <div class="mt-4">
+                        <div class="d-flex  justify-content-between">
+                            <div class="d-flex ">
+                                <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
+                                    {{ productDetails?.manufacturerCode }}
+                                </h5>
+                         
+                            </div>
+                            <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
+                            >
+                                <a
+                                    style="text-decoration: none"
+                                  (click)="goToShowroom()"
+                                    rel="noopener noreferrer"
+                                    >Visit the vitrual showroom</a
+                                >
+                            </button>
+                            </div>
+                    </div>
+                     
+                        <div class="d-flex">
+                            <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;">{{productDetails?.name}}</p>
+                            <h6 class="type ml-1 pt-2 text-center">
                                 {{
                                     productDetails?.orderByPrePack === false
                                         ? "By Size"
@@ -44,14 +300,10 @@
                                 }}
                             </h6>
                         </div>
-                        <div class="product-name mb-4">
-                            <h3 style="color: black !important;">{{ productDetails?.name }}</h3>
-                        </div>
-                        
                         <div class="price mb-4">
                             <!-- show msrp price and range in this product has no special pricing -->
                             <div
-                                class="msrp d-flex mb-4"
+                                class="msrp d-flex mb-2"
                             >
                                 <h5 class="mr-2" style="color: black !important;">MSRP:  </h5>
                                 <h5>
@@ -90,9 +342,11 @@
                                 <h5> /EAC </h5>
                             </div>
                             <div 
-                            *ngIf="productDetails?.minSpecialPrice "
-                            class="msrp d-flex"
+                          
+                            class="msrp d-flex justify-content-between"
                         >
+                        <div   *ngIf="productDetails?.minSpecialPrice">
+                            <div class="msrp d-flex align-items-center ">
                             <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
                             <h5 *ngIf="showEditSpecialPrice"> 
                                 <!-- {{
@@ -141,13 +395,15 @@
                                       border-radius: 8px;
                                       border: 2px solid #4A0D4A;"
                                              [(ngModel)]="updatedSpecialPrice">
-                                             <div  class="input-group-append position-absolute " style="right: 0px;  z-index: 99999;">
+                                             <div  class="input-group-append position-absolute " style="right: -6px;  z-index: 99999;">
                                                 <button class="btn ml-0 pl-2 pt-3 pb-3" (click)="showEditSpecialPrice= true">
                                                   <i class="clear-text fa fa-1x fa-times fa-2x" style="color: #777777;"></i>
                                                 </button>
                                               </div>
-                                      <div class="input-group-append position-absolute" style="right: 15%;
-                                      top: 4px;  z-index: 99999;">
+                                      <div class="input-group-append position-absolute" style="
+                                       z-index: 99999;     height: 41px; background: #4A0D4A;
+    right: 15%;
+    top: 5px;">
                                         <button class="btn btn-save  mr-0 pr-0" (click)="onEditpecialPrice(updatedSpecialPrice)" 
                                                 [ngClass]="{ 'disabled': updatedSpecialPrice <= 0 ||
                                                updatedSpecialPrice == productDetails.minSpecialPrice }"
@@ -166,18 +422,23 @@
                         
                         </div>
                         </div>
+                        <div class="description d-flex">
+                            <button
+                                (click)="scrollToTargetDiv()"
+                                class="btn text-primary m-0 p-0"
+                            >
+                                <a style="text-decoration: none;font-weight: bold;"
+                                    >Product description</a
+                                >
+                            </button>
+                        </div>
                     </div>
                    
-                    <div class="description d-flex">
-                        <button
-                            (click)="scrollToTargetDiv()"
-                            class="btn text-primary m-0 p-0"
-                        >
-                            <a style="text-decoration: none;font-weight: bold;"
-                                >Product description</a
-                            >
-                        </button>
+                 
+                        </div>
+                        </div>
                     </div>
+                
                     <hr
                         style="
                             border-top: 4px solid rgba(0, 0, 0, 0.1) !important ;
@@ -214,12 +475,13 @@
                                     class="colorBox"
                                     [ngStyle]="{'background-color':color.colorCode}"
                                     (click)="setSizes(i)"
-                                    [ngClass]="
+                               
+                                ></div>
+                                <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
                                         i === currentIndex
                                             ? 'border border-primary '
                                             : ''
-                                    "
-                                ></div>
+                                    ">
                                 <img
                                     *ngIf="
                                         (color.colorImg === null &&
@@ -233,12 +495,19 @@
                                     alt="images slides"
                                     class="imageSlides"
                                     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                    [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-primary '
-                                            : ''
-                                    "
+                              
                                 />
+                                <div class="card-body">
+                              
+                                   
+                                    <p class="card-text desc fw-bold" >
+                                        {{   color.colorCode }}
+                                    </p>
+                                    <p class="seller" >{{ color.colorName  }}</p> 
+                            
+                                 
+                                </div>
+                                </div>
                             </div>
                         </div>
                         <!-- color selection -->
@@ -297,10 +566,10 @@
                                             class="imageSlides"
                                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                             [ngClass]="
-                                                i === currentIndex
-                                                    ? 'border border-primary '
-                                                    : ''
-                                            "
+                                            i === currentIndex
+                                                ? 'border border-primary '
+                                                : ''
+                                        "
                                         />
                                     </div>
                                 </div>
@@ -516,227 +785,257 @@
                         <!-- end order by prepack -->
                     </div>
                 </div>
+
+                   <!-- summary section -->
+      <div class="col-3 summary-sec summaryWeb">
+        <div class="summary border">
+            <div class="header">
+                <h6 class="p-0 m-0" style=" font-weight: bold;">Ordered Summary</h6>
             </div>
+            <div class="totals">
+                <p class="p-0 m-0">qty {{ totalOrderQTY  }}</p>
+                <p class="p-0 m-0">
+                     <!-- {{
+                    productDetails?.appItemPriceInfos[0]
+                        .currencySymbol
+                }} -->
+                {{
+                    currencySymbol
+                 }}
+                
+                    {{ totlaOrderPrices| currency:' ' }}
+                   
+                </p>
+            </div>
+            <div class="orderedSummary">
+                <div *ngIf="orderSummary.length === 0" class="default">
+                    Product Order Summary
+                </div>
 
-            <!-- summary section -->
-            <div class="col-md-3">
-                <div class="summary border">
-                    <div class="header">
-                        <h6 class="p-0 m-0" style=" font-weight: bold;">Ordered Summary</h6>
-                    </div>
-                    <div class="totals">
-                        <p class="p-0 m-0">qty {{ totalOrderQTY  }}</p>
-                        <p class="p-0 m-0">
-                             <!-- {{
-                            productDetails?.appItemPriceInfos[0]
-                                .currencySymbol
-                        }} -->
-                        {{
-                            currencySymbol
-                         }}
-                        
-                            {{ totlaOrderPrices| currency:' ' }}
-                           
-                        </p>
-                    </div>
-                    <div class="orderedSummary">
-                        <div *ngIf="orderSummary.length === 0" class="default">
-                            Product Order Summary
-                        </div>
-
+                <div
+                    *ngIf="orderSummary.length !== 0"
+                    class="summaryTables"
+                >
+                    <div
+                        *ngFor="
+                            let order of orderSummary;
+                            let orderIndex = index
+                        "
+                    >
                         <div
-                            *ngIf="orderSummary.length !== 0"
-                            class="summaryTables"
+                            class="orderHeader m-2 d-flex align-items-center justify-content-between"
                         >
                             <div
-                                *ngFor="
-                                    let order of orderSummary;
-                                    let orderIndex = index
-                                "
+                                class="d-flex align-items-center justify-content-lg-start"
+                                style="gap: 5px"
                             >
-                                <div
-                                    class="orderHeader m-2 d-flex align-items-center justify-content-between"
-                                >
-                                    <div
-                                        class="d-flex align-items-center justify-content-lg-start"
-                                        style="gap: 5px"
-                                    >
-                                        <img
-                                             [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                            alt="colorImg"
-                                            style="width: 40px"
-                                        />
-                                        <p class="ml-2">
-                                            Color {{ order.color.colorName }}
-                                        </p>
-                                    </div>
-                                    <button
-                                        (click)="removeColor(order, orderIndex)"
-                                        type="button"
-                                        class="btn close border rounded-circle m-0 p-0"
-                                    >
-                                        <i class="fas fa-times p-0 m-0"></i>
-                                    </button>
-                                </div>
-                                <!-- order by size summary table -->
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Size</th>
-                                            <th>QTY</th>
-                                            <th>Price</th>
-                                            <th>Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody
-                                        *ngIf="!productDetails?.orderByPrePack"
-                                    >
-                                        <ng-container
-                                            *ngFor="
-                                                let size of order.color.sizes;
-                                                let i = index
-                                            "
-                                        >
-                                            <tr *ngIf="size.orderedQty !== 0">
-                                                <td>{{ size.label }}</td>
-                                                <td>{{ size.orderedQty }}</td>
-                                                <td>{{ size.price| currency:' ' }}</td>
-                                                <td>
-                                                    {{
-                                                        (size.orderedQty *
-                                                            size.price) | currency:' '
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    <button
-                                                        type="button"
-                                                        (click)="
-                                                            removeSize(
-                                                                i,
-                                                                size,
-                                                                order,
-                                                                orderIndex
-                                                            )
-                                                        "
-                                                        class="btn"
-                                                    >
-                                                        <i
-                                                            class="fas fa-times p-0 m-0"
-                                                        ></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </ng-container>
-                                        <tr
-                                            *ngIf="
-                                                calculateOrderedQTYSum(
-                                                    order.color.sizes
-                                                ) !== 0
-                                            "
-                                        >
-                                            <th>Total</th>
-                                            <th style=" color: #9E9E9E !important;">
-                                                {{
-                                                    calculateOrderedQTYSum(
-                                                        order.color.sizes
-                                                    )
-                                                }}
-                                            </th>
-                                            <th></th>
-                                            <th  style=" color: #9E9E9E !important;">
-                                                {{
-                                                    calculatePriceSum(
-                                                        order.color.sizes
-                                                    )| currency:' '
-                                                }}
-                                            </th>
-                                        </tr>
-                                    </tbody>
-                                    <tbody
-                                        *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
-                                            order.color.sizes,
-                                            orderIndex
-                                        )"
-                                    >
-                                        <ng-container
-                                            *ngFor="
-                                                let size of order.color.sizes;
-                                                let i = index
-                                            "
-                                        >
-                                            <tr>
-                                                <td>{{ size.label }}</td>
-                                                <td>
-                                                    {{
-                                                        !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
-                                                            size.sizeRatio *
-                                                            order.color.sizes[0]
-                                                                .orderedPrePacks
-
-                                                                :  order.color.sizes[i]
-                                                                .orderedPrePacks
-
-                                                    }}
-                                                </td>
-                                                <td>{{ size.price | currency:' '}}</td>
-                                                <td>
-                                                    {{
-                                                        !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
-                                                       ( size.sizeRatio *
-                                                            order.color.sizes[0]
-                                                                .orderedPrePacks *
-                                                            size.price | currency:' '
-                                                            ) 
-                                                            : (order.color.sizes[i]
-                                                            .orderedPrePacks *
-                                                        size.price | currency:' '
-                                                    )
-
-                                                    }}
-                                                </td>
-                                            </tr>
-                                        </ng-container>
-                                        <tr>
-                                            <th>Total</th>
-                                            <th>
-                                                {{
-                                                    calculatePrepackOrderedQTYSum(
-                                                        order.color.sizes,
-                                                        orderIndex
-                                                    )
-                                                }}
-                                            </th>
-                                            <th></th>
-                                            <th>
-                                                {{
-                                                    getTotalPrepackSizeAmount(
-                                                        order.color.sizes,
-                                                        orderIndex
-                                                    )| currency:' '
-                                                }}
-                                            </th>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <!-- order by size summary table -->
-                                <hr
-                                    style="
-                                        border-top: 2px solid #aaaaaa !important;
-                                    "
-                                />
+                                <!-- <img
+                                     [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                    alt="colorImg"
+                                    style="width: 40px"
+                                /> -->
+                                <!-- <p class="ml-2">
+                                    Color {{ order.color.colorName }}
+                                </p> -->
                             </div>
+                            <button
+                                (click)="removeColor(order, orderIndex)"
+                                type="button"
+                                class="btn close border rounded-circle m-0 p-0"
+                            >
+                                <i class="fas fa-times p-0 m-0"></i>
+                            </button>
                         </div>
+                        <!-- order by size summary table -->
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Color</th>
+                                    <th>Size</th>
+                                    <th>QTY</th>
+                                    <th>Price</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody
+                                *ngIf="!productDetails?.orderByPrePack"
+                            >
+                                <ng-container
+                                    *ngFor="
+                                        let size of order.color.sizes;
+                                        let i = index
+                                    "
+                                >
+                                    <tr *ngIf="size.orderedQty !== 0">
+                                        <td>
+                                                <img
+                                           
+                                        
+                                            [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                            style="width: 24px; height: 24px; border-radius: 6px;"
+                                        
+                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                        
+                                        />
+                                    </td>
+                                        <td>{{ size.label }}</td>
+                                        <td>{{ size.orderedQty }}</td>
+                                        <td>{{ size.price| currency:' ' }}</td>
+                                        <td>
+                                            {{
+                                                (size.orderedQty *
+                                                    size.price) | currency:' '
+                                            }}
+                                        </td>
+                                        <td>
+                                            <button
+                                                type="button"
+                                                (click)="
+                                                    removeSize(
+                                                        i,
+                                                        size,
+                                                        order,
+                                                        orderIndex
+                                                    )
+                                                "
+                                                class="btn"
+                                            >
+                                                <i
+                                                    class="fas fa-times p-0 m-0"
+                                                ></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                                <tr
+                                    *ngIf="
+                                        calculateOrderedQTYSum(
+                                            order.color.sizes
+                                        ) !== 0
+                                    "
+                                >
+                                    <th colspan="2" class="text-center">Total</th>
+                                    <th style=" color: #9E9E9E !important;">
+                                        {{
+                                            calculateOrderedQTYSum(
+                                                order.color.sizes
+                                            )
+                                        }}
+                                    </th>
+                                    <th></th>
+                                    <th  style=" color: #9E9E9E !important;">
+                                        {{
+                                            calculatePriceSum(
+                                                order.color.sizes
+                                            )| currency:' '
+                                        }}
+                                    </th>
+                                </tr>
+                            </tbody>
+                            <tbody
+                                *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
+                                    order.color.sizes,
+                                    orderIndex
+                                )"
+                            >
+                                <ng-container
+                                    *ngFor="
+                                        let size of order.color.sizes;
+                                        let i = index
+                                    "
+                                >
+                                    <tr>
+                                        <td>
+                                            <img
+                                            style="width: 24px; height: 24px; border-radius: 6px;"
+                                       
+                                    
+                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                        alt=" {{ order.color.colorName }}"
+                                   
+                                    
+                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                  
+                                    />
+                                </td>
+                                        <td>{{ size.label }}</td>
+                                        <td>
+                                            {{
+                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                    size.sizeRatio *
+                                                    order.color.sizes[0]
+                                                        .orderedPrePacks
+
+                                                        :  order.color.sizes[i]
+                                                        .orderedPrePacks
+
+                                            }}
+                                        </td>
+                                        <td>{{ size.price | currency:' '}}</td>
+                                        <td>
+                                            {{
+                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                               ( size.sizeRatio *
+                                                    order.color.sizes[0]
+                                                        .orderedPrePacks *
+                                                    size.price | currency:' '
+                                                    ) 
+                                                    : (order.color.sizes[i]
+                                                    .orderedPrePacks *
+                                                size.price | currency:' '
+                                            )
+
+                                            }}
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                                <tr>
+                                    <th colspan="2" class="text-center" >Total</th>
+                                    <th>
+                                        {{
+                                            calculatePrepackOrderedQTYSum(
+                                                order.color.sizes,
+                                                orderIndex
+                                            )
+                                        }}
+                                    </th>
+                                    <th></th>
+                                    <th>
+                                        {{
+                                            getTotalPrepackSizeAmount(
+                                                order.color.sizes,
+                                                orderIndex
+                                            )| currency:' '
+                                        }}
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- order by size summary table -->
+                        <hr
+                            style="
+                                border-top: 2px solid #aaaaaa !important;
+                            "
+                        />
                     </div>
-                    <button
-                        [disabled]="orderSummary.length == 0"
-                        (click)="addToShoppingCart()"
-                        class="btn m-0 add-btn"
-                    >
-                        Add To Shopping Cart
-                    </button>
                 </div>
             </div>
+            <div class="p-3">
+                <button
+                [disabled]="orderSummary.length == 0"
+                (click)="addToShoppingCart()"
+                class="btn m-0 add-btn"
+            >
+                Add To Shopping Cart
+            </button>
+            </div>
+          
+        </div>
+    </div>
+            </div>
+   
+      
 
             <div class="col-md-12">
                 <div class="bg-white rounded p-4 my-4">
@@ -779,8 +1078,876 @@
                 </div>
             </div>
         </div>
+
+        <div class="d-block d-md-none">
+
+            <p-tabView styleClass="tabview-custom">
+                <p-tabPanel>
+                    <ng-template pTemplate="header">
+                        <div class="tab-header d-flex flex-column align-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 38 20" class="mt-1">
+                            <path d="M0.667969 2.66634C0.667969 2.18011 0.861123 1.7138 1.20494 1.36998C1.54876 1.02616 2.01507 0.833008 2.5013 0.833008H35.5013C35.9875 0.833008 36.4538 1.02616 36.7977 1.36998C37.1415 1.7138 37.3346 2.18011 37.3346 2.66634C37.3346 3.15257 37.1415 3.61889 36.7977 3.9627C36.4538 4.30652 35.9875 4.49967 35.5013 4.49967H2.5013C2.01507 4.49967 1.54876 4.30652 1.20494 3.9627C0.861123 3.61889 0.667969 3.15257 0.667969 2.66634ZM0.667969 9.99967C0.667969 9.51344 0.861123 9.04713 1.20494 8.70331C1.54876 8.3595 2.01507 8.16634 2.5013 8.16634H35.5013C35.9875 8.16634 36.4538 8.3595 36.7977 8.70331C37.1415 9.04713 37.3346 9.51344 37.3346 9.99967C37.3346 10.4859 37.1415 10.9522 36.7977 11.296C36.4538 11.6399 35.9875 11.833 35.5013 11.833H2.5013C2.01507 11.833 1.54876 11.6399 1.20494 11.296C0.861123 10.9522 0.667969 10.4859 0.667969 9.99967ZM2.5013 15.4997C2.01507 15.4997 1.54876 15.6928 1.20494 16.0366C0.861123 16.3805 0.667969 16.8468 0.667969 17.333C0.667969 17.8192 0.861123 18.2856 1.20494 18.6294C1.54876 18.9732 2.01507 19.1663 2.5013 19.1663H24.5013C24.9875 19.1663 25.4538 18.9732 25.7977 18.6294C26.1415 18.2856 26.3346 17.8192 26.3346 17.333C26.3346 16.8468 26.1415 16.3805 25.7977 16.0366C25.4538 15.6928 24.9875 15.4997 24.5013 15.4997H2.5013Z" />
+                            </svg>
+                        <p class="mb-0 mt-md-4 " style="font-size: 11px;"> Details</p>
+                    </div>
+                    </ng-template>
+                    <div class="row">
+                        <div class="col-12">
+                            <app-product-detail-images
+                            [productImages]="productImages"
+                            [colorAttachmentForMainIamge]="colorAttachmentForMainIamge"
+                            [colorView]="isColorView"
+                            (setColorView)="setColorView($event)"
+                        ></app-product-detail-images>
+                        </div>
+                        <div class="col-12 bg-white details-sec mt-4">
+                            <div class="details mx-3 d-flex flex-column">
+                             
+                                <div
+                                    class="ssin_price align-items-center justify-content-between"
+                                >
+                                <div class="mt-4">
+                                    <div class="d-flex  justify-content-between">
+                                        <div class="d-flex ">
+                                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 18px;margin-top: 8px;">
+                                                {{ productDetails?.manufacturerCode }}
+                                            </h5>
+                                     
+                                        </div>
+                                        <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
+                                        >
+                                            <a
+                                                style="text-decoration: none"
+                                              (click)="goToShowroom()"
+                                                rel="noopener noreferrer"
+                                                >Visit the vitrual showroom</a
+                                            >
+                                        </button>
+                                        </div>
+                                </div>
+                                 
+                                    <div class="d-flex">
+                                        <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;">{{productDetails?.name}}</p>
+                                        <h6 class="type ml-1 pt-2 text-center">
+                                            {{
+                                                productDetails?.orderByPrePack === false
+                                                    ? "By Size"
+                                                    : "By Prepack"
+                                            }}
+                                        </h6>
+                                    </div>
+                                    <div class="price mb-4">
+                                        <!-- show msrp price and range in this product has no special pricing -->
+                                        <div
+                                            class="msrp d-flex mb-2"
+                                        >
+                                            <h5 class="mr-2" style="color: black !important;">MSRP:  </h5>
+                                            <h5>
+                                                <!-- {{
+                                                    productDetails?.appItemPriceInfos[0]
+                                                        .currencySymbol
+                                                }} -->
+                                                {{
+                                                   currencySymbol
+                                                }}
+                                                {{ productDetails?.minMSRP }}
+                                            </h5>
+                                            <span
+                                                *ngIf="
+                                                    productDetails?.minMSRP !==
+                                                    productDetails?.maxMSRP
+                                                "
+                                            >
+                                                -
+                                            </span>
+                                            <h5
+                                                *ngIf="
+                                                    productDetails?.minMSRP !==
+                                                    productDetails?.maxMSRP
+                                                "
+                                            >
+                                                <!-- {{
+                                                    productDetails?.appItemPriceInfos[0]
+                                                        ?.currencySymbol
+                                                }} -->
+                                                {{
+                                                    currencySymbol
+                                                 }}
+                                                {{ productDetails?.maxMSRP }}
+                                            </h5>
+                                            <h5> /EAC </h5>
+                                        </div>
+                                        <div 
+                                      
+                                        class="msrp d-flex justify-content-between"
+                                    >
+                                    <div   *ngIf="productDetails?.minSpecialPrice">
+                                        <div class="msrp d-flex align-items-center ">
+                                        <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
+                                        <h5 *ngIf="showEditSpecialPrice"> 
+                                            <!-- {{
+                                                productDetails?.appItemPriceInfos[0]
+                                                    .currencySymbol
+                                            }} -->
+                                                {{
+                                                    currencySymbol
+                                                 }}
+                                                
+                                            {{ productDetails?.minSpecialPrice| currency:' ' }}
+                                        </h5>
+                                        <span
+                                            *ngIf="
+                                                productDetails?.minSpecialPrice !==
+                                                productDetails?.maxSpecialPrice && showEditSpecialPrice
+                                            "
+                                        >
+                                            -
+                                        </span>
+                                        <h5
+                                            *ngIf="
+                                            productDetails?.minSpecialPrice !==
+                                            productDetails?.maxSpecialPrice  && showEditSpecialPrice"
+                                            
+                                        >
+                                            <!-- {{
+                                                productDetails?.appItemPriceInfos[0]
+                                                    ?.currencySymbol
+                                            }} -->
+                                                {{
+                                                    currencySymbol
+                                                 }}
+                                                
+                                            {{ productDetails?.maxSpecialPrice }}
+                                        </h5>
+                                        <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" />
+                                        
+                                        <label class="ml-3"
+                                        *ngIf="!showEditSpecialPrice">
+                                        <div class="editQtyContainer">
+                                            <div class="fieldset">
+                                                <div class="input-group">
+                                                  <input type="number" min="0" class="form-control inputs form-text" id="editQty" style="width: 267px;
+                                                  height: 44px;
+                                                  border-radius: 8px;
+                                                  border: 2px solid #4A0D4A;"
+                                                         [(ngModel)]="updatedSpecialPrice">
+                                                         <div  class="input-group-append position-absolute " style="right: -6px;  z-index: 99999;">
+                                                            <button class="btn ml-0 pl-2 pt-3 pb-3" (click)="showEditSpecialPrice= true">
+                                                              <i class="clear-text fa fa-1x fa-times fa-2x" style="color: #777777;"></i>
+                                                            </button>
+                                                          </div>
+                                                  <div class="input-group-append position-absolute" style="
+                                                   z-index: 99999;     height: 41px; background: #4A0D4A;
+                right: 15%;
+                top: 5px;">
+                                                    <button class="btn btn-save  mr-0 pr-0" (click)="onEditpecialPrice(updatedSpecialPrice)" 
+                                                            [ngClass]="{ 'disabled': updatedSpecialPrice <= 0 ||
+                                                           updatedSpecialPrice == productDetails.minSpecialPrice }"
+                                                            [disabled]="updatedSpecialPrice <= 0 ||
+                                                           updatedSpecialPrice == productDetails.minSpecialPrice ">
+                                                      <i class="fa fa-check fa-2x" style="color: #777777;"></i>
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                                
+                                              </div>
+                                        </div>
+            
+                                    </label>
+            
+                                    
+                                    </div>
+                                    </div>
+                                    <div class="description d-flex">
+                                        <button
+                                            (click)="scrollToTargetDiv()"
+                                            class="btn text-primary m-0 p-0"
+                                        >
+                                            <a style="text-decoration: none;font-weight: bold;"
+                                                >Product description</a
+                                            >
+                                        </button>
+                                    </div>
+                                </div>
+                               
+                             
+                                    </div>
+                                    </div>
+                                </div>
+                            
+                                <hr
+                                    style="
+                                        border-top: 4px solid rgba(0, 0, 0, 0.1) !important ;
+                                        border-radius: 13px;
+                                    "
+                                />
+            
+                                <div class="color-selection">
+                                    <h5 class="my-2" style="text-decoration: none;color:black  !important">
+                                        Colors
+                                    </h5>
+                                    <!-- color selections -->
+                                    <div
+                                        *ngIf="colorsData?.length <= 8"
+                                        class="d-flex flex-wrap align-items-center justify-content-lg-start"
+                                    >
+                                        <div
+                                            class="mr-3"
+                                            *ngFor="let color of colorsData; let i = index"
+                                            [title]="color.colorName"
+                                            position="top"
+                                            class="imagAndHexaCode"
+                                            tooltipPositionStyleClass="custom-tooltip"
+                                        >
+                                            <div
+                                                *ngIf="
+                                                    color.colorCode !== null &&
+                                                    color.colorImg === null
+                                                "
+                                                class="colorBox"
+                                                [ngStyle]="{'background-color':color.colorCode}"
+                                                (click)="setSizes(i)"
+                                                [ngClass]="
+                                                    i === currentIndex
+                                                        ? 'border border-primary '
+                                                        : ''
+                                                "
+                                            ></div>
+                                            
+                                          <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
+                                        i === currentIndex
+                                            ? 'border border-primary '
+                                            : ''
+                                    ">
+                                <img
+                                    *ngIf="
+                                        (color.colorImg === null &&
+                                            color.colorCode === null) ||
+                                        color.colorImg !== null
+                                    "
+                                    (click)="setSizes(i)"
+                                    [src]="
+                                        attachmentBaseUrl + '/' + color.colorImg
+                                    "
+                                    alt="images slides"
+                                    class="imageSlides"
+                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                              
+                                />
+                                <div class="card-body">
+                              
+                                   
+                                    <p class="card-text desc fw-bold" >
+                                        {{   color.colorCode }}
+                                    </p>
+                                    <p class="seller" >{{ color.colorName  }}</p> 
+                            
+                                 
+                                </div>
+                                </div>
+                                        </div>
+                                    </div>
+                                    <!-- color selection -->
+            
+                                    <!-- color slider -->
+                                    <div class="d-flex" style="height: 70px;" *ngIf="colorsData?.length > 8">
+                                        <button
+                                        (click)="slideToPreviousImage()"
+                                        class="mr-4 indicator-btns"
+                                    >
+                                        <i class="fa fa-chevron-left"></i>
+                                    </button>
+                                        <div class="slider-container">
+                                            <div
+                                                class="slider"
+                                                [style.transform]="
+                                                    'translateX(' + translateX + 'px)'
+                                                "
+                                            >
+                                                <div
+                                                    *ngFor="
+                                                        let color of colorsData;
+                                                        let i = index
+                                                    "
+                                                    [title]="color.colorName"
+                                                    position="top"
+                                                    tooltipPositionStyleClass="custom-tooltip"
+                                                >
+                                                    <div
+                                                        *ngIf="
+                                                            color.colorCode !== null &&
+                                                            color.colorImg === null
+                                                        "
+                                                        class="colorBox"
+                                                        [ngStyle]="{'background-color': color.colorCode}"
+                                                        (click)="setSizes(i)"
+                                                        [ngClass]="
+                                                            i === currentIndex
+                                                                ? 'border border-primary '
+                                                                : ''
+                                                        "
+                                                    ></div>
+                                                    <img
+                                                        *ngIf="
+                                                            (color.colorImg === null &&
+                                                                color.colorCode === null) ||
+                                                            color.colorImg !== null
+                                                        "
+                                                        (click)="setSizes(i)"
+                                                        [src]="
+                                                            attachmentBaseUrl +
+                                                            '/' +
+                                                            color.colorImg
+                                                        "
+                                                        alt="images slides"
+                                                        class="imageSlides"
+                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                        [ngClass]="
+                                                            i === currentIndex
+                                                                ? 'border border-primary '
+                                                                : ''
+                                                        "
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            (click)="slideToNextImage()"
+                                            class="indicator-btns"
+                                        >
+                                            <i class="fa fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+            
+                                    <!-- start order by size -->
+                                    <h5
+                                        *ngIf="!productDetails?.orderByPrePack"
+                                        class="my-4"
+                                        style="text-decoration: none"
+                                    >
+                                        Order By Size
+                                    </h5>
+                                    <table
+                                        *ngIf="!productDetails?.orderByPrePack"
+                                        class="table text-center table-bordered table-white"
+                                    >
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Size</th>
+                                                <th scope="col">Avaiable QTY</th>
+                                                <th scope="col">Ordered</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="
+                                                    let size of colorsData[currentIndex]
+                                                        ?.sizes;
+                                                    let i = index
+                                                "
+                                            >
+                                                <td>{{ size.label }}</td>
+                                                <td>{{ size.stockAvailability }}</td>
+                                                <td>
+                                                    <p-inputNumber
+                                                        [(ngModel)]="size.orderedQty"
+                                                        mode="decimal"
+                                                        [showButtons]="true"
+                                                        inputId="minmax-buttons"
+                                                        [min]="0"
+                                                        (ngModelChange)="
+                                                            onNumberChange(
+                                                                $event,
+                                                                colorsData[currentIndex],
+                                                                i
+                                                            )
+                                                        "
+                                                    >
+                                                    </p-inputNumber>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <!-- end order by size -->
+            
+                                    <!-- start order by prepack -->
+                                    <h5
+                                        *ngIf="productDetails?.orderByPrePack"
+                                        class="my-4"
+                                        style="text-decoration: none;color:black  !important"
+                                    >
+                                        Prepack Definition
+                                    </h5>
+                                    <table
+                                        *ngIf="productDetails?.orderByPrePack"
+                                        class="table text-center table-bordered table-white"
+                                    >
+                                        <tbody>
+                                            <tr>
+                                                <th  style="background-color: #F8F8F8;">Size</th>
+                                                <td
+                                                    *ngFor="
+                                                        let size of colorsData[currentIndex]
+                                                            .sizes
+                                                    "
+                                                >
+                                                    {{ size.label }}
+                                                </td>
+                                                <th  style="background-color: #F8F8F8;">Total Pcs</th>
+                                            </tr>
+                                            <tr>
+                                                <th  style="background-color: #F8F8F8;">Prepack</th>
+                                                <td
+                                                    *ngFor="
+                                                        let size of colorsData[currentIndex]
+                                                            .sizes
+                                                    "
+                                                >
+                                                    {{ size.sizeRatio }}
+                                                </td>
+                                                <th>{{ getTotlaPrepackSum()}}</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+            
+                                   
+                                    <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"   class="p-4 font-weight-bold" style="color:black !important" >Order by prepack</span>
+                                      <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack" class="switch switch-container my-4 font-weight-bold" >
+                                        <input type="checkbox" [(ngModel)]="chk_Order_by_prepack" checked (change)="onChangechk_Order_by_prepack()">
+                                        <span class="slider round"></span>
+                                    </label>
+            
+                                    <p-tabView *ngIf="productDetails?.orderByPrePack" [activeIndex]="chk_Order_by_prepack? 0 : 1">
+                                        <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack" >
+                                            <table
+                                                *ngIf="productDetails?.orderByPrePack"
+                                                class="table text-center table-bordered table-white"
+                                            >
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">
+                                                            Avaiable Prepacks
+                                                        </th>
+                                                        <th scope="col">Ordered</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            {{
+                                                                colorsData[currentIndex]
+                                                                    ?.sizes[0]
+                                                                    .noOfAvailablePrepacks
+                                                            }}
+                                                        </td>
+                                                        <td>
+                                                            <p-inputNumber
+                                                            [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack)"
+                                                                [(ngModel)]="
+                                                                    colorsData[currentIndex]
+                                                                        ?.sizes[0]
+                                                                        .orderedPrePacks
+                                                                "
+                                                                mode="decimal"
+                                                                [showButtons]="true"
+                                                                inputId="minmax-buttons"
+                                                                [min]="0"
+                                                                (ngModelChange)="
+                                                                    onNumberChange(
+                                                                        $event,
+                                                                        colorsData[
+                                                                            currentIndex
+                                                                        ],
+                                                                        null
+                                                                    )
+                                                                "
+                                                            >
+                                                            </p-inputNumber>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p-tabPanel>
+                                        <p-tabPanel [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack)  ? 'Order By Size' : 'View Ordered Quantity By Size'" >
+                                            <table
+                                                class="table text-center table-bordered table-white"
+                                            >
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Size</th>
+                                                        <th scope="col">Avaiable QTY</th>
+                                                        <th scope="col">Ordered</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr
+                                                        *ngFor="
+                                                            let size of colorsData[
+                                                                currentIndex
+                                                            ]?.sizes;
+                                                            let i = index
+                                                        "
+                                                    >
+                                                        <td>{{ size.label }}</td>
+                                                        <td>
+                                                            {{ size.stockAvailability }}
+                                                        </td>
+                                                        <td>
+                                                            
+                                                            <p-inputNumber
+                                                            [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? (size.sizeRatio * colorsData[currentIndex]?.sizes[0].orderedPrePacks) : colorsData[currentIndex]?.sizes[i].orderedPrePacks"
+                                                               
+                                                                mode="decimal"
+                                                                [showButtons]="true"
+                                                                inputId="minmax-buttons"
+                                                                [min]="0"
+                                                                [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack)"
+                                                                (ngModelChange)="
+                                                                    onNumberChange(
+                                                                        $event,
+                                                                        colorsData[
+                                                                            currentIndex
+                                                                        ],
+                                                                        i
+                                                                    )
+                                                                "
+                                                            >
+                                                            </p-inputNumber>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p-tabPanel>
+                                    </p-tabView>
+                                    <!-- end order by prepack -->
+                                </div>
+                            </div>
+            
+                    
+                    </div>
+                </p-tabPanel>
+                <p-tabPanel header="Header II">
+                    <ng-template pTemplate="header">
+                        <div class="tab-header d-flex flex-column align-items-center">
+        
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 45 44" >
+                            <path d="M11.5 10.9993C11.5 10.5131 11.6932 10.0468 12.037 9.70299C12.3808 9.35917 12.8471 9.16602 13.3333 9.16602H31.6667C32.1529 9.16602 32.6192 9.35917 32.963 9.70299C33.3068 10.0468 33.5 10.5131 33.5 10.9993C33.5 11.4856 33.3068 11.9519 32.963 12.2957C32.6192 12.6395 32.1529 12.8327 31.6667 12.8327H13.3333C12.8471 12.8327 12.3808 12.6395 12.037 12.2957C11.6932 11.9519 11.5 11.4856 11.5 10.9993ZM11.5 18.3327C11.5 17.8465 11.6932 17.3801 12.037 17.0363C12.3808 16.6925 12.8471 16.4993 13.3333 16.4993H31.6667C32.1529 16.4993 32.6192 16.6925 32.963 17.0363C33.3068 17.3801 33.5 17.8465 33.5 18.3327C33.5 18.8189 33.3068 19.2852 32.963 19.629C32.6192 19.9729 32.1529 20.166 31.6667 20.166H13.3333C12.8471 20.166 12.3808 19.9729 12.037 19.629C11.6932 19.2852 11.5 18.8189 11.5 18.3327ZM13.3333 23.8327C12.8471 23.8327 12.3808 24.0258 12.037 24.3697C11.6932 24.7135 11.5 25.1798 11.5 25.666C11.5 26.1522 11.6932 26.6186 12.037 26.9624C12.3808 27.3062 12.8471 27.4993 13.3333 27.4993H31.6667C32.1529 27.4993 32.6192 27.3062 32.963 26.9624C33.3068 26.6186 33.5 26.1522 33.5 25.666C33.5 25.1798 33.3068 24.7135 32.963 24.3697C32.6192 24.0258 32.1529 23.8327 31.6667 23.8327H13.3333ZM11.5 32.9993C11.5 32.5131 11.6932 32.0468 12.037 31.703C12.3808 31.3592 12.8471 31.166 13.3333 31.166H20.6667C21.1529 31.166 21.6192 31.3592 21.963 31.703C22.3068 32.0468 22.5 32.5131 22.5 32.9993C22.5 33.4856 22.3068 33.9519 21.963 34.2957C21.6192 34.6395 21.1529 34.8327 20.6667 34.8327H13.3333C12.8471 34.8327 12.3808 34.6395 12.037 34.2957C11.6932 33.9519 11.5 33.4856 11.5 32.9993Z" />
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M4.16797 7.33301C4.16797 5.87432 4.74743 4.47537 5.77888 3.44392C6.81033 2.41247 8.20928 1.83301 9.66797 1.83301H35.3346C36.7933 1.83301 38.1923 2.41247 39.2237 3.44392C40.2552 4.47537 40.8346 5.87432 40.8346 7.33301V36.6663C40.8346 38.125 40.2552 39.524 39.2237 40.5554C38.1923 41.5869 36.7933 42.1663 35.3346 42.1663H9.66797C8.20928 42.1663 6.81033 41.5869 5.77888 40.5554C4.74743 39.524 4.16797 38.125 4.16797 36.6663V7.33301ZM9.66797 5.49967H35.3346C35.8209 5.49967 36.2872 5.69283 36.631 6.03664C36.9748 6.38046 37.168 6.84678 37.168 7.33301V36.6663C37.168 37.1526 36.9748 37.6189 36.631 37.9627C36.2872 38.3065 35.8209 38.4997 35.3346 38.4997H9.66797C9.18174 38.4997 8.71542 38.3065 8.37161 37.9627C8.02779 37.6189 7.83464 37.1526 7.83464 36.6663V7.33301C7.83464 6.84678 8.02779 6.38046 8.37161 6.03664C8.71542 5.69283 9.18174 5.49967 9.66797 5.49967Z" />
+                            </svg>
+                        <span style="font-size: 11px;">Summary</span>
+                        </div>
+                    </ng-template>
+              
+                     
+                   <div class="row">
+                    <div class="col-12 summary-sec ">
+                        <div class="summary border">
+                            <div class="header">
+                                <h6 class="p-0 m-0" style=" font-weight: bold;">Ordered Summary</h6>
+                            </div>
+                            <div class="totals">
+                                <p class="p-0 m-0">qty {{ totalOrderQTY  }}</p>
+                                <p class="p-0 m-0">
+                                     <!-- {{
+                                    productDetails?.appItemPriceInfos[0]
+                                        .currencySymbol
+                                }} -->
+                                {{
+                                    currencySymbol
+                                 }}
+                                
+                                    {{ totlaOrderPrices| currency:' ' }}
+                                   
+                                </p>
+                            </div>
+                            <div class="orderedSummary">
+                                <div *ngIf="orderSummary.length === 0" class="default">
+                                    Product Order Summary
+                                </div>
+                
+                                <div
+                                    *ngIf="orderSummary.length !== 0"
+                                    class="summaryTables"
+                                >
+                                    <div
+                                        *ngFor="
+                                            let order of orderSummary;
+                                            let orderIndex = index
+                                        "
+                                    >
+                                        <div
+                                            class="orderHeader m-2 d-flex align-items-center justify-content-between"
+                                        >
+                                            <div
+                                                class="d-flex align-items-center justify-content-lg-start"
+                                                style="gap: 5px"
+                                            >
+                                                <!-- <img
+                                                     [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                    alt="colorImg"
+                                                    style="width: 40px"
+                                                /> -->
+                                                <!-- <p class="ml-2">
+                                                    Color {{ order.color.colorName }}
+                                                </p> -->
+                                            </div>
+                                            <button
+                                                (click)="removeColor(order, orderIndex)"
+                                                type="button"
+                                                class="btn close border rounded-circle m-0 p-0"
+                                            >
+                                                <i class="fas fa-times p-0 m-0"></i>
+                                            </button>
+                                        </div>
+                                        <!-- order by size summary table -->
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Color</th>
+                                                    <th>Size</th>
+                                                    <th>QTY</th>
+                                                    <th>Price</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody
+                                                *ngIf="!productDetails?.orderByPrePack"
+                                            >
+                                                <ng-container
+                                                    *ngFor="
+                                                        let size of order.color.sizes;
+                                                        let i = index
+                                                    "
+                                                >
+                                                    <tr *ngIf="size.orderedQty !== 0">
+                                                        <td>
+                                                                <img
+                                                           
+                                                        
+                                                            [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                            style="width: 24px; height: 24px; border-radius: 6px;"
+                                                        
+                                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                        
+                                                        />
+                                                    </td>
+                                                        <td>{{ size.label }}</td>
+                                                        <td>{{ size.orderedQty }}</td>
+                                                        <td>{{ size.price| currency:' ' }}</td>
+                                                        <td>
+                                                            {{
+                                                                (size.orderedQty *
+                                                                    size.price) | currency:' '
+                                                            }}
+                                                        </td>
+                                                        <td>
+                                                            <button
+                                                                type="button"
+                                                                (click)="
+                                                                    removeSize(
+                                                                        i,
+                                                                        size,
+                                                                        order,
+                                                                        orderIndex
+                                                                    )
+                                                                "
+                                                                class="btn"
+                                                            >
+                                                                <i
+                                                                    class="fas fa-times p-0 m-0"
+                                                                ></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                                <tr
+                                                    *ngIf="
+                                                        calculateOrderedQTYSum(
+                                                            order.color.sizes
+                                                        ) !== 0
+                                                    "
+                                                >
+                                                    <th colspan="2" class="text-center">Total</th>
+                                                    <th style=" color: #9E9E9E !important;">
+                                                        {{
+                                                            calculateOrderedQTYSum(
+                                                                order.color.sizes
+                                                            )
+                                                        }}
+                                                    </th>
+                                                    <th></th>
+                                                    <th  style=" color: #9E9E9E !important;">
+                                                        {{
+                                                            calculatePriceSum(
+                                                                order.color.sizes
+                                                            )| currency:' '
+                                                        }}
+                                                    </th>
+                                                </tr>
+                                            </tbody>
+                                            <tbody
+                                                *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
+                                                    order.color.sizes,
+                                                    orderIndex
+                                                )"
+                                            >
+                                                <ng-container
+                                                    *ngFor="
+                                                        let size of order.color.sizes;
+                                                        let i = index
+                                                    "
+                                                >
+                                                    <tr>
+                                                        <td>
+                                                            <img
+                                                            style="width: 24px; height: 24px; border-radius: 6px;"
+                                                       
+                                                    
+                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                        alt=" {{ order.color.colorName }}"
+                                                   
+                                                    
+                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                  
+                                                    />
+                                                </td>
+                                                        <td>{{ size.label }}</td>
+                                                        <td>
+                                                            {{
+                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                                    size.sizeRatio *
+                                                                    order.color.sizes[0]
+                                                                        .orderedPrePacks
+                
+                                                                        :  order.color.sizes[i]
+                                                                        .orderedPrePacks
+                
+                                                            }}
+                                                        </td>
+                                                        <td>{{ size.price | currency:' '}}</td>
+                                                        <td>
+                                                            {{
+                                                                !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                               ( size.sizeRatio *
+                                                                    order.color.sizes[0]
+                                                                        .orderedPrePacks *
+                                                                    size.price | currency:' '
+                                                                    ) 
+                                                                    : (order.color.sizes[i]
+                                                                    .orderedPrePacks *
+                                                                size.price | currency:' '
+                                                            )
+                
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                                <tr>
+                                                    <th colspan="2" class="text-center" >Total</th>
+                                                    <th>
+                                                        {{
+                                                            calculatePrepackOrderedQTYSum(
+                                                                order.color.sizes,
+                                                                orderIndex
+                                                            )
+                                                        }}
+                                                    </th>
+                                                    <th></th>
+                                                    <th>
+                                                        {{
+                                                            getTotalPrepackSizeAmount(
+                                                                order.color.sizes,
+                                                                orderIndex
+                                                            )| currency:' '
+                                                        }}
+                                                    </th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <!-- order by size summary table -->
+                                        <hr
+                                            style="
+                                                border-top: 2px solid #aaaaaa !important;
+                                            "
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+            <div class="p-3">
+
+                            <button
+                                [disabled]="orderSummary.length == 0"
+                                (click)="addToShoppingCart()"
+                                class="btn m-0 add-btn"
+                            >
+                                Add To Shopping Cart
+                            </button>
+            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="bg-white rounded p-4 my-4">
+                            <h4>Product Description</h4>
+                            <hr />
+                            <div [innerHTML]="productDetails?.description"></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div id="targetDiv" class="bg-white rounded p-4 my-4">
+                            <h4>Product Details</h4>
+                            <hr />
+                            <div class="row">
+                                <div class="col-6">
+                                    <h6>Product Type</h6>
+                                    <h6 style="padding: 10px 0px">SSIN</h6>
+                                    <h6>Department</h6>
+                                    <h6 style="padding: 10px 0px">Brand</h6>
+                                    <h6>SoldOut Date</h6>
+                                    <h6 style="padding: 10px 0px">Start Ship Date</h6>
+                                </div>
+                                <div class="col-6"  style="font-size: 12px;white-space: nowrap;">
+                                    <p>{{ productDetails?.entityObjectTypeName }}</p>
+                                    <p>{{ productDetails?.code }}</p>
+                                    <p>
+                                        <span
+                                            class="mr-2 p-2 border"
+                                            *ngFor="
+                                                let item of productDetails
+                                                    ?.entityDepartmentsNames.items
+                                            "
+                                            >{{ item }}</span
+                                        >
+                                    </p>
+                                    <p>{{ productDetails?.brand }}</p>
+                                    <p>{{ productDetails?.soldOutDate }}</p>
+                                    <p>{{ productDetails?.startShipDate }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   </div>
+                    
+                 
+               
+        
+                </p-tabPanel>
+           
+        
+            
+        
+          
+            </p-tabView>
+
+
+
+
+
+           
+        </div>
+        </div>
     </div>
-</div>
+<!-- </div> -->
 
 <p-confirmDialog #cd [style]="{ width: '25vw' }">
     <ng-template pTemplate="header">

@@ -1167,6 +1167,12 @@ namespace onetouch.AppItems
                             {
                                 ExtraDataSelectedValues extraDataSelectedValues = new ExtraDataSelectedValues();
                                 extraDataSelectedValues.value = varItem;
+                                //Iteration#42,1 MMT 08/20/2024 Add new property for the code[Start]
+                                var extraAttrObj = firstattributeCodes.Where(z => z.AttributeValue == varItem).FirstOrDefault();
+                                if (extraAttrObj != null)
+                                    extraDataSelectedValues.Code = extraAttrObj.AttributeCode;
+                                //Iteration#42,1 MMT 08/20/2024 Add new property for the code[End]
+
                                 extraDataSelectedValues.DefaultEntityAttachment = new AppEntityAttachmentDto();
                                 //YYY
                                 //41

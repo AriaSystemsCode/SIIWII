@@ -497,7 +497,10 @@ namespace onetouch.AppSiiwiiTransaction
                     BranchSSIN = input.BuyerBranchSSIN
                 });
                 //
-                var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses)
+                    .ThenInclude(z=>z.AddressTypeFk)
+                    .Include(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
+                    .Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
                 if (accountSSINBranchBuyer != null)
                 {
                     var addressObj = accountSSINBranchBuyer.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code == "DIRECT-SHIPPING" || x.AddressTypeFk.Code == "DISTRIBUTION-CENTER");
@@ -544,7 +547,9 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactAddressState = contactBuyerAddressState
                     
                 });
-                var accountSSINBranchBuy = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                var accountSSINBranchBuy = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk)
+                    .Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
+                    .Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
                 if (accountSSINBranchBuy != null)
                 {
                     var addressObj = accountSSINBranchBuy.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code== "BILLING");
@@ -1832,10 +1837,17 @@ namespace onetouch.AppSiiwiiTransaction
                 //                          }
                 //                      };
 
-                var totalCount = await filteredAppTransactions.CountAsync();
-                var objList = await pagedAndFilteredAppTransactions.ToListAsync();
-                var appTrans = ObjectMapper.Map<List<GetAllAppTransactionsForViewDto>>(objList);
-
+                    var totalCount = await filteredAppTransactions.CountAsync();
+                    var objList = await pagedAndFilteredAppTransactions.ToListAsync();
+                    var appTrans = ObjectMapper.Map<List<GetAllAppTransactionsForViewDto>>(objList);
+                foreach (var tran in appTrans)
+                {
+                    if (tran.TenantOwner != null)
+                    {  
+                        var creatorTenant =await  TenantManager.GetByIdAsync(int.Parse(tran.TenantOwner.ToString()));
+                        tran.CreatorTenantName = creatorTenant.Name;
+                    }
+                }
                 return new PagedResultDto<GetAllAppTransactionsForViewDto>(
                     totalCount,
                     appTrans
@@ -2389,6 +2401,11 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         itemMajor.Quantity = qty;
                         itemMajor.Amount = itemMajor.NetPrice * qty;
+                        //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[Start]
+                        filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
+                        filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                        await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                        //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }
@@ -2445,9 +2462,31 @@ namespace onetouch.AppSiiwiiTransaction
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }
+                //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[Start]
+                filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
+                filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
                 return true;
             }
         }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[Start]
+        public async Task<bool> IsManualCompany(string companySSIN)
+        {
+            var contact = await _appContactRepository.GetAll().Where(z => z.SSIN == companySSIN).FirstOrDefaultAsync();
+            if (contact != null)
+            {
+                if (!string.IsNullOrEmpty(contact.PartnerId.ToString()))
+                    return false;
+                else
+                    return true;
+            }
+            else
+            { 
+                return false;
+            }
+        }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[End]
 
         [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
         public async Task AddTransactionDetails(GetAppMarketplaceItemDetailForViewDto input, string transactionId, string transactionType)

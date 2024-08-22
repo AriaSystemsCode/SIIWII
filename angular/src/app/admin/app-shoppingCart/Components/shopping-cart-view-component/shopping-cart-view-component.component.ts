@@ -83,6 +83,7 @@ export class ShoppingCartViewComponentComponent
   companeyNames:GetAccountInformationOutputDto[];
   currentTab:number
   shareDone:boolean=false;
+  openActions:boolean =false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -95,11 +96,18 @@ export class ShoppingCartViewComponentComponent
 
   }
   ngOnInit(): void {
-   
+   console.log(this.openActions, "openActions")
   }
   loadCommentsList() {
+    const screenWidth = window.innerWidth;
+    const tabletWidth = 768; // iPads and tablets
     // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
+   //if(screenWidth <= tabletWidth)
     this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+    
+    //else 
+      this.commentParentComponent?.last?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+      
   }
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
@@ -218,7 +226,10 @@ export class ShoppingCartViewComponentComponent
           this.canChange= this.isOwnedByMe
            this.transactionCode=res?.code;
           
-           this.loadCommentsList()
+   
+
+        this.loadCommentsList()
+      
    
            //lines
            this._AppTransactionServiceProxy

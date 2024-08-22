@@ -1,10 +1,16 @@
 .previewbtn{
-    background-color: #f88011;
+    border-radius: 6px;
+    background:  #4A0D4A;
+    box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.10);
     color: #fff;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    z-index: 9999;
+    // position: absolute;
+    // top: 5px;
+    // right: 25px;
+    // z-index: 9999;
+    margin-right: 10px;
+
+    width: 99px;
+    height: 46px;
 }
 
  
@@ -18,12 +24,17 @@
     z-index: 9999;
 }
 .headertxt{
-    color: #F88011 !important;
+    color: #1B101B !important;
+    font-size: 14px;
+font-style: normal;
+font-weight: 600;
+
 }
 
 .label{
-    font-size: 12px;
-    color: #700066;
+    color: #1B101B;
+    font-size: 16px;
+    font-style: normal;
     font-weight: 600;
 }
 
@@ -48,5 +59,5 @@
 }
 .tab-cont {
     max-height: 550px;
-    overflow: hidden scroll;
+    // overflow: hidden scroll;
 }
