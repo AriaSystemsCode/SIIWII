@@ -200,7 +200,7 @@
                     </div>
                 </span>
             </div>
-            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.amount" class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
+            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="ml-3 mt-2 pt-3"> 
                 <h5 class="text-white"> {{currencySymbol }} {{shoppingCartSummary?.amount | currency:' ' }}</h5>  
             </div>
 
