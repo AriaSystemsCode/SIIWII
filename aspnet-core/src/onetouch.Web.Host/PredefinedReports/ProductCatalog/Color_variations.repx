@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="22.2.4.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Color_Size" ScriptsSource="&#xD;&#xA;private void tableCell24_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void tableCell52_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;&#xD;&#xA; &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Color_Size_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;//Color_Size.Width = 1000;    &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Detail_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA; &#xD;&#xA;&#xD;&#xA;        &#xD;&#xA;                &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Detail_BeforePrint_1(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA; &#xD;&#xA;&#xD;&#xA;    &#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void table2_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;    //table2.WidthF=1200;&#xD;&#xA;    &#xD;&#xA;}&#xD;&#xA;" SnapGridSize="25" ReportUnit="TenthsOfAMillimeter" Landscape="true" Margins="0, 0, 3, 0" PageWidth="2794" PageHeight="2159" Version="22.2" DataMember="Color_Sizes" DataSource="#Ref-0" Dpi="254" Font="Arial, 9.75pt">
+  <Extensions>
+    <Item1 Ref="2" Key="VSReportExtInfo" Value=".repx" />
+  </Extensions>
+  <Parameters>
+    <Item1 Ref="4" ValueInfo="0" Name="ItemId" Type="#Ref-3" />
+    <Item2 Ref="6" Description="ItemCode" Name="ItemCode" />
+    <Item3 Ref="7" Description="ItemName" Name="ItemName" />
+    <Item4 Ref="8" Description="ItemDesc" Name="ItemDesc" />
+    <Item5 Ref="10" Description="productListId" ValueInfo="0" Name="productListId" Type="#Ref-9" />
+    <Item6 Ref="11" Name="attachmentBaseUrl2" />
+    <Item7 Ref="12" ValueInfo="0" Name="tenantId2" Type="#Ref-3" />
+    <Item8 Ref="13" Description="showNo" ValueInfo="2" Name="showNo" Type="#Ref-9" />
+    <Item9 Ref="14" ValueInfo="0" Name="itemlistid" Type="#Ref-3" />
+    <Item10 Ref="15" Description="mimimumInStockQty" ValueInfo="0" Name="mimimumInStockQty" Type="#Ref-9" />
+    <Item11 Ref="17" Description="onlyInStockColors" ValueInfo="False" Name="onlyInStockColors" Type="#Ref-16" />
+  </Parameters>
+  <Bands>
+    <Item1 Ref="18" ControlType="TopMarginBand" Name="TopMargin" HeightF="3" Dpi="254" />
+    <Item2 Ref="19" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="0" Dpi="254" />
+    <Item3 Ref="20" ControlType="DetailBand" Name="Detail" KeepTogetherWithDetailReports="true" HeightF="448.232666" KeepTogether="true" Dpi="254" BackColor="DarkKhaki">
+      <HierarchyPrintOptions Ref="21" Indent="50.8" />
+      <MultiColumn Ref="22" ColumnCount="13" Layout="AcrossThenDown" Mode="UseColumnCount" />
+      <Controls>
+        <Item1 Ref="23" ControlType="XRLabel" Name="label3" Text="ItemDesc" SizeF="201.083328,39.6875153" LocationFloat="13.8397522,383.545166" Dpi="254" BackColor="Transparent" BorderColor="Silver" Borders="All">
+          <ExpressionBindings>
+            <Item1 Ref="24" EventName="BeforePrint" PropertyName="Text" Expression="'Order:'" />
+          </ExpressionBindings>
+          <StylePriority Ref="25" UseBackColor="false" UseBorderColor="false" UseBorders="false" />
+        </Item1>
+        <Item2 Ref="26" ControlType="XRLabel" Name="label4" Text="ItemDesc" SizeF="176.083328,39.6875153" LocationFloat="13.839756,320.045166" Dpi="254" BackColor="Transparent">
+          <ExpressionBindings>
+            <Item1 Ref="27" EventName="BeforePrint" PropertyName="Text" Expression="'ATS:'+[AttributeValue3]&#xA;" />
+          </ExpressionBindings>
+          <StylePriority Ref="28" UseBackColor="false" />
+        </Item2>
+        <Item3 Ref="29" ControlType="XRLabel" Name="label2" Text="ItemDesc" SizeF="176.083328,50.270874" LocationFloat="13.839756,269.7743" Dpi="254" BackColor="Transparent">
+          <ExpressionBindings>
+            <Item1 Ref="30" EventName="BeforePrint" PropertyName="Text" Expression="iif(len(trim([AttributeValue]))&gt;7 and [DataSource.CurrentRowIndex] &gt;0&#xA;,Substring([AttributeValue],0 ,6 )+'...',[AttributeValue])&#xA;&#xA;" />
+          </ExpressionBindings>
+          <StylePriority Ref="31" UseBackColor="false" />
+        </Item3>
+        <Item4 Ref="32" ControlType="XRLabel" Name="label1" Text="ItemDesc" SizeF="176.083328,47.62506" LocationFloat="13.839756,222.149231" Dpi="254" BackColor="Transparent">
+          <ExpressionBindings>
+            <Item1 Ref="33" EventName="BeforePrint" PropertyName="Text" Expression="?ItemCode" />
+          </ExpressionBindings>
+          <StylePriority Ref="34" UseBackColor="false" />
+        </Item4>
+        <Item5 Ref="35" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="176.083328,185.128326" LocationFloat="13.839756,25" Dpi="254">
+          <ExpressionBindings>
+            <Item1 Ref="36" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[Attachment]" />
+            <Item2 Ref="37" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] &gt;0 and [DataSource.CurrentRowIndex] &lt;20&#xA;" />
+          </ExpressionBindings>
+        </Item5>
+      </Controls>
+      <ExpressionBindings>
+        <Item1 Ref="38" EventName="BeforePrint" PropertyName="BackColor" Expression="Iif([DataSource.CurrentRowIndex] != 21, &#xA;Iif([DataSource.CurrentRowIndex] % 2 = 0, 'grey', 'white'), 'red')" />
+      </ExpressionBindings>
+      <StylePriority Ref="39" UseBackColor="false" UseTextAlignment="false" />
+    </Item3>
+    <Item4 Ref="40" ControlType="PageHeaderBand" Name="PageHeader" HeightF="131.083359" Dpi="254">
+      <Controls>
+        <Item1 Ref="41" ControlType="XRLabel" Name="label7" TextFormatString="{0:MM/dd/yyyy}" CanGrow="false" CanShrink="true" TextAlignment="MiddleCenter" SizeF="352.3982,60" LocationFloat="38.7315979,71.08336" Dpi="254" Font="Arial, 10pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+          <ExpressionBindings>
+            <Item1 Ref="42" EventName="BeforePrint" PropertyName="Text" Expression="'Available Colors :'" />
+          </ExpressionBindings>
+          <StylePriority Ref="43" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
+        </Item1>
+        <Item2 Ref="44" ControlType="XRLabel" Name="label6" Text="ItemDesc" SizeF="1038.625,47.62506" LocationFloat="506.493927,0" Dpi="254" Font="Arial, 12pt" ForeColor="Silver" BackColor="Transparent">
+          <ExpressionBindings>
+            <Item1 Ref="45" EventName="BeforePrint" PropertyName="Text" Expression="?ItemName" />
+          </ExpressionBindings>
+          <StylePriority Ref="46" UseFont="false" UseForeColor="false" UseBackColor="false" />
+        </Item2>
+        <Item3 Ref="47" ControlType="XRLabel" Name="label5" Text="ItemDesc" SizeF="424.791656,47.62506" LocationFloat="38.7315979,0" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="IndianRed" BackColor="Transparent">
+          <ExpressionBindings>
+            <Item1 Ref="48" EventName="BeforePrint" PropertyName="Text" Expression="?ItemCode" />
+          </ExpressionBindings>
+          <StylePriority Ref="49" UseFont="false" UseForeColor="false" UseBackColor="false" />
+        </Item3>
+      </Controls>
+    </Item4>
+  </Bands>
+  <Scripts Ref="50" OnBeforePrint="Color_Size_BeforePrint" />
+  <StyleSheet>
+    <Item1 Ref="51" Name="Title" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 14.25pt" ForeColor="255,64,70,80" BackColor="Transparent" BorderColor="Black" Sides="None" StringFormat="Near;Near;0;None;Character;GenericDefault" BorderWidthSerializable="1" />
+    <Item2 Ref="52" Name="DetailCaption1" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 8.25pt, style=Bold" ForeColor="255,64,70,80" BackColor="White" BorderColor="White" Sides="Left" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="2" />
+    <Item3 Ref="53" Name="DetailData1" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 8.25pt" ForeColor="Black" BorderColor="Transparent" Sides="Left" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="2" />
+    <Item4 Ref="54" Name="DetailData3_Odd" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 8.25pt" ForeColor="Black" BackColor="255,243,245,248" BorderColor="Transparent" Sides="None" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="1" />
+    <Item5 Ref="55" Name="PageInfo" BorderStyle="Inset" Padding="15,15,0,0,254" Font="Arial, 8.25pt, style=Bold" ForeColor="255,64,70,80" StringFormat="Near;Near;0;None;Character;GenericDefault" />
+  </StyleSheet>
+  <ReportPrintOptions Ref="56" PrintOnEmptyDataSource="false" />
+  <ParameterPanelLayoutItems>
+    <Item1 Ref="57" LayoutItemType="Parameter" Parameter="#Ref-4" />
+    <Item2 Ref="58" LayoutItemType="Parameter" Parameter="#Ref-6" />
+    <Item3 Ref="59" LayoutItemType="Parameter" Parameter="#Ref-7" />
+    <Item4 Ref="60" LayoutItemType="Parameter" Parameter="#Ref-8" />
+    <Item5 Ref="61" LayoutItemType="Parameter" Parameter="#Ref-10" />
+    <Item6 Ref="62" LayoutItemType="Parameter" Parameter="#Ref-11" />
+    <Item7 Ref="63" LayoutItemType="Parameter" Parameter="#Ref-12" />
+    <Item8 Ref="64" LayoutItemType="Parameter" Parameter="#Ref-13" />
+    <Item9 Ref="65" LayoutItemType="Parameter" Parameter="#Ref-14" />
+    <Item10 Ref="66" LayoutItemType="Parameter" Parameter="#Ref-15" />
+    <Item11 Ref="67" LayoutItemType="Parameter" Parameter="#Ref-17" />
+  </ParameterPanelLayoutItems>
+  <ComponentStorage>
+    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v22.2" Name="sqlDataSource1" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxDb25uZWN0aW9uIE5hbWU9IlJlcG9ydHMiIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlN0b3JlZFByb2NRdWVyeSIgTmFtZT0iQ29sb3JfU2l6ZXMiPjxQYXJhbWV0ZXIgTmFtZT0iQEl0ZW1JZCIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uSW50NjQpKD9JdGVtSWQpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAYXR0YWNobWVudEJhc2VVcmwiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLlN0cmluZykoP2F0dGFjaG1lbnRCYXNlVXJsMik8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBzaG93Tm8iIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDY0KSg/c2hvd05vKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHByb2R1Y3RMaXN0SWQiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDY0KSg/aXRlbWxpc3RpZCk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBvbmx5SW5TdG9ja0NvbG9ycyIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uQm9vbGVhbikoP29ubHlJblN0b2NrQ29sb3JzKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQG1pbWltdW1JblN0b2NrUXR5IiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5JbnQ2NCkoP21pbWltdW1JblN0b2NrUXR5KTwvUGFyYW1ldGVyPjxQcm9jTmFtZT5Db2xvcl9TaXplczI8L1Byb2NOYW1lPjwvUXVlcnk+PFJlc3VsdFNjaGVtYT48RGF0YVNldCBOYW1lPSJzcWxEYXRhU291cmNlMSI+PFZpZXcgTmFtZT0iQ29sb3JfU2l6ZXMiIC8+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
+  </ComponentStorage>
+  <ObjectStorage>
+    <Item1 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v22.2" Ref="3" Content="System.Int64" Type="System.Type" />
+    <Item2 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v22.2" Ref="9" Content="System.Int32" Type="System.Type" />
+    <Item3 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v22.2" Ref="16" Content="System.Boolean" Type="System.Type" />
+  </ObjectStorage>
+</XtraReportsLayoutSerializer>
