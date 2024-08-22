@@ -169,7 +169,7 @@
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
                         <div class="d-flex"> <label class="label pt-1">Categories</label>  <button *ngIf="hideCatBtn  && allRecords.length == 0" (click)="showCatBtn = true ;hideCatBtn= false" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button></div> 
 
-                         <div class="d-flex" *ngIf="showCatBtn || allRecords.length == 0 ">
+                         <!-- <div class="d-flex" *ngIf="showCatBtn || allRecords.length == 0 ">
                             <div  class="formGroup  col-8">
                               
                                 <input
@@ -200,7 +200,7 @@
                         Cancel
                        
                         </button>
-                         </div>
+                         </div> -->
 
 <div class="d-flex" *ngIf="!showCatBtn && appTransactionsForViewDto?.entityCategories
 ?.length === 0">
@@ -275,18 +275,18 @@
                         ></p-treeSelect> -->
                         <!-- &&  (appTransactionsForViewDto?.entityCategories  ||  appTransactionsForViewDto?.entityCategories
                         ?.length === 0) -->
-                        <div *ngIf="selectedCategories && selectedCategories.length > 0 && showSelectedCat" class="selected-items-container">
+                        <!-- <div *ngIf="selectedCategories && selectedCategories.length > 0 && showSelectedCat" class="selected-items-container">
                             <div *ngFor="let item of selectedCategories" class="selected-item">
                                 <span>{{ item.label }}</span>
                             </div>
-                        </div>
+                        </div> -->
 <div class="d-flex" *ngIf="!showCatBtn && allRecords.length != 0">
     <!-- {{selectedCategories}} -->
                     <!-- Selected Items Display -->
 
 
 <!-- TreeSelect Component -->
-<div  class="flex justify-content-center treeSel"   style="z-index:9999999999 !important ;" >
+<!-- <div  class="flex justify-content-center treeSel"   style="z-index:9999999999 !important ;" >
     <p-treeSelect 
     class="w-full md:w-20rem"
     containerStyleClass="w-full"
@@ -366,7 +366,7 @@
             </div>
         </ng-template>
     </p-treeSelect>
-</div>
+</div> -->
 
                   
                         <button (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button>
