@@ -68,7 +68,7 @@
                     </div>
                 </div>
                 <div class="col-md-6 ">
-                    <div class="mb-3 enteredDate">
+                    <div class="mb-3 ">
                         <label class="form-label">Entered Date*</label>
                         <div class="position-relative">
                         
@@ -76,8 +76,9 @@
                         [appendTo]="'body'"
                             formControlName="enteredDate"
                             [showIcon]="true"
-                            [disabled]="true"
-                            [readonlyInput]="true"
+                            [readonlyInput]="false"
+                            [minDate]="today"
+                         
                          
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
@@ -109,7 +110,7 @@
                         submitted &&  startDateMsg
                         "
                     >
-                    start date Can’t be after the Entered date 
+                    start date Can’t be befor the Entered date 
                     </small>
                     </div>
                 </div>
@@ -135,7 +136,7 @@
                         submitted &&  comtDateMsg
                         "
                     >
-                    Complete date Can’t be after the Start date 
+                    Complete date Can’t be before the Start date 
                     </small>
                     </div>
                 </div>
@@ -163,7 +164,7 @@
                     submitted &&  avalabletDateMsg
                     "
                 >
-                Available date Can’t be after the complete date 
+                Available date Can’t be before the complete date 
                 </small>
                 </div>
                 
@@ -278,6 +279,8 @@
                             (onClick)="addNewBuyer()">
                         </p-dropdown> -->
                         <div>
+                          
+                            
                             <p-dropdown
                                 [options]="buyerContacts"
                                 formControlName="buyerContactName"
@@ -285,7 +288,7 @@
                                 optionLabel="name"
                                 filterBy="name"
                                 [disabled]="buyerComapnyId === 0"
-                                placeholder="Please Select Buyer Name"
+                                [placeholder]="orderForm.controls['buyerContactName']?.value ? orderForm.controls['buyerContactName']?.value : 'Please Select Buyer Name'"
                                 (onFilter)="handleBuyerNameSearch($event)"
                                 [emptyMessage]="emptyMessage != '' ? emptyMessage : ''"
                                 (onChange)="handleBuyerNameChange($event)"
@@ -296,9 +299,18 @@
                                 </ng-template>
                         
                                 <ng-template pTemplate="empty">
-                                    <div class="d-flex justify-content-between">
+                                
+                                    <div *ngIf="buyerContacts.length === 0 && searchTerm == undefined" class="no-data">
+                                        No data found
+                                    </div>
+                                </ng-template>
+
+
+                                <ng-template class="" pTemplate="footer">
+                                 
+                                    <div *ngIf="searchTerm != undefined && showAddBuyBtn" class="d-flex justify-content-between tem-footer">
                                         <span>{{searchTerm}} </span>
-                                        <button  pButton type="button" class="addTextBtn" label="Add New" (click)="addNewBuyer()"></button>
+                                        <button  pButton type="button" class="addTextBtn" label="Add New" (click)="addNewBuyer();orderForm.controls['buyerContactName']?.setValue(searchTerm) "></button>
                                     </div>
                                 </ng-template>
                             </p-dropdown>
@@ -517,10 +529,32 @@
                                 formControlName="sellerContactName"
                                 [filter]="true"
                                 optionLabel="name"
-                                placeholder="Please Select Seller Contact Name"
+                                filterBy="name"
+                                [placeholder]="orderForm.controls['sellerContactName'].value? orderForm.controls['sellerContactName'].value : 'Please Select Seller Contact Name'"
                                 (onFilter)="handleSellerNameSearch($event)"
                                 (onChange)="handleSellerNameChange($event)"
-                            ></p-dropdown>
+                            >
+                               <ng-template let-itemS pTemplate="itemS">
+                                {{ itemS.name }}
+                            </ng-template>
+                    
+                            <ng-template pTemplate="empty">
+                            
+                                <div *ngIf="sellerContacts.length === 0 && searchTermSeller == undefined" class="no-data">
+                                    No data found
+                                </div>
+                            </ng-template>
+
+
+                            <ng-template class="" pTemplate="footer">
+                             
+                                <div *ngIf="searchTermSeller != undefined && showAddSellBtn" class="d-flex justify-content-between tem-footer">
+                                    <span>{{searchTermSeller}} </span>
+                                    <button  pButton type="button" class="addTextBtn" label="Add New" (click)="addNewSeller();"></button>
+                                </div>
+                            </ng-template>
+
+                        </p-dropdown>
 
                             <small
                                 class="text-danger"

@@ -70,17 +70,18 @@
         <div class="col-md-6 my-2">
             <div class="formGroup">
                 <label class="label">Contact Name</label>
-                <p-dropdown   [filter]="true" [filterValue]="contactFilterValue" (onFilter)="handleContactSearch($event)" class="w-100" [placeholder]="tempContact ? contactNamePlaceholder : defaultcontactNamePlaceholder" 
+               
+                <p-dropdown   [filter]="true" [filterValue]="contactFilterValue" (onFilter)="handleContactSearch($event)" class="w-100" [placeholder]="tempContact ? contactNamePlaceholder : appTransactionsForViewDto.buyerContactName ? appTransactionsForViewDto.buyerContactName : defaultcontactNamePlaceholder" 
                 placeholder="Select Contact Name" [options]="allContacts"
-                *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo" [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
+                *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo" [(ngModel)]=" appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
                 [ngClass]="{'tempAccount': tempContact}"  optionLabel="name" name="selectedContact" (onChange)="onChangeContact($event)" ></p-dropdown>
                
                         
                     <div *ngIf="activeTab==shoppingCartoccordionTabs.orderInfo">
                     <p class=" previewValue text-nowrap  m-0 p-0 pl-2 col-6" *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
-                        {{ appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name }}
+                        {{ appTransactionsForViewDto.buyerContactName ? appTransactionsForViewDto.buyerContactName : appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name }}
                     </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  pl-5 col-6" *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
+                    <p class=" previewValue text-nowrap  m-0 p-0  pl-5 col-6" *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name && !appTransactionsForViewDto.buyerContactName ">
                         -
                     </p>
                 </div>

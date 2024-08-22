@@ -113,7 +113,9 @@ color: #4a0d4a;
 }
 
 
-
+.tem-footer {
+    padding: 4px 10px;
+}
 ::ng-deep  .calendar-form {
     .p-calendar {
         width: 100% !important;
@@ -140,16 +142,16 @@ img {
 p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
     border: 1px solid #a80000 !important;
 }
-.enteredDate {
-    .p-disabled, .p-component:disabled {
-        opacity: 1 !important;
-    color: #1B101B !important;
-    }
-    .p-calendar-w-btn .p-datepicker-trigger {
-        background: #808080 !important;
+// .enteredDate {
+//     .p-disabled, .p-component:disabled {
+//         opacity: 1 !important;
+//     color: #1B101B !important;
+//     }
+//     .p-calendar-w-btn .p-datepicker-trigger {
+//         background: #808080 !important;
 
-    }
-}
+//     }
+// }
 
 }
 

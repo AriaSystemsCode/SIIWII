@@ -702,6 +702,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     saveSelection() {
         // Implement your save logic here
         this.showSelectedCat = true
+        this.closeDropdown();
+
         console.log(this.selectedCategories ,'this.selectedCategories ')
         this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
         console.log(this.appTransactionsForViewDto.entityCategories,'this.appTransactionsForViewDto.entityCategories')
@@ -712,7 +714,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // Implement your cancel logic here
         // this.selectedCategories = []; // Or any logic to reset selection
         this.closeDropdown();
-        this.notify.info('Selection canceled.');
+        // this.notify.info('Selection canceled.');
     }
     closeDropdown() {
         if (this.treeSelect) {
@@ -727,7 +729,7 @@ saveCat(category:any){
         name: category.name,
         objectId: undefined,
         parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
-        id: undefined
+        id: this.editSubCat?  this.parentCat.parentId : undefined
     });
 
 
@@ -763,7 +765,7 @@ saveCat(category:any){
         // this.saving = false;
     }))
     .subscribe(() => {
-       this.notify.info(this.l('SavedSuccessfully'));
+    //    this.notify.info(this.l('SavedSuccessfully'));
        this.getAppTransactionList()
 
     });

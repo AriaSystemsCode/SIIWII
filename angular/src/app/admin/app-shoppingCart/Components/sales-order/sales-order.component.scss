@@ -93,6 +93,9 @@ font-weight: 600;
 
 ::ng-deep{
 
+    .p-treeselect-panel .p-treeselect-header .p-treeselect-filter-container .p-treeselect-filter-icon {
+        top: 16px !important;
+    }
     .p-treeselect{
         width: 100% !important;
     }

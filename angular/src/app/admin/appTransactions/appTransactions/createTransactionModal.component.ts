@@ -107,13 +107,16 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     minStartDate:Date;
     sellerCurrencyCode;
     emptyMessage: string = 'No results found';
-    searchTerm: string = '';
+    searchTerm: string = undefined;
+    searchTermSeller: string = undefined;
     filteredBuyerContacts: any[] ; 
     today: Date ;
     startDateMsg:boolean = false
     comtDateMsg:boolean = false
     avalabletDateMsg:boolean = false
     showAddTextBtn:boolean = false
+    showAddSellBtn:boolean = false
+    showAddBuyBtn:boolean = false
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -148,7 +151,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
-        this.orderForm.controls['enteredDate'].disable();
+
        
     }
 
@@ -178,7 +181,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
-        this.orderForm.controls['enteredDate'].disable();
+  
     
 
     }
@@ -421,6 +424,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
     handleBuyerCompanyChange(event: any) {
+        this.searchTerm = ''
         this.buyerComapnyId = event.value.id;
         this.buyerCompanySSIN = event.value.accountSSIN;
         this.currencyCode = event.value.currencyCode;
@@ -446,10 +450,14 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
     handleBuyerNameSearch(event: any) {
-        console.log(event,'event')
-        console.log(event.filter,'event.filter')
+      
 if (event.filter != '' || event.filter != undefined){
     this.searchTerm = event.filter;
+    this.showAddBuyBtn = true
+
+
+}else {
+    this.searchTerm =undefined;
 
 }
         clearTimeout(this.searchTimeout);
@@ -457,12 +465,12 @@ if (event.filter != '' || event.filter != undefined){
             this._AppTransactionServiceProxy
                 .getAccountRelatedContacts(this.buyerComapnyId, event.filter)
                 .subscribe((res: any) => {
-                    console.log(this.buyerContacts,'this.buyerContacts')
+               
                     if(this.buyerContacts?.length == 0  && event.filter != undefined) {
-                        this.emptyMessage = ` Click to add "${this.searchTerm}".`;
-                        // this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
-                        this.showAddTextBtn = true
-                        // console.log(`Added new buyer: ${'kk'}`);
+                        // this.emptyMessage = ` Click to add "${this.searchTerm}".`;
+                        // // this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+                        // this.showAddTextBtn = true
+                     
                     }
                     else {
                         this.buyerContacts = [...res];
@@ -471,34 +479,59 @@ if (event.filter != '' || event.filter != undefined){
               
 
                 });
-        }, 500);
+        }, 0);
     }
     addNewBuyer() {
-        console.log(`helloooooo`);
-        console.log(`Added new buyer: ${this.searchTerm}`);
-                this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
-                console.log(this.buyerContacts,`this.buyerContacts`);
-     
-    //      if (this.searchTerm) {
-    //   const newBuyer = { name: this.searchTerm, id: this.buyerContacts.length + 1 };
-    //   this.buyerContacts.push(newBuyer);
+        this.orderForm.controls['buyerContactName'].setValue(this.searchTerm);
 
-    //   console.log(`Added new buyer: ${this.searchTerm}`);
-    // }
-         
+                this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+        //  this.searchTerm=  undefined
+    this.showAddBuyBtn = true
+
+
       
       }
+      addNewSeller() {
+        // this.searchTermSeller= undefined
+       this.orderForm.controls['sellerContactName'].setValue(this.searchTermSeller);
+
+               this.sellerContacts.push({ name: `  ${this.searchTermSeller}`, id: this.sellerContacts.length + 1 });
+               this.showAddSellBtn = false
+               console.log(this.orderForm.controls['sellerContactName'].value,'value')
+     
+     }
     handleSellerNameSearch(event: any) {
+        if (event.filter != '' || event.filter != undefined){
+            this.searchTermSeller = event.filter;
+            this.showAddSellBtn = true
+
+        
+        }else {
+            this.searchTermSeller =undefined;
+        
+        }
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {
             console.log(this.buyerComapnyId);
             this._AppTransactionServiceProxy
                 .getAccountRelatedContacts(this.sellerCompanyId, event.filter)
                 .subscribe((res: any) => {
-                    this.sellerContacts = [...res];
+                    if(this.sellerContacts?.length == 0  && event.filter != undefined) {
+                        // this.emptyMessage = ` Click to add "${this.searchTerm}".`;
+                        // // this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+                        // this.showAddTextBtn = true
+                     
+                    }
+                    else {
+                        this.sellerContacts = [...res];
+
+                    }
+                  
                 });
         }, 500);
     }
+
+    
     handleBuyerNameChange(event: any) {
         this.buyerContactId = event.value.id;
         this.buyerContactSSIN = event.value.ssin;
@@ -607,17 +640,17 @@ if (event.filter != '' || event.filter != undefined){
                         .value as ICreateOrEditAppTransactionsDto;
                     this.body = {
                         sellerContactName:
-                            this.orderForm.value?.sellerContactName?.name &&
+                        this.orderForm.controls['sellerContactName']?.value ? this.orderForm.controls['sellerContactName']?.value : this.orderForm.value?.sellerContactName?.name &&
                                 this.orderForm.value?.sellerContactName?.name !==
                                 null
                                 ? this.orderForm.value?.sellerContactName?.name
-                                : null,
+                                :   null,
                         buyerContactName: this.isBuyerTempAccount
                             ? this.orderForm.value?.buyerContactName
                             : this.orderForm.value?.buyerContactName?.name &&
                                 this.orderForm.value?.buyerContactName !== null
                                 ? this.orderForm.value?.buyerContactName?.name
-                                : null,
+                                :  this.orderForm.controls['buyerContactName']?.value ? this.orderForm.controls['buyerContactName']?.value :null,
                         sellerContactId:
                             this.sellerContactId === 0
                                 ? null
@@ -664,6 +697,10 @@ if (event.filter != '' || event.filter != undefined){
                         availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString()),
                         reference: this.orderForm.controls['reference']?.value
                     };
+
+                    console.log(this.orderForm.value?.buyerContactName,'this.orderForm.value?.buyerContactName')
+                    console.log(this.orderForm.value?.buyerContactName.name,'name')
+                    console.log(this.orderForm.controls['buyerContactName']?.value,'value')
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,
                     //     sellerId: this.sellerCompanyId,
@@ -1086,7 +1123,7 @@ if (event.filter != '' || event.filter != undefined){
         this.minDate.setMonth(prevMonth);
         this.minDate.setFullYear(prevYear);
         this.orderForm.controls['enteredDate'].setValue(new Date());
-        this.orderForm.controls['enteredDate'].disable();
+
 
     }
 }
