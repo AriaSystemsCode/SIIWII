@@ -11,15 +11,16 @@
     <div *ngIf="!editMode">--> 
 
     <input type="text" id="AppEntity_Code" 
-     [readonly]="!sycSegmentIdentifierDefinitionDto.isEditable"
+     [readonly]="!sycSegmentIdentifierDefinitionDto.isEditable || editMode"
      class="form-control form-control-border-grey"
      name="Code"  
      [value]="code ? code : ''"
      [placeholder]="placeHolder"
      [ngClass]="classes"
     (input)="OnGetCodeValue($event)"
-    [readOnly]=readonly
     [ngStyle]="styles"
-    required/>
+    maxlength="maxlength"
+    required
+    style="background-color: #EEEEEE !important;border: none !important;"/>
 
 </div>

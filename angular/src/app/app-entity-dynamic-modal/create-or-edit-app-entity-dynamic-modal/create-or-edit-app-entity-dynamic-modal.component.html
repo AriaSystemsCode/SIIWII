@@ -18,10 +18,10 @@
                     <div class="modal-content-wrapper">
                         <div class="modal-header" style="display: block;background-color: #ffffff !important;">
                             <h4 class="modal-title text-left" style="display: block;">
-                                <span *ngIf="appEntity?.id">{{l("Edit")}} {{entityObjectType.name}}</span>
-                                <span *ngIf="!appEntity?.id">{{l("CreateNew")}} {{entityObjectType.name}}</span>
+                                <span *ngIf="appEntity?.id" class="font-weight-bold">{{l("Edit")}} {{entityObjectType.name}}</span>
+                                <span *ngIf="!appEntity?.id" class="font-weight-bold">{{l("CreateNew")}} {{entityObjectType.name}}</span>
                             </h4>
-                            <p>{{l("PleaseFillTheBelowInformation")}}</p>
+                            <p>* {{l("PleaseFillTheBelowInformation")}}</p>
 
                             <button style="position: absolute;right: 8px;top: 8px;" type="button" class="close" (click)="close()"
                             aria-label="Close" [disabled]="saving">
@@ -32,8 +32,8 @@
 
                             <div class="form-group">
                                 <label for="AppEntity_Code">
+                                    <span class="required">* </span>
                                     {{l("Code")}}
-                                    <span class="required">*</span>
                                     <span class="text-danger ml-3" *ngIf="showCodeErrMsg">{{ 'CodeIsRequired' | localize }}</span>
                                 </label>
                                 <app-codes *ngIf="!appEntity?.id"
@@ -41,29 +41,69 @@
                                     [code]="appEntity.code"
                                     [editMode]=false
                                     placeHolder="Add your code"
-                                    (getCodeValue)="getCodeValue($event)" >
+                                    (getCodeValue)="getCodeValue($event)" 
+                                    [maxlength]="10">
                                 </app-codes>
                                 <app-codes *ngIf="appEntity?.id"
                                     [objectType]="entityObjectType.code"
                                     [editMode]=true
                                     [code]="appEntity.code"
-                                    (getCodeValue)="getCodeValue($event)" >
+                                    (getCodeValue)="getCodeValue($event)"
+                                    [maxlength]="10" >
                                 </app-codes>
 
                             </div>
 
                             <!-- <div class="form-group">
-                                    <label for="AppEntity_Code">{{l("Code")}} <span class="required">*</span></label>
+                                    <label for="AppEntity_Code">{{l("Code")}} <span class="required">* </span></label>
                                     <input type="text" id="AppEntity_Code" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.code" name="Code"     required/>
                                 </div> -->
 
                                 <div class="form-group">
-                                    <label for="AppEntity_Name">{{l("Name")}} <span class="required">*</span></label>
+                                    <span class="required">* </span>  <label for="AppEntity_Name">{{l("Name")}} </label>
                                     <input type="text" id="AppEntity_Name" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.name" name="Name"     required/>
+                                </div>
+                                 <div class="form-group d-flex" *ngIf="!appEntity?.id">
+                                    <input [disabled]="!enableAddToLookup" type="checkbox" id="AppEntity_AddToLookup" class="form-control form-control-sm  col-1 mr-3" [(ngModel)]="addToLookup" name="addToLookup"/>
+                                    <label for="AppEntity_AddToLookup" class="pt-2">{{l("Add to lookup")}} </label>
+                                </div>
+
+                              
+
+                                <div class="row col-12">
+                                    <div class="mr-3">
+                                        <input
+                                            type="radio"
+                                            id="solid"
+                                            name="visualType"
+                                            class="form-control"
+                                            [checked]="
+                                            visual.solid
+                                            "
+                                            [value]="true"
+                                            class="mr-2 radio"
+                                           (change)="setSolid(true)"
+                                        />
+                                        <label for="online">{{"Solid" | localize}}</label>
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            id="image"
+                                            name="visualType"
+                                            [value]="false"
+                                            class="form-control"
+                                            [checked]="visual.image"
+                                            class="mr-2 radio"
+                                            (change)="setSolid(false)"
+                                        />
+                                        <label for="inperson">{{"Image"| localize}}</label>
+                                    </div>
                                 </div>
 
                                 <div class="d-flex flex-column" *ngIf="extraAttributes?.length">
-                                    <label for="AppEntity_Code">{{l("Extra Attributes")}} <span class="required">*</span></label>
+                                  <div class="row"> <span class="required pl-2 pr-1">* </span><label for="AppEntity_Code">{{l("Extra Attributes")}}</label></div> 
                                     <div class="row justify-content-center mt-4">
                                         <div class="col-12 mb-4"  *ngFor="let extraAttr of extraAttributes">
                                             <div >
@@ -107,19 +147,7 @@
                                                             </p-dropdown>
                                                         </div>
                                                     </div>
-                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
-                                                      <div class="d-flex align-items-baseline justify-content-start ">
-                                                        <input type="text" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                        name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}" class="form-control"  id="extraAttr{{extraAttr.name}}"
-                                                         [(ngModel)]="extraAttr.selectedValues">
-                                                       <div class="border rounded" class="w-25 " *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  " >
-                                                        <input (colorPickerChange)="onColorChange($event, extraAttr)"
-                                                        *ngIf="extraAttr.name === 'Color HEXA Code' || extraAttr.name === 'Color HEX Code'"
-                                                          class="picker" [(colorPicker)]="extraAttr.selectedValues"
-                                                         [style.background]="extraAttr.selectedValues || '#09c' "/>
-                                                       </div>
-                                                      </div>
-                                                    </div>
+                                                    
                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
                                                         <div class="radio-inline mt-2">
                                                             <label class="radio radio-accent radio-primary mr-4" for="extraAttr{{extraAttr.name}}_1" >
@@ -140,6 +168,19 @@
                                                     <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Numeric' ">
                                                         <input type="number" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)" name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}" class="form-control" id="extraAttr{{extraAttr.name}}" [(ngModel)]="extraAttr.selectedValues">
                                                     </div>
+                                                    <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup && visual.solid">
+                                                        <div class="d-flex align-items-baseline justify-content-start ">
+                                                          <input type="text" (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
+                                                          name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}" class="form-control"  id="extraAttr{{extraAttr.name}}"
+                                                           [(ngModel)]="extraAttr.selectedValues">
+                                                         <div class="border rounded" class="w-25 " *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  " >
+                                                          <input (colorPickerChange)="onColorChange($event, extraAttr)"
+                                                          *ngIf="extraAttr.name === 'Color HEXA Code' || extraAttr.name === 'Color HEX Code'"
+                                                            class="picker" [(colorPicker)]="extraAttr.selectedValues"
+                                                           [style.background]="extraAttr.selectedValues || '#09c' "/>
+                                                         </div>
+                                                        </div>
+                                                      </div>
 
                                                     <!-- <p class="ml-2" *ngIf="extraAttr.isLookup && !extraAttr?.lookupData?.length">{{ "NoData" | localize }} ...</p> -->
                                                     <!-- <div *ngIf="!isSize || !isColor">
@@ -159,11 +200,8 @@
                                     </div>
                                 </div>
 
-                            <div class="form-group">
-                                <label for="AppEntity_Notes">{{l("Notes")}}</label>
-                                <input type="text" id="AppEntity_Notes" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.notes" name="Notes"    />
-                            </div>
-                            <div class="row align-items-baseline mb-5 item-photos">
+                           
+                            <div class="row align-items-baseline mb-5 item-photos" *ngIf="visual.image">
                                 <div class="col-12 item-photos-header pt-4 pb-2">
                                     <div class="d-flex flex-wrap justify-content-between">
                                         <div>
@@ -237,10 +275,18 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-group" *ngIf="addToLookup">
+                                <label for="AppEntity_Notes">{{l("Notes")}}</label>
+                                <input style="height: 131px !important;" type="text" id="AppEntity_Notes" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.notes" name="Notes"    />
+                            </div>
                         </div>
                         <div class="modal-footer">
-                            <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()">{{l("Cancel")}}</button>
-                            <button type="submit" class="btn btn-primary blue  btn-blue btn-save" [disabled]="!appEntityForm.form.valid || uploader.isUploading" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
+                            <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()" style="border-radius: 5px;
+                            background-color: white !important;
+                            border: white !important;color: #4A0D4A !important;">{{l("Cancel")}}</button>
+                            <button type="submit" class="btn btn-primary blue  btn-blue btn-save" style="border-radius: 5px;
+                            background-color: #4A0D4A !important;
+                            border: #4A0D4A !important;color: white;"  [disabled]="!appEntityForm.form.valid || uploader.isUploading" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
                         </div>
 
                     </div>

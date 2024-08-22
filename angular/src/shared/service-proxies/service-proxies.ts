@@ -9077,6 +9077,175 @@ export class AppEntitiesServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    isCodeExisting(body: AppEntityDto | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/IsCodeExisting";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processIsCodeExisting(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processIsCodeExisting(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processIsCodeExisting(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    convertAppEntityDtoToLookupLabelDto(body: AppEntityDto | undefined): Observable<LookupLabelDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/ConvertAppEntityDtoToLookupLabelDto";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processConvertAppEntityDtoToLookupLabelDto(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processConvertAppEntityDtoToLookupLabelDto(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<LookupLabelDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<LookupLabelDto>;
+        }));
+    }
+
+    protected processConvertAppEntityDtoToLookupLabelDto(response: HttpResponseBase): Observable<LookupLabelDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = LookupLabelDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    convertAppLookupLabelDtoToEntityDto(body: LookupLabelDto | undefined): Observable<AppEntityDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/ConvertAppLookupLabelDtoToEntityDto";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processConvertAppLookupLabelDtoToEntityDto(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processConvertAppLookupLabelDtoToEntityDto(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppEntityDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppEntityDto>;
+        }));
+    }
+
+    protected processConvertAppLookupLabelDtoToEntityDto(response: HttpResponseBase): Observable<AppEntityDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppEntityDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -11489,6 +11658,65 @@ export class AppItemsServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param productId (optional) 
+     * @param sSINs (optional) 
+     * @return Success
+     */
+    getItemVariationsToDelete(productId: number | undefined, sSINs: string[] | null | undefined): Observable<VariationListToDeleteDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/GetItemVariationsToDelete?";
+        if (productId === null)
+            throw new Error("The parameter 'productId' cannot be null.");
+        else if (productId !== undefined)
+            url_ += "productId=" + encodeURIComponent("" + productId) + "&";
+        if (sSINs !== undefined && sSINs !== null)
+            sSINs && sSINs.forEach(item => { url_ += "sSINs=" + encodeURIComponent("" + item) + "&"; });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetItemVariationsToDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetItemVariationsToDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<VariationListToDeleteDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<VariationListToDeleteDto>;
+        }));
+    }
+
+    protected processGetItemVariationsToDelete(response: HttpResponseBase): Observable<VariationListToDeleteDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = VariationListToDeleteDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -52990,6 +53218,8 @@ export class LookupLabelDto implements ILookupLabelDto {
     code!: string | undefined;
     stockAvailability!: number | undefined;
     isHostRecord!: boolean | undefined;
+    hexaCode!: string | undefined;
+    image!: string | undefined;
 
     [key: string]: any;
 
@@ -53013,6 +53243,8 @@ export class LookupLabelDto implements ILookupLabelDto {
             this.code = _data["code"];
             this.stockAvailability = _data["stockAvailability"];
             this.isHostRecord = _data["isHostRecord"];
+            this.hexaCode = _data["hexaCode"];
+            this.image = _data["image"];
         }
     }
 
@@ -53034,6 +53266,8 @@ export class LookupLabelDto implements ILookupLabelDto {
         data["code"] = this.code;
         data["stockAvailability"] = this.stockAvailability;
         data["isHostRecord"] = this.isHostRecord;
+        data["hexaCode"] = this.hexaCode;
+        data["image"] = this.image;
         return data;
     }
 }
@@ -53044,6 +53278,8 @@ export interface ILookupLabelDto {
     code: string | undefined;
     stockAvailability: number | undefined;
     isHostRecord: boolean | undefined;
+    hexaCode: string | undefined;
+    image: string | undefined;
 
     [key: string]: any;
 }
@@ -60273,6 +60509,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
     code!: string | undefined;
     stockAvailability!: number | undefined;
     isHostRecord!: boolean | undefined;
+    hexaCode!: string | undefined;
+    image!: string | undefined;
 
     [key: string]: any;
 
@@ -60297,6 +60535,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
             this.code = _data["code"];
             this.stockAvailability = _data["stockAvailability"];
             this.isHostRecord = _data["isHostRecord"];
+            this.hexaCode = _data["hexaCode"];
+            this.image = _data["image"];
         }
     }
 
@@ -60319,6 +60559,8 @@ export class LookupLabelWithAttachmentDto implements ILookupLabelWithAttachmentD
         data["code"] = this.code;
         data["stockAvailability"] = this.stockAvailability;
         data["isHostRecord"] = this.isHostRecord;
+        data["hexaCode"] = this.hexaCode;
+        data["image"] = this.image;
         return data;
     }
 }
@@ -60330,6 +60572,8 @@ export interface ILookupLabelWithAttachmentDto {
     code: string | undefined;
     stockAvailability: number | undefined;
     isHostRecord: boolean | undefined;
+    hexaCode: string | undefined;
+    image: string | undefined;
 
     [key: string]: any;
 }
@@ -60401,6 +60645,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
     code!: string | undefined;
     stockAvailability!: number | undefined;
     isHostRecord!: boolean | undefined;
+    hexaCode!: string | undefined;
+    image!: string | undefined;
 
     [key: string]: any;
 
@@ -60425,6 +60671,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
             this.code = _data["code"];
             this.stockAvailability = _data["stockAvailability"];
             this.isHostRecord = _data["isHostRecord"];
+            this.hexaCode = _data["hexaCode"];
+            this.image = _data["image"];
         }
     }
 
@@ -60447,6 +60695,8 @@ export class CurrencyInfoDto implements ICurrencyInfoDto {
         data["code"] = this.code;
         data["stockAvailability"] = this.stockAvailability;
         data["isHostRecord"] = this.isHostRecord;
+        data["hexaCode"] = this.hexaCode;
+        data["image"] = this.image;
         return data;
     }
 }
@@ -60458,6 +60708,8 @@ export interface ICurrencyInfoDto {
     code: string | undefined;
     stockAvailability: number | undefined;
     isHostRecord: boolean | undefined;
+    hexaCode: string | undefined;
+    image: string | undefined;
 
     [key: string]: any;
 }
@@ -64444,6 +64696,7 @@ export interface IAppItemForViewDto {
 
 export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
     appItem!: AppItemForViewDto;
+    nonLookupValues!: LookupLabelDto[] | undefined;
 
     [key: string]: any;
 
@@ -64463,6 +64716,11 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
                     this[property] = _data[property];
             }
             this.appItem = _data["appItem"] ? AppItemForViewDto.fromJS(_data["appItem"]) : <any>undefined;
+            if (Array.isArray(_data["nonLookupValues"])) {
+                this.nonLookupValues = [] as any;
+                for (let item of _data["nonLookupValues"])
+                    this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
+            }
         }
     }
 
@@ -64480,12 +64738,18 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
                 data[property] = this[property];
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
+        if (Array.isArray(this.nonLookupValues)) {
+            data["nonLookupValues"] = [];
+            for (let item of this.nonLookupValues)
+                data["nonLookupValues"].push(item.toJSON());
+        }
         return data;
     }
 }
 
 export interface IGetAppItemDetailForViewDto {
     appItem: AppItemForViewDto;
+    nonLookupValues: LookupLabelDto[] | undefined;
 
     [key: string]: any;
 }
@@ -64868,6 +65132,7 @@ export interface IAppItemForEditDto {
 
 export class GetAppItemForEditOutput implements IGetAppItemForEditOutput {
     appItem!: AppItemForEditDto;
+    nonLookupValues!: LookupLabelDto[] | undefined;
 
     [key: string]: any;
 
@@ -64887,6 +65152,11 @@ export class GetAppItemForEditOutput implements IGetAppItemForEditOutput {
                     this[property] = _data[property];
             }
             this.appItem = _data["appItem"] ? AppItemForEditDto.fromJS(_data["appItem"]) : <any>undefined;
+            if (Array.isArray(_data["nonLookupValues"])) {
+                this.nonLookupValues = [] as any;
+                for (let item of _data["nonLookupValues"])
+                    this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
+            }
         }
     }
 
@@ -64904,12 +65174,18 @@ export class GetAppItemForEditOutput implements IGetAppItemForEditOutput {
                 data[property] = this[property];
         }
         data["appItem"] = this.appItem ? this.appItem.toJSON() : <any>undefined;
+        if (Array.isArray(this.nonLookupValues)) {
+            data["nonLookupValues"] = [];
+            for (let item of this.nonLookupValues)
+                data["nonLookupValues"].push(item.toJSON());
+        }
         return data;
     }
 }
 
 export interface IGetAppItemForEditOutput {
     appItem: AppItemForEditDto;
+    nonLookupValues: LookupLabelDto[] | undefined;
 
     [key: string]: any;
 }
@@ -64955,6 +65231,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     originalCode!: string | undefined;
     sycIdentifierId!: number | undefined;
     ssin!: string | undefined;
+    nonLookupValues!: LookupLabelDto[] | undefined;
     id!: number;
 
     [key: string]: any;
@@ -65090,6 +65367,11 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             this.originalCode = _data["originalCode"];
             this.sycIdentifierId = _data["sycIdentifierId"];
             this.ssin = _data["ssin"];
+            if (Array.isArray(_data["nonLookupValues"])) {
+                this.nonLookupValues = [] as any;
+                for (let item of _data["nonLookupValues"])
+                    this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
+            }
             this.id = _data["id"];
         }
     }
@@ -65222,6 +65504,11 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         }
         data["originalCode"] = this.originalCode;
         data["sycIdentifierId"] = this.sycIdentifierId;
+        if (Array.isArray(this.nonLookupValues)) {
+            data["nonLookupValues"] = [];
+            for (let item of this.nonLookupValues)
+                data["nonLookupValues"].push(item.toJSON());
+        }
         data["ssin"] = this.ssin;
         data["id"] = this.id;
         return data;
@@ -65269,7 +65556,76 @@ export interface ICreateOrEditAppItemDto {
     originalCode: string | undefined;
     sycIdentifierId: number | undefined;
     ssin: string | undefined;
+    nonLookupValues: LookupLabelDto[] | undefined;
     id: number;
+
+    [key: string]: any;
+}
+
+export class VariationListToDeleteDto implements IVariationListToDeleteDto {
+    variationsInUse!: VariationItemDto[] | undefined;
+    variationCanBeDeleted!: VariationItemDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IVariationListToDeleteDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["variationsInUse"])) {
+                this.variationsInUse = [] as any;
+                for (let item of _data["variationsInUse"])
+                    this.variationsInUse!.push(VariationItemDto.fromJS(item));
+            }
+            if (Array.isArray(_data["variationCanBeDeleted"])) {
+                this.variationCanBeDeleted = [] as any;
+                for (let item of _data["variationCanBeDeleted"])
+                    this.variationCanBeDeleted!.push(VariationItemDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): VariationListToDeleteDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new VariationListToDeleteDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.variationsInUse)) {
+            data["variationsInUse"] = [];
+            for (let item of this.variationsInUse)
+                data["variationsInUse"].push(item.toJSON());
+        }
+        if (Array.isArray(this.variationCanBeDeleted)) {
+            data["variationCanBeDeleted"] = [];
+            for (let item of this.variationCanBeDeleted)
+                data["variationCanBeDeleted"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IVariationListToDeleteDto {
+    variationsInUse: VariationItemDto[] | undefined;
+    variationCanBeDeleted: VariationItemDto[] | undefined;
 
     [key: string]: any;
 }

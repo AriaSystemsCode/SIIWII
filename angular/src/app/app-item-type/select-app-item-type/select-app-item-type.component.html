@@ -38,8 +38,12 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()">{{l("Cancel")}}</button>
-        <button type="submit"  (click)="submitSelection()" class="btn btn-primary blue btn-blue" [disabled]="!selectedRecord" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Select")}}</span></button>
+        <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()" style="border-radius: 5px;
+        background-color: white !important;
+        border: white !important;color: #4A0D4A !important;">{{l("Cancel")}}</button>
+        <button type="submit"  (click)="submitSelection()" class="btn btn-primary blue btn-blue" [disabled]="!selectedRecord" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')" style="border-radius: 5px;
+        background-color: #4A0D4A !important;
+        border: #4A0D4A !important;color: white;"> <span>{{l("Select")}}</span></button>
     </div>
 </div>
 
