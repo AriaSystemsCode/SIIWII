@@ -21,33 +21,33 @@
     <Item2 Ref="19" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="0" Dpi="254" />
     <Item3 Ref="20" ControlType="DetailBand" Name="Detail" KeepTogetherWithDetailReports="true" HeightF="448.232666" KeepTogether="true" Dpi="254" BackColor="DarkKhaki">
       <HierarchyPrintOptions Ref="21" Indent="50.8" />
-      <MultiColumn Ref="22" ColumnCount="13" Layout="AcrossThenDown" Mode="UseColumnCount" />
+      <MultiColumn Ref="22" ColumnCount="12" Layout="AcrossThenDown" Mode="UseColumnCount" />
       <Controls>
-        <Item1 Ref="23" ControlType="XRLabel" Name="label3" Text="ItemDesc" SizeF="201.083328,39.6875153" LocationFloat="13.8397522,383.545166" Dpi="254" BackColor="Transparent" BorderColor="Silver" Borders="All">
+        <Item1 Ref="23" ControlType="XRLabel" Name="label3" Text="ItemDesc" SizeF="204.808517,39.6875" LocationFloat="13.839756,383.5452" Dpi="254" Font="Arial, 9pt" BackColor="Transparent" BorderColor="Silver" Borders="All">
           <ExpressionBindings>
             <Item1 Ref="24" EventName="BeforePrint" PropertyName="Text" Expression="'Order:'" />
           </ExpressionBindings>
-          <StylePriority Ref="25" UseBackColor="false" UseBorderColor="false" UseBorders="false" />
+          <StylePriority Ref="25" UseFont="false" UseBackColor="false" UseBorderColor="false" UseBorders="false" />
         </Item1>
-        <Item2 Ref="26" ControlType="XRLabel" Name="label4" Text="ItemDesc" SizeF="176.083328,39.6875153" LocationFloat="13.839756,320.045166" Dpi="254" BackColor="Transparent">
+        <Item2 Ref="26" ControlType="XRLabel" Name="label4" Text="ItemDesc" SizeF="204.808517,39.68753" LocationFloat="13.839756,320.0452" Dpi="254" Font="Arial, 8pt" BackColor="Transparent">
           <ExpressionBindings>
-            <Item1 Ref="27" EventName="BeforePrint" PropertyName="Text" Expression="'ATS:'+[AttributeValue3]&#xA;" />
+            <Item1 Ref="27" EventName="BeforePrint" PropertyName="Text" Expression="'ATS:'+[Total]&#xA;" />
           </ExpressionBindings>
-          <StylePriority Ref="28" UseBackColor="false" />
+          <StylePriority Ref="28" UseFont="false" UseBackColor="false" />
         </Item2>
-        <Item3 Ref="29" ControlType="XRLabel" Name="label2" Text="ItemDesc" SizeF="176.083328,50.270874" LocationFloat="13.839756,269.7743" Dpi="254" BackColor="Transparent">
+        <Item3 Ref="29" ControlType="XRLabel" Name="label2" Text="ItemDesc" SizeF="204.808517,50.270874" LocationFloat="13.839756,269.774261" Dpi="254" Font="Arial, 9pt" BackColor="Transparent">
           <ExpressionBindings>
             <Item1 Ref="30" EventName="BeforePrint" PropertyName="Text" Expression="iif(len(trim([AttributeValue]))&gt;7 and [DataSource.CurrentRowIndex] &gt;0&#xA;,Substring([AttributeValue],0 ,6 )+'...',[AttributeValue])&#xA;&#xA;" />
           </ExpressionBindings>
-          <StylePriority Ref="31" UseBackColor="false" />
+          <StylePriority Ref="31" UseFont="false" UseBackColor="false" />
         </Item3>
-        <Item4 Ref="32" ControlType="XRLabel" Name="label1" Text="ItemDesc" SizeF="176.083328,47.62506" LocationFloat="13.839756,222.149231" Dpi="254" BackColor="Transparent">
+        <Item4 Ref="32" ControlType="XRLabel" Name="label1" Text="ItemDesc" SizeF="204.808517,47.6250458" LocationFloat="13.839756,222.149277" Dpi="254" Font="Arial, 9pt" BackColor="Transparent">
           <ExpressionBindings>
             <Item1 Ref="33" EventName="BeforePrint" PropertyName="Text" Expression="?ItemCode" />
           </ExpressionBindings>
-          <StylePriority Ref="34" UseBackColor="false" />
+          <StylePriority Ref="34" UseFont="false" UseBackColor="false" />
         </Item4>
-        <Item5 Ref="35" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="176.083328,185.128326" LocationFloat="13.839756,25" Dpi="254">
+        <Item5 Ref="35" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="190.968765,185.128326" LocationFloat="13.839756,25.0000076" Dpi="254">
           <ExpressionBindings>
             <Item1 Ref="36" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[Attachment]" />
             <Item2 Ref="37" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] &gt;0 and [DataSource.CurrentRowIndex] &lt;20&#xA;" />
@@ -55,7 +55,7 @@
         </Item5>
       </Controls>
       <ExpressionBindings>
-        <Item1 Ref="38" EventName="BeforePrint" PropertyName="BackColor" Expression="Iif([DataSource.CurrentRowIndex] != 21, &#xA;Iif([DataSource.CurrentRowIndex] % 2 = 0, 'grey', 'white'), 'red')" />
+        <Item1 Ref="38" EventName="BeforePrint" PropertyName="Visible" Expression="  ([DataSource.CurrentRowIndex] != 0 )&#xA;" />
       </ExpressionBindings>
       <StylePriority Ref="39" UseBackColor="false" UseTextAlignment="false" />
     </Item3>
@@ -67,13 +67,13 @@
           </ExpressionBindings>
           <StylePriority Ref="43" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
         </Item1>
-        <Item2 Ref="44" ControlType="XRLabel" Name="label6" Text="ItemDesc" SizeF="1038.625,47.62506" LocationFloat="506.493927,0" Dpi="254" Font="Arial, 12pt" ForeColor="Silver" BackColor="Transparent">
+        <Item2 Ref="44" ControlType="XRLabel" Name="label6" Text="ItemDesc" SizeF="1038.625,47.62506" LocationFloat="506.493927,0" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="DimGray" BackColor="Transparent">
           <ExpressionBindings>
             <Item1 Ref="45" EventName="BeforePrint" PropertyName="Text" Expression="?ItemName" />
           </ExpressionBindings>
           <StylePriority Ref="46" UseFont="false" UseForeColor="false" UseBackColor="false" />
         </Item2>
-        <Item3 Ref="47" ControlType="XRLabel" Name="label5" Text="ItemDesc" SizeF="424.791656,47.62506" LocationFloat="38.7315979,0" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="IndianRed" BackColor="Transparent">
+        <Item3 Ref="47" ControlType="XRLabel" Name="label5" Text="ItemDesc" SizeF="424.791656,47.62506" LocationFloat="38.7315979,0" Dpi="254" Font="Arial, 14pt, style=Bold" ForeColor="IndianRed" BackColor="Transparent">
           <ExpressionBindings>
             <Item1 Ref="48" EventName="BeforePrint" PropertyName="Text" Expression="?ItemCode" />
           </ExpressionBindings>
