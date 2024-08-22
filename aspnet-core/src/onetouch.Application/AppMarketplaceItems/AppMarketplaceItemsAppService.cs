@@ -839,14 +839,23 @@ namespace onetouch.AppMarketplaceItems
                                     if (codeItemVar != null) 
                                     {
                                         var varColor = codeItemVar.EntityExtraData.Where(x=>x.AttributeId ==201).FirstOrDefault();
-                                        if (varColor != null)
-                                            extraDataSelectedValues.ColorHexaCode = varColor.AttributeValue;
-
-                                        var varColorImage = codeItemVar.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
-                                        if (varColorImage != null)
+                                        if (varColor != null && !string.IsNullOrEmpty(varColor.AttributeValue))
                                         {
-                                            string tenantId =null;
+                                            extraDataSelectedValues.ColorHexaCode = varColor.AttributeValue;
+                                        }
+                                        else
+                                        {
+                                            extraDataSelectedValues.ColorHexaCode = "";
+                                        }
+                                        var varColorImage = codeItemVar.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
+                                        if (varColorImage != null && !string.IsNullOrEmpty(varColorImage.AttributeValue))
+                                        {
+                                            string tenantId = null;
                                             extraDataSelectedValues.ColorImage = imagesUrl + (tenantId == null ? "-1" : tenantId.ToString()) + @"/" + varColorImage.AttributeValue;
+                                        }
+                                        else
+                                        {
+                                            extraDataSelectedValues.ColorImage = "";
                                         }
                                         if (codeItemVar.EntityAttachments != null && codeItemVar.EntityAttachments.Count() > 0)
                                         {

@@ -94,43 +94,37 @@
                             class="msrp d-flex"
                         >
                             <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
-                            <h5 *ngIf="showEditSpecialPrice"> 
-                                <!-- {{
-                                    productDetails?.appItemPriceInfos[0]
-                                        .currencySymbol
-                                }} -->
-                                    {{
-                                        currencySymbol
-                                     }}
+
+                           <!--  <h5 *ngIf="showEditSpecialPrice"> 
                                     
                                 {{ productDetails?.minSpecialPrice| currency:' ' }}
                             </h5>
-                            <span
+                            <<span
                                 *ngIf="
                                     productDetails?.minSpecialPrice !==
                                     productDetails?.maxSpecialPrice && showEditSpecialPrice
                                 "
                             >
                                 -
-                            </span>
+                            </span> 
                             <h5
                                 *ngIf="
                                 productDetails?.minSpecialPrice !==
                                 productDetails?.maxSpecialPrice  && showEditSpecialPrice"
                                 
                             >
-                                <!-- {{
-                                    productDetails?.appItemPriceInfos[0]
-                                        ?.currencySymbol
-                                }} -->
-                                    {{
-                                        currencySymbol
-                                     }}
-                                    
                                 {{ productDetails?.maxSpecialPrice }}
-                            </h5>
-                            <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" />
+                            </h5> -->
                             
+                            
+                            <h5 *ngIf="showEditSpecialPrice"> 
+                                    
+                                {{ productDetails?.maxSpecialPrice| currency:' ' }}
+                            </h5>
+
+                            <!-- <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" /> -->
+                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+
                             <label class="ml-3"
                             *ngIf="!showEditSpecialPrice">
                             <div class="editQtyContainer">
@@ -149,10 +143,10 @@
                                       <div class="input-group-append position-absolute" style="right: 15%;
                                       top: 4px;  z-index: 99999;">
                                         <button class="btn btn-save  mr-0 pr-0" (click)="onEditpecialPrice(updatedSpecialPrice)" 
-                                                [ngClass]="{ 'disabled': updatedSpecialPrice <= 0 ||
-                                               updatedSpecialPrice == productDetails.minSpecialPrice }"
-                                                [disabled]="updatedSpecialPrice <= 0 ||
-                                               updatedSpecialPrice == productDetails.minSpecialPrice ">
+                                                [ngClass]="{ 'disabled': updatedSpecialPrice < 0 ||
+                                               updatedSpecialPrice == productDetails.maxSpecialPrice }"
+                                                [disabled]="updatedSpecialPrice < 0 ||
+                                               updatedSpecialPrice == productDetails.maxSpecialPrice ">
                                           <i class="fa fa-check fa-2x" style="color: #777777;"></i>
                                         </button>
                                       </div>
@@ -208,8 +202,8 @@
                             >
                                 <div
                                     *ngIf="
-                                        color.colorCode !== null &&
-                                        color.colorImg === null
+                                        color.colorCode &&
+                                        !color.colorImg
                                     "
                                     class="colorBox"
                                     [ngStyle]="{'background-color':color.colorCode}"
@@ -222,9 +216,9 @@
                                 ></div>
                                 <img
                                     *ngIf="
-                                        (color.colorImg === null &&
-                                            color.colorCode === null) ||
-                                        color.colorImg !== null
+                                        (!color.colorImg&&
+                                            !color.colorCode) ||
+                                        color.colorImg
                                     "
                                     (click)="setSizes(i)"
                                     [src]="
@@ -269,8 +263,8 @@
                                     >
                                         <div
                                             *ngIf="
-                                                color.colorCode !== null &&
-                                                color.colorImg === null
+                                                color.colorCode&&
+                                                !color.colorImg
                                             "
                                             class="colorBox"
                                             [ngStyle]="{'background-color': color.colorCode}"
@@ -283,9 +277,9 @@
                                         ></div>
                                         <img
                                             *ngIf="
-                                                (color.colorImg === null &&
-                                                    color.colorCode === null) ||
-                                                color.colorImg !== null
+                                                (!color.colorImg&&
+                                                    !color.colorCode ) ||
+                                                color.colorImg 
                                             "
                                             (click)="setSizes(i)"
                                             [src]="

@@ -2315,7 +2315,7 @@ namespace onetouch.AppSiiwiiTransaction
                                                 var lineAttachmentDefault = size.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
                                                 var lineAttachment = size.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
                                                 sizeColorDetailView.Data.Image = (lineAttachmentDefault == null ?
-                                                           (lineAttachment == null ? "attachments/" + line.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
+                                                           (lineAttachment != null ? "attachments/" + line.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
                                                             : "attachments/" + (line.TenantId.HasValue ? line.TenantId : -1) + "/" +
                                                             lineAttachmentDefault.AttachmentFk.Attachment);
                                             }
