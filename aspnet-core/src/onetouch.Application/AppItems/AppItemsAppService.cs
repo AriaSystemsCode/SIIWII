@@ -143,8 +143,8 @@ namespace onetouch.AppItems
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
             IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
-            IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
-            IRepository<AppTransactionDetails, long> appTransactionDetails, IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails
+            IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
+             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails
             )
         {
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
