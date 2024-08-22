@@ -2400,6 +2400,11 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         itemMajor.Quantity = qty;
                         itemMajor.Amount = itemMajor.NetPrice * qty;
+                        //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[Start]
+                        filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
+                        filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                        await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                        //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }
@@ -2445,6 +2450,11 @@ namespace onetouch.AppSiiwiiTransaction
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }
+                //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[Start]
+                filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
+                filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
                 return true;
             }
         }
