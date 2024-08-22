@@ -1162,6 +1162,32 @@ namespace onetouch.AppItems
                                 extraDataSelectedValues.value = varItem;
                                 extraDataSelectedValues.DefaultEntityAttachment = new AppEntityAttachmentDto();
                                 //YYY
+                                //41
+                                //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[Start]
+                                var codeItemVar = varAppItems.Where(x => x.EntityFk.EntityExtraData
+                                                                                 .Where(a => a.AttributeValue == varItem.ToString() &&
+                                                                                 a.AttributeId == firstAttributeIdLong
+                                                                                 ).Any()).FirstOrDefault();
+                                if (codeItemVar != null)
+                                {
+                                    var varColor = codeItemVar.EntityFk.EntityExtraData.Where(x => x.AttributeId == 201).FirstOrDefault();
+                                    if (varColor != null && !string.IsNullOrEmpty(varColor.AttributeValue))
+                                        extraDataSelectedValues.ColorHexaCode = varColor.AttributeValue;
+                                    else
+                                        extraDataSelectedValues.ColorHexaCode = "";
+
+                                    var varColorImage = codeItemVar.EntityFk.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
+                                    if (varColorImage != null && !string.IsNullOrEmpty(varColorImage.AttributeValue))
+                                    {
+                                        string tenantId = null;
+                                        extraDataSelectedValues.ColorImage = imagesUrl + (tenantId == null ? "-1" : tenantId.ToString()) + @"/" + varColorImage.AttributeValue;
+                                    }
+                                    else
+                                    {
+                                        extraDataSelectedValues.ColorImage = "";
+                                    }
+                                }
+                                //41
                                 var tenantIdvar = AbpSession.TenantId;
                                 if (appItem.TenantId != AbpSession.TenantId)
                                 {
@@ -1172,7 +1198,7 @@ namespace onetouch.AppItems
                                 }
                                 //YYY
                                 //extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + firstattributeDefaultImages[imageLoopCounter];
-                                if (firstattributeDefaultImages.Count > imageLoopCounter && firstattributeDefaultImages[imageLoopCounter] != null)
+                                if (firstattributeDefaultImages.Count > imageLoopCounter && firstattributeDefaultImages[imageLoopCounter]!=null && !string.IsNullOrEmpty(firstattributeDefaultImages[imageLoopCounter].ToString()))
                                     extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (tenantIdvar == null ? "-1" : tenantIdvar.ToString()) + @"/" + firstattributeDefaultImages[imageLoopCounter].ToString();
                                 //extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + firstattributeDefaultImages[imageLoopCounter].ToString();
 

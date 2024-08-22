@@ -193,13 +193,11 @@
                                                     <div
                                                         class="p-d-flex p-jc-center p-ai-center mr-2 ml-2"
                                                     >
-                                                        <img
+                                                        <img *ngIf="img?.colorImage"
                                                             [src]="
                                                                 attachmentBaseUrl +
                                                                 '/' +
-                                                                img
-                                                                    .defaultEntityAttachment
-                                                                    .url
+                                                                img?.colorImage
                                                             "
                                                             alt="defaultImage"
                                                             (error)="
@@ -222,6 +220,25 @@
                                                                 imageSelectedIndex = 0
                                                             "
                                                         />
+                                                        <div
+                                    *ngIf="!img?.colorImage"
+                                    class="colorBox"
+                                    [ngStyle]="{'background-color':img?.colorHexaCode}"
+                                    [ngClass]="{
+                                        leftImageBorder:
+                                            appItemForViewDto
+                                                .variations[0]
+                                                .selectedValues[
+                                                varitaionSelectedIndex
+                                            ] == img
+                                    }"
+                                    (click)="
+                                    showImagesOfVaritaionSelectedValues(
+                                        img
+                                    );
+                                    imageSelectedIndex = 0
+                                "
+                                ></div>
                                                     </div>
                                                 </ng-template>
                                             </p-carousel>
@@ -255,13 +272,11 @@
                                                     <div
                                                         class="p-d-flex p-jc-center p-ai-center mr-2 ml-2"
                                                     >
-                                                        <img
+                                                        <img *ngIf="img?.colorImage"
                                                             [src]="
                                                                 attachmentBaseUrl +
                                                                 '/' +
-                                                                img
-                                                                    .defaultEntityAttachment
-                                                                    .url
+                                                                img?.colorImage
                                                             "
                                                             alt="defaultImage"
                                                             (error)="
@@ -284,6 +299,27 @@
                                                                 imageSelectedIndex = 0
                                                             "
                                                         />
+
+
+                                                        <div
+                                    *ngIf="!img?.colorImage"
+                                    class="colorBox"
+                                    [ngStyle]="{'background-color':img?.colorHexaCode}"
+                                    [ngClass]="{
+                                        leftImageBorder:
+                                            appItemForViewDto
+                                                .variations[0]
+                                                .selectedValues[
+                                                varitaionSelectedIndex
+                                            ] == img
+                                    }"
+                                    (click)="
+                                    showImagesOfVaritaionSelectedValues(
+                                        img
+                                    );
+                                    imageSelectedIndex = 0
+                                "
+                                ></div>
                                                     </div>
                                                 </div>
                                             </div>

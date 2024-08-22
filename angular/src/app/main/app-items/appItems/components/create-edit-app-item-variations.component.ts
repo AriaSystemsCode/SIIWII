@@ -1270,6 +1270,11 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             let item = this.variationMatrices?.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')));
             if(!item || ! (item?.length>0) )
                 this.variationMatrices.push(newVariation);
+
+        else
+            this.variationMatrices.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0].entityExtraData = newVariation?.entityExtraData;
+        
+
                 this.showNewVariation=true;
             
             }
