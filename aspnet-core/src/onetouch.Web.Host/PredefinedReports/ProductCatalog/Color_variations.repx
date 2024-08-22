@@ -21,7 +21,7 @@
     <Item2 Ref="19" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="0" Dpi="254" />
     <Item3 Ref="20" ControlType="DetailBand" Name="Detail" KeepTogetherWithDetailReports="true" HeightF="448.232666" KeepTogether="true" Dpi="254" BackColor="DarkKhaki">
       <HierarchyPrintOptions Ref="21" Indent="50.8" />
-      <MultiColumn Ref="22" ColumnCount="13" Mode="UseColumnCount" />
+      <MultiColumn Ref="22" ColumnCount="13" Layout="AcrossThenDown" Mode="UseColumnCount" />
       <Controls>
         <Item1 Ref="23" ControlType="XRLabel" Name="label3" Text="ItemDesc" SizeF="201.083328,39.6875153" LocationFloat="13.8397522,383.545166" Dpi="254" BackColor="Transparent" BorderColor="Silver" Borders="All">
           <ExpressionBindings>
