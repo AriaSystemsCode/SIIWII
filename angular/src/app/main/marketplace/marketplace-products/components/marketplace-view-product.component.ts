@@ -58,7 +58,7 @@ export class MarketplaceViewProductComponent
     currencySymbol: string = "";
     showEditSpecialPrice: boolean = true;
     updatedSpecialPrice: number = 0;
-    chk_Order_by_prepack: boolean = true;
+    chk_Order_by_prepack:boolean [] =[]
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -187,6 +187,9 @@ export class MarketplaceViewProductComponent
                         });
                     });
 
+                    this.chk_Order_by_prepack=[];
+                    this.chk_Order_by_prepack = new Array(this.colorsData.length).fill(true);
+
                 this.GetCurrencyInfo();
             }
             );
@@ -205,7 +208,7 @@ export class MarketplaceViewProductComponent
         this.isColorView = false
         this.colorAttachmentForMainIamge = this.colorsData[index].colorImg;
         this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex].entityAttachments;
-        console.log(this.colorsData[index]);
+       // console.log(this.colorsData[index]);
     }
     setColorView(value: boolean) {
         this.isColorView = value
@@ -244,7 +247,7 @@ export class MarketplaceViewProductComponent
         if (!foundColor) {
             this.orderSummary.push(orederedMappedData);
         }
-        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
+        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
             this.productDetails.variations.map((variation: any) => {
                 if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
                     variation.selectedValues.forEach((value) => {
@@ -387,7 +390,7 @@ export class MarketplaceViewProductComponent
         let sum = 0;
         prepackSizes.forEach((item) => {
             let multiby;
-            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)
+            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item.orderedPrePacks;
 
             else
@@ -406,7 +409,7 @@ export class MarketplaceViewProductComponent
         let sum = 0;
         prepackSizes.forEach((item) => {
             let multiby;
-            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)
+            if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item.orderedPrePacks;
 
             else
@@ -482,10 +485,11 @@ export class MarketplaceViewProductComponent
 
 
                 /////
-                if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
+                for (let index = 0; index < this.colorsData.length; index++) {
+                if ((this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[index])) {
                     this.productDetails.variations.map((variation: any) => {
                         if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
-                            variation.selectedValues.forEach((value) => {
+                           let value= variation.selectedValues[index];
                                 value.edRestAttributes.forEach((attr) => {
                                     if (attr.extraAttrName === "SIZE") {
                                         attr.values.forEach((sizeValue) => {
@@ -494,10 +498,10 @@ export class MarketplaceViewProductComponent
                                         });
                                     }
                                 });
-                            });
                         }
                     });
                 }
+            }
                 /////
 
                 let bodyRequest: any = {
@@ -592,7 +596,7 @@ export class MarketplaceViewProductComponent
         });
     }
     onChangechk_Order_by_prepack() {
-        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
+        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {
             this.colorsData[this.currentIndex].sizes.forEach((item) => {
                 item.orderedPrePacks=0;
             });

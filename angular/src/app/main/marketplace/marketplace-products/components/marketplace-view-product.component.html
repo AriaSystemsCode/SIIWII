@@ -90,7 +90,7 @@
                                 <h5> /EAC </h5>
                             </div>
                             <div 
-                            *ngIf="productDetails?.minSpecialPrice "
+                            *ngIf="productDetails?.minSpecialPrice"
                             class="msrp d-flex"
                         >
                             <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
@@ -401,12 +401,12 @@
                        
                         <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"   class="p-4 font-weight-bold" style="color:black !important" >Order by prepack</span>
                           <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack" class="switch switch-container my-4 font-weight-bold" >
-                            <input type="checkbox" [(ngModel)]="chk_Order_by_prepack" checked (change)="onChangechk_Order_by_prepack()">
+                            <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked (change)="onChangechk_Order_by_prepack()">
                             <span class="slider round"></span>
                         </label>
 
-                        <p-tabView *ngIf="productDetails?.orderByPrePack" [activeIndex]="chk_Order_by_prepack? 0 : 1">
-                            <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack" >
+                        <p-tabView *ngIf="productDetails?.orderByPrePack" [activeIndex]="chk_Order_by_prepack[currentIndex]? 0 : 1">
+                            <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack[currentIndex]" >
                                 <table
                                     *ngIf="productDetails?.orderByPrePack"
                                     class="table text-center table-bordered table-white"
@@ -430,7 +430,7 @@
                                             </td>
                                             <td>
                                                 <p-inputNumber
-                                                [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack)"
+                                                [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex])"
                                                     [(ngModel)]="
                                                         colorsData[currentIndex]
                                                             ?.sizes[0]
@@ -456,7 +456,7 @@
                                     </tbody>
                                 </table>
                             </p-tabPanel>
-                            <p-tabPanel [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack)  ? 'Order By Size' : 'View Ordered Quantity By Size'" >
+                            <p-tabPanel [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])  ? 'Order By Size' : 'View Ordered Quantity By Size'" >
                                 <table
                                     class="table text-center table-bordered table-white"
                                 >
@@ -483,13 +483,13 @@
                                             <td>
                                                 
                                                 <p-inputNumber
-                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? (size.sizeRatio * colorsData[currentIndex]?.sizes[0].orderedPrePacks) : colorsData[currentIndex]?.sizes[i].orderedPrePacks"
+                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * colorsData[currentIndex]?.sizes[0].orderedPrePacks) : colorsData[currentIndex]?.sizes[i].orderedPrePacks"
                                                    
                                                     mode="decimal"
                                                     [showButtons]="true"
                                                     inputId="minmax-buttons"
                                                     [min]="0"
-                                                    [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack)"
+                                                    [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex])"
                                                     (ngModelChange)="
                                                         onNumberChange(
                                                             $event,
@@ -663,7 +663,7 @@
                                                 <td>{{ size.label }}</td>
                                                 <td>
                                                     {{
-                                                        !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                        !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
                                                             size.sizeRatio *
                                                             order.color.sizes[0]
                                                                 .orderedPrePacks
@@ -676,7 +676,7 @@
                                                 <td>{{ size.price | currency:' '}}</td>
                                                 <td>
                                                     {{
-                                                        !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? 
+                                                        !(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex] ) ? 
                                                        ( size.sizeRatio *
                                                             order.color.sizes[0]
                                                                 .orderedPrePacks *
