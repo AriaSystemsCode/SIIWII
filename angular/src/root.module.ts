@@ -181,8 +181,7 @@ function registerLocales(resolve: (value?: boolean | Promise<boolean>) => void, 
     if (shouldLoadLocale()) {
         let angularLocale = convertAbpLocaleToAngularLocale(abp.localization.currentLanguage.name);
         // const moduleName = `/node_modules/@angular/common/locales/${angularLocale}.js`
-    
-     
+        AppConsts.languageSettingName=angularLocale;
     let localeModulePromise = import(/* webpackInclude: /(en|es|id)\.mjs$/ */
     `/node_modules/@angular/common/locales/${angularLocale}.mjs`);
 

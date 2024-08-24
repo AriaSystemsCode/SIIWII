@@ -22,7 +22,7 @@
                     <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;">
                         <div class="price pt-2" style="float: right;
                         clear: both;">
-                            {{ "MSRP" | localize }}:
+                      {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:
                             {{ tenantDefaultCurrency.symbol
                             }}{{item?.appItem?.price }}
                         </div>
