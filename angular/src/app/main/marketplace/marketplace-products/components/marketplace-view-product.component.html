@@ -486,7 +486,14 @@
                                 class="imagAndHexaCode"
                                 tooltipPositionStyleClass="custom-tooltip"
                             >
-                                <div
+                              
+                                <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
+                                        i === currentIndex
+                                            ? 'border border-primary '
+                                            : ''
+                                    ">
+
+                                    <div
                                     *ngIf="
                                         color.colorCode &&
                                         !color.colorImg
@@ -496,11 +503,6 @@
                                     (click)="setSizes(i)"
                                
                                 ></div>
-                                <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-primary '
-                                            : ''
-                                    ">
                                 <img
                                     *ngIf="
                                         (!color.colorImg&&
@@ -555,25 +557,26 @@
                                         position="top"
                                         tooltipPositionStyleClass="custom-tooltip"
                                     >
-                                        <div
-                                            *ngIf="
-                                                color.colorCode&&
-                                                !color.colorImg
-                                            "
-                                            class="colorBox"
-                                            [ngStyle]="{'background-color': color.colorCode}"
-                                            (click)="setSizes(i)"
-                                            [ngClass]="
-                                                i === currentIndex
-                                                    ? 'border border-primary '
-                                                    : ''
-                                            "
-                                        ></div>
+                                    
                                         <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
                                         i === currentIndex
                                             ? 'border border-primary '
                                             : ''
                                     ">
+                                    <div
+                                    *ngIf="
+                                        color.colorCode&&
+                                        !color.colorImg
+                                    "
+                                    class="colorBox"
+                                    [ngStyle]="{'background-color': color.colorCode}"
+                                    (click)="setSizes(i)"
+                                    [ngClass]="
+                                        i === currentIndex
+                                            ? 'border border-primary '
+                                            : ''
+                                    "
+                                ></div>
                                 <img
                                     *ngIf="
                                         (color.colorImg === null &&
@@ -1355,26 +1358,27 @@
                                             class="imagAndHexaCode"
                                             tooltipPositionStyleClass="custom-tooltip"
                                         >
-                                            <div
-                                                *ngIf="
-                                                    color.colorCode !== null &&
-                                                    color.colorImg === null
-                                                "
-                                                class="colorBox"
-                                                [ngStyle]="{'background-color':color.colorCode}"
-                                                (click)="setSizes(i)"
-                                                [ngClass]="
-                                                    i === currentIndex
-                                                        ? 'border border-primary '
-                                                        : ''
-                                                "
-                                            ></div>
+                                       
                                             
                                           <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
                                         i === currentIndex
                                             ? 'border border-primary '
                                             : ''
                                     ">
+                                    <div
+                                    *ngIf="
+                                        color.colorCode !== null &&
+                                        color.colorImg === null
+                                    "
+                                    class="colorBox"
+                                    [ngStyle]="{'background-color':color.colorCode}"
+                                    (click)="setSizes(i)"
+                                    [ngClass]="
+                                        i === currentIndex
+                                            ? 'border border-primary '
+                                            : ''
+                                    "
+                                ></div>
                                 <img
                                     *ngIf="
                                         (color.colorImg === null &&
@@ -1429,25 +1433,26 @@
                                                     position="top"
                                                     tooltipPositionStyleClass="custom-tooltip"
                                                 >
-                                                    <div
-                                                        *ngIf="
-                                                            color.colorCode !== null &&
-                                                            color.colorImg === null
-                                                        "
-                                                        class="colorBox"
-                                                        [ngStyle]="{'background-color': color.colorCode}"
-                                                        (click)="setSizes(i)"
-                                                        [ngClass]="
-                                                            i === currentIndex
-                                                                ? 'border border-primary '
-                                                                : ''
-                                                        "
-                                                    ></div>
+                                              
                                                     <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
                                                     i === currentIndex
                                                         ? 'border border-primary '
                                                         : ''
                                                 ">
+                                                <div
+                                                *ngIf="
+                                                    color.colorCode !== null &&
+                                                    color.colorImg === null
+                                                "
+                                                class="colorBox"
+                                                [ngStyle]="{'background-color': color.colorCode}"
+                                                (click)="setSizes(i)"
+                                                [ngClass]="
+                                                    i === currentIndex
+                                                        ? 'border border-primary '
+                                                        : ''
+                                                "
+                                            ></div>
                                             <img
                                                 *ngIf="
                                                     (color.colorImg === null &&
