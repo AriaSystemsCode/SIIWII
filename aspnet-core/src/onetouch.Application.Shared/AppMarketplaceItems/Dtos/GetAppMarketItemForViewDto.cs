@@ -77,6 +77,9 @@ namespace onetouch.AppMarketplaceItems.Dtos
     }
     public class MarketplaceExtraDataSelectedValues
     {
+        //Iteration#42,1 MMT 08/20/2024 Add new property for the code[Start]
+        public string Code { get; set; }
+        //Iteration#42,1 MMT 08/20/2024 Add new property for the code[End]
         public string value { get; set; }
         public int TotalCount { get; set; }
         public virtual List<AppEntityAttachmentDto> EntityAttachments { get; set; }
