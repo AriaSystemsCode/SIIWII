@@ -231,10 +231,11 @@ export class MarketplaceViewProductComponent
                             };
                         });
                         this.filteredColors = this.colorsData
+                        this.chk_Order_by_prepack=[];
+                        this.chk_Order_by_prepack = new Array(this.colorsData.length).fill(true);
                     });
 
-                    this.chk_Order_by_prepack=[];
-                    this.chk_Order_by_prepack = new Array(this.colorsData.length).fill(true);
+                  
 
                 this.GetCurrencyInfo();
             }
