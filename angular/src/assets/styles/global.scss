@@ -520,6 +520,11 @@ span.p-tabview-title {
     border: #F8F8F8;
     color: black;
 }
+}
 .p-datepicker:not(.p-datepicker-inline) {
-    z-index: 2000 !important;
-}}
+    z-index: 999999999999 !important;
+}
+
+.p-datepicker{
+    z-index: 999999999999 !important;
+}
