@@ -123,10 +123,10 @@ namespace onetouch.AppMarketplaceContacts
 		//[ForeignKey("EntityId")]
 		//public virtual AppEntity EntityFk { get; set; }
 
-		//[ForeignKey("ParentId")]
+		[ForeignKey("ParentId")]
 		public virtual AppMarketplaceContact ParentFk { get; set; }
 
-		//[ForeignKey("PartnerId")]
+		[ForeignKey("PartnerId")]
 		public virtual AppMarketplaceContact PartnerFk { get; set; }
 
 		[ForeignKey("Phone1TypeId")]
