@@ -296,20 +296,21 @@ export class ShoppingCartViewComponentComponent
   }
 
   onContinueShopping() {
+    this.hide();
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
     if (this.shoppingCartDetails?.sellerCompanySSIN) {
       localStorage.setItem(
         "SellerSSIN",
-        JSON.stringify(this.shoppingCartDetails.sellerCompanySSIN)
+        JSON.stringify(this.shoppingCartDetails?.sellerCompanySSIN)
       );
       localStorage.setItem(
         "contactSSIN",
-        JSON.stringify(this.shoppingCartDetails.buyerContactSSIN)
+        JSON.stringify(this.shoppingCartDetails?.buyerContactSSIN)
       );
       localStorage.setItem(
         "currencyCode",
-        JSON.stringify(this.appTransactionsForViewDto.currencyCode)
+        JSON.stringify(this.shoppingCartDetails?.currencyCode)
       );
 
       localStorage.setItem(
@@ -323,7 +324,6 @@ export class ShoppingCartViewComponentComponent
                     else
                         this.router.navigateByUrl("app/main/marketplace/products");
     }
-    this.hide();
   }
 
   validateShoppingCart() {
