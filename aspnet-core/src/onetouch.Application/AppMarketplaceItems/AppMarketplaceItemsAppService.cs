@@ -830,6 +830,13 @@ namespace onetouch.AppMarketplaceItems
                                 {
                                     MarketplaceExtraDataSelectedValues extraDataSelectedValues = new MarketplaceExtraDataSelectedValues();
                                     extraDataSelectedValues.value = varItem;
+
+                                    //Iteration#42,1 MMT 08/20/2024 Add new property for the code[Start]
+                                    var extraAttrObj = firstattributeCodes.Where(z => z.AttributeValue == varItem).FirstOrDefault();
+                                    if (extraAttrObj != null)
+                                        extraDataSelectedValues.Code = extraAttrObj.AttributeCode;
+                                    //Iteration#42,1 MMT 08/20/2024 Add new property for the code[End]
+
                                     extraDataSelectedValues.DefaultEntityAttachment = new AppEntityAttachmentDto();
                                     //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[Start]
                                     var codeItemVar = varAppItems.Where(x => x.EntityExtraData
