@@ -41,12 +41,14 @@
     <None Remove="PredefinedReports\ProductCatalog\Colors_port.repx" />
     <None Remove="PredefinedReports\ProductCatalog\Color_names.repx" />
     <None Remove="PredefinedReports\ProductCatalog\Color_Size11.repx" />
+    <None Remove="PredefinedReports\ProductCatalog\Color_variations.repx" />
     <None Remove="PredefinedReports\ProductCatalog\CoverPage_P.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate12.repx" />
+    <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate13.repx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate2.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate3.vsrepx" />
     <None Remove="PredefinedReports\ProductCatalog\ProductsCatalogTemplate4.vsrepx" />
@@ -97,11 +99,13 @@
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\Colors_port.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\Color_names.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\Color_Size11.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\Color_variations.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\CoverPage_P.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate1.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate11.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate10.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate12.repx" />
+    <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate13.repx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate7.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate5.vsrepx" />
     <EmbeddedResource Include="PredefinedReports\ProductCatalog\ProductsCatalogTemplate4.vsrepx" />
@@ -151,6 +155,12 @@
     <Compile Update="PredefinedReports\ProductCatalog\Color_Size11.Designer.cs">
       <DependentUpon>Color_Size11.repx</DependentUpon>
     </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Color_variations.cs">
+      <DependentUpon>Color_variations.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\Color_variations.Designer.cs">
+      <DependentUpon>Color_variations.repx</DependentUpon>
+    </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\CoverPage_P.cs">
       <DependentUpon>CoverPage_P.repx</DependentUpon>
     </Compile>
@@ -180,6 +190,12 @@
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate12.Designer.cs">
       <DependentUpon>ProductsCatalogTemplate12.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate13.cs">
+      <DependentUpon>ProductsCatalogTemplate13.repx</DependentUpon>
+    </Compile>
+    <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate13.Designer.cs">
+      <DependentUpon>ProductsCatalogTemplate13.repx</DependentUpon>
     </Compile>
     <Compile Update="PredefinedReports\ProductCatalog\ProductsCatalogTemplate2.cs">
       <DependentUpon>ProductsCatalogTemplate2.vsrepx</DependentUpon>
