@@ -656,12 +656,19 @@ if (event.filter != '' || event.filter != undefined){
                     let formValue = this.orderForm
                         .value as ICreateOrEditAppTransactionsDto;
                     this.body = {
-                        sellerContactName:
+                       /*  sellerContactName:
                         this.orderForm.controls['sellerContactName']?.value ? this.orderForm.controls['sellerContactName']?.value : this.orderForm.value?.sellerContactName?.name &&
                                 this.orderForm.value?.sellerContactName?.name !==
                                 null
                                 ? this.orderForm.value?.sellerContactName?.name
-                                :   null,
+                                :   null, */
+                                sellerContactName: this.isSellerTempAccount
+                                ? this.orderForm.value?.sellerContactName
+                                : this.orderForm.value?.sellerContactName?.name &&
+                                    this.orderForm.value?.sellerContactName !== null
+                                    ? this.orderForm.value?.sellerContactName?.name
+                                    :  this.orderForm.controls['sellerContactName']?.value ? this.orderForm.controls['sellerContactName']?.value :null,
+                                
                         buyerContactName: this.isBuyerTempAccount
                             ? this.orderForm.value?.buyerContactName
                             : this.orderForm.value?.buyerContactName?.name &&
