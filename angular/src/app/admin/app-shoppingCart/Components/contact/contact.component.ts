@@ -399,9 +399,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.allPhoneTypes = $event.value.phoneList;
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = $event?.value;
             // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
-            // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  $event?.value?.phone ;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  $event?.value?.phone ;
             // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail)
-            // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =  $event?.value?.email ;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =  $event?.value?.email ;
         }
 
         else {
