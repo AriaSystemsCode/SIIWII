@@ -187,7 +187,7 @@
                                                     <th *ngFor="let extraAttr of selectedExtraAttributes" [hidden]="extraAttr.entityObjectTypeCode !== 'COLOR' && extraAttr.entityObjectTypeCode !== 'SIZE' && extraAttr?.entityObjectTypeCode!=='CLOSURE'">
                                                         {{extraAttr.name | localize}} {{"Code" | localize}}
                                                     </th>
-                                                    <th *ngFor="let extraAttr of selectedExtraAttributes" [hidden]="extraAttr.entityObjectTypeCode !== 'COLOR' && extraAttr.entityObjectTypeCode !== 'SIZE'">
+                                                    <th *ngFor="let extraAttr of selectedExtraAttributes" [hidden]="extraAttr.entityObjectTypeCode !== 'COLOR' && extraAttr.entityObjectTypeCode !== 'SIZE' && extraAttr?.entityObjectTypeCode!=='CLOSURE'">
                                                       <div> SIWII Marketplace  {{extraAttr.name | localize}}</div> 
                                                     </th>
                                                     <th>
@@ -199,7 +199,7 @@
                                                     <th>
                                                         {{ "Photos" | localize }}
                                                     </th>
-                                                    <th class="row mr-5">
+                                                    <th class="row mr-5" style="display: ruby;">
                                                         <div>
                                                             <div class="text-center">
                                                                 {{ "Price" | localize }}
