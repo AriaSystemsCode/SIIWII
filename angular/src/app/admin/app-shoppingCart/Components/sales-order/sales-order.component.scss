@@ -7,6 +7,7 @@
 }
 .bgPurple {
     background:  #4A0D4A;
+    color: #fff;
 
 }
 
@@ -92,6 +93,9 @@ font-weight: 600;
 
 ::ng-deep{
 
+    .p-treeselect-panel .p-treeselect-header .p-treeselect-filter-container .p-treeselect-filter-icon {
+        top: 16px !important;
+    }
     .p-treeselect{
         width: 100% !important;
     }
@@ -174,7 +178,29 @@ font-weight: 600;
     cursor: not-allowed; /* Change cursor to indicate non-interactivity */
     z-index: 1; /* Ensure it overlays the calendar */
 }
+.selected-items-container {
+    // margin-bottom: 10px;
+    // padding: 5px;
+    // border: 1px solid #ddd;
+    // border-radius: 4px;
+    // background-color: #f9f9f9;
+    display: flex;
+    gap: 10px;
+}
+
+.selected-item {
+    border-radius: 4px;
+    border: 1px solid #D9D9D9;
+    background: rgba(248, 248, 248, 0.97);
+    border-radius: 12px;
+    padding: 12px;
+}
 ::ng-deep .treeSel {
+    .p-treeselect.p-treeselect-chip .p-treeselect-token{
+        display: none !important;
+    }
+
+    
     width: 75% !important;
     .three-dots:after {
         cursor: pointer;

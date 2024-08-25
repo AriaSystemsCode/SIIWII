@@ -556,8 +556,9 @@ export class ShoppingCartViewComponentComponent
             )
             .subscribe((res) => {
               if (res) this.notify.info("Successfully Updated.");
+              this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
-              rowNode.node.data.showEditQty = false;
+              // rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
             });
         } else {

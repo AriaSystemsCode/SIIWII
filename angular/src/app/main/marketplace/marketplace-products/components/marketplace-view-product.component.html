@@ -441,6 +441,7 @@
                     />
 
                     <div class="color-selection">
+                        <div class="d-flex justify-content-between">
                         <h5 class="my-2" style="text-decoration: none;color:black  !important">
                             {{
                                 productDetails
@@ -448,14 +449,38 @@
                                     .extraAttrName
                             }}
                         </h5>
+                        <div class="mb-0 ">
+                            <div class="form-group m-form__group align-items-center">
+                                <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <button  class="searchBtn" type="submit">
+                                            <img 
+                                                src="../../../assets/landingPage/Search.png" />
+                                            </button>
+                                    </span>
+                                    <input [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
+                                        class="form-control m-input" placeholder="search with color"
+                                        type="text" >
+                                       
+                                        <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText()">
+                                            <i class=" fa fa-1x fa-times fa-1x" style="color: #fff;" ></i>
+
+                                        </a>
+
+                                 
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                         <!-- color selections -->
                         <div
-                            *ngIf="colorsData?.length <= 8"
+                            *ngIf="filteredColors?.length <= 8"
                             class="d-flex flex-wrap align-items-center justify-content-lg-start"
                         >
                             <div
                                 class="mr-3"
-                                *ngFor="let color of colorsData; let i = index"
+                                *ngFor="let color of filteredColors; let i = index"
                                 [title]="color.colorName"
                                 position="top"
                                 class="imagAndHexaCode"
@@ -507,7 +532,7 @@
                         <!-- color selection -->
 
                         <!-- color slider -->
-                        <div class="d-flex" style="height: 70px;" *ngIf="colorsData?.length > 8">
+                        <div class="d-flex" style="height: 70px;" *ngIf="filteredColors?.length > 8">
                             <button
                             (click)="slideToPreviousImage()"
                             class="mr-4 indicator-btns"
@@ -523,7 +548,7 @@
                                 >
                                     <div
                                         *ngFor="
-                                            let color of colorsData;
+                                            let color of filteredColors;
                                             let i = index
                                         "
                                         [title]="color.colorName"
@@ -598,7 +623,7 @@
                             <tbody>
                                 <tr
                                     *ngFor="
-                                        let size of colorsData[currentIndex]
+                                        let size of filteredColors[currentIndex]
                                             ?.sizes;
                                         let i = index
                                     "
@@ -615,7 +640,7 @@
                                             (ngModelChange)="
                                                 onNumberChange(
                                                     $event,
-                                                    colorsData[currentIndex],
+                                                    filteredColors[currentIndex],
                                                     i
                                                 )
                                             "
@@ -644,7 +669,7 @@
                                     <th  style="background-color: #F8F8F8;">Size</th>
                                     <td
                                         *ngFor="
-                                            let size of colorsData[currentIndex]
+                                            let size of filteredColors[currentIndex]
                                                 .sizes
                                         "
                                     >
@@ -656,7 +681,7 @@
                                     <th  style="background-color: #F8F8F8;">Prepack</th>
                                     <td
                                         *ngFor="
-                                            let size of colorsData[currentIndex]
+                                            let size of filteredColors[currentIndex]
                                                 .sizes
                                         "
                                     >
@@ -692,7 +717,7 @@
                                         <tr>
                                             <td>
                                                 {{
-                                                    colorsData[currentIndex]
+                                                    filteredColors[currentIndex]
                                                         ?.sizes[0]
                                                         .noOfAvailablePrepacks
                                                 }}
@@ -701,7 +726,7 @@
                                                 <p-inputNumber
                                                 [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack)"
                                                     [(ngModel)]="
-                                                        colorsData[currentIndex]
+                                                        filteredColors[currentIndex]
                                                             ?.sizes[0]
                                                             .orderedPrePacks
                                                     "
@@ -712,7 +737,7 @@
                                                     (ngModelChange)="
                                                         onNumberChange(
                                                             $event,
-                                                            colorsData[
+                                                            filteredColors[
                                                                 currentIndex
                                                             ],
                                                             null
@@ -739,7 +764,7 @@
                                     <tbody>
                                         <tr
                                             *ngFor="
-                                                let size of colorsData[
+                                                let size of filteredColors[
                                                     currentIndex
                                                 ]?.sizes;
                                                 let i = index
@@ -752,7 +777,7 @@
                                             <td>
                                                 
                                                 <p-inputNumber
-                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? (size.sizeRatio * colorsData[currentIndex]?.sizes[0].orderedPrePacks) : colorsData[currentIndex]?.sizes[i].orderedPrePacks"
+                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0].orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
                                                    
                                                     mode="decimal"
                                                     [showButtons]="true"
@@ -762,7 +787,7 @@
                                                     (ngModelChange)="
                                                         onNumberChange(
                                                             $event,
-                                                            colorsData[
+                                                            filteredColors[
                                                                 currentIndex
                                                             ],
                                                             i
@@ -1282,12 +1307,12 @@
                                     </h5>
                                     <!-- color selections -->
                                     <div
-                                        *ngIf="colorsData?.length <= 8"
+                                        *ngIf="filteredColors?.length <= 8"
                                         class="d-flex flex-wrap align-items-center justify-content-lg-start"
                                     >
                                         <div
                                             class="mr-3"
-                                            *ngFor="let color of colorsData; let i = index"
+                                            *ngFor="let color of filteredColors; let i = index"
                                             [title]="color.colorName"
                                             position="top"
                                             class="imagAndHexaCode"
@@ -1344,7 +1369,7 @@
                                     <!-- color selection -->
             
                                     <!-- color slider -->
-                                    <div class="d-flex" style="height: 70px;" *ngIf="colorsData?.length > 8">
+                                    <div class="d-flex" style="height: 70px;" *ngIf="filteredColors?.length > 8">
                                         <button
                                         (click)="slideToPreviousImage()"
                                         class="mr-4 indicator-btns"
@@ -1360,7 +1385,7 @@
                                             >
                                                 <div
                                                     *ngFor="
-                                                        let color of colorsData;
+                                                        let color of filteredColors;
                                                         let i = index
                                                     "
                                                     [title]="color.colorName"
@@ -1435,7 +1460,7 @@
                                         <tbody>
                                             <tr
                                                 *ngFor="
-                                                    let size of colorsData[currentIndex]
+                                                    let size of filteredColors[currentIndex]
                                                         ?.sizes;
                                                     let i = index
                                                 "
@@ -1452,7 +1477,7 @@
                                                         (ngModelChange)="
                                                             onNumberChange(
                                                                 $event,
-                                                                colorsData[currentIndex],
+                                                                filteredColors[currentIndex],
                                                                 i
                                                             )
                                                         "
@@ -1481,7 +1506,7 @@
                                                 <th  style="background-color: #F8F8F8;">Size</th>
                                                 <td
                                                     *ngFor="
-                                                        let size of colorsData[currentIndex]
+                                                        let size of filteredColors[currentIndex]
                                                             .sizes
                                                     "
                                                 >
@@ -1493,7 +1518,7 @@
                                                 <th  style="background-color: #F8F8F8;">Prepack</th>
                                                 <td
                                                     *ngFor="
-                                                        let size of colorsData[currentIndex]
+                                                        let size of filteredColors[currentIndex]
                                                             .sizes
                                                     "
                                                 >
@@ -1529,7 +1554,7 @@
                                                     <tr>
                                                         <td>
                                                             {{
-                                                                colorsData[currentIndex]
+                                                                filteredColors[currentIndex]
                                                                     ?.sizes[0]
                                                                     .noOfAvailablePrepacks
                                                             }}
@@ -1538,7 +1563,7 @@
                                                             <p-inputNumber
                                                             [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack)"
                                                                 [(ngModel)]="
-                                                                    colorsData[currentIndex]
+                                                                    filteredColors[currentIndex]
                                                                         ?.sizes[0]
                                                                         .orderedPrePacks
                                                                 "
@@ -1549,7 +1574,7 @@
                                                                 (ngModelChange)="
                                                                     onNumberChange(
                                                                         $event,
-                                                                        colorsData[
+                                                                        filteredColors[
                                                                             currentIndex
                                                                         ],
                                                                         null
@@ -1576,7 +1601,7 @@
                                                 <tbody>
                                                     <tr
                                                         *ngFor="
-                                                            let size of colorsData[
+                                                            let size of filteredColors[
                                                                 currentIndex
                                                             ]?.sizes;
                                                             let i = index
@@ -1589,7 +1614,7 @@
                                                         <td>
                                                             
                                                             <p-inputNumber
-                                                            [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? (size.sizeRatio * colorsData[currentIndex]?.sizes[0].orderedPrePacks) : colorsData[currentIndex]?.sizes[i].orderedPrePacks"
+                                                            [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0].orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
                                                                
                                                                 mode="decimal"
                                                                 [showButtons]="true"
@@ -1599,7 +1624,7 @@
                                                                 (ngModelChange)="
                                                                     onNumberChange(
                                                                         $event,
-                                                                        colorsData[
+                                                                        filteredColors[
                                                                             currentIndex
                                                                         ],
                                                                         i

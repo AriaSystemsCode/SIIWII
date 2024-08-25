@@ -358,7 +358,45 @@ font-size: 14px;
 font-style: normal;
 font-weight: 600;
 }
+.searchBtn {
+    padding: 5px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    right: 0px;
+    background-color: transparent;
+    img {
+        position: absolute;
+        left: 16px;
+        z-index: 3;
+        width: 20px;
+        height: 20px;
+        top: 10px;
+    }
+}
+.m-input {
+    padding-left: 35px;
+}
+.searchBtn:hover {
+    border: none;
+    background-color: transparent;
+}
+.clear-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 18px;
+    height: 18px;
+    background: #4A0D4A;
+    text-align: center;
+    border-radius: 2px;
+}
+
 ::ng-deep {
+    .input-group > .form-control:focus {
+        z-index: 0 !important;
+        border: 1px solid #E2E2E2 !important;
+    }
 @media only screen and (max-width: 567px) {
     table th{
         white-space: nowrap !important;
