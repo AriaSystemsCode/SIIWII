@@ -7,23 +7,7 @@
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
                  {{l("Continue")}}
             </button>
-            <button
-            *ngIf="showSaveBtn"
-            [disabled]="!(isContactsValid)"
-            (click)="save()"
-            class="previewbtn text-center btn float-right"
-        >
-            Save
-            <i class="pi pi-check"></i>
-        </button>
-        <button
-        *ngIf="showSaveBtn"
-        (click)="cancel()"
-        class="cancelbtn text-center btn float-right"
-    >
-        Cancel
-        <i class="pi pi-times"></i>
-    </button>
+   
 
         </div>
         <hr class="my-2" />
@@ -41,6 +25,25 @@
                 (formValidityChanged)="isContactFormValid($event,1)"
             ></app-contact>
             </div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button
+            *ngIf="showSaveBtn"
+            [disabled]="!(isContactsValid)"
+            (click)="save()"
+            class="previewbtn text-center btn float-right"
+        >
+            Save
+            <!-- <i class="pi pi-check"></i> -->
+        </button>
+        <button
+        *ngIf="showSaveBtn"
+        (click)="cancel()"
+        class="cancelbtn text-center btn float-right"
+    >
+        Cancel
+        <!-- <i class="pi pi-times"></i> -->
+    </button>
         </div>
     </div>
         <hr class="my-2" />

@@ -7079,6 +7079,9 @@ namespace onetouch.Migrations
                     b.Property<string>("PaymentTermsName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Reference")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SellerCompanyName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -7260,6 +7263,9 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PriceLevel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SellerCompanyName")

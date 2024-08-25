@@ -9,19 +9,7 @@
                             *ngIf="salesRepIndex==0 &&!showSaveBtn " class="continuebtn text-center btn float-right">
                             Continue
                         </button>
-                        <button *ngIf="salesRepIndex==0 &&showSaveBtn" (click)="save()"  [disabled]="!(isContactsValid)"
-                            class="previewbtn text-center btn float-right">
-                            Save
-                            <i class="pi pi-check"></i>
-                        </button>
-                        <button
-                        *ngIf="showSaveBtn"
-                        (click)="cancel()"
-                        class="cancelbtn text-center btn float-right"
-                    >
-                        Cancel
-                        <i class="pi pi-times"></i>
-                    </button>
+                     
                     </div>
                 </div>
                 <hr class="my-2" *ngIf="salesRepIndex>0" />
@@ -39,10 +27,29 @@
 
                 <hr class="my-2" *ngIf="salesRepIndex>0" />
             </div>
+            <div class="d-flex justify-content-between" >
+                <button *ngIf="salesRepIndex==0 &&showSaveBtn" (click)="save()"  [disabled]="!(isContactsValid)"
+                class="previewbtn text-center btn float-right">
+                Save
+                <!-- <i class="pi pi-check"></i> -->
+            </button>
+            <div  *ngIf="salesRepIndex!=0 &&showSaveBtn">
+
+            </div>
+
+            <button
+            *ngIf="showSaveBtn"
+            (click)="cancel()"
+            class="cancelbtn text-center btn float-right"
+        >
+            Cancel
+            <!-- <i class="pi pi-times"></i> -->
+        </button>
+            </div>
         </div>
         <br/>
-        <button  class="addbtn mr-3" (click)="addNewSalesRep()" *ngIf="salesReps?.length <= 2">
-            Add <i class="fa fa-plus" style="color:#F88011"></i>
+        <button   class="addbtn mr-3" (click)="addNewSalesRep()" *ngIf="salesReps?.length <= 2" >
+            Add <i class="fa fa-plus" style="color:#4A0D4A"></i>
         </button>
         <br/><br/>
     </div>

@@ -125,7 +125,7 @@ import { CreateOrEditBillingInfoComponent } from "./admin/app-shoppingCart/Compo
 import { ViewBillingInfoComponent } from "./admin/app-shoppingCart/Components/billing-info/view-billing-info/view-billing-info.component";
 import { DevExpressDemoModule } from "./main/dev-express-demo/dev-express-demo.module";
 import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Components/share-transaction-tab/share-transaction-tab.component";
-
+import { TabViewModule } from 'primeng/tabview';
 @NgModule({
     declarations: [
         AppComponent,
@@ -238,7 +238,8 @@ import { ShareTransactionTabComponent } from "./admin/app-shoppingCart/Component
         TreeTableModule,
         TreeSelectModule,
         CalendarModule, TooltipModule,DevExpressDemoModule,
-        ChipModule
+        ChipModule,
+        TabViewModule
     ],
     providers: [
         ImpersonationService,

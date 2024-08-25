@@ -83,6 +83,7 @@ export class ShoppingCartViewComponentComponent
   companeyNames:GetAccountInformationOutputDto[];
   currentTab:number
   shareDone:boolean=false;
+  openActions:boolean =false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -95,11 +96,18 @@ export class ShoppingCartViewComponentComponent
 
   }
   ngOnInit(): void {
-   
+   console.log(this.openActions, "openActions")
   }
   loadCommentsList() {
+    const screenWidth = window.innerWidth;
+    const tabletWidth = 768; // iPads and tablets
     // this.commentParentComponent.show(this.postCreatorUserId,this.orderId,this.parentId,this.threadId)
+   //if(screenWidth <= tabletWidth)
     this.commentParentComponent?.first?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+    
+    //else 
+      this.commentParentComponent?.last?.show(this.appTransactionsForViewDto.creatorUserId, this.orderId, undefined, undefined)
+      
   }
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
@@ -218,7 +226,10 @@ export class ShoppingCartViewComponentComponent
           this.canChange= this.isOwnedByMe
            this.transactionCode=res?.code;
           
-           this.loadCommentsList()
+   
+
+        this.loadCommentsList()
+      
    
            //lines
            this._AppTransactionServiceProxy
@@ -523,12 +534,17 @@ export class ShoppingCartViewComponentComponent
 
       case 1:
         this.showMainSpinner();
+        // let moduleQty =
+        //   rowNode.node.data.updatedQty %
+        //   rowNode.node.data.noOfPrePacks;
+
         let moduleQty =
-          rowNode.node.data.updatedQty %
-          rowNode.node.data.noOfPrePacks;
-        let qty =
-          rowNode.node.data.updatedQty /
-          rowNode.node.data.noOfPrePacks;
+        rowNode.node.data.updatedQty % (
+        rowNode.node.data.qty/  rowNode.node.data.noOfPrePacks);
+        // let qty =
+        //   rowNode.node.data.updatedQty /
+        //   rowNode.node.data.noOfPrePacks 
+        let qty=rowNode.node.data.updatedQty ;
         if (moduleQty == 0) {
           this._AppTransactionServiceProxy
             .updateByProductSSINColor(
@@ -540,15 +556,17 @@ export class ShoppingCartViewComponentComponent
             )
             .subscribe((res) => {
               if (res) this.notify.info("Successfully Updated.");
+              this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
-              rowNode.node.data.showEditQty = false;
+              // rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
             });
         } else {
-          rowNode.node.data.invalidUpdatedQty =
-            "The quantity must be divisible by the prepack (" +
-            rowNode.node.data.noOfPrePacks +
-            ")";
+          // rowNode.node.data.invalidUpdatedQty =
+          //   "The quantity must be divisible by the prepack (" +
+          //   rowNode.node.data.noOfPrePacks +
+          //   ")";
+          rowNode.node.data.invalidUpdatedQty = "The quantity must be divisible by the prepack qty";
           this.hideMainSpinner();
         }
 

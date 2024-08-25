@@ -1,19 +1,31 @@
 .topbar {
     background-color: #4a0d4a;
     height: 70px;
-    margin-right: 13px !important;
+    // margin-right: 13px !important;
 }
-
+.navbar {
+    background: #4A0D4A;
+}
 .navbar-brand {
     font-size: unset;
     height: 3.5rem;
 }
+@media (min-width: 1024px) {
 
 .rightList {
     position: absolute;
     right: 3%;
     top: 0;
     border-left: 1px solid rgb(255 252 252 / 50%);
+}
+
+}
+@media (max-width: 1024px) {
+
+    .rightList {
+        position: relative;
+      
+    }
 }
 
 .small {
@@ -50,8 +62,13 @@
     position: absolute;
     right: 0px;
 }
-
+.navbar {
+    border-radius: 0px 0px 20px 20px !important;
+background: #4A0D4A;
+box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
+}
 @media only screen and (min-width: 768px) and (max-width: 1023px) {
+
     .rightList {
         position: unset;
     }
@@ -64,7 +81,26 @@
         flex-basis: unset !important;
     }
 }
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .position-md-absolute {
+        position: absolute;
+    }
+}
+
+@media (min-width: 992px) {
+    .position-lg-static {
+        position: static;
+    }
+}
 @media only screen and (max-width: 767px) {
+    .navbar-nav {
+        -webkit-box-orient: horizontal !important;
+        display: flex !important;
+        flex-direction: row !important;
+    }
+    .container-tab {
+        position: absolute !important;
+    }
     .input-group-form {
         width: 64%;
     }
@@ -90,6 +126,7 @@
     align-items: center;
     justify-content: center;
     gap: 15px;
+    white-space: nowrap;
 }
 
 .btn i {
@@ -104,10 +141,10 @@
     .p-menu .p-submenu-header {
         display: none !important;
     }
-    .p-dialog .p-dialog-header {
-        background-color: #fff !important;
-        color: #f6851d !important ;
-    }
+    // .p-dialog .p-dialog-header {
+    //     background-color: #fff !important;
+    //     color: #f6851d !important ;
+    // }
     .p-dialog .p-dialog-content {
         text-align: left !important;
     }
@@ -176,3 +213,12 @@
     padding: 5px;
     border: 1px solid #FFFFFF;
 }
+
+// @media (max-width: 567px) {
+
+//     .navbar {
+//         border-radius: 20px 20px 0px 0px !important;
+//     background: #4A0D4A;
+//     box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
+//     }
+//     }
