@@ -199,7 +199,7 @@
                         </span>
                     </div>
                 </span>
-                <p class="text-white mb-0" style="white-space: nowrap;font-size: 10px;">My cart</p>
+                <p *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="text-white mb-0" style="white-space: nowrap;font-size: 10px;">My cart</p>
             </div>
             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
                 <h5 class="text-white"> {{currencySymbol }} {{shoppingCartSummary?.amount | currency:' ' }}</h5>  
