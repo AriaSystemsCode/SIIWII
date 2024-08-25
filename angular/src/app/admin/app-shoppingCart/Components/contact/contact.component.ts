@@ -237,7 +237,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, undefined).subscribe(result => {
                     this.allContacts = result;
     
-                    if ((tempContact &&  this.allContacts?.length>0)  ||  (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactSSIN) ) {
+                    if (tempContact &&  this.allContacts?.length>0) {
                         this.tempContact=true;
                         this.contactNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName + "*";
     
