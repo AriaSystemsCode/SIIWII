@@ -15,6 +15,8 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("selectedAddressDetails") selectedAddressDetails;
     @Input("showAddressType") showAddressType:boolean=true;
+    @Input("showAddBtn") showAddBtn:boolean=false;
+
     showAddList:boolean=false;
     addressCode: string;
     addressName: string;
@@ -76,7 +78,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
             this.savedAddressesList=null;
             this.savedAddressesList=result;
             this.refSavedAddressesList=result;
-            debugger
+            // debugger
             if(this.savedAddressesList.length==0&&!this.selectedAddress){
                 this.openAddNewAddForm=true;
                 this.showAddList=false;

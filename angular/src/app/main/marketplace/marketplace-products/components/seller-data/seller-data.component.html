@@ -1,9 +1,5 @@
 <div class="d-flex seller-data web">
-    <div class="logo-name w-25">
-        <img [src]="attachmentBaseUrl + '/' + sellerData?.logoImage"
-            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-        <h3 class="text-white mt-3">{{ sellerData?.name }}</h3>
-    </div>
+
 
     <!--  <div class="banner w-75">
         <img
@@ -12,10 +8,17 @@
             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
         />
     </div> -->
-    <div class="h-100 w-100" #viewProfileCover>
+    <div class=" w-100" #viewProfileCover>
         <app-image-display [image]="bannerImg" [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-             [staticHeight]="viewProfileCover?.offsetHeight" [classList]="'img-cover'">
+             [staticHeight]="viewProfileCover?.offsetHeight" [classList]="'img-cover'" [staticWidth]="1330">
+
         </app-image-display>
+    
+    </div>
+    <div class="logo-name w-25 position-absolute">
+        <img [src]="attachmentBaseUrl + '/' + sellerData?.logoImage"
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+        <h3 class="text-white mt-3">{{ sellerData?.name }}</h3>
     </div>
 </div>
 
@@ -23,7 +26,7 @@
     <div class="seller-bannner" [style.background]="
             'url(' + attachmentBaseUrl + '/' + sellerData?.bannerImage + ')'
         ">
-        <h5 class="text-white h-100 d-flex align-items-center justify-content-center">
+        <h5 class="text-white  d-flex align-items-center justify-content-center">
             {{ sellerData?.name }}
         </h5>
     </div>

@@ -1,10 +1,10 @@
 ...<!-- Navbar -->
 <nav
-    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5"
+    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5 ml-0"
     [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
 >
     <!-- Container wrapper -->
-    <div class="container ml-0">
+    <div class="container ml-0 position-md-absolute position-lg-static p-2">
         <!-- Navbar brand -->
 
         <!--  <a
@@ -26,6 +26,18 @@
             iconPos="right"
             class="Create-New me-2"
         ></button> -->
+        <a
+        class="navbar-brand pt-0"
+        style="margin-left: 25px;"
+        [routerLink]="['/app/main/Home']"
+        routerLinkActive="header-link-active"
+        (click)="userClick('Home')"
+    >
+        <img
+            src="../../../assets/landingPage/Logo_Main.png"
+            class="navbar-brand"
+        />
+    </a>
         <button
             type="button"
             (click)="menu.toggle($event)"
@@ -37,19 +49,9 @@
         </button>
 
         <!-- test nav -->
-        <a
-            class="navbar-brand pt-0"
-            [routerLink]="['/app/main/Home']"
-            routerLinkActive="header-link-active"
-            (click)="userClick('Home')"
-        >
-            <img
-                src="../../../assets/landingPage/Logo_Main.png"
-                class="navbar-brand"
-            />
-        </a>
+ 
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form d-md-block d-none">
+        <form class="input-group pt-3 input-group-form  d-none">
             <div class="position-relative search-bar w-100" *ngIf="showSearch">
                 <div class="input-group mb-3">
                     <div
@@ -134,7 +136,7 @@
         </a>
 
         <!-- Collapsible wrapper -->
-        <div class="ml-4 d-md-block d-none navbar-collapse">
+        <div class="ml-4 d-md-flex d-none sec-section" style="justify-content: center;margin-left: 35px;">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -154,18 +156,18 @@
                         }}</span>
                     </a>
                 </li>
-                <li  class="border-left ml-2 nav-item text-white pt-3 pl-3" *ngIf="shoppingCartSummary?.shoppingCartId >0 && transactionType">
+                <li  class="border-left ml-2 nav-item text-white pt-3 pl-3 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0 && transactionType">
                 <div class="orderType"> {{transactionType}}</div> 
                   </li>
 
-                <li  class="ml-2 nav-item pt-2" *ngIf="shoppingCartSummary?.shoppingCartId >0">
+                <li  class="ml-2 nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
                         [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' +  shoppingCartSummary?.sellerLogo  : defaultSellerLogo "
                         onerror="this.onerror=null;this.src=defaultSellerLogo"
                         class="navbar-brand"
                     />
                   </li>
-                  <li  class="nav-item pt-2" *ngIf="shoppingCartSummary?.shoppingCartId >0">
+                  <li  class="nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img
                     [src]="shoppingCartSummary?.buyerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.buyerLogo : defaultBuyerLogo"
                     onerror="this.onerror=null;this.src=defaultBuyerLogo"
@@ -174,7 +176,7 @@
                   </li>
                   </ul>
 
-            <div class="position-relative pt-3">
+            <div class="position-relative pt-3 d-flex flex-column ml-4" style="">
                 <span
                     class="kt-header__topbar-icon kt-header__topbar-icon--primary"
                 >
@@ -190,23 +192,25 @@
                             class="kt-badge kt-badge--primary unread-notification-count"
                             style="
                                 top: 5px !important;
-                                right: -15px !important;
+                                right: 10px !important;
                             "
                         >
                             {{ shoppingCartSummary?.qty }}
                         </span>
                     </div>
                 </span>
+                <p class="text-white mb-0" style="white-space: nowrap;font-size: 10px;">My cart</p>
             </div>
-            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="ml-3 mt-2 pt-3"> 
+            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
                 <h5 class="text-white"> {{currencySymbol }} {{shoppingCartSummary?.amount | currency:' ' }}</h5>  
             </div>
 
             <!-- Left links -->
         </div>
 
-        <div class="rightList d-md-block d-none ml-4 ml-lg-0 navbar-collapse">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2">
+        <div class="rightList ml-4 ml-lg-0 navbar-collapse d-md-block d-none">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-md-flex d-none " style="justify-content: space-around;">
+                <div class="border-left text-white  d-md-block  mt-1" style="height: 55px;"></div>
                 <li class="nav-item pl-3 pt-2">
                     <a
                         class="nav-link active d-flex flex-column text-center"
@@ -255,12 +259,12 @@
                     </a>
                 </li>
 
-                <li class="nav-item pl-3">
+                <li class="nav-item pl-3 ">
                     <a class="nav-link active d-flex flex-column text-center">
                         <div
                             dropdown
-                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-3 pr-3"
-                            style="width: 40px; height: 40px; color: white"
+                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3"
+                            style=" height: 40px; color: white"
                         >
                             <div
                                 dropdownToggle
@@ -542,7 +546,9 @@
                         </div>
                     </a>
                 </li>
+               
             </ul>
+           
         </div>
         <!-- Collapsible wrapper -->
 
@@ -581,7 +587,32 @@
                         />
                     </a>
                 </li>
-
+<li  class="nav-item pt-1">
+    <div class="position-relative pt-3" >
+        <span
+            class="kt-header__topbar-icon kt-header__topbar-icon--primary"
+        >
+            <img
+                src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
+                style="width: 20px; height: 20px; cursor: pointer;"
+                class="m-auto"
+                (click)="getShoppingCartInfo(true)"
+                *ngIf="shoppingCartSummary?.shoppingCartId >0"
+            />
+            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
+                <span
+                    class="kt-badge kt-badge--primary unread-notification-count"
+                    style="
+                        top: 5px !important;
+                        right: -15px !important;
+                    "
+                >
+                    {{ shoppingCartSummary?.qty }}
+                </span>
+            </div>
+        </span>
+    </div>
+</li>
                 <li class="nav-item pt-2">
                     <a
                         class="nav-link active d-flex flex-column text-center"

@@ -1,5 +1,5 @@
 ﻿<div [@routerTransition]>
-    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor transPage transBrow">
 
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
             <div class="kt-portlet kt-portlet--mobile">
@@ -8,7 +8,7 @@
                         style=" border-bottom: solid 2px #e5e2e2;">
                         <div>
 
-                            <div class="row mb-3 justify-content-between">
+                            <div class="row mb-3 ">
                                 <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                         *ngIf="showMainFiltersOptions">
@@ -55,27 +55,49 @@
                                         {{ mainFilterCtrl?.value?.displayName | localize }}
                                     </div>
                                 </div>
-                                <div class="mb-4 col-4 mb-md-0 list-toolbar-search">
+                           
+                            </div>
+                            <div class="top-sec">
+                            <div class="row justify-content-between">
+                            <div class="mb-0 col-md-4 col-12 mb-md-0 list-toolbar-search">
                                     <div class="form-group m-form__group align-items-center">
                                         <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button (click)="getAppTransactions()" class="searchBtn" type="submit">
+                                                    <img 
+                                                        src="../../../assets/landingPage/Search.png" />
+                                                    </button>
+                                            </span>
                                             <input [(ngModel)]="filterText" formControlName="search" autoFocus
                                                 class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
                                                 type="text" >
-                                            <span class="input-group-btn">
-                                                <button (click)="getAppTransactions()" class="searchBtn" type="submit">
-                                                    <img style="width: 30px; height: 30px"
-                                                        src="../../../assets/landingPage/Iconionic-md-search.png" /></button>
-                                            </span>
+                                         
                                         </div>
                                     </div>
                                 </div>
-                                <div class="list-toolbar-divider" *ngIf="showAddButton"></div>
-                                <div class="mb-4 mb-md-0 text-center">
+                                <div class="col-4"></div>
+                                <!-- <div class="list-toolbar-divider" *ngIf="showAddButton"></div> -->
+                          
+                                <!-- <div class="list-toolbar-divider"></div> -->
+<div class="col-md-4 col-12 d-flex justify-content-md-end justify-content-start">
+                                <div class="text-center mr-2">
+                                    <a style="
+                                        padding-right: 4px;
+                                        padding-left: 10px;
+                                    " [title]="'ResetData' | localize"
+                                        class="btn  font-weight-normal text-center text-primary toolbar-btn"
+                                        (click)="resetList()">
+                                        <i class="d-inline-block w-100 flaticon2-reload icon-center purpleColor"></i>
+                                    </a>
+
+                                </div>
+                                <div class="mb-3 mb-md-0 text-center">
 
                                     <ng-container *ngIf="showAddButton">
                                         <div class="btn-group" dropdown>
-                                            <button dropdownToggle type="button"
-                                                class="btn btn-primary bgPurple border-0" data-toggle="dropdown"
+                                            <button dropdownToggle type="button" style="    width: 146px;
+    height: 48px;"
+                                                class="btn  bgPurpleM border-0" data-toggle="dropdown"
                                                 aria-haspopup="true" aria-expanded="false">
                                                 {{"Create new" | localize}} <i class="fa fa-plus pl-2"></i>
                                             </button>
@@ -93,20 +115,8 @@
                                         </div>
                                     </ng-container>
                                 </div>
-                                <div class="list-toolbar-divider"></div>
-
-                                <div class="text-center">
-                                    <a style="
-                                        padding-right: 4px;
-                                        padding-left: 10px;
-                                    " [title]="'ResetData' | localize"
-                                        class="btn  font-weight-normal text-center text-primary toolbar-btn"
-                                        (click)="resetList()">
-                                        <i class="d-inline-block w-100 flaticon2-reload icon-center purpleColor"></i>
-                                    </a>
-
-                                </div>
                             </div>
+                        </div>
                             <div class="row " [hidden]="!advancedFiltersAreShown">
                                 <div class="col-md-12">
                                     <div class="kt-separator kt-separator--border-dashed"></div>
@@ -192,8 +202,8 @@
 
                             </div>
 
-                            <div class="row mb-2">
-                                <div class="col-sm-12">
+                            <div class="row mb-2 ">
+                                <div class="col-sm-12 d-flex justify-content-end">
                                     <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown"
                                         (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
                                             class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
@@ -202,6 +212,7 @@
                                             class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </form>
 
@@ -293,6 +304,34 @@
                                             <!-- <p-columnFilter type="date" field="completeDate" display="menu"
                                                 class="ml-auto"></p-columnFilter> -->
                                         </th>
+                                        <th style="width: 150px" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('Reference #')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 165px" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('CreatorTenantName')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        
+                                
+
+                                        <th style="width: 150px;white-space: nowrap;" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('TotalQuantity')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        <th style="width: 150px" pSortableColumn="completeDate" class="purpleColor">
+                                            {{l('TotalAmount')}}
+                                            <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
+                                            <!-- <p-columnFilter type="date" field="completeDate" display="menu"
+                                                class="ml-auto"></p-columnFilter> -->
+                                        </th>
+                                        
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
@@ -343,6 +382,34 @@
                                                 {{record.completeDate | momentFormat:'L' }}
                                             </span>
                                             <span *ngIf="!record.completeDate">-</span>
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('Reference #')}}</span>
+                                            <span >
+                                                {{record.reference }}
+                                            </span>
+                                            <span *ngIf="!record.reference">-</span>
+                                        </td>
+                                        <td style="width:165px ;">
+                                            <span class="p-column-title" style="white-space: nowrap;"> {{l('CreatorTenantName')}}</span>
+                                            <span >
+                                                {{record.creatorTenantName }}
+                                            </span>
+                                            <!-- <span *ngIf="!record.creatorTenantName">-</span> -->
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('TotalQuantity')}}</span>
+                                            <span >
+                                                {{record.totalQuantity }}
+                                            </span>
+                                            <!-- <span *ngIf="!record.totalQuantity">-</span> -->
+                                        </td>
+                                        <td style="width:150px">
+                                            <span class="p-column-title"> {{l('TotalAmount')}}</span>
+                                            <span >
+                                                {{record.totalAmount }}
+                                            </span>
+                                            <!-- <span *ngIf="!record.totalAmount">-</span> -->
                                         </td>
                                     </tr>
 

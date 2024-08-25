@@ -43,7 +43,8 @@ export class MarketplaceViewProductComponent
     //     appItemForViewDto: new AppItemForViewDto(),
     //     publish: false,
     // };
-
+    filterText = ''
+    showIconClose : boolean = false
     productBodyData: any;
     productImages: AppEntityAttachmentDto[];
     productDetails: any;
@@ -59,6 +60,8 @@ export class MarketplaceViewProductComponent
     showEditSpecialPrice: boolean = true;
     updatedSpecialPrice: number = 0;
     chk_Order_by_prepack: boolean = true;
+    filteredColors: any[] = [];
+    handleSCreenSelect :number = 0
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -72,8 +75,18 @@ export class MarketplaceViewProductComponent
         super(injector);
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.getProductDetailsForView();
+        this.filteredColors = this.colorsData;
     }
     ngOnInit(): void {
+
+        const screenWidth = window.innerWidth;
+        if (screenWidth >= 992) { // lg screen
+          this.handleSCreenSelect = 5
+        } else if (screenWidth >= 768) { // md screen
+            this.handleSCreenSelect = 3
+
+        } 
+        
         // this.productId = this._activatedRoute.snapshot.params["id"];
         // this.showMainSpinner();
         // const subs = this._appItemsServiceProxy
@@ -110,8 +123,39 @@ export class MarketplaceViewProductComponent
         //         this.appItemViewInput = this._appItemViewInput;
         //     });
         // this.subscriptions.push(subs);
-    }
+        this.filteredColors = this.colorsData;
+        console.log(this.filteredColors,'this.filteredColors')
 
+    }
+    onFilterTextChanged() {
+        this.showIconClose = this.filterText.trim() !== '';
+        console.log(this.filterText,'this.filterText')
+        if (!this.filterText) {
+          // If no filter text, show all colors
+          this.filteredColors = this.colorsData;
+        
+        console.log(this.filteredColors,'this.filteredColors')
+
+        } else {
+          
+
+          const filterTextLower = this.filterText.toLowerCase();
+        console.log(filterTextLower,'filterTextLower')
+
+          this.filteredColors = this.colorsData.filter(color =>
+            (color.colorName && color.colorName.toLowerCase().includes(filterTextLower)) ||
+            (color.colorCode && color.colorCode.toLowerCase().includes(filterTextLower))
+          );
+        console.log( this.filteredColors,'final')
+
+        }
+      }
+      clearFilterText() {
+        this.filterText = '';
+        this.filteredColors = this.colorsData;
+
+        this.showIconClose = false;
+      }
     getProductDetailsForView() {
         this.showEditSpecialPrice = true;
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
@@ -183,8 +227,10 @@ export class MarketplaceViewProductComponent
                                 sizes: sizesValue[0],
                                 colorImg: variation.colorImage,
                                 colorCode: variation.colorHexaCode,
+                                colorCodeSelectedValues:variation.code
                             };
                         });
+                        this.filteredColors = this.colorsData
                     });
 
                 this.GetCurrencyInfo();
@@ -242,9 +288,12 @@ export class MarketplaceViewProductComponent
             }
         });
         if (!foundColor) {
+            console.log(foundColor,'foundColor')
+
             this.orderSummary.push(orederedMappedData);
         }
         if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
+            console.log('hello11')
             this.productDetails.variations.map((variation: any) => {
                 if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
                     variation.selectedValues.forEach((value) => {
@@ -254,6 +303,8 @@ export class MarketplaceViewProductComponent
                         ) {
                             value.edRestAttributes.forEach((attr) => {
                                 if (attr.extraAttrName === "SIZE") {
+  
+
                                     attr.values.forEach((sizeValue) => {
                                         sizeValue.orderedPrePacks =
                                             this.colorsData[
@@ -267,6 +318,7 @@ export class MarketplaceViewProductComponent
                 }
             });
         }
+    
         this.calculateTotalOrderPriceAndQty(this.orderSummary);
     }
 
@@ -592,20 +644,34 @@ export class MarketplaceViewProductComponent
         });
     }
     onChangechk_Order_by_prepack() {
-        if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
-            this.colorsData[this.currentIndex].sizes.forEach((item) => {
-                item.orderedPrePacks=0;
-            });
-        }
-            else{
-            this.colorsData[this.currentIndex].sizes.forEach((item) => {
-                item.orderedPrePacks*=item.sizeRatio;
-            });
-        }
+        console.log(this.orderSummary,'this.orderSummary')
+  
+                if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack)) {
+                    console.log(this.colorsData[this.currentIndex],'this.colorsData[this.currentIndex].sizes')
+                    this.colorsData[this.currentIndex].sizes.forEach((item) => {
+
+                        if(item.colorName ) {
+                            item.orderedPrePacks=0;
+
+                        }
+                        else {
+                            item.orderedPrePacks*=item.sizeRatio;
 
 
+                        }
+                    });
+                }
+                    else{
+
+                    this.colorsData[this.currentIndex].sizes.forEach((item) => {
+        console.log(item.orderedPrePacks,'item1')
+
+                        item.orderedPrePacks*=item.sizeRatio;
+                    });
+                }
 
     }
+    
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

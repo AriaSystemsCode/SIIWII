@@ -373,7 +373,7 @@ body {
 
 
 .purpleColor {
-    color: #700066 !important;
+    color: #1B101B !important;
 }
 
 .kt-notification .kt-notification__item:after {
@@ -413,6 +413,7 @@ color: #700066 !important;
 .shoppingCartAccordionTabBG  .p-accordion .p-accordion-header .p-accordion-header-link  {
     background: #f1f2f3 !important;
     padding: 15px;
+    // border-radius: 10px !important;
 }
 .shoppingCartAccordionTabBG   .p-accordion .p-accordion-content{
     background:white !important;
@@ -421,29 +422,29 @@ color: #700066 !important;
 
 .ticket-dropdown.form-control.aria-select.text-left.p-dropdown.p-component{
     background:white !important;
-    border-color: #700066 !important;
+    // border-color: #700066 !important;
 }
+//  p-treetable
+// .p-treetable .p-treetable-thead > tr {
+//     border: none !important;
+//    // background: white !important;
+// }
 
-.p-treetable .p-treetable-thead > tr {
-    border: none !important;
-   // background: white !important;
-}
-
-.p-treetable .p-treetable-thead > tr >  th
-{
-    border: 1px solid white !important;
-    background: white !important;
-}
+// .p-treetable .p-treetable-thead > tr >  th
+// {
+//     border: 1px solid white !important;
+//     background: white !important;
+// }
 
 .p-treetable .p-treetable-scrollable-body{
-    overflow: hidden scroll;
+    // overflow: hidden scroll;
     min-height: 400px;
     max-height: 500px;
 }
 
 
 .shoppingCartAccordionTabBG path {
-    color: #700066;
+    // color: #700066;
 }
   .shoppingCartAccordionTabBG.shoppingCartAccordionNotValidTab .p-accordion .p-accordion-header .p-accordion-header-link  {
     background: red !important;
@@ -451,7 +452,7 @@ color: #700066 !important;
 
 
 .tempAccount .p-dropdown.p-component{
-    background-color: red;
+    // background-color: red;
     border: none;
 }
 
@@ -500,9 +501,10 @@ button.dropdown-toggle.btn.btn-sm.btn-action {
 }
 
 .p-tabview .p-tabview-nav li {
-    margin-right: 2px;
+    // margin-right: 2px;
+    // margin: 0 !important;
     border-radius: 12px 0px 0px 0px !important;
-    border: 1px solid #4A0D4A;
+    // border: 1px solid #4A0D4A;
 }
 
 .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
@@ -521,6 +523,191 @@ span.p-tabview-title {
     color: black;
 }
 }
+
+
+// calendar general style
+.p-datepicker:not(.p-datepicker-inline) {
+    z-index: 12000 !important;
+    
+}
+
+.p-datepicker table td > span.p-highlight {
+    background-color: #4A0D4A !important;
+    border-radius: 6.04px;
+}
+.p-datepicker table thead {
+    background-color: #F9F0F9;
+    font-size: 12px;
+    border-radius: 3.71px;
+}
+.p-datepicker .p-datepicker-header .p-datepicker-title {
+    font-weight: 600;
+    color: #1B101B;
+    font-size: 14px;
+
+}
+.p-datepicker table td > span{
+    font-weight: 600;
+    color: #494949;
+    font-size: 10px;
+}
+
+.p-datepicker .p-datepicker-header .p-datepicker-prev, .p-datepicker .p-datepicker-header .p-datepicker-next {
+    border: 1px solid #EEEEEE !important;
+    border-radius: 4.46px !important;
+    color:#4A0D4A  ;
+}
+
+.p-datepicker .p-datepicker-header.p-button:hover {
+    border: 1px solid #4A0D4A !important;
+
+
+}
+.p-datepicker .p-datepicker-header .p-datepicker-prev:focus, .p-datepicker .p-datepicker-header .p-datepicker-next:focus{
+    box-shadow: none !important;
+       background: #4A0D4A !important;
+   color: #FFFFFF !important;
+
+}
+
+.p-datepicker .p-datepicker-header .p-datepicker-prev:enabled:hover, .p-datepicker .p-datepicker-header .p-datepicker-next:enabled:hover {
+    background: #4A0D4A ;
+    color: #FFFFFF;
+
+
+}
+.p-calendar .p-inputtext:enabled:focus {
+    box-shadow: none !important;
+     border:2px solid #4A0D4A !important;
+     border-bottom-left-radius: 0px !important;
+     .p-calendar-w-btn .p-datepicker-trigge{
+     border-bottom-left-radius: 0px !important;
+
+     }
+
+}
+
+.p-calendar-w-btn .p-inputtext {
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+     border: 1px solid #EEEEEE !important;
+    border-radius: 8px !important;
+    margin-right: -11px;
+    border-right: none;
+    padding-right: 0 !important;
+    
+}
+
+
+.p-calendar-w-btn .p-datepicker-trigger {
+    border-radius: 8px !important ;
+    background: #4A0D4A !important ;
+    color: #EFEFEF !important;
+}
+.p-calendar
+{
+     .p-button:enabled:hover {
+    background: #722972 !important;
+}
+}
+.p-calendar .p-button:focus {
+    box-shadow: none !important;
+    border-bottom-right-radius: 0px !important;
+}
+
+// on error date 
+::ng-deep {
+    .p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
+        border:2px solid #C83532 !important;
+    }
+}
+// inputs focus {
+    .p-inputtext:enabled:focus{
+        box-shadow: none !important;
+        border: 2px solid #4A0D4A !important;
+
+    }
+
+// scroll bar
+.p-dialog , .transBrow{
+::-webkit-scrollbar {
+    width: 10px;
+    height: 5px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #D9D9D9;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+
+background: #FFFFFF;
+box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+border-radius: 20px;
+border: 1px solid #D9D9D9 !important;
+
+
+  }
+}
+//  dropdown styles 
+
+// .p-dropdown .p-component:focus-visible {
+//     border: 1px solid #ab0788 !important;
+//     border-radius: 8px !important;
+// }
+.p-dropdown:not(.p-disabled):hover{
+border: 1px solid #D9D9D9 !important;
+}
+::ng-deep {
+    .p-dropdown {
+        border-radius: 8px !important;
+        border: 1px rgba(238, 238, 238, 0.93) !important;
+        
+        background: #FFF !important;
+
+     .p-dropdown .p-dropdown-label.p-placeholder {
+        color:#9E9E9E  !important;
+    }
+
+    .p-calendar .p-inputtext {
+        color: #9E9E9E !important;
+    }
+    }
+    .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+        background: #4A0D4A !important;
+        color: #FFF !important;
+    }
+.p-dropdown:not(.p-disabled):focus{
+    border: 1px solid #4A0D4A !important;
+    box-shadow: 0 0 0 2px rgba(255, 87, 51, 0.2) !important; 
+    }
+    //   general inputs 
+.form-control:focus, .form-control:active{
+    border: 1px solid #4A0D4A !important;
+    
+}
+
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background:  #4A0D4A !important;
+
+}
+}
+
+
+
+// .p-datepicker:not(.p-datepicker-inline) {
+//     z-index: 2000 !important;
+// }
+
+::ng-deep {
+    body {
+      overflow: scroll !important;
+    }
+}
+
 .p-datepicker:not(.p-datepicker-inline) {
     z-index: 999999999999 !important;
 }

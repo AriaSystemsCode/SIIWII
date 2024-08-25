@@ -3,7 +3,8 @@
     }
     .main-image {
         .main {
-            width: 400px;
+            width: 200px;
+            border-radius: 12px;
         }
     }
 }
@@ -11,6 +12,7 @@
 .imageSlides {
     width: 50px;
     cursor: pointer;
+    border-radius: 12px;
 }
 
 .slider-container {
