@@ -114,7 +114,6 @@ export class MarketplaceViewProductComponent
         //     });
         // this.subscriptions.push(subs);
         this.filteredColors = this.colorsData;
-        console.log(this.filteredColors,'this.filteredColors')
 
     }
     onFilterTextChanged() {
@@ -123,8 +122,6 @@ export class MarketplaceViewProductComponent
         if (!this.filterText) {
           // If no filter text, show all colors
           this.filteredColors = this.colorsData;
-        
-        console.log(this.filteredColors,'this.filteredColors')
 
         } else {
           
@@ -136,7 +133,6 @@ export class MarketplaceViewProductComponent
             (color.colorName && color.colorName.toLowerCase().includes(filterTextLower)) ||
             (color.colorCode && color.colorCode.toLowerCase().includes(filterTextLower))
           );
-        console.log( this.filteredColors,'final')
 
         }
       }
