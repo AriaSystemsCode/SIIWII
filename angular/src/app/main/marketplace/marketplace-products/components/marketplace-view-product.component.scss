@@ -61,10 +61,35 @@ td {
     justify-content: center;
 
 }
+.parent-slider {
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 5px;
+      }
+    
+      /* Track */
+      ::-webkit-scrollbar-track {
+        background: #D9D9D9;
+      }
+    
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+    
+    background: #FFFFFF;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    border: 1px solid #D9D9D9 !important;
+    
+    
+      }
+}
 .slider-container {
     position: relative;
-    overflow: scroll;
-    width: 100%; /* Set the height of the slider as needed */
+    // overflow-x: scroll;
+    overflow: hidden;
+    gap: 8px;
+    width: 100%; 
+   
 }
 
 .slider {
@@ -320,7 +345,7 @@ input:checked + .slider:before {
 }
 @media only screen and (max-width: 992px) {
     .web {
-        margin-top: 5px;
+        margin-top: 15px;
     }
     .summaryWeb{
 display: none;
@@ -393,6 +418,7 @@ font-weight: 600;
 }
 
 ::ng-deep {
+
     .input-group > .form-control:focus {
         z-index: 0 !important;
         border: 1px solid #E2E2E2 !important;

@@ -51,7 +51,7 @@
         <!-- test nav -->
  
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form d-lg-block d-md-none">
+        <form class="input-group pt-3 input-group-form  d-none">
             <div class="position-relative search-bar w-100" *ngIf="showSearch">
                 <div class="input-group mb-3">
                     <div
@@ -136,7 +136,7 @@
         </a>
 
         <!-- Collapsible wrapper -->
-        <div class="ml-4 d-md-flex d-none navbar-collapse " style="justify-content: space-evenly;margin-left: 35px;">
+        <div class="ml-4 d-md-flex d-none sec-section" style="justify-content: center;margin-left: 35px;">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -176,7 +176,7 @@
                   </li>
                   </ul>
 
-            <div class="position-relative pt-3" style="width: 20px;">
+            <div class="position-relative pt-3 d-flex flex-column ml-4" style="">
                 <span
                     class="kt-header__topbar-icon kt-header__topbar-icon--primary"
                 >
@@ -192,13 +192,14 @@
                             class="kt-badge kt-badge--primary unread-notification-count"
                             style="
                                 top: 5px !important;
-                                right: -15px !important;
+                                right: 10px !important;
                             "
                         >
                             {{ shoppingCartSummary?.qty }}
                         </span>
                     </div>
                 </span>
+                <p class="text-white mb-0" style="white-space: nowrap;font-size: 10px;">My cart</p>
             </div>
             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.amount" class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
                 <h5 class="text-white"> {{currencySymbol }} {{shoppingCartSummary?.amount | currency:' ' }}</h5>  
@@ -209,7 +210,7 @@
 
         <div class="rightList ml-4 ml-lg-0 navbar-collapse d-md-block d-none">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-md-flex d-none " style="justify-content: space-around;">
-                <div class="border-left text-white  d-md-block d-lg-none"></div>
+                <div class="border-left text-white  d-md-block  mt-1" style="height: 55px;"></div>
                 <li class="nav-item pl-3 pt-2">
                     <a
                         class="nav-link active d-flex flex-column text-center"

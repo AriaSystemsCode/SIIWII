@@ -477,7 +477,7 @@
                     </div>
                         <!-- color selections -->
                         <div
-                            *ngIf="filteredColors?.length <= 8"
+                            *ngIf="filteredColors?.length <= handleSCreenSelect"
                             class="d-flex flex-wrap align-items-center justify-content-lg-start"
                         >
                             <div
@@ -522,7 +522,7 @@
                               
                                    
                                     <p class="card-text desc fw-bold" >
-                                        {{   color.colorCode }}
+                                        {{   color.colorCodeSelectedValues }}
                                     </p>
                                     <p class="seller" >{{ color.colorName  }}</p> 
                             
@@ -534,7 +534,7 @@
                         <!-- color selection -->
 
                         <!-- color slider -->
-                        <div class="d-flex" style="height: 70px;" *ngIf="filteredColors?.length > 8">
+                        <div class="d-flex parent-slider" style="height: 130px;" *ngIf="filteredColors?.length > handleSCreenSelect">
                             <button
                             (click)="slideToPreviousImage()"
                             class="mr-4 indicator-btns"
@@ -571,27 +571,37 @@
                                                     : ''
                                             "
                                         ></div>
-                                        <img
-                                            *ngIf="
-                                                (color.colorImg === null &&
-                                                    color.colorCode === null) ||
-                                                color.colorImg !== null
-                                            "
-                                            (click)="setSizes(i)"
-                                            [src]="
-                                                attachmentBaseUrl +
-                                                '/' +
-                                                color.colorImg
-                                            "
-                                            alt="images slides"
-                                            class="imageSlides"
-                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                            [ngClass]="
-                                            i === currentIndex
-                                                ? 'border border-primary '
-                                                : ''
-                                        "
-                                        />
+                                        <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
+                                        i === currentIndex
+                                            ? 'border border-primary '
+                                            : ''
+                                    ">
+                                <img
+                                    *ngIf="
+                                        (color.colorImg === null &&
+                                            color.colorCode === null) ||
+                                        color.colorImg !== null
+                                    "
+                                    (click)="setSizes(i)"
+                                    [src]="
+                                        attachmentBaseUrl + '/' + color.colorImg
+                                    "
+                                    alt="images slides"
+                                    class="imageSlides"
+                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                              
+                                />
+                                <div class="card-body">
+                              
+                                   
+                                    <p class="card-text desc fw-bold" >
+                                        {{   color.colorCodeSelectedValues }}
+                                    </p>
+                                    <p class="seller" >{{ color.colorName  }}</p> 
+                            
+                                 
+                                </div>
+                                </div>
                                     </div>
                                 </div>
                             </div>
@@ -1304,12 +1314,39 @@
                                 />
             
                                 <div class="color-selection">
+                                    <div class="d-flex">
+
+
+
+
+                                   
                                     <h5 class="my-2" style="text-decoration: none;color:black  !important">
                                         Colors
                                     </h5>
+                                    <div class="form-group m-form__group align-items-center">
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button  class="searchBtn" type="submit">
+                                                    <img 
+                                                        src="../../../assets/landingPage/Search.png" />
+                                                    </button>
+                                            </span>
+                                            <input [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
+                                                class="form-control m-input" placeholder="search with color"
+                                                type="text" >
+                                               
+                                                <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText()">
+                                                    <i class=" fa fa-1x fa-times fa-1x" style="color: #fff;" ></i>
+        
+                                                </a>
+        
+                                         
+                                        </div>
+                                    </div>
+                                    </div>
                                     <!-- color selections -->
                                     <div
-                                        *ngIf="filteredColors?.length <= 8"
+                                        *ngIf="filteredColors?.length <= 3"
                                         class="d-flex flex-wrap align-items-center justify-content-lg-start"
                                     >
                                         <div
@@ -1359,7 +1396,7 @@
                               
                                    
                                     <p class="card-text desc fw-bold" >
-                                        {{   color.colorCode }}
+                                        {{   color.colorCodeSelectedValues }}
                                     </p>
                                     <p class="seller" >{{ color.colorName  }}</p> 
                             
@@ -1371,7 +1408,7 @@
                                     <!-- color selection -->
             
                                     <!-- color slider -->
-                                    <div class="d-flex" style="height: 70px;" *ngIf="filteredColors?.length > 8">
+                                    <div class="d-flex parent-slider" style="height: 120px;" *ngIf="filteredColors?.length > 3">
                                         <button
                                         (click)="slideToPreviousImage()"
                                         class="mr-4 indicator-btns"
@@ -1408,27 +1445,37 @@
                                                                 : ''
                                                         "
                                                     ></div>
-                                                    <img
-                                                        *ngIf="
-                                                            (color.colorImg === null &&
-                                                                color.colorCode === null) ||
-                                                            color.colorImg !== null
-                                                        "
-                                                        (click)="setSizes(i)"
-                                                        [src]="
-                                                            attachmentBaseUrl +
-                                                            '/' +
-                                                            color.colorImg
-                                                        "
-                                                        alt="images slides"
-                                                        class="imageSlides"
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                                        [ngClass]="
-                                                            i === currentIndex
-                                                                ? 'border border-primary '
-                                                                : ''
-                                                        "
-                                                    />
+                                                    <div   style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"   [ngClass]="
+                                                    i === currentIndex
+                                                        ? 'border border-primary '
+                                                        : ''
+                                                ">
+                                            <img
+                                                *ngIf="
+                                                    (color.colorImg === null &&
+                                                        color.colorCode === null) ||
+                                                    color.colorImg !== null
+                                                "
+                                                (click)="setSizes(i)"
+                                                [src]="
+                                                    attachmentBaseUrl + '/' + color.colorImg
+                                                "
+                                                alt="images slides"
+                                                class="imageSlides"
+                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                          
+                                            />
+                                            <div class="card-body">
+                                          
+                                               
+                                                <p class="card-text desc fw-bold" >
+                                                    {{   color.colorCodeSelectedValues }}
+                                                </p>
+                                                <p class="seller" >{{ color.colorName  }}</p> 
+                                        
+                                             
+                                            </div>
+                                            </div>
                                                 </div>
                                             </div>
                                         </div>

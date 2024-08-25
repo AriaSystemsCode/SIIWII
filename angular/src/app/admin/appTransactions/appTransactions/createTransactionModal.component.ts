@@ -473,20 +473,21 @@ if (event.filter != '' || event.filter != undefined){
                      
                     }
                     else {
+
                         this.buyerContacts = [...res];
 
                     }
               
 
                 });
-        }, 0);
+        },500);
     }
     addNewBuyer() {
         this.orderForm.controls['buyerContactName'].setValue(this.searchTerm);
 
                 this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
         //  this.searchTerm=  undefined
-    this.showAddBuyBtn = true
+    this.showAddBuyBtn = false
 
 
       
@@ -535,12 +536,18 @@ if (event.filter != '' || event.filter != undefined){
     handleBuyerNameChange(event: any) {
         this.buyerContactId = event.value.id;
         this.buyerContactSSIN = event.value.ssin;
-        this.orderForm
+        console.log(event.value,'vaaaal')
+        if(event.value.email != null){
+            this.orderForm
             .get("buyerContactEMailAddress")
             .setValue(event.value.email);
-        this.orderForm
+        }
+         if(event.value.phone != null){
+            this.orderForm
             .get("buyerContactPhoneNumber")
             .setValue(event.value.phone);
+         }
+
 
         this.invalidBuyerPhoneNumber = "";
         this.buyerPhoneLabel = event?.value?.phoneTypeName ?   event?.value?.phoneTypeName + " Number" : this.buyerPhoneLabel;
@@ -550,12 +557,17 @@ if (event.filter != '' || event.filter != undefined){
         console.log(">>", event.value);
         this.sellerContactId = event.value.id;
         this.sellerContactSSIN = event.value.ssin;
-        this.orderForm
+        if(event.value.email != null) {
+            this.orderForm
             .get("sellerContactEMailAddress")
             .setValue(event.value.email);
-        this.orderForm
+        } 
+        if(event.value.phone != null) {
+            this.orderForm
             .get("sellerContactPhoneNumber")
             .setValue(event.value.phone);
+        }
+
 
         this.sellerPhoneLabel = event?.value?.phoneTypeName ?  event?.value?.phoneTypeName + " Number" : this.sellerPhoneLabel;
 

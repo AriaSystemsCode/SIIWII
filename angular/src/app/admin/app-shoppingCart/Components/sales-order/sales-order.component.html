@@ -167,7 +167,7 @@
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1">Categories</label>  <button *ngIf="hideCatBtn  && allRecords.length == 0" (click)="showCatBtn = true ;hideCatBtn= false" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button></div> 
+                        <div class="d-flex"> <label class="label pt-1">Categories</label>  <button  (click)="showCatBtn = true ;hideCatBtn= false" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button></div> 
 
                          <!-- <div class="d-flex" *ngIf="showCatBtn || allRecords.length == 0 ">
                             <div  class="formGroup  col-8">
@@ -369,7 +369,7 @@
 </div> -->
 
                   
-                        <button (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button>
+                        <!-- <button (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button> -->
                     </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">

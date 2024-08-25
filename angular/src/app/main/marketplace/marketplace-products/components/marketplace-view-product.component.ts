@@ -61,6 +61,7 @@ export class MarketplaceViewProductComponent
     updatedSpecialPrice: number = 0;
     chk_Order_by_prepack: boolean = true;
     filteredColors: any[] = [];
+    handleSCreenSelect :number = 0
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -77,6 +78,15 @@ export class MarketplaceViewProductComponent
         this.filteredColors = this.colorsData;
     }
     ngOnInit(): void {
+
+        const screenWidth = window.innerWidth;
+        if (screenWidth >= 992) { // lg screen
+          this.handleSCreenSelect = 5
+        } else if (screenWidth >= 768) { // md screen
+            this.handleSCreenSelect = 3
+
+        } 
+        
         // this.productId = this._activatedRoute.snapshot.params["id"];
         // this.showMainSpinner();
         // const subs = this._appItemsServiceProxy
@@ -217,6 +227,7 @@ export class MarketplaceViewProductComponent
                                 sizes: sizesValue[0],
                                 colorImg: variation.colorImage,
                                 colorCode: variation.colorHexaCode,
+                                colorCodeSelectedValues:variation.code
                             };
                         });
                         this.filteredColors = this.colorsData

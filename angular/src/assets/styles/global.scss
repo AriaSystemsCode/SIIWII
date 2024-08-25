@@ -671,3 +671,9 @@ border: 1px solid #D9D9D9 !important;
 // .p-datepicker:not(.p-datepicker-inline) {
 //     z-index: 2000 !important;
 // }
+
+::ng-deep {
+    body {
+      overflow: scroll !important;
+    }
+}
