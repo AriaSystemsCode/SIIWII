@@ -23,7 +23,7 @@
     <Item17 Ref="22" Description="Color Page" ValueInfo="True" Name="showColors" Type="#Ref-7" />
     <Item18 Ref="23" Description="Product Code" ValueInfo="False" Name="showCode" Type="#Ref-7" />
     <Item19 Ref="24" Description="Product Avability Quantity" ValueInfo="False" Name="showQty" Type="#Ref-7" />
-    <Item20 Ref="25" Description="Show No" ValueInfo="20" Name="showNo" Type="#Ref-5" />
+    <Item20 Ref="25" Description="Show No" ValueInfo="50" Name="showNo" Type="#Ref-5" />
     <Item21 Ref="26" Description="MSRP Price" ValueInfo="False" Name="showPrice" Type="#Ref-7" />
     <Item22 Ref="27" Description="showFooter" ValueInfo="False" Name="showFooter" Type="#Ref-7" />
     <Item23 Ref="28" Description="Special Price" ValueInfo="False" Name="showSpecialPrice" Type="#Ref-7" />
@@ -102,7 +102,7 @@
       <HierarchyPrintOptions Ref="67" Indent="50.8" />
       <MultiColumn Ref="68" ColumnWidth="1310" Layout="AcrossThenDown" Mode="UseColumnCount" />
       <Controls>
-        <Item1 Ref="69" ControlType="XRSubreport" Name="subreport1" SizeF="2657.693,1011.39624" LocationFloat="52.4142761,25.0000076" Dpi="254">
+        <Item1 Ref="69" ControlType="XRSubreport" Name="subreport1" SnapLineMargin="5,5,3,3,254" SizeF="2657.693,1011.39624" LocationFloat="0,25.0000076" Dpi="254">
           <Scripts Ref="70" OnBeforePrint="subreport1_BeforePrint" />
         </Item1>
       </Controls>
@@ -125,12 +125,12 @@
         </Item2>
       </Controls>
     </Item7>
-    <Item8 Ref="80" ControlType="GroupHeaderBand" Name="GroupHeader3" PageBreak="BeforeBand" HeightF="1757.27881" Dpi="254">
+    <Item8 Ref="80" ControlType="GroupHeaderBand" Name="GroupHeader3" PageBreak="BeforeBand" HeightF="1908.9613" Dpi="254">
       <GroupFields>
         <Item1 Ref="81" FieldName="ItemCode" />
       </GroupFields>
       <Controls>
-        <Item1 Ref="82" ControlType="XRPanel" Name="panel2" CanGrow="false" SizeF="1168.27075,1669.64868" LocationFloat="36.2919235,25" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
+        <Item1 Ref="82" ControlType="XRPanel" Name="panel2" CanGrow="false" SizeF="1168.27075,1883.9613" LocationFloat="36.2919235,25.0000076" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
           <Controls>
             <Item1 Ref="83" ControlType="XRLabel" Name="label19" Multiline="true" ProcessDuplicatesMode="Suppress" Angle="90" Text="xrLabel3" TextAlignment="MiddleCenter" SizeF="74.08334,918.86615" LocationFloat="51.2269363,26.2768211" Dpi="254" Padding="5,5,0,0,254">
               <ExpressionBindings>
@@ -139,7 +139,7 @@
               </ExpressionBindings>
               <StylePriority Ref="86" UseTextAlignment="false" />
             </Item1>
-            <Item2 Ref="87" ControlType="XRPictureBox" Name="pictureBox2" Sizing="ZoomImage" KeepTogether="false" SizeF="831,1619.64868" LocationFloat="261.364258,25.0000076" Dpi="254" Borders="None">
+            <Item2 Ref="87" ControlType="XRPictureBox" Name="pictureBox2" Sizing="ZoomImage" KeepTogether="false" SizeF="900,1800" LocationFloat="243.270752,25.0000076" Dpi="254" Borders="None">
               <ExpressionBindings>
                 <Item1 Ref="88" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[imageURL]" />
               </ExpressionBindings>
@@ -148,7 +148,7 @@
           </Controls>
           <StylePriority Ref="90" UseBackColor="false" UseBorderColor="false" />
         </Item1>
-        <Item2 Ref="91" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="1551.53015,1185.46118" LocationFloat="1232.95837,77.04674" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
+        <Item2 Ref="91" ControlType="XRPanel" Name="panel1" CanGrow="false" SizeF="1551.53015,893.0961" LocationFloat="1232.95837,333.552551" Dpi="254" BackColor="Transparent" BorderColor="Transparent">
           <Controls>
             <Item1 Ref="92" ControlType="XRLabel" Name="label15" TextFormatString="{0:MM/dd/yyyy}" CanGrow="false" CanShrink="true" TextAlignment="MiddleJustify" SizeF="939.3159,59.99994" LocationFloat="46.16333,543.7633" Dpi="254" Font="Arial, 12pt, style=Bold" ForeColor="Black" Padding="16,16,0,0,254" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
