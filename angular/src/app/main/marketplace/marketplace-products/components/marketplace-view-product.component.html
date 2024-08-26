@@ -342,10 +342,9 @@
                                 <h5> /EAC </h5>
                             </div>
                             <div 
-                            *ngIf="productDetails?.minSpecialPrice"
                             class="msrp d-flex"
                         >
-                        <div   *ngIf="productDetails?.minSpecialPrice">
+                        <div>
                             <div class="msrp d-flex align-items-center ">
                             <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
 
@@ -373,7 +372,7 @@
                             
                             <h5 *ngIf="showEditSpecialPrice"> 
                                     
-                                {{ productDetails?.maxSpecialPrice| currency:' ' }}
+                                {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
                             </h5>
 
                             <!-- <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" /> -->
@@ -395,7 +394,7 @@
                                                 </button>
                                               </div>
                                       <div class="input-group-append position-absolute" style="
-                                       z-index: 99999;     height: 41px; background: #4A0D4A;
+                                       z-index: 99999;     height: 41px;
     right: 15%;
     top: 5px;">
                                         <button class="btn btn-save  mr-0 pr-0" (click)="onEditpecialPrice(updatedSpecialPrice)" 
@@ -1214,7 +1213,7 @@
                                       
                                         class="msrp d-flex justify-content-between"
                                     >
-                                    <div   *ngIf="productDetails?.minSpecialPrice">
+                                    <div>
                                         <div class="msrp d-flex align-items-center ">
                                         <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
                                         <h5 *ngIf="showEditSpecialPrice"> 
@@ -1226,22 +1225,23 @@
                                                     currencySymbol
                                                  }}
                                                 
-                                            {{ productDetails?.minSpecialPrice| currency:' ' }}
+                                                 {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
+
                                         </h5>
-                                        <span
+                                     <!--    <span
                                             *ngIf="
                                                 productDetails?.minSpecialPrice !==
                                                 productDetails?.maxSpecialPrice && showEditSpecialPrice
                                             "
                                         >
                                             -
-                                        </span>
-                                        <h5
+                                        </span> -->
+                                        <!-- <h5
                                             *ngIf="
                                             productDetails?.minSpecialPrice !==
                                             productDetails?.maxSpecialPrice  && showEditSpecialPrice"
                                             
-                                        >
+                                        > -->
                                             <!-- {{
                                                 productDetails?.appItemPriceInfos[0]
                                                     ?.currencySymbol
@@ -1250,10 +1250,11 @@
                                                     currencySymbol
                                                  }}
                                                 
-                                            {{ productDetails?.maxSpecialPrice }}
-                                        </h5>
-                                        <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" />
-                                        
+                                            <!-- {{ productDetails?.maxSpecialPrice }}
+                                        </h5> -->
+                                        <!-- <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" /> -->
+                                        <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : 0  " />
+
                                         <label class="ml-3"
                                         *ngIf="!showEditSpecialPrice">
                                         <div class="editQtyContainer">
@@ -1270,14 +1271,14 @@
                                                             </button>
                                                           </div>
                                                   <div class="input-group-append position-absolute" style="
-                                                   z-index: 99999;     height: 41px; background: #4A0D4A;
+                                                   z-index: 99999;     height: 41px; 
                 right: 15%;
                 top: 5px;">
                                                     <button class="btn btn-save  mr-0 pr-0" (click)="onEditpecialPrice(updatedSpecialPrice)" 
                                                             [ngClass]="{ 'disabled': updatedSpecialPrice <= 0 ||
-                                                           updatedSpecialPrice == productDetails.minSpecialPrice }"
+                                                           updatedSpecialPrice == productDetails.maxSpecialPrice }"
                                                             [disabled]="updatedSpecialPrice <= 0 ||
-                                                           updatedSpecialPrice == productDetails.minSpecialPrice ">
+                                                           updatedSpecialPrice == productDetails.maxSpecialPrice ">
                                                       <i class="fa fa-check fa-2x" style="color: #777777;"></i>
                                                     </button>
                                                   </div>
