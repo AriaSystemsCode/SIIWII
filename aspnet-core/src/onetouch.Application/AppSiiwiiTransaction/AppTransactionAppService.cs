@@ -213,6 +213,7 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task<long> CreateOrEditTransaction(GetAppTransactionsForViewDto input)
         {
             var createOrEditDto = ObjectMapper.Map<CreateOrEditAppTransactionsDto>(input);
+            
             if (createOrEditDto != null)
             {
                 return await CreateOrEdit(createOrEditDto);
@@ -325,6 +326,8 @@ namespace onetouch.AppSiiwiiTransaction
                         input.CurrencyId = currencyObj.Id;
                     //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[End]
                 }
+                if (input.EnteredDate == new DateTime(1, 1, 1))
+                    input.EnteredDate = DateTime.Now.Date;
 
                 if (input.StartDate == new DateTime(1, 1, 1))
                     input.StartDate = DateTime.Now.Date;
@@ -774,8 +777,9 @@ namespace onetouch.AppSiiwiiTransaction
                                 await GetProductFromMarketplace(det.SSIN, int.Parse(buyerTenantId.ToString()));
                         }
                     }
-
+                    
                     appTrans.Id = header.Id;
+                    appTrans.EnteredDate = input.EnteredDate;
                     if (header.EntityObjectStatusId == null)
                         appTrans.CreatorUserId = AbpSession.UserId;
 
@@ -786,8 +790,10 @@ namespace onetouch.AppSiiwiiTransaction
                     //XX
                     //var  AppTrans = Objmapper. ObjectMapper.Map<CreateOrEditAppTransactionDto,AppTransactionsHeader>(input);
                     //ObjectMapper..Map<CreateOrEditAppTransactionDto,AppTransactionsHeader>(input) ;
-
+                    appTrans.EnteredDate = input.EnteredDate;
                     obj = await _appTransactionsHeaderRepository.InsertAsync(appTrans);
+                    
+                    obj = await _appTransactionsHeaderRepository.UpdateAsync(obj);
                 }
 
                 await CurrentUnitOfWork.SaveChangesAsync();
@@ -798,7 +804,7 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
                 appTrans.EnteredUserByRole = input.EnteredByUserRole;
-
+                appTrans.EnteredDate = input.EnteredDate;
                 if (input.lFromPlaceOrder)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 //MMT-Fix Status
@@ -1226,6 +1232,7 @@ namespace onetouch.AppSiiwiiTransaction
                     var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
                     appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
                 }
+                appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 return obj.Id;
