@@ -83,7 +83,8 @@ namespace onetouch.Migrations
                     Phone3TypeName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Phone3CountryKey = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     Phone3Number = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    Phone3Ext = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    Phone3Ext = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    AppMarketplaceContactId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -118,6 +119,16 @@ namespace onetouch.Migrations
                         name: "FK_AppMarketplaceContacts_AppEntities_Phone3TypeId",
                         column: x => x.Phone3TypeId,
                         principalTable: "AppEntities",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AppMarketplaceContacts_AppMarketplaceContacts_AppMarketplaceContactId",
+                        column: x => x.AppMarketplaceContactId,
+                        principalTable: "AppMarketplaceContacts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AppMarketplaceContacts_AppMarketplaceContacts_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "AppMarketplaceContacts",
                         principalColumn: "Id");
                 });
 
@@ -158,29 +169,6 @@ namespace onetouch.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "AppMarketplaceContactAppMarketplaceContact",
-                columns: table => new
-                {
-                    ParentFkListId = table.Column<long>(type: "bigint", nullable: false),
-                    PartnerFkListId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AppMarketplaceContactAppMarketplaceContact", x => new { x.ParentFkListId, x.PartnerFkListId });
-                    table.ForeignKey(
-                        name: "FK_AppMarketplaceContactAppMarketplaceContact_AppMarketplaceContacts_ParentFkListId",
-                        column: x => x.ParentFkListId,
-                        principalTable: "AppMarketplaceContacts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AppMarketplaceContactAppMarketplaceContact_AppMarketplaceContacts_PartnerFkListId",
-                        column: x => x.PartnerFkListId,
-                        principalTable: "AppMarketplaceContacts",
-                        principalColumn: "Id");
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AppMarketplaceAddresses_CountryId",
                 table: "AppMarketplaceAddresses",
@@ -202,9 +190,9 @@ namespace onetouch.Migrations
                 column: "ContactId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppMarketplaceContactAppMarketplaceContact_PartnerFkListId",
-                table: "AppMarketplaceContactAppMarketplaceContact",
-                column: "PartnerFkListId");
+                name: "IX_AppMarketplaceContacts_AppMarketplaceContactId",
+                table: "AppMarketplaceContacts",
+                column: "AppMarketplaceContactId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AppMarketplaceContacts_CurrencyId",
@@ -215,6 +203,11 @@ namespace onetouch.Migrations
                 name: "IX_AppMarketplaceContacts_LanguageId",
                 table: "AppMarketplaceContacts",
                 column: "LanguageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppMarketplaceContacts_ParentId",
+                table: "AppMarketplaceContacts",
+                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AppMarketplaceContacts_Phone1TypeId",
@@ -237,9 +230,6 @@ namespace onetouch.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AppMarketplaceContactAddresses");
-
-            migrationBuilder.DropTable(
-                name: "AppMarketplaceContactAppMarketplaceContact");
 
             migrationBuilder.DropTable(
                 name: "AppMarketplaceAddresses");

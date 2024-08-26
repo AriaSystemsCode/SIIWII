@@ -391,6 +391,11 @@ namespace onetouch.EntityFrameworkCore
                        .WithMany(x => x.ParentFkList)
                        .HasForeignKey(x => x.ParentId);
 
+            modelBuilder.Entity<AppMarketplaceContact>()
+                   .HasOne(x => x.ParentFk)
+                   .WithMany(x => x.ParentFkList)
+                   .HasForeignKey(x => x.ParentId);
+
             modelBuilder.Entity<AppEntityExtraData>()
                .HasOne(x => x.EntityFk)
                .WithMany(x => x.EntityExtraData)

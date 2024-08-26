@@ -12,7 +12,7 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    [Migration("20240826035742_add_contact_Marketplace3")]
+    [Migration("20240826041551_add_contact_Marketplace3")]
     partial class addcontactMarketplace3
     {
         /// <inheritdoc />
@@ -1646,24 +1646,6 @@ namespace onetouch.Migrations
                     b.ToTable("AbpWebhookSubscriptions", t =>
                         {
                             t.HasTrigger("AbpWebhookSubscriptions_Trigger");
-                        });
-                });
-
-            modelBuilder.Entity("AppMarketplaceContactAppMarketplaceContact", b =>
-                {
-                    b.Property<long>("ParentFkListId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PartnerFkListId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ParentFkListId", "PartnerFkListId");
-
-                    b.HasIndex("PartnerFkListId");
-
-                    b.ToTable("AppMarketplaceContactAppMarketplaceContact", t =>
-                        {
-                            t.HasTrigger("AppMarketplaceContactAppMarketplaceContact_Trigger");
                         });
                 });
 
@@ -7063,6 +7045,9 @@ namespace onetouch.Migrations
                     b.Property<long>("AccountTypeId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("AppMarketplaceContactId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("CurrencyCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -7167,9 +7152,13 @@ namespace onetouch.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.HasIndex("AppMarketplaceContactId");
+
                     b.HasIndex("CurrencyId");
 
                     b.HasIndex("LanguageId");
+
+                    b.HasIndex("ParentId");
 
                     b.HasIndex("Phone1TypeId");
 
@@ -8075,21 +8064,6 @@ namespace onetouch.Migrations
                         .IsRequired();
 
                     b.Navigation("WebhookEvent");
-                });
-
-            modelBuilder.Entity("AppMarketplaceContactAppMarketplaceContact", b =>
-                {
-                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceContact", null)
-                        .WithMany()
-                        .HasForeignKey("ParentFkListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceContact", null)
-                        .WithMany()
-                        .HasForeignKey("PartnerFkListId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("onetouch.AppAdvertisements.AppAdvertisement", b =>
@@ -9301,6 +9275,10 @@ namespace onetouch.Migrations
 
             modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContact", b =>
                 {
+                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceContact", null)
+                        .WithMany("PartnerFkList")
+                        .HasForeignKey("AppMarketplaceContactId");
+
                     b.HasOne("onetouch.AppEntities.AppEntity", "CurrencyFk")
                         .WithMany()
                         .HasForeignKey("CurrencyId");
@@ -9314,6 +9292,10 @@ namespace onetouch.Migrations
                     b.HasOne("onetouch.AppEntities.AppEntity", "LanguageFk")
                         .WithMany()
                         .HasForeignKey("LanguageId");
+
+                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceContact", "ParentFk")
+                        .WithMany("ParentFkList")
+                        .HasForeignKey("ParentId");
 
                     b.HasOne("onetouch.AppEntities.AppEntity", "Phone1TypeFk")
                         .WithMany()
@@ -9330,6 +9312,8 @@ namespace onetouch.Migrations
                     b.Navigation("CurrencyFk");
 
                     b.Navigation("LanguageFk");
+
+                    b.Navigation("ParentFk");
 
                     b.Navigation("Phone1TypeFk");
 
@@ -9707,6 +9691,10 @@ namespace onetouch.Migrations
             modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContact", b =>
                 {
                     b.Navigation("ContactAddresses");
+
+                    b.Navigation("ParentFkList");
+
+                    b.Navigation("PartnerFkList");
                 });
 
             modelBuilder.Entity("onetouch.AppMarketplaceItemLists.AppMarketplaceItemLists", b =>
