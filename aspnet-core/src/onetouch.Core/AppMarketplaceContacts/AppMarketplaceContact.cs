@@ -9,6 +9,7 @@ using Abp.Domain.Entities;
 using Abp.Auditing;
 using onetouch.AppEntities;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace onetouch.AppMarketplaceContacts
 {
@@ -123,10 +124,11 @@ namespace onetouch.AppMarketplaceContacts
 		//[ForeignKey("EntityId")]
 		//public virtual AppEntity EntityFk { get; set; }
 
+		//[NotMapped]
 		[ForeignKey("ParentId")]
 		public virtual AppMarketplaceContact ParentFk { get; set; }
-
-		[ForeignKey("PartnerId")]
+        [NotMapped]
+        [ForeignKey("PartnerId")]
 		public virtual AppMarketplaceContact PartnerFk { get; set; }
 
 		[ForeignKey("Phone1TypeId")]
