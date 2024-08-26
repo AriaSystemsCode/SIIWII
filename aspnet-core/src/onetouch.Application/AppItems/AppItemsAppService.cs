@@ -116,6 +116,8 @@ namespace onetouch.AppItems
         private readonly IRepository<SycSegmentIdentifierDefinition, long> _sycSegmentIdentifierDefinition;
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
+        private readonly IRepository<AppMarketplaceItemsListDetails, long> _appMarketplaceItemsListDetails;
+
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
@@ -141,12 +143,14 @@ namespace onetouch.AppItems
             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing,
             IRepository<AppMarketplaceItemPrices, long> appMarketplaceItemPricesRepository, IRepository<AppEntityAttachment, long> appEntityAttachment,
             IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, IRepository<AppAttachment, long> appAttachmentRepository, TimeZoneInfoAppService timeZoneInfoAppService,
-            IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService
+            IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
+             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails
             )
         {
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             //MMT33-2
-            _appTransactionDetails = appTransactionDetails;
+             _appMarketplaceItemsListDetails= appMarketplaceItemsListDetails;
+             _appTransactionDetails = appTransactionDetails;
             _timeZoneInfoAppService = timeZoneInfoAppService;
             _appAttachmentRepository = appAttachmentRepository;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
@@ -841,6 +845,7 @@ namespace onetouch.AppItems
             //MMY
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //XX
                 var allItems = await _appItemRepository.GetAll()
                .Include(x => x.ItemPricesFkList).ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
                .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
@@ -848,32 +853,34 @@ namespace onetouch.AppItems
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
+               //MMTCAT
                .Include(x => x.EntityFk).ThenInclude(z => z.EntityCategories).ThenInclude(z => z.EntityObjectCategoryFk)
                .Include(x => x.EntityFk).ThenInclude(z => z.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
                .AsNoTracking().Where(x => x.Id == input.ItemId || x.ParentId == input.ItemId).ToListAsync();
                 //XX
+                var appItem = allItems.Where(z => z.Id == input.ItemId).FirstOrDefault();
+                var varAppItems = allItems.Where(z => z.ParentId == input.ItemId).ToList();
+                // var appItem = await _appItemRepository.GetAll()
+                //.Include(x => x.ItemPricesFkList).ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
+                //.Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
+                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
+                //.Include(x => x.ListingItemFkList)
+                //.Include(x => x.PublishedListingItemFkList)
+                ////.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
+                //.AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.ItemId);
 
-                var appItem = allItems.Where(x => x.Id == input.ItemId).FirstOrDefault();  /* await _appItemRepository.GetAll()
-               .Include(x => x.ItemPricesFkList).ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
-               .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
-               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
-               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
-               .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
-               .Include(x => x.ListingItemFkList)
-               .Include(x => x.PublishedListingItemFkList)
-               //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
-               .AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.ItemId);*/
-
-                var varAppItems = allItems.Where(x => x.ParentId == input.ItemId).ToList(); /*await _appItemRepository.GetAll().Include(x => x.ItemPricesFkList)
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
-                .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
-                .Include(x => x.ListingItemFkList)
-                .Include(x => x.PublishedListingItemFkList)
-                .Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk).ThenInclude(x => x.EntityExtraData)
-                .AsNoTracking().Where(x => x.ParentId == input.ItemId).ToListAsync();*/
+                // var varAppItems = await _appItemRepository.GetAll().Include(x => x.ItemPricesFkList)
+                // .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                // .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                // .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                // .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectTypeFk)
+                // .Include(x => x.ListingItemFkList)
+                // .Include(x => x.PublishedListingItemFkList)
+                // .Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk).ThenInclude(x => x.EntityExtraData)
+                // .AsNoTracking().Where(x => x.ParentId == input.ItemId).ToListAsync();
 
 
 
@@ -2104,12 +2111,14 @@ namespace onetouch.AppItems
                                                            // .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk).AsNoTracking()
                 .Where(r => r.Id == input.Id)
                 .FirstOrDefaultAsync();
-
+                var orgSSIN = appItem.SSIN;
                 ObjectMapper.Map(input, appItem);
+                appItem.SSIN = orgSSIN;
             }
             AppEntityDto entity = new AppEntityDto();
             ObjectMapper.Map(input, entity);
             entity.Id = 0;
+            entity.SSIN = appItem.SSIN;
             entity.Code = input.Code;
             entity.ObjectId = itemObjectId;
             entity.TenantId = AbpSession.TenantId;
@@ -2178,6 +2187,10 @@ namespace onetouch.AppItems
             if (string.IsNullOrEmpty(appItem.SSIN))
             {
                 appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(entity));
+                entity.SSIN = appItem.SSIN;
+            }
+            else
+            {
                 entity.SSIN = appItem.SSIN;
             }
             entity.TenantOwner = appItem.TenantOwner;
@@ -7935,6 +7948,100 @@ namespace onetouch.AppItems
             }
         }
         //T-SII-20231206.0003,1 MMT 02/05/2024 Product View and Edit does not display classification and categories correctly[End]
+        public async Task<string> EmptySSIN()
+        {
+            var itemsList = _appItemRepository.GetAll().Where(e => (e.TenantId == AbpSession.TenantId) && (e.IsDeleted == false)).ToListAsync().Result;
+
+            itemsList.ForEach(e => e.SSIN = "");
+            return "No of SSIN items Cleared - " + itemsList.Count.ToString();
+        }
+
+        public async Task<string> UpdateDouplicatedSSIN(int takeNo = 1, int skipNo = 0)
+        {
+            //reset syccounters
+            //reset SSIN
+            string ret = "";
+            var itemsList = _appItemRepository.GetAll().Where(e => (e.TenantId == AbpSession.TenantId) && (e.IsDeleted == false)
+                                                                     && (string.IsNullOrEmpty(e.SSIN))).Skip(skipNo).Take(takeNo).ToListAsync().Result;
+
+            var itemsWithSSINList = _appItemRepository.GetAll().Where(e => (e.TenantId == AbpSession.TenantId) && (e.IsDeleted == false)
+                                                                     && (!string.IsNullOrEmpty(e.SSIN))).ToListAsync().Result;
+
+            int ssin = 1;
+            if (itemsWithSSINList != null && itemsWithSSINList.Count > 0)
+            {
+                string ssinString = itemsWithSSINList.Select(e => e.SSIN).Max();
+                if (!string.IsNullOrEmpty(ssinString))
+                {
+                    ssinString = ssinString.Substring(9);
+                    ssin = int.Parse(ssinString);
+                }
+            }
+            string tenantstring = AbpSession.TenantId.ToString().PadLeft(8, '0');
+            //itemsList.ForEach(e => e.SSIN = "");
+            // await CurrentUnitOfWork.SaveChangesAsync() ;
+
+            //Update items SSIN WITH NEW SSIN
+
+            if (itemsList != null)
+            {
+                var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+                foreach (var item in itemsList)
+                {
+                    try
+                    {
+                        // item.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId); //get ssing fun by Mariam
+                        ssin = ssin + 1;
+
+                        item.SSIN = tenantstring + "-" + ssin.ToString().PadLeft(12, '0');                                                                                                                  //item.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId); //get ssing fun by Mariam
+                        ret = item.SSIN;
+                        var appentity = _appEntityRepository.GetAll().Where(e => e.Id == item.EntityId).FirstOrDefaultAsync().Result;
+                        if (appentity != null)
+                        {
+                            appentity.SSIN = item.SSIN;
+                        }
+
+                        // #1
+                        var _appTransactionDetailsList = _appTransactionDetails.GetAll()
+                            .Where(e => e.ManufacturerCode == appentity.Code && e.TenantId == AbpSession.TenantId
+                                            && (e.IsDeleted == false)).ToListAsync().Result;
+                        if (_appTransactionDetailsList != null)
+                        {
+                            _appTransactionDetailsList.ForEach(e => { e.ItemSSIN = item.SSIN; e.SSIN = item.SSIN; });
+                        }
+
+                        // #2
+                        var _appItemsListDetailRepositoryList = _appItemsListDetailRepository.GetAll()
+                            .Where(e => e.ItemCode == appentity.Code && e.ItemId == item.Id
+                            ).ToListAsync().Result;
+                        if (_appItemsListDetailRepositoryList != null)
+                        { _appItemsListDetailRepositoryList.ForEach(e => e.ItemSSIN = item.SSIN); }
+
+
+                        //#3
+                        var _appMarketplaceItemsList = _appMarketplaceItem.GetAll()
+                             .Where(e => e.ManufacturerCode == appentity.Code && e.TenantOwner == AbpSession.TenantId
+                             && (e.IsDeleted == false)).ToListAsync().Result;
+                        if (_appMarketplaceItemsList != null)
+                        { _appMarketplaceItemsList.ForEach(e => { e.SSIN = item.SSIN; e.Code = item.SSIN; }); }
+
+                        var _appMarketplaceItemsListDetailsList = _appMarketplaceItemsListDetails.GetAll()
+                            .Where(e => e.ItemCode == appentity.Code && e.AppMarketplaceItemId == item.Id).ToListAsync().Result;
+                        if (_appMarketplaceItemsListDetailsList != null)
+                        { _appMarketplaceItemsListDetailsList.ForEach(e => e.AppMarketplaceItemSSIN = item.SSIN); }
+
+                    }
+                    catch (Exception ex) { ret = ret + " --- " + ex.Message; }
+
+
+                }
+            }
+            //UPDATE PRODUCT LIST DETAILS WITH SSIN
+            //UPDATE TRANSACTION DETAILS WITH SSIN
+            // CHECK IF STILL MORE DOUPICATIONS
+            return ret;
+
+        }
     }
     //MMT
     public sealed class AppItemExcelDtoProfile : Profile

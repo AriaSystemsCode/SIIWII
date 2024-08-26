@@ -527,8 +527,8 @@ span.p-tabview-title {
 
 // calendar general style
 .p-datepicker:not(.p-datepicker-inline) {
-    z-index: 12000 !important;
-    
+    //z-index: 12000 !important;
+    z-index: 999999999999 !important;
 }
 
 .p-datepicker table td > span.p-highlight {
@@ -697,8 +697,6 @@ border: 1px solid #D9D9D9 !important;
 
 }
 }
-
-
 
 // .p-datepicker:not(.p-datepicker-inline) {
 //     z-index: 2000 !important;

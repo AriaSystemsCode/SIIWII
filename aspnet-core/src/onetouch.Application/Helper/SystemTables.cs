@@ -51,6 +51,7 @@ namespace onetouch.Helpers
             _sycCurrencyExchangeRate = sycCurrencyExchangeRate;
             _sycSegmentIdentifierDefinition = sycSegmentIdentifierDefinition;
             //MMT30[End]
+            _appEntityRepository = appEntityRepository;
         }
 
         public async Task< long> GetObjectContactId()
