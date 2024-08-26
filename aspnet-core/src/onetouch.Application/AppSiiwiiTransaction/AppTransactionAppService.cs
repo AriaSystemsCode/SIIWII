@@ -213,7 +213,7 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task<long> CreateOrEditTransaction(GetAppTransactionsForViewDto input)
         {
             var createOrEditDto = ObjectMapper.Map<CreateOrEditAppTransactionsDto>(input);
-            
+            createOrEditDto.EnteredDate = input.EnteredDate;
             if (createOrEditDto != null)
             {
                 return await CreateOrEdit(createOrEditDto);
@@ -3601,6 +3601,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (FilteredAppTransaction != null)
                 {
                     var viewTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(FilteredAppTransaction);
+                    viewTrans.EnteredDate = FilteredAppTransaction.EnteredDate;
                     viewTrans.EnteredByUserRole = FilteredAppTransaction.EnteredUserByRole;
                     if (viewTrans.EntityAttachments != null && viewTrans.EntityAttachments.Count > 0)
                     {
@@ -3691,6 +3692,7 @@ namespace onetouch.AppSiiwiiTransaction
             if (trans != null)
             {
                 var retTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
+                retTrans.EnteredDate = trans.EnteredDate;
                 if (retTrans.AppTransactionContacts != null && retTrans.AppTransactionContacts.Count > 0)
                 {
                     foreach (var cont in retTrans.AppTransactionContacts)
