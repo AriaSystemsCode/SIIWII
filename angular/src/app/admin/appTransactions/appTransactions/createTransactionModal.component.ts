@@ -489,9 +489,10 @@ if (event.filter != '' || event.filter != undefined){
     }
     addNewBuyer() {
         this.orderForm.controls['buyerContactName'].setValue(this.searchTerm);
+        console.log( this.orderForm.controls['buyerContactName'].value,'lll')
 
-       if(!this.buyerContacts?.length) 
-        this.buyerContacts=[];
+    //    if(!this.buyerContacts?.length) 
+    //     this.buyerContacts=[];
 
                 this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
         //  this.searchTerm=  undefined
@@ -504,8 +505,8 @@ if (event.filter != '' || event.filter != undefined){
         // this.searchTermSeller= undefined
        this.orderForm.controls['sellerContactName'].setValue(this.searchTermSeller);
 
-       if(!this.sellerContacts?.length) 
-        this.sellerContacts=[];
+    //    if(!this.sellerContacts?.length) 
+    //     this.sellerContacts=[];
 
                this.sellerContacts.push({ name: `  ${this.searchTermSeller}`, id: this.sellerContacts.length + 1 });
                this.showAddSellBtn = false
