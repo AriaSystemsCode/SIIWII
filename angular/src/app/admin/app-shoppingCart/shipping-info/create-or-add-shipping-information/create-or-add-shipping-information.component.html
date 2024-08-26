@@ -26,7 +26,22 @@
             ></app-contact>
             </div>
         </div>
-      
+        <div class="d-flex justify-content-end">
+            <button *ngIf="showSaveBtn" (click)="save()"
+            [disabled]="!(shippingTabValid)"
+            class="previewbtn text-center btn ">
+            Save
+            <!-- <i class="pi pi-check"></i> -->
+        </button>
+        <button
+        *ngIf="showSaveBtn"
+        (click)="cancel()"
+        class="cancelbtn text-center btn float-right"
+    >
+        Cancel
+        <!-- <i class="pi pi-times"></i> -->
+    </button>
+        </div>
         
     </div>
 
@@ -41,7 +56,6 @@
         [selectedAddressDetails]="shipFromSelectedAdd"
         [showAddressType]="false"
         [canChange]="canChange"
-        [showAddBtn]=" appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER'  ? true: false "
         ></app-address>
     </div>
     <div class="container-fluid pt-1" *ngIf="createOrEditshippingInfO">
@@ -81,7 +95,6 @@
    [selectedAddressDetails]="shipToSelectedAdd"
    [showAddressType]="false"
    [canChange]="canChange"
-   [showAddBtn]=" appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER'  ? false: true "
 
    ></app-address>
 </div>
@@ -111,22 +124,7 @@
     </p>
     </div>
 </div>
-<div class="d-flex justify-content-end">
-    <button *ngIf="showSaveBtn" (click)="save()"
-    [disabled]="!(shippingTabValid)"
-    class="previewbtn text-center btn ">
-    Save
-    <!-- <i class="pi pi-check"></i> -->
-</button>
-<button
-*ngIf="showSaveBtn"
-(click)="cancel()"
-class="cancelbtn text-center btn float-right"
->
-Cancel
-<!-- <i class="pi pi-times"></i> -->
-</button>
-</div>
+
     
 </div>
 
