@@ -107,6 +107,7 @@ namespace onetouch.AppSiiwiiTransaction
         //Iteration#36,1 MMT 08/16/2023 Check out and manage placed orders [End]
         //Iteration#42[Start]
         public virtual string? Reference { set; get; }
+        public virtual DateTime EnteredDate { set; get; }
         //Iteration#42[End]
     }
 }
