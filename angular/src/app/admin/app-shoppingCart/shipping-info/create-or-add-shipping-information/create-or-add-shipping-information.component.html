@@ -26,23 +26,8 @@
             ></app-contact>
             </div>
         </div>
-        <div class="d-flex justify-content-end">
-            <button *ngIf="showSaveBtn" (click)="save()"
-            [disabled]="!(shippingTabValid)"
-            class="previewbtn text-center btn ">
-            Save
-            <!-- <i class="pi pi-check"></i> -->
-        </button>
-        <button
-        *ngIf="showSaveBtn"
-        (click)="cancel()"
-        class="cancelbtn text-center btn float-right"
-    >
-        Cancel
-        <!-- <i class="pi pi-times"></i> -->
-    </button>
-        </div>
-        
+  
+          
     </div>
 
     <div *ngIf="createOrEditshippingInfO"   [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
@@ -145,5 +130,21 @@
     (isContactsValid_1)="isContactFormValid($event,1)"
     (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-shipping-information>
+</div>
+<div class="d-flex justify-content-end">
+    <button *ngIf="showSaveBtn" (click)="save()"
+    [disabled]="!(shippingTabValid)"
+    class="previewbtn text-center btn ">
+    Save
+    <!-- <i class="pi pi-check"></i> -->
+</button>
+<button
+*ngIf="showSaveBtn"
+(click)="cancel()"
+class="cancelbtn text-center btn float-right"
+>
+Cancel
+<!-- <i class="pi pi-times"></i> -->
+</button>
 </div>
 </div>
