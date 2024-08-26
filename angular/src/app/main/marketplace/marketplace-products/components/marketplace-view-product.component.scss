@@ -418,7 +418,18 @@ font-weight: 600;
 }
 
 ::ng-deep {
-
+    .p-button {
+        background-color: #4A0D4A !important;
+        border: 1px solid #4A0D4A;
+    }
+    .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        background-color: #4A0D4A !important;
+        border: 1px solid #4A0D4A;
+        border-top-right-radius :0 !important
+    }
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+        box-shadow: none !important;
+    }
     .input-group > .form-control:focus {
         z-index: 0 !important;
         border: 1px solid #E2E2E2 !important;

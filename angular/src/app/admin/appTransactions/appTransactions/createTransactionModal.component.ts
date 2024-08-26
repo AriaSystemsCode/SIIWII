@@ -717,6 +717,7 @@ if (event.filter != '' || event.filter != undefined){
                         sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
                         completeDate: moment.utc(this.orderForm.controls['completeDate']?.value?.toLocaleString()),
+                        enteredDate: moment.utc(this.orderForm.controls['enteredDate']?.value?.toLocaleString()),
                         startDate: moment.utc(this.orderForm.controls['startDate']?.value?.toLocaleString()),
                         availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString()),
                         reference: this.orderForm.controls['reference']?.value
