@@ -2,6 +2,13 @@
     background-color: #949090;
     color: #fff;
     padding: 2px 5px;
+    Width: 106px;
+    Height: 32px;
+    border-radius: 6px;
+    border: 1px;
+    Padding: 6px 16px 6px 16px;
+    background-color: #e4e4e4;
+    color: #b6b7b9;
 }
 
 .imageSlides {
@@ -16,6 +23,38 @@
 
     }
 }
+.msrp h5, .msrp span {
+    color: #b6b7b9 !important;
+}
+td {
+    color: black !important;
+    font-weight: bold;
+}
+
+.showRoomLink{
+    width: 257px;
+    height: 46px;
+    border-radius: 6px 0px 0px 0px;
+    padding: 11px 20px 11px 20px !important;
+    background-color: #4A0D4A;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.description button{
+    width: 195px;
+    height: 46px;
+    border-radius: 6px;
+    padding: 11px 16px 11px 16px !important;
+    background-color:#EEEEEE !important    ;
+    color: #4A0D4A !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
 .slider-container {
     position: relative;
     overflow: hidden;
@@ -26,6 +65,7 @@
     display: flex;
     flex-direction: row;
     transition: transform 0.5s;
+    background-color: transparent !important;
 }
 
 .indicator-btns {
@@ -40,14 +80,14 @@
 
 .summary {
     .header {
-        background-color: #5e5e5e;
-        color: #fff;
-        font-weight: 500;
+        background-color: #F8F8F8;
+        color: black;
+        font-weight: bold;
         padding: 8px 12px;
     }
     .totals {
-        color: #fff;
-        background-color: #a4a0a0;
+        color: black;
+    background-color: #F8F8F8;
         padding: 8px 12px;
         display: flex;
         align-items: center;
@@ -67,10 +107,10 @@
         overflow-y: scroll;
         background-color: #fff;
         .default {
-            background-color: #dfdfdf;
+            background-color: #F8F8F8;
             align-items: center;
             padding: 10px;
-            color: #b6b3b3;
+            color: black;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -98,7 +138,7 @@
         background-color: #fff; /* Set the color when hovering over the track */
     }
     .add-btn {
-        background-color: #5e5e5e;
+        background-color: #4A0D4A;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -106,7 +146,7 @@
         font-weight: 600;
         color: #fff;
         width: 100%;
-        border-radius: 0%;
+        border-radius:6px;
 
     }
 }
@@ -138,3 +178,91 @@
 }
 
 
+
+table th{
+    color: black !important;
+    background-color: #F8F8F8;
+}
+.summaryTables td {
+    color: #9E9E9E !important;
+}
+
+
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-left: 10px; /* Adjust margin as needed */
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.switch .slider:before {
+background-color: white;
+}
+
+.switch .slider {
+    border: #aaaaaa solid 1px !important;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+   //background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2DC74F !important;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2DC74F;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}

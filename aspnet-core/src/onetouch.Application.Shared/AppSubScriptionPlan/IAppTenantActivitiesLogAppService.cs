@@ -21,7 +21,8 @@ namespace onetouch.AppSubScriptionPlan
 
         Task<FileDto> GetAppTenantActivitiesLogToExcel(GetAllAppTenantActivitiesLogForExcelInput input);
         //Task<bool> AddUsageActivityLog(string featureCode, string reference, int qty);
-        Task<bool> AddUsageActivityLog(string featureCode, string? relatedEntityCode, long? relatedEntityId, long? relatedEntityOvbjectTypeId, string reference, int qty);
+        //Task<bool> AddUsageActivityLog(string featureCode, string? relatedEntityCode, long? relatedEntityId, long? relatedEntityOvbjectTypeId, string reference, int qty);
+        Task<bool> AddUsageActivityLog(string featureCode, string? relatedEntityCode, long? relatedEntityId, long? relatedEntityOvbjectTypeId, string? relatedEntityObjectTypeCode, string reference, int qty);
         Task<bool> AddPlanRenewalBalances(DateTime startdate);
         Task<bool> IsFeatureAvailable(string featureCode);
     }

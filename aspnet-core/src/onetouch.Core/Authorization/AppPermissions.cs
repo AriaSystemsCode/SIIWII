@@ -41,6 +41,11 @@
         public const string Pages_Administration_AppFeatures_Edit = "Pages.Administration.AppFeatures.Edit";
         public const string Pages_Administration_AppFeatures_Delete = "Pages.Administration.AppFeatures.Delete";
 
+        public const string Pages_Administration_SycCurrencyExchangeRates = "Pages.Administration.SycCurrencyExchangeRates";
+        public const string Pages_Administration_SycCurrencyExchangeRates_Create = "Pages.Administration.SycCurrencyExchangeRates.Create";
+        public const string Pages_Administration_SycCurrencyExchangeRates_Edit = "Pages.Administration.SycCurrencyExchangeRates.Edit";
+        public const string Pages_Administration_SycCurrencyExchangeRates_Delete = "Pages.Administration.SycCurrencyExchangeRates.Delete";
+
         public const string Pages_Administration_Maintainances = "Pages.Administration.Maintainances";
         public const string Pages_Administration_Maintainances_Create = "Pages.Administration.Maintainances.Create";
         public const string Pages_Administration_Maintainances_Edit = "Pages.Administration.Maintainances.Edit";

@@ -3,6 +3,16 @@ import { FileUploadModule as PrimeNgFileUploadModule } from 'primeng/fileupload'
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { AppSubscriptionPlanDetailsComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetails.component';
+import { ViewAppSubscriptionPlanDetailModalComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/view-appSubscriptionPlanDetail-modal.component';
+import { CreateOrEditAppSubscriptionPlanDetailModalComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/create-or-edit-appSubscriptionPlanDetail-modal.component';
+// import { AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetail-appSubscriptionPlanHeader-lookup-table-modal.component';
+// import { AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent } from './appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetail-appFeature-lookup-table-modal.component';
+
+import { SycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/sycCurrencyExchangeRates.component';
+import { ViewSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/view-sycCurrencyExchangeRates.component';
+import { CreateOrEditSycCurrencyExchangeRatesComponent } from './sycCurrencyExchangeRates/sycCurrencyExchangeRates/create-or-edit-sycCurrencyExchangeRates.component';
+
 import { AppTenantInvoicesComponent } from './appSubscriptionPlans/appTenantInvoices/appTenantInvoices.component';
 import { ViewAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/view-appTenantInvoice.component';
 import { CreateOrEditAppTenantInvoiceComponent } from './appSubscriptionPlans/appTenantInvoices/create-or-edit-appTenantInvoice.component';
@@ -245,6 +255,16 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
     ],
     declarations: [
+		//AppSubscriptionPlanDetailsComponent,
+
+		//ViewAppSubscriptionPlanDetailModalComponent,
+		//CreateOrEditAppSubscriptionPlanDetailModalComponent,
+    // AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent,
+    // AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent,
+		SycCurrencyExchangeRatesComponent,
+
+		ViewSycCurrencyExchangeRatesComponent,
+		CreateOrEditSycCurrencyExchangeRatesComponent,
 		AppTenantInvoicesComponent,
 
 		ViewAppTenantInvoiceComponent,

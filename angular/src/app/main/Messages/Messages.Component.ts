@@ -143,6 +143,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.skipCount,
                 this.maxResultCount
             )
+            .pipe(finalize(() => {  this.hideMainSpinner(); }))
             .subscribe((result) => {
                 if (search == true) {
                     this.messages = [];
@@ -232,35 +233,38 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
     }
 
-    getPrimaryMessage() {
+    getPrimaryMessage(event) {
+        this.clearActiveTab();
+        event.target.closest('button').classList.add('active-tab');
         this.messageCategoryFilter = "MESSAGE";
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();
     }
 
-    getUpdatesMessage(event,messageType) {
+    
+    getUpdatesMessage(event, messageType) {
         this.showMainSpinner();
-        Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
-            element.classList.remove("active-tab");
-
-        });
-        event.target.className+=' active-tab'
+        this.clearActiveTab();
+        event.target.closest('button').classList.add('active-tab');
         this.messageCategoryFilter = messageType;
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();
     }
+    
     getMentionsMessage(event) {
-        Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
-            element.classList.remove("active-tab");
-
-        });
-        event.target.className+=' active-tab'
+        this.clearActiveTab();
+        event.target.closest('button').classList.add('active-tab');
         this.messageCategoryFilter = "MENTION";
         this.messages = [];
         this.messagesDetails = null;
         this.getMesssage();
+    }
+    clearActiveTab() {
+        Array.from(document.getElementsByClassName('active-tab')).forEach(element => {
+            element.classList.remove("active-tab");
+        });
     }
 
     onScroll(): void {

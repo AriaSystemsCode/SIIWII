@@ -119,6 +119,7 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
 
     getAppTenantActivitiesLog(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

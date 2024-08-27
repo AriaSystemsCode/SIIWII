@@ -30,6 +30,7 @@ import {
     ICreateOrEditAppTransactionsDto,
     TransactionType,
     ValidateTransaction,
+    AppMarketplaceItemsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
@@ -47,6 +48,7 @@ import * as moment from "moment";
     templateUrl: "./createTransactionModal.component.html",
     selector: "createTransactionModal",
     styleUrls: ["./createTransactionModal.component.scss"],
+    providers:[AppMarketplaceItemsServiceProxy]
 })
 export class CreateTransactionModal extends AppComponentBase implements OnInit,OnChanges {
     dt: string;
@@ -103,12 +105,14 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
     minCompleteDate:Date;
     minStartDate:Date;
-    
+    sellerCurrencyCode;
+
     constructor(
         injector: Injector,
         private fb: FormBuilder,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
+        private _AppMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy,
         private userClickService: UserClickService,
         private router: Router
     ) {
@@ -403,6 +407,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     handleSellerCompanyChange(event: any) {
         this.sellerCompanyId = event.value.id;
         this.sellerCompanySSIN = event.value.accountSSIN;
+        this.sellerCurrencyCode=event.value.currencyCode;
         this.areSame = false
         this.orderForm.get('sellerContactPhoneNumber').setValue(event.value.phone)
         this.orderForm.get('sellerContactEMailAddress').setValue(event.value.email)
@@ -844,6 +849,43 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                             JSON.stringify(this.currencyCode)
                         );
                     }
+
+
+                     ////////////////////////////
+                    this._AppMarketplaceItemsServiceProxy
+                     .checkCurrencyExchangeRate(this.currencyCode)
+                     .subscribe((res: boolean) => {
+                         if(!res){
+                              Swal.fire({
+                                 title: "",
+                                 text: "Currency exchange rate hasn't been defined switching to seller currency",
+                                 icon: "info",
+                                 showCancelButton: false,
+                                 confirmButtonText:
+                                     "Ok",
+                                 allowOutsideClick: false,
+                                 allowEscapeKey: false,
+                                 backdrop: true,
+                                 customClass: {
+                                     popup: "popup-class",
+                                     icon: "icon-class",
+                                     content: "content-class",
+                                     actions: "actions-class",
+                                     confirmButton: "confirm-button-class2",
+                                 },
+                             });
+
+
+                             this.currencyCode=  this.sellerCurrencyCode ? this.sellerCurrencyCode :this.appSession.tenant.currencyInfoDto ;
+                             localStorage.setItem(
+                                 "currencyCode",
+                                 JSON.stringify(this.currencyCode)
+                             );
+                         }
+                         }); 
+                             //////////////////////////
+
+                             
                     if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
                         location.reload();
                     else

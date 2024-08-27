@@ -3,12 +3,12 @@
 }
 #commentBody{
     border-radius: 10px;
-    border:1px solid rgb(158, 158, 158);
+    border: 1px solid #F8F8F8;
     resize: none;
     padding: 10px;
     box-shadow: 0 0 3px transparent;
     overflow: hidden;
-    background-color: #fff;
+    background-color: #F8F8F8;
     &:focus {
         outline: none !important;
         box-shadow: 0 0 3px #464444;

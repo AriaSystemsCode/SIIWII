@@ -13,6 +13,7 @@ import { finalize } from 'rxjs';
 export class ViewShippingInformationComponent  extends AppComponentBase{
   @Input() shoppingCartMode = ShoppingCartMode;
   @Input("activeTab") activeTab: number;
+  @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Input("createOrEditshippingInfO") createOrEditshippingInfO: boolean=true;
   @Input() contactIdFrom:number;

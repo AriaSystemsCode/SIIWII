@@ -156,7 +156,12 @@ namespace onetouch.Authorization
 
             var administration = pages.CreateChildPermission(AppPermissions.Pages_Administration, L("Administration"));
 
-            var appTenantInvoices = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices, L("AppTenantInvoices"));
+            var sycCurrencyExchangeRates = administration.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates, L("SycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
+            sycCurrencyExchangeRates.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates_Create, L("CreateNewSycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
+            sycCurrencyExchangeRates.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates_Edit, L("EditSycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
+            sycCurrencyExchangeRates.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates_Delete, L("DeleteSycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
+
+            var appTenantInvoices = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices, L("AppTenantInvoices"), multiTenancySides: MultiTenancySides.Host);
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Create, L("CreateNewAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Edit, L("EditAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Delete, L("DeleteAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);

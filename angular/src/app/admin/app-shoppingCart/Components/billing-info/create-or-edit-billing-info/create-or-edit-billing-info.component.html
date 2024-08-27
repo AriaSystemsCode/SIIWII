@@ -1,7 +1,7 @@
 <div class="position-relative tab-cont thin-scroll">
 
-    <div *ngIf="createOrEditBillingInfo">
-    <div class="container-fluid pt-1 mb-3 ">
+    <div>
+    <div class="container-fluid pt-1 mb-3 "  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
@@ -35,13 +35,16 @@
                 (loadAddressComponent)="reloadAddresscomponentAPContact($event)"
                 [isCreateOrEdit]="createOrEditBillingInfo"
                 [activeTab]="activeTab"
+                [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                 (formValidityChanged)="isContactFormValid($event,1)"
             ></app-contact>
             </div>
         </div>
+    </div>
         <hr class="my-2" />
+        <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <app-address 
         [isCreateOredit]="createOrEditBillingInfo"
         [contactId]="contactIdApContact"
@@ -50,9 +53,9 @@
         [showAddressType]="false"
         [canChange]="canChange"
         ></app-address>
-        
     </div>
-    <div class="container-fluid pt-1">
+    
+    <div class="container-fluid pt-1"  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">  {{l("ARContact")}} : </span></h6>
         </div>
@@ -65,6 +68,7 @@
                 (loadAddressComponent)="reloadAddresscomponentARContact($event)"
                 [isCreateOrEdit]="createOrEditBillingInfo"
                 [activeTab]="activeTab"
+                [currentTab]="currentTab"
                 [appTransactionsForViewDto]="appTransactionsForViewDto"
                 (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                 (formValidityChanged)="isContactFormValid($event,2)"
@@ -72,18 +76,21 @@
             </div>
         </div>
         <hr class="my-2" />
-        <app-address 
-        [isCreateOredit]="createOrEditBillingInfo"
-        [contactId]="contactIdARContact"
-        (updateSelectedAddress)="updateArContact($event)"
-        [selectedAddressDetails]="arContactSelectedAdd"
-        [showAddressType]="false"
-        [canChange]="canChange"
-        ></app-address>
+      
 
 
     </div>
-    <div class="container-fluid pt-1 mb-3 mt-3">
+    <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+    <app-address  
+    [isCreateOredit]="createOrEditBillingInfo"
+    [contactId]="contactIdARContact"
+    (updateSelectedAddress)="updateArContact($event)"
+    [selectedAddressDetails]="arContactSelectedAdd"
+    [showAddressType]="false"
+    [canChange]="canChange"
+    ></app-address>
+</div>
+    <div class="container-fluid pt-1 mb-3 mt-3"  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
         </div>
@@ -117,6 +124,7 @@
     (showBillingEditMode)="onshowBillingEditMode($event)"
     (onshowSaveBtn)="onshowSaveBtn($event)"
     [activeTab]="activeTab"
+    [currentTab]="currentTab" 
     [contactIdApContact]="contactIdApContact"
     [contactIdARContact]="contactIdARContact"
     [createOrEditBillingInfo]="createOrEditBillingInfo"

@@ -25,7 +25,7 @@ namespace onetouch.AppSubScriptionPlan
         [StringLength(AppTenantActivityLogConsts.MaxActivityTypeLength, MinimumLength = AppTenantActivityLogConsts.MinActivityTypeLength)]
         public virtual string ActivityType { get; set; }
 
-        public virtual long AppSubscriptionPlanHeaderId { get; set; }
+        public virtual long? AppSubscriptionPlanHeaderId { get; set; }
 
         [StringLength(AppTenantActivityLogConsts.MaxAppSubscriptionPlanCodeLength, MinimumLength = AppTenantActivityLogConsts.MinAppSubscriptionPlanCodeLength)]
         public virtual string AppSubscriptionPlanCode { get; set; }
@@ -80,6 +80,7 @@ namespace onetouch.AppSubScriptionPlan
         public virtual string? RelatedEntityCode { get; set; }
 
         public virtual long? RelatedEntityObjectTypeId { get; set; }
+        public virtual string? RelatedEntityObjectTypeCode { get; set; }
 
         [ForeignKey("RelatedEntityObjectTypeId")]
         public SycEntityObjectType? RelatedEntityObjectTypeFk { get; set; }
