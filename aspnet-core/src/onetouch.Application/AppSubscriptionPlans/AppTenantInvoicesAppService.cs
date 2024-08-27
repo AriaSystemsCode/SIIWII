@@ -20,6 +20,7 @@ using onetouch.SycSegmentIdentifierDefinitions;
 using NPOI.HPSF;
 using Microsoft.Extensions.Configuration;
 using onetouch.Configuration;
+using System.IO;
 
 namespace onetouch.AppSubscriptionPlans
 {
@@ -42,7 +43,8 @@ namespace onetouch.AppSubscriptionPlans
 
         public async Task<PagedResultDto<GetAppTenantInvoiceForViewDto>> GetAll(GetAllAppTenantInvoicesInput input)
         {
-            var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + "-1" + @"\" ;
+           // var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + "-1" + @"\" ;
+            string pathSource = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/"+"-1" + @"/"; 
             var filteredAppTenantInvoices = _appTenantInvoiceRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.InvoiceNumber.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.InvoiceNumberFilter), e => e.InvoiceNumber == input.InvoiceNumberFilter)
@@ -93,8 +95,8 @@ namespace onetouch.AppSubscriptionPlans
                         DueDate = o.DueDate,
                         PayDate = o.PayDate,
                         Id = o.Id,
-                        Attachment = string.IsNullOrEmpty(o.Attachment) ? (pathSource + o.Attachment): null,
-                        DisplayName = o.DisplayName,
+                        Attachment = !string.IsNullOrEmpty(o.Attachment) ? (pathSource + o.Attachment): null,
+                        DisplayName = o.DisplayName.TrimEnd()+ Path.GetExtension(o.Attachment), //Path.GetFileNameWithoutExtension(templateFileName) + DateTime.Now.ToString("yyyyMMddhhmmss") + Path.GetExtension(templateFileName);
                     }
                 };
 

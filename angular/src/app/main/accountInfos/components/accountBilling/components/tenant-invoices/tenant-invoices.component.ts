@@ -11,6 +11,7 @@ import { LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import { FileDownloadService } from "@shared/download/fileDownload.service" ;
+import { AppConsts } from '@shared/AppConsts';
 @Component({
   selector: 'app-tenant-invoices',
   templateUrl: './tenant-invoices.component.html',
@@ -61,9 +62,11 @@ export class TenantInvoicesComponent extends AppComponentBase {
       return this.isGrantedAny('Pages.Administration.AuditLogs') && customSettings.EntityHistory && customSettings.EntityHistory.isEnabled && _.filter(customSettings.EntityHistory.enabledEntities, entityType => entityType === this._entityTypeFullName).length === 1;
   } 
   downloadFile(url, name) {
-    let attach = "AppConsts.attachmentBaseUrl";
+    let attach = AppConsts.attachmentBaseUrl;
     let fullURL = `${attach}/${url}`;
-    this._downloadService.downloadFile(fullURL,name,false);
+    //this._downloadService.downloadFile(fullURL,name,false);
+    this._downloadService.download(fullURL,
+        name);
 }
   getAppTenantInvoices(event?: LazyLoadEvent) {
       if (this.primengTableHelper.shouldResetPaging(event)) {
