@@ -4143,6 +4143,7 @@ namespace onetouch.AppSiiwiiTransaction
                         tenantTransaction.TenantOwner = int.Parse(marketplaceTransaction.TenantOwner.ToString());
                         tenantTransaction.TenantId = tenantId;
                         tenantTransaction.Id = 0;
+                        tenantTransaction.EnteredDate = marketplaceTransaction.EnteredDate;
                         tenantTransaction.AppTransactionDetails = null;
                         tenantTransaction.AppTransactionContacts = null;
                         tenantTransaction.EntityCategories = null;
@@ -4417,6 +4418,7 @@ namespace onetouch.AppSiiwiiTransaction
                         tenantTransactionObj.EntityClassifications = null;
                         tenantTransactionObj.EntityExtraData = null;
                         tenantTransactionObj.EntityAttachments = null;
+                        tenantTransactionObj.EnteredDate = marketplaceTransaction.EnteredDate;
                         returnTran = tenantTransactionObj.Code;
                         await _appEntityAttachment.DeleteAsync(z => z.EntityId == id);
                         await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == id);
@@ -4661,6 +4663,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.Code = marketplaceTransaction.TenantOwner.ToString().Trim() + "-" + marketplaceTransaction.Code.Trim();
                     marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
+                    marketplaceTransaction.EnteredDate = transaction.EnteredDate;
                     //marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     //marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;
@@ -4871,6 +4874,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;
                     marketplaceTransaction.EntityClassifications = null;
+                    marketplaceTransaction.EnteredDate = transaction.EnteredDate;
                     marketplaceTransaction.Code = marketplaceTransaction.TenantOwner.ToString().Trim() + "-" + marketplaceTransaction.Code.Trim();
                     await _appEntityAttachment.DeleteAsync(z => z.EntityId == id);
                     await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == id);
