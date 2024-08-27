@@ -276,6 +276,8 @@
                                 <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
                                     {{ productDetails?.manufacturerCode }}
                                 </h5>
+                                
+                    
                          
                             </div>
                             <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
@@ -342,7 +344,7 @@
                                 <h5> /EAC </h5>
                             </div>
                             <div 
-                            class="msrp d-flex"
+                            class="msrp d-flex justify-content-between"
                         >
                         <div>
                             <div class="msrp d-flex align-items-center ">
@@ -376,7 +378,7 @@
                             </h5>
 
                             <!-- <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" /> -->
-                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="ml-4  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
 
                             <label class="ml-3"
                             *ngIf="!showEditSpecialPrice">
@@ -1146,18 +1148,11 @@
                                             </h5>
                                      
                                         </div>
-                                        <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
-                                        >
-                                            <a
-                                                style="text-decoration: none"
-                                              (click)="goToShowroom()"
-                                                rel="noopener noreferrer"
-                                                >Visit the vitrual showroom</a
-                                            >
-                                        </button>
+                                 
                                         </div>
                                 </div>
-                                 
+                                 <div class="d-flex justify-content-between">
+
                                     <div class="d-flex">
                                         <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;">{{productDetails?.name}}</p>
                                         <h6 class="type ml-1 pt-2 text-center">
@@ -1168,6 +1163,18 @@
                                             }}
                                         </h6>
                                     </div>
+                                    <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
+                                    >
+                                    
+                                        <a
+                                            style="text-decoration: none"
+                                          (click)="goToShowroom()"
+                                            rel="noopener noreferrer"
+                                            >Visit the vitrual showroom</a
+                                        >
+                                    </button>
+                                 </div>
+                               
                                     <div class="price mb-4">
                                         <!-- show msrp price and range in this product has no special pricing -->
                                         <div
@@ -1253,7 +1260,7 @@
                                             <!-- {{ productDetails?.maxSpecialPrice }}
                                         </h5> -->
                                         <!-- <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" /> -->
-                                        <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : 0  " />
+                                        <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="ml-4  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : 0  " />
 
                                         <label class="ml-3"
                                         *ngIf="!showEditSpecialPrice">
@@ -1693,7 +1700,7 @@
                                                 </tbody>
                                             </table>
                                         </p-tabPanel>
-                                    </p-tabView>s
+                                    </p-tabView>
                                     <!-- end order by prepack -->
                                 </div>
                             </div>
