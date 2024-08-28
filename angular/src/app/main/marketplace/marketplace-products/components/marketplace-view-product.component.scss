@@ -435,9 +435,46 @@ font-weight: 600;
         border: 1px solid #E2E2E2 !important;
     }
 @media only screen and (max-width: 567px) {
+    .tabView-mob {
+        .p-tabview .p-tabview-nav , .p-tabview .p-tabview-nav li {
+            height: 45 !important;
+        }
+    }
+ 
+    .msrp {
+        font-size: 12px;
+    }
+    font-size: 12px;
+    .p-inputnumber-buttons-stacked .p-inputnumber-input {
+        width: 140px ;
+    }
+
     table th{
         white-space: nowrap !important;
         font-size: 11px !important;
+    }
+    .input-custom {
+        max-width: 160px !important;
+    }
+    .table-mob {
+    
+        .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link{
+            background-color: #4A0D4A !important
+        }
+
+        .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+            /* color: #777 !important; */
+            border: none !important;
+            border-radius: 6px !important;
+            height: 33px !important;
+            min-width: 150px !important;
+            /* margin: auto; */
+        }
+  
+        .p-tabview-title {
+            font-size:  11px !important;
+            margin-top: 11px;
+        }
     }
     .p-tabview .p-tabview-nav {
         padding: 8px 14px !important;
@@ -446,6 +483,7 @@ font-weight: 600;
         border-top-right-radius: 6px !important;
         padding: 5px !important;
         background: #FFF !important;
+        min-height: 35px !important;
         .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
             border-radius: 12px !important;
             fill: white !important;
@@ -454,34 +492,67 @@ font-weight: 600;
     .p-tabview .p-tabview-panels {
         padding: 5px !important;
     }
-    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
-        width: 80px !important;
-        height: 66px !important;
-        padding: 0 !important;
-        border: none !important;
-        svg {
-            width: 24px !important;
-            height: 24px !important;
-            font-size: 10px !important;
-            margin-top: 10px !important;
+    .tabPanel-custom {
+        .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+            width: 80px !important;
+            height: 66px !important;
+            padding: 0 !important;
+            border: none !important;
+            svg {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 10px !important;
+                margin-top: 10px !important;
+            }
         }
     }
-     .p-tabview .p-tabview-nav li {
-        width: 25% !important;
-        height: 66px !important;
-        border-right:  1px solid #eee !important;
+
+
+    .tabPanel-custom {
+        .p-tabview .p-tabview-nav li {
+            // width: 25% !important;
+            // height: 66px !important;
+            border-right:  1px solid #eee !important;
+            margin: 0 4px;
+        }
+
+        .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+            // width: 80px !important;
+            width: 100% !important;
+            height: 66px !important;
+            padding: 0 !important;
+            border: none !important;
+            svg {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 10px !important;
+                margin-top: 10px !important;
+            }
+        }
     }
+
+    .table-mob {
+        
+        .p-tabview .p-tabview-nav li {
+            width: 100% !important;
+            height: 35px !important;
+            margin: 0 !important;
+            // border-right:  1px solid #eee !important;
+        }
+    }
+
     .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
         // background-color: white !important; 
         color: #777 !important;
         border: none!important;
-        border-radius: 0 !important;
+        border-radius: 6px !important;
         padding: 0 !important;
          width: 66px  !important;
          height: 66px !important;
-         margin-top: 3px !important;
+         margin: auto !important;
+        //  margin-top: 0 !important;
          .tab-header {
-            background-color: #4A0D4A !important;
+            // background-color: #4A0D4A !important;
             border-radius: 6px !important;
             color: white !important;
             padding: 2px 5px !important;

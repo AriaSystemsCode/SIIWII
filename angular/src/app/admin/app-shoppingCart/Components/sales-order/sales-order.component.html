@@ -166,10 +166,11 @@
                      [code]="category?.code"
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
+                    <!-- (click)="showCatBtn = true"  -->
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1">Classifications</label>  <div class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div></div> 
+                        <div class="d-flex"> <label class="label pt-1">Classifications</label>  <div *ngIf="allRecords.length == 0 " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div></div> 
 
-                         <!-- <div class="d-flex" *ngIf="showCatBtn || allRecords.length == 0 ">
+                          <!-- <div class="d-flex" *ngIf="showCatBtn || allRecords.length == 0 ">
                             <div  class="formGroup  col-8">
                               
                                 <input
@@ -194,7 +195,7 @@
                        
                         </button>
                         <button
-                        (click)="showCatBtn = false"
+                        (click)="cancelCat()"
                         class="cancelbtn text-center btn "
                         >
                         Cancel
@@ -202,7 +203,7 @@
                         </button>
                          </div> -->
 
-<div class="d-flex" *ngIf="!showCatBtn && appTransactionsForViewDto?.entityCategories
+<!-- <div class="d-flex" *ngIf="!showCatBtn && appTransactionsForViewDto?.entityCategories
 ?.length === 0">
     <p
     class="previewValue classificationsValues  m-0 p-0  my-2"
@@ -221,7 +222,7 @@
             >
             {{ item?.entityObjectCategoryName}}
             </p>
-</div>
+</div> -->
 
 
                         <!-- if no selection -->
@@ -280,13 +281,13 @@
                                 <span>{{ item.label }}</span>
                             </div>
                         </div> -->
-<div class="d-flex" *ngIf="!showCatBtn && allRecords.length != 0">
+<div class="d-flex" *ngIf=" allRecords.length != 0">
     <!-- {{selectedCategories}} -->
                     <!-- Selected Items Display -->
 
 
 <!-- TreeSelect Component -->
-<!-- <div  class="flex justify-content-center treeSel"   style="z-index:9999999999 !important ;" >
+<!-- <div *ngIf="!showCatBtn"  class="flex justify-content-center treeSel"   style="z-index:9999999999 !important ;" >
     <p-treeSelect 
     class="w-full md:w-20rem"
     containerStyleClass="w-full"
@@ -346,7 +347,7 @@
                             </a>
                         </div>
                         <div class="pointer">
-                            <a class="link purpleColor p-3">
+                            <a class="link purpleColor p-3" (click)="deleteCat(node)">
                                 <img
                                     src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
                                     class="imgIcon"
@@ -369,9 +370,9 @@
 </div> -->
 
                   
-                        <!-- <button (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button> -->
+                        <!-- <button *ngIf="!showCatBtn" (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button>
                     </div>
-                    </div>
+                    </div> -->
                     <div *ngIf="!createOrEditorderInfo">
                         <div
                             class="categoriesClassificationsContainer d-flex align-items-center big-scroll px-3    h-100 row   w-100"

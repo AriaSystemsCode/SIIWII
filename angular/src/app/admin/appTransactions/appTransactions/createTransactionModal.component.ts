@@ -157,7 +157,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
     ngOnChanges(){
         this.orderForm = this.fb.group({
-            enteredDate: [new Date()],
+            enteredDate: [Date],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],
@@ -489,7 +489,7 @@ if (event.filter != '' || event.filter != undefined){
     }
     addNewBuyer() {
         this.orderForm.controls['buyerContactName'].setValue(this.searchTerm);
-        console.log( this.orderForm.controls['buyerContactName'].value,'lll')
+    
 
     //    if(!this.buyerContacts?.length) 
     //     this.buyerContacts=[];
@@ -510,7 +510,7 @@ if (event.filter != '' || event.filter != undefined){
 
                this.sellerContacts.push({ name: `  ${this.searchTermSeller}`, id: this.sellerContacts.length + 1 });
                this.showAddSellBtn = false
-               console.log(this.orderForm.controls['sellerContactName'].value,'value')
+               
      
      }
     handleSellerNameSearch(event: any) {
@@ -730,9 +730,7 @@ if (event.filter != '' || event.filter != undefined){
                         reference: this.orderForm.controls['reference']?.value
                     };
 
-                    console.log(this.orderForm.value?.buyerContactName,'this.orderForm.value?.buyerContactName')
-                    console.log(this.orderForm.value?.buyerContactName.name,'name')
-                    console.log(this.orderForm.controls['buyerContactName']?.value,'value')
+         
                     // buyerId:
                     //         this.buyerComapnyId === 0 ? null : this.buyerComapnyId,
                     //     sellerId: this.sellerCompanyId,
@@ -1125,7 +1123,7 @@ if (event.filter != '' || event.filter != undefined){
     ngOnInit(): void {
         this.today = new Date()
         this.orderForm = this.fb.group({
-            enteredDate: [new Date()],
+            enteredDate: [ Date],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],

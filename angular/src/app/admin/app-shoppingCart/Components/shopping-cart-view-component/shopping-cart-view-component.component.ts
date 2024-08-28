@@ -30,6 +30,7 @@ export class ShoppingCartViewComponentComponent
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
   @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
   @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("refreshReport") refreshReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   orderInfoValid: boolean = false;
   buyerContactInfoValid = false;
@@ -96,7 +97,12 @@ export class ShoppingCartViewComponentComponent
 
   }
   ngOnInit(): void {
+    this.onGeneratOrderReport(true,undefined,true,true);
    console.log(this.openActions, "openActions")
+  }
+  ngOnChanges() {
+    this.onGeneratOrderReport(true,undefined,true,true);
+
   }
   loadCommentsList() {
     const screenWidth = window.innerWidth;
@@ -112,6 +118,7 @@ export class ShoppingCartViewComponentComponent
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
     this.resetData();
+    this.onGeneratOrderReport(true,undefined,true,true);
     this.orderId = orderId;
     this.loadNotesComp = true;
     this.showCarousel = showCarousel;
@@ -241,6 +248,7 @@ export class ShoppingCartViewComponentComponent
                this.productCode
              )
              .pipe(finalize(() => {
+
               if (res?.entityAttachments?.length > 0)
              this._transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
    
@@ -283,6 +291,10 @@ export class ShoppingCartViewComponentComponent
           
     
       });
+
+
+    
+
   }
 
   expandCollapseRecursive(node: TreeNode, isExpand: boolean) {
@@ -881,4 +893,6 @@ export class ShoppingCartViewComponentComponent
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
+
+
 }
