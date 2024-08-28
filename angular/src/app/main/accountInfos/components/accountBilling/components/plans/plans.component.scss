@@ -1,0 +1,51 @@
+.period-btn {
+    width: Hug (150px)px;
+height: Hug (37px)px;
+padding: 8px 53px 8px 53px;
+gap: 10px;
+border-radius: 0px 6px 6px 0px;
+border: 1px 0px 0px 0px;
+opacity: 0px;
+border: 1px solid #eeeeeeee;
+// background: var(--Primary-Color, btnBackColor);
+  }
+  .selected-month-btn{
+    background: var(--Primary-Color, #4A0D4A);
+    width: Hug (152px)px;
+height: Hug (37px)px;
+padding: 8px 46px 8px 46px;
+gap: 10px;
+border-radius: 6px 0px 0px 6px;
+opacity: 0px;
+border: 1px solid #eeeeeeee;
+box-shadow: 1px 1px 2px 0px #1616161A;
+  }
+
+  .selected-year-btn{
+    background: var(--Primary-Color, #4A0D4A);
+    width: Hug (152px)px;
+height: Hug (37px)px;
+padding: 8px 46px 8px 46px;
+gap: 10px;
+border-radius: 0px 6px 6px 0px;
+opacity: 0px;
+border: 1px solid #eeeeeeee;
+box-shadow: 1px 1px 2px 0px #1616161A;
+  }
+
+  .container{  
+    text-align: center;  
+   
+    }
+    .align-paragraph {
+        margin: 0; 
+        font-family: Poppins;
+font-size: 20px;
+font-weight: 600;
+line-height: 30px;
+text-align: left;
+color:  #1B101B;
+
+//background: var(--Header-Text-Color, #1B101B);
+
+    }

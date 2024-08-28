@@ -1,1 +1,31 @@
-<p>plans works!</p>
+<!-- <p>plans works!</p> -->
+<div class="container">
+    <button id="monthlybtn" [ngClass]="{'period-btn': !isMonthlyPlan, 'selected-month-btn': isMonthlyPlan}"
+    (click)="monthlyClick()">
+        Monthly
+    </button>
+    <button id="yearlybtn" [ngClass]="{'period-btn': isMonthlyPlan, 'selected-year-btn': !isMonthlyPlan}"
+    (click)="yearlyClick()">
+        Yearly
+    </button>
+</div>
+<div class="container">
+    <p class="align-paragraph">Plans</p>
+     <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td> 
+              <button style="background-color: 'blue';">
+                toto
+              </button>
+             </td>
+          </tr>
+        </tbody>
+      </table> 
+</div>

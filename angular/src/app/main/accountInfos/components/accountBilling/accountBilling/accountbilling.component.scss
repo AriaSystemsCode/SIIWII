@@ -5,7 +5,21 @@ background-color:white;
 color:#9E9E9E;
 font-size: 14px;
 font-weight: 500;
+//position: absolute;
+//top: 0;
+//margin-right: 10px; 
+width: Fixed (100px)px;
+height: Hug (37px)px;
+padding: 8px 18px 8px 18px;
+gap: 10px;
+border-radius: 4px 0px 0px 0px;
+opacity: 0px;
+
+
 }
+.align-paragraph {
+    margin: 0; /* Reset margin if needed */}
+
 .billing-option-btn-clicked
 {
 margin-left:20px;
@@ -13,4 +27,54 @@ background-color:#5A225A;
 color:white;
 font-size: 14px;
 font-weight: 500;
+//margin-right: 10px; 
+//top: 0;
+width: Fixed (100px)px;
+height: Hug (37px)px;
+padding: 8px 18px 8px 18px;
+gap: 10px;
+border-radius: 4px 4px 4px 4px;
+opacity: 0px;
+border: 1px solid var(--Primary-Color, #4A0D4A)
+
 }
+.billing-btn-frame{
+    width: Fixed (100px)px;
+    height: Hug (37px)px;
+    padding: 8px 18px 8px 18px;   
+    gap: 10px;   
+    border-radius: 4px 0px 0px 0px;
+    border: 1px 0px 0px 0px;
+    opacity: 0px;
+    
+}
+.relative-container {
+    position: relative;
+    height: 200px; /* Adjust as needed */
+   // border: 1px solid black; /* Optional, for visual aid */
+  }
+  .absolute-item {
+    //position: absolute;
+    top: 0; /* Align items to the top */
+    //left: 0; /* Adjust as needed */
+    //margin: 10px; /* Optional, for spacing */
+    //padding: 20px; /* Optional, for styling */
+    //border:  1px solid black; 
+    width: Fixed (436px)px;
+height: Hug (37px)px;
+gap: 12px;
+opacity: 0px;
+
+}
+.container {
+    //display: flex;
+   // align-items:  flex-start; /* Align items to the top */
+    width: Hug (862px)px;
+height: Hug (37px)px;
+top: 28px;
+left: 24px;
+gap: 240px;
+border-radius: 4px 4px 0px 0px;
+opacity: 0px;
+
+  }

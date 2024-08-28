@@ -75,7 +75,7 @@ import { FileDownloadService } from "@shared/download/fileDownload.service";
 import { MenuModule } from "primeng/menu"; // add this import
 import { DialogModule } from "primeng/dialog";
 import { ChipModule } from 'primeng/chip';
-
+import { PlansComponent } from "./main/accountInfos/components/accountBilling/components/plans/plans.component";
 // Metronic
 import {
     PerfectScrollbarModule,

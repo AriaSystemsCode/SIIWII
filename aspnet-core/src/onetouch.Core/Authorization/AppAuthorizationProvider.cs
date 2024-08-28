@@ -35,7 +35,7 @@ namespace onetouch.Authorization
             appTenantActivitiesLog.CreateChildPermission(AppPermissions.Pages_AppTenantActivitiesLog_Edit, L("EditAppTenantActivityLog"), multiTenancySides: MultiTenancySides.Host);
             appTenantActivitiesLog.CreateChildPermission(AppPermissions.Pages_AppTenantActivitiesLog_Delete, L("DeleteAppTenantActivityLog"), multiTenancySides: MultiTenancySides.Host);
 
-            var appSubscriptionPlanHeaders = pages.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders, L("AppSubscriptionPlanHeaders"), multiTenancySides: MultiTenancySides.Host);
+            var appSubscriptionPlanHeaders = pages.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders, L("AppSubscriptionPlanHeaders"));
             appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Create, L("CreateNewAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
             appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Edit, L("EditAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
             appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Delete, L("DeleteAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
