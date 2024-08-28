@@ -368,7 +368,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (string.IsNullOrEmpty(appTrans.SSIN))
                 {
                     var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
-                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId,ObjectMapper.Map<AppEntityDto>(appTrans));
                 }
                 long? phoneTypeSeller = null;
                 string? phoneTypeNameSeller = null;
@@ -761,7 +761,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (string.IsNullOrEmpty(appTrans.SSIN))
                 {
                     var transactionObject = await _helper.SystemTables.GetObjectTransactionId();
-                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObject, null);
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObject, ObjectMapper.Map<AppEntityDto>(appTrans));
                 }
                 AppTransactionHeaders obj = new AppTransactionHeaders();
                 var header = await _appTransactionsHeaderRepository.GetAll().AsNoTracking().Include(z => z.AppTransactionDetails).Where(s => s.Code == input.Code && s.TenantId == AbpSession.TenantId
@@ -1230,7 +1230,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (string.IsNullOrEmpty(appTrans.SSIN))
                 {
                     var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
-                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, ObjectMapper.Map<AppEntityDto>(appTrans));
                 }
                 appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
@@ -1526,7 +1526,7 @@ namespace onetouch.AppSiiwiiTransaction
                 trans.EntityObjectStatusId = null;
                 trans.EntityObjectTypeId = objectRec.Id;
                 var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
-                trans.SSIN = await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                trans.SSIN = tranType+"-"+ await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
                 await _appTransactionsHeaderRepository.InsertAsync(trans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 //XX
@@ -2349,7 +2349,7 @@ namespace onetouch.AppSiiwiiTransaction
                                             colorDetailView.Children.Add(sizeColorDetailView);
                                         }
                                         colorDetailView.Data.Qty = colorDetailView.Data.Qty + size.Quantity;
-                                        colorDetailView.Data.NoOfPrePacks = colorDetailView.Data.NoOfPrePacks + (size.NoOfPrePacks == null ? 0 : (long)size.NoOfPrePacks);
+                                        colorDetailView.Data.NoOfPrePacks =  (size.NoOfPrePacks == null ? 0 : (long)size.NoOfPrePacks);//colorDetailView.Data.NoOfPrePacks +
                                         //colorDetailView.Data.Price = colorDetailView.Data.Price + size.NetPrice;
                                         colorDetailView.Data.Price = size.NetPrice;
                                         colorDetailView.Data.Amount = colorDetailView.Data.Amount + size.Amount;
@@ -2446,15 +2446,26 @@ namespace onetouch.AppSiiwiiTransaction
                         ((!string.IsNullOrEmpty(colorCode) && x.AttributeValue.ToUpper() == colorCode.ToUpper())
                         || (colorId > 0 && x.AttributeValueId == colorId))).Count() > 0)
                             .ToList();
-
+                        double oldQty = 0;
                         foreach (var e in itemsList)
                         {
                             if ((long)e.NoOfPrePacks > 0)
                             {
-                                e.Quantity = qty * e.Quantity / (long)e.NoOfPrePacks;
-                                e.NoOfPrePacks = qty;
+                               // e.Quantity = qty / (e.Quantity / (long)e.NoOfPrePacks);
+                               // e.NoOfPrePacks = qty;
+                                oldQty += e.Quantity;
                             }
                         };
+                        long? NewNoOfPrePack = qty/(((long?)oldQty) / itemMajor.NoOfPrePacks);
+                        foreach (var e in itemsList)
+                        {
+                            if ((long)e.NoOfPrePacks > 0)
+                            {
+                                e.Quantity = (double)(NewNoOfPrePack * (e.Quantity / (long)e.NoOfPrePacks));
+                                e.NoOfPrePacks = NewNoOfPrePack;
+                            }
+                        };
+                        itemMajor.NoOfPrePacks = NewNoOfPrePack;
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }

@@ -95,7 +95,7 @@
             // BottomMargin
             // 
             this.BottomMargin.Dpi = 254F;
-            this.BottomMargin.HeightF = 0F;
+            this.BottomMargin.HeightF = 2.079976F;
             this.BottomMargin.Name = "BottomMargin";
             // 
             // Detail
@@ -328,7 +328,7 @@
             this.Dpi = 254F;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Landscape = true;
-            this.Margins = new DevExpress.Drawing.DXMargins(0F, 2185F, 3F, 0F);
+            this.Margins = new DevExpress.Drawing.DXMargins(0F, 2185F, 3F, 2.079976F);
             this.PageHeight = 2159;
             this.PageWidth = 2794;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
