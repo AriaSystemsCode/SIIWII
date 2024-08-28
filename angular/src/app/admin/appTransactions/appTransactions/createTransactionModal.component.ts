@@ -157,7 +157,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
     ngOnChanges(){
         this.orderForm = this.fb.group({
-            enteredDate: [new Date()],
+            enteredDate: [Date],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],
@@ -1123,7 +1123,7 @@ if (event.filter != '' || event.filter != undefined){
     ngOnInit(): void {
         this.today = new Date()
         this.orderForm = this.fb.group({
-            enteredDate: [new Date()],
+            enteredDate: [ Date],
             startDate: [ Date, [Validators.required]],
             completeDate: ["", [Validators.required]],
             availableDate: ["", [Validators.required]],

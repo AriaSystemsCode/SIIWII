@@ -435,7 +435,7 @@
                                                                         (click)="rowNode.node.data.showEditQty=false"></a>
                                                                     <button
                                                                         class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
-                                                                        (click)="onEditQty(rowNode)"
+                                                                        (click)="onEditQty(rowNode);onGeneratOrderReport(true,undefined,false,true);"
                                                                         [ngClass]="{ disabled:!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0 || rowNode.node.data.updatedQty==rowNode.node.data.qty}"
                                                                         [disabled]="!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0  || rowNode.node.data.updatedQty==rowNode.node.data.qty"></button>
                                                                 </div>
@@ -1017,7 +1017,7 @@ height: 48px;"
                                                                     (click)="rowNode.node.data.showEditQty=false"></a>
                                                                 <button
                                                                     class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
-                                                                    (click)="onEditQty(rowNode)"
+                                                                    (click)="onEditQty(rowNode);onGeneratOrderReport(true,undefined,false,true);"
                                                                     [ngClass]="{ disabled:!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0 || rowNode.node.data.updatedQty==rowNode.node.data.qty}"
                                                                     [disabled]="!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0  || rowNode.node.data.updatedQty==rowNode.node.data.qty"></button>
                                                             </div>

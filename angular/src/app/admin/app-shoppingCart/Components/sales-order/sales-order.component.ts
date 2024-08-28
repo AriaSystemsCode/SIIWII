@@ -729,9 +729,10 @@ saveCat(category:any){
         name: category.name,
         objectId: undefined,
         parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
-        id: this.editSubCat?  this.parentCat.parentId : undefined
+        id: undefined
     });
-
+    // parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
+    // id: this.editSubCat?  this.parentCat.parentId : undefined
 
     
     // edit
@@ -766,13 +767,43 @@ saveCat(category:any){
     }))
     .subscribe(() => {
     //    this.notify.info(this.l('SavedSuccessfully'));
-       this.getAppTransactionList()
 
     });
     this.showCatBtn = false
-        this.selectedCategories[0] = {...cat};
+        // this.selectedCategories[0] = {...cat};
+       this.getAppTransactionList()
+       this.category.name = ''
         console.log(this.selectedCategories,'selectedCategories')
     
+}
+
+
+
+
+
+
+deleteCat(cat:any){
+    console.log(cat,'id') 
+
+    this._sycEntityObjectCategoriesServiceProxy.delete(cat.data.sycEntityObjectCategory.id)
+    .pipe(finalize(() => { 
+        // this.saving = false;
+    }))
+    .subscribe(() => {
+        this.notify.info("Successfully deleted.");
+       this.getAppTransactionList()
+
+
+    });
+    // this.showCatBtn = false
+        // this.selectedCategories[0] = {...cat};
+    //    this.category.name = ''
+        console.log(this.selectedCategories,'selectedCategories')
+    
+}
+cancelCat(){
+     this.getAppTransactionList()
+       this.category.name = ''
 }
     showEditMode() {
         this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
@@ -803,46 +834,47 @@ saveCat(category:any){
         console.log(">>", searchQuery)
         // this.loading = true;
         const subs = this._sycEntityObjectCategoriesServiceProxy
-            .getAllWithChildsForTransactionWithPaging(
-                searchQuery,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                false,
-                undefined,
-                undefined,
-                this.sortBy,
-                this.skipCount,
-                this.maxResultCount
+            .getAllWithChildsForTransaction(
+                // searchQuery,
+                // undefined,
+                // undefined,
+                // undefined,
+                // undefined,
+                // undefined,
+                // undefined,
+                // undefined,
+                // false,
+                // undefined,
+                // undefined,
+                // this.sortBy,
+                // this.skipCount,
+                // this.maxResultCount
             )
             .pipe(finalize(() => (this.loading = false)))
             .subscribe((result) => {
                 console.log(result.items,'result.items')
 
-                if (searchQuery !== undefined) this.allRecords = [];
-                result.items.map((record) => {
+                // if (searchQuery !== undefined) this.allRecords = [];
+                // result.items.map((record) => {
               
-                    // const cachedItem : TreeNodeOfGetSycEntityObjectTypeForViewDto = this.loadedChildrenRecords.filter((selectedRecord:TreeNodeOfGetSycEntityObjectTypeForViewDto)=>{
-                    //     const isCached : boolean = selectedRecord.data.sycEntityObjectType.id == record.data.sycEntityObjectType.id
-                    //     return isCached
-                    // })[0]
-                    // const isCached : boolean = !!cachedItem
+                //     // const cachedItem : TreeNodeOfGetSycEntityObjectTypeForViewDto = this.loadedChildrenRecords.filter((selectedRecord:TreeNodeOfGetSycEntityObjectTypeForViewDto)=>{
+                //     //     const isCached : boolean = selectedRecord.data.sycEntityObjectType.id == record.data.sycEntityObjectType.id
+                //     //     return isCached
+                //     // })[0]
+                //     // const isCached : boolean = !!cachedItem
 
-                    // if(isCached){
-                    //     record.children = cachedItem.children
-                    //     record.expanded = cachedItem.expanded
-                    //     record.totalChildrenCount = cachedItem.totalChildrenCount;
-                    //     (record as any).partialSelected = (cachedItem as any).partialSelected
-                    // }
+                //     // if(isCached){
+                //     //     record.children = cachedItem.children
+                //     //     record.expanded = cachedItem.expanded
+                //     //     record.totalChildrenCount = cachedItem.totalChildrenCount;
+                //     //     (record as any).partialSelected = (cachedItem as any).partialSelected
+                //     // }
 
-                    // this.checkItemSelection(record);
+                //     // this.checkItemSelection(record);
 
-                    return record;
-                });
+                //     return record;
+                // });
+                this.allRecords = [];
                 this.allRecords.push(...result.items);
                 console.log(this.allRecords,'this.allRecords')
                 // this.lastSelectedRecord = this.selectedRecord;
