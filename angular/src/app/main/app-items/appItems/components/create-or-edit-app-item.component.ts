@@ -1675,10 +1675,13 @@ let x=  this.appItem.nonLookupValues;
                         this.appItem.variationItems[i].code = this.appItem.code;
                     else this.appItem.variationItems[i].code = "";
                 }
+
+                if(this.appItem?.variationItems[i]?.entityExtraData[j]?.attributeValue ){
                 this.appItem.variationItems[i].code +=
                     "-" +
                     this.appItem?.variationItems[i]?.entityExtraData[j]
                         ?.attributeValue;
+                }
             }
         }
     }
