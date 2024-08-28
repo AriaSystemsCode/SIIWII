@@ -97,11 +97,11 @@ export class ShoppingCartViewComponentComponent
 
   }
   ngOnInit(): void {
-    this.onGeneratOrderReport(true,undefined,true,true);
+    // this.onGeneratOrderReport(true,undefined,true,true);
    console.log(this.openActions, "openActions")
   }
   ngOnChanges() {
-    this.onGeneratOrderReport(true,undefined,true,true);
+    // this.onGeneratOrderReport(true,undefined,true,true);
 
   }
   loadCommentsList() {
@@ -118,7 +118,7 @@ export class ShoppingCartViewComponentComponent
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
     this.resetData();
-    this.onGeneratOrderReport(true,undefined,true,true);
+    // this.onGeneratOrderReport(true,undefined,true,true);
     this.orderId = orderId;
     this.loadNotesComp = true;
     this.showCarousel = showCarousel;
