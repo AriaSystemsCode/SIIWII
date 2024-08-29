@@ -43,6 +43,7 @@ import { AppConsts } from "@shared/AppConsts";
 import { get } from "http";
 import { ProductCatalogueReportParams } from "@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params";
 import * as moment from "moment";
+import { Calendar } from "primeng/calendar";
 
 @Component({
     templateUrl: "./createTransactionModal.component.html",
@@ -105,6 +106,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     printInfoParam: ProductCatalogueReportParams = new ProductCatalogueReportParams()
     minCompleteDate:Date;
     minStartDate:Date;
+    minSEnteredDate:Date;
     sellerCurrencyCode;
     emptyMessage: string = 'No results found';
     searchTerm: string = undefined;
@@ -117,6 +119,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     showAddTextBtn:boolean = false
     showAddSellBtn:boolean = false
     showAddBuyBtn:boolean = false
+    @ViewChild('calendar1') calendar1: Calendar;
+    @ViewChild('calendar2') calendar2: Calendar;
+    @ViewChild('calendar3') calendar3: Calendar;
+    @ViewChild('calendar4') calendar4: Calendar;
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -154,7 +160,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
        
     }
-
+    openCalendar(calendar: Calendar) {
+        calendar.inputfieldViewChild.nativeElement.click();
+      }
     ngOnChanges(){
         this.orderForm = this.fb.group({
             enteredDate: [Date],
@@ -784,6 +792,7 @@ if (event.filter != '' || event.filter != undefined){
         const completeDateControl = this.orderForm.controls['completeDate'];
         const availableDateControl = this.orderForm.controls['availableDate'];
        const startDateControl = this.orderForm.controls['startDate'];
+       const EnteredDateControl = this.orderForm.controls['enteredDate'];
         
     
 
@@ -798,10 +807,11 @@ if (event.filter != '' || event.filter != undefined){
 
         this.minCompleteDate = this.orderForm.get('completeDate')?.value;
         this.minStartDate = this.orderForm.get('startDate')?.value;
+        this.minSEnteredDate = this.orderForm.get('enteredDate')?.value;
        //this.orderForm.controls['startDate'].setValue(moment.utc(date.toLocaleString()));
-    
+       
        const selectedStartDate = new Date(startDateControl.value);
-       if (selectedStartDate < this.today) {
+       if (selectedStartDate <  this.minSEnteredDate) {
          this.startDateMsg = true
          startDateControl.setErrors({ minDate: true });
        } else {
@@ -809,6 +819,58 @@ if (event.filter != '' || event.filter != undefined){
         this.startDateMsg = false
          startDateControl.setErrors(null); 
        }
+
+
+
+
+    //    const selectedavailableDate = new Date(availableDateControl.value);
+    //    if (selectedavailableDate < selectedCompliteDate) {
+    //      this.avalabletDateMsg = true
+    //      availableDateControl.setErrors({ minDate: true });
+    //    } else {
+
+    //     this.avalabletDateMsg = false
+    //     availableDateControl.setErrors(null); 
+    //    }
+
+       
+    }
+
+
+    changeEnteredDate(date){
+console.log(date,'daaate')
+        const newDate = new Date();
+
+        let month = date?.value?.getMonth();
+        let year = date?.value?.getFullYear();
+        let day = date?.value?.getDate();
+
+        let monthVal = (month === 11) ? 0 : month + 1;
+        let yearVal = (monthVal === 0) ? year + 1 : year;
+        this.minDate = newDate;
+        this.minDate.setDate(day);
+        this.minDate.setMonth(monthVal);
+        this.minDate.setFullYear(yearVal);
+
+        
+    
+
+
+
+
+
+        this.minSEnteredDate = this.orderForm.get('enteredDate')?.value;
+       this.orderForm.controls['startDate'].setValue(this.orderForm.get('enteredDate')?.value);
+    
+    //    const selectedStartDate = new Date(startDateControl.value);
+    //    if (selectedStartDate < this.today) {
+    //      this.startDateMsg = true
+    //      startDateControl.setErrors({ minDate: true });
+    //    } else {
+
+    //     this.startDateMsg = false
+    //      startDateControl.setErrors(null); 
+    //    }
 
 
 

@@ -590,8 +590,8 @@
 <div class="card position-relative dot">
     <div class="d-md-none d-block"  style="    z-index: 9999;
     position: absolute;
-    right: -20px;
-    top: 14px;">
+    right: -33px;
+    top: 21px;">
         <div class="btn-group" dropdown style="color: #9E9E9E;">
             <button dropdownToggle type="button" style="    width: 146px;
 height: 48px;"
@@ -1222,7 +1222,8 @@ height: 48px;"
                 [sharedWithUsers]="appTransactionsForViewDto.sharedWithUsers"
                 (closeTranScreenEvent)="hide()"
                     (offShareTransactionEvent)="offShareTransaction()"
-                    (onShareTransactionByMessage)="onShareTransactionByMessage($event)"></app-share-transaction-tab>
+                   
+                    (onShareTransactionByMessage)="onShareTransactionByMessage($event);"></app-share-transaction-tab>
             </div>
         </div>
     </div>
