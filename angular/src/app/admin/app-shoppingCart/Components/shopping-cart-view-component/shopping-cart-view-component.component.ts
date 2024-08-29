@@ -857,19 +857,20 @@ export class ShoppingCartViewComponentComponent
      this.transactionFormPath=this._transactionFormPath;
    }
 
-  onShareTransactionByMessage($event:TenantTransactionInfo[])
+  onShareTransactionByMessage($event: { tenantTransactionInfo: TenantTransactionInfo[], appTransactionsForViewDto: GetAppTransactionsForViewDto })
   {
+    this.appTransactionsForViewDto=$event.appTransactionsForViewDto;
     let printInfoParam= new ProductCatalogueReportParams();
     //printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
     printInfoParam.reportTemplateName = this.transactionReportTemplateName;
     printInfoParam.saveToPDF = true;
-    printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+    printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto?.enteredByUserRole);
     printInfoParam.userId = this.appSession?.userId
 
-    for (let i = 0; i < $event.length; i++) {
-      printInfoParam.TransactionId = $event[i].transactionId.toString();
-      printInfoParam.tenantId =$event[i].tenantId;
-      this.onGeneratOrderReport(true,printInfoParam,false,true);
+    for (let i = 0; i < $event.tenantTransactionInfo?.length; i++) {
+      printInfoParam.TransactionId = $event.tenantTransactionInfo[i].transactionId.toString();
+      printInfoParam.tenantId =$event.tenantTransactionInfo[i].tenantId;
+      this.onGeneratOrderReport(true,printInfoParam,false,false);
     }
   }
   createReportViewer() {
