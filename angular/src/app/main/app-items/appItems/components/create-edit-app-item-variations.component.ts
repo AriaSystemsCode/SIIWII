@@ -211,7 +211,7 @@ export class CreateEditAppItemVariationsComponent
             //     extraAttrSelectedValues =
             //         this.appSizeRatios?.appSizeScalesDetails?.length;
             // } else {
-                extraAttrSelectedValues = extraAttr.selectedValues?.length;
+               extraAttrSelectedValues =  extraAttr?.entityObjectTypeCode=='SIZE' ?  extraAttr.selectedValues?.length :  extraAttr.displayedSelectedValues?.length ;
             // }
             if (count == 0 && extraAttrSelectedValues > 0) count = 1;
             if (extraAttrSelectedValues) count *= extraAttrSelectedValues;
@@ -1280,6 +1280,16 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             }
         };
             // if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
+
+/////
+currentExtraAttr?.displayedSelectedValues?.forEach(item => {
+    if (!currentExtraAttr?.selectedValues?.includes(item?.value) && (item?.value!=0)) {
+        currentExtraAttr?.selectedValues?.push(item.value);
+    }
+});
+
+////
+
                 currentExtraAttr.selectedValues.forEach((attrId) => {
                     // if(attrId || attrId>=0){
                     let attrOptionData: any = currentExtraAttr?.lookupData?.filter(
@@ -1955,7 +1965,11 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             AppEntityListDynamicModalComponent,
             config
         );
+        let isProcessing = false; 
    const subs = this._BsModalService.onHidden.subscribe(() => {
+    if (isProcessing) return;  // Prevent multiple processing
+    isProcessing = true;
+
             const  subscription=  this._extraAttributeDataService.getExtraAttributeLookupData(
                 extraAttr.entityObjectTypeCode,
                 extraAttr.lookupData,
@@ -1971,8 +1985,10 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                 modalRef.content;
                 if (modalRefData.selectionDone)
                 this.onselectionDone(modalRefData,extraAttr);
+           
                 if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
            
+                isProcessing = false;
                 this.hideMainSpinner();
             });
 
