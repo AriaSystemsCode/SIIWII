@@ -522,6 +522,7 @@ span.p-tabview-title {
     border: #F8F8F8;
     color: black;
 }
+}
 
 
 // calendar general style
@@ -602,6 +603,8 @@ span.p-tabview-title {
     border-radius: 8px !important ;
     background: #4A0D4A !important ;
     color: #EFEFEF !important;
+    border: none !important;
+
 }
 .p-calendar
 {
@@ -694,4 +697,27 @@ border: 1px solid #D9D9D9 !important;
 
 }
 }
+
+// .p-datepicker:not(.p-datepicker-inline) {
+//     z-index: 2000 !important;
+// }
+:host ::ng-deep .p-overlay {
+    z-index: 99999999999 !important;
+}
+::ng-deep {
+    body {
+      overflow: scroll !important;
+    }
+    // .p-dropdown-panel {
+    //     z-index: 9999999999999 !important;
+    
+    // } 
+}
+
+.p-datepicker:not(.p-datepicker-inline) {
+    z-index: 999999999999 !important;
+}
+
+.p-datepicker{
+    z-index: 999999999999 !important;
 }

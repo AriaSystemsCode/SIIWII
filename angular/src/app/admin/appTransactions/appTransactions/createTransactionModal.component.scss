@@ -37,10 +37,17 @@ font-weight: 600 !important;
     .p-dropdown-filter-icon{
         top: 16px !important;
     }
+    .p-button:enabled:active {
+        border-radius: 6px;
+        border: 1px solid rgba(238, 238, 238, 0.93);
+        background: #FFF !important;
+        box-shadow: 2px 2px 6px 0px rgba(22, 22, 22, 0.05);
+        color: #4a0d4a;
+    }
     .addTextBtn{
         border-radius: 6px;
 border: 1px solid rgba(238, 238, 238, 0.93);
-background: #FFF;
+background: #FFF !important;
 box-shadow: 2px 2px 6px 0px rgba(22, 22, 22, 0.05);
 color: #4a0d4a;
     }
@@ -113,7 +120,9 @@ color: #4a0d4a;
 }
 
 
-
+.tem-footer {
+    padding: 4px 10px;
+}
 ::ng-deep  .calendar-form {
     .p-calendar {
         width: 100% !important;
@@ -135,21 +144,22 @@ img {
     position: absolute;
     right: 12px;
     bottom: 12px;
+    cursor: pointer;
 
 }
 p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
     border: 1px solid #a80000 !important;
 }
-.enteredDate {
-    .p-disabled, .p-component:disabled {
-        opacity: 1 !important;
-    color: #1B101B !important;
-    }
-    .p-calendar-w-btn .p-datepicker-trigger {
-        background: #808080 !important;
+// .enteredDate {
+//     .p-disabled, .p-component:disabled {
+//         opacity: 1 !important;
+//     color: #1B101B !important;
+//     }
+//     .p-calendar-w-btn .p-datepicker-trigger {
+//         background: #808080 !important;
 
-    }
-}
+//     }
+// }
 
 }
 

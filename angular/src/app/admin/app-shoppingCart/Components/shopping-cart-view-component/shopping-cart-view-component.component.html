@@ -21,9 +21,9 @@
 <ng-template #shoppingcartContainer>
 
     <div class="h-100 parentDiv" >
-        <div class="modal-content big-scroll pb-5 pl-3">
+        <div class="modal-content big-scroll pb-5 pl-3" style="max-height: 100%;">
             <div class="row topheader">
-                <div class="col-lg-4 col-md-5">
+                <div class="col-lg-3 col-md-5">
                     <div class="row bg-white col-md-11 col-9 m-3 p-2  pl-4" style="border-radius: 4px;">
                         Transactions &nbsp; &nbsp; > &nbsp; &nbsp; {{transactionType}} &nbsp; &nbsp; >
                         &nbsp; &nbsp;
@@ -435,7 +435,7 @@
                                                                         (click)="rowNode.node.data.showEditQty=false"></a>
                                                                     <button
                                                                         class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
-                                                                        (click)="onEditQty(rowNode)"
+                                                                        (click)="onEditQty(rowNode);onGeneratOrderReport(true,undefined,false,true);"
                                                                         [ngClass]="{ disabled:!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0 || rowNode.node.data.updatedQty==rowNode.node.data.qty}"
                                                                         [disabled]="!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0  || rowNode.node.data.updatedQty==rowNode.node.data.qty"></button>
                                                                 </div>
@@ -590,8 +590,8 @@
 <div class="card position-relative dot">
     <div class="d-md-none d-block"  style="    z-index: 9999;
     position: absolute;
-    right: -20px;
-    top: 14px;">
+    right: -33px;
+    top: 21px;">
         <div class="btn-group" dropdown style="color: #9E9E9E;">
             <button dropdownToggle type="button" style="    width: 146px;
 height: 48px;"
@@ -1017,7 +1017,7 @@ height: 48px;"
                                                                     (click)="rowNode.node.data.showEditQty=false"></a>
                                                                 <button
                                                                     class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
-                                                                    (click)="onEditQty(rowNode)"
+                                                                    (click)="onEditQty(rowNode);onGeneratOrderReport(true,undefined,false,true);"
                                                                     [ngClass]="{ disabled:!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0 || rowNode.node.data.updatedQty==rowNode.node.data.qty}"
                                                                     [disabled]="!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0  || rowNode.node.data.updatedQty==rowNode.node.data.qty"></button>
                                                             </div>
@@ -1219,10 +1219,12 @@ height: 48px;"
             </div>
             <div class="col-12 h-100 " *ngIf="onshare">
                 <app-share-transaction-tab [orderId]="orderId" 
-                [sharedWithUsers]="appTransactionsForViewDto.sharedWithUsers"
+                [appTransactionsForViewDto]="appTransactionsForViewDto"
+                [sharedWithUsers]="appTransactionsForViewDto?.sharedWithUsers"
                 (closeTranScreenEvent)="hide()"
                     (offShareTransactionEvent)="offShareTransaction()"
-                    (onShareTransactionByMessage)="onShareTransactionByMessage($event)"></app-share-transaction-tab>
+                   
+                    (onShareTransactionByMessage)="onShareTransactionByMessage($event);"></app-share-transaction-tab>
             </div>
         </div>
     </div>

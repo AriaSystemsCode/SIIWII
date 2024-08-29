@@ -10,22 +10,32 @@
     font-size: unset;
     height: 3.5rem;
 }
+
+@media (min-width: 1399px) {
+    .container {
+        max-width: 1277px;
+    }
+}
 @media (min-width: 1024px) {
 
 .rightList {
     position: absolute;
-    right: 3%;
+    right: 0%;
     top: 0;
-    border-left: 1px solid rgb(255 252 252 / 50%);
+    // border-left: 1px solid rgb(255 252 252 / 50%);
 }
 
 }
-@media (max-width: 1024px) {
-
-    .rightList {
-        position: relative;
-      
+@media (min-width: 1024px) {
+    .sec-section {
+        position: absolute;
+        right: 300px;
     }
+
+    // .rightList {
+    //     position: relative;
+      
+    // }
 }
 
 .small {
@@ -67,6 +77,24 @@
 background: #4A0D4A;
 box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
 }
+// @media (min-width: 768px) {
+//     .container {
+//         max-width: 973px !important;
+//     }
+// }
+@media (min-width: 1024px) {
+    .navbar-expand-lg .navbar-collapse {
+
+        max-width: 750px !important;
+    }
+}
+
+@media (max-width: 1024px) {
+    .navbar-expand-lg .navbar-collapse {
+
+        max-width: 1015px !important;
+    }
+}
 @media only screen and (min-width: 768px) and (max-width: 1023px) {
 
     .rightList {
@@ -78,7 +106,7 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
     }
 
     .navbar-collapse {
-        flex-basis: unset !important;
+        flex-basis:content !important;
     }
 }
 @media (min-width: 768px) and (max-width: 991.98px) {
@@ -89,7 +117,7 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
 
 @media (min-width: 992px) {
     .position-lg-static {
-        position: static;
+        // position: static;
     }
 }
 @media only screen and (max-width: 767px) {

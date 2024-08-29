@@ -30,6 +30,7 @@ export class ShoppingCartViewComponentComponent
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
   @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
   @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("refreshReport") refreshReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   orderInfoValid: boolean = false;
   buyerContactInfoValid = false;
@@ -96,7 +97,12 @@ export class ShoppingCartViewComponentComponent
 
   }
   ngOnInit(): void {
+    // this.onGeneratOrderReport(true,undefined,true,true);
    console.log(this.openActions, "openActions")
+  }
+  ngOnChanges() {
+    // this.onGeneratOrderReport(true,undefined,true,true);
+
   }
   loadCommentsList() {
     const screenWidth = window.innerWidth;
@@ -195,6 +201,7 @@ export class ShoppingCartViewComponentComponent
     //header
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
+
         this._AppTransactionServiceProxy
         .getRelatedAccounts(
             "",
@@ -241,6 +248,7 @@ export class ShoppingCartViewComponentComponent
                this.productCode
              )
              .pipe(finalize(() => {
+
               if (res?.entityAttachments?.length > 0)
              this._transactionFormPath = res?.entityAttachments[0]?.url? this.attachmentBaseUrl +"/"+ res?.entityAttachments[0]?.url : "";
    
@@ -270,6 +278,9 @@ export class ShoppingCartViewComponentComponent
    
                this.colors = res.colors;
                this.sizes = res.sizes;
+              // this.onGeneratOrderReport(true,undefined,true,false);
+          
+
    
              });
    
@@ -281,8 +292,13 @@ export class ShoppingCartViewComponentComponent
                    });
         });
           
+        this.onGeneratOrderReport(true,undefined,true,false);
     
       });
+
+
+    
+
   }
 
   expandCollapseRecursive(node: TreeNode, isExpand: boolean) {
@@ -307,20 +323,21 @@ export class ShoppingCartViewComponentComponent
   }
 
   onContinueShopping() {
+    this.hide();
     if (this.validateOrder && this.shoppingCartTreeNodes)
       this.validateShoppingCart();
     if (this.shoppingCartDetails?.sellerCompanySSIN) {
       localStorage.setItem(
         "SellerSSIN",
-        JSON.stringify(this.shoppingCartDetails.sellerCompanySSIN)
+        JSON.stringify(this.shoppingCartDetails?.sellerCompanySSIN)
       );
       localStorage.setItem(
         "contactSSIN",
-        JSON.stringify(this.shoppingCartDetails.buyerContactSSIN)
+        JSON.stringify(this.shoppingCartDetails?.buyerContactSSIN)
       );
       localStorage.setItem(
         "currencyCode",
-        JSON.stringify(this.appTransactionsForViewDto.currencyCode)
+        JSON.stringify(this.shoppingCartDetails?.currencyCode)
       );
 
       localStorage.setItem(
@@ -334,7 +351,6 @@ export class ShoppingCartViewComponentComponent
                     else
                         this.router.navigateByUrl("app/main/marketplace/products");
     }
-    this.hide();
   }
 
   validateShoppingCart() {
@@ -556,8 +572,9 @@ export class ShoppingCartViewComponentComponent
             )
             .subscribe((res) => {
               if (res) this.notify.info("Successfully Updated.");
+              this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
-              rowNode.node.data.showEditQty = false;
+              // rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
             });
         } else {
@@ -839,18 +856,19 @@ export class ShoppingCartViewComponentComponent
      this.transactionFormPath=this._transactionFormPath;
    }
 
-  onShareTransactionByMessage($event:TenantTransactionInfo[])
+  onShareTransactionByMessage($event: { tenantTransactionInfo: TenantTransactionInfo[], appTransactionsForViewDto: GetAppTransactionsForViewDto })
   {
+    this.appTransactionsForViewDto=$event.appTransactionsForViewDto;
     let printInfoParam= new ProductCatalogueReportParams();
     //printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
     printInfoParam.reportTemplateName = this.transactionReportTemplateName;
     printInfoParam.saveToPDF = true;
-    printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+    printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto?.enteredByUserRole);
     printInfoParam.userId = this.appSession?.userId
 
-    for (let i = 0; i < $event.length; i++) {
-      printInfoParam.TransactionId = $event[i].transactionId.toString();
-      printInfoParam.tenantId =$event[i].tenantId;
+    for (let i = 0; i < $event.tenantTransactionInfo?.length; i++) {
+      printInfoParam.TransactionId = $event.tenantTransactionInfo[i].transactionId.toString();
+      printInfoParam.tenantId =$event.tenantTransactionInfo[i].tenantId;
       this.onGeneratOrderReport(true,printInfoParam,false,false);
     }
   }
@@ -880,4 +898,6 @@ export class ShoppingCartViewComponentComponent
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
+
+
 }

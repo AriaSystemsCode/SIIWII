@@ -213,6 +213,7 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task<long> CreateOrEditTransaction(GetAppTransactionsForViewDto input)
         {
             var createOrEditDto = ObjectMapper.Map<CreateOrEditAppTransactionsDto>(input);
+            createOrEditDto.EnteredDate = input.EnteredDate;
             if (createOrEditDto != null)
             {
                 return await CreateOrEdit(createOrEditDto);
@@ -325,6 +326,8 @@ namespace onetouch.AppSiiwiiTransaction
                         input.CurrencyId = currencyObj.Id;
                     //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[End]
                 }
+                if (input.EnteredDate == new DateTime(1, 1, 1))
+                    input.EnteredDate = DateTime.Now.Date;
 
                 if (input.StartDate == new DateTime(1, 1, 1))
                     input.StartDate = DateTime.Now.Date;
@@ -774,8 +777,9 @@ namespace onetouch.AppSiiwiiTransaction
                                 await GetProductFromMarketplace(det.SSIN, int.Parse(buyerTenantId.ToString()));
                         }
                     }
-
+                    
                     appTrans.Id = header.Id;
+                    appTrans.EnteredDate = input.EnteredDate;
                     if (header.EntityObjectStatusId == null)
                         appTrans.CreatorUserId = AbpSession.UserId;
 
@@ -786,8 +790,10 @@ namespace onetouch.AppSiiwiiTransaction
                     //XX
                     //var  AppTrans = Objmapper. ObjectMapper.Map<CreateOrEditAppTransactionDto,AppTransactionsHeader>(input);
                     //ObjectMapper..Map<CreateOrEditAppTransactionDto,AppTransactionsHeader>(input) ;
-
+                    appTrans.EnteredDate = input.EnteredDate;
                     obj = await _appTransactionsHeaderRepository.InsertAsync(appTrans);
+                    
+                    obj = await _appTransactionsHeaderRepository.UpdateAsync(obj);
                 }
 
                 await CurrentUnitOfWork.SaveChangesAsync();
@@ -798,7 +804,7 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
                 appTrans.EnteredUserByRole = input.EnteredByUserRole;
-
+                appTrans.EnteredDate = input.EnteredDate;
                 if (input.lFromPlaceOrder)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 //MMT-Fix Status
@@ -1226,6 +1232,7 @@ namespace onetouch.AppSiiwiiTransaction
                     var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
                     appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, ObjectMapper.Map<AppEntityDto>(appTrans));
                 }
+                appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 return obj.Id;
@@ -3605,6 +3612,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (FilteredAppTransaction != null)
                 {
                     var viewTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(FilteredAppTransaction);
+                    viewTrans.EnteredDate = FilteredAppTransaction.EnteredDate;
                     viewTrans.EnteredByUserRole = FilteredAppTransaction.EnteredUserByRole;
                     if (viewTrans.EntityAttachments != null && viewTrans.EntityAttachments.Count > 0)
                     {
@@ -3695,6 +3703,7 @@ namespace onetouch.AppSiiwiiTransaction
             if (trans != null)
             {
                 var retTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
+                retTrans.EnteredDate = trans.EnteredDate;
                 if (retTrans.AppTransactionContacts != null && retTrans.AppTransactionContacts.Count > 0)
                 {
                     foreach (var cont in retTrans.AppTransactionContacts)
@@ -4145,6 +4154,7 @@ namespace onetouch.AppSiiwiiTransaction
                         tenantTransaction.TenantOwner = int.Parse(marketplaceTransaction.TenantOwner.ToString());
                         tenantTransaction.TenantId = tenantId;
                         tenantTransaction.Id = 0;
+                        tenantTransaction.EnteredDate = marketplaceTransaction.EnteredDate;
                         tenantTransaction.AppTransactionDetails = null;
                         tenantTransaction.AppTransactionContacts = null;
                         tenantTransaction.EntityCategories = null;
@@ -4419,6 +4429,7 @@ namespace onetouch.AppSiiwiiTransaction
                         tenantTransactionObj.EntityClassifications = null;
                         tenantTransactionObj.EntityExtraData = null;
                         tenantTransactionObj.EntityAttachments = null;
+                        tenantTransactionObj.EnteredDate = marketplaceTransaction.EnteredDate;
                         returnTran = tenantTransactionObj.Code;
                         await _appEntityAttachment.DeleteAsync(z => z.EntityId == id);
                         await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == id);
@@ -4663,6 +4674,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.Code = marketplaceTransaction.TenantOwner.ToString().Trim() + "-" + marketplaceTransaction.Code.Trim();
                     marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
+                    marketplaceTransaction.EnteredDate = transaction.EnteredDate;
                     //marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     //marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;
@@ -4873,6 +4885,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;
                     marketplaceTransaction.EntityClassifications = null;
+                    marketplaceTransaction.EnteredDate = transaction.EnteredDate;
                     marketplaceTransaction.Code = marketplaceTransaction.TenantOwner.ToString().Trim() + "-" + marketplaceTransaction.Code.Trim();
                     await _appEntityAttachment.DeleteAsync(z => z.EntityId == id);
                     await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == id);
