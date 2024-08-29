@@ -166,9 +166,8 @@
                      [code]="category?.code"
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
-                    <!-- (click)="showCatBtn = true"  -->
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1">Classifications</label>  <div *ngIf="allRecords.length == 0 " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div></div> 
+                        <div class="d-flex"> <label class="label pt-1">Classifications</label>  <div *ngIf="allRecords.length == 0 " (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div></div> 
 
                           <!-- <div class="d-flex" *ngIf="showCatBtn || allRecords.length == 0 ">
                             <div  class="formGroup  col-8">
@@ -264,30 +263,15 @@
                         </div>
                          -->
                       
-                        <!-- <p-treeSelect
-                            class="md:w-20rem w-full"
-                            containerStyleClass="w-full"
-                            [(ngModel)]="selectedCategories"
-                            selectionMode="checkbox"
-                            [options]="categoriesFiles"
-                            placeholder="Select Item..."
-                            (onNodeExpand)="categoriesNodeExpand($event)"
-                            (onNodeSelect)="categoriesNodeSelect($event)"
-                        ></p-treeSelect> -->
-                        <!-- &&  (appTransactionsForViewDto?.entityCategories  ||  appTransactionsForViewDto?.entityCategories
-                        ?.length === 0) -->
-                        <!-- <div *ngIf="selectedCategories && selectedCategories.length > 0 && showSelectedCat" class="selected-items-container">
-                            <div *ngFor="let item of selectedCategories" class="selected-item">
-                                <span>{{ item.label }}</span>
-                            </div>
-                        </div> -->
+                   
 <div class="d-flex" *ngIf=" allRecords.length != 0">
-    <!-- {{selectedCategories}} -->
-                    <!-- Selected Items Display -->
+ 
 
 
-<!-- TreeSelect Component -->
-<!-- <div *ngIf="!showCatBtn"  class="flex justify-content-center treeSel"   style="z-index:9999999999 !important ;" >
+
+
+<!-- 
+<div *ngIf="!showCatBtn"  class="flex justify-content-center treeSel"   style="z-index:9999999999 !important ;" >
     <p-treeSelect 
     class="w-full md:w-20rem"
     containerStyleClass="w-full"
@@ -347,7 +331,7 @@
                             </a>
                         </div>
                         <div class="pointer">
-                            <a class="link purpleColor p-3" (click)="deleteCat(node)">
+                            <a class="link purpleColor p-3" (click)="deleteCat(node.id)">
                                 <img
                                     src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
                                     class="imgIcon"
@@ -370,9 +354,9 @@
 </div> -->
 
                   
-                        <!-- <button *ngIf="!showCatBtn" (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button>
+                        <!-- <button *ngIf="!showCatBtn" (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button> -->
                     </div>
-                    </div> -->
+                    </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
                             class="categoriesClassificationsContainer d-flex align-items-center big-scroll px-3    h-100 row   w-100"

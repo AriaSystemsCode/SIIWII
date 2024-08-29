@@ -72,15 +72,17 @@
                         <div class="position-relative">
                         
                         <p-calendar
+                        #calendar1
                         [appendTo]="'body'"
                             formControlName="enteredDate"
                             [showIcon]="true"
                             [readonlyInput]="false"
-                           
+                            
+                            (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
                          
                          
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                        <img  src="../../../../../assets/icons/calendar.png"  (click)="openCalendar(calendar1)"  alt="" srcset="">
                            </div>
                     </div>
                 </div>
@@ -89,15 +91,17 @@
                         <label class="form-label">Start Date*</label>
                         <div class="position-relative">
                         <p-calendar
+                        #calendar2
                         [appendTo]="'body'"
+                        #calendar
                             formControlName="startDate"
                             [showIcon]="true"
                             (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
                             [readonlyInput]="false"
-                          [minDate]="today"
+                          [minDate]="minSEnteredDate"
 
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                        <img (click)="openCalendar(calendar2)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
                        
                         
                     </div>
@@ -119,6 +123,8 @@
                         <div class="position-relative">
 
                         <p-calendar
+                        #calendar3
+
                         [appendTo]="'body'"
                             formControlName="completeDate"
                             [showIcon]="true"
@@ -126,7 +132,7 @@
                             [readonlyInput]="false"
                             (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
+                        <img (click)="openCalendar(calendar3)" src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
                         </div>
                         <small
                         class="text-danger"
@@ -145,6 +151,7 @@
                         <div class="position-relative">
 
                         <p-calendar
+                        #calendar4
                         [appendTo]="'body'"
                             formControlName="availableDate"
                             [showIcon]="true"
@@ -153,7 +160,7 @@
 
                             [minDate]="minCompleteDate"
                         ></p-calendar>
-                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+                        <img (click)="openCalendar(calendar4)" src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
                        </div>
                     </div>
                     <small

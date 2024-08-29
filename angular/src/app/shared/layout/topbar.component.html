@@ -587,7 +587,7 @@
                         />
                     </a>
                 </li>
-<li  class="nav-item pt-1">
+<li        *ngIf="shoppingCartSummary?.shoppingCartId >0" class="nav-item pt-1">
     <div class="position-relative pt-3" >
         <span
             class="kt-header__topbar-icon kt-header__topbar-icon--primary"
@@ -597,7 +597,7 @@
                 style="width: 20px; height: 20px; cursor: pointer;"
                 class="m-auto"
                 (click)="getShoppingCartInfo(true)"
-                *ngIf="shoppingCartSummary?.shoppingCartId >0"
+         
             />
             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
                 <span

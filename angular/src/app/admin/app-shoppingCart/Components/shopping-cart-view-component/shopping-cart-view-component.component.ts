@@ -118,7 +118,6 @@ export class ShoppingCartViewComponentComponent
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
     this.resetData();
-    // this.onGeneratOrderReport(true,undefined,true,true);
     this.orderId = orderId;
     this.loadNotesComp = true;
     this.showCarousel = showCarousel;
@@ -202,6 +201,7 @@ export class ShoppingCartViewComponentComponent
     //header
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
+
         this._AppTransactionServiceProxy
         .getRelatedAccounts(
             "",
@@ -278,6 +278,9 @@ export class ShoppingCartViewComponentComponent
    
                this.colors = res.colors;
                this.sizes = res.sizes;
+              // this.onGeneratOrderReport(true,undefined,true,false);
+          
+
    
              });
    
@@ -289,6 +292,7 @@ export class ShoppingCartViewComponentComponent
                    });
         });
           
+        this.onGeneratOrderReport(true,undefined,true,false);
     
       });
 
