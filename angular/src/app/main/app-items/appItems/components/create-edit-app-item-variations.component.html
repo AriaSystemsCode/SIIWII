@@ -166,8 +166,9 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                         <!-- selectionMode="multiple" -->
                                         <p-table #dataTable
-                                            selectionMode="multiple"
                                             [(selection)]="selectedVaritaions"
                                             dataKey="position"
                                             [value]="primengTableHelper.records"
@@ -241,9 +242,9 @@
                                             <ng-template  pTemplate="body" let-record="$implicit" let-index ="rowIndex">
                                                 <tr [pSelectableRow]="record">
                                                     <td style="width: 4rem">
-                                                        <label class="h-100 w-100" [for]="'var_'+index">
-                                                            <p-tableCheckbox [inputId]="'var_'+index" [value]="record" [index]="index"></p-tableCheckbox>
-                                                        </label>
+                                                        <!-- <label class="h-100 w-100" [for]="'var_'+index"> -->
+                                                            <p-tableCheckbox [inputId]="'var_'+index" [value]="record"></p-tableCheckbox>
+                                                        <!-- </label> -->
                                                     </td>
                                                     <td>
                                                         <input type="text" readonly [value]="appItem?.code || ''" class="form-control rounded-lg pt-3 pb-3 row-item" name="code">

@@ -510,6 +510,7 @@ namespace onetouch.AppMarketplaceItems
 
                     var output = new GetAppMarketplaceItemDetailForViewDto { AppItem = ObjectMapper.Map<AppMarketplaceItemForViewDto>(appItem) };
                     //
+                    output.AppItem.HasPriceLevel = (!string.IsNullOrEmpty(level) && level != "MSRP") ? true : false;
                     var brandId = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108) != null ?
                         appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108).AttributeValueId : 0;
                     if (brandId != 0)

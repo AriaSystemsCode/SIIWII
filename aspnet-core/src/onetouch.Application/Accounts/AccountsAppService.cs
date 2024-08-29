@@ -3883,12 +3883,17 @@ namespace onetouch.Accounts
                 }
             }
             //MMT37
-            if (string.IsNullOrEmpty(entity.SSIN))
+            var contactObjectOrg = await _appContactRepository.GetAll().Where(x => x.Id == contact.Id).FirstOrDefaultAsync();
+            if (contactObjectOrg == null  || string.IsNullOrEmpty(contactObjectOrg.SSIN))
             {
                 entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
                 entity.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
                 contact.SSIN = entity.SSIN;
+            }
+            else {
+                entity.SSIN = contactObjectOrg.SSIN;
+                contact.SSIN = contactObjectOrg.SSIN;
             }
             //MMT37
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);

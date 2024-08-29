@@ -62,6 +62,7 @@ namespace onetouch.AppMarketplaceItems.Dtos
         //look to be removed if could handle performance
         public List<ExtraAttribute> extraAttributesVar { get; set; }
         public virtual bool OrderByPrePack { set; get; }
+        public virtual bool HasPriceLevel { get; set; }
         
     }
     public class MarketplaceExtraDataAttrDto
