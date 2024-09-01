@@ -97,7 +97,12 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
       
     }
     ngOnInit(): void {
-        this.getAppTransactionList();
+        if(this.createOrEditorderInfo){
+            this.getAppTransactionList();
+
+            
+
+        }
 
         if(!this.category) {
             this.category = new CreateOrEditSycEntityObjectCategoryDto()

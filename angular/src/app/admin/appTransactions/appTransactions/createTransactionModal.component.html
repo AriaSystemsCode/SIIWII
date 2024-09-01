@@ -270,6 +270,7 @@
                                 formControlName="buyerContactName"
                                 *ngIf="isBuyerTempAccount"
                             />
+                        
                             <!-- <p-dropdown
                             *ngIf="!isBuyerTempAccount"
                             [options]="buyerContacts"
@@ -288,6 +289,7 @@
                           
                             
                             <p-dropdown
+                            *ngIf="!isBuyerTempAccount"
                                 [options]="buyerContacts"
                                 formControlName="buyerContactName"
                                 [filter]="true"
@@ -715,7 +717,7 @@
             pButton
             [loading]="btnLoader"
             (click)="getStarted()"
-            class="btn"
+            class=" btn-c"
         >
         Start Shopping
         </button>
