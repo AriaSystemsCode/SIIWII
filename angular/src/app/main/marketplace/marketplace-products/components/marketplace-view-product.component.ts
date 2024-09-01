@@ -611,7 +611,7 @@ export class MarketplaceViewProductComponent
             text: "The price assigned to the ordered Items will be updated ",
             icon: "info",
             showCancelButton: false,
-            confirmButtonText: "Yes",
+            confirmButtonText: "Ok",
             allowOutsideClick: false,
             allowEscapeKey: false,
             backdrop: true,
