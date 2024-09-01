@@ -720,7 +720,6 @@ export class ShoppingCartViewComponentComponent
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
             this.onGeneratOrderReport(true,undefined,true,true);
-            this.hideMainSpinner();
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
         }
@@ -746,6 +745,8 @@ export class ShoppingCartViewComponentComponent
               }).then((result) => {
                 if (result.isConfirmed) {
                 }
+            this.hideMainSpinner();
+
               });
             }
           });

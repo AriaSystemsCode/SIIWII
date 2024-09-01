@@ -598,7 +598,9 @@ if (event.filter != '' || event.filter != undefined){
 
         if(this.isBuyerTempAccount){
         this.orderForm = this.fb.group({
-            buyerCompanyBranch:["", null]
+            buyerCompanyBranch:["", null],
+            buyerContactName:this.orderForm.controls['buyerContactName']?.value ,
+            buyerCompanyName:this.orderForm.controls['buyerCompanyName']?.value ,
         }) 
     }
 
@@ -685,7 +687,7 @@ if (event.filter != '' || event.filter != undefined){
                                     :  this.orderForm.controls['sellerContactName']?.value ? this.orderForm.controls['sellerContactName']?.value :null,
                                 
                         buyerContactName: this.isBuyerTempAccount
-                            ? this.orderForm.value?.buyerContactName
+                            ? this.orderForm.controls['buyerContactName']?.value 
                             : this.orderForm.value?.buyerContactName?.name &&
                                 this.orderForm.value?.buyerContactName !== null
                                 ? this.orderForm.value?.buyerContactName?.name

@@ -71,7 +71,7 @@
             <div class="formGroup">
                 <label class="label">Contact Name</label>
                
-                <p-dropdown   [filter]="true" [filterValue]="contactFilterValue" (onFilter)="handleContactSearch($event)" class="w-100" [placeholder]="tempContact ? contactNamePlaceholder : defaultcontactNamePlaceholder" 
+                <p-dropdown   [filter]="true" [filterValue]="contactFilterValue" (onFilter)="handleContactSearch($event)" class="w-100" [placeholder]="tempContact ? contactNamePlaceholder : tempAccount ? contactNamePlaceholder  : defaultcontactNamePlaceholder" 
                 placeholder="Select Contact Name" [options]="allContacts"
                 *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo" [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
                 [ngClass]="{'tempAccount': tempContact}"  optionLabel="name" name="selectedContact" (onChange)="onChangeContact($event)" ></p-dropdown>

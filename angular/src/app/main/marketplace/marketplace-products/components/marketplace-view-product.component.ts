@@ -144,7 +144,7 @@ export class MarketplaceViewProductComponent
 
           this.filteredColors = this.colorsData.filter(color =>
             (color.colorName && color.colorName.toLowerCase().includes(filterTextLower)) ||
-            (color.colorCode && color.colorCode.toLowerCase().includes(filterTextLower))
+            (color.colorCodeSelectedValues && color.colorCodeSelectedValues.toLowerCase().includes(filterTextLower))
           );
         console.log( this.filteredColors,'final')
 
