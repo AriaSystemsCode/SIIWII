@@ -66,8 +66,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     searchTimeout: any;
     buyerComapnyId: number = 0;
     sellerCompanyId: number = 0;
-    sellerCompanySSIN: number = 0;
-    buyerCompanySSIN: number = 0;
+    sellerCompanySSIN: string = ""
+    buyerCompanySSIN:string = ""
     sellerContactId: number = 0;
     buyerContactId: number = 0;
     buyerContactSSIN!: string | undefined;
@@ -283,12 +283,19 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.isBuyerTempAccount = !this.isBuyerTempAccount;
         this.isCompantIdExist = this.isBuyerTempAccount;
         if (this.isBuyerTempAccount) {
+            this.orderForm.controls["buyerCompanyBranch"].clearValidators();
+            this.orderForm.controls["buyerCompanyBranch"].reset();
             this.orderForm.controls["buyerCompanyName"].reset();
-            
         }
     }
     selectTempSeller() {
         this.isSellerTempAccount = !this.isSellerTempAccount;
+
+        if (this.isSellerTempAccount) {
+            this.orderForm.controls["sellerCompanyBranch"].clearValidators();
+            this.orderForm.controls["sellerCompanyBranch"].reset();
+            this.orderForm.controls["sellerCompanyName"].reset();
+        }
     }
     handleRoleChange(data: any) {
         
@@ -597,11 +604,18 @@ if (event.filter != '' || event.filter != undefined){
     async getStarted() {
 
         if(this.isBuyerTempAccount){
-        this.orderForm = this.fb.group({
-            buyerCompanyBranch:["", null],
-            buyerContactName:this.orderForm.controls['buyerContactName']?.value ,
-            buyerCompanyName:this.orderForm.controls['buyerCompanyName']?.value ,
-        }) 
+            this.orderForm.patchValue({
+                buyerContactName: this.orderForm.controls['buyerContactName']?.value,
+                buyerCompanyName: this.orderForm.controls['buyerCompanyName']?.value,
+            });
+    }
+
+
+    if(this.isSellerTempAccount){
+        this.orderForm.patchValue({
+            sellerContactName: this.orderForm.controls['sellerContactName']?.value,
+            sellerCompanyName: this.orderForm.controls['sellerCompanyName']?.value,
+        });
     }
 
         if ((!this.sellerCompanyId || !this.buyerComapnyId)  || (this.sellerCompanyId !== this.buyerComapnyId)) {
@@ -737,8 +751,8 @@ if (event.filter != '' || event.filter != undefined){
                         enteredDate: moment.utc(this.orderForm.controls['enteredDate']?.value?.toLocaleString()),
                         startDate: moment.utc(this.orderForm.controls['startDate']?.value?.toLocaleString()),
                         availableDate: moment.utc(this.orderForm.controls['availableDate']?.value?.toLocaleString()),
-                        reference: this.orderForm.controls['reference']?.value
-                    };
+                        reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : ""
+                    }; 
 
          
                     // buyerId:
