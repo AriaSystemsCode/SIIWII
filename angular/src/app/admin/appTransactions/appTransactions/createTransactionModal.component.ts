@@ -1124,6 +1124,8 @@ console.log(date,'daaate')
 
 
                      ////////////////////////////
+
+                     if(this.currencyCode){
                     this._AppMarketplaceItemsServiceProxy
                      .checkCurrencyExchangeRate(this.currencyCode)
                      .subscribe((res: boolean) => {
@@ -1155,6 +1157,15 @@ console.log(date,'daaate')
                              );
                          }
                          }); 
+                        }
+
+                        else{
+                            this.currencyCode=  this.sellerCurrencyCode ? this.sellerCurrencyCode :this.appSession.tenant.currencyInfoDto ;
+                            localStorage.setItem(
+                                "currencyCode",
+                                JSON.stringify(this.currencyCode)
+                            );
+                        }
                              //////////////////////////
 
                              
