@@ -664,5 +664,8 @@ export class MarketplaceViewProductComponent
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
+        // document.body.style.overflow = 'auto';
+
     }
+
 }
