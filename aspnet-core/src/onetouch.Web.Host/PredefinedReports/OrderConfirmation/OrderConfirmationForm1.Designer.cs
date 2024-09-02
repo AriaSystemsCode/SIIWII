@@ -85,6 +85,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.label1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label1");
             this.GroupHeader1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupHeaderBand>("GroupHeader1");
             this.Detail = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailBand>("Detail");
+            this.label53 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label53");
             this.label52 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label52");
             this.pictureBox1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox1");
             this.label40 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label40");
@@ -113,7 +114,6 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.label36 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label36");
             this.label35 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label35");
             this.label39 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label39");
-            this.label53 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label53");
 
             // Parameters
             this.TransactionId = reportInitializer.GetParameter("TransactionId");
@@ -199,6 +199,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.XRLabel label1;
         private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader1;
         private DevExpress.XtraReports.UI.DetailBand Detail;
+        private DevExpress.XtraReports.UI.XRLabel label53;
         private DevExpress.XtraReports.UI.XRLabel label52;
         private DevExpress.XtraReports.UI.XRPictureBox pictureBox1;
         private DevExpress.XtraReports.UI.XRLabel label40;
@@ -235,6 +236,5 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.Parameters.Parameter userId;
         private DevExpress.XtraReports.Parameters.Parameter roleType;
         private DevExpress.XtraReports.Parameters.Parameter saveToPDF;
-        private DevExpress.XtraReports.UI.XRLabel label53;
     }
 }

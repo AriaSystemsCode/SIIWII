@@ -22,9 +22,9 @@
         <Item1 Ref="16" FieldName="Id" />
       </GroupFields>
       <Controls>
-        <Item1 Ref="17" ControlType="XRLabel" Name="label50" Multiline="true" Text="Date:" TextAlignment="TopLeft" SizeF="165.175476,29.3158264" LocationFloat="26.48188,572.170166" Dpi="254" Font="Arial, 7pt, style=Bold" Padding="5,5,0,0,254">
+        <Item1 Ref="17" ControlType="XRLabel" Name="label50" Multiline="true" Text="Date:" TextAlignment="TopLeft" SizeF="620.2588,31.3157959" LocationFloat="26.48187,570.170166" Dpi="254" Font="Arial, 7pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
-            <Item1 Ref="18" EventName="BeforePrint" PropertyName="Text" Expression="'Department: '" />
+            <Item1 Ref="18" EventName="BeforePrint" PropertyName="Text" Expression="'Department: '+[BuyerDepartment]" />
           </ExpressionBindings>
           <StylePriority Ref="19" UseFont="false" UseTextAlignment="false" />
         </Item1>
@@ -450,13 +450,13 @@
           </SortFields>
           <Scripts Ref="232" OnAfterPrint="Detail_AfterPrint" OnBeforePrint="Detail_BeforePrint" />
           <Controls>
-            <Item1 Ref="233" ControlType="XRLabel" Name="label33" Multiline="true" CanGrow="false" Text="label33" TextAlignment="MiddleCenter" SizeF="111.124992,49.42" LocationFloat="11.3750324,54.43746" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="White" Padding="5,5,0,0,254">
+            <Item1 Ref="233" ControlType="XRLabel" Name="label33" KeepTogether="true" Multiline="true" CanGrow="false" Text="label33" TextAlignment="MiddleCenter" SizeF="111.124992,49.42" LocationFloat="11.3750324,54.43746" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="White" Padding="5,5,0,0,254">
               <ExpressionBindings>
                 <Item1 Ref="234" EventName="BeforePrint" PropertyName="Text" Expression="[Quantity]" />
               </ExpressionBindings>
               <StylePriority Ref="235" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
             </Item1>
-            <Item2 Ref="236" ControlType="XRLabel" Name="label32" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.420002" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
+            <Item2 Ref="236" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.420002" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
               <ExpressionBindings>
                 <Item1 Ref="237" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeSizeCode]" />
               </ExpressionBindings>
