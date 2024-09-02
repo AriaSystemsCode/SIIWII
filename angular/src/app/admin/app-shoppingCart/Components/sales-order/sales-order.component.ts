@@ -7,6 +7,7 @@ import {
     AppEntityClassificationDto,
     AppTransactionServiceProxy,
     CreateOrEditSycEntityObjectCategoryDto,
+    CreateOrEditSycEntityObjectClassificationDto,
     CurrencyInfoDto,
     GetAppTransactionForViewDto,
     GetAppTransactionsForViewDto,
@@ -14,6 +15,7 @@ import {
     SycEntityObjectClassificationsServiceProxy,
     SycEntityObjectTypesServiceProxy,
     TreeNodeOfGetSycEntityObjectCategoryForViewDto,
+    TreeNodeOfGetSycEntityObjectClassificationForViewDto,
     TreeNodeOfGetSycEntityObjectTypeForViewDto,
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "express-serve-static-core";
@@ -33,6 +35,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     companeyNames: any[];
     nodes: any[];
     category : CreateOrEditSycEntityObjectCategoryDto
+    classification : CreateOrEditSycEntityObjectClassificationDto
 
     selectedCategories: any;
 
@@ -62,7 +65,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     showSaveBtn: boolean = false;
     showCatBtn: boolean = false;
     hideCatBtn: boolean = true;
+    hideClassBtn: boolean = true;
     showSelectedCat: boolean = true;
+    showClassBtn: boolean = false;
+    showSelectedClass: boolean = true;
     
     oldappTransactionsForViewDto;
     @ViewChild(TreeSelect) treeSelect!: TreeSelect;
@@ -70,13 +76,21 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     @Input("canChange") canChange: boolean = true;
     sycEntityObjectCategory: CreateOrEditSycEntityObjectCategoryDto = new CreateOrEditSycEntityObjectCategoryDto();
     entityObjectType:string ="CATEGORY"
+    entityObjectClassificationType:string ="CLASSIFICATION"
     sortBy: string = "name";
     skipCount: number = 0;
     maxResultCount: number = 10;
     allRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
+    allClassRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
+    parentClassification : CreateOrEditSycEntityObjectClassificationDto
+
     parentCat : any;
+    parentClass : any;
     addSubCat: boolean = false;
     editSubCat: boolean = false;
+
+    addSubClas: boolean = false;
+    editSubClass: boolean = false;
     openDropDown: boolean = false;
     constructor(
         injector: Injector,
@@ -98,11 +112,17 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
     ngOnInit(): void {
         this.getAppTransactionList();
+        this.getAppTransactionClassList()
 
         if(!this.category) {
             this.category = new CreateOrEditSycEntityObjectCategoryDto()
         }
-
+        if(!this.classification) {
+            this.classification = new CreateOrEditSycEntityObjectClassificationDto()
+        }
+        if(this.parentClassification && this.parentClassification.id ) {
+            this.classification.parentId = this.parentClassification.id
+        }
         // DepartmentFlag: false
         // EntityId: 165420
         // Sorting: name
@@ -216,6 +236,9 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
     getCodeValue(code: string) {
         this.category.code= code;
+    }
+    getClassCodeValue(code: string) {
+        this.classification.code= code;
     }
     // get parent categories
     getParentCategories() {
@@ -433,35 +456,52 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
 
     categoriesNodeSelect(event: any) {
-        // Preserve default selection behavior
+        // Check if the event contains the node data
+        if (!event || !event.node) {
+            console.error('Node data is missing in the event:', event);
+            return;
+        }
+    
+        this.showSelectedCat = true;
         const selectedNode = event.node;
-        
-        // Add custom logic here, if needed
+    
+        // Log the selected node to verify the data
+        console.log(selectedNode, 'selectedNode');
+    
+        // Initialize the entityCategories array if it doesn't exist
         if (!this.appTransactionsForViewDto?.entityCategories) {
             this.appTransactionsForViewDto.entityCategories = [];
         }
     
+        // Create a new category object from the selected node
         const newCategory = new AppEntityCategoryDto({
-            entityObjectCategoryCode: selectedNode.data.sycEntityObjectCategory?.code,
-            entityObjectCategoryId: selectedNode.data.sycEntityObjectCategory?.id,
-            entityObjectCategoryName: selectedNode.data.sycEntityObjectCategory?.name,
+            entityObjectCategoryCode: selectedNode.data?.sycEntityObjectCategory?.code || '',
+            entityObjectCategoryId: selectedNode.data?.sycEntityObjectCategory?.id || 0,
+            entityObjectCategoryName: selectedNode.data?.sycEntityObjectCategory?.name || '',
             id: 0,
             init: undefined,
-            toJSON:undefined
+            toJSON: undefined,
         });
     
-        // Ensure no duplicate categories are added
-        const categoryExists = this.appTransactionsForViewDto.entityCategories
-            .some(cat => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId);
+        // Check if the category already exists in the entityCategories
+        const categoryExists = this.appTransactionsForViewDto.entityCategories.some(
+            (cat) => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId
+        );
     
+        // Add the new category if it doesn't already exist
         if (!categoryExists) {
             this.appTransactionsForViewDto.entityCategories.push(newCategory);
         }
-    console.log(categoryExists,'categoryExists')
-    console.log( this.appTransactionsForViewDto.entityCategories,' this.appTransactionsForViewDto.entityCategories')
-        // Sync the selected categories with `appTransactionsForViewDto.entityCategories`
+    
+        // Log the state after attempting to add the category
+        console.log(categoryExists, 'categoryExists');
+        console.log(this.appTransactionsForViewDto.entityCategories, 'this.appTransactionsForViewDto.entityCategories');
+    
+        // Update the selected categories to reflect the current state
         this.selectedCategories = [...this.appTransactionsForViewDto.entityCategories];
+        console.log(this.selectedCategories, 'this.selectedCategories');
     }
+    
     
     onLabelClick(event: Event) {
         event.stopPropagation(); // Prevent selection on label click
@@ -539,14 +579,34 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.categoriesItemPath.push(item);
     }
     addAsNewChild(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
+        console.log(node,'new child')
         this.showCatBtn = true
         this.addSubCat = true
      this.parentCat = {
         // name: node.data.sycEntityObjectCategory,
-        
-        code: node.data.sycEntityObjectCategory.code,
-        parentId: node.data.sycEntityObjectCategory.id,
+        // parentCategory: node.data.sycEntityObjectCategory,
+        code: this.category.code,
+        parentId: node.data.sycEntityObjectCategory.parentId,
  }
+
+ 
+  
+    }
+
+
+    addAsNewChildClass(node: TreeNodeOfGetSycEntityObjectClassificationForViewDto) {
+        console.log(node,'new child')
+        this.showClassBtn = true
+        this.addSubClas = true
+     this.parentClass = {
+        // name: node.data.sycEntityObjectCategory,
+        // parentCategory: node.data.sycEntityObjectCategory,
+        code: this.classification.code,
+        parentId: node.data.sycEntityObjectClassification.id,
+ }
+ console.log(this.parentClass ,'this.parentClass ')
+
+ 
   
     }
     
@@ -559,15 +619,33 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         name: node.data.sycEntityObjectCategory.name,
         
         code: node.data.sycEntityObjectCategory.code,
-        parentId: node.data.sycEntityObjectCategory.id,
+        id: node.data.sycEntityObjectCategory.id,
  }
+
+ 
  this.category.name =  this.parentCat.name
  console.log(node,'node')
  console.log(this.parentCat,'this.parentCat')
  console.log(this.category.name ,'this.category.name ')
 
     }
+    EditClass(node: TreeNodeOfGetSycEntityObjectClassificationForViewDto) {
+ console.log(node,'node')
+
+        this.showClassBtn = true
+        this.editSubClass = true
+     this.parentClass = {
+        name: node.data.sycEntityObjectClassification.name,
+        
+        code: node.data.sycEntityObjectClassification.code,
+        id: node.data.sycEntityObjectClassification.id,
+    }
+     this.classification.name =  this.parentClass.name
+     console.log(node,'node')
+     console.log( this.parentClass,' this.parentClass')
+
     
+        }
     getClassificationPath(item: any): any {
         if (item.children && item.children?.length > 0) {
             item.children.forEach(child => {
@@ -641,12 +719,14 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         let startDate = this.startDate.toLocaleString();
         let availableDate = this.availableDate.toLocaleString();
         let completeDate = this.completeDate.toLocaleString();
-
+            console.log(enteredDate,'enteredDate')
 
         this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
         this.appTransactionsForViewDto.startDate = moment.utc(startDate);
         this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
         this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+        console.log(this.appTransactionsForViewDto.enteredDate,'this.appTransactionsForViewDto.enteredDate')
+
     }
     changeCompleteDate(date) {
         const selectedDate = date;
@@ -660,7 +740,9 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // this.showMainSpinner();
         this.onChangeDate();
     
+       
          this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
+
          this.appTransactionsForViewDto.reference = this.reference;
          console.log(this.appTransactionsForViewDto.entityCategories,'this.appTransactionsForViewDto.entityCategories')
 
@@ -684,6 +766,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
                 }
             });
+        console.log(this.appTransactionsForViewDto.enteredDate,'save')
+
     }
 
 
@@ -699,13 +783,40 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             }
         }
     }
+   
+    deSelectCat(
+        category: any,
+        i: number
+    ) {
+        this.formTouched = true;
+        if (category?.data?.sycEntityObjectCategory?.id) {
+            category.removed = true;
+        } else this.selectedCategories.splice(i, 1);
+    }
+    // undoCategory(category: AppEntityDtoWithActions<AppEntityCategoryDto>) {
+    //     category.removed = false;
+    // }
     saveSelection() {
         // Implement your save logic here
         this.showSelectedCat = true
         this.closeDropdown();
 
         console.log(this.selectedCategories ,'this.selectedCategories ')
+        this.selectedCategories =  this.selectedCategories .map(item => ({
+            entityObjectCategoryId: item?.data?.sycEntityObjectCategory?.id,
+            entityObjectCategoryCode: item?.data?.sycEntityObjectCategory?.code,
+            entityObjectCategoryName: item?.data?.sycEntityObjectCategory?.name,
+            id: item?.data?.sycEntityObjectCategory?.objectId, // Assuming objectId is used as the id
+          }));
         this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
+        // this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
+        // this.appTransactionsForViewDto.entityCategories =   {
+        //     entityObjectCategoryId: data.sycEntityObjectCategory.id,
+        //     entityObjectCategoryCode: data.sycEntityObjectCategory.code,
+        //     entityObjectCategoryName: data.sycEntityObjectCategory.name,
+        //     id: data.sycEntityObjectCategory.objectId, // Assuming `objectId` is used as the id in this context
+        //   },
+        console.log(this.selectedCategories,'this.selectedCategories')
         console.log(this.appTransactionsForViewDto.entityCategories,'this.appTransactionsForViewDto.entityCategories')
         // this.notify.info('Selection saved successfully!');
     }
@@ -722,14 +833,14 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         }
       }
     
-saveCat(category:any){
+saveCat(category:any,type?:''){
     console.log(category,'category') 
     let cat = new CreateOrEditSycEntityObjectCategoryDto({
-        code: this.editSubCat ? this.parentCat.code: this.category.code,
+        code: this.editSubCat ? this.parentCat.code: this.addSubCat ? this.parentCat.code: this.category.code,
         name: category.name,
         objectId: undefined,
         parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
-        id: undefined
+        id: this.editSubCat ? this.parentCat.id: undefined,
     });
     // parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
     // id: this.editSubCat?  this.parentCat.parentId : undefined
@@ -780,6 +891,66 @@ saveCat(category:any){
 
 
 
+saveClass(classification:any,type?:''){
+    console.log(classification,'classification') 
+    let classificate = new CreateOrEditSycEntityObjectClassificationDto({
+        code:  this.classification.code,
+        name: this.classification.name,
+        objectId: undefined,
+        parentId:  this.addSubClas ? this.parentClass.parentId : undefined,
+        id:  this.editSubClass ? this.parentClass.id : undefined,
+    });
+    // parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
+    // id: this.editSubCat?  this.parentCat.parentId : undefined
+
+    
+    // edit
+    // let cat = new CreateOrEditSycEntityObjectCategoryDto({
+    //     code: this.editSubCat ? this.parentCat.code: this.category.code,
+    //     name: category.name,
+    //     objectId: undefined,
+    //     parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
+    //     id:this.editSubCat?  this.parentCat.parentId : undefined
+    // });
+
+
+
+
+
+    // this.sycEntityObjectCategory = {...cat}
+    // this._sycEntityObjectCategoriesServiceProxy.createOrEdit(cat)
+    // .pipe(finalize(() => { 
+    //     // this.saving = false;
+    // }))
+    // .subscribe(() => {
+    //    this.notify.info(this.l('SavedSuccessfully'));
+
+    // });
+    // this.showCatBtn = false
+
+    
+        // this.sycEntityObjectCategory = {...cat}
+    this._sycEntityObjectClassificationsServiceProxy.createOrEditForObjectTransaction(classificate)
+    .pipe(finalize(() => { 
+        // this.saving = false;
+    }))
+    .subscribe(() => {
+    //    this.notify.info(this.l('SavedSuccessfully'));
+
+    });
+    this.showCatBtn = false
+    this.addSubClas = false
+    this.editSubClass = false
+        // this.selectedCategories[0] = {...cat};
+       this.getAppTransactionClassList()
+       this.classification.name = ''
+        console.log(this.selectedCategories,'selectedCategories')
+    
+}
+
+
+
+
 
 
 deleteCat(cat:any){
@@ -801,9 +972,36 @@ deleteCat(cat:any){
         console.log(this.selectedCategories,'selectedCategories')
     
 }
+
+deleteClass(classi:any){
+    console.log(classi,'id') 
+
+    this._sycEntityObjectClassificationsServiceProxy.delete(classi.data.sycEntityObjectClassification.id)
+    .pipe(finalize(() => { 
+        // this.saving = false;
+    }))
+    .subscribe(() => {
+        this.notify.info("Successfully deleted.");
+       this.getAppTransactionClassList()
+
+
+    });
+    // this.showCatBtn = false
+        // this.selectedCategories[0] = {...cat};
+    //    this.category.name = ''
+        console.log(this.selectedCategories,'selectedCategories')
+    
+}
 cancelCat(){
      this.getAppTransactionList()
        this.category.name = ''
+}
+
+cancelClass(){
+    this.getAppTransactionClassList()
+      this.classification.name = ''
+      this.addSubClas = false
+      this.editSubClass = false
 }
     showEditMode() {
         this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
@@ -877,6 +1075,55 @@ cancelCat(){
                 this.allRecords = [];
                 this.allRecords.push(...result.items);
                 console.log(this.allRecords,'this.allRecords')
+                // this.lastSelectedRecord = this.selectedRecord;
+                // this.selectedRecord = undefined;
+                // this.displayedRecords = this.allRecords;
+                // this.totalCount = result.totalCount;
+                // this.showMoreListDataButton =
+                //     this.allRecords.length < this.totalCount;
+                // this.active = true;
+                // this.loading = false;
+            });
+        this.subscriptions.push(subs);
+    }
+
+
+
+
+    getAppTransactionClassList(searchQuery?: string) {
+        console.log(">>", searchQuery)
+        // this.loading = true;
+        const subs = this._sycEntityObjectClassificationsServiceProxy
+            .getAllWithChildsForTransaction(
+
+            )
+            .pipe(finalize(() => (this.loading = false)))
+            .subscribe((result) => {
+                console.log(result.items,'result.items')
+
+                // if (searchQuery !== undefined) this.allRecords = [];
+                // result.items.map((record) => {
+              
+                //     // const cachedItem : TreeNodeOfGetSycEntityObjectTypeForViewDto = this.loadedChildrenRecords.filter((selectedRecord:TreeNodeOfGetSycEntityObjectTypeForViewDto)=>{
+                //     //     const isCached : boolean = selectedRecord.data.sycEntityObjectType.id == record.data.sycEntityObjectType.id
+                //     //     return isCached
+                //     // })[0]
+                //     // const isCached : boolean = !!cachedItem
+
+                //     // if(isCached){
+                //     //     record.children = cachedItem.children
+                //     //     record.expanded = cachedItem.expanded
+                //     //     record.totalChildrenCount = cachedItem.totalChildrenCount;
+                //     //     (record as any).partialSelected = (cachedItem as any).partialSelected
+                //     // }
+
+                //     // this.checkItemSelection(record);
+
+                //     return record;
+                // });
+                this.allClassRecords = [];
+                this.allClassRecords.push(...result.items);
+                console.log(this.allClassRecords,'this.allRecordsclass')
                 // this.lastSelectedRecord = this.selectedRecord;
                 // this.selectedRecord = undefined;
                 // this.displayedRecords = this.allRecords;
