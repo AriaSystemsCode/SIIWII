@@ -287,6 +287,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             this.orderForm.controls["buyerCompanyBranch"].reset();
             this.orderForm.controls["buyerCompanyName"].reset();
         }
+
+        else
+            this.orderForm.controls["buyerCompanyBranch"].setValidators([Validators.required]);
+        
+
+            this.orderForm.controls["buyerCompanyBranch"].updateValueAndValidity();
+
     }
     selectTempSeller() {
         this.isSellerTempAccount = !this.isSellerTempAccount;
@@ -296,6 +303,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             this.orderForm.controls["sellerCompanyBranch"].reset();
             this.orderForm.controls["sellerCompanyName"].reset();
         }
+
+        else 
+        this.orderForm.controls["sellerCompanyBranch"].setValidators([Validators.required]);
+
+
+        this.orderForm.controls["buyerCompanyBranch"].updateValueAndValidity();
+
     }
     handleRoleChange(data: any) {
         
