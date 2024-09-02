@@ -278,7 +278,7 @@ export class ShoppingCartViewComponentComponent
    
                this.colors = res.colors;
                this.sizes = res.sizes;
-              // this.onGeneratOrderReport(true,undefined,true,false);
+        
           
 
    
@@ -292,7 +292,7 @@ export class ShoppingCartViewComponentComponent
                    });
         });
           
-        this.onGeneratOrderReport(true,undefined,true,false);
+       
     
       });
 
