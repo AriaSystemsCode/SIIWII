@@ -21,6 +21,7 @@ using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.SycSegmentIdentifierDefinitions.Dtos;
 using onetouch.SystemObjects.Dtos;
 using Abp.Domain.Uow;
+using onetouch.AppEntities;
 
 namespace onetouch.SycIdentifierDefinitions
 {
@@ -32,13 +33,13 @@ namespace onetouch.SycIdentifierDefinitions
         private readonly IRepository<SycCounter, long> _sycCounter;
         private readonly IRepository<SycEntityObjectType, long> _sycEntityObjectTypeRepository;
         private readonly ISycIdentifierDefinitionsExcelExporter _sycIdentifierDefinitionsExcelExporter;
-
+        private readonly IRepository<AppEntity, long> _appEntityRepository;
         public SycIdentifierDefinitionsAppService(
             IRepository<SycIdentifierDefinition, long> sycIdentifierDefinitionRepository,
             ISycIdentifierDefinitionsExcelExporter sycIdentifierDefinitionsExcelExporter,
             IRepository<SycEntityObjectType, long> SycEntityObjectTypeRepository,
             IRepository<SycSegmentIdentifierDefinition, long> SycSegmentIdentifierDefinition,
-            IRepository<SycCounter, long> SycCounter
+            IRepository<SycCounter, long> SycCounter, IRepository<AppEntity, long> appEntityRepository
             )
         {
             _sycIdentifierDefinitionRepository = sycIdentifierDefinitionRepository;
@@ -46,6 +47,7 @@ namespace onetouch.SycIdentifierDefinitions
             _sycEntityObjectTypeRepository = SycEntityObjectTypeRepository;
             _sycSegmentIdentifierDefinition = SycSegmentIdentifierDefinition;
             _sycCounter = SycCounter;
+            _appEntityRepository = appEntityRepository;
         }
 
         public async Task<PagedResultDto<GetSycIdentifierDefinitionForViewDto>> GetAll(GetAllSycIdentifierDefinitionsInput input)
@@ -219,6 +221,17 @@ namespace onetouch.SycIdentifierDefinitions
                         }
                     }
                 }
+                //MMT - 09-02-2024[Start]
+                if (code == "MANUALACCOUNTCONTACT" && !string.IsNullOrEmpty(output))
+                {
+                    var tenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    var existCode = await _appEntityRepository.GetAll().Where(z => z.Code == tenantObject.TenancyName + "-C" + output && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                    if (existCode != null)
+                    {
+                        output = await GetNextEntityCode(code);
+                    }
+                }
+                //MMT - 09-02-2024[End]
                 return output;
             }
         }
