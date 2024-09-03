@@ -3672,7 +3672,12 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                         }
                         //MMT
+
                         viewTrans.IsOwnedByMe = (AbpSession.TenantId == viewTrans.TenantOwner);
+                        viewTrans.TotalQuantity = transOrg.TotalQuantity;
+                        viewTrans.TotalAmount = transOrg.TotalAmount;
+                        viewTrans.TransactionType = transOrg.EntityObjectTypeCode == "SALESORDER" ? TransactionType.SalesOrder : TransactionType.PurchaseOrder;
+                        viewTrans.EntityStatusCode = transOrg.EntityObjectStatusCode;
                         if (viewTrans.AppTransactionContacts!=null && viewTrans.AppTransactionContacts.Count>0)
                         {
                             foreach (var cont in viewTrans.AppTransactionContacts)

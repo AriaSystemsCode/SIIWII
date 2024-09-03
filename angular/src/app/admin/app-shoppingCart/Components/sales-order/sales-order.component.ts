@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
     AppEntitiesServiceProxy,
@@ -28,7 +28,7 @@ import { TreeSelect } from "primeng/treeselect";
     templateUrl: "./sales-order.component.html",
     styleUrls: ["./sales-order.component.scss"],
 })
-export class SalesOrderComponent extends AppComponentBase implements OnInit, OnChanges {
+export class SalesOrderComponent extends AppComponentBase implements OnInit, OnChanges , AfterViewInit {
     fullName: string;
     companeyNames: any[];
     nodes: any[];
@@ -90,20 +90,22 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         
         super(injector);
         // this.getAppTransactionList();
-
-        this.getParentCategories();
-        this.getParentClassifications();
-        this.getAllCurrencies();
+       
       
     }
+
+    ngAfterViewInit() {
+        if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
+            this.getParentCategories();
+            this.getParentClassifications();
+            this.getAllCurrencies();
+            }
+    }
     ngOnInit(): void {
+        if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
         if(this.createOrEditorderInfo){
             this.getAppTransactionList();
-
-            
-
         }
-
         if(!this.category) {
             this.category = new CreateOrEditSycEntityObjectCategoryDto()
         }
@@ -173,9 +175,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
 
     }
+}
 
     ngOnChanges(changes: SimpleChanges) {
-        
+        if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
         if (this.appTransactionsForViewDto) {
             this.createOrEditorderInfo=this.oldCreateOrEditorderInfo;
             this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
@@ -193,7 +196,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             this.selectedClassification = this.appTransactionsForViewDto?.entityClassifications;
         }
         console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
-
+    }
 
     }
     toggleDropDown (){
@@ -220,6 +223,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
 
     getCodeValue(code: string) {
+        if(this.category?.code)
         this.category.code= code;
     }
     // get parent categories

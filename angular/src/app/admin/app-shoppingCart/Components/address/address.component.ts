@@ -1,17 +1,18 @@
-import { Component, Injector,OnInit ,Input,ViewChild,Output,EventEmitter, SimpleChanges, OnChanges} from "@angular/core";
+import { Component, Injector,OnInit ,Input,ViewChild,Output,EventEmitter, SimpleChanges, OnChanges, AfterViewInit} from "@angular/core";
 import { AccountsServiceProxy, AppAddressDto, AppEntitiesServiceProxy,  LookupLabelDto,AppTransactionServiceProxy, GetAppTransactionsForViewDto,ContactRoleEnum } from "@shared/service-proxies/service-proxies";
 import Swal from 'sweetalert2';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs/operators';
 import { NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
 
 @Component({
     selector: "app-address",
     templateUrl: "./address.component.html",
     styleUrls: ["./address.component.scss"],
 })
-export class AddressComponent extends AppComponentBase implements OnInit,OnChanges {
+export class AddressComponent extends AppComponentBase implements OnInit,OnChanges,AfterViewInit {
     @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
     @Input("selectedAddressDetails") selectedAddressDetails;
     @Input("showAddressType") showAddressType:boolean=true;
@@ -43,18 +44,27 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     @ViewChild("addressForm") addressForm: NgForm;
     @Input("canChange")  canChange:boolean=true;
 
+    @Input("currentTab") currentTab: number;
+
     constructor(injector: Injector,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _AppTransactionServiceProxy:AppTransactionServiceProxy
         ) {
         super(injector);
-        this.getCountries();
-        this.getAddressTypes()
 
     }
 
+
+    ngAfterViewInit() {
+      if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo  || this.currentTab == ShoppingCartoccordionTabs.ShippingInfo ){
+        this.getCountries();
+        this.getAddressTypes()
+      }
+    }
+
     ngOnChanges(changes: SimpleChanges) {
+        if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo  || this.currentTab == ShoppingCartoccordionTabs.ShippingInfo ){
         if(this.selectedAddressDetails){
         this.selectedAddressDetails.addressLine1=  this.selectedAddressDetails?.addressLine1 ? this.selectedAddressDetails?.addressLine1 : '' ;
         this.selectedAddressDetails.addressLine2=  this.selectedAddressDetails?.addressLine2 ? this.selectedAddressDetails?.addressLine2 : '' ;
@@ -67,6 +77,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
         this.selectedAddress=this.selectedAddressDetails;
   
         }
+    }
     }
     filterAddressList(filterVal){
         this.savedAddressesList=this.refSavedAddressesList.filter(item=>item.name.includes(filterVal));

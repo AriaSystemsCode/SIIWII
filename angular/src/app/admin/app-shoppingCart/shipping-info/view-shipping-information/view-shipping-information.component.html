@@ -38,6 +38,7 @@
         [selectedAddressDetails]="selectedAddressDetailsFrom"
         [showAddressType]="false"
         [canChange]="canChange"
+        [currentTab]="currentTab"
         ></app-address>
         
     </div>
@@ -67,6 +68,7 @@
         [selectedAddressDetails]="selectedAddressDetailsTo"
         [showAddressType]="false"
         [canChange]="canChange"
+        [currentTab]="currentTab"
         ></app-address>
         <div class="row view-mode mt-2 mb-2">
             <div class="col-6" *ngIf="appTransactionsForViewDto?.buyerStore">

@@ -51,7 +51,7 @@
                 <div class="py-4 px-0 d-flex ">
                     <label class="pt-2 mr-1 font-weight-bold purpleColor"> {{l("Status")}} </label>
                     <div class="status   pt-2">
-                        <p style="white-space: nowrap;"> {{shoppingCartDetails?.entityStatusCode}}</p>
+                        <p style="white-space: nowrap;"> {{appTransactionsForViewDto?.entityStatusCode}}</p>
                        
                     </div>
 
@@ -59,21 +59,21 @@
                 <div class="p-4" style="line-height: 10px;">
                     <label class="pt-2 font-weight-bold purpleColor"> {{l("Created")}} </label>
                     <div class="purpleColor" style="white-space: nowrap;">
-                        {{shoppingCartDetails?.createDate?.toString() | date: 'MMM d y, h:mm a'}}
+                        {{appTransactionsForViewDto?.enteredDate?.toString() | date: 'MMM d y, h:mm a'}}
                     </div>
                 </div>
 
                 <div class="py-4 px-3 text-right border-left row  d-lg-flex
                 d-none">
                     <button type="button" class="btn   border-0  shareBtn"
-                        [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
-                        [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                        [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
+                        [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                         style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
                         <img src="../../../../../assets/shoppingCart/share.svg" />
                         {{l("Share")}}
                     </button>
-                    <button type="button" [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
-                        [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                    <button type="button" [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
+                        [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                         class="btn  bgPurple border-0 d-lg-block d-none" (click)="printTransaction()" style="width: 85px;
                     height: 37px;
                     border-radius: 4px;">
@@ -83,16 +83,16 @@
 
 
                     <div class="dropdown" dropdown
-                        *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='DRAFT'">
+                        *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='DRAFT'">
                         <button class="btn btn-secondary dropdown-toggle p-0" type="button" id="dropdownMenuButton"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" dropdownToggle>
                             <div class="three-dots"></div>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" *dropdownMenu>
                             <a class="link purpleColor p-3" (click)="cancelOrder()"
-                                *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'">{{l('Cancel')}}</a>
+                                *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'">{{l('Cancel')}}</a>
                             <a class="link purpleColor p-3" (click)="unCancelOrder()"
-                                *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='CANCELLED'">{{l('UnCancel')}}</a>
+                                *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='CANCELLED'">{{l('UnCancel')}}</a>
                         </div>
                     </div>
 
@@ -119,8 +119,8 @@
                            
                                     
                                 <button type="button" class="btn border-0  mx-1"
-                                    [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
-                                    [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                                    [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
+                                    [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                                     style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
                                     <svg width="15" height="15"  viewBox="0 0 15 15"  style="margin-top: 10px;" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g clip-path="url(#clip0_292_8466)">
@@ -144,8 +144,8 @@
                             </a>
                             <a class="dropdown-item d-flex" id="printTransaction"
                                 href="javascript:;">
-                                <button type="button" [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
-                                [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                                <button type="button" [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
+                                [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                                 class="btn  border-0" (click)="printTransaction()" style="width: 85px;
                             height: 37px;
                             border-radius: 4px;">
@@ -169,12 +169,12 @@
                 <div class="p-4 text-right border-left d-flex">
                     <button type="button" class="btn  bgPurple border-0  "
                         style="height: 37px;white-space: nowrap;" (click)="onContinueShopping()"
-                        [disabled]="!shoppingCartDetails?.detailsView || !isOwnedByMe"
-                        [ngClass]="{ disabled:!shoppingCartDetails?.detailsView}">
+                        [disabled]="!isOwnedByMe"
+                        [ngClass]="{ disabled:!isOwnedByMe}">
                         {{l("ContinueShopping")}}
                     </button>
 
-                    <button  *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'" type="button" class="btn  border-0  discartBtn"
+                    <button  *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'" type="button" class="btn  border-0  discartBtn"
                     style="height: 37px;white-space: nowrap;" (click)="onDiscardShopping()">
                         {{l("DiscardShopping")}}
                     </button>
@@ -183,7 +183,7 @@
             <div class="row h-100 m-3 web" *ngIf="!onshare">
                 <div class="col-8 p-0">
                     
-                    <h1 class="mb-4 purpleColor"> {{shoppingCartDetails?.name}} </h1>
+                    <h1 class="mb-4 purpleColor"> {{appTransactionsForViewDto?.name}} </h1>
                     <p-accordion class="shoppingCartAccordionTabBG mt-4" [(activeIndex)]="activeIndex">
                         <!-- order information tab -->
 
@@ -197,6 +197,7 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Information</h6>
                                 </div>
                             </ng-template>
+                            <div *ngIf="currentTab==0">
                                 <app-sales-order [activeTab]="0"
                                 [currentTab]="currentTab"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -206,6 +207,7 @@
                                     (ontabChange)="ontabChange($event)"
                                     (generatOrderReport)="onGeneratOrderReport($event)"
                                     [canChange]="canChange"></app-sales-order>
+                                </div>
                         </p-accordionTab>
                         <!-- order information tab -->
 
@@ -219,7 +221,7 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
                                 </div>
                             </ng-template>
-                                <div>
+                            <div *ngIf="currentTab==1">
                                     <app-create-or-edit-buyer-seller-contact-info
                                         [activeTab]="1"
                                         [currentTab]="currentTab"
@@ -242,7 +244,7 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Sellercontactinfo")}}</h6>
                                 </div>
                             </ng-template>
-                                <div>
+                            <div *ngIf="currentTab==2">
                                     <app-create-or-edit-buyer-seller-contact-info
                                         [activeTab]="2"
                                         [currentTab]="currentTab"
@@ -268,7 +270,7 @@
                             </ng-template>
 
                            
-                                <div>
+                            <div *ngIf="currentTab==3">
                                     <app-create-or-edit-sales-rep-info [activeTab]="3"
                                     [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -291,7 +293,7 @@
                                     </h6>
                                 </div>
                             </ng-template>
-                                <div>
+                            <div *ngIf="currentTab==4">
                                     <app-create-or-add-shipping-information [activeTab]="4"
                                     [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -312,7 +314,7 @@
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
                                 </div>
                             </ng-template>
-                                <div>
+                            <div *ngIf="currentTab==5">
                                     <app-create-or-edit-billing-info [activeTab]="5"
                                     [currentTab]="currentTab"
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -323,7 +325,7 @@
                                     </app-create-or-edit-billing-info>
                                 </div>
                         </p-accordionTab>
-                        <p-accordionTab class="shoppingCartAccordionTabBG">
+                        <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="currentTab=6; getLinesData()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 mt-1 purpleColor">{{l("OrderDetails")}}</h6>
@@ -495,7 +497,7 @@
                         </p-accordionTab>
                         <!-- order Preview tab -->
                         <p-accordionTab class="shoppingCartAccordionTabBG" 
-                            *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
+                            *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
@@ -520,15 +522,15 @@
                         <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor order-summary">
                             <div class="row w-100">
                                 <div class="col-6 font-weight-bold">{{l("TotalAmount")}}</div>
-                                <div class="font-weight-bold">{{currencySymbol}} {{shoppingCartDetails?.totalAmount   ? (shoppingCartDetails?.totalAmount | currency:' ') : '0.00' }}</div>
+                                <div class="font-weight-bold">{{currencySymbol}} {{appTransactionsForViewDto?.totalAmount   ? (appTransactionsForViewDto?.totalAmount | currency:' ') : '0.00' }}</div>
                             </div>
                             <div class="row w-100 mt-4 mb-4">
                                 <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
-                                <div class="font-weight-bold">{{shoppingCartDetails?.totalQty ?
-                                    shoppingCartDetails?.totalQty : 0 }}</div>
+                                <div class="font-weight-bold">{{appTransactionsForViewDto?.totalQuantity ?
+                                    appTransactionsForViewDto?.totalQuantity : 0 }}</div>
                             </div>
                             <div class=" row w-100 mt-4 ml-1">
-                                 <!-- [disabled]="shoppingCartDetails?.totalAmount<=0" -->
+                                 <!-- [disabled]="appTransactionsForViewDto?.totalAmount<=0" -->
                                 <button type="button"
                                     class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
                                     style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
@@ -542,7 +544,7 @@
                                 </button> -->
                                 <button type="button" class="btn  bgPurple border-0 w-100 pointer"
                                     style="height: 37px;"
-                                    *ngIf="showTabs && shoppingCartDetails?.entityStatusCode?.toUpperCase()=='DRAFT'"
+                                    *ngIf="showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
                                     [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
                                     [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}"
                                     (click)="PlaceOrder()">
@@ -612,8 +614,8 @@ height: 48px;"
                
                         
                     <button type="button" class="btn border-0  mx-1"
-                        [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
-                        [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                        [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
+                        [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                         style="height: 37px; white-space: nowrap;" (click)="onShareTransaction()">
                         <svg width="15" height="15"  viewBox="0 0 15 15"  style="margin-top: 10px;" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#clip0_292_8466)">
@@ -637,8 +639,8 @@ height: 48px;"
                 </a>
                 <a class="dropdown-item d-flex" id="printTransaction"
                     href="javascript:;">
-                    <button type="button" [disabled]="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'"
-                    [ngClass]="{ disabled:shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'}"
+                    <button type="button" [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
+                    [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                     class="btn  border-0" (click)="printTransaction()" style="width: 85px;
                 height: 37px;
                 border-radius: 4px;">
@@ -660,8 +662,8 @@ height: 48px;"
 
                     <button type="button" class="btn  border-0  "
                     style="height: 37px;white-space: nowrap;" (click)="onContinueShopping()"
-                    [disabled]="!shoppingCartDetails?.detailsView || !isOwnedByMe"
-                    [ngClass]="{ disabled:!shoppingCartDetails?.detailsView}">
+                    [disabled]="!isOwnedByMe"
+                    [ngClass]="{ disabled:!isOwnedByMe}">
                     <svg width="19" height="18" viewBox="0 0 19 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M1.41406 7.54165C1.41406 5.91651 2.05965 4.35794 3.20879 3.20879C4.35794 2.05965 5.91651 1.41406 7.54165 1.41406C9.16679 1.41406 10.7254 2.05965 11.8745 3.20879C13.0237 4.35794 13.6692 5.91651 13.6692 7.54165C13.6692 7.72917 13.7437 7.909 13.8763 8.0416C14.0089 8.17419 14.1888 8.24868 14.3763 8.24868C14.5638 8.24868 14.7436 8.17419 14.8762 8.0416C15.0088 7.909 15.0833 7.72917 15.0833 7.54165C15.0833 6.05005 14.641 4.59195 13.8123 3.35174C12.9836 2.11152 11.8058 1.14489 10.4277 0.574077C9.04966 0.00326765 7.53328 -0.146082 6.07035 0.144914C4.60741 0.43591 3.26362 1.15418 2.2089 2.2089C1.15418 3.26362 0.43591 4.60741 0.144914 6.07035C-0.146082 7.53329 0.00326765 9.04966 0.574077 10.4277C1.14489 11.8058 2.11152 12.9836 3.35174 13.8123C4.59195 14.641 6.05005 15.0833 7.54165 15.0833C7.72917 15.0833 7.909 15.0088 8.0416 14.8762C8.17419 14.7436 8.24868 14.5638 8.24868 14.3763C8.24868 14.1888 8.17419 14.0089 8.0416 13.8763C7.909 13.7437 7.72917 13.6692 7.54165 13.6692C5.91651 13.6692 4.35794 13.0237 3.20879 11.8745C2.05965 10.7254 1.41406 9.16679 1.41406 7.54165Z" fill="#777777"/>
                         <path d="M8.49961 13.8004L12.5947 17.8955C12.6442 17.9451 12.7072 17.9788 12.7759 17.9925C12.8445 18.0062 12.9157 17.9992 12.9804 17.9724C13.0451 17.9456 13.1003 17.9002 13.1392 17.8419C13.178 17.7837 13.1987 17.7152 13.1985 17.6452V14.6106H17.7942C18.0755 14.6106 18.3453 14.4989 18.5441 14.3C18.743 14.1011 18.8548 13.8314 18.8548 13.5501C18.8548 13.2688 18.743 12.9991 18.5441 12.8002C18.3453 12.6013 18.0755 12.4896 17.7942 12.4896H13.1985V9.45498C13.1987 9.38497 13.178 9.3165 13.1392 9.25825C13.1003 9.2 13.0451 9.15459 12.9804 9.12778C12.9157 9.10097 12.8445 9.09397 12.7759 9.10766C12.7072 9.12136 12.6442 9.15513 12.5947 9.20469L8.49961 13.2998C8.46669 13.3326 8.44057 13.3717 8.42275 13.4146C8.40493 13.4576 8.39576 13.5036 8.39576 13.5501C8.39576 13.5966 8.40493 13.6426 8.42275 13.6856C8.44057 13.7285 8.46669 13.7675 8.49961 13.8004ZM12.1804 5.8152C12.2788 5.71678 12.3569 5.59993 12.4102 5.47134C12.4634 5.34275 12.4908 5.20493 12.4908 5.06574C12.4908 4.92656 12.4634 4.78873 12.4102 4.66014C12.3569 4.53155 12.2788 4.41471 12.1804 4.31629C12.082 4.21787 11.9651 4.1398 11.8366 4.08654C11.708 4.03327 11.5701 4.00586 11.431 4.00586C11.2918 4.00586 11.1539 4.03327 11.0254 4.08654C10.8968 4.1398 10.7799 4.21787 10.6815 4.31629L6.48175 8.51463L4.40309 6.43738C4.30467 6.33896 4.18783 6.26089 4.05923 6.20763C3.93064 6.15436 3.79282 6.12695 3.65363 6.12695C3.51445 6.12695 3.37663 6.15436 3.24803 6.20763C3.11944 6.26089 3.0026 6.33896 2.90418 6.43738C2.80576 6.5358 2.72769 6.65264 2.67443 6.78123C2.62116 6.90982 2.59375 7.04765 2.59375 7.18683C2.59375 7.32602 2.62116 7.46384 2.67443 7.59243C2.72769 7.72102 2.80576 7.83786 2.90418 7.93628L5.7323 10.7644C5.83067 10.8629 5.94749 10.9411 6.07609 10.9944C6.20469 11.0477 6.34254 11.0751 6.48175 11.0751C6.62097 11.0751 6.75881 11.0477 6.88741 10.9944C7.01601 10.9411 7.13283 10.8629 7.2312 10.7644L12.1804 5.8152Z" fill="#777777"/>
@@ -675,7 +677,7 @@ height: 48px;"
             href="javascript:;">
          
 
-                <button  *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()!='OPEN'" type="button" class="btn  border-0  "
+                <button  *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'" type="button" class="btn  border-0  "
                 style="height: 37px;white-space: nowrap;" (click)="onDiscardShopping()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <g clip-path="url(#clip0_292_8477)">
@@ -765,7 +767,7 @@ height: 48px;"
             </ng-template>
             <div class="">
                     
-                <h1 class="mb-4 purpleColor"> {{shoppingCartDetails?.name}} </h1>
+                <h1 class="mb-4 purpleColor"> {{appTransactionsForViewDto?.name}} </h1>
                 <p-accordion class="shoppingCartAccordionTabBG mt-4" [(activeIndex)]="activeIndex">
                     <!-- order information tab -->
 
@@ -779,6 +781,7 @@ height: 48px;"
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Information</h6>
                             </div>
                         </ng-template>
+                        <div *ngIf="currentTab==0">
                             <app-sales-order [activeTab]="0"
                             [currentTab]="currentTab"
                                 [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -788,6 +791,7 @@ height: 48px;"
                                 (ontabChange)="ontabChange($event)"
                                 (generatOrderReport)="onGeneratOrderReport($event)"
                                 [canChange]="canChange"></app-sales-order>
+                                </div>
                     </p-accordionTab>
                     <!-- order information tab -->
 
@@ -801,7 +805,7 @@ height: 48px;"
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
                             </div>
                         </ng-template>
-                            <div>
+                        <div *ngIf="currentTab==1">
                                 <app-create-or-edit-buyer-seller-contact-info
                                     [activeTab]="1"
                                     [currentTab]="currentTab"
@@ -824,7 +828,7 @@ height: 48px;"
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Sellercontactinfo")}}</h6>
                             </div>
                         </ng-template>
-                            <div>
+                        <div *ngIf="currentTab==2">
                                 <app-create-or-edit-buyer-seller-contact-info
                                     [activeTab]="2"
                                     [currentTab]="currentTab"
@@ -850,7 +854,7 @@ height: 48px;"
                         </ng-template>
 
                        
-                            <div>
+                        <div *ngIf="currentTab==3">
                                 <app-create-or-edit-sales-rep-info [activeTab]="3"
                                 [currentTab]="currentTab"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -873,7 +877,7 @@ height: 48px;"
                                 </h6>
                             </div>
                         </ng-template>
-                            <div>
+                        <div *ngIf="currentTab==4">
                                 <app-create-or-add-shipping-information [activeTab]="4"
                                 [currentTab]="currentTab"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -894,7 +898,7 @@ height: 48px;"
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
                             </div>
                         </ng-template>
-                            <div>
+                        <div *ngIf="currentTab==5">
                                 <app-create-or-edit-billing-info [activeTab]="5"
                                 [currentTab]="currentTab"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -905,7 +909,7 @@ height: 48px;"
                                 </app-create-or-edit-billing-info>
                             </div>
                     </p-accordionTab>
-                    <p-accordionTab class="shoppingCartAccordionTabBG">
+                    <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="currentTab=6; getLinesData()">
                         <ng-template pTemplate="header">
                             <div class="d-inline-block custom-header d-flex">
                                 <h6 class="mb-1 mt-1 purpleColor">{{l("OrderDetails")}}</h6>
@@ -1077,7 +1081,7 @@ height: 48px;"
                     </p-accordionTab>
                     <!-- order Preview tab -->
                     <p-accordionTab class="shoppingCartAccordionTabBG" 
-                        *ngIf="shoppingCartDetails?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
+                        *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
                         <ng-template pTemplate="header">
                             <div class="d-inline-block custom-header d-flex">
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
@@ -1117,16 +1121,15 @@ height: 48px;"
                         <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor order-summary">
                             <div class="row w-100">
                                 <div class="col-6 font-weight-bold">{{l("TotalAmount")}}</div>
-                                <div class="font-weight-bold">{{currencySymbol}} {{shoppingCartDetails?.totalAmount   ? (shoppingCartDetails?.totalAmount | currency:' ') : '0.00' }}</div>
+                                <div class="font-weight-bold">{{currencySymbol}} {{appTransactionsForViewDto?.totalAmount   ? (appTransactionsForViewDto?.totalAmount | currency:' ') : '0.00' }}</div>
                             </div>
                             <div class="row w-100 mt-4 mb-4">
                                 <div class="col-6 font-weight-bold">{{l("TotalQuantity")}}</div>
-                                <div class="font-weight-bold">{{shoppingCartDetails?.totalQty ?
-                                    shoppingCartDetails?.totalQty : 0 }}</div>
+                                <div class="font-weight-bold">{{appTransactionsForViewDto?.totalQuantity ?
+                                    appTransactionsForViewDto?.totalQuantity : 0 }}</div>
                             </div>
                             <div class=" row w-100 mt-4 ml-1">
                                 <button type="button"
-                                [disabled]="shoppingCartDetails?.totalAmount<=0"
                                     class="btn  bgPurple border-0 w-100 pointer Proceedtocheckout"
                                     style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
                                     {{l("Proceedtocheckout")}}
@@ -1139,7 +1142,7 @@ height: 48px;"
                                 </button> -->
                                 <button type="button" class="btn  bgPurple border-0 w-100 pointer"
                                     style="height: 37px;"
-                                    *ngIf="showTabs && shoppingCartDetails?.entityStatusCode?.toUpperCase()=='DRAFT'"
+                                    *ngIf="showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
                                     [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
                                     [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}"
                                     (click)="PlaceOrder()">
