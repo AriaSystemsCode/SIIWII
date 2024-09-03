@@ -81,6 +81,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     skipCount: number = 0;
     maxResultCount: number = 10;
     allRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
+    filteredRecords: any[] = [];
+    
     allClassRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
     parentClassification : CreateOrEditSycEntityObjectClassificationDto
 
@@ -111,8 +113,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
       
     }
     ngOnInit(): void {
-        this.getAppTransactionList();
-        this.getAppTransactionClassList()
+        
 
         if(!this.category) {
             this.category = new CreateOrEditSycEntityObjectCategoryDto()
@@ -182,15 +183,20 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.availableDate = this.appTransactionsForViewDto?.availableDate?.toDate();
         this.completeDate = this.appTransactionsForViewDto?.completeDate?.toDate();
         this.reference = this.appTransactionsForViewDto?.reference;
-        // this.category = this.appTransactionsForViewDto.entityCategories
+        
+        // this.selectedCategories = this.appTransactionsForViewDto.entityCategories
         this.classificationItemPath = [];
         this.categoriesItemPath = [];
         console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
+        this.getAppTransactionList();
+        this.getAppTransactionClassList()
 
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        
+        this.getAppTransactionList();
+        this.getAppTransactionClassList()
+
         if (this.appTransactionsForViewDto) {
             this.createOrEditorderInfo=this.oldCreateOrEditorderInfo;
             this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
@@ -741,10 +747,11 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.onChangeDate();
     
        
-         this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
+        //  this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
 
          this.appTransactionsForViewDto.reference = this.reference;
          console.log(this.appTransactionsForViewDto.entityCategories,'this.appTransactionsForViewDto.entityCategories')
+         console.log(this.appTransactionsForViewDto,'this.appTransactionsForViewDto')
 
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
@@ -797,31 +804,80 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     //     category.removed = false;
     // }
     saveSelection() {
-        // Implement your save logic here
-        this.showSelectedCat = true
+        // Show selected categories and close dropdown
+        this.showSelectedCat = true;
         this.closeDropdown();
-
-        console.log(this.selectedCategories ,'this.selectedCategories ')
-        this.selectedCategories =  this.selectedCategories .map(item => ({
-            entityObjectCategoryId: item?.data?.sycEntityObjectCategory?.id,
-            entityObjectCategoryCode: item?.data?.sycEntityObjectCategory?.code,
-            entityObjectCategoryName: item?.data?.sycEntityObjectCategory?.name,
-            id: item?.data?.sycEntityObjectCategory?.objectId, // Assuming objectId is used as the id
-          }));
-        this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
-        // this.appTransactionsForViewDto.entityCategories = this.selectedCategories ;
-        // this.appTransactionsForViewDto.entityCategories =   {
-        //     entityObjectCategoryId: data.sycEntityObjectCategory.id,
-        //     entityObjectCategoryCode: data.sycEntityObjectCategory.code,
-        //     entityObjectCategoryName: data.sycEntityObjectCategory.name,
-        //     id: data.sycEntityObjectCategory.objectId, // Assuming `objectId` is used as the id in this context
-        //   },
-        console.log(this.selectedCategories,'this.selectedCategories')
-        console.log(this.appTransactionsForViewDto.entityCategories,'this.appTransactionsForViewDto.entityCategories')
-        // this.notify.info('Selection saved successfully!');
+    
+        // Map selected categories properly without assigning `toJSON`
+        this.selectedCategories = this.selectedCategories.map(item => ({
+            entityObjectCategoryId: item.data?.sycEntityObjectCategory?.id,
+            entityObjectCategoryCode: item.data?.sycEntityObjectCategory?.code,
+            entityObjectCategoryName: item.data?.sycEntityObjectCategory?.name,
+            // id: item.data?.sycEntityObjectCategory?.objectId, // Assuming objectId is used as the id
+        }));
+    
+        // Ensure selected categories are assigned correctly
+        this.appTransactionsForViewDto.entityCategories = [...this.selectedCategories];
+    
+        // Optional: Call any required update or refresh methods
+        this.getAppTransactionList(); // Refresh the list if required
     }
     
+    
+    
     cancelSelection() {
+        // Implement your cancel logic here
+        // this.selectedCategories = []; // Or any logic to reset selection
+        this.closeDropdown();
+        // this.notify.info('Selection canceled.');
+    }
+
+
+
+
+    saveClassSelection() {
+        // Show selected categories and close dropdown
+        this.showSelectedClass = true;
+        this.closeDropdown();
+    
+
+        // this.selectedCategories.forEach((item) => {
+            
+        //     let index = this.appTransactionsForViewDto.entityCategories.findIndex(
+        //         (x) => x.entityObjectCategoryId === item.data.sycEntityObjectCategory.id
+        //     );
+    
+        //     if (index < 0) {
+        //         const appEntityCategoryDto : AppEntityCategoryDto = {
+        //             entityObjectCategoryCode: item.data.sycEntityObjectCategory.code,
+        //             entityObjectCategoryId: item.data.sycEntityObjectCategory.id,
+        //             entityObjectCategoryName: item.data.sycEntityObjectCategory.name,
+        //             id: 0,
+        //             init: undefined,
+        //             toJSON:undefined
+        //         };
+        //         this.appTransactionsForViewDto.entityCategories.push(appEntityCategoryDto);
+        //     }
+        // });
+        // Map selected categories properly without assigning `toJSON`
+        this.selectedClassification = this.selectedClassification.map(item => ({
+            entityObjectClassificationId: item.data?.sycEntityObjectClassification?.id,
+            entityObjectClassificationCode:  item.data?.sycEntityObjectClassification?.code,
+            entityObjectClassificationName:  item.data?.sycEntityObjectClassification?.name,
+            // id: item.data?.sycEntityObjectClassification?.objectId
+           
+        }));
+    
+        // Ensure selected categories are assigned correctly
+        this.appTransactionsForViewDto.entityClassifications = [...this.selectedClassification];
+    
+        // Optional: Call any required update or refresh methods
+        this.getAppTransactionClassList(); // Refresh the list if required
+    }
+    
+    
+    
+    cancelClassSelection() {
         // Implement your cancel logic here
         // this.selectedCategories = []; // Or any logic to reset selection
         this.closeDropdown();
@@ -832,61 +888,31 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
           this.treeSelect.hide(); // Close the dropdown (make sure this method exists in your TreeSelect version)
         }
       }
+      saveCat(category: any, type?: '') {
+        console.log(category, 'category');
+        let cat = new CreateOrEditSycEntityObjectCategoryDto({
+            code: this.category.code,
+            name: category.name,
+            objectId: undefined,
+            parentId: this.addSubCat ? this.parentCat.parentId : undefined,
+            id: this.editSubCat ? this.parentCat.id : undefined,
+        });
     
-saveCat(category:any,type?:''){
-    console.log(category,'category') 
-    let cat = new CreateOrEditSycEntityObjectCategoryDto({
-        code: this.editSubCat ? this.parentCat.code: this.addSubCat ? this.parentCat.code: this.category.code,
-        name: category.name,
-        objectId: undefined,
-        parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
-        id: this.editSubCat ? this.parentCat.id: undefined,
-    });
-    // parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
-    // id: this.editSubCat?  this.parentCat.parentId : undefined
-
+        this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
+            .pipe(finalize(() => {
+                // Optional: Handle finalization logic here
+            }))
+            .subscribe(() => {
+                // Optional: Show notification or update state
+                // this.notify.info(this.l('SavedSuccessfully'));
+            });
     
-    // edit
-    // let cat = new CreateOrEditSycEntityObjectCategoryDto({
-    //     code: this.editSubCat ? this.parentCat.code: this.category.code,
-    //     name: category.name,
-    //     objectId: undefined,
-    //     parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
-    //     id:this.editSubCat?  this.parentCat.parentId : undefined
-    // });
-
-
-
-
-
-    // this.sycEntityObjectCategory = {...cat}
-    // this._sycEntityObjectCategoriesServiceProxy.createOrEdit(cat)
-    // .pipe(finalize(() => { 
-    //     // this.saving = false;
-    // }))
-    // .subscribe(() => {
-    //    this.notify.info(this.l('SavedSuccessfully'));
-
-    // });
-    // this.showCatBtn = false
-
+        this.showCatBtn = false;
+        this.getAppTransactionList(); // Refresh the list if required
+        this.category.name = ''; // Clear the input field after saving
+        console.log(this.selectedCategories, 'selectedCategories');
+    }
     
-        // this.sycEntityObjectCategory = {...cat}
-    this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
-    .pipe(finalize(() => { 
-        // this.saving = false;
-    }))
-    .subscribe(() => {
-    //    this.notify.info(this.l('SavedSuccessfully'));
-
-    });
-    this.showCatBtn = false
-        // this.selectedCategories[0] = {...cat};
-       this.getAppTransactionList()
-       this.category.name = ''
-        console.log(this.selectedCategories,'selectedCategories')
-    
-}
 
 
 
@@ -900,36 +926,7 @@ saveClass(classification:any,type?:''){
         parentId:  this.addSubClas ? this.parentClass.parentId : undefined,
         id:  this.editSubClass ? this.parentClass.id : undefined,
     });
-    // parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
-    // id: this.editSubCat?  this.parentCat.parentId : undefined
-
-    
-    // edit
-    // let cat = new CreateOrEditSycEntityObjectCategoryDto({
-    //     code: this.editSubCat ? this.parentCat.code: this.category.code,
-    //     name: category.name,
-    //     objectId: undefined,
-    //     parentId: this.addSubCat?  this.parentCat.parentId  : undefined,
-    //     id:this.editSubCat?  this.parentCat.parentId : undefined
-    // });
-
-
-
-
-
-    // this.sycEntityObjectCategory = {...cat}
-    // this._sycEntityObjectCategoriesServiceProxy.createOrEdit(cat)
-    // .pipe(finalize(() => { 
-    //     // this.saving = false;
-    // }))
-    // .subscribe(() => {
-    //    this.notify.info(this.l('SavedSuccessfully'));
-
-    // });
-    // this.showCatBtn = false
-
-    
-        // this.sycEntityObjectCategory = {...cat}
+  
     this._sycEntityObjectClassificationsServiceProxy.createOrEditForObjectTransaction(classificate)
     .pipe(finalize(() => { 
         // this.saving = false;
@@ -1050,6 +1047,7 @@ cancelClass(){
             )
             .pipe(finalize(() => (this.loading = false)))
             .subscribe((result) => {
+                // this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
                 console.log(result.items,'result.items')
 
                 // if (searchQuery !== undefined) this.allRecords = [];
@@ -1073,8 +1071,20 @@ cancelClass(){
                 //     return record;
                 // });
                 this.allRecords = [];
+
+                
                 this.allRecords.push(...result.items);
-                console.log(this.allRecords,'this.allRecords')
+                console.log(this.allRecords,'thinininini')
+                console.log(this.appTransactionsForViewDto?.entityCategories,'meeeeeeeeeeeeeeeeeeeeeee')
+                console.log(this.selectedCategories,'selectedCategories')
+                // this.filteredRecords = this.allRecords.filter(record =>
+                //     !this.selectedCategories.some(
+                //         selected => selected.entityObjectCategoryId === record.data?.sycEntityObjectCategory?.id
+                //     )
+                
+                //   );
+                // }
+               
                 // this.lastSelectedRecord = this.selectedRecord;
                 // this.selectedRecord = undefined;
                 // this.displayedRecords = this.allRecords;
