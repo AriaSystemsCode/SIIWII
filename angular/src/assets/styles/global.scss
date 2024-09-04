@@ -47,12 +47,12 @@
     cursor: not-allowed;
 }
 
-:root {
-    overflow: hidden;
-}
+// :root {
+//     overflow: hidden;
+// }
 
 body {
-    overflow-y: scroll;
+    overflow-y: scroll !important;
     max-height: 100vh;
 }
 
@@ -707,6 +707,7 @@ border: 1px solid #D9D9D9 !important;
 ::ng-deep {
     body {
       overflow: scroll !important;
+      overflow-y: scroll !important;
     }
     // .p-dropdown-panel {
     //     z-index: 9999999999999 !important;

@@ -45,17 +45,17 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string? SellerContactPhoneNumber { get; set; }
 
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string BuyerContactName { get; set; }
+        public virtual string? BuyerContactName { get; set; }
 
         [StringLength(AppTransactionConst.MaxSellerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string SellerContactName { get; set; }
+        public virtual string? SellerContactName { get; set; }
         public virtual string PriceLevel { get; set; }
         public virtual string? BuyerContactSSIN { set; get; }
         
-        public virtual string BuyerBranchSSIN { set; get; }
-        public virtual string BuyerBranchName { set; get; }
-        public virtual string SellerBranchSSIN { set; get; }
-        public virtual string SellerBranchName { set; get; }
+        public virtual string? BuyerBranchSSIN { set; get; }
+        public virtual string? BuyerBranchName { set; get; }
+        public virtual string? SellerBranchSSIN { set; get; }
+        public virtual string? SellerBranchName { set; get; }
         public virtual string? SellerContactSSIN { set; get; }
         public virtual TransactionType TransactionType { set; get; }
         public string EntityStatusCode { set; get; }

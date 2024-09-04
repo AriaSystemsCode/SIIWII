@@ -144,17 +144,18 @@ export class MarketplaceViewProductComponent
 
           this.filteredColors = this.colorsData.filter(color =>
             (color.colorName && color.colorName.toLowerCase().includes(filterTextLower)) ||
-            (color.colorCode && color.colorCode.toLowerCase().includes(filterTextLower))
+            (color.colorCodeSelectedValues && color.colorCodeSelectedValues.toLowerCase().includes(filterTextLower))
           );
         console.log( this.filteredColors,'final')
 
         }
       }
-      clearFilterText() {
+      clearFilterText(inputElement: HTMLInputElement) {
         this.filterText = '';
         this.filteredColors = this.colorsData;
 
         this.showIconClose = false;
+        inputElement.focus();
       }
     getProductDetailsForView() {
         this.showEditSpecialPrice = true;
@@ -611,7 +612,7 @@ export class MarketplaceViewProductComponent
             text: "The price assigned to the ordered Items will be updated ",
             icon: "info",
             showCancelButton: false,
-            confirmButtonText: "Yes",
+            confirmButtonText: "Ok",
             allowOutsideClick: false,
             allowEscapeKey: false,
             backdrop: true,
@@ -664,5 +665,8 @@ export class MarketplaceViewProductComponent
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
+        // document.body.style.overflow = 'auto';
+
     }
+
 }
