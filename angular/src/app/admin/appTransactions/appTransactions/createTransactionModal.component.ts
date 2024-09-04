@@ -554,7 +554,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     // //     this.buyerContacts=[];
 
     //             this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
-    //     //  this.searchTerm=  undefined
+    //       this.searchTerm=  undefined
     // this.showAddBuyBtn = false
 
 
