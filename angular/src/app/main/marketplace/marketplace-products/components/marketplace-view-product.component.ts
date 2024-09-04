@@ -150,11 +150,12 @@ export class MarketplaceViewProductComponent
 
         }
       }
-      clearFilterText() {
+      clearFilterText(inputElement: HTMLInputElement) {
         this.filterText = '';
         this.filteredColors = this.colorsData;
 
         this.showIconClose = false;
+        inputElement.focus();
       }
     getProductDetailsForView() {
         this.showEditSpecialPrice = true;

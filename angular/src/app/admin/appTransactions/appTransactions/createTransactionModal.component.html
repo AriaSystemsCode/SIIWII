@@ -286,9 +286,35 @@
                             (onClick)="addNewBuyer()">
                         </p-dropdown> -->
                         <div>
-                          
+
+
+                       
+                   <p-autoComplete
+    #autoComplete
+    [dropdown]="true"
+    *ngIf="!isBuyerTempAccount"
+    [suggestions]="filteredBuyerContacts"
+    formControlName="buyerContactName"
+    [(ngModel)]="selectedBuyerContact"
+    (completeMethod)="handleBuyerNameSearch($event)"
+    (ngModelChange)="handleBuyerNameChange($event)"
+     (click)="loadInitialContacts()"
+    [disabled]="buyerComapnyId === 0"
+    [placeholder]="orderForm.controls['buyerContactName']?.value || 'Please Select Buyer Name'"
+    field="name"
+    [forceSelection]="false">
+    
+    <ng-template pTemplate="empty">
+        <div *ngIf="buyerContacts.length === 0" class="no-data">
+            No data found
+        </div>
+    </ng-template>
+</p-autoComplete>
+
+                        
+                        
                             
-                            <p-dropdown
+                            <!-- <p-dropdown
                             *ngIf="!isBuyerTempAccount"
                                 [options]="buyerContacts"
                                 formControlName="buyerContactName"
@@ -301,7 +327,7 @@
                                
                                 (onChange)="handleBuyerNameChange($event)"
                             >
-                                <!-- Custom template for when no matching results are found -->
+                                
                                 <ng-template let-item pTemplate="item">
                                     {{ item.name }}
                                 </ng-template>
@@ -321,7 +347,7 @@
                                         <button  pButton type="button" class="addTextBtn" label="Add As Text" (click)="addNewBuyer()"></button>
                                     </div>
                                 </ng-template>
-                            </p-dropdown>
+                            </p-dropdown> -->
                         </div>
                         
                  

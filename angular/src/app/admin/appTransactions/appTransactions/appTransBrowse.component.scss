@@ -32,6 +32,12 @@
 
 
 ::ng-deep  {
+    .transBrow {
+        padding-top: 0px !important;
+    }
+    .kt-portlet {
+        margin-top: 0px !important;
+    }
     // .p-element {
         .btn-group > .btn:not(:last-child):not(.dropdown-toggle), .btn-group > .btn-group:not(:last-child) > .btn {
             

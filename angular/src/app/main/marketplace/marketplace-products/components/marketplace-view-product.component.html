@@ -64,9 +64,16 @@
                                                 alt="colorImg"
                                                 style="width: 40px"
                                             /> -->
-                                            <!-- <p class="ml-2">
-                                                Color {{ order.color.colorName }}
-                                            </p> -->
+                                            <div>
+                                                <p class="ml-2" style="color: #1B101B;font-weight: 600;">
+                                                    {{ order.color.colorCodeSelectedValues }}
+                                               </p>
+                                                <p class="ml-2" style="color: #9E9E9E;">
+                                                     {{ order.color.colorName }}
+                                                </p>
+                                            </div>
+                                       
+                                        
                                         </div>
                                         <button
                                             (click)="removeColor(order, orderIndex)"
@@ -459,11 +466,11 @@
                                                 src="../../../assets/landingPage/Search.png" />
                                             </button>
                                     </span>
-                                    <input [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
+                                    <input #filterInput [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
                                         class="form-control m-input" placeholder="search with color"
                                         type="text" >
                                        
-                                        <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText()">
+                                        <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText(filterInput)">
                                             <i class=" fa fa-1x fa-times fa-1x" style="color: #fff;" ></i>
 
                                         </a>
@@ -869,9 +876,14 @@
                                     alt="colorImg"
                                     style="width: 40px"
                                 /> -->
-                                <!-- <p class="ml-2">
-                                    Color {{ order.color.colorName }}
-                                </p> -->
+                                <div>
+                                    <p class="ml-2" style="color: #1B101B;font-weight: 600;">
+                                        {{ order.color.colorCodeSelectedValues }}
+                                   </p>
+                                    <p class="ml-2" style="color: #9E9E9E;">
+                                         {{ order.color.colorName }}
+                                    </p>
+                                </div>
                             </div>
                             <button
                                 (click)="removeColor(order, orderIndex)"
@@ -1342,11 +1354,11 @@
                                                         src="../../../assets/landingPage/Search.png" />
                                                     </button>
                                             </span>
-                                            <input [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
+                                            <input #filterInput [(ngModel)]="filterText"   (ngModelChange)="onFilterTextChanged()"
                                                 class="form-control m-input" placeholder="search with color"
                                                 type="text" >
                                                
-                                                <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText()">
+                                                <a class="clear-icon" *ngIf="showIconClose" (click)="clearFilterText(filterInput)">
                                                     <i class=" fa fa-1x fa-times fa-1x" style="color: #fff;" ></i>
         
                                                 </a>
@@ -1773,9 +1785,14 @@
                                                     alt="colorImg"
                                                     style="width: 40px"
                                                 /> -->
-                                                <!-- <p class="ml-2">
-                                                    Color {{ order.color.colorName }}
-                                                </p> -->
+                                                <div>
+                                                    <p class="ml-2" style="color: #1B101B;font-weight: 600;">
+                                                        {{ order.color.colorCodeSelectedValues }}
+                                                   </p>
+                                                    <p class="ml-2" style="color: #9E9E9E;">
+                                                         {{ order.color.colorName }}
+                                                    </p>
+                                                </div>
                                             </div>
                                             <button
                                                 (click)="removeColor(order, orderIndex)"

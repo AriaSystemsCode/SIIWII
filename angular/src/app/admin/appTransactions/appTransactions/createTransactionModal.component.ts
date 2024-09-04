@@ -112,6 +112,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     searchTerm: string = undefined;
     searchTermSeller: string = undefined;
     filteredBuyerContacts: any[] ; 
+    selectedBuyerContact: any | string = '';
     today: Date ;
     startDateMsg:boolean = false
     comtDateMsg:boolean = false
@@ -119,10 +120,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     showAddTextBtn:boolean = false
     showAddSellBtn:boolean = false
     showAddBuyBtn:boolean = false
+    
     @ViewChild('calendar1') calendar1: Calendar;
     @ViewChild('calendar2') calendar2: Calendar;
     @ViewChild('calendar3') calendar3: Calendar;
     @ViewChild('calendar4') calendar4: Calendar;
+    @ViewChild('autoComplete') autoComplete: any; 
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -160,10 +163,19 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
        
     }
+
+    ngAfterViewInit() {
+        // Set initial suggestions or interact with the component after it has been initialized
+        this.loadInitialContacts();
+
+      }
     openCalendar(calendar: Calendar) {
         calendar.inputfieldViewChild.nativeElement.click();
       }
+
+      
     ngOnChanges(){
+        this.loadInitialContacts();
         this.orderForm = this.fb.group({
             enteredDate: [Date],
             startDate: [ Date, [Validators.required]],
@@ -459,6 +471,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
     handleBuyerCompanyChange(event: any) {
         this.searchTerm = ''
+        this.selectedBuyerContact = ''
         this.buyerComapnyId = event.value.id;
         this.buyerCompanySSIN = event.value.accountSSIN;
         this.currencyCode = event.value.currencyCode;
@@ -482,54 +495,71 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.sellerBranches=[];
         this.getBranches(event.value.accountSSIN,'seller')
     }
+    loadInitialContacts() {
+        this._AppTransactionServiceProxy
+          .getAccountRelatedContacts(this.buyerComapnyId, '')
+          .subscribe((res: any) => {
+            this.buyerContacts = res;
+            this.filteredBuyerContacts = res; // Show all contacts initially
+          });
+      }
 
-    handleBuyerNameSearch(event: any) {
+    //   handleBuyerNameSearch(event: any) {
       
-if (event.filter != '' || event.filter != undefined){
-    this.searchTerm = event.filter;
-    this.showAddBuyBtn = true
 
+    //     const query = event.query.toLowerCase();
 
-}else {
-    this.searchTerm =undefined;
-
-}
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
-            this._AppTransactionServiceProxy
-                .getAccountRelatedContacts(this.buyerComapnyId, event.filter)
-                .subscribe((res: any) => {
-               
-                    if(this.buyerContacts?.length == 0  && event.filter != undefined) {
-                        // this.emptyMessage = ` Click to add "${this.searchTerm}".`;
-                        // // this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
-                        // this.showAddTextBtn = true
-                     
-                    }
-                    else {
-
+    //     // Clear any existing timeout to avoid frequent API calls
+    //     // clearTimeout(this.searchTimeout);
+    
+    //     // Debounce to reduce API calls
+    //     // this.searchTimeout = setTimeout(() => {
+    //       this._AppTransactionServiceProxy
+    //         .getAccountRelatedContacts(this.buyerComapnyId, query)
+    //         .subscribe((res: any) => {
+    //           // Update suggestions with the filtered results from the API
+    //           this.filteredBuyerContacts = res.length > 0 ? res : this.buyerContacts; // Keep the list intact if no results
+    //         });
+    //     // }, 500); // Adjust the debounce delay as needed
+    // }
+    handleBuyerNameSearch(event: any) {
+        if (this.buyerContacts && this.buyerContacts.length > 0) {
+            // Filtering logic
+            const query = event.query.toLowerCase();
+            this.filteredBuyerContacts = this.buyerContacts.filter(contact =>
+                contact.name.toLowerCase().includes(query)
+            );
+        } else {
+            console.log(this.selectedBuyerContact, 'selectedBuyerContact');
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this._AppTransactionServiceProxy
+                    .getAccountRelatedContacts(this.buyerComapnyId, this.selectedBuyerContact)
+                    .subscribe((res: any) => {
                         this.buyerContacts = [...res];
-
-                    }
-              
-
-                });
-        },500);
+                        // Apply filtering after fetching data
+                        this.filteredBuyerContacts = this.buyerContacts.filter(contact =>
+                            contact.name.toLowerCase().includes(event.query.toLowerCase())
+                        );
+                    });
+            }, 300);
+        }
     }
-    addNewBuyer() {
-        this.orderForm.controls['buyerContactName'].setValue(this.searchTerm);
+    
+    // addNewBuyer() {
+    //     this.orderForm.controls['buyerContactName'].setValue(this.searchTerm);
     
 
-    //    if(!this.buyerContacts?.length) 
-    //     this.buyerContacts=[];
+    // //    if(!this.buyerContacts?.length) 
+    // //     this.buyerContacts=[];
 
-                this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
-        //  this.searchTerm=  undefined
-    this.showAddBuyBtn = false
+    //             this.buyerContacts.push({ name: `  ${this.searchTerm}`, id: this.buyerContacts.length + 1 });
+    //     //  this.searchTerm=  undefined
+    // this.showAddBuyBtn = false
 
 
       
-      }
+    //   }
       addNewSeller() {
         // this.searchTermSeller= undefined
        this.orderForm.controls['sellerContactName'].setValue(this.searchTermSeller);
@@ -575,23 +605,25 @@ if (event.filter != '' || event.filter != undefined){
 
     
     handleBuyerNameChange(event: any) {
-        this.buyerContactId = event.value.id;
-        this.buyerContactSSIN = event.value.ssin;
-        console.log(event.value,'vaaaal')
-        if(event.value.email != null){
+        
+        console.log(event,'vaaaal')
+
+        this.buyerContactId = event.id;
+        this.buyerContactSSIN = event.ssin;
+        if(event?.email != null){
             this.orderForm
             .get("buyerContactEMailAddress")
-            .setValue(event.value.email);
+            .setValue(event.email);
         }
-         if(event.value.phone != null){
+         if(event?.phone != null){
             this.orderForm
             .get("buyerContactPhoneNumber")
-            .setValue(event.value.phone);
+            .setValue(event.phone);
          }
 
 
         this.invalidBuyerPhoneNumber = "";
-        this.buyerPhoneLabel = event?.value?.phoneTypeName ?   event?.value?.phoneTypeName + " Number" : this.buyerPhoneLabel;
+        this.buyerPhoneLabel = event?.phoneTypeName ?   event?.phoneTypeName + " Number" : this.buyerPhoneLabel;
 
     }
     handleSellerNameChange(event: any) {

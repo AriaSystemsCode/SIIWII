@@ -197,6 +197,7 @@ export class ShoppingCartViewComponentComponent
   }
 
   getShoppingCartData(temp: TreeNode<any>[] = null) {
+    this.showMainSpinner();
 
     //header
     this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
