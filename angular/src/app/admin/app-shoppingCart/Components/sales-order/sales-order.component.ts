@@ -82,7 +82,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     maxResultCount: number = 10;
     allRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
     filteredRecords: any[] = [];
-    
+    tempDeselectedCategories: any[] = [];
     allClassRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
     parentClassification : CreateOrEditSycEntityObjectClassificationDto
 
@@ -468,7 +468,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             return;
         }
     
-        this.showSelectedCat = true;
+        // this.showSelectedCat = true;
         const selectedNode = event.node;
     
         // Log the selected node to verify the data
@@ -505,7 +505,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     
         // Update the selected categories to reflect the current state
         this.selectedCategories = [...this.appTransactionsForViewDto.entityCategories];
-        console.log(this.selectedCategories, 'this.selectedCategories');
+        console.log(this.selectedCategories, 'this.selectedCategories onnoooooode');
     }
     
     
@@ -795,7 +795,11 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         category: any,
         i: number
     ) {
-        this.formTouched = true;
+
+        if (!this.tempDeselectedCategories.includes(category)) {
+            this.tempDeselectedCategories.push(category);
+          }
+        // this.formTouched = true;
         if (category?.data?.sycEntityObjectCategory?.id) {
             category.removed = true;
         } else this.selectedCategories.splice(i, 1);
@@ -804,23 +808,34 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     //     category.removed = false;
     // }
     saveSelection() {
+
+
+        this.selectedCategories = this.selectedCategories.filter(
+            (item) => !this.tempDeselectedCategories.includes(item)
+          );
+          // Clear temporary deselections
+          this.tempDeselectedCategories = [];
         // Show selected categories and close dropdown
         this.showSelectedCat = true;
         this.closeDropdown();
-    
+        if (!this.appTransactionsForViewDto?.entityCategories) {
+            this.appTransactionsForViewDto.entityCategories = [];
+        }
         // Map selected categories properly without assigning `toJSON`
         this.selectedCategories = this.selectedCategories.map(item => ({
-            entityObjectCategoryId: item.data?.sycEntityObjectCategory?.id,
-            entityObjectCategoryCode: item.data?.sycEntityObjectCategory?.code,
-            entityObjectCategoryName: item.data?.sycEntityObjectCategory?.name,
-            // id: item.data?.sycEntityObjectCategory?.objectId, // Assuming objectId is used as the id
+            entityObjectCategoryId: item.data?.sycEntityObjectCategory?.id || '',
+            entityObjectCategoryCode: item.data?.sycEntityObjectCategory?.code || 0,
+            entityObjectCategoryName: item.data?.sycEntityObjectCategory?.name || '',
+            id: 0, // Assuming objectId is used as the id
+            init: undefined,
+            toJSON: undefined,
         }));
     
         // Ensure selected categories are assigned correctly
         this.appTransactionsForViewDto.entityCategories = [...this.selectedCategories];
     
         // Optional: Call any required update or refresh methods
-        this.getAppTransactionList(); // Refresh the list if required
+        // this.getAppTransactionList(); // Refresh the list if required
     }
     
     
@@ -861,10 +876,12 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // });
         // Map selected categories properly without assigning `toJSON`
         this.selectedClassification = this.selectedClassification.map(item => ({
-            entityObjectClassificationId: item.data?.sycEntityObjectClassification?.id,
-            entityObjectClassificationCode:  item.data?.sycEntityObjectClassification?.code,
-            entityObjectClassificationName:  item.data?.sycEntityObjectClassification?.name,
-            // id: item.data?.sycEntityObjectClassification?.objectId
+            entityObjectClassificationId: item.data?.sycEntityObjectClassification?.id || '',
+            entityObjectClassificationCode:  item.data?.sycEntityObjectClassification?.code || 0,
+            entityObjectClassificationName:  item.data?.sycEntityObjectClassification?.name || '',
+            id: 0,
+            init: undefined,
+            toJSON: undefined,
            
         }));
     
@@ -872,7 +889,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.appTransactionsForViewDto.entityClassifications = [...this.selectedClassification];
     
         // Optional: Call any required update or refresh methods
-        this.getAppTransactionClassList(); // Refresh the list if required
+        // this.getAppTransactionClassList(); // Refresh the list if required
     }
     
     
@@ -935,7 +952,7 @@ saveClass(classification:any,type?:''){
     //    this.notify.info(this.l('SavedSuccessfully'));
 
     });
-    this.showCatBtn = false
+    this.showClassBtn = false
     this.addSubClas = false
     this.editSubClass = false
         // this.selectedCategories[0] = {...cat};
@@ -1071,18 +1088,18 @@ cancelClass(){
                 //     return record;
                 // });
                 this.allRecords = [];
-
+  
                 
                 this.allRecords.push(...result.items);
                 console.log(this.allRecords,'thinininini')
                 console.log(this.appTransactionsForViewDto?.entityCategories,'meeeeeeeeeeeeeeeeeeeeeee')
                 console.log(this.selectedCategories,'selectedCategories')
-                // this.filteredRecords = this.allRecords.filter(record =>
-                //     !this.selectedCategories.some(
-                //         selected => selected.entityObjectCategoryId === record.data?.sycEntityObjectCategory?.id
-                //     )
+                this.filteredRecords = this.allRecords.filter(record =>
+                    !this.selectedCategories.some(
+                        selected => selected.entityObjectCategoryId === record.data?.sycEntityObjectCategory?.id
+                    )
                 
-                //   );
+                  );
                 // }
                
                 // this.lastSelectedRecord = this.selectedRecord;

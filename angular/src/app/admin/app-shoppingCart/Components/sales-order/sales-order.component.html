@@ -285,9 +285,9 @@
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1">Categories</label>  <div *ngIf="allRecords.length == 0 " (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div></div> 
+                        <div class="d-flex"> <label class="label pt-1">Categories</label>  <div *ngIf="filteredRecords.length == 0 " (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div></div> 
 
-                          <div class="d-flex" *ngIf="showCatBtn || allRecords.length == 0 ">
+                          <div class="d-flex" *ngIf="showCatBtn || filteredRecords.length == 0 ">
                             <div  class="formGroup  col-8">
                               
                                 <input
@@ -319,27 +319,23 @@
                        
                         </button>
                          </div>
-
-<div class="d-flex" *ngIf="showSelectedCat ">
-    <div
-    class="previewValue classificationsValues  m-0 p-0  my-2 d-flex justify-content-between"
-    *ngFor="
-        let item of selectedCategories;index  as i
-    "
->
-   <span> {{ item?.entityObjectCategoryName}}</span> 
-   <a class="clear-icon" (click)="deSelectCat(item,i)" >
-    <i class=" fa fa-1x fa-times fa-1x" style="color: #fff;" ></i>
-
-</a>
-</div>
-
-          
-</div>
+                         <div class="d-flex" *ngIf="showSelectedCat">
+                            <div
+                              class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between"
+                              *ngFor="let item of selectedCategories; index as i"
+                              [ngClass]="{ 'dimmed': tempDeselectedCategories.includes(item) }"
+                            >
+                              <span>{{ item?.entityObjectCategoryName }}</span>
+                              <a class="clear-icon" (click)="deSelectCat(item, i)">
+                                <i class="fa fa-1x fa-times fa-1x" style="color: #fff;"></i>
+                              </a>
+                            </div>
+                          </div>
+                          
 
 
                       
-<div class="d-flex" *ngIf=" allRecords.length != 0">
+<div class="d-flex" *ngIf=" filteredRecords.length != 0">
  
 
 
@@ -351,13 +347,14 @@
     class="w-full md:w-20rem"
     containerStyleClass="w-full"
     [(ngModel)]="selectedCategories"
-    [options]="allRecords"
+    [options]="filteredRecords"
     display="overlay"
     [metaKeySelection]="false"
     selectionMode="checkbox"
     placeholder="Select Item"
     [filter]="true"
-    filterPlaceholder="Search Items"
+    filterPlaceholder="Search Items" 
+  
    
     (onNodeExpand)="onNodeToggle($event, true)"
     (onNodeCollapse)="onNodeToggle($event, false)"

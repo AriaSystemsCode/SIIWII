@@ -130,6 +130,10 @@ font-weight: 600;
     }
 
 }
+.dimmed {
+    opacity: 0.5;
+    pointer-events: none; /* Optional: makes them unclickable */
+  }
 .clear-icon {
     // position: absolute;
     // right: 10px;
