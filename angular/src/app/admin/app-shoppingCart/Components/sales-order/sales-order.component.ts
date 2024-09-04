@@ -66,10 +66,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     showCatBtn: boolean = false;
     hideCatBtn: boolean = true;
     hideClassBtn: boolean = true;
-    showSelectedCat: boolean = true;
+    showSelectedCat: boolean = false;
     showClassBtn: boolean = false;
-    showSelectedClass: boolean = true;
-    
+    showSelectedClass: boolean = false;
+    showExistCat: boolean = false;
     oldappTransactionsForViewDto;
     @ViewChild(TreeSelect) treeSelect!: TreeSelect;
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -82,7 +82,9 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     maxResultCount: number = 10;
     allRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
     filteredRecords: any[] = [];
+    allClassFilteredRecords :any[] =[]
     tempDeselectedCategories: any[] = [];
+    tempDeselectedClassification :any[]=[]
     allClassRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
     parentClassification : CreateOrEditSycEntityObjectClassificationDto
 
@@ -129,53 +131,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // Sorting: name
         // SkipCount: 0
         // MaxResultCount: 10
-        this.categoriesFiles = [
-            {
-                label: 'Electronics',
-                data: '1',
-                children: [
-                    {
-                        label: 'Mobile Phones',
-                        data: '1.1',
-                        children: [
-                            { label: 'Apple', data: '1.1.1' },
-                            { label: 'Samsung', data: '1.1.2' },
-                        ]
-                    },
-                    {
-                        label: 'Laptops',
-                        data: '1.2',
-                        children: [
-                            { label: 'HP', data: '1.2.1' },
-                            { label: 'Dell', data: '1.2.2' },
-                        ]
-                    }
-                ]
-            },
-            {
-                label: 'Furniture',
-                data: '2',
-                children: [
-                    {
-                        label: 'Tables',
-                        data: '2.1',
-                        children: [
-                            { label: 'Dining Table', data: '2.1.1' },
-                            { label: 'Coffee Table', data: '2.1.2' },
-                        ]
-                    },
-                    {
-                        label: 'Chairs',
-                        data: '2.2',
-                        children: [
-                            { label: 'Office Chair', data: '2.2.1' },
-                            { label: 'Dining Chair', data: '2.2.2' },
-                        ]
-                    }
-                ]
-            }
-
-        ];
+    
         this.fullName =
             this.appSession.user.name + this.appSession.user.surname;
         this.enteredDate = this.appTransactionsForViewDto?.enteredDate?.toDate();
@@ -796,13 +752,15 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         i: number
     ) {
 
-        if (!this.tempDeselectedCategories.includes(category)) {
-            this.tempDeselectedCategories.push(category);
-          }
+        // if (!this.tempDeselectedCategories.includes(category)) {
+        //     this.tempDeselectedCategories.push(category);
+        //   }
         // this.formTouched = true;
         if (category?.data?.sycEntityObjectCategory?.id) {
             category.removed = true;
         } else this.selectedCategories.splice(i, 1);
+
+        this.tempDeselectedCategories.push(category);
     }
     // undoCategory(category: AppEntityDtoWithActions<AppEntityCategoryDto>) {
     //     category.removed = false;
@@ -849,7 +807,21 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
 
 
+    deSelectClass(
+        classification: any,
+        i: number
+    ) {
 
+        // if (!this.tempDeselectedCategories.includes(category)) {
+        //     this.tempDeselectedCategories.push(category);
+        //   }
+        // this.formTouched = true;
+        if (classification?.data?.sycEntityObjectClassification?.id) {
+            classification.removed = true;
+        } else this.selectedClassification.splice(i, 1);
+
+        this.tempDeselectedClassification.push(classification);
+    }
     saveClassSelection() {
         // Show selected categories and close dropdown
         this.showSelectedClass = true;
@@ -875,6 +847,19 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         //     }
         // });
         // Map selected categories properly without assigning `toJSON`
+
+
+        this.selectedClassification = this.selectedClassification.filter(
+            (item) => !this.tempDeselectedClassification.includes(item)
+          );
+          // Clear temporary deselections
+          this.tempDeselectedClassification = [];
+        // Show selected categories and close dropdown
+        this.showSelectedClass = true;
+        this.closeDropdown();
+        if (!this.appTransactionsForViewDto?.entityClassifications) {
+            this.appTransactionsForViewDto.entityClassifications = [];
+        }
         this.selectedClassification = this.selectedClassification.map(item => ({
             entityObjectClassificationId: item.data?.sycEntityObjectClassification?.id || '',
             entityObjectClassificationCode:  item.data?.sycEntityObjectClassification?.code || 0,
@@ -925,6 +910,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             });
     
         this.showCatBtn = false;
+        this.addSubCat = false
+        this.editSubCat = false
         this.getAppTransactionList(); // Refresh the list if required
         this.category.name = ''; // Clear the input field after saving
         console.log(this.selectedCategories, 'selectedCategories');
@@ -1009,6 +996,8 @@ deleteClass(classi:any){
 cancelCat(){
      this.getAppTransactionList()
        this.category.name = ''
+       this.addSubCat = false
+       this.editSubCat = false
 }
 
 cancelClass(){
@@ -1159,6 +1148,13 @@ cancelClass(){
                 //     this.allRecords.length < this.totalCount;
                 // this.active = true;
                 // this.loading = false;
+
+                this.allClassFilteredRecords = this.allClassRecords.filter(record =>
+                    !this.selectedClassification.some(
+                        selected => selected.entityObjectClassificationId === record.data?.sycEntityObjectClassification?.id
+                    )
+                  );
+
             });
         this.subscriptions.push(subs);
     }
