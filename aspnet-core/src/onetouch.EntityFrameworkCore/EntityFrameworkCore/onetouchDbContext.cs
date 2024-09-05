@@ -69,6 +69,7 @@ namespace onetouch.EntityFrameworkCore
 
         public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
         public virtual DbSet<AppMarketplaceContact> AppMarketplaceContacts { get; set; }
+        public virtual DbSet<AppMarketplaceAddress> AppMarketplaceAddresses  { get; set; }
         public virtual DbSet<AppMarketplaceContactAddress> AppMarketplaceContactAddress { get; set; }
 
 

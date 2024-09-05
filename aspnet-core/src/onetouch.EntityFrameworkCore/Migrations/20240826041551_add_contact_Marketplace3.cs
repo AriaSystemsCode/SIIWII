@@ -160,13 +160,13 @@ namespace onetouch.Migrations
                         column: x => x.AddressId,
                         principalTable: "AppMarketplaceAddresses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_AppMarketplaceContactAddresses_AppMarketplaceContacts_ContactId",
                         column: x => x.ContactId,
                         principalTable: "AppMarketplaceContacts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(
