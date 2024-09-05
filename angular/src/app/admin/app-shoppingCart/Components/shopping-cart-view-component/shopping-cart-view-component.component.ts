@@ -241,6 +241,15 @@ this.hideMainSpinner();
     .subscribe((res: GetAppTransactionsForViewDto) => {
          res.companeyNames=this.companeyNames;
           this.appTransactionsForViewDto = res;
+
+          /// set validations 
+          this.orderInfoValid = this.appTransactionsForViewDto.isOrderInformationValid;
+          this.buyerContactInfoValid = this.appTransactionsForViewDto.isBuyerContactInformationValid;
+          this.SellerContactInfoValid = this.appTransactionsForViewDto.isSellerContactInformationValid;
+          this.SalesRepInfoValid = (this.transactionType == "Sales Order" && this.appTransactionsForViewDto?.enteredByUserRole.toString().includes("Independent Sales Rep"))  ?  this.SalesRepInfoValid  : this.appTransactionsForViewDto.isSalesRepInformationValid ;
+          this.shippingInfOValid = this.appTransactionsForViewDto.isShippingInformationValid;
+          this.BillingInfoValid = this.appTransactionsForViewDto.isBillingInformationValid;
+          ///
           this.isOwnedByMe= res.isOwnedByMe;
           this.canChange= this.isOwnedByMe
            this.transactionCode=res?.code;
