@@ -38,7 +38,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   shipToSelectedAdd: any;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
-
+isAccManual :boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -49,6 +49,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   }
 
   ngOnInit() {
+    this.isMamualAcc()
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
     shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
@@ -224,6 +225,18 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
 
     }
 
+  }
+
+  
+
+
+  isMamualAcc() {
+    this._AppTransactionServiceProxy.isManualCompany(this.appTransactionsForViewDto?.companySSIN)
+      .subscribe((res) => {
+        console.log(res,'resmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmh')
+        this.isAccManual = res;
+   
+      })
   }
   loadShipViaList() {
     this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')

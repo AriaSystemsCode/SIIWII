@@ -41,6 +41,7 @@
         [selectedAddressDetails]="shipFromSelectedAdd"
         [showAddressType]="false"
         [canChange]="canChange"
+        [showAddBtn]="appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER'"
         ></app-address>
     </div>
     <div class="container-fluid pt-1" *ngIf="createOrEditshippingInfO">
@@ -80,6 +81,8 @@
    [selectedAddressDetails]="shipToSelectedAdd"
    [showAddressType]="false"
    [canChange]="canChange"
+   [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && isAccManual )"
+
 
    ></app-address>
 </div>

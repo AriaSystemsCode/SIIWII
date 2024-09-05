@@ -24,6 +24,7 @@ import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/Shopp
 import * as moment from "moment";
 import { forEach } from "lodash";
 import { TreeSelect } from "primeng/treeselect";
+import { TreeNode } from "primeng/api";
 
 @Component({
     selector: "app-sales-order",
@@ -70,6 +71,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     showClassBtn: boolean = false;
     showSelectedClass: boolean = false;
     showExistCat: boolean = false;
+    showExistClass: boolean = false;
     oldappTransactionsForViewDto;
     @ViewChild(TreeSelect) treeSelect!: TreeSelect;
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -87,7 +89,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     tempDeselectedClassification :any[]=[]
     allClassRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
     parentClassification : CreateOrEditSycEntityObjectClassificationDto
-
+  
     parentCat : any;
     parentClass : any;
     addSubCat: boolean = false;
@@ -548,7 +550,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // name: node.data.sycEntityObjectCategory,
         // parentCategory: node.data.sycEntityObjectCategory,
         code: this.category.code,
-        parentId: node.data.sycEntityObjectCategory.parentId,
+        parentId: node.data.sycEntityObjectCategory.id,
  }
 
  
@@ -761,41 +763,45 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         } else this.selectedCategories.splice(i, 1);
 
         this.tempDeselectedCategories.push(category);
+        this.showSelectedCat = true
     }
     // undoCategory(category: AppEntityDtoWithActions<AppEntityCategoryDto>) {
     //     category.removed = false;
     // }
     saveSelection() {
-
-
-        this.selectedCategories = this.selectedCategories.filter(
+        // Update selectedCategories with any new selections from tempDeselectedCategories
+        this.selectedCategories = [
+          ...this.selectedCategories.filter(
             (item) => !this.tempDeselectedCategories.includes(item)
-          );
-          // Clear temporary deselections
-          this.tempDeselectedCategories = [];
+          ),
+          ...this.tempDeselectedCategories
+        ];
+      
+        // Clear temporary deselections
+        this.tempDeselectedCategories = [];
+      
+        // Update the DTO with selected categories
+        if (!this.appTransactionsForViewDto?.entityCategories) {
+          this.appTransactionsForViewDto.entityCategories = [];
+        }
+      
+        this.appTransactionsForViewDto.entityCategories = this.selectedCategories.map(item => ({
+          entityObjectCategoryId: item.data?.sycEntityObjectCategory?.id || '',
+          entityObjectCategoryCode: item.data?.sycEntityObjectCategory?.code || 0,
+          entityObjectCategoryName: item.data?.sycEntityObjectCategory?.name || '',
+          id: 0, // Assuming objectId is used as the id
+          init: undefined,
+          toJSON: undefined,
+        }));
+      
         // Show selected categories and close dropdown
         this.showSelectedCat = true;
         this.closeDropdown();
-        if (!this.appTransactionsForViewDto?.entityCategories) {
-            this.appTransactionsForViewDto.entityCategories = [];
-        }
-        // Map selected categories properly without assigning `toJSON`
-        this.selectedCategories = this.selectedCategories.map(item => ({
-            entityObjectCategoryId: item.data?.sycEntityObjectCategory?.id || '',
-            entityObjectCategoryCode: item.data?.sycEntityObjectCategory?.code || 0,
-            entityObjectCategoryName: item.data?.sycEntityObjectCategory?.name || '',
-            id: 0, // Assuming objectId is used as the id
-            init: undefined,
-            toJSON: undefined,
-        }));
-    
-        // Ensure selected categories are assigned correctly
-        this.appTransactionsForViewDto.entityCategories = [...this.selectedCategories];
-    
-        // Optional: Call any required update or refresh methods
-        // this.getAppTransactionList(); // Refresh the list if required
-    }
-    
+        this.treeSelect.hide();
+        this.showExistCat = false
+       
+      }
+      
     
     
     cancelSelection() {
@@ -803,9 +809,34 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // this.selectedCategories = []; // Or any logic to reset selection
         this.closeDropdown();
         // this.notify.info('Selection canceled.');
+        this.treeSelect.hide();
+        this.showExistCat = false
+        this.tempDeselectedCategories =[]
+
     }
 
-
+    handleNodeSelect(event: any) {
+        // Custom logic to handle node selection
+        console.log('Node selected:', event.node);
+        // Example: Ensure that only the selected node is in the selection list
+        const selectedNode = event.node;
+        if (!this.selectedClassification.includes(selectedNode)) {
+          this.selectedClassification.push(selectedNode);
+        }
+      }
+    
+      // This method is called when a node is unselected
+      handleNodeUnselect(event: any) {
+        const unselectedNode = event.node;
+        this.selectedClassification = this.selectedClassification.filter(node => node !== unselectedNode);
+      }
+    
+      // Example method to check if a node is selectable
+      isNodeSelectable(node: TreeNode) {
+        // Custom logic to determine if a node should be selectable
+        return true; // Or any condition you need
+      }
+    
 
     deSelectClass(
         classification: any,
@@ -821,12 +852,13 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         } else this.selectedClassification.splice(i, 1);
 
         this.tempDeselectedClassification.push(classification);
+        this.showSelectedClass= true
     }
     saveClassSelection() {
         // Show selected categories and close dropdown
         this.showSelectedClass = true;
         this.closeDropdown();
-    
+        this.showExistClass = false
 
         // this.selectedCategories.forEach((item) => {
             
@@ -875,6 +907,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     
         // Optional: Call any required update or refresh methods
         // this.getAppTransactionClassList(); // Refresh the list if required
+
     }
     
     
@@ -883,7 +916,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         // Implement your cancel logic here
         // this.selectedCategories = []; // Or any logic to reset selection
         this.closeDropdown();
+        this.showExistClass = false
         // this.notify.info('Selection canceled.');
+        this.tempDeselectedClassification =[]
+
     }
     closeDropdown() {
         if (this.treeSelect) {
@@ -892,6 +928,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
       }
       saveCat(category: any, type?: '') {
         console.log(category, 'category');
+        // this.showSelectedCat = true
         let cat = new CreateOrEditSycEntityObjectCategoryDto({
             code: this.category.code,
             name: category.name,
@@ -902,6 +939,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     
         this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
             .pipe(finalize(() => {
+                this.getAppTransactionList();
                 // Optional: Handle finalization logic here
             }))
             .subscribe(() => {
@@ -912,7 +950,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.showCatBtn = false;
         this.addSubCat = false
         this.editSubCat = false
-        this.getAppTransactionList(); // Refresh the list if required
+         // Refresh the list if required
         this.category.name = ''; // Clear the input field after saving
         console.log(this.selectedCategories, 'selectedCategories');
     }
@@ -923,6 +961,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
 saveClass(classification:any,type?:''){
     console.log(classification,'classification') 
+    
     let classificate = new CreateOrEditSycEntityObjectClassificationDto({
         code:  this.classification.code,
         name: this.classification.name,
@@ -936,14 +975,14 @@ saveClass(classification:any,type?:''){
         // this.saving = false;
     }))
     .subscribe(() => {
-    //    this.notify.info(this.l('SavedSuccessfully'));
+       this.notify.info(this.l('SavedSuccessfully'));
+       this.getAppTransactionClassList()
 
     });
     this.showClassBtn = false
     this.addSubClas = false
     this.editSubClass = false
         // this.selectedCategories[0] = {...cat};
-       this.getAppTransactionClassList()
        this.classification.name = ''
         console.log(this.selectedCategories,'selectedCategories')
     
