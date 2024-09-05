@@ -470,7 +470,6 @@
 		<text name="Phone2Ex">Phone 2 ex</text>
 		<text name="Phone3Number">Phone 3 number</text>
 		<text name="Phone3Ex">Phone 3 ex</text>
-		<text name="EMailAddress">E-mail address</text>
 		<text name="AccountInfoTempsHeaderInfo">Account info temps header info</text>
 		<text name="CreateNewAccountInfoTemp">Create new account info temp</text>
 		<text name="EditAccountInfoTemp">Edit account info temp</text>
@@ -2561,5 +2560,20 @@
     <text name="MessageBody">Message body</text>
     <text name="InvalidEmailFormate">Invalid email formate</text>
     <text name="TransactionHasBeenSent">Transaction has been sent</text>
+	<text name="PersonalInformation">Personal Information</text>
+	<text name="WorkSpaceName">Work Space Name</text>
+	<text name="AdminEmailAddressL">Admin Email Address</text>
+		<text name="PersonalEmailAddressL">Personal Email Address</text>
+	<text name="Information">information</text>
+	<text name="EmailAddressR">Email Address</text>
+	<text name="GetStarted">Get Started</text>
+		<text name="FreeEdition">Free Edition</text>
+		<text name="YourAccountCreatedSuccessfully">Your Personal Account Is Created Successfully</text>
+		<text name="AccountCredentials">Account Credentials</text>
+		<text name="ConfirmationMail">Confirmation Mail</text>
+		<text name="CreateBusinessAccount">Create Business Account</text>
+		<text name="CreateGroupAccount">Create Group Account</text>
+		<text name="registrationmailSentto">A registration mail has been Sent*Please Click on the register link in the email in order to create the new to</text>
+		<text name="clickRegisterToCreate"> </text>
   </texts>  
 </localizationDictionary>
