@@ -76,12 +76,12 @@
                   
 </div>
                 <!-- classification -->
-                <app-codes *ngIf="!(classification?.id>0)"
+                <app-codes *ngIf="showAppCodes &&  !(classification?.id>0)"
                     [objectType]="entityObjectClassificationType"
                     [editMode]=false
                     (getCodeValue)="getClassCodeValue($event)" ></app-codes>
 
-                    <app-codes *ngIf="classification?.id>0"
+                    <app-codes *ngIf="showAppCodes &&  classification?.id>0"
                      [objectType]="entityObjectClassificationType"
                      [editMode]=true
                      [code]="classification?.code"
@@ -89,7 +89,7 @@
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
                         <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Classifications</label> 
-                             <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0" (click)="showClassBtn = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Classification</div>
+                             <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0" (click)="showClassBtn = true ; toggleAppCodes() " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Classification</div>
                         <div *ngIf="(allClassFilteredRecords.length != 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0 && !showExistClass)" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2 mb-2">+</span> Add Classification</div>
 
 <div class="d-flex" *ngIf="showSelectedClass || appTransactionsForViewDto?.entityClassifications?.length != 0
@@ -228,7 +228,7 @@ Cancel
 </div>
 
                   
-                        <button *ngIf=" showExistClass" (click)="showClassBtn = true;showExistClass= false" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Classification</button>
+                        <button *ngIf=" showExistClass" (click)="showClassBtn = true;showExistClass= false ; toggleAppCodes()" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Classification</button>
                     </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
@@ -261,19 +261,19 @@ Cancel
                 <!-- classification -->
 
                 <!-- categories -->
-                <app-codes *ngIf="!(category?.id>0)"
+                <app-codes *ngIf="showAppCodes && !(category?.id>0)"
                     [objectType]="entityObjectType"
                     [editMode]=false
                     (getCodeValue)="getCodeValue($event)" ></app-codes>
 
-                <app-codes *ngIf="category?.id>0"
+                <app-codes *ngIf="showAppCodes &&  category?.id>0"
                      [objectType]="entityObjectType"
                      [editMode]=true
                      [code]="category?.code"
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
+                        <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
 
                         <div *ngIf="(filteredRecords.length != 0 &&  appTransactionsForViewDto?.entityCategories?.length == 0 && !showExistCat)" (click)="showExistCat = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2 mb-2">+</span> Add Categories</div>
                          <div class="d-flex" *ngIf="showSelectedCat || appTransactionsForViewDto?.entityCategories?.length != 0">
@@ -440,7 +440,7 @@ Cancel
 </div>
 
                   
-                        <button *ngIf="showExistCat " (click)="showCatBtn = true;showExistCat = false" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Categories</button>
+                        <button *ngIf="showExistCat " (click)="showCatBtn = true;showExistCat = false ; toggleAppCodes()" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Categories</button>
                     </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">

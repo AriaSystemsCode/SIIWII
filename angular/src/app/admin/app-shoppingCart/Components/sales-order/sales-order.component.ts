@@ -98,6 +98,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     addSubClas: boolean = false;
     editSubClass: boolean = false;
     openDropDown: boolean = false;
+    showAppCodes: boolean = false;
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1198,4 +1199,11 @@ cancelClass(){
         this.subscriptions.push(subs);
     }
 
+    toggleAppCodes() {
+        this.showAppCodes = false;
+        setTimeout(() => {
+          this.showAppCodes = true; // Re-render app-codes after a delay
+        }, 0); // Delay to force Angular to re-create the component
+      }
+      
 }
