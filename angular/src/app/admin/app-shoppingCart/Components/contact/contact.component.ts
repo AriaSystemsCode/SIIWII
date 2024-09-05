@@ -41,7 +41,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     contactNamePlaceholder: string = "Select Contact Name";
     defaultcontactNamePlaceholder: string = "Select Contact Name";
     contactFilterValue: string = "";
-    
+
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -57,6 +57,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     ngOnChanges(changes: SimpleChanges) {
+       if( changes?.currentTab?.currentValue !== undefined &&
+        this.activeTab ==changes?.currentTab?.currentValue ){
+            this.activeTab =changes?.currentTab?.currentValue;
         if (this.appTransactionsForViewDto && this.activeTab != null && (this.activeTab >=0) ) {
             this.companeyNames=this.appTransactionsForViewDto?.companeyNames;
             this.showMainSpinner();
@@ -64,6 +67,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.getAppTransactionContactsIndex();
             this.getAllCompaniesData();
         }
+    }
     }
     resetSelectedData() {
         if(this.appTransactionContactsIndex>=0){
@@ -149,6 +153,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     getAppTransactionContactsIndex() {
         this.appTransactionContactsIndex = -1;
+
         let _contactRole: ContactRoleEnum;
         switch (this.activeTab) {
             case ShoppingCartoccordionTabs.orderInfo:
@@ -198,6 +203,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             this.appTransactionsForViewDto.appTransactionContacts.push(appTransactionContactDto);
             this.appTransactionContactsIndex = this.appTransactionsForViewDto?.appTransactionContacts.length - 1;
         }
+
+      
     }
 
 

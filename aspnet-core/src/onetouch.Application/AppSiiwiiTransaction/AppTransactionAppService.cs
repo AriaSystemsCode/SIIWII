@@ -723,9 +723,11 @@ namespace onetouch.AppSiiwiiTransaction
                             ContactRole = ContactRoleEnum.Creator.ToString(),
                             CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                             CompanyName = contactCompany != null ? contactCompany.Name : null,
-                            BranchName = null,
-                            BranchSSIN = null
-                        });
+                            BranchName = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchName :
+                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchName: null),
+                            BranchSSIN = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchSSIN:
+                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchSSIN: null)
+                        }) ;
                         //MMT2024[start]
                         //MMT2024[End]
                         if (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole.Contains("Independent Sales Rep"))
@@ -3672,7 +3674,12 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                         }
                         //MMT
+
                         viewTrans.IsOwnedByMe = (AbpSession.TenantId == viewTrans.TenantOwner);
+                        viewTrans.TotalQuantity = transOrg.TotalQuantity;
+                        viewTrans.TotalAmount = transOrg.TotalAmount;
+                        viewTrans.TransactionType = transOrg.EntityObjectTypeCode == "SALESORDER" ? TransactionType.SalesOrder : TransactionType.PurchaseOrder;
+                        viewTrans.EntityStatusCode = transOrg.EntityObjectStatusCode;
                         if (viewTrans.AppTransactionContacts!=null && viewTrans.AppTransactionContacts.Count>0)
                         {
                             foreach (var cont in viewTrans.AppTransactionContacts)
@@ -3690,6 +3697,55 @@ namespace onetouch.AppSiiwiiTransaction
                                 
                             }
                         }
+                        //MMT-Performance[Start]
+                        viewTrans.IsOrderInformationValid = false;
+                        var creator = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Creator).FirstOrDefault();
+                        if (creator!=null)
+                            viewTrans.IsOrderInformationValid = (!string.IsNullOrEmpty(creator.CompanyName) && !string.IsNullOrEmpty(creator.BranchName)) &&
+                                        !string.IsNullOrEmpty(viewTrans.CurrencyCode) && (viewTrans.CurrencyExchangeRate!=0) &&  viewTrans.AvailableDate != new DateTime(1, 1, 1) &&
+                                        viewTrans.CompleteDate != new DateTime(1, 1, 1) && viewTrans.StartDate != new DateTime(1, 1, 1) &&
+                                        viewTrans.EnteredDate != new DateTime(1, 1, 1) ;
+
+                        viewTrans.IsSellerContactInformationValid = false;
+                        var sellor = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Seller).FirstOrDefault();
+                        if (sellor!=null)
+                            viewTrans.IsSellerContactInformationValid = (!string.IsNullOrEmpty(sellor.CompanyName) && !string.IsNullOrEmpty(sellor.BranchName))  ;
+                        
+                        
+                        viewTrans.IsBuyerContactInformationValid = false;
+                        var buyer = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Buyer).FirstOrDefault();
+                        if (buyer!=null)
+                            viewTrans.IsBuyerContactInformationValid= (!string.IsNullOrEmpty(buyer.CompanyName) && !string.IsNullOrEmpty(buyer.BranchName));
+
+                        viewTrans.IsSalesRepInformationValid = true;
+                        var salesRep = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.SalesRep1).FirstOrDefault();
+                        if (salesRep!=null)
+                            viewTrans.IsSalesRepInformationValid = viewTrans.IsSalesRepInformationValid && (!string.IsNullOrEmpty(salesRep.CompanyName) && !string.IsNullOrEmpty(salesRep.BranchName));
+
+                        var salesRep2 = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.SalesRep2).FirstOrDefault();
+                        if (salesRep2 != null)
+                            viewTrans.IsSalesRepInformationValid = viewTrans.IsSalesRepInformationValid && (!string.IsNullOrEmpty(salesRep2.CompanyName) && !string.IsNullOrEmpty(salesRep2.BranchName));
+
+                        
+                        viewTrans.IsShippingInformationValid = false;
+                        var shipTo= viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipToContact).FirstOrDefault();
+                        var shipFrom = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipFromContact).FirstOrDefault();
+                        if (shipTo!=null && shipFrom!=null)
+                           viewTrans.IsShippingInformationValid = (!string.IsNullOrEmpty(shipTo.CompanyName) && !string.IsNullOrEmpty(shipTo.BranchName)) &&
+                                (!string.IsNullOrEmpty(shipFrom.CompanyName) && !string.IsNullOrEmpty(shipFrom.BranchName)) &&
+                                !string.IsNullOrEmpty(shipTo.ContactAddressCode) && !string.IsNullOrEmpty(shipTo.ContactAddressLine1) &&
+                                !string.IsNullOrEmpty(shipFrom.ContactAddressCode) && !string.IsNullOrEmpty(shipFrom.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.ShipViaCode);
+
+
+                        viewTrans.IsBillingInformationValid = false;
+                        var apContact = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.APContact).FirstOrDefault();
+                        var arContact = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ARContact).FirstOrDefault();
+                        if (shipTo != null && shipFrom != null)
+                            viewTrans.IsBillingInformationValid = (!string.IsNullOrEmpty(apContact.CompanyName) && !string.IsNullOrEmpty(apContact.BranchName)) &&
+                                 (!string.IsNullOrEmpty(arContact.CompanyName) && !string.IsNullOrEmpty(arContact.BranchName)) &&
+                                 !string.IsNullOrEmpty(arContact.ContactAddressCode) && !string.IsNullOrEmpty(arContact.ContactAddressLine1) &&
+                                 !string.IsNullOrEmpty(apContact.ContactAddressCode) && !string.IsNullOrEmpty(apContact.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.PaymentTermsCode);
+                        //MMT-Performance[End]
                         return viewTrans;
                     }
 

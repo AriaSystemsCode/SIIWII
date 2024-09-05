@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
 import { ShoppingCartoccordionTabs } from "../../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -10,7 +10,7 @@ import { AddressComponent } from '../../address/address.component';
   templateUrl: './create-or-edit-billing-info.component.html',
   styleUrls: ['./create-or-edit-billing-info.component.scss']
 })
-export class CreateOrEditBillingInfoComponent extends AppComponentBase  implements OnInit,OnChanges{
+export class CreateOrEditBillingInfoComponent extends AppComponentBase  implements OnInit,OnChanges,AfterViewInit{
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
@@ -46,15 +46,33 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
     super(injector);
 
   }
+
+  ngAfterViewInit() {
+    if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
+    this.loadAddresComponentShipFrom = true;
+    this.contactIdApContact = this.apContactdata?.compId;
+      if( this.AddressComponentChild)
+    this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
+
+      this.contactIdARContact = this.arContactdata?.compId;
+      this.loadAddresComponentShipTo = true;
+      if( this.AddressComponentChild)
+      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
+    }
+      
+  }
   ngOnInit() {
+    if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
     apContactObj[0]?.companySSIN  && apContactObj[0]?.contactAddressDetail?.addressLine1 ? this.apContactSelectedAdd = apContactObj[0]?.contactAddressDetail : null;
     let arContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ARContact);
     arContactObj[0]?.companySSIN  && arContactObj[0]?.contactAddressDetail?.addressLine1 ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
-    this.loadpayTermsListListist();
+  //  this.loadpayTermsListListist();
+    }
   }
   ngOnChanges(changes: SimpleChanges) {
+    if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
     if (this.appTransactionsForViewDto) {
       this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
       let apContactObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.APContact);
@@ -63,6 +81,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       arContactObj[0]?.companySSIN && arContactObj[0]?.contactAddressDetail?.addressLine1  ? this.arContactSelectedAdd = arContactObj[0]?.contactAddressDetail : null;
       this.loadpayTermsListListist();
     }
+  }
   }
 
   updateTabInfo(addObj, contactRole) {
@@ -157,28 +176,20 @@ debugger
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
   }
+
+  apContactdata;
+  arContactdata;
+
   reloadAddresscomponentAPContact(data) {
-    this.loadAddresComponentShipFrom = true;
-    this.contactIdApContact = data.compId;
-   // this.apContactSelectedAdd = null;
-    //if(data.compssin){
-      if( this.AddressComponentChild)
-    this.AddressComponentChild['first']?.getAddressList(data.compssin);
 
-    //}
-
+    this.apContactdata=data;
   }
+
+   
   reloadAddresscomponentARContact(data) {
-    //if(data.compssin){
-    this.contactIdARContact = data.compId;
-    this.loadAddresComponentShipTo = true;
- //   this.arContactSelectedAdd = null;
-    if( this.AddressComponentChild)
-    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
-
-    // }
-
+    this.arContactdata=data;
   }
+
   createOrEditTransaction() {
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)

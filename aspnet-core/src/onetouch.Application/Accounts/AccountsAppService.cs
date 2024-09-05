@@ -4315,7 +4315,19 @@ namespace onetouch.Accounts
                 throw new UserFriendlyException(L("CodeIsAlreadyExists", input.Code));
 
             }
-            return ObjectMapper.Map<AppAddressDto>(value);
+            //return ObjectMapper.Map<AppAddressDto>(value);
+            var returnObj = ObjectMapper.Map<AppAddressDto>(value);
+            if (input.CountryId != null)
+            {
+                var countryObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeCountryId();
+                var country = await _appEntityRepository.GetAll().Where(z => z.Id == input.CountryId && z.EntityObjectTypeId == countryObjectTypeId).FirstOrDefaultAsync();
+                if (country != null)
+                {
+                    returnObj.CountryCode = country.Code;
+                    returnObj.CountryIdName = country.Name;
+                }
+            }
+            return returnObj;
         }
 
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
