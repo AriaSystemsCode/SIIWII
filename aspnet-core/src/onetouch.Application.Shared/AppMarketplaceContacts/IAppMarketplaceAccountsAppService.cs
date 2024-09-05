@@ -12,13 +12,13 @@ using onetouch.AppMarketplaceContacts.Dtos;
 
 namespace onetouch.AppMarketplaceAccounts
 {
-    public interface IMarketplaceAccountsAppService : IApplicationService 
+    public interface IMarketplaceAccountsAppService //: IApplicationService 
     {   Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input);
 
 
 
     }
-    public interface ICreateMarketplaceAccount : IApplicationService
+    public interface ICreateMarketplaceAccount //: IApplicationService
     {
         Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input, bool sync);
          

@@ -25,3 +25,81 @@ button{
 a {
     color:$bold-color !important; 
 }
+.Login_container{
+    border: 1px solid #EEEEEE    ;
+    border-radius: 20px;
+    max-width: 90% !important;
+    margin-top: 0px !important;
+    padding: 50px 20px;
+
+}
+.title_KeyColor{
+    color: #1B101B !important;
+    font-weight: 600;
+}
+.Primer_colour{
+    color: #4A0D4A;
+}
+.sub_titleLog{
+    color: #1B101B !important;
+    font-weight: 600;
+}
+.StarInfo {
+    color: #F6851D;
+}
+.Secondary_colour{
+    color: #F6851D;
+}
+#forget-password {
+    color: #4A0D4A !important;
+    font-weight: 600;
+    text-decoration: underline;
+}
+.login_button{
+    width: 100%;
+    margin-top: 6%;
+}
+.login_button:hover, .login_button:focus , .login_button{
+    background-color: #4A0D4A !important;
+    border: 1px solid #4A0D4A !important;
+    cursor: pointer;
+}
+#email-activation-btn {
+    color: #4A0D4A !important;
+    font-weight: 500;
+    box-shadow:0 4px 10px 0px rgba(0, 0, 0, 0.2), 0 0px 0px 0px rgba(0, 0, 0, 0.19);
+    text-align: center;
+    padding: 7px 30px;
+    border-radius: 3px;
+}
+#kt_login.kt-grid.kt-grid--hor.kt-grid--root {
+    max-width: 95% !important;
+    margin: auto;
+    height: 95% !important;
+}
+.kt-login__wrapper {
+    border-top-right-radius: 20px !important;
+    border-bottom-right-radius: 20px !important;
+}
+.kt-login__aside {
+    border-top-left-radius: 20px !important;
+    border-bottom-left-radius: 20px !important;
+}
+.MT0{
+    margin-top: 0px !important;
+}
+.MB20{
+    margin-bottom: 20px !important;
+}
+.PL10{
+    padding-left: 10px !important;
+}
+.W600{
+    font-weight: 600;
+}
+.kt-login__divider{
+    margin: 10px auto 50px auto !important;
+}
+.kt-divider_P1,.kt-divider_P2{
+    height: 3px !important;
+}

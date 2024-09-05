@@ -36,10 +36,26 @@
 }
 
 .backBtn{
-    background-color: $bold-color;
-    color: white;
+    color: #4A0D4A !important;
+    font-weight: 500;
+    border-radius: 3px;
 }
 
 .submitBtn{
-    background-color: $light-color !important;
+    // background-color: $light-color !important;
+    color: white;
+    background-color: #4A0D4A !important;
+}
+.edition_label{
+    font-size: 20px;
+    font-weight: 500;
+    color: #9E9E9E;
+    margin-top: 16px;
+}
+.Personal_Info {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1B101B;
+    width: 100%;
+    margin-bottom: 20px;
 }

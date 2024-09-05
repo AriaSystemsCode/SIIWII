@@ -115,12 +115,13 @@
                                     ></div>
                                     <div class="mb-4 mb-md-0 text-center" >
                                         <a
-                                            class="btn btn-hover-primary font-weight-normal toolbar-btn"
-                                            (click)="showSendMail()"
-                                            style="background-color: #6259CE !important; color: white !important;border: none !important;"
-                                        >
+                                            class="btn font-weight-normal toolbar-btn btn_Primary"
+                                            (click)="showSendMail()">
+                                            <img
+                                            src="../../assets/img/input_icons/user-plus.png"
+                                            class="alarmInfo">
                                             {{ "InvitePartner" | localize }}
-                                            <i class="fas fa-share-alt" style="color: white !important;"></i>
+                                            <!-- <i class="fas fa-share-alt" style="color: white !important;"></i> -->
                                         </a>
                                         <ng-container *ngIf="showAddButton">
                                             <a
@@ -190,14 +191,9 @@
 
                                     <div class="text-center">
                                         <a
-                                            style="
-                                                padding-right: 4px;
-                                                padding-left: 10px;
-                                                background-color: transparent !important;
-    border: none !important;
-                                            "
+                                        
                                             [title]="'ResetData' | localize"
-                                            class="btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn"
+                                            class="btn font-weight-normal text-center text-primary toolbar-btn ResetData_btn"
                                             (click)="resetList()"
                                         >
                                             <i
@@ -208,15 +204,14 @@
                                             style="padding-left: 10px"
                                             [title]="'ToggleView' | localize"
                                             (click)="triggerListView()"
-                                            class="btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn"
-                                            style="background-color: #F88011 !important; border: none !important;"
-                                        >
+                                            class="btn font-weight-normal pr-1 text-center text-primary toolbar-btn btn_Primary" >
+
                                             <i
                                                 class="d-inline-block w-100"
                                                 [ngClass]="
                                                     singleItemPerRowMode
                                                         ? 'flaticon2-menu'
-                                                        : 'fa-bars fas'
+                                                        : 'fa fa-th'
                                                 "
                                             ></i>
                                         </a>

@@ -193,13 +193,13 @@
                 <div class="kt-portlet__body p-0">
                     <div class="row p-28">
                         <div class="col-4" *ngIf="accountData && accountData.accountType">
-                            <p class="title-dev-slider text-left">{{"AccountType" | localize}}</p>
+                            <p class="title-dev-slider text-left emailColor">{{"AccountType" | localize}}</p>
                         </div>
                         <div class="col-4" *ngIf="accountData && accountData.ssin">
-                            <p class="title-dev-slider text-left">{{"AccountSSIN" | localize}}</p>
+                            <p class="title-dev-slider text-left emailColor">{{"AccountSSIN" | localize}}</p>
                         </div>
                         <div class="col-4" *ngIf="(accountData && accountData.priceLevel && !accountData.isConnected ) ||(accountData  && accountData.isConnected && !showEditConnected) || (accountData  && accountData.isConnected && accountData.priceLevel  && showEditConnected ) ">
-                            <p class="title-dev-slider text-left">{{"PriceLevel" | localize}}</p>
+                            <p class="title-dev-slider text-left emailColor">{{"PriceLevel" | localize}}</p>
                         </div>
                     </div>
 
@@ -245,7 +245,7 @@
         <div class="p-4 seeMoreContainer">
             <div class="row pl-3">
                 <div>
-                    <h6 class="header">{{ "Departments" | localize }}:</h6>
+                    <h6 class="header emailColor">{{ "Departments" | localize }}:</h6>
                 </div>
             </div>
             <div
@@ -299,7 +299,7 @@
             <div class="p-4 seeMoreContainer">
                 <div class="row pl-3">
                     <div>
-                        <h6 class="header">
+                        <h6 class="header emailColor">
                             {{ "BusinessClassifications" | localize }}:
                         </h6>
                     </div>

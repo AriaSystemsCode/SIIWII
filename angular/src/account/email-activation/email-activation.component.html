@@ -1,20 +1,25 @@
-<div class="kt-login__form" [@routerTransition]>
+<div class="kt-login__form Login_container" [@routerTransition]>
     <div class="kt-login__title">
-        <h3>
+        <h3 class="text-left EmailActivation">
             {{"EmailActivation" | localize}}
         </h3>
 
-        <form class="kt-form" #emailActivationForm="ngForm" method="post" novalidate (ngSubmit)="save()">
-            <p>
-                {{"SendEmailActivationLink_Information" | localize}}
+        <form class="kt-form text-left MT0" #emailActivationForm="ngForm" method="post" novalidate (ngSubmit)="save()">
+            <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo">
+            <p class="text-left alarmInfo_title">
+                  {{"SendEmailActivationLink_Information" | localize}}
             </p>
-            <div class="form-group">
-                <input #emailAddressInput="ngModel" [(ngModel)]="model.emailAddress" class="form-control form-control-solid placeholder-no-fix input-ltr" type="email" autocomplete="new-password" placeholder="{{'EmailAddress' | localize}} *" name="emailAddress" required maxlength="256" email />
+            <div class="form-group text-left MT40 p_relative">
+                <label class="sub_titleLog">{{'	EmailAddress' | localize}} <span class="StarInfo">*</span></label>
+                <img src="../../assets/img/input_icons/user.png" class="User_icon icon-width">
+                <input #emailAddressInput="ngModel" [(ngModel)]="model.emailAddress" class="MT0 form-control form-control-solid placeholder-no-fix input-ltr" type="email" autocomplete="new-password" placeholder="{{'EmailAddress' | localize}} *" name="emailAddress" required maxlength="256" email />
                 <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
             </div>
             <div class="kt-login__actions">
-                <button [disabled]="saving"  routerLink="/account/login" type="button" class="backBtn bgPurple btn btn-light btn-elevate kt-login__btn-secondary"><i class="fa fa-arrow-left"></i> {{"Back" | localize}}</button>
-                <button type="submit" class="submitBtn btn btn-elevate kt-login__btn-primary" [disabled]="!emailActivationForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-check"></i> {{"Submit" | localize}}</button>
+                <button [disabled]="saving"  routerLink="/account/login" type="button" class="backBtn btn btn-light btn-elevate kt-login__btn-secondary">  {{"Back" | localize}}</button>  
+                <!-- <i class="fa fa-arrow-left"></i> -->
+                <button type="submit" class="submitBtn btn btn-elevate kt-login__btn-primary" [disabled]="!emailActivationForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> {{"Submit" | localize}}</button>
+                <!-- <i class="fa fa-check"></i> -->
             </div>
         </form>
     </div>

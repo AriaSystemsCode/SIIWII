@@ -72,19 +72,19 @@
               </div>
               <div class="sidebar-item-data">
                 <div class="row row-item row-item-main-data">
-                  <div class="col-md-4 row-item-title">{{l("Email")}}</div>
+                  <div class="col-md-4 row-item-title emailColor">{{l("Email")}}</div>
                   <div class="col-md-8 row-item-desc text-right">
                     <span > {{ accountDataForView?.eMailAddress || '-' }} </span>
                   </div>
                 </div>
                 <div class="row row-item row-item-main-data">
-                  <div class="col-md-4 row-item-title">{{l("Phone")}}</div>
+                  <div class="col-md-4 row-item-title emailColor">{{l("Phone")}}</div>
                   <div class="col-md-8 row-item-desc text-right">
                     <span > {{ accountDataForView?.phone1Number || '-' }}</span>
                   </div>
                 </div>
                 <div class="row row-item row-item-main-data">
-                  <div class="col-md-4 row-item-title">{{l("Website")}}</div>
+                  <div class="col-md-4 row-item-title emailColor">{{l("Website")}}</div>
                   <div class="col-md-8 row-item-desc text-right">
                     <span> {{ accountDataForView?.website || '-' }} </span>
                   </div>
@@ -108,7 +108,7 @@
                 <li class="nav-item">
                   <a class="nav-link d-flex w-100 justify-content-between" (click)="changeTab( !accountInfoTemp?.id && !accountId ? accountInfoPageTabsEnum.ProfileCreateOrEdit : accountInfoPageTabsEnum.ProfileView  )"  [ngClass]="{'active' :currentTab ==  accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit }">
                     <span>
-                        <img class="sidebar-menu-item-img" *ngIf="currentTab === accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit" src="assets/profile/My-Account-Information-Activated.svg">
+                        <img class="sidebar-menu-item-img" *ngIf="currentTab === accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit" src="/assets/img/input_icons/bage-prof.png">
                         <img class="sidebar-menu-item-img" *ngIf="currentTab !== accountInfoPageTabsEnum.ProfileView && currentTab !== accountInfoPageTabsEnum.ProfileCreateOrEdit" src="assets/profile/My-Account-Information-Default.svg">
                         <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                           {{l("MyProfile")}}

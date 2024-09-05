@@ -1,9 +1,58 @@
 @import '../../assets/styles/base/variables';
 
 .backBtn{
-    color: white !important;
+    color: #4A0D4A !important;
+    font-weight: 500;
+    // box-shadow:0 4px 10px 0px rgba(0, 0, 0, 0.2), 0 0px 0px 0px rgba(0, 0, 0, 0.19);
+    // text-align: center;
+    // padding: 7px 30px;
+    border-radius: 3px;
 }
-
+// $light-color
 .submitBtn{
-   background-color: $light-color !important;
+   background-color:#4A0D4A !important;
+   color: white;
 }
+// .Login_container{
+//     border: 1px solid #EEEEEE    ;
+//     border-radius: 20px;
+//     max-width: 90% !important;
+//     margin-top: 0px !important;
+//     padding: 50px 20px;
+
+// }
+
+
+// .sub_titleLog{
+//     color: #1B101B !important;
+//     font-weight: 600;
+// }
+// .MT0{
+//     margin-top: 0px !important;
+// }
+// .alarmInfo {
+//     font-size: 22px;
+//     color: #F6851D;
+//     vertical-align: super;
+//     padding-right: 10px;
+
+//     display: inline-block;
+
+// }
+.EmailActivation{
+    margin-bottom: 40px;;
+}
+// .alarmInfo_title{
+//     display: inline-block;
+//     width: 90%;
+//     vertical-align: middle;
+// }
+// .MT40{
+//     margin-top: 40px !important;
+// }
+// .MB0{
+//     margin-bottom: 0px !important;
+// }
+// .MB20{
+//     margin-bottom: 20px !important;
+//     }

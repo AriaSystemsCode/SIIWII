@@ -1,20 +1,30 @@
 @import "../../../../../assets/styles/base/variables";
-.toolbar-btn {
-    color: $primary-color;
-    background-color: $blue-light;
-    border-color: $blue-light;
-    i {
-        color: $primary-color;
-    }
-    &:hover i {
-        color: $white;
-    }
-}
+// .toolbar-btn {
+//     color: $primary-color;
+//     background-color: $blue-light;
+//     border-color: $blue-light;
+//     i {
+//         color: $primary-color;
+//     }
+//     &:hover i {
+//         color: $white;
+//     }
+// }
 
 .fa-bars:before{
     color: white !important;
 }
 
 .flaticon2-reload:before {
-    color: #6259CE !important;
+    color: #4a0d4a !important;
+}
+.ResetData_btn {
+    background-color: transparent !important;
+    border: 1px solid #c7c7c7 !important;
+    text-align: center !important;
+    
+}
+.ResetData_btn i{
+ color: #4A0D4A !important;
+ padding: 0px;
 }

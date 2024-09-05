@@ -1,28 +1,38 @@
-<div class="kt-login__form" [@routerTransition]>
-    <h4>{{"SuccessfullyRegistered" | localize}}</h4>
-
-    <ul>
-        <li><span class="text-muted"> {{model.accountType?.split(' ')[0]}} {{ "WorkspaceName" | localize}}:</span> {{model.tenancyName}}</li>
-        <li><span class="text-muted">{{"Account Type" | localize}}:</span> {{model.accountType}}</li>
-        <li><span class="text-muted">{{"AccountName" | localize}}:</span> {{model.name}}</li>
-        <li><span class="text-muted">{{"FirstName" | localize}}:</span> {{model.firstName}}</li>
-        <li><span class="text-muted">{{"LastName" | localize}}:</span> {{model.lastName}}</li>
-        <li><span class="text-muted">{{"UserName" | localize}}:</span> {{model.userName}}@{{model.tenancyName}}</li>
-        <li><span class="text-muted">{{"EmailAddress" | localize}}:</span> {{model.emailAddress}}</li>
-    </ul>
-
+<div class="kt-login__form Login_container shadow borderDesign" [@routerTransition]>
+    <img src="../../assets/img/input_icons/true.png" class="alarmInfo">
+    <h4 class="text-left alarmInfo_title CreatedSuccessfullyLabel">{{"YourAccountCreatedSuccessfully" | localize}}</h4>
     <div>
-        <div *ngIf="model.isEmailConfirmationRequired" class="alert alert-warning" role="alert">
-            {{"ConfirmationMailSentPleaseClickLinkInTheEmail" | localize:model.emailAddress}}
-        </div>
+        <label class="AccountCredentials"> {{"AccountCredentials" | localize}} :</label>
 
-        <div *ngIf="!model.isActive" class="alert alert-primary" role="alert">
-            {{"YourAccountIsWaitingToBeActivatedByAdmin" | localize}}
-        </div>
+        <ul>
+            <li class="w-100"><span class="confirmLabel"> {{model.accountType?.split(' ')[0]}} {{ "WorkspaceName" |
+                    localize}}:</span> {{model.tenancyName}}</li>
+            <li class="w-40"><span class="confirmLabel">{{"FirstName" | localize}}:</span> {{model.firstName}}</li>
+            <li class="w-60"><span class="confirmLabel">{{"UserName" | localize}}:</span>
+                {{model.userName}}@{{model.tenancyName}}</li>
+            <li class="w-40"><span class="confirmLabel">{{"LastName" | localize}}:</span> {{model.lastName}}</li>
+            <li class="w-60"><span class="confirmLabel">{{"AccountName" | localize}}:</span> {{model.name}}</li>
+            <li class="w-40"><span class="confirmLabel">{{"EmailAddress" | localize}}:</span> {{model.emailAddress}}
+            </li>
+            <li class="w-60"><span class="confirmLabel">{{"Account Type" | localize}}:</span> {{model.accountType}}</li>
+        </ul>
+    </div>
+</div>
+<div class="kt-login__form Login_container shadow">
+    <div class="MB20">
+        <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo">
+        <h4 class="text-left alarmInfo_title CreatedSuccessfullyLabel">{{"ConfirmationMail" | localize}}</h4>
+    </div>
+    <div *ngIf="model.isEmailConfirmationRequired" class="">
+        {{"ConfirmationMailSentPleaseClickLinkInTheEmail" | localize:model.emailAddress}}
+    </div>
 
-        <div *ngIf="tenantUrl" class="alert alert-secondary" role="alert">
-            {{"TenantRegistrationLoginInfo" | localize}}<br />
-            <a href="{{tenantUrl}}">{{tenantUrl}}</a>
-        </div>
+    <div *ngIf="!model.isActive" class="">
+        {{"YourAccountIsWaitingToBeActivatedByAdmin" | localize}}
+    </div>
+
+    <div *ngIf="tenantUrl" class="">
+        <label class="ClickToLog">{{"TenantRegistrationLoginInfo" | localize}} :</label>
+        <a href="{{tenantUrl}}">{{tenantUrl}}</a>
     </div>
 </div>
