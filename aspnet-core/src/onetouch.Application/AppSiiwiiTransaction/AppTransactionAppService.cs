@@ -2465,6 +2465,7 @@ namespace onetouch.AppSiiwiiTransaction
                             {
                                 e.Quantity = (double)(NewNoOfPrePack * (e.Quantity / (long)e.NoOfPrePacks));
                                 e.NoOfPrePacks = NewNoOfPrePack;
+                                e.Amount = e.NetPrice * decimal.Parse(e.Quantity.ToString());
                             }
                         };
                         itemMajor.NoOfPrePacks = NewNoOfPrePack;
