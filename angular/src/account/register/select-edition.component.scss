@@ -238,7 +238,11 @@ display: block;
 .FreeEdition_Container{
     background-color: white;
 }
-
+.FreeEdition_Cont {
+    width: 87%;
+    height: 100%;
+    margin: auto;
+}
 
 @media only screen and (max-width: 576px)  {
      .FreeEdition_Desktop_Photo{
@@ -302,8 +306,16 @@ display: block;
   height: 64px;
 }
 
-.startBtn{
-    background-color: $light-color;
+// .startBtn{
+//     background-color: $light-color;
+// }
+.getStart_button {
+    width: 100%;
+    background: white;
+    color: #4A0D4A;
+    font-size: 20px;
+    font-weight: 700;
+    height: 48px;
 }
 
 

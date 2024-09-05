@@ -106,6 +106,16 @@
       padding: 2px 10px;
       border-radius: 5px;
     }
+    .ResetData_btn {
+      background-color: transparent !important;
+      border: 1px solid #c7c7c7 !important;
+      text-align: center !important;
+      
+  }
+  .ResetData_btn i{
+   color: #4A0D4A !important;
+   padding: 0px;
+  }
     @media(max-width:672px){
     .kt-header--fixed.kt-subheader--fixed .kt-subheader {
        min-height: 100px !important;
