@@ -76,54 +76,160 @@
                   
 </div>
                 <!-- classification -->
+                <app-codes *ngIf="showAppCodes &&  !(classification?.id>0)"
+                    [objectType]="entityObjectClassificationType"
+                    [editMode]=false
+                    (getCodeValue)="getClassCodeValue($event)" ></app-codes>
+
+                    <app-codes *ngIf="showAppCodes &&  classification?.id>0"
+                     [objectType]="entityObjectClassificationType"
+                     [editMode]=true
+                     [code]="classification?.code"
+                     (getCodeValue)="getClassCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                      <div class="d-flex"> <label class="label pt-1">Classifications</label>  <div class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Classification</div></div> 
+                        <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Classifications</label> 
+                             <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0" (click)="showClassBtn = true ; toggleAppCodes() " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Classification</div>
+                        <div *ngIf="(allClassFilteredRecords.length != 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0 && !showExistClass)" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2 mb-2">+</span> Add Classification</div>
+
+<div class="d-flex" *ngIf="showSelectedClass || appTransactionsForViewDto?.entityClassifications?.length != 0
+">
+    <div
+    class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
+    *ngFor="let item of appTransactionsForViewDto?.entityClassifications; index as i"
+   
+  >
+    <span>{{ item?.entityObjectClassificationName }}</span>
+    <a class="clear-icon" (click)="deSelectClass(item, i)">
+      <i class="fa fa-1x fa-times fa-1x"></i>
+    </a>
+  </div>
+
+
+
+  <div
+  class="dimmed  m-0 p-0 my-2 d-flex justify-content-between position-relative"
+  *ngFor="let item of tempDeselectedClassification; index as i"
+  style="  border-radius: 4px;
+  border: 1px solid #D9D9D9;
+  background: #D9D9D9 !important;
+  padding: 5px 10px !important;
+  margin-right: 5px !important;
+  font-size: 13px;
+  font-weight: 600;"
+
+>
+  <span>{{ item?.entityObjectClassificationName }}</span>
+  <a class="clear-icon-d" style="background-color: #D9D9D9;">
+    <i class="fa fa-1x fa-times fa-1x"></i>
+  </a>
+</div>
+<div *ngIf="(allClassFilteredRecords.length != 0 &&  !showExistClass )" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Classification</div>
+</div>
+
+                            <!-- </div> -->
+
+         
+</div>
+
+
+<div class="d-flex" *ngIf="(showClassBtn || allClassFilteredRecords.length == 0 ) && !showExistClass">
+    <div  class="formGroup  col-8">
+      
+        <input
+        
+            type="text"
+            placeholder="classification"
+            class="form-control "
+            style="width: 95% !important;"
+            [(ngModel)]="classification.name"
+            
+        />
+     
+   
+    </div>
+    <button
+   
+ 
+   (click)="saveClass(classification);hideClassBtn =true;showClassBtn = false"
+    class="previewbtn text-center btn "
+>
+    Save
+
+</button>
+<button
+(click)="cancelClass();hideClassBtn =true;showExistClass = true;showClassBtn = false;
+"
+class="cancelbtn text-center btn "
+>
+Cancel
+
+</button>
+ </div>
+                   
+<!-- </div>       -->
+<div class="d-flex" *ngIf=" allClassFilteredRecords.length != 0">
+ 
 
 
 
 
 
-                      <!-- if has selection -->
-                        <!-- <div
-                            class="align-items-center big-scroll categoriesClassificationsContainer px-3 py-2 d-flex h-100 row   w-100 border"
-                        >
-                            <p
-                                class="previewValue classificationsValues mr-2 p-0 my-0"
-                                *ngFor="
-                                    let item of appTransactionsForViewDto?.entityClassifications
-                                "
-                            >
-                                {{ item?.entityObjectClassificationName }}
-                                <span 
-                                (click)="classififcationNodeUnSelect(item)">
-                                <i class="flaticon2-delete fa-sm pl-2 pointer"></i>
-                            </span>
-                            </p>
-                            <p
-                                *ngIf="
-                                !appTransactionsForViewDto?.entityClassifications  ||   appTransactionsForViewDto?.entityClassifications
-                                        ?.length === 0
-                                "
-                                class="p-0 m-0 customPlaceHolder"
-                            >
-                                Please select Classification From Tree below
-                            </p>
-                        </div> -->
-                        <!-- <div class="border">
-                            <p-tree
-                                class="w-full md:w-30rem"
-                                [value]="classificationsFiles"
-                                (onNodeExpand)="
-                                    classificationNodeExpand($event)
-                                "
-                                [loading]="loading"
-                                selectionMode="checkbox"
-                                (onNodeSelect)="
-                                    classififcationNodeSelect($event)
-                                "
-                            ></p-tree>
-                        </div> -->
+<div *ngIf="showExistClass"  class="flex justify-content-center treeSel"    >
+    <p-treeSelect 
+    class="w-full md:w-20rem"
+    containerStyleClass="w-full"
+    [(ngModel)]="selectedClassification"
+    [options]="allClassFilteredRecords"
+    display="chip"
+    selectionMode="checkbox"
+    placeholder="Select Item"
+    [filter]="true"
+    filterPlaceholder="Search Items"
+    (onNodeSelect)="handleNodeSelect($event)"
+    (onNodeUnselect)="handleNodeUnselect($event)"
+>
+    <ng-template pTemplate="default">
+        <div class="header p-2 d-flex align-items-center justify-content-between">
+            <div>
+                <input type="checkbox" (change)="toggleSelectAll($event)" /> Select All
+            </div>
+            <button class="btn btn-link" (click)="collapseAll()">Collapse All</button>
+        </div>
+    </ng-template>
+    
+    <ng-template let-node pTemplate="default">
+        <div (click)="onLabelClick($event)" class="d-flex justify-content-between">
+            <span style="margin-top: 8px;">{{ node.label }}</span>
+            <div class="treenode-action">
+                <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
+                    <button title="actions" class="dropdown-toggle btn btn-sm" aria-controls="dropdown-alignment" dropdownToggle>
+                        <div class="three-dots"></div>
+                    </button>
+                    <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right" *dropdownMenu>
+                        <li><a (click)="addAsNewChildClass(node);showClassBtn = true;showExistClass= false">{{ "AddSubClassification" | localize }}</a></li>
+                        <li><a (click)="EditClass(node);showClassBtn = true;showExistClass= false">{{ "Edit" | localize }}</a></li>
+                        <li><a (click)="deleteClass(node)">{{ "Delete" | localize }}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template let-last pTemplate="footer">
+        <div class="d-flex justify-content-end p-2">
+            <button class="btn bgPurple" (click)="saveClassSelection()">Save</button>
+            <button class="btn btn-secondary" (click)="cancelClassSelection()">Cancel</button>
+        </div>
+    </ng-template>
+</p-treeSelect>
+
+
+</div>
+
+                  
+                        <button *ngIf=" showExistClass" (click)="showClassBtn = true;showExistClass= false ; toggleAppCodes()" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Classification</button>
+                    </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
@@ -155,21 +261,61 @@
                 <!-- classification -->
 
                 <!-- categories -->
-                <app-codes *ngIf="!(category?.id>0)"
+                <app-codes *ngIf="showAppCodes && !(category?.id>0)"
                     [objectType]="entityObjectType"
                     [editMode]=false
                     (getCodeValue)="getCodeValue($event)" ></app-codes>
 
-                    <app-codes *ngIf="category?.id>0"
+                <app-codes *ngIf="showAppCodes &&  category?.id>0"
                      [objectType]="entityObjectType"
                      [editMode]=true
                      [code]="category?.code"
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1">Classifications</label>  <div *ngIf="allRecords.length == 0 " (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div></div> 
+                        <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
 
-                          <!-- <div class="d-flex" *ngIf="showCatBtn || allRecords.length == 0 ">
+                        <div *ngIf="(filteredRecords.length != 0 &&  appTransactionsForViewDto?.entityCategories?.length == 0 && !showExistCat)" (click)="showExistCat = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2 mb-2">+</span> Add Categories</div>
+                         <div class="d-flex" *ngIf="showSelectedCat || appTransactionsForViewDto?.entityCategories?.length != 0">
+                            <div
+                              class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
+                              *ngFor="let item of  appTransactionsForViewDto?.entityCategories; index as i"
+                              [ngClass]="{ 'dimmed': tempDeselectedCategories.includes(item) }"
+                            >
+                              <span>{{ item?.entityObjectCategoryName }}</span>
+                              <a class="clear-icon" (click)="deSelectCat(item, i)">
+                                <i class="fa fa-1x fa-times fa-1x"></i>
+                              </a>
+                            </div>
+
+
+
+                            <div
+                            class="dimmed  m-0 p-0 my-2 d-flex justify-content-between position-relative"
+                            *ngFor="let item of tempDeselectedCategories; index as i"
+                            style="  border-radius: 4px;
+                            border: 1px solid #D9D9D9;
+                            background: #D9D9D9 !important;
+                            padding: 5px 10px !important;
+                            margin-right: 5px !important;
+                            font-size: 13px;
+                            font-weight: 600;"
+                         
+                          >
+                            <span>{{ item?.entityObjectCategoryName }}</span>
+                            <a class="clear-icon-d" >
+                              <i class="fa fa-1x fa-times fa-1x"></i>
+                            </a>
+                          </div>
+
+                          <div *ngIf="filteredRecords.length != 0 &&  !showExistCat" (click)="showExistCat = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div>
+                          </div>
+
+
+                          
+                        </div> 
+                          
+                        <div class="d-flex" *ngIf="(showCatBtn || filteredRecords.length == 0 ) && !showExistCat">
                             <div  class="formGroup  col-8">
                               
                                 <input
@@ -194,98 +340,36 @@
                        
                         </button>
                         <button
-                        (click)="cancelCat()"
+                        (click)="cancelCat();hideCatBtn =true;showExistCat = true;showCatBtn = false;"
                         class="cancelbtn text-center btn "
                         >
                         Cancel
                        
                         </button>
-                         </div> -->
+                         </div>
 
-<!-- <div class="d-flex" *ngIf="!showCatBtn && appTransactionsForViewDto?.entityCategories
-?.length === 0">
-    <p
-    class="previewValue classificationsValues  m-0 p-0  my-2"
-    *ngFor="
-        let item of selectedCategories
-    "
->
-    {{ item?.entityObjectCategoryName}}
-</p>
-
-            <p
-            class="previewValue classificationsValues  m-0 p-0  my-2"
-            *ngFor="
-                let item of appTransactionsForViewDto?.entityCategories
-            "
-            >
-            {{ item?.entityObjectCategoryName}}
-            </p>
-</div> -->
-
-
-                        <!-- if no selection -->
-                        <!-- <div
-                            class="categoriesClassificationsContainer  big-scroll  h-100 row align-tems-center border flex-row px-3 py-2 rounded row thin-scroll w-100 border"
-                        >
-                            <p
-                                class="previewValue categoriesValues mr-2 p-0"
-                                *ngFor="
-                                    let item of appTransactionsForViewDto?.entityCategories
-                                "
-                            >
-                                {{ item?.entityObjectCategoryName }}
-                                <span 
-                                (click)="categoriesNodeUnSelect(item)">
-                                <i class="flaticon2-delete fa-sm pl-2 pointer"></i>
-                            </span>
-                            </p>
-                            <p
-                                *ngIf="
-                                !appTransactionsForViewDto?.entityCategories  ||  appTransactionsForViewDto?.entityCategories
-                                        ?.length === 0
-                                "
-                                class="p-0 m-0 customPlaceHolder"
-                            >
-                                Please select Categories From Tree below
-                            </p>
-                        </div>
-                        <div class="border">
-                            <p-tree
-                                class="w-full md:w-30rem"
-                                [value]="categoriesFiles"
-                                (onNodeExpand)="categoriesNodeExpand($event)"
-                                [loading]="loading"
-                                selectionMode="checkbox"
-                                (onNodeSelect)="categoriesNodeSelect($event)"
-
-                            ></p-tree>
-                        </div>
-                         -->
                       
-                   
-<div class="d-flex" *ngIf=" allRecords.length != 0">
+<div class="d-flex"  *ngIf=" filteredRecords.length != 0">
  
 
 
 
 
-<!-- 
-<div *ngIf="!showCatBtn"  class="flex justify-content-center treeSel"   style="z-index:9999999999 !important ;" >
+
+<div *ngIf="  showExistCat"  class="flex justify-content-center treeSel"   >
     <p-treeSelect 
     class="w-full md:w-20rem"
     containerStyleClass="w-full"
     [(ngModel)]="selectedCategories"
-    [options]="allRecords"
+    [options]="filteredRecords"
     display="chip"
     [metaKeySelection]="false"
     selectionMode="checkbox"
     placeholder="Select Item"
     [filter]="true"
-    filterPlaceholder="Search Items"
-    (click)="categoriesNodeSelect($event)"
-    (onNodeExpand)="onNodeToggle($event, true)"
-    (onNodeCollapse)="onNodeToggle($event, false)"
+    filterPlaceholder="Search Items" 
+  
+ 
     >
 
     <ng-template pTemplate="default">
@@ -298,49 +382,51 @@
     </ng-template>
         <ng-template let-node pTemplate="default">
             <div (click)="onLabelClick($event)" class="d-flex justify-content-between">
-                <span  >{{ node.label }}</span>
-                <div class="dropdown" dropdown>
+                <span style="margin-top: 8px;" >{{ node.label }}</span>
+                <div
+                class="treenode-action"
+             
+              
+            >
+                <div
+                    class="btn-group dropdown"
+                    dropdown
+                    container="body"
+                    placement="bottom right"
+                >
                     <button
-                        class="btn btn-secondary dropdown-toggle p-0"
-                        type="button"
-                        id="dropdownMenuButton"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
+                        title="actions"
+                        class="dropdown-toggle btn btn-sm "
+                        aria-controls="dropdown-alignment"
                         dropdownToggle
+                    > 
+                    <div class="three-dots"></div>
+
+                </button>
+                    <ul
+                        id="dropdown-alignment"
+                        class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                        *dropdownMenu
                     >
-                        <div class="three-dots"></div>
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" *dropdownMenu>
-                        <div class="pointer">
-                            <a class="link purpleColor p-3" (click)="EditCat(node)">
-                                <img
-                                    src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
-                                    class="imgIcon"
-                                />
-                                {{ 'Edit' }}
-                            </a>
-                        </div>
-                        <div class="pointer">
-                            <a class="link purpleColor p-3" (click)="addAsNewChild(node)">
-                                <img
-                                    src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
-                                    class="imgIcon"
-                                />
-                                {{ 'Add SubCategory' }}
-                            </a>
-                        </div>
-                        <div class="pointer">
-                            <a class="link purpleColor p-3" (click)="deleteCat(node.id)">
-                                <img
-                                    src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
-                                    class="imgIcon"
-                                />
-                                {{ 'Delete' }}
-                            </a>
-                        </div>
-                    </div>
+                        <li>
+                            <a (click)="addAsNewChild(node);showCatBtn= true;showExistCat= false">{{
+                                "AddSubcategory" | localize
+                            }}</a>
+                        </li>
+                        <li>
+                            <a
+                                (click)="EditCat(node);showCatBtn= true;showExistCat= false"
+                                >{{ "Edit" | localize }}</a
+                            >
+                        </li>
+                        <li>
+                            <a (click)="deleteCat(node)">{{
+                                "Delete" | localize
+                            }}</a>
+                        </li>
+                    </ul>
                 </div>
+            </div>
             </div>
         </ng-template>
 
@@ -351,10 +437,10 @@
             </div>
         </ng-template>
     </p-treeSelect>
-</div> -->
+</div>
 
                   
-                        <!-- <button *ngIf="!showCatBtn" (click)="showCatBtn = true" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add Categories</button> -->
+                        <button *ngIf="showExistCat " (click)="showCatBtn = true;showExistCat = false ; toggleAppCodes()" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Categories</button>
                     </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
