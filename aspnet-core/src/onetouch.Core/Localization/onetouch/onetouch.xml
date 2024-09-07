@@ -1095,6 +1095,7 @@
 		<text name="RemainingDay">Remaining day</text>
 		<text name="SeeAllRecords">See all records</text>
 		<text name="RecentTenants">Recent tenants</text>
+		<text name="RegistrationLink">Registration Link</text>
 		<text name="RecentTenantsHelpText">Last {1} customers registered in {0} days...</text>
 		<text name="ExpiringTenantsHelpText">First {1} clients expiring in {0} days...</text>
 		<text name="NoData">No data</text>

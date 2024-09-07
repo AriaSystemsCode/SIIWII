@@ -4,12 +4,9 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using Abp.Linq.Extensions;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
-using onetouch.Accounts.Exporting;
 using onetouch.Accounts.Dtos;
-using onetouch.Dto;
 using Abp.Application.Services.Dto;
 using onetouch.Authorization;
 using Abp.Extensions;
@@ -27,11 +24,9 @@ using Abp.Collections.Extensions;
 using Abp.UI;
 using onetouch.AccountInfos.Dtos;
 using onetouch.Common;
-using Stripe.Checkout;
 using AuthorizeNet.Api.Contracts.V1;
 using AuthorizeNet.Api.Controllers.Bases;
 using AuthorizeNet.Api.Controllers;
-using Abp.UI;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using onetouch.Configuration;
@@ -39,35 +34,26 @@ using onetouch.SystemObjects;
 using onetouch.SystemObjects.Dtos;
 using System.Data;
 using System.IO;
-//using OfficeOpenXml;
 using Bytescout.Spreadsheet;
 using onetouch.AppItems.Dtos;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using onetouch.Authorization.Users;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.Globals.Dtos;
-using System.ComponentModel;
-using System.Dynamic;
 using onetouch.Globals;
 using onetouch.Notifications;
 using onetouch.Storage;
 using onetouch.Sessions.Dto;
 using AutoMapper;
-using Stripe;
 using Abp.Runtime.Session;
 using onetouch.MultiTenancy;
-using onetouch.AppMarketplaceAccountsPriceLevels;
-using System.Diagnostics;
 using Abp.EntityFrameworkCore.Uow;
 using onetouch.EntityFrameworkCore;
-using Twilio.Rest.Trunking.V1;
 using NUglify.Helpers;
-using Abp.Domain.Entities;
 using onetouch.Attachments;
 using onetouch.AppMarketplaceContacts.Dtos;
 using onetouch.AppMarketplaceContacts;
 using onetouch.AppMarketplaceAccounts;
+using onetouch.EmailingTemplates;
 
 namespace onetouch.Accounts
 {
@@ -83,6 +69,7 @@ namespace onetouch.Accounts
         private readonly IRepository<AppAddress, long> _appAddressRepository;
         private readonly IRepository<AppContactAddress, long> _appContactAddressRepository;
         private readonly IEmailSender _emailSender;
+        private readonly IEmailingTemplateAppService _emailingTemplateAppService;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<AppContactPaymentMethod, long> _appContactPaymentMethodRepository;
@@ -122,8 +109,10 @@ namespace onetouch.Accounts
               SycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService, IAppNotifier appNotifier, IBinaryObjectManager binaryObjectManager,
               TenantManager tenantManager, IRepository<AppEntityAttachment, long> appEntityAttachmentRepository, IRepository<AppAttachment, long> appAttachmentRepository
             , IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository
-            ,ICreateMarketplaceAccount iCreateMarketplaceAccount)
+            ,ICreateMarketplaceAccount iCreateMarketplaceAccount
+            ,IEmailingTemplateAppService emailingTemplateAppService)
         {
+            _emailingTemplateAppService = emailingTemplateAppService;
             _appMarketplaceContactRepository = _appMarketplaceContactRepository;
             _iCreateMarketplaceAccount = iCreateMarketplaceAccount;
             _appAttachmentRepository = appAttachmentRepository;
@@ -2941,6 +2930,14 @@ namespace onetouch.Accounts
                     Id = appEntity.Id,
                     DisplayName = appEntity == null || appEntity.Name == null ? "" : appEntity.Name.ToString()
                 }).ToListAsync();
+        }
+
+        public async Task SendRegistrationEmail(string email, int tenantId,string type,string link, string tenantName )
+        {
+            var localizedString = L("RegistrationLink");
+
+            var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartner", new List<string>() { tenantName, localizedString, link }, "en");
+            await SendMessage(new SendMailDto() { To = email, Subject = template.MessageSubject, Body = template.MessageBody, IsBodyHtml = true });
         }
 
         public async Task SendMessage(SendMailDto input)
