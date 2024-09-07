@@ -90,50 +90,44 @@
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
                         <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Classifications</label> 
                              <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0" (click)="showClassBtn = true ; toggleAppCodes() " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Classification</div>
-                        <div *ngIf="(allClassFilteredRecords.length != 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0 && !showExistClass)" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2 mb-2">+</span> Add Classification</div>
+                <div class="d-flex">
 
-<div class="d-flex" *ngIf="showSelectedClass || appTransactionsForViewDto?.entityClassifications?.length != 0
-">
-    <div
-    class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
-    *ngFor="let item of appTransactionsForViewDto?.entityClassifications; index as i"
-   
-  >
-    <span>{{ item?.entityObjectClassificationName }}</span>
-    <a class="clear-icon" (click)="deSelectClass(item, i)">
-      <i class="fa fa-1x fa-times fa-1x"></i>
-    </a>
-  </div>
+                    <div class="d-flex" *ngIf="showSelectedClass || appTransactionsForViewDto?.entityClassifications?.length != 0
+                    ">
+                        <div
+                        class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
+                        *ngFor="let item of selectedClassificationsShow; index as i"
+                        [ngClass]="{ 'dimmed': tempDeselectedClassification.includes(item) }"
+                      >
+                        <span>{{ item?.entityObjectClassificationName }}</span>
+                        <a class="clear-icon" (click)="deSelectClass(item, i)">
+                          <i class="fa fa-1x fa-times fa-1x"></i>
+                        </a>
+                        
+                        <a *ngIf="tempDeselectedClassification.includes(item)" class="clear-icon-d" >
+                            <i class="fa fa-1x fa-times fa-1x"></i>
+                        </a>
+                      </div>
+                    
+                    
+                    
+                      
+                    <div *ngIf="(allClassFilteredRecords.length != 0 &&  !showExistClass )" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Classification</div>
+                    </div>
+                    
+
+
+                    <div *ngIf="(allClassFilteredRecords.length != 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0 && !showExistClass)" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2 mb-2">+</span> Add Classification</div>
+                </div>
 
 
 
-  <div
-  class="dimmed  m-0 p-0 my-2 d-flex justify-content-between position-relative"
-  *ngFor="let item of tempDeselectedClassification; index as i"
-  style="  border-radius: 4px;
-  border: 1px solid #D9D9D9;
-  background: #D9D9D9 !important;
-  padding: 5px 10px !important;
-  margin-right: 5px !important;
-  font-size: 13px;
-  font-weight: 600;"
-
->
-  <span>{{ item?.entityObjectClassificationName }}</span>
-  <a class="clear-icon-d" style="background-color: #D9D9D9;">
-    <i class="fa fa-1x fa-times fa-1x"></i>
-  </a>
-</div>
-<div *ngIf="(allClassFilteredRecords.length != 0 &&  !showExistClass )" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Classification</div>
-</div>
-
-                            <!-- </div> -->
 
          
 </div>
 
 
-<div class="d-flex" *ngIf="(showClassBtn || allClassFilteredRecords.length == 0 ) && !showExistClass">
+<div class="d-flex" *ngIf="showClassBtn ">
     <div  class="formGroup  col-8">
       
         <input
@@ -186,8 +180,8 @@ Cancel
     placeholder="Select Item"
     [filter]="true"
     filterPlaceholder="Search Items"
-    (onNodeSelect)="handleNodeSelect($event)"
-    (onNodeUnselect)="handleNodeUnselect($event)"
+    (ngModelChange)="classificationNodeSelect($event)"
+ 
 >
     <ng-template pTemplate="default">
         <div class="header p-2 d-flex align-items-center justify-content-between">
@@ -266,7 +260,7 @@ Cancel
                     [editMode]=false
                     (getCodeValue)="getCodeValue($event)" ></app-codes>
 
-                <app-codes *ngIf="showAppCodes &&  category?.id>0"
+                <app-codes *ngIf="showAppCodes && category?.id>0"
                      [objectType]="entityObjectType"
                      [editMode]=true
                      [code]="category?.code"
@@ -274,48 +268,42 @@ Cancel
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
                         <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
-
-                        <div *ngIf="(filteredRecords.length != 0 &&  appTransactionsForViewDto?.entityCategories?.length == 0 && !showExistCat)" (click)="showExistCat = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2 mb-2">+</span> Add Categories</div>
-                         <div class="d-flex" *ngIf="showSelectedCat || appTransactionsForViewDto?.entityCategories?.length != 0">
-                            <div
-                              class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
-                              *ngFor="let item of  appTransactionsForViewDto?.entityCategories; index as i"
-                              [ngClass]="{ 'dimmed': tempDeselectedCategories.includes(item) }"
-                            >
-                              <span>{{ item?.entityObjectCategoryName }}</span>
-                              <a class="clear-icon" (click)="deSelectCat(item, i)">
-                                <i class="fa fa-1x fa-times fa-1x"></i>
-                              </a>
-                            </div>
+<div class="d-flex">
 
 
+    <div class="d-flex" *ngIf="showSelectedCat || appTransactionsForViewDto?.entityCategories?.length != 0">
+        <div
+            class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
+            *ngFor="let item of selectedCategoriesShow; index as i"
+            [ngClass]="{ 'dimmed': tempDeselectedCategories.includes(item) }"
+        >
+            <span>{{ item?.entityObjectCategoryName }}</span>
+            <a class="clear-icon" (click)="deSelectCat(item, i)">
+                <i class="fa fa-1x fa-times fa-1x"></i>
+            </a>
 
-                            <div
-                            class="dimmed  m-0 p-0 my-2 d-flex justify-content-between position-relative"
-                            *ngFor="let item of tempDeselectedCategories; index as i"
-                            style="  border-radius: 4px;
-                            border: 1px solid #D9D9D9;
-                            background: #D9D9D9 !important;
-                            padding: 5px 10px !important;
-                            margin-right: 5px !important;
-                            font-size: 13px;
-                            font-weight: 600;"
-                         
-                          >
-                            <span>{{ item?.entityObjectCategoryName }}</span>
-                            <a class="clear-icon-d" >
-                              <i class="fa fa-1x fa-times fa-1x"></i>
-                            </a>
-                          </div>
+            <a *ngIf="tempDeselectedCategories.includes(item)" class="clear-icon-d" >
+                <i class="fa fa-1x fa-times fa-1x"></i>
+            </a>
+        </div>
+    
 
-                          <div *ngIf="filteredRecords.length != 0 &&  !showExistCat" (click)="showExistCat = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Categories</div>
-                          </div>
+    
+    </div>
 
+
+    
+    <div *ngIf="filteredRecords.length != 0 && !showExistCat" (click)="showExistCat = true;" class="d-flex p-y-1 px-4 rounded cat">
+        <span class="mr-2">+</span> Add Categories
+    </div>
+</div>
+                      
+                        
 
                           
                         </div> 
                           
-                        <div class="d-flex" *ngIf="(showCatBtn || filteredRecords.length == 0 ) && !showExistCat">
+                        <div class="d-flex mt-2" *ngIf="(showCatBtn ) ">
                             <div  class="formGroup  col-8">
                               
                                 <input
@@ -369,7 +357,7 @@ Cancel
     [filter]="true"
     filterPlaceholder="Search Items" 
   
- 
+    (ngModelChange)="categoriesNodeSelect($event)"
     >
 
     <ng-template pTemplate="default">

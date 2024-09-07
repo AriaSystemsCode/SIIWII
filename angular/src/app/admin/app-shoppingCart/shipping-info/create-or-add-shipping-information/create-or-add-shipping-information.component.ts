@@ -49,6 +49,7 @@ isAccManual :boolean = false
   }
 
   ngAfterViewInit() {
+    this.isMamualAcc()
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.loadAddresComponentShipFrom = true;
       this.contactIdShipFrom = this.shipFromData.compId;
@@ -65,8 +66,9 @@ isAccManual :boolean = false
       
   }
   ngOnInit() {
-    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
     this.isMamualAcc()
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+  
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
     shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
@@ -251,7 +253,13 @@ isAccManual :boolean = false
 
 
   isMamualAcc() {
-    this._AppTransactionServiceProxy.isManualCompany(this.appTransactionsForViewDto?.companySSIN)
+    let accSSin = ''
+    if(this.appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER') {
+      accSSin = this.appTransactionsForViewDto?.buyerCompanySSIN
+    } else if (this.appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER'){
+      accSSin = this.appTransactionsForViewDto?.sellerCompanySSIN
+    }
+    this._AppTransactionServiceProxy.isManualCompany(accSSin)
       .subscribe((res) => {
         console.log(res,'resmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmh')
         this.isAccManual = res;
