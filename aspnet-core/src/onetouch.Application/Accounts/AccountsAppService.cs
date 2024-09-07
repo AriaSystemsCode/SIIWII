@@ -2936,7 +2936,7 @@ namespace onetouch.Accounts
         {
             var localizedString = L("RegistrationLink");
 
-            var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartner", new List<string>() { tenantName, localizedString, link }, "en");
+            var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartnerByType", new List<string>() { tenantName, localizedString, link }, "en");
             await SendMessage(new SendMailDto() { To = email, Subject = template.MessageSubject, Body = template.MessageBody, IsBodyHtml = true });
         }
 

@@ -2061,6 +2061,7 @@
 		<text name="UserDoesn'tAddAnyClassificationsYet">User doesn't add any classifications yet</text>
 		<text name="UserDoesn'tAddAnyCategoriesYet">User doesn't add any Categories yet</text>
 		<text name="InvitePartner">Invite partner</text>
+		<text name="InvitePartnerByType">Invite partner By Type</text>
 		<text name="ResetData">Reset data</text>
 		<text name="ToggleView">Toggle view</text>
 		<text name="NoDataFound">No data found ...</text>
