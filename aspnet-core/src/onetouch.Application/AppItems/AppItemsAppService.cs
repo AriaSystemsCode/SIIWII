@@ -1060,7 +1060,8 @@ namespace onetouch.AppItems
                         var firstattributeDefaultImages = firstattributeDefaultImages1.Select(x => x.FirstOrDefault()).Distinct().ToList();
                         var secondAttributeValuesFor1st = new List<string>();
                         //xx
-                        var firstattributeCodes = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID)).Select(z => new { z.AttributeCode, z.AttributeValue, z.AttributeValueId })).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
+                        var firstattributeCodes = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
+                        .Select(z => new { z.AttributeCode, z.AttributeValue, z.AttributeValueId })).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
                         //xx
                         //var secondAttributeValuesFor1st11 = varAppItems.Select(x => 
                         //    x.EntityFk.EntityExtraData.Where(z=> z.AttributeId != long.Parse(firstAttributeID)).Select(z=>z.EntityFk.EntityExtraData)).ToList();
@@ -1124,7 +1125,7 @@ namespace onetouch.AppItems
                                         img = itm.EntityFk.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
                                     }
                                     output.NonLookupValues.Add(new LookupLabelDto { Code  = firstattributeCodes[cod].AttributeCode,
-                                        Label= firstattributeValues[cod],
+                                        Label= firstattributeCodes[cod].AttributeValue,
                                         HexaCode = hexa !=null ? hexa.AttributeValue:"",
                                         Image= img!=null ? img.AttributeValue:""
                                     });
@@ -1163,14 +1164,14 @@ namespace onetouch.AppItems
                             extraDataAttrDto.selectedValues = new List<ExtraDataSelectedValues>();
                             int imageLoopCounter = 0;
                             bool firstAttributeRelatedAdded = false;
-                            foreach (string varItem in firstattributeValues)
+                            foreach (var varItem in firstattributeCodes)
                             {
                                 ExtraDataSelectedValues extraDataSelectedValues = new ExtraDataSelectedValues();
-                                extraDataSelectedValues.value = varItem;
+                                extraDataSelectedValues.value = varItem.AttributeValue;
                                 //Iteration#42,1 MMT 08/20/2024 Add new property for the code[Start]
-                                var extraAttrObj = firstattributeCodes.Where(z => z.AttributeValue == varItem).FirstOrDefault();
-                                if (extraAttrObj != null)
-                                    extraDataSelectedValues.Code = extraAttrObj.AttributeCode;
+                                //var extraAttrObj = firstattributeCodes.Where(z => z.AttributeValue == varItem).FirstOrDefault();
+                                //if (extraAttrObj != null)
+                                    extraDataSelectedValues.Code = varItem.AttributeCode;
                                 //Iteration#42,1 MMT 08/20/2024 Add new property for the code[End]
 
                                 extraDataSelectedValues.DefaultEntityAttachment = new AppEntityAttachmentDto();
@@ -1215,7 +1216,7 @@ namespace onetouch.AppItems
                                     extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (tenantIdvar == null ? "-1" : tenantIdvar.ToString()) + @"/" + firstattributeDefaultImages[imageLoopCounter].ToString();
                                 //extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + firstattributeDefaultImages[imageLoopCounter].ToString();
 
-                                var attribut = firstattributeCodes.FirstOrDefault(a => a.AttributeValue == varItem);
+                                var attribut =  varItem;
                                 if (attribut != null)
                                 {
                                     var imgObj = firstattributeDefaultImages.FirstOrDefault(z => z != null &&
@@ -1229,7 +1230,7 @@ namespace onetouch.AppItems
                                 }
                                 //xx2024
                                 var item = varAppItems.Where(x => x.EntityFk.EntityExtraData
-                                                                                  .Where(a => (a.AttributeValue == varItem || a.AttributeCode == varItem) &&
+                                                                                  .Where(a => (a.AttributeValue == varItem.AttributeValue || a.AttributeCode == varItem.AttributeCode) &&
                                                                                   a.AttributeId == firstAttributeIdLong).Any()).FirstOrDefault();
                                 if (item != null)
                                 {
@@ -1255,7 +1256,7 @@ namespace onetouch.AppItems
                                         string attCode = attributeIDs[0].Split(',')[0];
                                         EDRestAttributes eDRestAttributes = new EDRestAttributes();
                                         eDRestAttributes.ExtraAttributeId = long.Parse(attributeIDs[0].Split(',')[0].ToString());
-                                        var lookupLabelDtoList = firstattributeValues.Where(a => a == varItem).ToList();
+                                        var lookupLabelDtoList = firstattributeValues.Where(a => a == varItem.AttributeValue).ToList();
                                         if (lookupLabelDtoList != null && lookupLabelDtoList.Count > 0)
                                             eDRestAttributes.Values = lookupLabelDtoList.Select(r => new LookupLabelDto()
                                             {
@@ -1272,7 +1273,7 @@ namespace onetouch.AppItems
                                                                                    ).Any()).ToList();
                                             var itemVarSum = codeItems.Where(x =>
                                             x.EntityFk.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
-                                            a.AttributeValue == varItem).Any()).Sum(a => a.StockAvailability);
+                                            a.AttributeValue == varItem.AttributeValue).Any()).Sum(a => a.StockAvailability);
                                             attlook.StockAvailability = itemVarSum;
                                         }
                                         // eDRestAttributes.Values = lookupLabelDtoList.Select(r => new LookupLabelDto() { Label = r.Split(',')[0], Value = long.Parse(r.Split(',')[1]) }).ToList();
@@ -1317,7 +1318,7 @@ namespace onetouch.AppItems
                                                                                    ).Any()).ToList();
                                             var itemVarSum = codeItems.Where(x =>
                                             x.EntityFk.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
-                                            a.AttributeValue == varItem).Any()).Sum(a => a.StockAvailability);
+                                            a.AttributeValue == varItem.AttributeValue).Any()).Sum(a => a.StockAvailability);
                                             attlook.StockAvailability = itemVarSum;
                                         }
                                         // eDRestAttributes.Values = lookupLabelDtoList.Select(r => new LookupLabelDto() { Label = r.Split(',')[0], Value = long.Parse(r.Split(',')[1]) }).ToList();
@@ -1757,7 +1758,7 @@ namespace onetouch.AppItems
                         output.NonLookupValues.Add(new LookupLabelDto
                         {
                             Code = firstattributeCodes[cod].AttributeCode,
-                            Label = firstattributeValues[cod],
+                            Label = firstattributeCodes[cod].AttributeValue,
                             HexaCode = (hexa != null && hexa.AttributeValue != null) ? hexa.AttributeValue : "",
                             Image = (img != null && img.AttributeValue != null) ? (imagesUrl + (itm.TenantId.HasValue ? itm.TenantId.ToString() : "-1") + @"/" + img.AttributeValue) : ""
                         });
@@ -3511,7 +3512,7 @@ namespace onetouch.AppItems
                     //XX
                     AppMarketplaceItems.AppMarketplaceItems marketplaceItem = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
                         .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
-                        .Where(x => x.Code == appItem.SSIN).FirstOrDefaultAsync();
+                        .Where(x => x.Code == appItem.SSIN ).FirstOrDefaultAsync();
 
                     if (marketplaceItem == null || marketplaceItem.Id == 0)
                     {
