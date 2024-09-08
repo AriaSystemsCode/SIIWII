@@ -49,7 +49,7 @@ isAccManual :boolean = false
   }
 
   ngAfterViewInit() {
-    this.isMamualAcc()
+
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.loadAddresComponentShipFrom = true;
       this.contactIdShipFrom = this.shipFromData.compId;
@@ -261,7 +261,7 @@ isAccManual :boolean = false
     }
     this._AppTransactionServiceProxy.isManualCompany(accSSin)
       .subscribe((res) => {
-        console.log(res,'resmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmh')
+
         this.isAccManual = res;
    
       })

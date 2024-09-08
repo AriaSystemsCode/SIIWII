@@ -90,7 +90,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     tempDeselectedCategories: any[] = [];
     tempDeselectedClassification :any[]=[]
     allClassRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
+    loadedChildrenRecords: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = []
+
     parentClassification : CreateOrEditSycEntityObjectClassificationDto
+    savedIds: number[]; // input
   
     parentCat : any;
     parentClass : any;
@@ -101,6 +104,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     editSubClass: boolean = false;
     openDropDown: boolean = false;
     showAppCodes: boolean = false;
+    selectAllChecked: boolean = false;
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -119,17 +123,16 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
     ngAfterViewInit() {
         if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
-            this.getParentCategories();
-            this.getParentClassifications();
+            
+            // this.getParentCategories();
+            // this.getParentClassifications();
             this.getAllCurrencies();
             }
     }
     ngOnInit(): void {
         if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
-        if(this.createOrEditorderInfo){
-            // this.getAppTransactionList();
-            // this.getAppTransactionClassList()
-        }
+            this.getAppTransactionList();
+            this.getAppTransactionClassList()
         if(!this.category) {
             this.category = new CreateOrEditSycEntityObjectCategoryDto()
         }
@@ -157,8 +160,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.classificationItemPath = [];
         this.categoriesItemPath = [];
         console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
-        this.getAppTransactionList();
-        this.getAppTransactionClassList()
+
 
     }
 }
@@ -405,37 +407,61 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         event.stopPropagation(); // Prevent selection on label click
       }
 
-    toggleSelectAll(event: any) {
-        if (event.target.checked) {
-            // this.selectedCategories = [...this.allRecords]; // Select all nodes
+      toggleSelectAll() {
+        // Check if all nodes are already selected
+        const allNodesSelected = this.selectedCategories.length === this.filteredRecords.length;
+      
+        if (allNodesSelected) {
+          // Deselect all nodes
+          this.selectedCategories = [];
         } else {
-            this.selectedCategories = []; // Deselect all nodes
+          // Select all nodes
+          this.selectedCategories = this.filteredRecords.map(node => {
+            // Ensure the node has valid data
+            if (node && node.data && node.data.sycEntityObjectCategory) {
+              const category = node.data.sycEntityObjectCategory;
+              return new AppEntityCategoryDto({
+                entityObjectCategoryId: category.id || 0,
+                entityObjectCategoryCode: category.code || '',
+                entityObjectCategoryName: category.name || '',
+                id: 0,
+              });
+            } else {
+              console.warn('Invalid node structure:', node);
+              return null;
+            }
+          }).filter(category => category !== null);
         }
-    }
+      
+        // Optionally update appTransactionsForViewDto
+        this.appTransactionsForViewDto.entityCategories = this.selectedCategories;
+      }
+      
+    
     
     collapseAll() {
-        this.allRecords.forEach(node => {
+        this.filteredRecords.forEach(node => {
             node.expanded = false;
         });
     }
     categoriesItemPath: any[] = [];
     
   
-    categoriesNodeUnSelect(event: any) {
-        let indx = this.appTransactionsForViewDto.entityCategories.findIndex(x => x.entityObjectCategoryId == event?.entityObjectCategoryId);
-        if (indx >= 0)
-            this.appTransactionsForViewDto.entityCategories.splice(indx, 1);
+    // categoriesNodeUnSelect(event: any) {
+    //     let indx = this.appTransactionsForViewDto.entityCategories.findIndex(x => x.entityObjectCategoryId == event?.entityObjectCategoryId);
+    //     if (indx >= 0)
+    //         this.appTransactionsForViewDto.entityCategories.splice(indx, 1);
 
 
-        let categoriesItemPathindx = this.categoriesItemPath?.findIndex(x => x.data.sycEntityObjectCategory.id == event.entityObjectCategoryId);
-        if (categoriesItemPathindx >= 0)
-            this.categoriesItemPath.splice(categoriesItemPathindx, 1);
+    //     let categoriesItemPathindx = this.categoriesItemPath?.findIndex(x => x.data.sycEntityObjectCategory.id == event.entityObjectCategoryId);
+    //     if (categoriesItemPathindx >= 0)
+    //         this.categoriesItemPath.splice(categoriesItemPathindx, 1);
 
-        this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
+    //     this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
 
-        this.getParentCategories();
+    //     this.getParentCategories();
 
-    }
+    // }
 
     getCategoriesPath(item: any): any {
         // if (!item.parent) {
@@ -451,33 +477,27 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.categoriesItemPath.push(item);
     }
     addAsNewChild(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto) {
-        console.log(node,'new child')
-        this.showCatBtn = true
-        this.addSubCat = true
-        // parentClassification: node.data.sycEntityObjectClassification,
-
-     this.parentCat = {
-        // parentCat: node.data.sycEntityObjectCategory,
-        code: this.category.code,
-        parentId: node.data.sycEntityObjectCategory.id,
- }
-
- 
-  
+     
+        this.showCatBtn = true;
+        this.addSubCat = true;
+        // Set the parent category details when adding a subcategory
+        this.parentCat = {
+            code: this.category.code,
+            parentId: node.data.sycEntityObjectCategory.id,
+        };
     }
 
 
     addAsNewChildClass(node: TreeNodeOfGetSycEntityObjectClassificationForViewDto) {
-        console.log(node,'new child')
+      
         this.showClassBtn = true
         this.addSubClas = true
      this.parentClass = {
-        // name: node.data.sycEntityObjectCategory,
-        // parentCategory: node.data.sycEntityObjectCategory,
+
         code: this.classification.code,
         parentId: node.data.sycEntityObjectClassification.id,
  }
- console.log(this.parentClass ,'this.parentClass ')
+
 
  
   
@@ -497,13 +517,11 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
  
  this.category.name =  this.parentCat.name
- console.log(node,'node')
- console.log(this.parentCat,'this.parentCat')
- console.log(this.category.name ,'this.category.name ')
+
 
     }
     EditClass(node: TreeNodeOfGetSycEntityObjectClassificationForViewDto) {
- console.log(node,'node')
+
 
         this.showClassBtn = true
         this.editSubClass = true
@@ -514,8 +532,6 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         id: node.data.sycEntityObjectClassification.id,
     }
      this.classification.name =  this.parentClass.name
-     console.log(node,'node')
-     console.log( this.parentClass,' this.parentClass')
 
     
         }
@@ -669,43 +685,127 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.showSelectedCat = true
     }
 
-    
-    categoriesNodeSelect(event: any) {
-        console.log(event, 'Event received in categoriesNodeSelect');
-    
-        const newNode = event[event.length - 1];
-    
-        if (newNode?.data?.sycEntityObjectCategory) {
-            const category = newNode.data.sycEntityObjectCategory;
-    
-            const newCategory = new AppEntityCategoryDto();
-            newCategory.entityObjectCategoryId = category.id || 0;
-            newCategory.entityObjectCategoryCode = category.code || '';
-            newCategory.entityObjectCategoryName = category.name || '';
-            newCategory.id = 0;
-    
-            if (!this.appTransactionsForViewDto?.entityCategories) {
-                this.appTransactionsForViewDto.entityCategories = [];
-            }
-    
-            this.selectedCategories = this.selectedCategories.filter(
-                (cat) => !(cat instanceof AppEntityCategoryDto && cat.entityObjectCategoryId === newCategory.entityObjectCategoryId)
-            );
-    
-            const categoryExists = this.appTransactionsForViewDto.entityCategories.some(
-                (cat) => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId
-            );
-    
-            if (!categoryExists) {
-                this.appTransactionsForViewDto.entityCategories.push(newCategory);
-                this.selectedCategories.push(newCategory);
-            }
-    
-            console.log(this.selectedCategories, 'Current selected categories');
-        } else {
-            console.warn('Invalid node data:', newNode);
-        }
+
+onNodeSelectCat(event: any) {
+    this.processNodeSelectionCat(event.node, true);
+  }
+  
+  
+  onNodeUnselectCat(event: any) {
+    this.processNodeSelectionCat(event.node, false);
+  }
+  
+
+  processNodeSelectionCat(node: any, isSelected: boolean) {
+    if (!node?.data?.sycEntityObjectCategory) {
+      console.warn('Invalid node data:', node);
+      return;
     }
+  
+    const categoryy = node.data.sycEntityObjectCategory;
+    const newCategory = new AppEntityCategoryDto({
+      entityObjectCategoryId: categoryy.id || 0,
+      entityObjectCategoryCode: categoryy.code || '',
+      entityObjectCategoryName: categoryy.name || '',
+      id: 0,
+    });
+  
+    // Initialize entity categories if not present
+    if (!this.appTransactionsForViewDto?.entityCategories) {
+      this.appTransactionsForViewDto.entityCategories = [];
+    }
+  
+    if (isSelected) {
+      // Check if the category already exists in the selected list
+      const categoriesExists = this.appTransactionsForViewDto.entityCategories.some(
+        (existingCategory) =>
+          existingCategory.entityObjectCategoryId ===
+          newCategory.entityObjectCategoryId
+      );
+  
+      if (!categoriesExists) {
+        this.appTransactionsForViewDto.entityCategories.push(newCategory);
+        this.selectedCategories.push(newCategory);
+      }
+    } else {
+      // Remove the category when unselected
+      this.selectedCategories = this.selectedCategories.filter(
+        (existingCategory) =>
+          !(existingCategory instanceof AppEntityCategoryDto &&
+            existingCategory.entityObjectCategoryId ===
+              newCategory.entityObjectCategoryId)
+      );
+  
+      this.appTransactionsForViewDto.entityCategories = this.appTransactionsForViewDto.entityCategories.filter(
+        (existingCategory) =>
+          existingCategory.entityObjectCategoryId !==
+          newCategory.entityObjectCategoryId
+      );
+    }
+  
+    // Handle parent-child selection/deselection relationships
+    this.ensureParentChildSelectionCat(node, isSelected);
+  }
+  
+  // Function to manage parent-child relationships during selection
+  ensureParentChildSelectionCat(node: any, isSelected: boolean) {
+    if (node.children && node.children.length > 0) {
+      // If a parent node is unselected, ensure all its children are also unselected
+      node.children.forEach((child: any) => {
+        if (!isSelected) {
+          const childIndex = this.selectedCategories.findIndex(
+            (selected) =>
+              selected.entityObjectCategoryId ===
+              child.data?.sycEntityObjectCategory?.id
+          );
+  
+          if (childIndex !== -1) {
+            this.selectedCategories.splice(childIndex, 1);
+            this.appTransactionsForViewDto.entityCategories.splice(childIndex, 1);
+          }
+        }
+      });
+    } 
+
+  }
+  
+  
+    // categoriesNodeSelect(event: any) {
+    //     console.log(event, 'Event received in categoriesNodeSelect');
+    
+    //     const newNode = event[event.length - 1];
+    
+    //     if (newNode?.data?.sycEntityObjectCategory) {
+    //         const category = newNode.data.sycEntityObjectCategory;
+    
+    //         const newCategory = new AppEntityCategoryDto();
+    //         newCategory.entityObjectCategoryId = category.id || 0;
+    //         newCategory.entityObjectCategoryCode = category.code || '';
+    //         newCategory.entityObjectCategoryName = category.name || '';
+    //         newCategory.id = 0;
+    
+    //         if (!this.appTransactionsForViewDto?.entityCategories) {
+    //             this.appTransactionsForViewDto.entityCategories = [];
+    //         }
+    
+    //         this.selectedCategories = this.selectedCategories.filter(
+    //             (cat) => !(cat instanceof AppEntityCategoryDto && cat.entityObjectCategoryId === newCategory.entityObjectCategoryId)
+    //         );
+    
+    //         const categoryExists = this.appTransactionsForViewDto.entityCategories.some(
+    //             (cat) => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId
+    //         );
+    
+    //         if (!categoryExists) {
+    //             this.appTransactionsForViewDto.entityCategories.push(newCategory);
+    //             this.selectedCategories.push(newCategory);
+    //         }
+    
+    //         console.log(this.selectedCategories, 'Current selected categories');
+    //     } else {
+    //         console.warn('Invalid node data:', newNode);
+    //     }
+    // }
     
     
     
@@ -750,37 +850,39 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     }
 
     saveCat(category: any) {
-      
         const isEditing = this.editSubCat;
-
+        
         if (!isEditing) {
             this.getCodeValue(this.generateUniqueCode()); 
         }
-    
+        
+
+        const parentId = this.addSubCat ? this.parentCat?.parentId : undefined;
+        
+       
         let cat = new CreateOrEditSycEntityObjectCategoryDto({
             code: this.category.code, 
             name: category.name,
             objectId: undefined,
-            parentId: this.addSubCat ? this.parentCat.parentId : undefined,
+            parentId: parentId, 
             id: isEditing ? this.parentCat.id : undefined,
         });
-    
+        
 
         this._sycEntityObjectCategoriesServiceProxy.createOrEditForObjectTransaction(cat)
             .pipe(finalize(() => {
-                this.getAppTransactionList();
+                this.getAppTransactionList(); 
             }))
             .subscribe(() => {
-
-        if (!isEditing) {
-
- this.notify.info('Added Successfuly');
-        } else {
- this.notify.info('Updated Sucssefuly');
-
-        }
+           
+                if (!isEditing) {
+                    this.notify.info('Added Successfully');
+                } else {
+                    this.notify.info('Updated Successfully');
+                }
             });
-
+    
+        // Reset the flags and form inputs
         this.showCatBtn = false;
         this.addSubCat = false;
         this.editSubCat = false;
@@ -789,14 +891,12 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     
     // Function to generate a unique code for new categories or subcategories
     generateUniqueCode(): string {
-      
         return 'CAT-' + Math.floor(Math.random() * 100000).toString();
     }
 
-
     generateUniqueCodeClass(): string {
       
-        return 'CLASS-' + Math.floor(Math.random() * 100000).toString();
+        return 'CLS-' + Math.floor(Math.random() * 100000).toString();
     }
     
 
@@ -839,41 +939,129 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.tempDeselectedClassification.push(classification);
         this.showSelectedClass= true
     }
-    classificationNodeSelect(event: any) {
-    
-        const newNode = event[event.length - 1];
-    
-        if (newNode?.data?.sycEntityObjectClassification) {
-            const classification = newNode.data.sycEntityObjectClassification;
-    
-            const newClassification= new AppEntityClassificationDto();
-            newClassification.entityObjectClassificationId = classification.id || 0;
-            newClassification.entityObjectClassificationCode = classification.code || '';
-            newClassification.entityObjectClassificationName = classification.name || '';
-            newClassification.id = 0;
-    
-            if (!this.appTransactionsForViewDto?.entityClassifications) {
-                this.appTransactionsForViewDto.entityClassifications = [];
-            }
-    
-            this.selectedClassification = this.selectedClassification.filter(
-                (classificate) => !(classificate instanceof AppEntityClassificationDto && classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId)
-            );
-    
-            const classificationExists = this.appTransactionsForViewDto.entityClassifications.some(
-                (classificate) => classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId
-            );
-    
-            if (!classificationExists) {
-                this.appTransactionsForViewDto.entityClassifications.push(newClassification);
-                this.selectedClassification.push(newClassification);
-            }
-    
-            console.log(this.selectedClassification, 'Current selected classification');
-        } else {
-            console.warn('Invalid node data:', newNode);
-        }
+
+
+// Handles when a node is selected
+onNodeSelect(event: any) {
+    this.processNodeSelection(event.node, true);
+  }
+  
+  // Handles when a node is unselected
+  onNodeUnselect(event: any) {
+    this.processNodeSelection(event.node, false);
+  }
+  
+  // Common method to process the selection or deselection of a node
+  processNodeSelection(node: any, isSelected: boolean) {
+    if (!node?.data?.sycEntityObjectClassification) {
+      console.warn('Invalid node data:', node);
+      return;
     }
+  
+    const classification = node.data.sycEntityObjectClassification;
+    const newClassification = new AppEntityClassificationDto({
+      entityObjectClassificationId: classification.id || 0,
+      entityObjectClassificationCode: classification.code || '',
+      entityObjectClassificationName: classification.name || '',
+      id: 0,
+    });
+  
+    // Initialize entity classifications if not present
+    if (!this.appTransactionsForViewDto?.entityClassifications) {
+      this.appTransactionsForViewDto.entityClassifications = [];
+    }
+  
+    // Handling node addition (when selected)
+    if (isSelected) {
+      const classificationExists = this.appTransactionsForViewDto.entityClassifications.some(
+        (classificate) =>
+          classificate.entityObjectClassificationId ===
+          newClassification.entityObjectClassificationId
+      );
+  
+      if (!classificationExists) {
+        this.appTransactionsForViewDto.entityClassifications.push(newClassification);
+        this.selectedClassification.push(newClassification);
+      }
+    } else {
+      // Handling node removal (when unselected)
+      this.selectedClassification = this.selectedClassification.filter(
+        (classificate) =>
+          !(classificate instanceof AppEntityClassificationDto &&
+            classificate.entityObjectClassificationId ===
+              newClassification.entityObjectClassificationId)
+      );
+  
+      this.appTransactionsForViewDto.entityClassifications = this.appTransactionsForViewDto.entityClassifications.filter(
+        (classificate) =>
+          classificate.entityObjectClassificationId !==
+          newClassification.entityObjectClassificationId
+      );
+    }
+  
+    // Ensure parent or child specific handling
+    this.ensureParentChildSelection(node, isSelected);
+  
+    console.log(this.selectedClassification, 'Current selected classification');
+  }
+  
+  // Additional function to handle parent-child selection relationships
+  ensureParentChildSelection(node: any, isSelected: boolean) {
+    // Check if the node is a parent or has children
+    if (node.children && node.children.length > 0) {
+      // If a parent is unselected, ensure children are also unselected
+      node.children.forEach((child: any) => {
+        if (!isSelected) {
+          const childIndex = this.selectedClassification.findIndex(
+            (selected) =>
+              selected.entityObjectClassificationId ===
+              child.data?.sycEntityObjectClassification?.id
+          );
+          if (childIndex !== -1) {
+            this.selectedClassification.splice(childIndex, 1);
+            this.appTransactionsForViewDto.entityClassifications.splice(childIndex, 1);
+          }
+        }
+      });
+    }
+  }
+  
+  
+    // classificationNodeSelect(event: any) {
+    
+    //     const newNode = event[event.length - 1];
+    
+    //     if (newNode?.data?.sycEntityObjectClassification) {
+    //         const classification = newNode.data.sycEntityObjectClassification;
+    
+    //         const newClassification= new AppEntityClassificationDto();
+    //         newClassification.entityObjectClassificationId = classification.id || 0;
+    //         newClassification.entityObjectClassificationCode = classification.code || '';
+    //         newClassification.entityObjectClassificationName = classification.name || '';
+    //         newClassification.id = 0;
+    
+    //         if (!this.appTransactionsForViewDto?.entityClassifications) {
+    //             this.appTransactionsForViewDto.entityClassifications = [];
+    //         }
+    
+    //         this.selectedClassification = this.selectedClassification.filter(
+    //             (classificate) => !(classificate instanceof AppEntityClassificationDto && classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId)
+    //         );
+    
+    //         const classificationExists = this.appTransactionsForViewDto.entityClassifications.some(
+    //             (classificate) => classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId
+    //         );
+    
+    //         if (!classificationExists) {
+    //             this.appTransactionsForViewDto.entityClassifications.push(newClassification);
+    //             this.selectedClassification.push(newClassification);
+    //         }
+    
+    //         console.log(this.selectedClassification, 'Current selected classification');
+    //     } else {
+    //         console.warn('Invalid node data:', newNode);
+    //     }
+    // }
     saveClassSelection() {
         
         this.selectedClassification = this.selectedClassification.filter(
@@ -927,15 +1115,15 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 saveClass(classification:any,type?:''){
     const isEditing = this.editSubClass;
     if (!isEditing) {
-        this.getCodeValue(this.generateUniqueCodeClass()); 
+        this.getClassCodeValue(this.generateUniqueCodeClass()); 
     }
 
-    
+    const parentId = this.addSubClas ? this.parentClass?.parentId : undefined;
     let classificate = new CreateOrEditSycEntityObjectClassificationDto({
         code:  this.classification.code,
-        name: this.classification.name,
+        name: classification.name,
         objectId: undefined,
-        parentId:  this.addSubClas ? this.parentClass.parentId : undefined,
+        parentId:  parentId,
         id:  isEditing ? this.parentClass.id : undefined,
     });
   
@@ -957,6 +1145,7 @@ saveClass(classification:any,type?:''){
     this.showClassBtn = false
     this.addSubClas = false
     this.editSubClass = false
+    this.classification.name = '';
    
 
     
@@ -1062,7 +1251,7 @@ cancelClass(){
     }
 
 
-    loadedChildrenRecords: TreeNodeOfGetSycEntityObjectTypeForViewDto[] = [];
+    // loadedChildrenRecords: TreeNodeOfGetSycEntityObjectTypeForViewDto[] = [];
     // lastSelectedRecord: TreeNodeOfGetSycEntityObjectTypeForViewDto;
     getAppTransactionList(searchQuery?: string) {
         console.log(">>", searchQuery)
@@ -1120,6 +1309,15 @@ cancelClass(){
                     )
                 
                   );
+                //   this.filteredRecords = [
+                //     {
+                //       key: 'customNode', // Unique key to identify the custom node
+                //       label: '', // Optional label if needed
+                //       data: null, // Optional data if needed
+                //     },
+                //     ...this.filteredRecords, // Your actual nodes go here
+                //   ];
+              
                 // }
                
                 // this.lastSelectedRecord = this.selectedRecord;
@@ -1146,49 +1344,33 @@ cancelClass(){
             )
             .pipe(finalize(() => (this.loading = false)))
             .subscribe((result) => {
-                console.log(result.items,'result.items')
-
-                // if (searchQuery !== undefined) this.allRecords = [];
-                // result.items.map((record) => {
-              
-                //     // const cachedItem : TreeNodeOfGetSycEntityObjectTypeForViewDto = this.loadedChildrenRecords.filter((selectedRecord:TreeNodeOfGetSycEntityObjectTypeForViewDto)=>{
-                //     //     const isCached : boolean = selectedRecord.data.sycEntityObjectType.id == record.data.sycEntityObjectType.id
-                //     //     return isCached
-                //     // })[0]
-                //     // const isCached : boolean = !!cachedItem
-
-                //     // if(isCached){
-                //     //     record.children = cachedItem.children
-                //     //     record.expanded = cachedItem.expanded
-                //     //     record.totalChildrenCount = cachedItem.totalChildrenCount;
-                //     //     (record as any).partialSelected = (cachedItem as any).partialSelected
-                //     // }
-
-                //     // this.checkItemSelection(record);
-
-                //     return record;
-                // });
+           
                 this.allClassRecords = [];
                 this.allClassRecords.push(...result.items);
                 console.log(this.allClassRecords,'this.allRecordsclass')
-                // this.lastSelectedRecord = this.selectedRecord;
-                // this.selectedRecord = undefined;
-                // this.displayedRecords = this.allRecords;
-                // this.totalCount = result.totalCount;
-                // this.showMoreListDataButton =
-                //     this.allRecords.length < this.totalCount;
-                // this.active = true;
-                // this.loading = false;
+  
 
                 this.allClassFilteredRecords = this.allClassRecords.filter(record =>
                     !this.selectedClassification.some(
-                        selected => selected.entityObjectClassificationId === record.data?.sycEntityObjectClassification?.id
+                      (  selected => selected.entityObjectClassificationId === record.data?.sycEntityObjectClassification?.id)
                     )
                   );
+
+                //   this.allClassFilteredRecords = this.allClassRecords.filter(record => {
+           
+                //      !this.selectedClassification.some(selected => 
+                     
+                   
+                //         record.children?.some(child => 
+                //             selected.entityObjectClassificationId === child.data?.sycEntityObjectClassification?.id
+                //         )
+                //     );
+                // });
 
             });
         this.subscriptions.push(subs);
     }
+
 
     toggleAppCodes() {
         this.showAppCodes = false;
@@ -1197,15 +1379,6 @@ cancelClass(){
         }, 0); // Delay to force Angular to re-create the component
       }
 
-    //   ngDoCheck(){
-    //     if (this.appTransactionsForViewDto?.entityCategories) {
-    //         this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-    //         this.selectedCategoriesShow = [...this.selectedCategories];
-    //     }
-    //     if (this.appTransactionsForViewDto?.entityClassifications) {
-    //         this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-    //         this.selectedClassificationsShow= [...this.selectedClassification];
-    //     }
-    //   }
+
       
 }

@@ -104,30 +104,29 @@
                           <i class="fa fa-1x fa-times fa-1x"></i>
                         </a>
                         
-                        <a *ngIf="tempDeselectedClassification.includes(item)" class="clear-icon-d" >
+                        <a *ngIf="tempDeselectedClassification.includes(item)" style="background-color: #777;" class="clear-icon-d" >
                             <i class="fa fa-1x fa-times fa-1x"></i>
                         </a>
                       </div>
                     
-                    
+                    </div>
                     
                       
-                    <div *ngIf="(allClassFilteredRecords.length != 0 &&  !showExistClass )" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Classification</div>
+                    <div *ngIf="allClassFilteredRecords.length != 0 &&  !showExistClass " (click)="showExistClass = true;showClassBtn= false" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Classification</div>
                     </div>
                     
 
 
-                    <div *ngIf="(allClassFilteredRecords.length != 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0 && !showExistClass)" (click)="showExistClass = true" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2 mb-2">+</span> Add Classification</div>
+                   
                 </div>
 
 
 
 
-         
-</div>
 
 
-<div class="d-flex" *ngIf="showClassBtn ">
+
+<div class="d-flex mt-2" *ngIf="showClassBtn ">
     <div  class="formGroup  col-8">
       
         <input
@@ -180,13 +179,14 @@ Cancel
     placeholder="Select Item"
     [filter]="true"
     filterPlaceholder="Search Items"
-    (ngModelChange)="classificationNodeSelect($event)"
+    (onNodeSelect)="onNodeSelect($event)"
+    (onNodeUnselect)="onNodeUnselect($event)"
  
 >
     <ng-template pTemplate="default">
         <div class="header p-2 d-flex align-items-center justify-content-between">
             <div>
-                <input type="checkbox" (change)="toggleSelectAll($event)" /> Select All
+                <input type="checkbox" (change)="toggleSelectAll()" /> Select All
             </div>
             <button class="btn btn-link" (click)="collapseAll()">Collapse All</button>
         </div>
@@ -282,7 +282,7 @@ Cancel
                 <i class="fa fa-1x fa-times fa-1x"></i>
             </a>
 
-            <a *ngIf="tempDeselectedCategories.includes(item)" class="clear-icon-d" >
+            <a *ngIf="tempDeselectedCategories.includes(item)" style="background-color: #777;" class="clear-icon-d" >
                 <i class="fa fa-1x fa-times fa-1x"></i>
             </a>
         </div>
@@ -293,7 +293,7 @@ Cancel
 
 
     
-    <div *ngIf="filteredRecords.length != 0 && !showExistCat" (click)="showExistCat = true;" class="d-flex p-y-1 px-4 rounded cat">
+    <div *ngIf="filteredRecords.length != 0 && !showExistCat" (click)="showExistCat = true;showCatBtn= false" class="d-flex p-y-1 px-4 rounded cat">
         <span class="mr-2">+</span> Add Categories
     </div>
 </div>
@@ -321,7 +321,7 @@ Cancel
                             <button
                            
                          
-                           (click)="saveCat(category);hideCatBtn =true;showCatBtn = false"
+                           (click)="saveCat(category);hideCatBtn =true;showCatBtn = false;category.name ='' "
                             class="previewbtn text-center btn "
                         >
                             Save
@@ -343,89 +343,84 @@ Cancel
 
 
 
-
-<div *ngIf="  showExistCat"  class="flex justify-content-center treeSel"   >
-    <p-treeSelect 
-    class="w-full md:w-20rem"
-    containerStyleClass="w-full"
-    [(ngModel)]="selectedCategories"
-    [options]="filteredRecords"
-    display="chip"
-    [metaKeySelection]="false"
-    selectionMode="checkbox"
-    placeholder="Select Item"
-    [filter]="true"
-    filterPlaceholder="Search Items" 
-  
-    (ngModelChange)="categoriesNodeSelect($event)"
-    >
-
-    <ng-template pTemplate="default">
-        <div class="header p-2 d-flex align-items-center justify-content-between">
-            <div>
-                <input type="checkbox" (change)="toggleSelectAll($event)" /> Select All
-            </div>
-            <button class="btn btn-link" (click)="collapseAll()">Collapse All</button>
-        </div>
-    </ng-template>
-        <ng-template let-node pTemplate="default">
-            <div (click)="onLabelClick($event)" class="d-flex justify-content-between">
-                <span style="margin-top: 8px;" >{{ node.label }}</span>
-                <div
-                class="treenode-action"
-             
-              
-            >
-                <div
-                    class="btn-group dropdown"
-                    dropdown
-                    container="body"
-                    placement="bottom right"
-                >
-                    <button
-                        title="actions"
-                        class="dropdown-toggle btn btn-sm "
-                        aria-controls="dropdown-alignment"
-                        dropdownToggle
-                    > 
-                    <div class="three-dots"></div>
-
-                </button>
-                    <ul
-                        id="dropdown-alignment"
-                        class="dropdown-menu dropdown-action-btn dropdown-menu-right"
-                        *dropdownMenu
-                    >
-                        <li>
-                            <a (click)="addAsNewChild(node);showCatBtn= true;showExistCat= false">{{
-                                "AddSubcategory" | localize
-                            }}</a>
-                        </li>
-                        <li>
-                            <a
-                                (click)="EditCat(node);showCatBtn= true;showExistCat= false"
-                                >{{ "Edit" | localize }}</a
+    <div *ngIf="showExistCat" class="flex justify-content-center treeSel">
+        <p-treeSelect
+            class="w-full md:w-20rem"
+            containerStyleClass="w-full"
+            [(ngModel)]="selectedCategories"
+            [options]="filteredRecords"
+            display="chip"
+            selectionMode="checkbox"
+            placeholder="Select Item"
+            [filter]="true"
+            filterPlaceholder="Search Items"
+            (onNodeSelect)="onNodeSelectCat($event)"
+            (onNodeUnselect)="onNodeUnselectCat($event)"
+        >
+            <!-- Header Template to Create Space After the Search Filter -->
+            <ng-template pTemplate="header">
+                <!-- Empty Template to Reserve Space -->
+            </ng-template>
+    
+            <!-- Custom First Option with Select All and Collapse All -->
+            <ng-template let-node pTemplate="default">
+                <!-- Check if it's the first custom node; render Select All / Collapse All -->
+                <!-- <div *ngIf="node.key === 'customNode'" class="header p-2 d-flex align-items-center justify-content-between">
+                    <a (click)="toggleSelectAll()">
+                        Select All
+                    </a>
+                    <a class=" " (click)="collapseAll()">Collapse All</a>
+                </div> -->
+    
+                <!-- Main Display for Other Nodes -->
+                <div *ngIf="node.key !== 'customNode'" class="d-flex justify-content-between px-4">
+                    <span style="margin-top: 8px;">{{ node.label }}</span>
+                    <div class="treenode-action">
+                        <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
+                            <button
+                                title="actions"
+                                class="dropdown-toggle btn btn-sm"
+                                aria-controls="dropdown-alignment"
+                                dropdownToggle
                             >
-                        </li>
-                        <li>
-                            <a (click)="deleteCat(node)">{{
-                                "Delete" | localize
-                            }}</a>
-                        </li>
-                    </ul>
+                                <div class="three-dots"></div>
+                            </button>
+                            <ul
+                                id="dropdown-alignment"
+                                class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                                *dropdownMenu
+                            >
+                                <li>
+                                    <a (click)="addAsNewChild(node); showCatBtn = true; showExistCat = false">
+                                        {{ "AddSubcategory" | localize }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a (click)="EditCat(node); showCatBtn = true; showExistCat = false">
+                                        {{ "Edit" | localize }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a (click)="deleteCat(node)">
+                                        {{ "Delete" | localize }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            </div>
-        </ng-template>
-
-        <ng-template let-last pTemplate="footer">
-            <div class="d-flex justify-content-end p-2">
-                <button class="btn bgPurple" (click)="saveSelection()">Save</button>
-                <button class="btn btn-secondary" (click)="cancelSelection()">Cancel</button>
-            </div>
-        </ng-template>
-    </p-treeSelect>
-</div>
+            </ng-template>
+    
+            <!-- Footer Template -->
+            <ng-template pTemplate="footer">
+                <div class="d-flex justify-content-end p-2">
+                    <button class="btn bgPurple" (click)="saveSelection()">Save</button>
+                    <button class="btn btn-secondary" (click)="cancelSelection()">Cancel</button>
+                </div>
+            </ng-template>
+        </p-treeSelect>
+    </div>
+    
 
                   
                         <button *ngIf="showExistCat " (click)="showCatBtn = true;showExistCat = false ; toggleAppCodes()" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Categories</button>
