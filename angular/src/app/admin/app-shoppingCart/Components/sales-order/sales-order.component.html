@@ -444,7 +444,7 @@
                             [(ngModel)]="availableDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
-                            [minDate]="completeDate"
+                            [minDate]="startDate"
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
 
@@ -471,7 +471,7 @@
                             [showIcon]="true"
                             (onSelect)="changeCompleteDate(completeDate)"
                             (ngModelChange)="changeCompleteDate(completeDate)"
-                            [minDate]="startDate"
+                            [minDate]="availableDate"
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
 
