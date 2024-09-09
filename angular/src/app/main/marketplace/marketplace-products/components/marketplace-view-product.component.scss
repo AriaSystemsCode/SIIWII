@@ -10,7 +10,8 @@
     Height: 35px;
 }
 .summary-sec {
-    padding-left: 30px;
+    padding-left: 20px;
+    // padding-right: 2px;
 }
 .details-sec {
     border-radius: 12px;
@@ -157,6 +158,7 @@ td {
         height: 500px;
         overflow-y: scroll;
         padding: 7px;
+        padding-right: 0;
         background-color: #fff;
         .default {
             background-color: #F8F8F8;
@@ -612,4 +614,15 @@ font-weight: 600;
     font-weight: 700;
     margin-top: 3px;
     margin-bottom: 0;
+}
+
+
+.each-table{
+    border: 1px solid #EEEEEE;
+    border-radius: 6px;
+    // padding: 6px;
+    margin-bottom: 25px;
+}
+.orderHeader {
+    margin: 8px;
 }

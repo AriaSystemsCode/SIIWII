@@ -45,14 +45,14 @@
                                 *ngIf="orderSummary.length !== 0"
                                 class="summaryTables"
                             >
-                                <div
+                                <div class="each-table"
                                     *ngFor="
                                         let order of orderSummary;
                                         let orderIndex = index
                                     "
                                 >
                                     <div
-                                        class="orderHeader m-2 d-flex align-items-center justify-content-between"
+                                        class="orderHeader  d-flex align-items-center justify-content-between"
                                     >
                                         <div
                                             class="d-flex align-items-center justify-content-lg-start"
@@ -68,7 +68,7 @@
                                                 <p class="ml-2" style="color: #1B101B;font-weight: 600;">
                                                     {{ order.color.colorCodeSelectedValues }}
                                                </p>
-                                                <p class="ml-2" style="color: #9E9E9E;">
+                                                <p class="ml-2 mb-0" style="color: #9E9E9E;">
                                                      {{ order.color.colorName }}
                                                 </p>
                                             </div>
@@ -84,7 +84,7 @@
                                         </button>
                                     </div>
                                     <!-- order by size summary table -->
-                                    <table class="table table-bordered">
+                                    <table class="table table-bordered mb-0">
                                         <thead>
                                             <tr>
                                                 <th>Color</th>
@@ -152,7 +152,7 @@
                                                     ) !== 0
                                                 "
                                             >
-                                                <th colspan="2" class="text-center">Total</th>
+                                                <th  class="text-center">Total</th>
                                                 <th style=" color: #9E9E9E !important;">
                                                     {{
                                                         calculateOrderedQTYSum(
@@ -160,8 +160,8 @@
                                                         )
                                                     }}
                                                 </th>
-                                                <th></th>
-                                                <th  style=" color: #9E9E9E !important;">
+                                                <!-- <th></th> -->
+                                                <th colspan="3" style=" color: #9E9E9E !important;text-align: center;">
                                                     {{
                                                         calculatePriceSum(
                                                             order.color.sizes
@@ -228,7 +228,7 @@
                                                 </tr>
                                             </ng-container>
                                             <tr>
-                                                <th colspan="2" class="text-center" >Total</th>
+                                                <th  class="text-center" >Total</th>
                                                 <th>
                                                     {{
                                                         calculatePrepackOrderedQTYSum(
@@ -237,8 +237,8 @@
                                                         )
                                                     }}
                                                 </th>
-                                                <th></th>
-                                                <th>
+                                                <!-- <th></th> -->
+                                                <th colspan="3" style="text-align: center;">
                                                     {{
                                                         getTotalPrepackSizeAmount(
                                                             order.color.sizes,
@@ -250,11 +250,11 @@
                                         </tbody>
                                     </table>
                                     <!-- order by size summary table -->
-                                    <hr
+                                    <!-- <hr
                                         style="
                                             border-top: 2px solid #aaaaaa !important;
                                         "
-                                    />
+                                    /> -->
                                 </div>
                             </div>
                         </div>
@@ -857,14 +857,14 @@
                     *ngIf="orderSummary.length !== 0"
                     class="summaryTables"
                 >
-                    <div
+                    <div class="each-table"
                         *ngFor="
                             let order of orderSummary;
                             let orderIndex = index
                         "
                     >
                         <div
-                            class="orderHeader m-2 d-flex align-items-center justify-content-between"
+                            class="orderHeader d-flex align-items-center justify-content-between"
                         >
                             <div
                                 class="d-flex align-items-center justify-content-lg-start"
@@ -876,32 +876,67 @@
                                     alt="colorImg"
                                     style="width: 40px"
                                 /> -->
+                                <div class="d-flex" style="height: 36px;">
+                                    <img class="mt-2"
+                                           
+                                        
+                                    [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                    style="width: 24px; height: 24px; border-radius: 6px;"
+                                
+                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                
+                                />
                                 <div>
-                                    <p class="ml-2" style="color: #1B101B;font-weight: 600;">
+                                    <p class="ml-2 mb-0" style="
+                                    font-style: normal;
+                                    font-weight: 700;
+                                    font-size: 10px;
+                                    line-height: 15px;                               
+                                    color: #1B101B;                               
+                                    ">
                                         {{ order.color.colorCodeSelectedValues }}
                                    </p>
-                                    <p class="ml-2" style="color: #9E9E9E;">
+                                    <p class="ml-2 mb-0" style="color: #9E9E9E;/* Link → Select Categories */
+                                    font-weight: 600;
+                                    font-size: 10px;
+                                    line-height: 15px;
+                                    color: #9E9E9E;
+                                    ">
                                          {{ order.color.colorName }}
                                     </p>
                                 </div>
+                                </div>
+                            
                             </div>
-                            <button
+                            <a
                                 (click)="removeColor(order, orderIndex)"
-                                type="button"
-                                class="btn close border rounded-circle m-0 p-0"
+                             
                             >
-                                <i class="fas fa-times p-0 m-0"></i>
-                            </button>
+                            <img
+                                           
+                            class="mt-2"
+                            src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
+                            style=" border-radius: 6px;"
+                        
+                        
+                        />
+                        </a>
                         </div>
                         <!-- order by size summary table -->
-                        <table class="table table-bordered">
+                        <table class="table table-bordered mb-0">
                             <thead>
-                                <tr>
-                                    <th>Color</th>
+                                <tr style="    font-weight: 700;
+                                font-size: 10px;
+                                line-height: 15px;
+
+                                
+                                color: #1B101B;">
+                                    <!-- <th>Color</th> -->
                                     <th>Size</th>
                                     <th>QTY</th>
                                     <th>Price</th>
                                     <th>Amount</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody
@@ -913,8 +948,17 @@
                                         let i = index
                                     "
                                 >
-                                    <tr *ngIf="size.orderedQty !== 0">
-                                        <td>
+                                    <tr *ngIf="size.orderedQty !== 0" style="
+                                    font-weight: 400;
+                                    font-size: 12px;
+                                    line-height: 20px;
+                             
+                                    
+                                    color: #9E9E9E;
+                                    
+                            
+                                    ">
+                                        <!-- <td>
                                                 <img
                                            
                                         
@@ -924,7 +968,7 @@
                                             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                         
                                         />
-                                    </td>
+                                    </td> -->
                                         <td>{{ size.label }}</td>
                                         <td>{{ size.orderedQty }}</td>
                                         <td>{{ size.price| currency:' ' }}</td>
@@ -935,8 +979,8 @@
                                             }}
                                         </td>
                                         <td>
-                                            <button
-                                                type="button"
+                                            <a
+                                               
                                                 (click)="
                                                     removeSize(
                                                         i,
@@ -945,12 +989,17 @@
                                                         orderIndex
                                                     )
                                                 "
-                                                class="btn"
+                                             
                                             >
-                                                <i
-                                                    class="fas fa-times p-0 m-0"
-                                                ></i>
-                                            </button>
+                                            <img
+                                           
+                                        
+                                            src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
+                                            style=" border-radius: 6px;"
+                                        
+                                        
+                                        />
+                                        </a>
                                         </td>
                                     </tr>
                                 </ng-container>
@@ -961,7 +1010,7 @@
                                         ) !== 0
                                     "
                                 >
-                                    <th colspan="2" class="text-center">Total</th>
+                                    <th  class="text-center">Total</th>
                                     <th style=" color: #9E9E9E !important;">
                                         {{
                                             calculateOrderedQTYSum(
@@ -969,8 +1018,8 @@
                                             )
                                         }}
                                     </th>
-                                    <th></th>
-                                    <th  style=" color: #9E9E9E !important;">
+                                    <!-- <th></th> -->
+                                    <th colspan="3" style=" color: #9E9E9E !important;text-align: center;">
                                         {{
                                             calculatePriceSum(
                                                 order.color.sizes
@@ -1037,7 +1086,7 @@
                                     </tr>
                                 </ng-container>
                                 <tr>
-                                    <th colspan="2" class="text-center" >Total</th>
+                                    <th  class="text-center" >Total</th>
                                     <th>
                                         {{
                                             calculatePrepackOrderedQTYSum(
@@ -1046,8 +1095,8 @@
                                             )
                                         }}
                                     </th>
-                                    <th></th>
-                                    <th>
+                                    <!-- <th></th> -->
+                                    <th colspan="3" style="text-align: center;">
                                         {{
                                             getTotalPrepackSizeAmount(
                                                 order.color.sizes,
@@ -1059,11 +1108,11 @@
                             </tbody>
                         </table>
                         <!-- order by size summary table -->
-                        <hr
+                        <!-- <hr
                             style="
                                 border-top: 2px solid #aaaaaa !important;
                             "
-                        />
+                        /> -->
                     </div>
                 </div>
             </div>
@@ -1766,14 +1815,14 @@
                                     *ngIf="orderSummary.length !== 0"
                                     class="summaryTables"
                                 >
-                                    <div
+                                    <div class="each-table"
                                         *ngFor="
                                             let order of orderSummary;
                                             let orderIndex = index
                                         "
                                     >
                                         <div
-                                            class="orderHeader m-2 d-flex align-items-center justify-content-between"
+                                            class="orderHeader  d-flex align-items-center justify-content-between"
                                         >
                                             <div
                                                 class="d-flex align-items-center justify-content-lg-start"
@@ -1789,7 +1838,7 @@
                                                     <p class="ml-2" style="color: #1B101B;font-weight: 600;">
                                                         {{ order.color.colorCodeSelectedValues }}
                                                    </p>
-                                                    <p class="ml-2" style="color: #9E9E9E;">
+                                                    <p class="ml-2 mb-0" style="color: #9E9E9E;">
                                                          {{ order.color.colorName }}
                                                     </p>
                                                 </div>
@@ -1803,7 +1852,7 @@
                                             </button>
                                         </div>
                                         <!-- order by size summary table -->
-                                        <table class="table table-bordered">
+                                        <table class="table table-bordered mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Color</th>
@@ -1870,7 +1919,7 @@
                                                         ) !== 0
                                                     "
                                                 >
-                                                    <th colspan="2" class="text-center">Total</th>
+                                                    <th  class="text-center">Total</th>
                                                     <th style=" color: #9E9E9E !important;">
                                                         {{
                                                             calculateOrderedQTYSum(
@@ -1878,8 +1927,8 @@
                                                             )
                                                         }}
                                                     </th>
-                                                    <th></th>
-                                                    <th  style=" color: #9E9E9E !important;">
+                                                    <!-- <th></th> -->
+                                                    <th colspan="3" style=" color: #9E9E9E !important;text-align: center;">
                                                         {{
                                                             calculatePriceSum(
                                                                 order.color.sizes
@@ -1946,7 +1995,7 @@
                                                     </tr>
                                                 </ng-container>
                                                 <tr>
-                                                    <th colspan="2" class="text-center" >Total</th>
+                                                    <th  class="text-center" >Total</th>
                                                     <th>
                                                         {{
                                                             calculatePrepackOrderedQTYSum(
@@ -1955,8 +2004,8 @@
                                                             )
                                                         }}
                                                     </th>
-                                                    <th></th>
-                                                    <th>
+                                                    <!-- <th></th> -->
+                                                    <th colspan="3" style="text-align: center;">
                                                         {{
                                                             getTotalPrepackSizeAmount(
                                                                 order.color.sizes,
@@ -1968,11 +2017,11 @@
                                             </tbody>
                                         </table>
                                         <!-- order by size summary table -->
-                                        <hr
+                                        <!-- <hr
                                             style="
                                                 border-top: 2px solid #aaaaaa !important;
                                             "
-                                        />
+                                        /> -->
                                     </div>
                                 </div>
                             </div>
