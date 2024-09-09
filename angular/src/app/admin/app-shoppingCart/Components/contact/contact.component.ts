@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { AccountBranchDto, AppEntitiesServiceProxy, AppTransactionContactDto, AppTransactionServiceProxy, ContactRoleEnum, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetContactInformationDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, PhoneNumberAndtype, TransactionType } from "@shared/service-proxies/service-proxies";
 import { ShoppingCartoccordionTabs } from "../shopping-cart-view-component/ShoppingCartoccordionTabs";
 import { stringInsert } from "@devexpress/analytics-core/analytics-internal";
@@ -41,11 +41,12 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     contactNamePlaceholder: string = "Select Contact Name";
     defaultcontactNamePlaceholder: string = "Select Contact Name";
     contactFilterValue: string = "";
-
+    filteredContacts :any[]=[]
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+        private cdr: ChangeDetectorRef
     ) {
         super(injector);
     }
@@ -54,6 +55,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.resetSelectedData(); 
         this.setSelectedData();
      //   this.getAllCompaniesData();
+     
+     this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName;
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -143,12 +146,19 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             tempContact = true;
             this.tempAccount = false;
             this.companyFilterValue = "";
+            this.defaultcompanyNamePlaceholder = ''
+            this.contactNamePlaceholder = ''
+            this.cdr.detectChanges();
         }
         this.getContacts(tempContact);
         this.getBranches();
         if (this.loadAddressComponent) {
             this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id });
         }
+        this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.contactName || '';
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact=new GetContactInformationDto();
+        this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = ''
+     
     }
 
     getAppTransactionContactsIndex() {
@@ -249,8 +259,10 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                         this.contactNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName + "*";
     
                         this.contactFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName;
-                        if (this.contactFilterValue)
+                        if (this.contactFilterValue){
                             this.handleContactSearch(this.contactFilterValue);
+
+                        }
                     }
                     else {
                         this.tempContact=false;
@@ -296,16 +308,36 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             }
     
         }
-    
-    handleContactSearch($event) {
-        setTimeout(() => {
-            this._AppTransactionServiceProxy.getAccountRelatedContactsList(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, $event.filter)
-                .subscribe((res: any) => {
-                    this.allContacts = [...res];
-                });
-        }, 1000);
-    }
-  
+        handleContactSearch(event) {
+            if (!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact?.name) {
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = new GetContactInformationDto();
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = event.query;
+            }
+            if (this.allContacts && this.allContacts.length > 0) {
+                // Filtering logic
+                const query = event.query.toLowerCase();
+                this.filteredContacts = this.allContacts.filter(contact =>
+                    contact.name.toLowerCase().includes(query)
+                );
+            } else {
+            // Fetch contacts only if required and ensure selections are maintained
+            this._AppTransactionServiceProxy.getAccountRelatedContactsList(
+                this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, 
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactName
+            ).subscribe((res: any) => {
+                this.allContacts = [...res];
+                this.filteredContacts = this.allContacts.filter(contact =>
+                    contact.name.toLowerCase().includes(event.query.toLowerCase())
+                );
+        
+                // Set selected contact based on user input but don't overwrite existing selections
+        
+                
+            });
+        }
+        }
+        
+
     getBranches() {
         if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
             this.showMainSpinner();
@@ -422,7 +454,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber;
     }
 
-    onChangeContact($event) {
+    onChangeContact(event:any) {
+        console.log(event,'eventeventevent')
         if (this.tempContact && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact) {
             this.tempContact = false
             this.contactFilterValue = "";
@@ -433,18 +466,18 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         
 
 
-        if ($event?.value) {
-            this.allPhoneTypes = $event.value.phoneList;
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = $event?.value;
+        if (event) {
+            this.allPhoneTypes = event.phoneList;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
             // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  $event?.value?.phone ;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  event?.phone ;
             // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail)
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =  $event?.value?.email ;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail =  event?.email ;
         }
 
         else {
-            this.allPhoneTypes = $event.phoneList;
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = $event;
+            this.allPhoneTypes = event.phoneList;
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = event;
             // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber)
             // this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  $event?.phone ;
             // if(!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail)
@@ -468,6 +501,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.__selectedPhoneTypeValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType?.phoneTypeId;
 
     }
+
+
+
 
 
     handleCompanySearch($event) {

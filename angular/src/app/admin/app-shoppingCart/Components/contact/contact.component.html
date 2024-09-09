@@ -9,7 +9,7 @@
                   [options]="companeyNames"
                     *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo && activeTab!=shoppingCartoccordionTabs.SellerContactInfo" [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     [ngClass]="{'tempAccount': tempAccount}" 
-                    optionLabel="name" name="selectedCompany"  [virtualScroll]="true" [itemSize]="30" (onChange)="onChangeCompany()" ></p-dropdown>
+                    optionLabel="name" name="selectedCompany"  [virtualScroll]="true" [itemSize]="30" (onChange)="onChangeCompany();companyFilterValue=''" ></p-dropdown>
                   
                 <div *ngIf="activeTab==shoppingCartoccordionTabs.orderInfo || activeTab==shoppingCartoccordionTabs.SellerContactInfo">
                     <p class="previewValue text-nowrap m-0 p-0  pl-2 col-6" *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
@@ -70,12 +70,34 @@
         <div class="col-md-6 my-2">
             <div class="formGroup">
                 <label class="label">Contact Name</label>
-               
+<!--                
                 <p-dropdown   [filter]="true" [filterValue]="contactFilterValue" (onFilter)="handleContactSearch($event)" class="w-100" [placeholder]="tempContact ? contactNamePlaceholder : tempAccount ? contactNamePlaceholder  : defaultcontactNamePlaceholder" 
                 placeholder="Select Contact Name" [options]="allContacts"
                 *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo" [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
                 [ngClass]="{'tempAccount': tempContact}"  optionLabel="name" name="selectedContact" (onChange)="onChangeContact($event)" ></p-dropdown>
-               
+            -->
+          
+            <p-autoComplete
+            #autoComplete
+            [dropdown]="true"
+            [suggestions]="filteredContacts"  
+            [ngModelOptions]="{standalone: true}"
+            *ngIf="activeTab != shoppingCartoccordionTabs.orderInfo"
+            [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
+            (completeMethod)="handleContactSearch($event)"
+            (onSelect)="onChangeContact($event)"
+           
+            [placeholder]=" defaultcontactNamePlaceholder"
+            field="name" 
+            [forceSelection]="false" 
+          
+            class="w-100" 
+            [ngClass]="{'tempAccount': tempContact}" 
+  >
+            
+         
+        </p-autoComplete>
+        
                         
                     <div *ngIf="activeTab==shoppingCartoccordionTabs.orderInfo">
                     <p class=" previewValue text-nowrap  m-0 p-0 pl-2 col-4" *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
