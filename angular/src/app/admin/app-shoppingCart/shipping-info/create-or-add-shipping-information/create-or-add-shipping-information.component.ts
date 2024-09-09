@@ -38,7 +38,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   shipToSelectedAdd: any;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
-
+isAccManual :boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -49,6 +49,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   }
 
   ngAfterViewInit() {
+
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.loadAddresComponentShipFrom = true;
       this.contactIdShipFrom = this.shipFromData.compId;
@@ -65,7 +66,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
       
   }
   ngOnInit() {
+    this.isMamualAcc()
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+  
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
     shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
@@ -244,6 +247,24 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
 
     }
 
+  }
+
+  
+
+
+  isMamualAcc() {
+    let accSSin = ''
+    if(this.appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER') {
+      accSSin = this.appTransactionsForViewDto?.buyerCompanySSIN
+    } else if (this.appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER'){
+      accSSin = this.appTransactionsForViewDto?.sellerCompanySSIN
+    }
+    this._AppTransactionServiceProxy.isManualCompany(accSSin)
+      .subscribe((res) => {
+
+        this.isAccManual = res;
+   
+      })
   }
   loadShipViaList() {
     this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')

@@ -42,6 +42,7 @@
         [showAddressType]="false"
         [canChange]="canChange"
         [currentTab]="currentTab"
+        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
         ></app-address>
     </div>
     <div class="container-fluid pt-1" *ngIf="createOrEditshippingInfO">
@@ -82,6 +83,9 @@
    [showAddressType]="false"
    [canChange]="canChange"
    [currentTab]="currentTab"
+   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) "
+
+
    ></app-address>
 </div>
 

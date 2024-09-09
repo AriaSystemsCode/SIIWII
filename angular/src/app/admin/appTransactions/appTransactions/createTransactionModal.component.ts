@@ -201,7 +201,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
-  
+  console.log( this.orderForm.controls['enteredDate']?.value ,'init')
     
 
     }
@@ -835,6 +835,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         } else {
             this.areSame = true
         }
+  console.log( this.orderForm.controls['enteredDate']?.value ,'getstarted')
+
     }
 
     changeStartDate(date){
@@ -923,6 +925,7 @@ console.log(date,'daaate')
 
         this.minSEnteredDate = this.orderForm.get('enteredDate')?.value;
        this.orderForm.controls['startDate'].setValue(this.orderForm.get('enteredDate')?.value);
+  console.log( this.orderForm.controls['enteredDate']?.value ,'changeentereddate')
     
     //    const selectedStartDate = new Date(startDateControl.value);
     //    if (selectedStartDate < this.today) {
