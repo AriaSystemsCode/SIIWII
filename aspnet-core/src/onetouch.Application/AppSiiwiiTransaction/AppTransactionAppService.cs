@@ -1548,7 +1548,7 @@ namespace onetouch.AppSiiwiiTransaction
                 returnObject.AccountSSIN = account.SSIN;
                 returnObject.CurrencyCode = new CurrencyInfoDto
                 {
-                    Code = account.CurrencyCode,
+                    Code = account.CurrencyFk.Code,
                     Value = (long)account.CurrencyId,
                     Label = account.CurrencyFk.Name,
                     Symbol = (account.CurrencyFk != null && account.CurrencyFk.EntityExtraData != null) &&
@@ -1674,7 +1674,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 Name = o.Name.TrimEnd(),
                                 CurrencyCode = new CurrencyInfoDto
                                 {
-                                    Code = o.CurrencyCode == null ? "" : o.CurrencyCode,
+                                    Code = o.CurrencyId != null ? o.CurrencyFk.Code :"" ,
                                     Value = o.CurrencyId != null ? (long)o.CurrencyId : 0,
                                     Label = o.CurrencyFk == null ? "" : o.CurrencyFk.Name,
                                     Symbol = (o.CurrencyFk != null && o.CurrencyFk.EntityExtraData != null) &&
