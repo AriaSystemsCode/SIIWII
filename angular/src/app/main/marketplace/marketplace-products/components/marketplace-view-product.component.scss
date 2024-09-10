@@ -36,6 +36,8 @@
 td {
     color: black !important;
     font-weight: bold;
+    vertical-align:initial !important
+
 }
 
 .showRoomLink{
@@ -236,9 +238,15 @@ td {
 table th{
     color: black !important;
     background-color: #F8F8F8;
+    vertical-align:initial !important;
+    text-align: center !important;
+    
+
 }
 .summaryTables td {
     color: #9E9E9E !important;
+    text-align: center !important;
+    vertical-align:initial !important
 }
 .p-tabview .p-tabview-nav {
     margin-bottom: 10px;
