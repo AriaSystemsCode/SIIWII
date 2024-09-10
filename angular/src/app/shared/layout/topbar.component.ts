@@ -27,8 +27,8 @@ import {
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
-    //SucessCreateAccountApi,
-    //EmailingTemplateServiceProxy
+    AccountsServiceProxy,
+    //sendRegistrationEmail,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -182,6 +182,8 @@ export class TopBarComponent
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+        private _accountsServiceProxy:AccountsServiceProxy,
+       // private _SendRegistrationEmail:sendRegistrationEmail
         //private _getRegisterationLinkWithTenantID: EmailingTemplateServiceProxy,
        // private SucessCreateAccountApi: SucessCreateAccountApi,
       // private http: HttpClient,
@@ -537,12 +539,14 @@ export class TopBarComponent
         let accountType = accout_type;
         let accountname = account_name;
         let emailAddress= this.appSession.user.emailAddress;
+        let url="https://app.testing.siiwii.net";
+     
         const htmlContent: string = `<div><img src="../../assets/img/input_icons/alarm.png" class="alarmInfo"><p class="text-left alarmInfo_title">A registration mail has been Sent to ` + emailAddress +` </p> </div><p class="pleaseClick">*Please Click on the register link in the email in order to create the new <label>` + accountname + ` </label>  account .</p> `;
         var tenantId;
         if (this.appSession?.tenantId)
             tenantId = this.appSession?.tenantId?.toString();
         else tenantId = null;
-
+        let link= url+"/account/register-tenant?editionId=" + tenantId +"&subscriptionStartType=" + accountType ;
         Swal.fire({
             title: "",
             html: htmlContent,
@@ -563,7 +567,10 @@ export class TopBarComponent
         }).then((result) => {
             if (result.isConfirmed) {
                 debugger
-                //this.SucessCreateAccountApi.getData(tenantId, accountType)
+                this._accountsServiceProxy.sendRegistrationEmail(emailAddress, tenantId, accountType, link, tenantId).subscribe(
+                    response => {
+                      console.log('Email sent successfully', response);
+                    })
             }
         })
     }
