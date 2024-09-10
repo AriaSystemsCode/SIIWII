@@ -158,6 +158,7 @@ export class MarketplaceViewProductComponent
         inputElement.focus();
       }
     getProductDetailsForView() {
+        this.showMainSpinner();
         this.showEditSpecialPrice = true;
         this._AppTransactionServiceProxy.getCurrentUserActiveTransaction()
             .subscribe((res: ShoppingCartSummary) => {
@@ -198,7 +199,12 @@ export class MarketplaceViewProductComponent
                         undefined,
                         0,
                         10
-                    )
+                    )  
+                                      .pipe(
+                                        finalize(() => {
+                                            this.hideMainSpinner();
+                                        })
+                                    )
                     .subscribe((res: GetAppMarketplaceItemDetailForViewDto) => {
                         this.productDetails = res.appItem;
                         this.productDetails.maxSpecialPrice =  this.productDetails.maxSpecialPrice ?  this.productDetails.maxSpecialPrice : 0;

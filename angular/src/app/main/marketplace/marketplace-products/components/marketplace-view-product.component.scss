@@ -10,7 +10,8 @@
     Height: 35px;
 }
 .summary-sec {
-    padding-left: 30px;
+    padding-left: 20px;
+    // padding-right: 2px;
 }
 .details-sec {
     border-radius: 12px;
@@ -35,6 +36,8 @@
 td {
     color: black !important;
     font-weight: bold;
+    vertical-align:initial !important
+
 }
 
 .showRoomLink{
@@ -157,6 +160,7 @@ td {
         height: 500px;
         overflow-y: scroll;
         padding: 7px;
+        padding-right: 0;
         background-color: #fff;
         .default {
             background-color: #F8F8F8;
@@ -234,9 +238,15 @@ td {
 table th{
     color: black !important;
     background-color: #F8F8F8;
+    vertical-align:initial !important;
+    text-align: center !important;
+    
+
 }
 .summaryTables td {
     color: #9E9E9E !important;
+    text-align: center !important;
+    vertical-align:initial !important
 }
 .p-tabview .p-tabview-nav {
     margin-bottom: 10px;
@@ -612,4 +622,15 @@ font-weight: 600;
     font-weight: 700;
     margin-top: 3px;
     margin-bottom: 0;
+}
+
+
+.each-table{
+    border: 1px solid #EEEEEE;
+    border-radius: 6px;
+    // padding: 6px;
+    margin-bottom: 25px;
+}
+.orderHeader {
+    margin: 8px;
 }
