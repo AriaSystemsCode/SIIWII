@@ -558,7 +558,7 @@
                             <label for="" class="form-label"
                                 >Seller Contact Name</label
                             >
-                            <p-dropdown
+                            <!-- <p-dropdown
                                 [options]="sellerContacts"
                                 formControlName="sellerContactName"
                                 [filter]="true"
@@ -588,7 +588,26 @@
                                 </div>
                             </ng-template>
 
-                        </p-dropdown>
+                        </p-dropdown> -->
+
+
+                        <p-autoComplete
+                        #autoComplete
+                        [dropdown]="true"
+                      
+                        [suggestions]="filteredSellerContacts"
+                        formControlName="sellerContactName"
+                        [(ngModel)]="selectedSellerContact"
+                        (completeMethod)="handleSellerNameSearch($event)"
+                        (ngModelChange)="handleSellerNameChange($event)"
+                         (click)="loadInitialSellerContacts()"
+                       
+                        [placeholder]=" 'Please Select Seller Contact Name'"
+                        field="name"
+                        [forceSelection]="false">
+                        
+                      
+                    </p-autoComplete>
 
                             <small
                                 class="text-danger"
