@@ -104,6 +104,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     editSubClass: boolean = false;
     openDropDown: boolean = false;
     showAppCodes: boolean = false;
+    showAppCatCodes: boolean = false;
+    
     selectAllChecked: boolean = false;
     constructor(
         injector: Injector,
@@ -830,7 +832,7 @@ onNodeSelectCat(event: any) {
         });
     
     
-        this.showSelectedCat = true;
+        // this.showSelectedCat = true;
         this.showExistCat = false;
     
     
@@ -883,7 +885,7 @@ onNodeSelectCat(event: any) {
             });
     
         // Reset the flags and form inputs
-        this.showCatBtn = false;
+        this.showExistCat = true;
         this.addSubCat = false;
         this.editSubCat = false;
         this.category.name = '';
@@ -1080,7 +1082,7 @@ onNodeSelect(event: any) {
             });
         });
 
-        this.showSelectedClass = true;
+        // this.showSelectedClass = true;
      
         this.showExistClass = false;
         this.closeDropdown();
@@ -1376,6 +1378,13 @@ cancelClass(){
         this.showAppCodes = false;
         setTimeout(() => {
           this.showAppCodes = true; // Re-render app-codes after a delay
+        }, 0); // Delay to force Angular to re-create the component
+      }
+
+      toggleAppCatCodes() {
+        this.showAppCatCodes = false;
+        setTimeout(() => {
+          this.showAppCatCodes = true; // Re-render app-codes after a delay
         }, 0); // Delay to force Angular to re-create the component
       }
 
