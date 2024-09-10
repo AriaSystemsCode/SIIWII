@@ -4,6 +4,7 @@ import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactions
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
+import * as moment from 'moment';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
@@ -187,6 +188,16 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   }
   createOrEditTransaction() {
     this.showMainSpinner()
+    let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+    let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+    let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+    let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+
+
+    this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+    this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+    this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+    this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
