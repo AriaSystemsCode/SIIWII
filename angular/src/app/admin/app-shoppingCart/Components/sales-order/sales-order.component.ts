@@ -675,9 +675,6 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         i: number
     ) {
 
-        // if (!this.tempDeselectedCategories.includes(category)) {
-        //     this.tempDeselectedCategories.push(category);
-        //   }
 
         if (category?.data?.sycEntityObjectCategory?.id) {
             category.removed = true;
@@ -930,10 +927,7 @@ onNodeSelectCat(event: any) {
         i: number
     ) {
 
-        // if (!this.tempDeselectedCategories.includes(category)) {
-        //     this.tempDeselectedCategories.push(category);
-        //   }
-        // this.formTouched = true;
+
         if (classification?.data?.sycEntityObjectClassification?.id) {
             classification.removed = true;
         } else this.selectedClassification.splice(i, 1);
@@ -1202,7 +1196,7 @@ cancelCat(){
        this.category.name = ''
        this.addSubCat = false
        this.editSubCat = false
-       this.tempDeselectedCategories =[]
+    //    this.tempDeselectedCategories =[]
 
 }
 
