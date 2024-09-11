@@ -20,6 +20,6 @@ namespace onetouch.AppSubScriptionPlan
         Task Delete(EntityDto<long> input);
 
         Task<FileDto> GetAppTenantSubscriptionPlansToExcel(GetAllAppTenantSubscriptionPlansForExcelInput input);
-
+        Task<long?> GetTenantSubscriptionPlanId(long tenantId);
     }
 }

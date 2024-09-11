@@ -1,1 +1,68 @@
-<p>add-ons works!</p>
+<!-- <p>add-ons works!</p> -->
+<div>
+   
+<div class="row align-items-center">
+    <!--<Primeng-Datatable-Start>-->
+    <div class="primeng-datatable-container col-12"
+         [busyIf]="primengTableHelper.isLoading">
+<p-table #table 
+(onLazyLoad)="getAppTenantAddOns($event)"
+[value]="primengTableHelper.records"
+rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+[paginator]="false"
+[lazy]="true"
+[scrollable]="true"
+ScrollWidth="100%"
+columnResizeMode="expand" 
+[responsive]="primengTableHelper.isResponsive">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 45px;height: 45px;"></th>
+            <th style="width: 400px;height: 45px;"></th>
+            <th style="height: 45px;" class="auto-width"></th> 
+            <th style="height: 45px;"></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData>
+        <tr><td style="width: 45px"><img src="assets/accounts/Feature-Icon.svg"/></td>
+            <td >
+                <div class="container">
+                <p [ngClass]="'AddOnsBoldText'" style="margin-top: 0px;">{{ rowData.appSubscriptionPlanDetail.featureName }}</p>
+                <div class="progress-bar" style="margin-top: 12px;">
+                    <div class="progress-bar-fill"
+                     [ngStyle]="getProgressBarWidth(rowData)"></div>
+                  </div>
+                  </div>
+                <p [ngClass]="'AddOnsRegularText'">{{ rowData.appSubscriptionPlanDetail.featureDescription }}
+                    
+                </p></td>
+            <td class="auto-width"><span [ngClass]="'price-txt'">$ {{ rowData.appSubscriptionPlanDetail.unitPrice }}/</span>{{ rowData.appSubscriptionPlanDetail.featurePeriodLimit }}</td>
+            <td style="width: 30px">
+                <div  container="body">
+                    
+                     <button class="btn btn-add" 
+                     (click)="add()">
+                       {{l("Add2")}}
+                     </button>
+                     </div>
+                     </td> 
+        </tr>
+    </ng-template>
+</p-table>
+</div>
+</div>
+<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+    {{l('NoData')}}
+</div>
+<div class="primeng-paging-container">
+    <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                 #paginator
+                 (onPageChange)="getAppTenantAddOns($event)"
+                 [totalRecords]="primengTableHelper.totalRecordsCount"
+                 [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                 [showCurrentPageReport]="true"
+                 [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
+    >
+    </p-paginator>
+</div>
+</div>

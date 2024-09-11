@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Abp.Domain.Uow;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -99,7 +101,20 @@ namespace onetouch.AppSubScriptionPlan
             );
 
         }
+        [AllowAnonymous]
+        public async Task<long?> GetTenantSubscriptionPlanId(long tenantId)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
+                .Where(z => z.TenantId == tenantId && (z.CurrentPeriodStartDate <= DateTime.Now.Date && z.CurrentPeriodEndDate >= DateTime.Now.Date)).FirstOrDefaultAsync();
+                if (tenantPlan != null)
+                    return tenantPlan.AppSubscriptionPlanHeaderId;
+                else
+                    return null;
 
+            }
+        }
         public async Task<GetAppTenantSubscriptionPlanForViewDto> GetAppTenantSubscriptionPlanForView(long id)
         {
             var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAsync(id);

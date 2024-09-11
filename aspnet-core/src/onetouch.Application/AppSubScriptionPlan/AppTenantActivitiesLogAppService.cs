@@ -19,6 +19,7 @@ using System.Runtime.Caching;
 using NPOI.OpenXmlFormats.Shared;
 using Microsoft.AspNetCore.Authorization;
 using onetouch.Helpers;
+using Twilio.Rest.Video.V1.Room.Participant;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -627,7 +628,7 @@ namespace onetouch.AppSubScriptionPlan
         public async Task<bool> AddPlanRenewalBalances(DateTime startdate)
         {
             var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(z=>z.AppSubscriptionPlanHeaderFk).Where(z => z.TenantId == AbpSession.TenantId &&
-            (z.CurrentPeriodStartDate >= DateTime.Now.Date && z.CurrentPeriodEndDate >= DateTime.Now.Date)).FirstOrDefaultAsync();
+            (z.CurrentPeriodStartDate <= DateTime.Now.Date && z.CurrentPeriodEndDate >= DateTime.Now.Date)).FirstOrDefaultAsync();
             if (tenantPlan != null)
             {
                 tenantPlan.CurrentPeriodStartDate = startdate;
@@ -690,5 +691,6 @@ namespace onetouch.AppSubScriptionPlan
 
             return true;
         }
+       
     }
 }

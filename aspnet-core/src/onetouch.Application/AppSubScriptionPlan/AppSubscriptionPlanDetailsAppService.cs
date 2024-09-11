@@ -18,6 +18,9 @@ using Abp.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
+using Microsoft.AspNetCore.Authorization;
+using Abp.Domain.Uow;
+using System.Security.Permissions;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -28,20 +31,28 @@ namespace onetouch.AppSubScriptionPlan
         private readonly IAppSubscriptionPlanDetailsExcelExporter _appSubscriptionPlanDetailsExcelExporter;
         private readonly IRepository<AppSubscriptionPlanHeader, long> _lookup_appSubscriptionPlanHeaderRepository;
         private readonly IRepository<AppFeature, long> _lookup_appFeatureRepository;
-
-        public AppSubscriptionPlanDetailsAppService(IRepository<AppSubscriptionPlanDetail, long> appSubscriptionPlanDetailRepository, IAppSubscriptionPlanDetailsExcelExporter appSubscriptionPlanDetailsExcelExporter, IRepository<AppSubscriptionPlanHeader, long> lookup_appSubscriptionPlanHeaderRepository, IRepository<AppFeature, long> lookup_appFeatureRepository)
+        private readonly IRepository<AppTenantActivitiesLog, long> _appTenantActivitiesLogRepository;
+        private readonly IRepository<AppTenantSubscriptionPlan, long> _appTenantSubscriptionPlanRepository;
+        public AppSubscriptionPlanDetailsAppService(IRepository<AppSubscriptionPlanDetail, long> appSubscriptionPlanDetailRepository,
+            IAppSubscriptionPlanDetailsExcelExporter appSubscriptionPlanDetailsExcelExporter,
+            IRepository<AppSubscriptionPlanHeader, long> lookup_appSubscriptionPlanHeaderRepository, 
+            IRepository<AppFeature, long> lookup_appFeatureRepository,
+            IRepository<AppTenantSubscriptionPlan, long> appTenantSubscriptionPlanRepository,
+            IRepository<AppTenantActivitiesLog, long> appTenantActivitiesLogRepository)
         {
             _appSubscriptionPlanDetailRepository = appSubscriptionPlanDetailRepository;
             _appSubscriptionPlanDetailsExcelExporter = appSubscriptionPlanDetailsExcelExporter;
             _lookup_appSubscriptionPlanHeaderRepository = lookup_appSubscriptionPlanHeaderRepository;
             _lookup_appFeatureRepository = lookup_appFeatureRepository;
-
+            _appTenantActivitiesLogRepository= appTenantActivitiesLogRepository;
+            _appTenantSubscriptionPlanRepository = appTenantSubscriptionPlanRepository;
         }
-
+        [AllowAnonymous]
         public async Task<PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>> GetAll(GetAllAppSubscriptionPlanDetailsInput input)
         {
-
-            var filteredAppSubscriptionPlanDetails = _appSubscriptionPlanDetailRepository.GetAll()
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var filteredAppSubscriptionPlanDetails = _appSubscriptionPlanDetailRepository.GetAll()
                         .Include(e => e.AppSubscriptionPlanHeaderFk)
                         .Include(e => e.AppFeatureFk)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.FeatureCode.Contains(input.Filter) || e.FeatureName.Contains(input.Filter) || e.Availability.Contains(input.Filter) || e.FeaturePeriodLimit.Contains(input.Filter) || e.Category.Contains(input.Filter) || e.FeatureDescription.Contains(input.Filter) || e.FeatureStatus.Contains(input.Filter) || e.UnitOfMeasurementName.Contains(input.Filter) || e.UnitOfMeasurmentCode.Contains(input.Filter) || e.FeatureBillingCode.Contains(input.Filter) || e.FeatureCategory.Contains(input.Filter) || e.Notes.Contains(input.Filter))
@@ -63,86 +74,113 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureBillingCodeFilter), e => e.FeatureBillingCode == input.FeatureBillingCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCategoryFilter), e => e.FeatureCategory == input.FeatureCategoryFilter)
                         .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity))
-                        //.WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanHeaderFilter), e => e.AppSubscriptionPlanHeaderFk != null && e.AppSubscriptionPlanHeaderFk. == input.AppSubscriptionPlanHeaderFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter);
+                        .WhereIf(input.AppSubscriptionPlanHeaderFilter != null, e => e.AppSubscriptionPlanHeaderFk != null && e.AppSubscriptionPlanHeaderId == input.AppSubscriptionPlanHeaderFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter)
+                        .WhereIf(input.AddFeaturesOnly, e => e.IsAddOn == true);
 
-            var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails
-                .OrderBy(input.Sorting ?? "id asc")
-                .PageBy(input);
+                var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails
+                    .OrderBy(input.Sorting ?? "id asc")
+                    .PageBy(input);
 
-            var appSubscriptionPlanDetails = from o in pagedAndFilteredAppSubscriptionPlanDetails
-                                             join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll() on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
-                                             from s1 in j1.DefaultIfEmpty()
-                                             //join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
-                                             //from s2 in j2.DefaultIfEmpty()
+                var appSubscriptionPlanDetails = from o in pagedAndFilteredAppSubscriptionPlanDetails
+                                                 join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll() on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
+                                                 from s1 in j1.DefaultIfEmpty()
+                                                     //join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
+                                                     //from s2 in j2.DefaultIfEmpty()
 
-                                             select new
-                                             {
+                                                 select new
+                                                 {
 
-                                                 o.FeatureCode,
-                                                 o.FeatureName,
-                                                 o.Availability,
-                                                 o.FeatureLimit,
-                                                 o.RollOver,
-                                                 o.UnitPrice,
-                                                 o.FeaturePeriodLimit,
-                                                 o.Category,
-                                                 o.FeatureDescription,
-                                                 o.FeatureStatus,
-                                                 o.UnitOfMeasurementName,
-                                                 o.UnitOfMeasurmentCode,
-                                                 o.IsFeatureBillable,
-                                                 o.FeatureBillingCode,
-                                                 o.FeatureCategory,
-                                                 o.Trackactivity,
-                                                 Id = o.Id,
-                                                 AppFeatureId = o.AppFeatureId,
-                                                 //AppSubscriptionPlanHeader = o1 == null ? "" : o1.ToString(),
-                                                 //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
-                                             };
+                                                     o.FeatureCode,
+                                                     o.FeatureName,
+                                                     o.Availability,
+                                                     o.FeatureLimit,
+                                                     o.RollOver,
+                                                     o.UnitPrice,
+                                                     o.FeaturePeriodLimit,
+                                                     o.Category,
+                                                     o.FeatureDescription,
+                                                     o.FeatureStatus,
+                                                     o.UnitOfMeasurementName,
+                                                     o.UnitOfMeasurmentCode,
+                                                     o.IsFeatureBillable,
+                                                     o.FeatureBillingCode,
+                                                     o.FeatureCategory,
+                                                     o.Trackactivity,
+                                                     Id = o.Id,
+                                                     o.IsAddOn,
+                                                     AppFeatureId = o.AppFeatureId,
+                                                     o.AppSubscriptionPlanHeaderId
+                                                     //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
+                                                 };
 
-            var totalCount = await filteredAppSubscriptionPlanDetails.CountAsync();
+                var totalCount = await filteredAppSubscriptionPlanDetails.CountAsync();
 
-            var dbList = await appSubscriptionPlanDetails.ToListAsync();
-            var results = new List<GetAppSubscriptionPlanDetailForViewDto>();
+                var dbList = await appSubscriptionPlanDetails.ToListAsync();
+                var results = new List<GetAppSubscriptionPlanDetailForViewDto>();
 
-            foreach (var o in dbList)
-            {
-                var res = new GetAppSubscriptionPlanDetailForViewDto()
+                foreach (var o in dbList)
                 {
-                    AppSubscriptionPlanDetail = new AppSubscriptionPlanDetailDto
+                    var res = new GetAppSubscriptionPlanDetailForViewDto()
                     {
+                        AppSubscriptionPlanDetail = new AppSubscriptionPlanDetailDto
+                        {
 
-                        FeatureCode = o.FeatureCode,
-                        FeatureName = o.FeatureName,
-                        Availability = o.Availability,
-                        FeatureLimit = int.Parse(o.FeatureLimit.ToString()),
-                        RollOver = o.RollOver,
-                        UnitPrice = o.UnitPrice,
-                        FeaturePeriodLimit = o.FeaturePeriodLimit,
-                        Category = o.Category,
-                        FeatureDescription = o.FeatureDescription,
-                        FeatureStatus = o.FeatureStatus,
-                        UnitOfMeasurementName = o.UnitOfMeasurementName,
-                        UnitOfMeasurmentCode = o.UnitOfMeasurmentCode,
-                        IsFeatureBillable = o.IsFeatureBillable,
-                        FeatureBillingCode = o.FeatureBillingCode,
-                        FeatureCategory = o.FeatureCategory,
-                        Trackactivity = o.Trackactivity,
-                        Id = o.Id,
-                        AppFeatureId = o.AppFeatureId
-                    },
-                   // AppSubscriptionPlanHeader = o.AppSubscriptionPlanHeader,
-                   // AppFeatureDescription = o.AppFeatureDescription
-                };
+                            FeatureCode = o.FeatureCode,
+                            FeatureName = o.FeatureName,
+                            Availability = o.Availability,
+                            FeatureLimit = int.Parse(o.FeatureLimit.ToString()),
+                            RollOver = o.RollOver,
+                            UnitPrice = o.UnitPrice,
+                            FeaturePeriodLimit = o.FeaturePeriodLimit,
+                            Category = o.Category,
+                            FeatureDescription = o.FeatureDescription,
+                            FeatureStatus = o.FeatureStatus,
+                            UnitOfMeasurementName = o.UnitOfMeasurementName,
+                            UnitOfMeasurmentCode = o.UnitOfMeasurmentCode,
+                            IsFeatureBillable = o.IsFeatureBillable,
+                            FeatureBillingCode = o.FeatureBillingCode,
+                            FeatureCategory = o.FeatureCategory,
+                            Trackactivity = o.Trackactivity,
+                            Id = o.Id,
+                            IsAddOn = o.IsAddOn,
+                            AppFeatureId = o.AppFeatureId
+                        },
+                        
+                        // AppSubscriptionPlanHeader = o.AppSubscriptionPlanHeader,
+                        // AppFeatureDescription = o.AppFeatureDescription
+                    };
+                    if (input.AddFeaturesOnly)
+                    {
+                        var tenantHeader = await _appTenantSubscriptionPlanRepository.GetAll().
+                            Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodStartDate >= DateTime.Now.Date && DateTime.Now.Date <= z.CurrentPeriodEndDate &&
+                            z.Id == o.AppSubscriptionPlanHeaderId).FirstOrDefaultAsync();
+                        if (tenantHeader != null)
+                        {
+                            var activitySumConsumed = _appTenantActivitiesLogRepository.GetAll().Where(z => z.AppSubscriptionPlanHeaderId == o.AppSubscriptionPlanHeaderId
+                            && z.TenantId == AbpSession.TenantId && z.FeatureCode == o.FeatureCode &&
+                            z.ActivityDateTime <= tenantHeader.CurrentPeriodEndDate && z.ActivityDateTime >= tenantHeader.CurrentPeriodStartDate &&
+                              z.CreditOrUsage == "Credit").Sum(z => z.ConsumedQty);
 
-                results.Add(res);
+                          var activitySumBalance = _appTenantActivitiesLogRepository.GetAll().Where(z => z.AppSubscriptionPlanHeaderId == o.AppSubscriptionPlanHeaderId
+                          && z.TenantId == AbpSession.TenantId && z.FeatureCode == o.FeatureCode &&
+                          z.ActivityDateTime <= tenantHeader.CurrentPeriodEndDate && z.ActivityDateTime >= tenantHeader.CurrentPeriodStartDate &&
+                            z.CreditOrUsage == "Credit").Sum(z => z.ConsumedQty + z.RemainingQty);
+
+                            res.FeatureCreditQty = activitySumBalance;
+                            res.FeatureUsedQty = activitySumConsumed;
+
+                         }
+                    }
+
+                    results.Add(res);
+                }
+
+                return new PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>(
+                    totalCount,
+                    results
+                );
             }
-
-            return new PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>(
-                totalCount,
-                results
-            );
 
         }
 
