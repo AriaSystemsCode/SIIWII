@@ -59,9 +59,10 @@ namespace onetouch.AppSubScriptionPlan.Dtos
 
         [StringLength(AppSubscriptionPlanDetailConsts.MaxNotesLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinNotesLength)]
         public string Notes { get; set; }
-        public bool IsAddOn { get; set; }
+
         public long AppSubscriptionPlanHeaderId { get; set; }
-        public string EntityStatusCode { set; get; }
-        public int? EntityStatusId { get; set; }
+
+        public int? AppFeatureId { get; set; }
+
     }
 }

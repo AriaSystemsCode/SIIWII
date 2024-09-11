@@ -1,17 +1,17 @@
 ﻿using onetouch.AppSubScriptionPlan;
+using onetouch.AppSubScriptionPlan;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities.Auditing;
 using Abp.Domain.Entities;
 using Abp.Auditing;
-using onetouch.AppEntities;
 
 namespace onetouch.AppSubScriptionPlan
 {
     [Table("AppSubscriptionPlanDetails")]
     [Audited]
-    public class AppSubscriptionPlanDetail : AppEntity
+    public class AppSubscriptionPlanDetail : FullAuditedEntity<long>
     {
 
         [Required]
@@ -24,9 +24,9 @@ namespace onetouch.AppSubScriptionPlan
 
         [Required]
         [StringLength(AppSubscriptionPlanDetailConsts.MaxAvailabilityLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinAvailabilityLength)]
-        public virtual string Availability { get; set; }
+        public virtual string? Availability { get; set; }
 
-        public virtual int FeatureLimit { get; set; }
+        public virtual int? FeatureLimit { get; set; }
 
         public virtual bool RollOver { get; set; }
 
@@ -34,36 +34,35 @@ namespace onetouch.AppSubScriptionPlan
 
         [Required]
         [StringLength(AppSubscriptionPlanDetailConsts.MaxFeaturePeriodLimitLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinFeaturePeriodLimitLength)]
-        public virtual string FeaturePeriodLimit { get; set; }
+        public virtual string? FeaturePeriodLimit { get; set; }
 
         [Required]
         [StringLength(AppSubscriptionPlanDetailConsts.MaxCategoryLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinCategoryLength)]
-        public virtual string Category { get; set; }
+        public virtual string? Category { get; set; }
 
         [StringLength(AppSubscriptionPlanDetailConsts.MaxFeatureDescriptionLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinFeatureDescriptionLength)]
         public virtual string FeatureDescription { get; set; }
-
         [StringLength(AppSubscriptionPlanDetailConsts.MaxFeatureStatusLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinFeatureStatusLength)]
         public virtual string FeatureStatus { get; set; }
 
         [Required]
         [StringLength(AppSubscriptionPlanDetailConsts.MaxUnitOfMeasurementNameLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinUnitOfMeasurementNameLength)]
-        public virtual string UnitOfMeasurementName { get; set; }
+        public virtual string? UnitOfMeasurementName { get; set; }
 
         [Required]
         [StringLength(AppSubscriptionPlanDetailConsts.MaxUnitOfMeasurmentCodeLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinUnitOfMeasurmentCodeLength)]
-        public virtual string UnitOfMeasurmentCode { get; set; }
+        public virtual string? UnitOfMeasurmentCode { get; set; }
 
         public virtual bool IsFeatureBillable { get; set; }
+        public virtual bool IsAddOn { get; set; }
 
         [StringLength(AppSubscriptionPlanDetailConsts.MaxFeatureBillingCodeLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinFeatureBillingCodeLength)]
-        public virtual string FeatureBillingCode { get; set; }
+        public virtual string? FeatureBillingCode { get; set; }
 
         [StringLength(AppSubscriptionPlanDetailConsts.MaxFeatureCategoryLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinFeatureCategoryLength)]
-        public virtual string FeatureCategory { get; set; }
+        public virtual string? FeatureCategory { get; set; }
 
         public virtual bool Trackactivity { get; set; }
-        public virtual bool IsAddOn { get; set; }
 
         [StringLength(AppSubscriptionPlanDetailConsts.MaxNotesLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinNotesLength)]
         public virtual string Notes { get; set; }
@@ -72,6 +71,11 @@ namespace onetouch.AppSubScriptionPlan
 
         [ForeignKey("AppSubscriptionPlanHeaderId")]
         public AppSubscriptionPlanHeader AppSubscriptionPlanHeaderFk { get; set; }
+
+        public virtual long? AppFeatureId { get; set; }
+
+        [ForeignKey("AppFeatureId")]
+        public AppFeature AppFeatureFk { get; set; }
 
     }
 }

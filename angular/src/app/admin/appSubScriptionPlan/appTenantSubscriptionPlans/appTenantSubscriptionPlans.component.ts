@@ -75,6 +75,7 @@ export class AppTenantSubscriptionPlansComponent extends AppComponentBase {
 
     getAppTenantSubscriptionPlans(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
+using onetouch.AppEntities;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -25,11 +26,13 @@ namespace onetouch.AppSubScriptionPlan
         private readonly IRepository<AppFeature, long> _appFeatureRepository;
         private readonly IAppFeaturesExcelExporter _appFeaturesExcelExporter;
         private readonly Helper _helper;
-        public AppFeaturesAppService(IRepository<AppFeature,long> appFeatureRepository, IAppFeaturesExcelExporter appFeaturesExcelExporter, Helper helper)
+        private readonly IRepository<AppEntity, long> _appEntityRepository;
+        public AppFeaturesAppService(IRepository<AppFeature,long> appFeatureRepository, IAppFeaturesExcelExporter appFeaturesExcelExporter, Helper helper, IRepository<AppEntity, long> appEntityRepository)
         {
             _appFeatureRepository = appFeatureRepository;
             _appFeaturesExcelExporter = appFeaturesExcelExporter;
             _helper = helper;
+            _appEntityRepository = appEntityRepository;
         }
 
         public async Task<PagedResultDto<GetAppFeatureForViewDto>> GetAll(GetAllAppFeaturesInput input)
@@ -152,6 +155,13 @@ namespace onetouch.AppSubScriptionPlan
             appFeature.EntityObjectTypeId = entityFeatureObjectType.Id;
             appFeature.EntityObjectTypeCode = entityFeatureObjectType.Code;
             appFeature.TenantId = null;
+            //appFeature.UnitOfMeasurementId = null;
+            if (!string.IsNullOrEmpty(input.UnitOfMeasurementCode))
+            {
+                var uom = await _appEntityRepository.GetAll().Where(z => z.Code == input.UnitOfMeasurementCode && z.EntityObjectTypeCode=="UOM").FirstOrDefaultAsync();
+                if (uom != null)
+                    appFeature.UnitOfMeasurementId = uom.Id;
+            }
             await _appFeatureRepository.InsertAsync(appFeature);
 
         }
