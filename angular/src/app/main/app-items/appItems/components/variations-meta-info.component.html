@@ -1,36 +1,41 @@
-<h6 class="mb-4"> {{ 'AttributesAndOptionsYou’veSelected' | localize }}</h6>
-<div class="row mb-2">
-    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right">{{ 'NumberOfVariations' | localize }}:</div>
+
+<p class="hint m-0 p-0 pl-5 ml-5 mb-5">
+        <i class="pr-2 fa fa-bell"></i>   {{ 'AttributesAndOptionsYou’veSelected' | localize}}
+</p>
+
+
+<div class="row pl-5 ml-5 mb-3">
+    <div class="text-right">{{ 'NumberOfVariations' | localize }}:</div>
     <div class="col text-left font-weight-bold">{{variations?.length}}</div>
 </div>
-<div class="row mb-2" *ngFor="let extraAttr of selectedVariations | keyvalue">
-    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE'">
+<div class="row" *ngFor="let extraAttr of selectedVariations | keyvalue">
+    <div class=" text-right pl-5 ml-5 mb-3" *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE'">
         {{extraAttr?.key}}:
     </div>
-    <div class="col text-left font-weight-bold"  *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE'">{{extraAttr?.value | arrayToString}}</div>
+    <div class="col text-left font-weight-bold   mb-3"  *ngIf="extraAttr?.key =='COLOR' ||extraAttr?.key=='SIZE'">{{extraAttr?.value | arrayToString}}</div>
 </div>
-<div class="row mb-2" *ngIf="showPriceRange && minPrice != maxPrice">
-    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" >
+<div class="row" *ngIf="showPriceRange && minPrice != maxPrice">
+    <div class="text-right pl-5 ml-5 mb-3" >
         {{ 'PriceRangedFrom' | localize }}:
     </div>
-    <div class="col text-left font-weight-bold">
+    <div class="col text-left font-weight-bold   mb-3    ">
         {{tenantDefaultCurrency?.symbol}}{{minPrice}} {{'to' | localize}} {{tenantDefaultCurrency?.symbol}}{{maxPrice}}
     </div>
 </div>
 
-<div class="row mb-2" *ngIf="showPriceRange && minPrice == maxPrice">
-    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" >
+<div class="row" *ngIf="showPriceRange && minPrice == maxPrice">
+    <div class="text-right pl-5 ml-5 mb-3" >
         {{ 'Price' | localize }} :
     </div>
-    <div class="col text-left font-weight-bold">
+    <div class="col text-left font-weight-bold   mb-3    ">
         {{tenantDefaultCurrency?.symbol}}{{minPrice}}
     </div>
 </div>
-<div class="row mb-2" *ngIf="stockAvailability">
-    <div class="col-lg-2 col-md-3 col-sm-4 col-5 text-right" >
+<div class="row" *ngIf="stockAvailability">
+    <div class="text-right pl-5 ml-5 mb-3" >
         {{ 'AvailableQuantity' | localize }} :
     </div>
-    <div class="col text-left font-weight-bold">
+    <div class="col text-left font-weight-bold   mb-3">
         {{stockAvailability}}
     </div>
 </div>

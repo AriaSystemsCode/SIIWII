@@ -824,6 +824,8 @@ export class AppItemsViewComponent
                 value: priceDto.currencyId,
                 isHostRecord: undefined,
                 stockAvailability: undefined,
+                hexaCode:undefined,
+                image:undefined
             });
             if (currency.symbol) currency.label += ` ${currency.symbol}`;
             if (currency && !alreadyAdded) {

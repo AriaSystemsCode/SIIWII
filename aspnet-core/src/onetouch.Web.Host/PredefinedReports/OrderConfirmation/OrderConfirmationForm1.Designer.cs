@@ -22,16 +22,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.PageHeader = reportInitializer.GetControl<DevExpress.XtraReports.UI.PageHeaderBand>("PageHeader");
             this.Detail1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailBand>("Detail1");
             this.DetailReport = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailReportBand>("DetailReport");
-            this.label46 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label46");
-            this.label45 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label45");
-            this.label43 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label43");
-            this.label44 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label44");
-            this.label39 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label39");
-            this.label38 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label38");
-            this.label37 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label37");
-            this.label36 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label36");
-            this.label35 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label35");
-            this.label34 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label34");
+            this.PageFooter = reportInitializer.GetControl<DevExpress.XtraReports.UI.PageFooterBand>("PageFooter");
+            this.label50 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label50");
             this.label11 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label11");
             this.panel3 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPanel>("panel3");
             this.panel2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPanel>("panel2");
@@ -79,6 +71,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.xrTableCell10 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("xrTableCell10");
             this.xrTableCell11 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("xrTableCell11");
             this.xrTableCell12 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("xrTableCell12");
+            this.label48 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label48");
+            this.label49 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label49");
             this.label47 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label47");
             this.pictureBox3 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox3");
             this.label7 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label7");
@@ -91,6 +85,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.label1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label1");
             this.GroupHeader1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.GroupHeaderBand>("GroupHeader1");
             this.Detail = reportInitializer.GetControl<DevExpress.XtraReports.UI.DetailBand>("Detail");
+            this.label53 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label53");
+            this.label52 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label52");
             this.pictureBox1 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRPictureBox>("pictureBox1");
             this.label40 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label40");
             this.xrTable2 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTable>("xrTable2");
@@ -108,6 +104,16 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.tableCell6 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRTableCell>("tableCell6");
             this.label33 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label33");
             this.label32 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label32");
+            this.label46 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label46");
+            this.label45 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label45");
+            this.label43 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label43");
+            this.label44 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label44");
+            this.label34 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label34");
+            this.label38 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label38");
+            this.label37 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label37");
+            this.label36 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label36");
+            this.label35 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label35");
+            this.label39 = reportInitializer.GetControl<DevExpress.XtraReports.UI.XRLabel>("label39");
 
             // Parameters
             this.TransactionId = reportInitializer.GetParameter("TransactionId");
@@ -130,16 +136,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.PageHeaderBand PageHeader;
         private DevExpress.XtraReports.UI.DetailBand Detail1;
         private DevExpress.XtraReports.UI.DetailReportBand DetailReport;
-        private DevExpress.XtraReports.UI.XRLabel label46;
-        private DevExpress.XtraReports.UI.XRLabel label45;
-        private DevExpress.XtraReports.UI.XRLabel label43;
-        private DevExpress.XtraReports.UI.XRLabel label44;
-        private DevExpress.XtraReports.UI.XRLabel label39;
-        private DevExpress.XtraReports.UI.XRLabel label38;
-        private DevExpress.XtraReports.UI.XRLabel label37;
-        private DevExpress.XtraReports.UI.XRLabel label36;
-        private DevExpress.XtraReports.UI.XRLabel label35;
-        private DevExpress.XtraReports.UI.XRLabel label34;
+        private DevExpress.XtraReports.UI.PageFooterBand PageFooter;
+        private DevExpress.XtraReports.UI.XRLabel label50;
         private DevExpress.XtraReports.UI.XRLabel label11;
         private DevExpress.XtraReports.UI.XRPanel panel3;
         private DevExpress.XtraReports.UI.XRPanel panel2;
@@ -187,6 +185,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell10;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell11;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell12;
+        private DevExpress.XtraReports.UI.XRLabel label48;
+        private DevExpress.XtraReports.UI.XRLabel label49;
         private DevExpress.XtraReports.UI.XRLabel label47;
         private DevExpress.XtraReports.UI.XRPictureBox pictureBox3;
         private DevExpress.XtraReports.UI.XRLabel label7;
@@ -199,6 +199,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.XRLabel label1;
         private DevExpress.XtraReports.UI.GroupHeaderBand GroupHeader1;
         private DevExpress.XtraReports.UI.DetailBand Detail;
+        private DevExpress.XtraReports.UI.XRLabel label53;
+        private DevExpress.XtraReports.UI.XRLabel label52;
         private DevExpress.XtraReports.UI.XRPictureBox pictureBox1;
         private DevExpress.XtraReports.UI.XRLabel label40;
         private DevExpress.XtraReports.UI.XRTable xrTable2;
@@ -217,6 +219,16 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.XRLabel label33;
         private DevExpress.XtraReports.UI.XRLabel label32;
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
+        private DevExpress.XtraReports.UI.XRLabel label46;
+        private DevExpress.XtraReports.UI.XRLabel label45;
+        private DevExpress.XtraReports.UI.XRLabel label43;
+        private DevExpress.XtraReports.UI.XRLabel label44;
+        private DevExpress.XtraReports.UI.XRLabel label34;
+        private DevExpress.XtraReports.UI.XRLabel label38;
+        private DevExpress.XtraReports.UI.XRLabel label37;
+        private DevExpress.XtraReports.UI.XRLabel label36;
+        private DevExpress.XtraReports.UI.XRLabel label35;
+        private DevExpress.XtraReports.UI.XRLabel label39;
         private DevExpress.XtraReports.UI.CalculatedField calculatedField1;
         private DevExpress.XtraReports.Parameters.Parameter TransactionId;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;

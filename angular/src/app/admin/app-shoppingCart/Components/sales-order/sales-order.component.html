@@ -1,10 +1,9 @@
 <div class="orderForm  position-relative">
     <div class="container-fluid orderInfoForm thin-scroll">
         <div
-            class="header p-2 my-2 d-flex align-items-center  "
+            class="header p-2  d-flex align-items-center  justify-content-end"
         >
             <!-- <h6><span class="headertxt"> Entered By : </span> {{ fullName }}</h6> -->
-            <h6><span class="headertxt"> Entered By : </span></h6>
 
             <button
                 [disabled]="!(isContactsValid && isSalesOrderValidForm())"
@@ -14,33 +13,43 @@
             >
                 Continue
             </button>
-            <button
-                *ngIf="!createOrEditorderInfo &&  !showSaveBtn &&  canChange"
+     
+       
+ 
+        </div>
+        <!-- <hr class="my-2" /> -->
+        <div class="row ">
+            <h6 class="col-6 mt-4" ><span class="headertxt previewTitle ml3"> Entered By : </span></h6>
+            <div class="col-6"    *ngIf="!createOrEditorderInfo &&  !showSaveBtn &&  canChange">
+                <button
+             
                 (click)="showEditMode()"
                 class="previewbtn text-center btn float-right"
             >
-                Change
-                <i class="pi pi-pencil"></i>
+            
+            
+            <img src="../../../../../assets/shoppingCart/edit.png"
+            class="imgIcon" style="position: relative;right: 0 !important;bottom: 0 !important;"/>
+            <span class="mx-1 text-white"> Edit</span>
+
             </button>
-            <button
-            *ngIf="showSaveBtn"
-            [disabled]="!(isContactsValid && isSalesOrderValidForm())"
-            (click)="save()"
-            class="previewbtn text-center btn float-right"
-        >
-            Save
-            <i class="pi pi-check"></i>
-        </button>
-        <button
-        *ngIf="showSaveBtn"
-        (click)="cancel()"
-        class="cancelbtn text-center btn float-right"
-    >
-        Cancel
-        <i class="pi pi-times"></i>
-    </button>
+            </div>
+            <div *ngIf="createOrEditorderInfo" class="formGroup  col-md-6 col-12">
+                <label class="label">Reference #</label>
+                <input
+                
+                    type="text"
+                    placeholder="Reference Number"
+                    class="form-control "
+                    style="width: 95% !important;"
+                    [(ngModel)]="reference"
+                />
+             
+           
+            </div>
         </div>
-        <hr class="my-2" />
+        <hr   *ngIf="!createOrEditorderInfo " class="my-2" />
+
         <div class="pr-3">
             <app-contact
             class="w-100"
@@ -54,49 +63,167 @@
             ></app-contact>
 
             <div class="row">
+                <div *ngIf="!createOrEditorderInfo" class="col-md-6 col-12 mt-3">
+                 
+                        <div
+                            class="d-flex align-items-center   w-100"
+                        >
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">Reference Number:</h6>
+                            <p class="previewValue  m-0 p-0 col-6 my-2">
+                                {{ appTransactionsForViewDto?.reference }}
+                            </p>
+                        </div>
+                  
+</div>
                 <!-- classification -->
+                <app-codes *ngIf="showAppCodes &&  !(classification?.id>0)"
+                    [objectType]="entityObjectClassificationType"
+                    [editMode]=false
+                    (getCodeValue)="getClassCodeValue($event)" ></app-codes>
+
+                    <app-codes *ngIf="showAppCodes &&  classification?.id>0"
+                     [objectType]="entityObjectClassificationType"
+                     [editMode]=true
+                     [code]="classification?.code"
+                     (getCodeValue)="getClassCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <label class="label">Classifications</label>
+                        <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Classifications</label> 
+                             <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0" (click)="showClassBtn = true ; toggleAppCodes() " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Classification</div>
+                <div class="d-flex">
+
+                    <div class="d-flex" *ngIf="showSelectedClass || appTransactionsForViewDto?.entityClassifications?.length != 0
+                    ">
                         <div
-                            class="align-items-center big-scroll categoriesClassificationsContainer px-3 py-2 d-flex h-100 row   w-100 border"
-                        >
-                            <p
-                                class="previewValue classificationsValues mr-2 p-0 my-0"
-                                *ngFor="
-                                    let item of appTransactionsForViewDto?.entityClassifications
-                                "
-                            >
-                                {{ item?.entityObjectClassificationName }}
-                                <span 
-                                (click)="classififcationNodeUnSelect(item)">
-                                <i class="flaticon2-delete fa-sm pl-2 pointer"></i>
-                            </span>
-                            </p>
-                            <p
-                                *ngIf="
-                                !appTransactionsForViewDto?.entityClassifications  ||   appTransactionsForViewDto?.entityClassifications
-                                        ?.length === 0
-                                "
-                                class="p-0 m-0 customPlaceHolder"
-                            >
-                                Please select Classification From Tree below
-                            </p>
-                        </div>
-                        <div class="border">
-                            <p-tree
-                                class="w-full md:w-30rem"
-                                [value]="classificationsFiles"
-                                (onNodeExpand)="
-                                    classificationNodeExpand($event)
-                                "
-                                [loading]="loading"
-                                selectionMode="checkbox"
-                                (onNodeSelect)="
-                                    classififcationNodeSelect($event)
-                                "
-                            ></p-tree>
-                        </div>
+                        class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
+                        *ngFor="let item of selectedClassificationsShow; index as i"
+                        [ngClass]="{ 'dimmed': tempDeselectedClassification.includes(item) }"
+                      >
+                        <span>{{ item?.entityObjectClassificationName }}</span>
+                        <a class="clear-icon" (click)="deSelectClass(item, i)">
+                          <i class="fa fa-1x fa-times fa-1x"></i>
+                        </a>
+                        
+                        <a *ngIf="tempDeselectedClassification.includes(item)" style="background-color: #777;" class="clear-icon-d" >
+                            <i class="fa fa-1x fa-times fa-1x"></i>
+                        </a>
+                      </div>
+                    
+                    </div>
+                    
+                      
+                    <div *ngIf="allClassFilteredRecords.length != 0 &&  !showExistClass " (click)="showExistClass = true;showClassBtn= false" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Classification</div>
+                    </div>
+                    
+
+
+                   
+                </div>
+
+
+
+
+
+
+
+<div class="d-flex mt-2" *ngIf="showClassBtn ">
+    <div  class="formGroup  col-8">
+      
+        <input
+        
+            type="text"
+            placeholder="classification"
+            class="form-control "
+            style="width: 95% !important;"
+            [(ngModel)]="classification.name"
+            
+        />
+     
+   
+    </div>
+    <button
+   
+ 
+   (click)="saveClass(classification);hideClassBtn =true;showClassBtn = false"
+    class="previewbtn text-center btn "
+>
+    Save
+
+</button>
+<button
+(click)="cancelClass();hideClassBtn =true;showExistClass = true;showClassBtn = false;
+"
+class="cancelbtn text-center btn "
+>
+Cancel
+
+</button>
+ </div>
+                   
+<!-- </div>       -->
+<div class="d-flex" *ngIf=" allClassFilteredRecords.length != 0">
+ 
+
+
+
+
+
+<div *ngIf="showExistClass"  class="flex justify-content-center treeSel"    >
+    <p-treeSelect 
+    class="w-full md:w-20rem"
+    containerStyleClass="w-full"
+    [(ngModel)]="selectedClassification"
+    [options]="allClassFilteredRecords"
+    display="chip"
+    selectionMode="checkbox"
+    placeholder="Select Item"
+    [filter]="true"
+    filterPlaceholder="Search Items"
+    (onNodeSelect)="onNodeSelect($event)"
+    (onNodeUnselect)="onNodeUnselect($event)"
+ 
+>
+    <ng-template pTemplate="default">
+        <div class="header p-2 d-flex align-items-center justify-content-between">
+            <div>
+                <input type="checkbox" (change)="toggleSelectAll()" /> Select All
+            </div>
+            <button class="btn btn-link" (click)="collapseAll()">Collapse All</button>
+        </div>
+    </ng-template>
+    
+    <ng-template let-node pTemplate="default">
+        <div (click)="onLabelClick($event)" class="d-flex justify-content-between">
+            <span style="margin-top: 8px;">{{ node.label }}</span>
+            <div class="treenode-action">
+                <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
+                    <button title="actions" class="dropdown-toggle btn btn-sm" aria-controls="dropdown-alignment" dropdownToggle>
+                        <div class="three-dots"></div>
+                    </button>
+                    <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right" *dropdownMenu>
+                        <li><a (click)="addAsNewChildClass(node);showClassBtn = true;showExistClass= false">{{ "AddSubClassification" | localize }}</a></li>
+                        <li><a (click)="EditClass(node);showClassBtn = true;showExistClass= false">{{ "Edit" | localize }}</a></li>
+                        <li><a (click)="deleteClass(node)">{{ "Delete" | localize }}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template let-last pTemplate="footer">
+        <div class="d-flex justify-content-end p-2">
+            <button class="btn bgPurple" (click)="saveClassSelection()">Save</button>
+            <button class="btn btn-secondary" (click)="cancelClassSelection()">Cancel</button>
+        </div>
+    </ng-template>
+</p-treeSelect>
+
+
+</div>
+
+                  
+                        <button *ngIf=" showExistClass" (click)="showClassBtn = true;showExistClass= false ; toggleAppCodes()" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Classification</button>
+                    </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
@@ -114,7 +241,7 @@
                                 {{ item?.entityObjectClassificationName}}
                             </p>
                             <p
-                                class="previewValue m-0 p-0 col-4 my-2"
+                                class="previewValue m-0 p-0 col-md-6 col-12 my-2"
                                 *ngIf="
                              !appTransactionsForViewDto?.entityClassifications  ||  appTransactionsForViewDto?.entityClassifications
                                     ?.length === 0
@@ -128,57 +255,176 @@
                 <!-- classification -->
 
                 <!-- categories -->
+                <app-codes *ngIf="showAppCatCodes && !(category?.id>0)"
+                    [objectType]="entityObjectType"
+                    [editMode]=false
+                    (getCodeValue)="getCodeValue($event)" ></app-codes>
+
+                <app-codes *ngIf="showAppCatCodes && category?.id>0"
+                     [objectType]="entityObjectType"
+                     [editMode]=true
+                     [code]="category?.code"
+                     (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-3">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <label class="label">Categories</label>
-                        <div
-                            class="categoriesClassificationsContainer  big-scroll  h-100 row align-tems-center border flex-row px-3 py-2 rounded row thin-scroll w-100 border"
-                        >
-                            <p
-                                class="previewValue categoriesValues mr-2 p-0"
-                                *ngFor="
-                                    let item of appTransactionsForViewDto?.entityCategories
-                                "
-                            >
-                                {{ item?.entityObjectCategoryName }}
-                                <span 
-                                (click)="categoriesNodeUnSelect(item)">
-                                <i class="flaticon2-delete fa-sm pl-2 pointer"></i>
-                            </span>
-                            </p>
-                            <p
-                                *ngIf="
-                                !appTransactionsForViewDto?.entityCategories  ||  appTransactionsForViewDto?.entityCategories
-                                        ?.length === 0
-                                "
-                                class="p-0 m-0 customPlaceHolder"
-                            >
-                                Please select Categories From Tree below
-                            </p>
-                        </div>
-                        <div class="border">
-                            <p-tree
-                                class="w-full md:w-30rem"
-                                [value]="categoriesFiles"
-                                (onNodeExpand)="categoriesNodeExpand($event)"
-                                [loading]="loading"
-                                selectionMode="checkbox"
-                                (onNodeSelect)="categoriesNodeSelect($event)"
+                        <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCatCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
+<div class="d-flex">
 
-                            ></p-tree>
-                        </div>
+
+    <div class="d-flex" *ngIf="showSelectedCat || appTransactionsForViewDto?.entityCategories?.length != 0">
+        <div
+            class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
+            *ngFor="let item of selectedCategoriesShow; index as i"
+            [ngClass]="{ 'dimmed': tempDeselectedCategories.includes(item) }"
+        >
+            <span>{{ item?.entityObjectCategoryName }}</span>
+            <a class="clear-icon" (click)="deSelectCat(item, i)">
+                <i class="fa fa-1x fa-times fa-1x"></i>
+            </a>
+
+            <a *ngIf="tempDeselectedCategories.includes(item)" style="background-color: #777;" class="clear-icon-d" >
+                <i class="fa fa-1x fa-times fa-1x"></i>
+            </a>
+        </div>
+    
+
+    
+    </div>
+
+
+    
+    <div *ngIf="filteredRecords.length != 0 && !showExistCat" (click)="showExistCat = true;showCatBtn= false" class="d-flex p-y-1 px-4 rounded cat">
+        <span class="mr-2">+</span> Add Categories
+    </div>
+</div>
+                      
                         
-                        <!-- [(selection)]="selectedCategories"  -->
-                        <!-- <p-treeSelect
-                            class="md:w-20rem w-full"
-                            containerStyleClass="w-full"
-                            [(ngModel)]="selectedCategories"
-                            selectionMode="checkbox"
-                            [options]="categoriesFiles"
-                            placeholder="Select Item..."
-                            (onNodeExpand)="categoriesNodeExpand($event)"
-                            (onNodeSelect)="categoriesNodeSelect($event)"
-                        ></p-treeSelect> -->
+
+                          
+                        </div> 
+                          
+                        <div class="d-flex mt-2" *ngIf="(showCatBtn ) ">
+                            <div  class="formGroup  col-8">
+                              
+                                <input
+                                
+                                    type="text"
+                                    placeholder="Category"
+                                    class="form-control "
+                                    style="width: 95% !important;"
+                                    [(ngModel)]="category.name"
+                                    
+                                />
+                             
+                           
+                            </div>
+                            <button
+                           
+                         
+                           (click)="saveCat(category);hideCatBtn =true;showCatBtn = false;category.name ='' "
+                            class="previewbtn text-center btn "
+                        >
+                            Save
+                       
+                        </button>
+                        <button
+                        (click)="cancelCat();hideCatBtn =true;showExistCat = true;showCatBtn = false;"
+                        class="cancelbtn text-center btn "
+                        >
+                        Cancel
+                       
+                        </button>
+                         </div>
+
+                      
+<div class="d-flex"  *ngIf=" filteredRecords.length != 0">
+ 
+
+
+
+
+    <div *ngIf="showExistCat" class="flex justify-content-center treeSel">
+        <p-treeSelect
+            class="w-full md:w-20rem"
+            containerStyleClass="w-full"
+            [(ngModel)]="selectedCategories"
+            [options]="filteredRecords"
+            display="chip"
+            selectionMode="checkbox"
+            placeholder="Select Item"
+            [filter]="true"
+            filterPlaceholder="Search Items"
+            (onNodeSelect)="onNodeSelectCat($event)"
+            (onNodeUnselect)="onNodeUnselectCat($event)"
+        >
+            <!-- Header Template to Create Space After the Search Filter -->
+            <ng-template pTemplate="header">
+                <!-- Empty Template to Reserve Space -->
+            </ng-template>
+    
+            <!-- Custom First Option with Select All and Collapse All -->
+            <ng-template let-node pTemplate="default">
+                <!-- Check if it's the first custom node; render Select All / Collapse All -->
+                <!-- <div *ngIf="node.key === 'customNode'" class="header p-2 d-flex align-items-center justify-content-between">
+                    <a (click)="toggleSelectAll()">
+                        Select All
+                    </a>
+                    <a class=" " (click)="collapseAll()">Collapse All</a>
+                </div> -->
+    
+                <!-- Main Display for Other Nodes -->
+                <div (click)="onLabelClick($event)" class="d-flex justify-content-between px-4">
+                    <span style="margin-top: 8px;">{{ node.label }}</span>
+                    <div class="treenode-action">
+                        <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
+                            <button
+                                title="actions"
+                                class="dropdown-toggle btn btn-sm"
+                                aria-controls="dropdown-alignment"
+                                dropdownToggle
+                            >
+                                <div class="three-dots"></div>
+                            </button>
+                            <ul
+                                id="dropdown-alignment"
+                                class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+                                *dropdownMenu
+                            >
+                                <li>
+                                    <a (click)="addAsNewChild(node); showCatBtn = true; showExistCat = false">
+                                        {{ "AddSubcategory" | localize }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a (click)="EditCat(node); showCatBtn = true; showExistCat = false">
+                                        {{ "Edit" | localize }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a (click)="deleteCat(node)">
+                                        {{ "Delete" | localize }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+    
+            <!-- Footer Template -->
+            <ng-template pTemplate="footer">
+                <div class="d-flex justify-content-end p-2">
+                    <button class="btn bgPurple" (click)="saveSelection()">Save</button>
+                    <button class="btn btn-secondary" (click)="cancelSelection()">Cancel</button>
+                </div>
+            </ng-template>
+        </p-treeSelect>
+    </div>
+    
+
+                  
+                        <button *ngIf="showExistCat " (click)="showCatBtn = true;showExistCat = false ; toggleAppCatCodes()" class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New Categories</button>
+                    </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
@@ -193,8 +439,10 @@
                             >
                                 {{ item?.entityObjectCategoryName}}
                             </p>
+
+                    
                             <p
-                                class="previewValue   m-0 p-0 col-4 my-2"
+                                class="previewValue   m-0 p-0 col-6 my-2"
                                 *ngIf="
                                 !appTransactionsForViewDto?.entityCategories  || appTransactionsForViewDto?.entityCategories
                                     ?.length === 0
@@ -208,31 +456,33 @@
                 <!-- categories -->
 
                 <!-- dates -->
-                <div class="col-md-6 my-3">
+                <div class="col-md-6 mt-3 position-relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Entered Date</label>
-                        <div class="read-only-calendar">
+                        <div class="">
                             <p-calendar
                             appendTo="body"
                                 [(ngModel)]="enteredDate"
                                 [showIcon]="true"
                                 (ngModelChange)="onChangeDate()"
                             ></p-calendar>
-                            <div class="overlay"></div>
+                           
+                        <img src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
+
                         </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center   w-100"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">Entered Date :</h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">Entered Date :</h6>
+                            <p class="previewValue  m-0 p-0 col-6 my-2">
                                 {{ appTransactionsForViewDto?.enteredDate?.toString() | date : "MM/dd/yyyy  " }}
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 my-3">
+                <div class="col-md-6 mt-3 position-relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Start Date</label>
                         <p-calendar
@@ -241,19 +491,21 @@
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
                         ></p-calendar>
+                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center   w-100"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">Start Date :</h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">Start Date :</h6>
+                            <p class="previewValue  m-0 p-0 col-6 my-2">
                                 {{ appTransactionsForViewDto?.startDate?.toString() | date : "MM/dd/yyyy "}}
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 mt-3 position-relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Avaialable Date</label>
                         <p-calendar
@@ -261,23 +513,25 @@
                             [(ngModel)]="availableDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
-                            [minDate]="completeDate"
+                            [minDate]="startDate"
                         ></p-calendar>
+                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center   w-100"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">
                                 Avaialable Date :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                            <p class="previewValue  m-0 p-0 col-6 my-2">
                                 {{ appTransactionsForViewDto?.availableDate?.toString() | date : "MM/dd/yyyy " }}
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 mt-3 position-relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Complete Date</label>
                         <p-calendar
@@ -286,23 +540,26 @@
                             [showIcon]="true"
                             (onSelect)="changeCompleteDate(completeDate)"
                             (ngModelChange)="changeCompleteDate(completeDate)"
-                            [minDate]="startDate"
+                            [minDate]="availableDate"
                         ></p-calendar>
+                        <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
+
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center   w-100"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">
                                 Complete Date :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                            <p class="previewValue  m-0 p-0 col-6 my-2">
                                 {{ appTransactionsForViewDto?.completeDate?.toString() | date : "MM/dd/yyyy " }}
                             </p>
                         </div>
                     </div>
                 </div>
                 <!-- dates -->
+              
                 <!-- currency -->
                 <div class="col-md-6 mt-3">
                     <div *ngIf="createOrEditorderInfo">
@@ -320,8 +577,8 @@
                         <div
                             class="d-flex align-items-center  "
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-3 my-2">Currency :</h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle  m-0 p-0 col-md-6 col-12 my-2">Currency :</h6>
+                            <p class="previewValue  m-0 p-0 col-md-6 col-12 my-2">
                                 {{ appTransactionsForViewDto?.currencyCode }}
                             </p>
                         </div>
@@ -343,12 +600,12 @@
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
-                            class="d-flex align-items-center   w-75"
+                            class="d-flex align-items-center   w-100"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-4 my-2">
+                            <h6 class="previewTitle  m-0 p-0 col-md-6 col-12 my-2">
                                 Exchange Rate :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-4 my-2">
+                            <p class="previewValue  m-0 p-0 col-md-6 col-12 my-2">
                                 {{ appTransactionsForViewDto?.currencyExchangeRate }}
                             </p>
                         </div>
@@ -358,5 +615,25 @@
             </div>
         </div>
         <hr class="my-2" />
+        <div class="d-flex justify-content-end">
+
+    <button
+    *ngIf="showSaveBtn"
+    [disabled]="!(isContactsValid && isSalesOrderValidForm())"
+    (click)="save()"
+    class="previewbtn text-center btn float-right"
+>
+    Save
+    <!-- <i class="pi pi-check"></i> -->
+</button>
+<button
+*ngIf="showSaveBtn"
+(click)="cancel()"
+class="cancelbtn text-center btn float-right"
+>
+Cancel
+<!-- <i class="pi pi-times"></i> -->
+</button>
+</div>
     </div>
 </div>

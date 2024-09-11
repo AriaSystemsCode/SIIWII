@@ -1,7 +1,7 @@
 :host ::ng-deep {
     .p-accordion .p-accordion-header .p-accordion-header-link {
         padding: 0.857rem 1rem !important;
-        border: 1px solid #d1d1d1 !important;
+        
         color: #333333 !important;
         background: #ffff !important;
         font-weight: 700 !important;
@@ -19,12 +19,35 @@
         border-bottom-right-radius: 3px;
         border-bottom-left-radius: 3px;
     }
+     .p-accordion .p-accordion-header {
+      border-top : 1px solid #E7E7E7 !important;
+        border-bottom : 1px solid #E7E7E7 !important;
+     }
+    .p-accordion p-accordiontab .p-accordion-tab {
+        margin-bottom: 12px !important;
+    }
+
+    .p-accordion .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link {
+        border: none !important;
+    
+    }
     .p-accordion .p-accordion-content {
         margin-bottom: 0px !important ;
         border: none;
     }
     .p-calendar {
         width: 100% !important;
+    }
+    .wrapper-filters {
+        border-radius: 12px !important;
+    }
+    .switch {
+        margin-top: 8px;
+    }
+    .hr-line {
+        width: 92%;
+        border-width: 2px;
+        border-radius: 4px solid #E7E7E7;
     }
     // .p-tree .p-tree-container .p-treenode .p-treenode-content.p-treenode-selectable:not(.p-highlight) {
     //     background: #d1d1d1 !important;
@@ -34,9 +57,9 @@
 
 .filter-selection {
     height: 600px;
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    scrollbar-color: #ccc #f5f5f5;
+    // overflow-y: scroll;
+    // scrollbar-width: thin;
+    // scrollbar-color: #ccc #f5f5f5;
 }
 
 .filter-selection::-webkit-scrollbar {

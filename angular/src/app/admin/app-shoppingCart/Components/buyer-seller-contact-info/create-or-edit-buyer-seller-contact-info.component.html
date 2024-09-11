@@ -3,25 +3,7 @@
         <div class="container-fluid InfoForm thin-scroll">
             <div class="header p-2 my-2 d-flex align-items-center justify-content-between">
                 <h6><span class="headertxt"> Company & Contact Information : </span></h6>
-                <div>
-                    <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
-                        *ngIf="!showSaveBtn " class="continuebtn text-center btn float-right">
-                        Continue
-                    </button>
-                    <button *ngIf="showSaveBtn"  [disabled]="!(isContactsValid)" (click)="save()"
-                        class="previewbtn text-center btn float-right">
-                        Save
-                        <i class="pi pi-check"></i>
-                    </button>
-                    <button
-                    *ngIf="showSaveBtn"
-                    (click)="cancel()"
-                    class="cancelbtn text-center btn float-right"
-                >
-                    Cancel
-                    <i class="pi pi-times"></i>
-                </button>
-                </div>
+               
             </div>
             <hr class="my-2" />
             <div class="pr-3">
@@ -36,6 +18,26 @@
                 </div>
             </div>
             <hr class="my-2" />
+        </div>
+        <div class="d-flex justify-content-end mr-4">
+            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
+                *ngIf="!showSaveBtn " class="continuebtn text-center">
+                Continue
+            </button>
+          
+            <button
+            *ngIf="showSaveBtn"
+            (click)="cancel()"
+            class="cancelbtn text-center btn "
+        >
+            Cancel
+            <!-- <i class="pi pi-times"></i> -->
+        </button>
+        <button *ngIf="showSaveBtn"  [disabled]="!(isContactsValid)" (click)="save()"
+        class="previewbtn text-center ">
+        Save
+        <!-- <i class="pi pi-check"></i> -->
+    </button>
         </div>
     </div>
     

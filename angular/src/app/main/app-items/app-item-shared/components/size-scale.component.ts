@@ -199,12 +199,13 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
        
        
        
-        if(!modalRef.content.isHiddenToCreateOrEdit)  subs.unsubscribe()
+       // if(!modalRef.content.isHiddenToCreateOrEdit) 
+        if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe()
     })
   }
   adjustRows(modalRefData :AppEntityListDynamicModalComponent){
     // remove unselected values
-let selectedRecords:number[] ; 
+let selectedRecords:(string | number)[] ; 
 selectedRecords=modalRefData.selectedRecords;
     const unselectedItemsIndeces = []
     this.rows.forEach((row,index)=> {
@@ -243,7 +244,7 @@ selectedRecords=modalRefData.selectedRecords;
   }
   adjustCols(modalRefData:AppEntityListDynamicModalComponent){
     // remove unselected values
-let selectedRecords:number[] ; 
+let selectedRecords:(string | number)[] ; 
 selectedRecords=modalRefData.selectedRecords;
     const unselectedItemsIndeces = []
     this.cols.columns.forEach((col,index)=> {
@@ -258,7 +259,7 @@ selectedRecords=modalRefData.selectedRecords;
     let recordSelectItem : MatrixGridSelectItem;
     recordSelectItem = modalRefData.allRecords.filter(item=>item.value == record)[0];
     if(!recordSelectItem)
-     recordSelectItem =  this.extraAttr.lookupData.filter(item=>item.value == record)[0];
+     recordSelectItem =  this.extraAttr?.lookupData?.filter(item=>item.value == record)[0];
     
 
       const existIndex = this.cols.columns.findIndex(col=>col.value == record)

@@ -1,15 +1,16 @@
-import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ViewChildren, SimpleChanges, OnChanges, AfterViewInit } from '@angular/core';
 import { ShoppingCartoccordionTabs } from '../../Components/shopping-cart-view-component/ShoppingCartoccordionTabs';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAppTransactionsForViewDto, ContactRoleEnum, AppTransactionContactDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { AddressComponent } from '../../Components/address/address.component';
+import * as moment from 'moment';
 @Component({
   selector: 'app-create-or-add-shipping-information',
   templateUrl: './create-or-add-shipping-information.component.html',
   styleUrls: ['./create-or-add-shipping-information.component.scss']
 })
-export class CreateOrAddShippingInformationComponent extends AppComponentBase  implements OnInit,OnChanges{
+export class CreateOrAddShippingInformationComponent extends AppComponentBase  implements OnInit,OnChanges,AfterViewInit{
   @Input("activeTab") activeTab: number;
   @Input("currentTab") currentTab: number;
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
@@ -38,7 +39,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   shipToSelectedAdd: any;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
-
+isAccManual :boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -48,7 +49,27 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
 
   }
 
+  ngAfterViewInit() {
+
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+      this.loadAddresComponentShipFrom = true;
+      this.contactIdShipFrom = this.shipFromData.compId;
+        if( this.AddressComponentChild)
+      this.AddressComponentChild['first']?.getAddressList(this.shipFromData.compssin);
+  
+        
+  
+      this.contactIdShipTo = this.shipToData.compId;
+      this.loadAddresComponentShipTo = true;
+      if( this.AddressComponentChild)
+      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData.compssin);
+    }  
+      
+  }
   ngOnInit() {
+    this.isMamualAcc()
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+  
     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
     let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
     shipFromObj[0]?.companySSIN && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.shipFromSelectedAdd = shipFromObj[0]?.contactAddressDetail : null;
@@ -56,10 +77,13 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
     shipToObj[0]?.companySSIN && shipToObj[0]?.contactAddressDetail?.addressLine1  ? this.shipToSelectedAdd = shipToObj[0]?.contactAddressDetail : null;
     this.storeVal = this.appTransactionsForViewDto?.buyerStore;
     //this.shipViaValue = this.appTransactionsForViewDto?.shipViaId;
-    this.loadShipViaList();
-
+   // this.loadShipViaList();
+    console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
+    }
   }
   ngOnChanges(changes: SimpleChanges) {
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+
     if (this.appTransactionsForViewDto) {
       this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
       let shipFromObj = this.appTransactionsForViewDto?.appTransactionContacts?.filter(x => x.contactRole == ContactRoleEnum.ShipFromContact);
@@ -69,6 +93,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
       this.storeVal = this.appTransactionsForViewDto?.buyerStore;
       this.loadShipViaList();
     }
+  }
   }
 
   updateTabInfo(addObj, contactRole) {
@@ -166,6 +191,16 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   }
   createOrEditTransaction() {
     this.showMainSpinner()
+    let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+    let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+    let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+    let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+
+
+    this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+    this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+    this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+    this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
       .subscribe((res) => {
@@ -180,7 +215,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
       });
   }
   selectShipVia($event) {
-    var index = this.shipViaList.findIndex(x => x.value = $event?.value)
+    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
     if (index >= 0) {
       this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
       this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
@@ -198,9 +233,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
       if (this.shippingTabValid) {
 
         if (sectionIndex == 1) {
-          shipFromObj[0]?.contactAddressDetail && shipFromObj[0]?.contactAddressDetail?.addressLine1 ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
+          (!shipFromObj[0]?.companySSIN) || (shipFromObj[0]?.contactAddressDetail && shipFromObj[0]?.contactAddressDetail?.addressLine1) ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
         } else {
-          shipToObj[0]?.contactAddressDetail && shipToObj[0]?.contactAddressDetail?.addressLine1 ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
+          (!shipToObj[0]?.companySSIN) || (shipToObj[0]?.contactAddressDetail && shipToObj[0]?.contactAddressDetail?.addressLine1) ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
         }
         this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId ? this.shippingTabValid = true : this.shippingTabValid = false;  
 
@@ -224,11 +259,29 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
     }
 
   }
+
+  
+
+
+  isMamualAcc() {
+    let accSSin = ''
+    if(this.appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER') {
+      accSSin = this.appTransactionsForViewDto?.buyerCompanySSIN
+    } else if (this.appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER'){
+      accSSin = this.appTransactionsForViewDto?.sellerCompanySSIN
+    }
+    this._AppTransactionServiceProxy.isManualCompany(accSSin)
+      .subscribe((res) => {
+
+        this.isAccManual = res;
+   
+      })
+  }
   loadShipViaList() {
     this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA')
       .subscribe((res) => {
         this.shipViaList = res;
-        debugger
+        // debugger
         if(!this.appTransactionsForViewDto.shipViaId&&this.shipViaList.length==1){
             this.shipViaValue=this.shipViaList[0];
             this.appTransactionsForViewDto.shipViaId = this.shipViaValue?.value;
@@ -249,28 +302,14 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
   }
+  shipFromData;
+  shipToData;
   reloadAddresscomponentShipFrom(data) {
-    this.loadAddresComponentShipFrom = true;
-    this.contactIdShipFrom = data.compId;
-   // this.shipFromSelectedAdd = null;
-    // if(data.compssin){
-      if( this.AddressComponentChild)
-    this.AddressComponentChild['first']?.getAddressList(data.compssin);
-
-    //}
-
+    this.shipFromData=data;
   }
+
   reloadAddresscomponentShipTo(data) {
-  //  this.shipToSelectedAdd = null;
-
-    // if(data.compssin){
-    this.contactIdShipTo = data.compId;
-    this.loadAddresComponentShipTo = true;
-    if( this.AddressComponentChild)
-    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
-
-    // }
-
-  }
+  this.shipToData=data;
+}
 
 }

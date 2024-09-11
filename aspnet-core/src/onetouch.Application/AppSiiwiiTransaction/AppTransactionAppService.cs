@@ -213,6 +213,7 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task<long> CreateOrEditTransaction(GetAppTransactionsForViewDto input)
         {
             var createOrEditDto = ObjectMapper.Map<CreateOrEditAppTransactionsDto>(input);
+            createOrEditDto.EnteredDate = input.EnteredDate;
             if (createOrEditDto != null)
             {
                 return await CreateOrEdit(createOrEditDto);
@@ -325,6 +326,8 @@ namespace onetouch.AppSiiwiiTransaction
                         input.CurrencyId = currencyObj.Id;
                     //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[End]
                 }
+                if (input.EnteredDate == new DateTime(1, 1, 1))
+                    input.EnteredDate = DateTime.Now.Date;
 
                 if (input.StartDate == new DateTime(1, 1, 1))
                     input.StartDate = DateTime.Now.Date;
@@ -365,7 +368,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (string.IsNullOrEmpty(appTrans.SSIN))
                 {
                     var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
-                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId,ObjectMapper.Map<AppEntityDto>(appTrans));
                 }
                 long? phoneTypeSeller = null;
                 string? phoneTypeNameSeller = null;
@@ -497,7 +500,10 @@ namespace onetouch.AppSiiwiiTransaction
                     BranchSSIN = input.BuyerBranchSSIN
                 });
                 //
-                var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses)
+                    .ThenInclude(z=>z.AddressTypeFk)
+                    .Include(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
+                    .Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
                 if (accountSSINBranchBuyer != null)
                 {
                     var addressObj = accountSSINBranchBuyer.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code == "DIRECT-SHIPPING" || x.AddressTypeFk.Code == "DISTRIBUTION-CENTER");
@@ -544,7 +550,9 @@ namespace onetouch.AppSiiwiiTransaction
                     ContactAddressState = contactBuyerAddressState
                     
                 });
-                var accountSSINBranchBuy = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk).Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
+                var accountSSINBranchBuy = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z=>z.AddressTypeFk)
+                    .Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
+                    .Where(a => a.SSIN == input.BuyerBranchSSIN).FirstOrDefaultAsync();
                 if (accountSSINBranchBuy != null)
                 {
                     var addressObj = accountSSINBranchBuy.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk.Code== "BILLING");
@@ -715,9 +723,11 @@ namespace onetouch.AppSiiwiiTransaction
                             ContactRole = ContactRoleEnum.Creator.ToString(),
                             CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                             CompanyName = contactCompany != null ? contactCompany.Name : null,
-                            BranchName = null,
-                            BranchSSIN = null
-                        });
+                            BranchName = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchName :
+                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchName: null),
+                            BranchSSIN = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchSSIN:
+                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchSSIN: null)
+                        }) ;
                         //MMT2024[start]
                         //MMT2024[End]
                         if (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole.Contains("Independent Sales Rep"))
@@ -753,7 +763,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (string.IsNullOrEmpty(appTrans.SSIN))
                 {
                     var transactionObject = await _helper.SystemTables.GetObjectTransactionId();
-                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObject, null);
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObject, ObjectMapper.Map<AppEntityDto>(appTrans));
                 }
                 AppTransactionHeaders obj = new AppTransactionHeaders();
                 var header = await _appTransactionsHeaderRepository.GetAll().AsNoTracking().Include(z => z.AppTransactionDetails).Where(s => s.Code == input.Code && s.TenantId == AbpSession.TenantId
@@ -769,8 +779,9 @@ namespace onetouch.AppSiiwiiTransaction
                                 await GetProductFromMarketplace(det.SSIN, int.Parse(buyerTenantId.ToString()));
                         }
                     }
-
+                    
                     appTrans.Id = header.Id;
+                    appTrans.EnteredDate = input.EnteredDate;
                     if (header.EntityObjectStatusId == null)
                         appTrans.CreatorUserId = AbpSession.UserId;
 
@@ -781,8 +792,10 @@ namespace onetouch.AppSiiwiiTransaction
                     //XX
                     //var  AppTrans = Objmapper. ObjectMapper.Map<CreateOrEditAppTransactionDto,AppTransactionsHeader>(input);
                     //ObjectMapper..Map<CreateOrEditAppTransactionDto,AppTransactionsHeader>(input) ;
-
+                    appTrans.EnteredDate = input.EnteredDate;
                     obj = await _appTransactionsHeaderRepository.InsertAsync(appTrans);
+                    
+                    obj = await _appTransactionsHeaderRepository.UpdateAsync(obj);
                 }
 
                 await CurrentUnitOfWork.SaveChangesAsync();
@@ -793,7 +806,7 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
                 appTrans.EnteredUserByRole = input.EnteredByUserRole;
-
+                appTrans.EnteredDate = input.EnteredDate;
                 if (input.lFromPlaceOrder)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 //MMT-Fix Status
@@ -1219,8 +1232,9 @@ namespace onetouch.AppSiiwiiTransaction
                 if (string.IsNullOrEmpty(appTrans.SSIN))
                 {
                     var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
-                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                    appTrans.SSIN = (input.TransactionType == TransactionType.SalesOrder ? "SO-" : "PO-") + await _helper.SystemTables.GenerateSSIN(transactionObjectId, ObjectMapper.Map<AppEntityDto>(appTrans));
                 }
+                appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 return obj.Id;
@@ -1514,7 +1528,7 @@ namespace onetouch.AppSiiwiiTransaction
                 trans.EntityObjectStatusId = null;
                 trans.EntityObjectTypeId = objectRec.Id;
                 var transactionObjectId = await _helper.SystemTables.GetObjectTransactionId();
-                trans.SSIN = await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
+                trans.SSIN = tranType+"-"+ await _helper.SystemTables.GenerateSSIN(transactionObjectId, null);
                 await _appTransactionsHeaderRepository.InsertAsync(trans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 //XX
@@ -1534,7 +1548,7 @@ namespace onetouch.AppSiiwiiTransaction
                 returnObject.AccountSSIN = account.SSIN;
                 returnObject.CurrencyCode = new CurrencyInfoDto
                 {
-                    Code = account.CurrencyCode,
+                    Code = account.CurrencyFk.Code,
                     Value = (long)account.CurrencyId,
                     Label = account.CurrencyFk.Name,
                     Symbol = (account.CurrencyFk != null && account.CurrencyFk.EntityExtraData != null) &&
@@ -1622,7 +1636,7 @@ namespace onetouch.AppSiiwiiTransaction
             return accounts;
 
         }
-        public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false)
+        public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false, string? transactionType=null)
         {
 
             var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
@@ -1644,8 +1658,9 @@ namespace onetouch.AppSiiwiiTransaction
                 //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[Start]
                 .WhereIf(myAccount != null, z => z.Id != myAccount.Id)
                 //T-SII-20231110.0003,1 MMT 12/14/2023 - my tenant account is considered as manual account in the company dropdown in the transaction[End]
-                .Where(a => a.TenantId == AbpSession.TenantId & a.ParentId == null
-                && (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id || a.EntityFk.EntityObjectTypeId == manualAccountEntityObjectType.Id));
+                .Where(a => a.TenantId == AbpSession.TenantId & a.ParentId == null &&
+                ((string.IsNullOrEmpty(transactionType) || transactionType == "SO") ? (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id || a.EntityFk.EntityObjectTypeId == manualAccountEntityObjectType.Id) : a.PartnerId!=null )); //a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id
+                                                                                                                                                                                                                               //&& (a.EntityFk.EntityObjectTypeId == partnerEntityObjectType.Id || ((string.IsNullOrEmpty(transactionType) || transactionType =="PO") ? false :a.EntityFk.EntityObjectTypeId == manualAccountEntityObjectType.Id)));
 
 
             var pagedAndFilteredAccounts = accountsList.OrderBy(accountFilter.Sorting ?? "name asc");
@@ -1659,7 +1674,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 Name = o.Name.TrimEnd(),
                                 CurrencyCode = new CurrencyInfoDto
                                 {
-                                    Code = o.CurrencyCode == null ? "" : o.CurrencyCode,
+                                    Code = o.CurrencyId != null ? o.CurrencyFk.Code :"" ,
                                     Value = o.CurrencyId != null ? (long)o.CurrencyId : 0,
                                     Label = o.CurrencyFk == null ? "" : o.CurrencyFk.Name,
                                     Symbol = (o.CurrencyFk != null && o.CurrencyFk.EntityExtraData != null) &&
@@ -1831,10 +1846,17 @@ namespace onetouch.AppSiiwiiTransaction
                 //                          }
                 //                      };
 
-                var totalCount = await filteredAppTransactions.CountAsync();
-                var objList = await pagedAndFilteredAppTransactions.ToListAsync();
-                var appTrans = ObjectMapper.Map<List<GetAllAppTransactionsForViewDto>>(objList);
-
+                    var totalCount = await filteredAppTransactions.CountAsync();
+                    var objList = await pagedAndFilteredAppTransactions.ToListAsync();
+                    var appTrans = ObjectMapper.Map<List<GetAllAppTransactionsForViewDto>>(objList);
+                foreach (var tran in appTrans)
+                {
+                    if (tran.TenantOwner != null)
+                    {  
+                        var creatorTenant =await  TenantManager.GetByIdAsync(int.Parse(tran.TenantOwner.ToString()));
+                        tran.CreatorTenantName = creatorTenant.Name;
+                    }
+                }
                 return new PagedResultDto<GetAllAppTransactionsForViewDto>(
                     totalCount,
                     appTrans
@@ -2314,7 +2336,7 @@ namespace onetouch.AppSiiwiiTransaction
                                                 var lineAttachmentDefault = size.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
                                                 var lineAttachment = size.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
                                                 sizeColorDetailView.Data.Image = (lineAttachmentDefault == null ?
-                                                           (lineAttachment == null ? "attachments/" + line.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
+                                                           (lineAttachment != null ? "attachments/" + line.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
                                                             : "attachments/" + (line.TenantId.HasValue ? line.TenantId : -1) + "/" +
                                                             lineAttachmentDefault.AttachmentFk.Attachment);
                                             }
@@ -2329,7 +2351,7 @@ namespace onetouch.AppSiiwiiTransaction
                                             colorDetailView.Children.Add(sizeColorDetailView);
                                         }
                                         colorDetailView.Data.Qty = colorDetailView.Data.Qty + size.Quantity;
-                                        colorDetailView.Data.NoOfPrePacks = colorDetailView.Data.NoOfPrePacks + (size.NoOfPrePacks == null ? 0 : (long)size.NoOfPrePacks);
+                                        colorDetailView.Data.NoOfPrePacks =  (size.NoOfPrePacks == null ? 0 : (long)size.NoOfPrePacks);//colorDetailView.Data.NoOfPrePacks +
                                         //colorDetailView.Data.Price = colorDetailView.Data.Price + size.NetPrice;
                                         colorDetailView.Data.Price = size.NetPrice;
                                         colorDetailView.Data.Amount = colorDetailView.Data.Amount + size.Amount;
@@ -2388,6 +2410,11 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         itemMajor.Quantity = qty;
                         itemMajor.Amount = itemMajor.NetPrice * qty;
+                        //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[Start]
+                        filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
+                        filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                        await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                        //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }
@@ -2421,21 +2448,55 @@ namespace onetouch.AppSiiwiiTransaction
                         ((!string.IsNullOrEmpty(colorCode) && x.AttributeValue.ToUpper() == colorCode.ToUpper())
                         || (colorId > 0 && x.AttributeValueId == colorId))).Count() > 0)
                             .ToList();
-
+                        double oldQty = 0;
                         foreach (var e in itemsList)
                         {
                             if ((long)e.NoOfPrePacks > 0)
                             {
-                                e.Quantity = qty * e.Quantity / (long)e.NoOfPrePacks;
-                                e.NoOfPrePacks = qty;
+                               // e.Quantity = qty / (e.Quantity / (long)e.NoOfPrePacks);
+                               // e.NoOfPrePacks = qty;
+                                oldQty += e.Quantity;
                             }
                         };
+                        long? NewNoOfPrePack = qty/(((long?)oldQty) / itemMajor.NoOfPrePacks);
+                        foreach (var e in itemsList)
+                        {
+                            if ((long)e.NoOfPrePacks > 0)
+                            {
+                                e.Quantity = (double)(NewNoOfPrePack * (e.Quantity / (long)e.NoOfPrePacks));
+                                e.NoOfPrePacks = NewNoOfPrePack;
+                                e.Amount = e.NetPrice * decimal.Parse(e.Quantity.ToString());
+                            }
+                        };
+                        itemMajor.NoOfPrePacks = NewNoOfPrePack;
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }
+                //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[Start]
+                filteredAppTransactions.TotalQuantity = long.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Quantity).ToString());
+                filteredAppTransactions.TotalAmount = double.Parse(filteredAppTransactions.AppTransactionDetails.Where(s => !s.IsDeleted && s.ParentId != null).Sum(s => s.Amount).ToString());
+                await _appTransactionsHeaderRepository.UpdateAsync(filteredAppTransactions);
+                //T-SII-20240801.0002,1 MMT 08/22/2024 Adjust transaction total qty and amount after editing lines[End]
                 return true;
             }
         }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[Start]
+        public async Task<bool> IsManualCompany(string companySSIN)
+        {
+            var contact = await _appContactRepository.GetAll().Where(z => z.SSIN == companySSIN).FirstOrDefaultAsync();
+            if (contact != null)
+            {
+                if (!string.IsNullOrEmpty(contact.PartnerId.ToString()))
+                    return false;
+                else
+                    return true;
+            }
+            else
+            { 
+                return false;
+            }
+        }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[End]
 
         [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
         public async Task AddTransactionDetails(GetAppMarketplaceItemDetailForViewDto input, string transactionId, string transactionType)
@@ -3554,6 +3615,7 @@ namespace onetouch.AppSiiwiiTransaction
                 if (FilteredAppTransaction != null)
                 {
                     var viewTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(FilteredAppTransaction);
+                    viewTrans.EnteredDate = FilteredAppTransaction.EnteredDate;
                     viewTrans.EnteredByUserRole = FilteredAppTransaction.EnteredUserByRole;
                     if (viewTrans.EntityAttachments != null && viewTrans.EntityAttachments.Count > 0)
                     {
@@ -3613,7 +3675,12 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                         }
                         //MMT
+
                         viewTrans.IsOwnedByMe = (AbpSession.TenantId == viewTrans.TenantOwner);
+                        viewTrans.TotalQuantity = transOrg.TotalQuantity;
+                        viewTrans.TotalAmount = transOrg.TotalAmount;
+                        viewTrans.TransactionType = transOrg.EntityObjectTypeCode == "SALESORDER" ? TransactionType.SalesOrder : TransactionType.PurchaseOrder;
+                        viewTrans.EntityStatusCode = transOrg.EntityObjectStatusCode;
                         if (viewTrans.AppTransactionContacts!=null && viewTrans.AppTransactionContacts.Count>0)
                         {
                             foreach (var cont in viewTrans.AppTransactionContacts)
@@ -3631,6 +3698,55 @@ namespace onetouch.AppSiiwiiTransaction
                                 
                             }
                         }
+                        //MMT-Performance[Start]
+                        viewTrans.IsOrderInformationValid = false;
+                        var creator = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Creator).FirstOrDefault();
+                        if (creator!=null)
+                            viewTrans.IsOrderInformationValid = (!string.IsNullOrEmpty(creator.CompanyName) && !string.IsNullOrEmpty(creator.BranchName)) &&
+                                        !string.IsNullOrEmpty(viewTrans.CurrencyCode) && (viewTrans.CurrencyExchangeRate!=0) &&  viewTrans.AvailableDate != new DateTime(1, 1, 1) &&
+                                        viewTrans.CompleteDate != new DateTime(1, 1, 1) && viewTrans.StartDate != new DateTime(1, 1, 1) &&
+                                        viewTrans.EnteredDate != new DateTime(1, 1, 1) ;
+
+                        viewTrans.IsSellerContactInformationValid = false;
+                        var sellor = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Seller).FirstOrDefault();
+                        if (sellor!=null)
+                            viewTrans.IsSellerContactInformationValid = (!string.IsNullOrEmpty(sellor.CompanyName) && !string.IsNullOrEmpty(sellor.BranchName))  ;
+                        
+                        
+                        viewTrans.IsBuyerContactInformationValid = false;
+                        var buyer = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Buyer).FirstOrDefault();
+                        if (buyer!=null)
+                            viewTrans.IsBuyerContactInformationValid= (!string.IsNullOrEmpty(buyer.CompanyName) && !string.IsNullOrEmpty(buyer.BranchName));
+
+                        viewTrans.IsSalesRepInformationValid = true;
+                        var salesRep = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.SalesRep1).FirstOrDefault();
+                        if (salesRep!=null)
+                            viewTrans.IsSalesRepInformationValid = viewTrans.IsSalesRepInformationValid && (!string.IsNullOrEmpty(salesRep.CompanyName) && !string.IsNullOrEmpty(salesRep.BranchName));
+
+                        var salesRep2 = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.SalesRep2).FirstOrDefault();
+                        if (salesRep2 != null)
+                            viewTrans.IsSalesRepInformationValid = viewTrans.IsSalesRepInformationValid && (!string.IsNullOrEmpty(salesRep2.CompanyName) && !string.IsNullOrEmpty(salesRep2.BranchName));
+
+                        
+                        viewTrans.IsShippingInformationValid = false;
+                        var shipTo= viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipToContact).FirstOrDefault();
+                        var shipFrom = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipFromContact).FirstOrDefault();
+                        if (shipTo!=null && shipFrom!=null)
+                           viewTrans.IsShippingInformationValid = (!string.IsNullOrEmpty(shipTo.CompanyName) && !string.IsNullOrEmpty(shipTo.BranchName)) &&
+                                (!string.IsNullOrEmpty(shipFrom.CompanyName) && !string.IsNullOrEmpty(shipFrom.BranchName)) &&
+                                !string.IsNullOrEmpty(shipTo.ContactAddressCode) && !string.IsNullOrEmpty(shipTo.ContactAddressLine1) &&
+                                !string.IsNullOrEmpty(shipFrom.ContactAddressCode) && !string.IsNullOrEmpty(shipFrom.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.ShipViaCode);
+
+
+                        viewTrans.IsBillingInformationValid = false;
+                        var apContact = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.APContact).FirstOrDefault();
+                        var arContact = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ARContact).FirstOrDefault();
+                        if (shipTo != null && shipFrom != null)
+                            viewTrans.IsBillingInformationValid = (!string.IsNullOrEmpty(apContact.CompanyName) && !string.IsNullOrEmpty(apContact.BranchName)) &&
+                                 (!string.IsNullOrEmpty(arContact.CompanyName) && !string.IsNullOrEmpty(arContact.BranchName)) &&
+                                 !string.IsNullOrEmpty(arContact.ContactAddressCode) && !string.IsNullOrEmpty(arContact.ContactAddressLine1) &&
+                                 !string.IsNullOrEmpty(apContact.ContactAddressCode) && !string.IsNullOrEmpty(apContact.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.PaymentTermsCode);
+                        //MMT-Performance[End]
                         return viewTrans;
                     }
 
@@ -3644,6 +3760,7 @@ namespace onetouch.AppSiiwiiTransaction
             if (trans != null)
             {
                 var retTrans = ObjectMapper.Map<GetAppTransactionsForViewDto>(trans);
+                retTrans.EnteredDate = trans.EnteredDate;
                 if (retTrans.AppTransactionContacts != null && retTrans.AppTransactionContacts.Count > 0)
                 {
                     foreach (var cont in retTrans.AppTransactionContacts)
@@ -4094,6 +4211,7 @@ namespace onetouch.AppSiiwiiTransaction
                         tenantTransaction.TenantOwner = int.Parse(marketplaceTransaction.TenantOwner.ToString());
                         tenantTransaction.TenantId = tenantId;
                         tenantTransaction.Id = 0;
+                        tenantTransaction.EnteredDate = marketplaceTransaction.EnteredDate;
                         tenantTransaction.AppTransactionDetails = null;
                         tenantTransaction.AppTransactionContacts = null;
                         tenantTransaction.EntityCategories = null;
@@ -4368,6 +4486,7 @@ namespace onetouch.AppSiiwiiTransaction
                         tenantTransactionObj.EntityClassifications = null;
                         tenantTransactionObj.EntityExtraData = null;
                         tenantTransactionObj.EntityAttachments = null;
+                        tenantTransactionObj.EnteredDate = marketplaceTransaction.EnteredDate;
                         returnTran = tenantTransactionObj.Code;
                         await _appEntityAttachment.DeleteAsync(z => z.EntityId == id);
                         await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == id);
@@ -4612,6 +4731,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.Code = marketplaceTransaction.TenantOwner.ToString().Trim() + "-" + marketplaceTransaction.Code.Trim();
                     marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
+                    marketplaceTransaction.EnteredDate = transaction.EnteredDate;
                     //marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     //marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;
@@ -4822,6 +4942,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;
                     marketplaceTransaction.EntityClassifications = null;
+                    marketplaceTransaction.EnteredDate = transaction.EnteredDate;
                     marketplaceTransaction.Code = marketplaceTransaction.TenantOwner.ToString().Trim() + "-" + marketplaceTransaction.Code.Trim();
                     await _appEntityAttachment.DeleteAsync(z => z.EntityId == id);
                     await _appEntityCategoryRepository.DeleteAsync(z => z.EntityId == id);

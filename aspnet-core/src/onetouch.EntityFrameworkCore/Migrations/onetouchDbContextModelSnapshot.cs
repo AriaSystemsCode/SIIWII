@@ -7184,6 +7184,9 @@ namespace onetouch.Migrations
                     b.Property<decimal>("CurrencyExchangeRate")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("EnteredDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EnteredUserByRole")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -7197,6 +7200,9 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PaymentTermsName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SellerCompanyName")
@@ -7358,6 +7364,9 @@ namespace onetouch.Migrations
                     b.Property<long?>("CurrencyId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime>("EnteredDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EnteredUserByRole")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -7380,6 +7389,9 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PriceLevel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SellerCompanyName")

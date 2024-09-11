@@ -9,8 +9,10 @@
                 class="previewbtn text-center btn float-right"
                 *ngIf="canChange"
             >
-                Change
-                <i class="pi pi-pencil"></i>
+            <img src="../../../../../assets/shoppingCart/edit.png"
+            class="imgIcon" />
+            <span class="mx-1 text-white"> Edit</span>
+
             </button>
             </div>
         </div>
@@ -23,7 +25,7 @@
                 [currentTab]="currentTab" [salesRepIndex]="salesRepIndex"
                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                     (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
-                    [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"></app-contact>
+                    [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo" (formValidityChanged)="isContactFormValid($event)"></app-contact>
             </div>
         </div>
 

@@ -17,7 +17,7 @@
 
 .form-control {
     &:hover {
-        border-color: lighten( $blue, 50% );
+       // border-color: lighten( $blue, 50% );
     }
 }
 
@@ -43,9 +43,11 @@
 
 .image-wrapper {
     border: 1px solid $grey-1;
+    border: 1px dashed #DADADA;
     &.upload {
         border: none;
         filter: grayscale(1);
+        border: 1px dashed #DADADA;
     }
     width: 200px;
     height: 276px;
@@ -90,8 +92,11 @@
         right: 0;
     }
     .upload-btn.btn {
-        background-color: #c8c8c8!important;
-        color: #000!important;
+       // background-color: #c8c8c8!important;
+       // color: #000!important;
+        background-color: #4A0D4A !important;
+    color: white !important;
+    border-radius: 5px;
         border-color: #c8c8c8!important;
         font-weight: 500;
         @extend %transition-all-3ms;
@@ -107,9 +112,9 @@
         @extend %transition-all-3ms;
         filter: none;
         .upload-btn.btn {
-            background-color: $blue!important;
+           // background-color: $blue!important;
             color: $white!important;
-            border-color: $blue!important;
+           // border-color: $blue!important;
             font-weight: 500;
             @extend %transition-all-3ms;
         }
@@ -137,10 +142,10 @@
 
 .item-photos {
     .item-photos-header {
-        background-color: #3699FF1A;
+      // background-color: #3699FF1A;
     }
     .item-photos-body {
-        background-color: #F5FAFF;
+      //  background-color: #F5FAFF;
     }
 }
 
@@ -159,4 +164,24 @@ textarea.ng-pristine.ng-invalid.ng-touched {
 .aria-tag-wrapper {
     max-height: 300px;
     overflow-y: scroll;
+}
+
+.text-danger {
+    color: #F6851D !important;
+}
+
+
+.text-primary {
+    color: #4A0D4A !important;
+}
+
+.aria-tag
+{
+    background-color: #EEEEEE;
+}
+
+
+.bg-input{
+    background-color: #EEEEEE !important;
+    border: none !important;
 }

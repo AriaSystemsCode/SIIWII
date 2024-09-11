@@ -38,6 +38,9 @@ using onetouch.AppMarketplaceTransactions;
 using Twilio.Rest.Api.V2010.Account;
 using NPOI.Util;
 using Abp.Domain.Entities;
+using NPOI.SS.Formula.Functions;
+using NPOI.HPSF;
+using System.IO;
 
 namespace onetouch.AppEntities
 {
@@ -530,17 +533,25 @@ namespace onetouch.AppEntities
 
         public async Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code)
         {
+            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
             var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
-            return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                return await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
+                .Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
                 .OrderBy("Name asc")
                 .Select(appEntity => new LookupLabelDto
                 {
                     Value = appEntity.Id,
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
-                    IsHostRecord = appEntity.TenantId == null
+                    IsHostRecord = appEntity.TenantId == null,
+                    HexaCode = (appEntity.EntityExtraData != null && appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
+                    Image = (appEntity.EntityAttachments != null && appEntity.EntityAttachments.FirstOrDefault() != null && appEntity.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
+                                  (imagesUrl + "-1" + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
                 })
                 .ToListAsync();
+            }
         }
         //MMT30
         public async Task<List<LookupLabelDto>> GetMarketPlaceSizes()
@@ -566,8 +577,9 @@ namespace onetouch.AppEntities
         public async Task<PagedResultDto<LookupLabelDto>> GetAllEntitiesByTypeCodeWithPaging(GetAllAppEntitiesInput input)
         {
             //var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId(); *Abdo : Not used variable 
-
-            var filteredAppEntities = _appEntityRepository.GetAll()
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var filteredAppEntities = _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z=>z.AttachmentFk).Include(z=>z.EntityExtraData)
                 .Where(x => x.EntityObjectTypeCode == input.SycEntityObjectTypeNameFilter &&
                 (x.TenantId == AbpSession.TenantId || x.TenantId == null))
                 .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), x => false || x.Name.Contains(input.NameFilter));// *Abdo : is added to filter by name "Red" as  example
@@ -576,14 +588,19 @@ namespace onetouch.AppEntities
               .OrderBy(input.Sorting ?? "Name asc")
               .PageBy(input);
 
+            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+
             var appEntities = from o in pagedAndFilteredAppEntities
                               select new LookupLabelDto()
                               {
                                   Value = o.Id,
                                   Label = o.Name.ToString(),
                                   Code = o.Code,
-                                  IsHostRecord = o.TenantId == null
-                              };
+                                  IsHostRecord = o.TenantId == null,
+                                  HexaCode = (o.EntityExtraData!=null && o.EntityExtraData.Where(z=>z.AttributeId ==39).FirstOrDefault()!=null) ? o.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue:"",
+                                  Image = (o.EntityAttachments!= null && o.EntityAttachments.FirstOrDefault() !=null && o.EntityAttachments.FirstOrDefault().AttachmentFk !=null) ? 
+                                  (imagesUrl + "-1" + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()):""
+        };
 
 
             var totalCount = await filteredAppEntities.CountAsync();
@@ -592,6 +609,7 @@ namespace onetouch.AppEntities
                 totalCount,
                 await appEntities.ToListAsync()
             );
+                }
         }
 
         public async Task<List<LookupLabelDto>> GetLineSheetColorSort()
@@ -2188,6 +2206,56 @@ namespace onetouch.AppEntities
             }
             return outputList;
         }
+        public async Task<bool> IsCodeExisting(AppEntityDto input)
+        {
+            
+            var entity = await _appEntityRepository.GetAll().Where(z => z.Code == input.Code && z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == input.EntityObjectTypeId &&
+            z.ObjectId == input.ObjectId).FirstOrDefaultAsync();
+            if (entity != null)
+                return true;
+            else
+                return false;
 
+        }
+        public async Task<LookupLabelDto> ConvertAppEntityDtoToLookupLabelDto(AppEntityDto input)
+        {
+            string imagesUrl = _appConfiguration[$"Attachment:PathTemp"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+            LookupLabelDto returnObject = new LookupLabelDto();
+            returnObject.Code = input.Code;
+            returnObject.Label = input.Name;
+            returnObject.Value = input.Id;
+            returnObject.IsHostRecord = input.TenantId == null;
+            returnObject.HexaCode = (input.EntityExtraData != null && input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "";
+            returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().guid != null) ?
+                          (imagesUrl + input.TenantId.ToString() + @"/" + input.EntityAttachments.FirstOrDefault().guid.ToString()+"."+ input.EntityAttachments.FirstOrDefault().FileName.Split('.')[1]) : "";
+
+            return returnObject;
+        }
+        public async Task<AppEntityDto> ConvertAppLookupLabelDtoToEntityDto(LookupLabelDto input)
+        {
+            AppEntityDto returnObject = new AppEntityDto();
+            returnObject.Code = input.Code;
+            returnObject.Id = input.Value;
+            returnObject.Name = input.Label;
+            if (!string.IsNullOrEmpty(input.Image))
+            {
+                returnObject.EntityAttachments = new List<AppEntityAttachmentDto>();
+                AppEntityAttachmentDto attach = new AppEntityAttachmentDto();
+                attach.FileName = Path.GetFileName(input.Image);
+                attach.Url = input.Image;
+                attach.guid =  Path.GetFileNameWithoutExtension(input.Image);
+                returnObject.EntityAttachments.Add(attach);
+            }
+            if (!string.IsNullOrEmpty(input.HexaCode))
+            {
+                returnObject.EntityExtraData = new List<AppEntityExtraDataDto>();
+                AppEntityExtraDataDto extra = new AppEntityExtraDataDto();
+                extra.AttributeId = 39;
+                extra.AttributeValue = input.HexaCode;
+                returnObject.EntityExtraData.Add(extra);
+
+            }
+            return returnObject;
+        }
     }
 }
