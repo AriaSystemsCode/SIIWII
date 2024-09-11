@@ -129,7 +129,7 @@ namespace onetouch.AppSubScriptionPlan
                         TenantName = o.TenantName,
                         UserId = o.UserId,
                         ActivityType = o.ActivityType,
-                        AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
+                       // AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                         AppSubscriptionPlanCode = o.AppSubscriptionPlanCode,
                         ActivityDateTime = o.ActivityDateTime,
                         UserName = o.UserName,

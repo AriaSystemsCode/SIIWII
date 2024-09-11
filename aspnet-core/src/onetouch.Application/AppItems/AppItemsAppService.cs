@@ -1315,14 +1315,23 @@ namespace onetouch.AppItems
                                             var codeItems = varAppItems.Where(x => x.EntityFk.EntityExtraData
                                                                                    .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                    a.AttributeId == long.Parse(secondAttId)
-                                                                                   ).Any()).ToList();
-                                            var itemVarSum = codeItems.Where(x =>
-                                            x.EntityFk.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
-                                            a.AttributeValue == varItem.AttributeValue).Any()).Sum(a => a.StockAvailability);
-                                            attlook.StockAvailability = itemVarSum;
+                                                                                   ).Any()).ToList().Where(x => x.EntityFk.EntityExtraData
+                                                                                   .Where(a => a.AttributeId == firstAttributeIdLong & a.AttributeValue == varItem).Any()).ToList();
+                                            if (codeItems.Count != 0)
+                                            {
+                                                var itemVarSum = codeItems.Where(x =>
+                                                x.EntityFk.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
+                                                a.AttributeValue == varItem).Any()).Sum(a => a.StockAvailability);
+                                                attlook.StockAvailability = itemVarSum;
+                                            }
+                                            else
+                                            {
+                                                attlook.StockAvailability = null;
+                                            }
                                         }
+                                        eDRestAttributes.Values.RemoveAll(x => x.StockAvailability == null);
                                         // eDRestAttributes.Values = lookupLabelDtoList.Select(r => new LookupLabelDto() { Label = r.Split(',')[0], Value = long.Parse(r.Split(',')[1]) }).ToList();
-                                        eDRestAttributes.TotalCount = secondAttributeValuesFor1st.Count;//variationsLists[loop_counter + 3].Split('|').ToList().Count;
+                                        eDRestAttributes.TotalCount = eDRestAttributes.Values.Count; // secondAttributeValuesFor1st.Count;//variationsLists[loop_counter + 3].Split('|').ToList().Count;
                                         extraDataSelectedValues.EDRestAttributes.Add(eDRestAttributes);
                                     }
                                     firstAttributeRelatedAdded = true;
