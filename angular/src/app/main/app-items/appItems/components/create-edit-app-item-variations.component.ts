@@ -1248,6 +1248,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             // const curentItem=oldAttributes.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0];
             let curentItem;
             let repCode = newVariation;
+
              if(!this.appItem?.id) {
                 curentItem = this.variationMatrices.filter((record) => {
                 const repCodeNormalized = repCode.code.replace(/\s+/g, '').replace(/-0+/g, '');
@@ -1262,11 +1263,22 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                     return repCodeNormalized.includes(recordNormalized);
                 })[0];
             }
+           
 
              if(curentItem?.stockAvailability>0){
                 newVariation.stockAvailability=curentItem.stockAvailability;
             }
-
+ //P-SII-20240905.0006,1 MMT 09/12/2024 read stock availablity from existing variation[Start]
+ let existingVariation = oldAttributes.filter((record) => {
+    const repCodeNormalized = repCode.code.replace(/\s+/g, '').replace(/-0+/g, '');
+    const recordNormalized = record.code.replace(/\s+/g, '').replace(/-0+/g, '');
+    return repCodeNormalized.includes(recordNormalized);
+            })[0];
+    if (existingVariation != undefined && existingVariation?.stockAvailability>0)
+    {
+        newVariation.stockAvailability=existingVariation.stockAvailability;
+    }
+//P-SII-20240905.0006,1 MMT 09/12/2024 read stock availablity from existing variation[End]
             let item = this.variationMatrices?.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')));
             if(!item || ! (item?.length>0) )
                 this.variationMatrices.push(newVariation);
