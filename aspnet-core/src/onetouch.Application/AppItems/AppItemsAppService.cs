@@ -925,7 +925,7 @@ namespace onetouch.AppItems
                     //MMT
                     //MMT33-2
                     output.AppItem.ShowSync = false;
-                    var marketplaceItem = await _appMarketplaceItem.GetAll().Where(a => a.Code == appItem.SSIN).FirstOrDefaultAsync();
+                    var marketplaceItem = await _appMarketplaceItem.GetAll().Where(a => a.Code == appItem.SSIN || (a.ManufacturerCode == appItem.Code && a.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
                     if (marketplaceItem != null)
                     {
                         output.AppItem.SharingLevel = marketplaceItem.SharingLevel;
@@ -3520,7 +3520,7 @@ namespace onetouch.AppItems
                     //XX
                     AppMarketplaceItems.AppMarketplaceItems marketplaceItem = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
                         .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
-                        .Where(x => x.Code == appItem.SSIN).FirstOrDefaultAsync();
+                        .Where(x => x.Code == appItem.SSIN || (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
 
                     if (marketplaceItem == null || marketplaceItem.Id == 0)
                     {
