@@ -994,7 +994,7 @@ this.showMainSpinner();
         // create app attachment entity
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
       //  att.index = index;
-        att.fileName = file.name;
+        att.fileName = file?.name;
         let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
        // let optionValue = this.activeAttachmentOption.lookupData.value;
        let optionValue;
@@ -2464,11 +2464,23 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
   
     }
     getExistingVariations(){
-        this.activeExisttingVariation=true;
-        this.activeNewVariation=false
-        this.primengTableHelper.records=this.variationMatrices.filter((variation) => {
+        this.primengTableHelper.records=this.variationMatrices?.filter((variation) => {
             return variation.ssin;
         });
+        if(this.primengTableHelper?.records  && this.primengTableHelper?.records?.length >0){
+            this.showExisttingVariation=true;
+        this.activeExisttingVariation=true;
+        this.activeNewVariation=false;
+        }
+
+        else{
+             this.showExisttingVariation=false;
+        this.activeExisttingVariation=false;
+        this.activeNewVariation=true;
+        this.primengTableHelper.records=this.variationMatrices?.filter((variation) => {
+            return !variation.ssin;
+        });
+        }
     }
     isExistingVariationsSelected():boolean{
         let sectedRecordsPositions: number[] = this.selectedVaritaions.reduce(
@@ -2493,11 +2505,23 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
 
     
     getNewVariations(){
-        this.activeExisttingVariation=false;
-        this.activeNewVariation=true
-        this.primengTableHelper.records=this.variationMatrices.filter((variation) => {
+        this.primengTableHelper.records=this.variationMatrices?.filter((variation) => {
             return !variation.ssin;
         });
+        if(this.primengTableHelper?.records  && this.primengTableHelper?.records?.length >0){
+        this.showNewVariation=true;
+        this.activeExisttingVariation=false;
+        this.activeNewVariation=true;
+        }
+    else{
+         this.showNewVariation=false;
+        this.activeExisttingVariation=true;
+        this.activeNewVariation=false;
+        this.primengTableHelper.records=this.variationMatrices?.filter((variation) => {
+            return variation.ssin;
+        });
+         }
+        
     }
 
 }
