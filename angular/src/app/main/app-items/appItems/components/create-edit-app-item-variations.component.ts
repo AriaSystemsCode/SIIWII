@@ -902,6 +902,10 @@ this.showMainSpinner();
             
             var index =this.activeAttachmentOption.entityAttachments.findIndex(y=>y?.url ===this.activeAttachmentOption.attachmentSrcs[i] )
 
+            if(index<0)
+                 index =this.activeAttachmentOption.entityAttachments.findIndex(  (y) => `${this.attachmentBaseUrl}/${y?.url}` === this.activeAttachmentOption.attachmentSrcs[i]);
+                
+
             this.activeAttachmentOption.attachmentSrcs.splice(i, 1);
                 if(index>=0)
                 this.activeAttachmentOption.entityAttachments.splice(index, 1);
