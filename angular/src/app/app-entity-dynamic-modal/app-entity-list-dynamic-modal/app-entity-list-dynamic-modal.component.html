@@ -49,10 +49,11 @@
                 </div>
                 </div>
 
-                <!-- <div class="row" *ngIf="item.value">
-                    *Added to lookup
-                </div> -->
+               
                 <div *ngIf="showActions && !item.isHostRecord">
+                    <div class="row" *ngIf="item.value">
+                        *Added to lookup
+                    </div> 
                     <div class="btn-group dropdown" dropdown container="body" placement='bottom right'>
                         <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
                         </button>
