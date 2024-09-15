@@ -97,6 +97,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 {
             this.editMode = true;
             this.addToLookup=true;
+            this.appEntity.nonlookup=false;
                 this._appEntitiesServiceProxy
                 .getAppEntityForEdit(this.appEntity.id)
                 .subscribe((res) => {
@@ -120,6 +121,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 this.editMode = true;
                 if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
                 this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
+                this.appEntity.nonlookup=true;
                 this.addToLookup=false;
                 this.adjustImageSrcsUrls();
                 this.loading = true;
@@ -254,9 +256,15 @@ export class CreateOrEditAppEntityDynamicModalComponent
             this.appEntity.entityExtraData=[];
            else
            this.appEntity.entityAttachments=[];
-        
-        if(this.addToLookup){
 
+        if(this.addToLookup){ 
+           if(this.appEntity.nonlookup)
+            {
+                this.appEntity.id=0;
+                this.appEntity.nonlookup=false;
+            }
+
+            this.appEntity.nonlookup=false;
         this._appEntitiesServiceProxy
             .saveEntity(this.appEntity)
             .pipe(
@@ -264,17 +272,19 @@ export class CreateOrEditAppEntityDynamicModalComponent
                     this.saving = false;
                 })
             )
-            .subscribe(() => {
+            .subscribe((result) => {
                 this.notify.info(this.l("SavedSuccessfully"));
                 if(this.wantdisplaySaveSideBar)
                 this.displaySaveSideBar = true;
+                this.appEntity.value=  !this.appEntity.value ? result :this.appEntity.value ; 
+                this.addNonLookupValues.emit(this.appEntity);
                 this.saveDone.emit(true);
                 this.hide();
             });
         }
         else {
 
-
+            this.appEntity.nonlookup=true;
             if(!this.appEntity.id){
             this._appEntitiesServiceProxy
             .isCodeExisting(this.appEntity)
