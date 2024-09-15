@@ -1730,46 +1730,49 @@ namespace onetouch.AppItems
             //MMT30
             string firstAttributeId = "";
             var frstAttId = varAppItems.Select(x => x.EntityFk.EntityAttachments.Where(z => z.Attributes.Contains("=")).Select(a => a.Attributes)).FirstOrDefault();
-            if (frstAttId != null & frstAttId.Count() > 0)
+            if (frstAttId != null && frstAttId.Count() > 0)
                 firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
 
             var firstItem = varAppItems.FirstOrDefault();
-            List<string> attributeValues = firstItem.EntityFk.EntityExtraData.Select(x => x.EntityObjectTypeCode).Distinct().ToList();
-            List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.Select(x => x.AttributeId.ToString()).Distinct().ToList();
-            var firstAttributeID = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
-                .FirstOrDefault().ToString();
-            var firstAttributeValue = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
-            var firstattributeCodes = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID)).Select(z => new { z.AttributeCode, z.AttributeValue, z.AttributeValueId })).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
-            var firstattributeValues = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
-                                                  .Select(z => z.AttributeValue)).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
-            if (firstattributeCodes != null && firstattributeCodes.Count > 0)
+            if (firstItem != null)
             {
-                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                
-                output.NonLookupValues = new List<LookupLabelDto>();
-                for (int cod = 0; cod < firstattributeCodes.Count; cod++)
+                List<string> attributeValues = firstItem.EntityFk.EntityExtraData.Select(x => x.EntityObjectTypeCode).Distinct().ToList();
+                List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.Select(x => x.AttributeId.ToString()).Distinct().ToList();
+                var firstAttributeID = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
+                    .FirstOrDefault().ToString();
+                var firstAttributeValue = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
+                var firstattributeCodes = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID)).Select(z => new { z.AttributeCode, z.AttributeValue, z.AttributeValueId })).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
+                var firstattributeValues = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
+                                                      .Select(z => z.AttributeValue)).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();
+                if (firstattributeCodes != null && firstattributeCodes.Count > 0)
                 {
-                    var entity = await _appEntityRepository.GetAll()
-                        .Where(z => (z.EntityObjectTypeCode == firstAttributeValue && z.Code == firstattributeCodes[cod].AttributeCode) && (z.TenantId == null || z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
-                    if (entity == null)
+                    string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+
+                    output.NonLookupValues = new List<LookupLabelDto>();
+                    for (int cod = 0; cod < firstattributeCodes.Count; cod++)
                     {
-                        AppEntityExtraData? hexa, img;
-                        hexa = null;
-                        img = null;
-                        var itm = varAppItems.Where(z => z.EntityFk.EntityExtraData
-                        .Where(x => x.AttributeId == long.Parse(firstAttributeID.ToString()) && x.AttributeCode == firstattributeCodes[cod].AttributeCode).Count() > 0).FirstOrDefault();
-                        if (itm != null)
+                        var entity = await _appEntityRepository.GetAll()
+                            .Where(z => (z.EntityObjectTypeCode == firstAttributeValue && z.Code == firstattributeCodes[cod].AttributeCode) && (z.TenantId == null || z.TenantId == AbpSession.TenantId)).FirstOrDefaultAsync();
+                        if (entity == null)
                         {
-                            hexa = itm.EntityFk.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
-                            img = itm.EntityFk.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                            AppEntityExtraData? hexa, img;
+                            hexa = null;
+                            img = null;
+                            var itm = varAppItems.Where(z => z.EntityFk.EntityExtraData
+                            .Where(x => x.AttributeId == long.Parse(firstAttributeID.ToString()) && x.AttributeCode == firstattributeCodes[cod].AttributeCode).Count() > 0).FirstOrDefault();
+                            if (itm != null)
+                            {
+                                hexa = itm.EntityFk.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                img = itm.EntityFk.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                            }
+                            output.NonLookupValues.Add(new LookupLabelDto
+                            {
+                                Code = firstattributeCodes[cod].AttributeCode,
+                                Label = firstattributeValues[cod],
+                                HexaCode = (hexa != null && hexa.AttributeValue != null) ? hexa.AttributeValue : "",
+                                Image = (img != null && img.AttributeValue != null) ? (imagesUrl + (itm.TenantId.HasValue ? itm.TenantId.ToString() : "-1") + @"/" + img.AttributeValue) : ""
+                            });
                         }
-                        output.NonLookupValues.Add(new LookupLabelDto
-                        {
-                            Code = firstattributeCodes[cod].AttributeCode,
-                            Label = firstattributeValues[cod],
-                            HexaCode = (hexa != null && hexa.AttributeValue != null) ? hexa.AttributeValue : "",
-                            Image = (img != null && img.AttributeValue != null) ? (imagesUrl + (itm.TenantId.HasValue ? itm.TenantId.ToString() : "-1") + @"/" + img.AttributeValue) : ""
-                        });
                     }
                 }
             }
