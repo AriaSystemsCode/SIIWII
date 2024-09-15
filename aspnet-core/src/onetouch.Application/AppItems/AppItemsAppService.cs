@@ -2501,7 +2501,7 @@ namespace onetouch.AppItems
                             }
                             else
                             {
-                                var extraNonLookup = input.NonLookupValues.FirstOrDefault(z=>z.Code== colorExtraAtt.AttributeCode);
+                                var extraNonLookup = input.NonLookupValues.FirstOrDefault(z => z.Code == colorExtraAtt.AttributeCode);
                                 if (extraNonLookup != null)
                                 {
                                     if (extraNonLookup.HexaCode != null)
@@ -2738,6 +2738,16 @@ namespace onetouch.AppItems
                 #endregion concatenate variation lists
 
             }
+            //mmt0912
+            else
+            {
+                if (input.Id != null && input.Id != 0)
+                {
+                    await _appItemRepository.DeleteAsync(x => x.ParentId == input.Id);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                }
+            }
+            //mmt0912
             //MMT
             // if (appItem.ItemPricesFkList == null)
             //      appItem.ItemPricesFkList = new List<AppItemPrices>();
