@@ -113,7 +113,7 @@ namespace onetouch.Accounts
             ,IEmailingTemplateAppService emailingTemplateAppService)
         {
             _emailingTemplateAppService = emailingTemplateAppService;
-            _appMarketplaceContactRepository = _appMarketplaceContactRepository;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _iCreateMarketplaceAccount = iCreateMarketplaceAccount;
             _appAttachmentRepository = appAttachmentRepository;
             _appEntityAttachmentRepository = appEntityAttachmentRepository;
@@ -1972,35 +1972,39 @@ namespace onetouch.Accounts
             if (contact != null)
             {
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-                {
-                    var publishedContact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == contact.Id);
-                    if (publishedContact != null)
-                    {
-                        var publishedContactEntity = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.Id == publishedContact.EntityId);
-                        if (publishedContactEntity != null)
-                        {
+                {    
+                    //check if account has published styles
 
-                            // publishedContactEntity.EntityObjectStatusCode = "CANCELLED";
-                            publishedContactEntity.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                            await CurrentUnitOfWork.SaveChangesAsync();
-                        }
-                        //xx
-                        //XX
-                        
-                            var publishedbranchesandMemebers = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishedContact.Id &&
-                                         x.ParentId != null).ToList(); // First level of branches
-                            if (publishedbranchesandMemebers != null && publishedbranchesandMemebers.Count() > 0)
-                            {
-                                foreach (var publishedBranchMember in publishedbranchesandMemebers)
-                                {
-                                    publishedBranchMember.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                                }
-                                await CurrentUnitOfWork.SaveChangesAsync();
-                        }
-                        
-                        //XX
-                        //xx
-                    }
+                    var appMarketplaceContact = await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
+
+                    //var publishedContact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == contact.Id);
+                    //if (publishedContact != null)
+                    //{
+                    //    var publishedContactEntity = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == null && x.Id == publishedContact.EntityId);
+                    //    if (publishedContactEntity != null)
+                    //    {
+
+                    //        // publishedContactEntity.EntityObjectStatusCode = "CANCELLED";
+                    //        publishedContactEntity.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                    //        await CurrentUnitOfWork.SaveChangesAsync();
+                    //    }
+                    //    //xx
+                    //    //XX
+
+                    //        var publishedbranchesandMemebers = _appContactRepository.GetAll().Include(z => z.EntityFk).Where(x => x.TenantId == null && x.AccountId == publishedContact.Id &&
+                    //                     x.ParentId != null).ToList(); // First level of branches
+                    //        if (publishedbranchesandMemebers != null && publishedbranchesandMemebers.Count() > 0)
+                    //        {
+                    //            foreach (var publishedBranchMember in publishedbranchesandMemebers)
+                    //            {
+                    //                publishedBranchMember.EntityFk.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                    //            }
+                    //            await CurrentUnitOfWork.SaveChangesAsync();
+                    //    }
+
+                    //    //XX
+                    //    //xx
+                    //}
                 }
             }
 
@@ -2935,7 +2939,7 @@ namespace onetouch.Accounts
         public async Task SendRegistrationEmail(string email, int tenantId,string type,string link, string tenantName )
         {
             var localizedString = L("RegistrationLink");
-
+            //link = "https://app.testing.siiwii.net/account/register-tenant?editionId=1&subscriptionStartType=2";
             var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartnerByType", new List<string>() { tenantName, localizedString, link }, "en");
             await SendMessage(new SendMailDto() { To = email, Subject = template.MessageSubject, Body = template.MessageBody, IsBodyHtml = true });
         }
