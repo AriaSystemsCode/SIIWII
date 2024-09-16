@@ -668,7 +668,7 @@ span.p-tabview-title {
 }
 
 .shadow {
-    box-shadow: (99, 99, 99, 0.2) 0px 2px 8px 0px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
 
 .emailColor {
@@ -711,4 +711,10 @@ span.p-tabview-title {
 }
 .form-control {
     background-color: transparent !important;
+}
+.transparent-button{
+    color: #4A0D4A !important;
+    padding-top: 6px;
+    padding-bottom: 6px !important;
+    border:1px solid #eeeeee !important;
 }

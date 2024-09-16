@@ -30,6 +30,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Output("delete") delete: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("publish") publish: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("unPublish") unPublish: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output("private") private: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output("hide") hide: EventEmitter<boolean> = new EventEmitter<boolean>()
 
     accountLevelEnum = AccountLevelEnum;
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
@@ -328,5 +330,12 @@ this.btnLoader = true;
 // .pipe(finalize(() => (this.btnLoader = false)))
 
     }
-
+    PrivateAccount(){
+        debugger
+        this.private.emit()
+    }
+    HideAccount(){
+        debugger
+        this.hide.emit()
+    }
 }
