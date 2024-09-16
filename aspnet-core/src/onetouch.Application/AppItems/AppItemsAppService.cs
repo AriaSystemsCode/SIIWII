@@ -1192,7 +1192,7 @@ namespace onetouch.AppItems
                                     var varColorImage = codeItemVar.EntityFk.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
                                     if (varColorImage != null && !string.IsNullOrEmpty(varColorImage.AttributeValue))
                                     {
-                                        string tenantId = AbpSession.TenantId.ToString();
+                                        string tenantId = varColorImage.AttributeValueId != null ? null : AbpSession.TenantId.ToString();
                                         extraDataSelectedValues.ColorImage = imagesUrl + (tenantId == null ? "-1" : tenantId.ToString()) + @"/" + varColorImage.AttributeValue;
                                     }
                                     else
@@ -2447,7 +2447,7 @@ namespace onetouch.AppItems
                         {
                             var colorExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
                                 .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
+                                .Where(z => z.Code == colorExtraAtt.AttributeCode && (z.EntityObjectTypeCode == "COLOR" || z.EntityObjectTypeCode == "CLOSURE") && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
                             if (colorExtra != null)
                             {
                                 if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
@@ -4173,6 +4173,10 @@ namespace onetouch.AppItems
                                 x.ChangeTracker.Clear();
                                 foreach (var chEx in child.EntityFk.EntityExtraData)
                                 {
+                                    //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[Start]
+                                    if (chEx.AttributeId == 202 && !string.IsNullOrEmpty(chEx.AttributeValue))
+                                        MoveFile(chEx.AttributeValue, AbpSession.TenantId, -1);
+                                    //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[End]
                                     chEx.Id = 0;
                                     chEx.EntityCode = publishChild.Code;
                                     chEx.EntityId = publishChild.Id;
