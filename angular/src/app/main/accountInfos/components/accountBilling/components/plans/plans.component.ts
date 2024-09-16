@@ -9,6 +9,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 export class PlansComponent extends AppComponentBase {
   isMonthlyPlan:boolean =true;
   buttonMonthColor: string= '#4A0D4A';
+  products: any[];
   //primengTableHelper:any;
   constructor( injector: Injector,
         private _appSubscriptionPlanHeadersServiceProxy: AppSubscriptionPlanHeadersServiceProxy)
@@ -19,7 +20,12 @@ export class PlansComponent extends AppComponentBase {
         }
 ngOnInit()
 {
- 
+ this.products= [
+  { code: '001', name: 'Product A', category: 'Category X', quantity: 10 },
+  { code: '002', name: 'Product B', category: 'Category Y', quantity: 20 },
+  { code: '003', name: 'Product C', category: 'Category Z', quantity: 30 },
+  { code: '004', name: 'Product D', category: 'Category L', quantity: 34 },
+ ]
 } 
 monthlyClick()
 {
