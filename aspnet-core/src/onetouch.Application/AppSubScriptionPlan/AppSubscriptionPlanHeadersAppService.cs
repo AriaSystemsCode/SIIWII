@@ -33,7 +33,7 @@ namespace onetouch.AppSubScriptionPlan
             _appSubscriptionPlanHeadersExcelExporter = appSubscriptionPlanHeadersExcelExporter;
             _helper = helper;
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAppSubscriptionPlanHeaderForViewDto>> GetAll(GetAllAppSubscriptionPlanHeadersInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
