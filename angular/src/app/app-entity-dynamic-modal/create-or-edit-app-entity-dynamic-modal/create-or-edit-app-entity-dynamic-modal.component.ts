@@ -656,7 +656,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
         // create app attachment entity
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
         att.index = index;
-        att.fileName = file.name;
+        att.fileName = file?.name;
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
 
