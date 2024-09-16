@@ -63,7 +63,7 @@
                                     <span class="required">* </span>  <label for="AppEntity_Name">{{l("Name")}} </label>
                                     <input type="text" id="AppEntity_Name" class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.name" name="Name"     required/>
                                 </div>
-                                 <div class="form-group d-flex" *ngIf="!appEntity?.id">
+                                 <div class="form-group d-flex" *ngIf="!appEntity?.id || appEntity.nonlookup">
                                     <input [disabled]="!enableAddToLookup" type="checkbox" id="AppEntity_AddToLookup" class="form-control form-control-sm  col-1 mr-3" [(ngModel)]="addToLookup" name="addToLookup"/>
                                     <label for="AppEntity_AddToLookup" class="pt-2">{{l("Add to lookup")}} </label>
                                 </div>

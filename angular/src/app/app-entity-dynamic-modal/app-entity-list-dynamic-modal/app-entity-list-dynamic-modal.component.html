@@ -48,10 +48,10 @@
                     <span class="pt-1"> {{item.label}}</span>
                 </div>
                 </div>
-
-                <!-- <div class="row" *ngIf="item.value">
+                <div class="row" *ngIf="showActions && !item.isHostRecord && item.value">
                     *Added to lookup
-                </div> -->
+                </div> 
+               
                 <div *ngIf="showActions && !item.isHostRecord">
                     <div class="btn-group dropdown" dropdown container="body" placement='bottom right'>
                         <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>

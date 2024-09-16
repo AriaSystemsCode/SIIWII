@@ -196,8 +196,23 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
 
          this._appEntitiesServiceProxy.convertAppEntityDtoToLookupLabelDto($event)
         .subscribe((nonLookupValues :LookupLabelDto) => {
-            if(!$event?.id)
+            if(!$event?.id){
+                if(!$event.nonlookup){
+    let nonLookupIndx = this.nonLookupValues.findIndex(x=>x.code==nonLookupValues.code);
+    let selectedRecordIndx = this.selectedRecords.findIndex(x=>x==nonLookupValues.code);
+
+    if(nonLookupIndx>=0){
+        if(selectedRecordIndx>=0)
+            this.selectedRecords[selectedRecordIndx]=$event.value
+
+        this.nonLookupValues.splice(nonLookupIndx,1);
+    }
+}
+
+                    else
             this.nonLookupValues.push(nonLookupValues);
+            }
+            
 
             else{
                 let x = this.nonLookupValues.filter(x=>x.code==nonLookupValues.code);
@@ -211,4 +226,5 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
             }
         }); 
     }
+
 }
