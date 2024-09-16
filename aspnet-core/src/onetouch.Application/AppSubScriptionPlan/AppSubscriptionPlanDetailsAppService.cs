@@ -37,7 +37,7 @@ namespace onetouch.AppSubScriptionPlan
             _lookup_appFeatureRepository = lookup_appFeatureRepository;
 
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>> GetAll(GetAllAppSubscriptionPlanDetailsInput input)
         {
 
