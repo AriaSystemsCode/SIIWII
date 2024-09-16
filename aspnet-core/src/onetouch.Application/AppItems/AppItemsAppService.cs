@@ -1192,7 +1192,7 @@ namespace onetouch.AppItems
                                     var varColorImage = codeItemVar.EntityFk.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
                                     if (varColorImage != null && !string.IsNullOrEmpty(varColorImage.AttributeValue))
                                     {
-                                        string tenantId = null;
+                                        string tenantId = AbpSession.TenantId.ToString();
                                         extraDataSelectedValues.ColorImage = imagesUrl + (tenantId == null ? "-1" : tenantId.ToString()) + @"/" + varColorImage.AttributeValue;
                                     }
                                     else
