@@ -60,8 +60,10 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     ngOnChanges(changes: SimpleChanges) {
-       if( changes?.currentTab?.currentValue !== undefined &&
-        this.activeTab ==changes?.currentTab?.currentValue ){
+       if( (changes?.currentTab?.currentValue !== undefined &&
+        this.activeTab ==changes?.currentTab?.currentValue ) || (changes?.isCreateOrEdit !== undefined))
+        {
+            if(changes?.currentTab?.currentValue)
             this.activeTab =changes?.currentTab?.currentValue;
         if (this.appTransactionsForViewDto && this.activeTab != null && (this.activeTab >=0) ) {
             this.companeyNames=this.appTransactionsForViewDto?.companeyNames;
