@@ -2577,5 +2577,6 @@
 		<text name="CreateGroupAccount">Create Group Account</text>
 		<text name="registrationmailSentto">A registration mail has been Sent*Please Click on the register link in the email in order to create the new to</text>
 		<text name="clickRegisterToCreate"> </text>
+		<text name="CreateUserName"> Create Username</text>
   </texts>  
 </localizationDictionary>

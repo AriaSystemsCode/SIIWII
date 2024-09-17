@@ -769,7 +769,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             return
         }
         this.publishing=true;
-        this._AccountsServiceProxy.publishProfile()
+        this._AccountsServiceProxy.publishProfile(false)
         .pipe(finalize(() => { this.publishing = false;}))
             .subscribe(() => {
                 if(this.getForEditResult)

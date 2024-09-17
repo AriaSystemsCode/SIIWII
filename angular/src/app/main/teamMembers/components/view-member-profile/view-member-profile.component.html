@@ -31,13 +31,19 @@
                                             [classList]="'img-cover'"
                                             >
                                         </app-image-display>
-                                        <div class="d-flex view-profile-action-buttons" >
-                                            <button *ngIf="canEdit" class="btn mb-3 mt-4 w-100 btn-success" (click)="editMember()" >
+                                        <div class="view-profile-action-buttons" >
+                                            <button *ngIf="canEdit" class="btn mb-3 mt-4  transparent-button shadow" (click)="CreateUserName()" >
+                                                <img src="../../assets/img/input_icons/plus.png" class="">
+                                                {{ "CreateUserName" | localize }}
+                                            </button>
+                                            <button *ngIf="canEdit" class="btn mb-3 mt-4 editAccount_butn" (click)="editMember()" >
+                                                <img src="../../assets/img/input_icons/edit.png" class="">
                                                 {{ "Edit" | localize }}
                                             </button>
                                             <button *ngIf="canDelete" class="btn mb-3 mt-4 w-100 btn-danger" (click)="deleteMember()" >
                                                 {{ "Delete" | localize }}
                                             </button>
+
                                         </div>
                                     </div>
 
@@ -54,8 +60,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-10 title-cover">
-                                    <p>{{memberData?.contact?.firstName}} {{" "}} {{memberData?.contact?.lastName}} </p>
-                                    <p>{{memberData?.contact?.jobTitle}} </p>
+                                    <h5 class="account-name">{{memberData?.contact?.firstName}} {{" "}} {{memberData?.contact?.lastName}} </h5>
+                                    <p class="jobTitle-label">{{memberData?.contact?.jobTitle}} </p>
                                     <div class="desc">
                                         <p>
                                             {{memberData?.contact?.notes}}
@@ -71,45 +77,46 @@
         </div>
 
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet kt-portlet--mobile profileInfo_container">
                 <div class="kt-portlet__body p-0 pb-3">
                     <div class="pb-5 pl-4 pr-4 pt-5 row">
                         <div class="col-md-12 d-flex align-items-baseline pl-3 pb-3">
                             <p class="title-dev-slider text-left">{{"Overview" | localize}}</p>
                         </div>
-                        <div class="col-md-12 d-flex align-items-baseline">
-                            <h6 class="text-right col-2">{{ ( "FirstName" | localize ) + ":"}}</h6>
-                            <p class="text-left col">{{memberData?.contact?.firstName}}</p>
+                        <div class="col-md-12 align-items-baseline">
+                            <h6 class="text-right"><img src="../../assets/img/input_icons/user.png" class=""> {{ ( "FirstName" | localize ) + " :"}}</h6>
+                            <p class="text-left ">{{memberData?.contact?.firstName}}</p>
                         </div>
                         <hr class="header">
-                        <div class="col-md-12 d-flex align-items-baseline">
-                            <h6 class="text-right col-2">{{ ( "SurName" | localize ) + ":" }}</h6>
-                            <p class="text-left col">{{memberData?.contact?.lastName}}</p>
+                        <div class="col-md-12 align-items-baseline">
+                            <h6 class="text-right "><img src="../../assets/img/input_icons/user.png" class=""> {{ ( "SurName" | localize ) + " :" }}</h6>
+                            <p class="text-left ">{{memberData?.contact?.lastName}}</p>
                         </div>
                         <hr class="header">
-                        <div class="col-md-12 d-flex align-items-baseline">
-                            <h6 class="text-right col-2">{{ ( "JobTitle" | localize ) + ":" }}</h6>
-                            <p class="text-left col">{{memberData?.contact?.jobTitle}}</p>
+                        <div class="col-md-12  align-items-baseline">
+                            <h6 class="text-right "> <img src="../../assets/img/input_icons/outline-work.png" class=""> {{ ( "JobTitle" | localize ) + " :" }}</h6>
+                            <p class="text-left old_editjobTitle" [ngClass]="{'hide':NoteditInfo}">{{memberData?.contact?.jobTitle}}</p>
+                            <input type="text" class="editjobTitle form-control form-control-sm aria-input-text" name="JobTitle" minlength="2" maxlength="100" [placeholder]="'PleaseEnterJobTitle' | localize " [ngClass]="{'hide':editInfo}">
                         </div>
                         <hr class="header"  *ngIf="memberData?.contact?.joinDateIsPublic">
-                        <div class="col-md-12 d-flex align-items-baseline" *ngIf="memberData?.contact?.joinDateIsPublic">
-                            <h6 class="text-right col-2">{{ ( "JoinDate" | localize ) + ":" }}</h6>
-                            <p class="text-left col">{{memberData?.contact?.joinDate?.toString()| date: 'short'}}</p>
+                        <div class="col-md-12 align-items-baseline" *ngIf="memberData?.contact?.joinDateIsPublic">
+                            <h6 class="text-right "> <img src="../../assets/img/input_icons/workSpaceIcon.png" class="">  {{ ( "JoinDate" | localize ) + " :" }}</h6>
+                            <p class="text-left ">{{memberData?.contact?.joinDate?.toString()| date: 'short'}}</p>
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.emailAddressIsPublic">
-                        <div class="col-md-12 d-flex align-items-baseline" *ngIf="memberData?.contact?.emailAddressIsPublic">
-                            <h6 class="text-right col-2">{{ ( "Email" | localize ) + ":" }}</h6>
-                            <p class="text-left col">{{memberData?.contact?.eMailAddress}}</p>
+                        <div class="col-md-12  align-items-baseline" *ngIf="memberData?.contact?.emailAddressIsPublic">
+                            <h6 class="text-right "><img src="../../assets/img/input_icons/letter.png" class="">{{ ( "Email" | localize ) + " :" }}</h6>
+                            <p class="text-left ">{{memberData?.contact?.eMailAddress}}</p>
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.languageIsPublic">
-                        <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.languageIsPublic">
-                            <h6 class="text-right col-2">{{ ( "Language" | localize ) + ":" }}</h6>
-                            <p class="text-left col">{{memberData?.contact?.languageName}}</p>
+                        <div class="col-md-12  align-items-baseline"  *ngIf="memberData?.contact?.languageIsPublic">
+                            <h6 class="text-right "> <img src="../../assets/img/input_icons/language.png" class=""> {{ ( "Language" | localize ) + " :" }}</h6>
+                            <p class="text-left ">{{memberData?.contact?.languageName}}</p>
                         </div>
                         <hr class="header">
-                        <div class="col-md-12 d-flex align-items-baseline">
-                            <h6 class="text-right col-2" >{{ ( "Branch" | localize ) + ":" }}</h6>
-                            <p class="text-left col" *ngIf="memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName">
+                        <div class="col-md-12  align-items-baseline">
+                            <h6 class="text-right " >  <img src="../../assets/img/input_icons/location.png" class=""> {{ ( "Branch" | localize ) + " :" }}</h6>
+                            <p class="text-left old_editBranch" [class.hide]="NoteditInfo" *ngIf="memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName">
                                 <span *ngIf="memberData?.branchName">
                                     {{ memberData?.branchName + ' '}}
                                 </span>
@@ -132,28 +139,32 @@
                                     {{ memberData?.countryName  }}
                                 </span>
                             </p>
+                            <input type="text" class="editBranch form-control form-control-sm aria-input-text"  [placeholder]="'PleaseSelectBranch' | localize "  [class.hide]="editInfo">
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.phone1IsPublic">
-                        <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.phone1IsPublic">
-                            <h6 class="text-right col-2" >
-                                {{ (memberData?.contact?.phone1TypeName ? (memberData?.contact?.phone1TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
+                        <div class="col-md-12  align-items-baseline"  *ngIf="memberData?.contact?.phone1IsPublic">
+                            <h6 class="text-right " >
+                                <img src="../../assets/img/input_icons/phone.png" class=""> {{ (memberData?.contact?.phone1TypeName ? (memberData?.contact?.phone1TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ' :' }}
                             </h6>
-                            <p class="text-left col">{{memberData?.contact?.phone1Number}}</p>
+                            <p class="text-left ">{{memberData?.contact?.phone1Number}}</p>
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.phone2IsPublic">
-                        <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.phone2IsPublic">
-                            <h6 class="text-right col-2" >
-                                {{ (memberData?.contact?.phone2TypeName ? (memberData?.contact?.phone2TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
+                        <div class="col-md-12  align-items-baseline"  *ngIf="memberData?.contact?.phone2IsPublic">
+                            <h6 class="text-right " >
+                                <img src="../../assets/img/input_icons/phone.png" class="">  {{ (memberData?.contact?.phone2TypeName ? (memberData?.contact?.phone2TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ' :' }}
                             </h6>
-                            <p class="text-left col">{{memberData?.contact?.phone2Number}}</p>
+                            <p class="text-left ">{{memberData?.contact?.phone2Number}}</p>
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.phone3IsPublic">
-                        <div class="col-md-12 d-flex align-items-baseline"  *ngIf="memberData?.contact?.phone3IsPublic">
-                            <h6 class="text-right col-2" >
-                                {{ (memberData?.contact?.phone3TypeName ? (memberData?.contact?.phone3TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ':' }}
+                        <div class="col-md-12  align-items-baseline"  *ngIf="memberData?.contact?.phone3IsPublic">
+                            <h6 class="text-right">
+                                <img src="../../assets/img/input_icons/phone.png" class=""> {{ (memberData?.contact?.phone3TypeName ? (memberData?.contact?.phone3TypeName  | localize)  : '')  + " " +  ( "Number"  | localize )  + ' :' }}
                             </h6>
-                            <p class="text-left col">{{memberData?.contact?.phone3Number}}</p>
+                            <p class="text-left ">{{memberData?.contact?.phone3Number}}</p>
                         </div>
+                        <button class="btn mb-3 mt-4 editAccount_butn Save_editMember"   [class.hide]="editInfo" (click)="Save_editMember()" >
+                            {{ "SaveChanges" | localize }}
+                        </button>
                     </div>
 
                 </div>

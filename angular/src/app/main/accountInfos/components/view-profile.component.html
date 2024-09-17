@@ -35,11 +35,12 @@
                                                 <img src="../../assets/img/input_icons/edit.png" class="">
                                                 {{ "Edit" | localize }}
                                             </button>
-                                            <button class="btn transparent-button" (click)="PrivateAccount()">
-                                                <img src="../../assets/img/input_icons/privateAccount.png" class="">
+                                            <!-- *ngIf="isPublished && appEntityName='lol'" -->
+                                            <button class="btn transparent-button" (click)="UnShareAccount()"  *ngIf="isPublished">
+                                                <img src="../../assets/img/input_icons/privateAccount.png" class="" >
                                                 {{ "Private" | localize }}
                                             </button>
-                                            <button class="btn transparent-button" (click)="HideAccount()">
+                                            <button class="btn transparent-button" (click)="UnShareAccount()" *ngIf="!isPublished">
                                                 <img src="../../assets/img/input_icons/hideAccount.png" class="">
                                                 {{ "Hide" | localize }}
                                             </button>
@@ -56,7 +57,7 @@
 
                                             <button pButton pRipple label="Share"
                                                 class="share btn transparent-button" icon="pi pi-share-alt"
-                                                (click)="openShareAccountsModal()"></button>
+                                                (click)="openShareAccountsModal()" *ngIf="!isPublished"></button>
                                             <button pButton pRipple label="Sync" class="sync btn" icon="pi pi-sync"
                                                 (click)="syncAccount()" [loading]="btnLoader"
                                                 [disabled]="!accountData?.showSync"></button>
@@ -98,8 +99,8 @@
                                     <!-- <img [src]="logoPhoto"  onerror="this.src='../../../assets/placeholders/_logo-placeholder.png';" class="logo-profile ml-4"> -->
                                 </div>
                                 <div class="col title-cover">
-                                    <h4 class="account-name">{{accountData?.name}} <span class="number-connect">
-                                            {{accountData?.connections}} {{'MembersAreConnected'|localize}}</span></h4>
+                                    <h5 class="account-name">{{accountData?.name}} <span class="number-connect">
+                                            {{accountData?.connections}} {{'MembersAreConnected'|localize}}</span></h5>
                                     <div>
                                         <textarea class="thin-scroll w-100" style="
                                             height: 120px;
