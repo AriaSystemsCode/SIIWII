@@ -1444,6 +1444,11 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
         this.variationMatrices = this.variationMatrices.filter((variation) => {
             return !sectedRecordsPositions.includes(variation.position) || !variation.ssin ;   
         });
+
+        this.variationMatrices.map((item, index) => {
+            item.position = index + 1;
+            return item;
+        });
     }
         this.selectedVaritaions = [];
         this.primengTableHelper.records = this.variationMatrices;
@@ -2539,7 +2544,15 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
          }
         
     }
+     
+    getIndex(record){
+        
+       let index=  this.variationMatrices.findIndex(item => item.code == record.code);
 
+       return index;
+       
+    }
+   
 }
 export interface ApplyVariationOutput {
     variation: VariationItemDto[];

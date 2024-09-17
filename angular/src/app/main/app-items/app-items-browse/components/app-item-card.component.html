@@ -1,6 +1,7 @@
-<div class="single-item position-relative" [ngClass]=" { 'row': singleItemPerRowMode }">
-    <div class="purple-selection position-absolute" style="width: 45px;top: 3px;"
-        *ngIf="browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections ">
+<div class="single-item position-relative" [ngClass]=" { 'row': singleItemPerRowMode }" style="    border-radius: 11px;
+    border: 2px solid #EDEDED !important;">
+    <div class="purple-selection position-absolute p-2" style="width: 45px;top: 3px;"
+        *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections  ) && !singleItemPerRowMode  ">
         <p-inputSwitch [(ngModel)]="item.selected" name="showCode" (onChange)="handleSelection($event)"
             [styleClass]="'purple-selection'" [ngStyle]="{'right.px': !singleItemPerRowMode ? 50 : 0}"></p-inputSwitch>
     </div>
@@ -10,16 +11,16 @@
             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"   [ngStyle]="{ 'height.px': photoDiv.clientHeight }" />
     </div>
     <div class="single-item-body col d-flex position-static p-0 pl-2">
-        <div class="align-items-center row w-100">
+        <div class="row w-100">
 
             <div class="pl-2 pr-0 pt-3 w-100"
                 [ngStyle]="{'margin-right.px':browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections ? 0 : 0}">
 
-                <div class="row d-flex justify-content-between p-3 flex-column flex-nowrap">
+                <div class="row d-flex justify-content-between p-3  flex-nowrap">
                     <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" style="white-space: nowrap;" (click)="viewItemHandler()">
-                        {{item.appItem.code | textSubstring:12}}
+                        {{item.appItem.code | textSubstring:6}}
                     </h4>
-                    <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;">
+                    <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;" *ngIf="!singleItemPerRowMode">
                         <div class="price pt-2" style="float: right;
                         clear: both;">
                             {{ "MSRP" | localize }}:
@@ -29,21 +30,21 @@
                     </h6>
                 </div>
 
-                <p class="mb-2 product-name" style="color: #9E9E9E;">
+                <p class="mb-2 product-name pl-2" style="color: #9E9E9E;">
                     {{ item?.appItem?.name | textSubstring: 60 }}
                 </p>
 
                
 
                 <div class="row pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode &&  item.entityObjectCategoryNames?.length >  0 ">
-                    <p class="pt-2 product-name" style="color: #9E9E9E;">
+                    <p class="pt-2 product-name pl-2" style="color: #9E9E9E;">
                         Categories:
                     </p>
                     <div class="row details">
                         <div *ngFor="let category of item?.entityObjectCategoryNames; let i = index">
                             <ng-container *ngIf="i < 3">
                                 <div class="seeMoreData">
-                                    <p class="title-tag">{{ category }}</p>
+                                    <p class="title-tag p-0 m-0">{{ category }}</p>
                                 </div>
                             </ng-container>
                         </div>
@@ -52,21 +53,21 @@
                 </div>
 
                 <div class="row pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode && item?.entityClassificationNames?.length >  0  ">
-                    <p class="pt-2 product-name" style="color: #9E9E9E;">
+                    <p class="pt-2 product-name pl-2" style="color: #9E9E9E;">
                         Classifications : </p>
                     <div class="row details">
                         <div
                             *ngFor="let classification of item?.entityClassificationNames; let i = index">
                             <ng-container *ngIf="i < 3">
                                 <div class="seeMoreData">
-                                    <p class="title-tag">{{ classification }}</p>
+                                    <p class="title-tag p-0 m-0">{{ classification }}</p>
                                 </div>
                             </ng-container>
                         </div>
                     </div>
                 </div>
 
-                <p class="mb-2" [ngClass]="{ 'd-none': !singleItemPerRowMode }"
+                <p class="mb-2 pl-3" [ngClass]="{ 'd-none': !singleItemPerRowMode }"
                     style="max-width: 70ch; color: #9E9E9E;"  [innerHTML]="item?.appItem?.description | textSubstring: 180">
                     <!-- {{ item?.appItem?.description | textSubstring: 180 }} -->
                 </p>
@@ -166,7 +167,15 @@
                 </div>
             </ng-container>
 
-            <div class="actions-menu"
+            <div class="purple-selection position-absolute p-2" style="width: 45px;
+            top: 1.5%;
+            right: 5%;"
+            *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections  ) && singleItemPerRowMode  ">
+            <p-inputSwitch [(ngModel)]="item.selected" name="showCode" (onChange)="handleSelection($event)"
+                [styleClass]="'purple-selection'" [ngStyle]="{'right.px': !singleItemPerRowMode ? 50 : 0}"></p-inputSwitch>
+        </div>
+
+            <div class="actions-menu m-2"
                 [ngClass]="{'d-none':actionsMenuFlags?.allIsHidden || (browseMode != BrowseModeEnum.Actions && browseMode != BrowseModeEnum.ActionsAndSelections) }">
                 <app-appitems-actions-menu #AppitemsActionsMenuComponent [item]="item.appItem"
                     [appItemType]="mainFilterCtrl?.value?.value" [actionsMenuFlags]="actionsMenuFlags"

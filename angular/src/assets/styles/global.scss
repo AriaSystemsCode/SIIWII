@@ -722,3 +722,8 @@ border: 1px solid #D9D9D9 !important;
 .p-datepicker{
     z-index: 999999999999 !important;
 }
+
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler{
+    order: 2;
+}
