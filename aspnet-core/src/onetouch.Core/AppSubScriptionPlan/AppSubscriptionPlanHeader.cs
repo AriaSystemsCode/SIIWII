@@ -5,6 +5,8 @@ using Abp.Domain.Entities.Auditing;
 using Abp.Domain.Entities;
 using Abp.Auditing;
 using onetouch.AppEntities;
+using onetouch.AppSiiwiiTransaction;
+using System.Collections.Generic;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -28,6 +30,7 @@ namespace onetouch.AppSubScriptionPlan
         public virtual decimal MonthlyPrice { get; set; }
 
         public virtual decimal YearlyPrice { get; set; }
+        public virtual ICollection<AppSubscriptionPlanDetail> AppSubscriptionPlanDetails { get; set; }
 
         //[Required]
         //[StringLength(AppSubscriptionPlanHeaderConsts.MaxCodeLength, MinimumLength = AppSubscriptionPlanHeaderConsts.MinCodeLength)]
