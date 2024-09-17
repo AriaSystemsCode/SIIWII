@@ -17,6 +17,7 @@ using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
 using Abp.Domain.Uow;
+using Abp.EntityFrameworkCore.Extensions;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -25,12 +26,14 @@ namespace onetouch.AppSubScriptionPlan
     {
         private readonly IRepository<AppSubscriptionPlanHeader, long> _appSubscriptionPlanHeaderRepository;
         private readonly IAppSubscriptionPlanHeadersExcelExporter _appSubscriptionPlanHeadersExcelExporter;
+        private readonly IRepository<AppTenantSubscriptionPlan, long> _appTenantSubscriptionPlanRepository;
         private readonly Helper _helper;
         public AppSubscriptionPlanHeadersAppService(IRepository<AppSubscriptionPlanHeader, long> appSubscriptionPlanHeaderRepository,
-            IAppSubscriptionPlanHeadersExcelExporter appSubscriptionPlanHeadersExcelExporter, Helper helper)
+            IAppSubscriptionPlanHeadersExcelExporter appSubscriptionPlanHeadersExcelExporter, Helper helper, IRepository<AppTenantSubscriptionPlan, long> appTenantSubscriptionPlanRepository)
         {
             _appSubscriptionPlanHeaderRepository = appSubscriptionPlanHeaderRepository;
             _appSubscriptionPlanHeadersExcelExporter = appSubscriptionPlanHeadersExcelExporter;
+            _appTenantSubscriptionPlanRepository = appTenantSubscriptionPlanRepository;
             _helper = helper;
         }
         [AbpAllowAnonymous]
@@ -39,7 +42,7 @@ namespace onetouch.AppSubScriptionPlan
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
 
-                var filteredAppSubscriptionPlanHeaders = _appSubscriptionPlanHeaderRepository.GetAll()
+                var filteredAppSubscriptionPlanHeaders = _appSubscriptionPlanHeaderRepository.GetAll().IncludeIf( AbpSession.TenantId!=null , z=>z.AppSubscriptionPlanDetails)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Description.Contains(input.Filter) || e.BillingCode.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.Name.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.DescriptionFilter), e => e.Description == input.DescriptionFilter)
                         .WhereIf(input.IsStandardFilter.HasValue && input.IsStandardFilter > -1, e => (input.IsStandardFilter == 1 && e.IsStandard) || (input.IsStandardFilter == 0 && !e.IsStandard))
@@ -71,7 +74,8 @@ namespace onetouch.AppSubScriptionPlan
                                                      o.YearlyPrice,
                                                      o.Code,
                                                      o.Name,
-                                                     Id = o.Id
+                                                     Id = o.Id,
+                                                     o.AppSubscriptionPlanDetails
                                                  };
 
                 var totalCount = await filteredAppSubscriptionPlanHeaders.CountAsync();
@@ -96,12 +100,28 @@ namespace onetouch.AppSubScriptionPlan
                             Code = o.Code,
                             Name = o.Name,
                             Id = o.Id,
+                            AppSubscriptionPlanDetails =ObjectMapper.Map<List<AppSubscriptionPlanDetailDto>>(o.AppSubscriptionPlanDetails),
                         }
                     };
 
                     results.Add(res);
                 }
+                //MMT
+                if (AbpSession.TenantId != null)
+                {
+                    var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
+                        .Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodEndDate >= DateTime.Now.Date && DateTime.Now.Date >= z.CurrentPeriodStartDate).FirstOrDefaultAsync();
+                    if (tenantPlan != null)
+                    {
+                        var plan = results.Where(z => z.AppSubscriptionPlanHeader.Id == tenantPlan.AppSubscriptionPlanHeaderId).FirstOrDefault();
+                        if (plan != null)
+                            plan.AppSubscriptionPlanHeader.AppTenantSubscriptionPlanId= tenantPlan.Id;
 
+                    }
+                          
+                }
+                   // AppTenantSubscriptionPlanId
+                //MMT
                 return new PagedResultDto<GetAppSubscriptionPlanHeaderForViewDto>(
                     totalCount,
                     results
