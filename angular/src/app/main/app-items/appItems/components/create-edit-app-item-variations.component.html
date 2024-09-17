@@ -338,9 +338,7 @@
                                                             placeholder="Price"
                                                            [name]="'price_'+record.position+index"
                                                             class="form-control rounded-lg pt-3 pb-3 row-item"
-                                                            [(ngModel)]=" record.appItemPriceInfos[pricingFilter.variationCorrespondingIndex[getIndex(record)]].price">
-                                                            <label> index= {{index}} </label>
-                                                            <label> position= {{record.position}} </label>
+                                                            [(ngModel)]=" record.appItemPriceInfos[pricingFilter.variationCorrespondingIndex[index]].price">
                                                         </div>
                                                     </td>
 
