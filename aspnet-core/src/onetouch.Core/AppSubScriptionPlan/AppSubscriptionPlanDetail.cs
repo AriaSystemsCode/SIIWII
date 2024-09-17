@@ -54,7 +54,7 @@ namespace onetouch.AppSubScriptionPlan
         public virtual string? UnitOfMeasurmentCode { get; set; }
 
         public virtual bool IsFeatureBillable { get; set; }
-        public virtual bool IsAddOn { get; set; }
+        
 
         [StringLength(AppSubscriptionPlanDetailConsts.MaxFeatureBillingCodeLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinFeatureBillingCodeLength)]
         public virtual string? FeatureBillingCode { get; set; }
