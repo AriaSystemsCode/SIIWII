@@ -46,20 +46,20 @@
           </tr>
           <tr>
               <td class="head-c" style="font-size: 20px;">Prices</td> <!-- First vertical column for 'Name' -->
-              <td *ngFor="let product of products">{{ product.name }}</td>
+              <td *ngFor="let product of plans">{{ product.name }}</td>
           </tr>
           <tr>
               <td class="head-c" style="font-size: 20px;">Description</td> <!-- First vertical column for 'Category' -->
-              <td *ngFor="let product of products">{{ product.category }}</td>
+              <td *ngFor="let product of plans">{{ product.category }}</td>
           </tr>
           <!-- <tr>
               <td>Quantity</td> 
-              <td *ngFor="let product of products">{{ product.quantity }}</td>
+              <td *ngFor="let product of plans">{{ product.quantity }}</td>
           </tr>
 
           <tr>
             <td>Quantity</td> 
-            <td *ngFor="let product of products">{{ product.quantity }}</td>
+            <td *ngFor="let product of plans">{{ product.quantity }}</td>
         </tr> -->
       </tbody>
   </table>
@@ -72,7 +72,7 @@
  
         <tr>
             <td class="head-c">No of Users</td> <!-- First vertical column for 'Name' -->
-            <td *ngFor="let product of products">{{ product.name }}</td>
+            <td *ngFor="let product of plans">{{ product.name }}</td>
         </tr>
      
 
@@ -87,13 +87,13 @@
 
       <tr>
           <td class="head-c">Connect with Marketplace Accounts</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
 
       <tr>
         <td class="head-c">Manual Acoount Creation</td> <!-- First vertical column for 'Name' -->
-        <td *ngFor="let product of products">{{ product.name }}</td>
+        <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
 
@@ -101,20 +101,20 @@
 </table>
 
 <div class="plan">
-<h2 class="text-center ">Products</h2>
+<h2 class="text-center ">plans</h2>
 </div>
 <table class="vertical-header-table">
   <tbody>
 
       <tr>
           <td class="head-c">New Product Creation</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
 
       <tr>
         <td class="head-c">Customer product variations template</td> <!-- First vertical column for 'Name' -->
-        <td *ngFor="let product of products">{{ product.name }}</td>
+        <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
 
@@ -122,14 +122,14 @@
 </table>
 
 <div class="plan">
-<h2 class="text-center ">Marketplace Products</h2>
+<h2 class="text-center ">Marketplace plans</h2>
 </div>
 <table class="vertical-header-table">
   <tbody>
 
       <tr>
           <td class="head-c">Share product to SIIWII Marketplace</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
 
@@ -141,19 +141,19 @@
 
 
 <div class="plan">
-<h2 class="text-center ">Products List</h2>
+<h2 class="text-center ">plans List</h2>
 </div>
 <table class="vertical-header-table">
   <tbody>
 
       <tr>
           <td class="head-c">Product list creation</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
       <tr>
         <td class="head-c">Product list contents</td> <!-- First vertical column for 'Name' -->
-        <td *ngFor="let product of products">{{ product.name }}</td>
+        <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
 
@@ -162,10 +162,10 @@
 
   </tbody>
 </table>
-<table class="vertical-header-table">
+<!-- <table class="vertical-header-table">
   <tbody>
       <tr>
-          <td class="top-left head-c">PLans</td> <!-- First vertical column for 'Code' -->
+          <td class="top-left head-c">PLans</td> 
           <td >
             <div class="d-flex flex-column">
               <p  class="custom-p-free">Free</p>
@@ -193,16 +193,16 @@
           </td>
       </tr>
       <tr>
-          <td class="head-c">Prices</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td class="head-c">Prices</td> 
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
       <tr>
-          <td class="head-c">Description</td> <!-- First vertical column for 'Category' -->
-          <td *ngFor="let product of products">{{ product.category }}</td>
+          <td class="head-c">Description</td> 
+          <td *ngFor="let product of plans">{{ product.category }}</td>
       </tr>
  
   </tbody>
-</table>
+</table> -->
 <div class="plan">
 
 <h2 class="text-center">Linesheet</h2>
@@ -212,17 +212,17 @@
 
       <tr>
           <td class="head-c">Generate Linesheet report</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
       <tr>
         <td class="head-c">Print linesheet PDF</td> <!-- First vertical column for 'Name' -->
-        <td *ngFor="let product of products">{{ product.name }}</td>
+        <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
     <tr>
       <td class="head-c">Custom linesheet layout</td> <!-- First vertical column for 'Name' -->
-      <td *ngFor="let product of products">{{ product.name }}</td>
+      <td *ngFor="let product of plans">{{ product.name }}</td>
   </tr>
 
 
@@ -241,12 +241,12 @@
 
       <tr>
           <td class="head-c">Sales order Transaction line</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
       <tr>
         <td class="head-c">Purshase order Transaction line</td> <!-- First vertical column for 'Name' -->
-        <td *ngFor="let product of products">{{ product.name }}</td>
+        <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
 
@@ -266,7 +266,7 @@
 
       <tr>
           <td class="head-c">Event Creation</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
 
@@ -287,7 +287,7 @@
 
       <tr>
           <td class="head-c">Number of advertising</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of products">{{ product.name }}</td>
+          <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
 
