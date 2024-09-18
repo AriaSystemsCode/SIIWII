@@ -9,9 +9,12 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 export class PlansComponent extends AppComponentBase {
   isMonthlyPlan:boolean =true;
   buttonMonthColor: string= '#4A0D4A';
-  plans: GetAppSubscriptionPlanHeaderForViewDto[] = []
+  plans: any[] = []
   records: any[];
   //primengTableHelper:any;
+  allDetails: any[] = [];
+  featureName:any
+  categoryName:any
   constructor( injector: Injector,
         private _appSubscriptionPlanHeadersServiceProxy: AppSubscriptionPlanHeadersServiceProxy,private _AppSubscriptionPlanDetailsServiceProxy:AppSubscriptionPlanDetailsServiceProxy)
         {
@@ -21,12 +24,7 @@ export class PlansComponent extends AppComponentBase {
         }
 ngOnInit()
 {
-//  this.products= [
-//   { code: '001', name: 'Product A', category: 'Category X', quantity: 10 },
-//   { code: '002', name: 'Product B', category: 'Category Y', quantity: 20 },
-//   { code: '003', name: 'Product C', category: 'Category Z', quantity: 30 },
-//   { code: '004', name: 'Product D', category: 'Category L', quantity: 34 },
-//  ]
+
 this.monthlyClick()
 } 
 monthlyClick()
@@ -40,19 +38,72 @@ monthlyClick()
     // this.primengTableHelper.records = result.items;
     // this.primengTableHelper.hideLoadingIndicator();
     this.plans = result.items
-    console.log(result.items,'result.items')
+    this.plans.forEach(plan => {
+    this.getDetailsForPlan(plan.appSubscriptionPlanHeader.id )
+
+      // plan.appSubscriptionPlanHeader.appSubscriptionPlanDetails.forEach(detail => {
+      //   if (plan.appSubscriptionPlanHeader.id === detail.appSubscriptionPlanHeaderId) {
+      //     this.allDetails.push(detail);
+      //   }
+      // });
+    });
+    console.log(this.allDetails, 'Filtered details');
+
+
+
 });
-this._AppSubscriptionPlanDetailsServiceProxy.getAll(
-  null,    null,    null,    null,  null ,    null,null,  null ,    null,null,  null ,    null,null,  null ,   
-  null,    null,    null,    null,    null,    null,
-  null,    null,    0,    100).subscribe(result => {
-  this.primengTableHelper.totalRecordsCount = result.totalCount;
-  // this.primengTableHelper.records = result.items;
-  // this.primengTableHelper.hideLoadingIndicator();
-  this.records = result.items
-  console.log(result.items,'result.itemssssssssssssssssss')
-});
+
+
 }
+
+getDetailsForPlan(planId: number) {
+  this.allDetails = [];  // Clear previous details
+
+  // Find the plan with the matching planId
+  const selectedPlan = this.plans.find(plan => plan.appSubscriptionPlanHeader.id === planId);
+
+  if (selectedPlan) {
+    // Filter the details for that specific plan
+    selectedPlan.appSubscriptionPlanHeader.appSubscriptionPlanDetails.forEach(detail => {
+      if (selectedPlan.appSubscriptionPlanHeader.id === detail.appSubscriptionPlanHeaderId) {
+        this.allDetails.push(detail);
+      }
+    });
+  }
+
+  console.log(this.allDetails, 'Filtered details for plan with ID: ' + planId);
+}
+getUniqueCategories() {
+  const allDetails = this.plans.reduce((acc, plan) => {
+    return [...acc, ...plan.appSubscriptionPlanHeader.appSubscriptionPlanDetails];
+  }, []);
+
+  // Extract unique categories
+  const uniqueCategories = allDetails
+    .map(detail => detail.category)
+    .filter((value, index, self) => value && index === self.indexOf(value));
+
+  return uniqueCategories;
+}
+
+getFeaturesByCategory(category: string) {
+  // Aggregate all details from all plans
+  const allDetails = this.plans.reduce((acc, plan) => {
+    return [...acc, ...plan.appSubscriptionPlanHeader.appSubscriptionPlanDetails];
+  }, []);
+
+  // Filter features by category
+  const filteredFeatures = allDetails.filter(detail => detail.category === category);
+
+  // Ensure unique features by featureCode
+  const uniqueFeatures = filteredFeatures.filter((feature, index, self) =>
+    index === self.findIndex(f => f.featureCode === feature.featureCode)
+  );
+
+  return uniqueFeatures;
+}
+
+
 getMonthStyle()
 {
   //return this.monthStyle;

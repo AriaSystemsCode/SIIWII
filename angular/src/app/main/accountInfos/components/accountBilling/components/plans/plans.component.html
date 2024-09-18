@@ -13,17 +13,17 @@
   <div class="">
     <table class="vertical-header-table">
       <tbody>
-          <tr>
-              <td class="top-left head-c" style="       font-size: 20px;
+          <tr >
+              <td  class="top-left head-c" style="       font-size: 20px;
               display: inline-block;
               padding-top: 50px;">PLans</td> <!-- First vertical column for 'Code' -->
-              <td >
+              <td *ngFor="let plan of plans">
                 <div class="d-flex flex-column">
-                  <p  class="custom-p-free">Free</p>
+                  <p  class="custom-p-free">{{ plan?.appSubscriptionPlanHeader?.name }}</p>
                   <button class="btn free-btn">Sellected</button>
                 </div>
               </td>
-
+<!-- 
               <td >
                 <div class="d-flex flex-column">
                   <p  class="custom-p-sil">Silver</p>
@@ -42,93 +42,96 @@
                   <p  class="custom-p-cu">Custom</p>
                   <button class="btn cu-btn">Sellected</button>
                 </div>
-              </td>
+              </td> -->
           </tr>
           <tr>
               <td class="head-c" style="font-size: 20px;">Prices</td> <!-- First vertical column for 'Name' -->
-              <td *ngFor="let product of plans">{{ product.name }}</td>
+              <td *ngFor="let plan of plans">{{ plan?.appSubscriptionPlanHeader?.monthlyPrice }}</td>
           </tr>
           <tr>
               <td class="head-c" style="font-size: 20px;">Description</td> <!-- First vertical column for 'Category' -->
-              <td *ngFor="let product of plans">{{ product.category }}</td>
+              <td *ngFor="let product of plans">{{ product?.appSubscriptionPlanHeader.description }}</td>
           </tr>
-          <!-- <tr>
-              <td>Quantity</td> 
-              <td *ngFor="let product of plans">{{ product.quantity }}</td>
-          </tr>
-
-          <tr>
-            <td>Quantity</td> 
-            <td *ngFor="let product of plans">{{ product.quantity }}</td>
-        </tr> -->
+    
       </tbody>
   </table>
-<div class="plan">
+<!-- <div class="plan">
   <h2 class="text-center ">Users</h2>
-</div>
-
-  <table class="vertical-header-table">
+    <table class="vertical-header-table">
     <tbody>
  
-        <tr>
-            <td class="head-c">No of Users</td> <!-- First vertical column for 'Name' -->
-            <td *ngFor="let product of plans">{{ product.name }}</td>
+        <tr *ngFor="let detail of plans[0]?.appSubscriptionPlanHeader?.appSubscriptionPlanDetails">
+        
+          <td  class="head-c"  *ngIf="detail.category == 'USER'">{{ detail.featureName }}</td>
+          <div *ngIf="detail.category == 'USER' ">
+          <td  *ngFor="let plan of plans">
+            <span *ngIf="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId == plan?.appSubscriptionPlanHeader?.appSubscriptionPlanDetails?.appSubscriptionPlanHeaderId">
+              <p  *ngIf="detail.category == 'USER'">{{ detail.featureLimit }}</p>
+            </span>
+          </td>
+        </div>
         </tr>
      
 
     </tbody>
 </table>
+</div> -->
+
+<!-- 
 <div class="plan">
 
 <h2 class="text-center">Acounts</h2>
-</div>
-<table class="vertical-header-table">
+</div> -->
+<!-- <table class="vertical-header-table">
   <tbody>
 
       <tr>
-          <td class="head-c">Connect with Marketplace Accounts</td> <!-- First vertical column for 'Name' -->
+          <td class="head-c">Connect with Marketplace Accounts</td> 
           <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
 
       <tr>
-        <td class="head-c">Manual Acoount Creation</td> <!-- First vertical column for 'Name' -->
+        <td class="head-c">Manual Acoount Creation</td> 
         <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
 
   </tbody>
-</table>
+</table> -->
 
-<div class="plan">
-<h2 class="text-center ">plans</h2>
+<div *ngFor="let category of getUniqueCategories()">
+  <!-- Dynamically display category name -->
+   <div  class="plan">
+  <h2 class="text-center ">{{ category }}</h2>
 </div>
-<table class="vertical-header-table">
-  <tbody>
-
-      <tr>
-          <td class="head-c">New Product Creation</td> <!-- First vertical column for 'Name' -->
-          <td *ngFor="let product of plans">{{ product.name }}</td>
+  <table class="vertical-header-table">
+    <tbody>
+      <!-- Dynamically create a row for each feature under the current category -->
+      <tr *ngFor="let feature of getFeaturesByCategory(category)">
+        <!-- First column: Feature name -->
+        <td class="head-c">{{ feature.featureName }}</td>
+        <!-- Loop through each plan to display the corresponding feature limit -->
+        <td *ngFor="let plan of plans">
+          <span *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails">
+            <!-- Check if the feature name matches the current feature being iterated -->
+            <span *ngIf="detail.featureName === feature.featureName">{{ detail.featureLimit }}</span>
+          </span>
+        </td>
       </tr>
-   
+    </tbody>
+  </table>
+</div>
 
-      <tr>
-        <td class="head-c">Customer product variations template</td> <!-- First vertical column for 'Name' -->
-        <td *ngFor="let product of plans">{{ product.name }}</td>
-    </tr>
- 
 
-  </tbody>
-</table>
-
-<div class="plan">
+<!-- <div class="plan">
 <h2 class="text-center ">Marketplace plans</h2>
 </div>
 <table class="vertical-header-table">
   <tbody>
 
       <tr>
-          <td class="head-c">Share product to SIIWII Marketplace</td> <!-- First vertical column for 'Name' -->
+          <td class="head-c">Share product to SIIWII Marketplace</td>
           <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
@@ -147,12 +150,12 @@
   <tbody>
 
       <tr>
-          <td class="head-c">Product list creation</td> <!-- First vertical column for 'Name' -->
+          <td class="head-c">Product list creation</td> 
           <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
       <tr>
-        <td class="head-c">Product list contents</td> <!-- First vertical column for 'Name' -->
+        <td class="head-c">Product list contents</td> 
         <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
@@ -162,47 +165,6 @@
 
   </tbody>
 </table>
-<!-- <table class="vertical-header-table">
-  <tbody>
-      <tr>
-          <td class="top-left head-c">PLans</td> 
-          <td >
-            <div class="d-flex flex-column">
-              <p  class="custom-p-free">Free</p>
-              <button class="btn free-btn">Sellected</button>
-            </div>
-          </td>
-
-          <td >
-            <div class="d-flex flex-column">
-              <p  class="custom-p-sil">Silver</p>
-              <button class="btn sil-btn">Sellected</button>
-            </div>
-          </td>
-          <td >
-            <div class="d-flex flex-column">
-              <p  class="custom-p-gold">Gold</p>
-              <button class="btn gold-btn">Sellected</button>
-            </div>
-          </td>
-          <td >
-            <div class="d-flex flex-column">
-              <p  class="custom-p-cu">Custom</p>
-              <button class="btn cu-btn">Sellected</button>
-            </div>
-          </td>
-      </tr>
-      <tr>
-          <td class="head-c">Prices</td> 
-          <td *ngFor="let product of plans">{{ product.name }}</td>
-      </tr>
-      <tr>
-          <td class="head-c">Description</td> 
-          <td *ngFor="let product of plans">{{ product.category }}</td>
-      </tr>
- 
-  </tbody>
-</table> -->
 <div class="plan">
 
 <h2 class="text-center">Linesheet</h2>
@@ -211,17 +173,17 @@
   <tbody>
 
       <tr>
-          <td class="head-c">Generate Linesheet report</td> <!-- First vertical column for 'Name' -->
+          <td class="head-c">Generate Linesheet report</td> 
           <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
       <tr>
-        <td class="head-c">Print linesheet PDF</td> <!-- First vertical column for 'Name' -->
+        <td class="head-c">Print linesheet PDF</td> 
         <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
     <tr>
-      <td class="head-c">Custom linesheet layout</td> <!-- First vertical column for 'Name' -->
+      <td class="head-c">Custom linesheet layout</td>
       <td *ngFor="let product of plans">{{ product.name }}</td>
   </tr>
 
@@ -240,12 +202,12 @@
   <tbody>
 
       <tr>
-          <td class="head-c">Sales order Transaction line</td> <!-- First vertical column for 'Name' -->
+          <td class="head-c">Sales order Transaction line</td> 
           <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
       <tr>
-        <td class="head-c">Purshase order Transaction line</td> <!-- First vertical column for 'Name' -->
+        <td class="head-c">Purshase order Transaction line</td> 
         <td *ngFor="let product of plans">{{ product.name }}</td>
     </tr>
  
@@ -265,7 +227,7 @@
   <tbody>
 
       <tr>
-          <td class="head-c">Event Creation</td> <!-- First vertical column for 'Name' -->
+          <td class="head-c">Event Creation</td> 
           <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
@@ -286,7 +248,7 @@
   <tbody>
 
       <tr>
-          <td class="head-c">Number of advertising</td> <!-- First vertical column for 'Name' -->
+          <td class="head-c">Number of advertising</td> 
           <td *ngFor="let product of plans">{{ product.name }}</td>
       </tr>
    
@@ -297,6 +259,6 @@
  
 
   </tbody>
-</table>
+</table> -->
 </div>
 </div>
