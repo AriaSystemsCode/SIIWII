@@ -571,7 +571,7 @@ namespace onetouch.AppMarketplaceAccounts
                            && x.EntityFk.EntityObjectTypeId == personEntityObjectTypeId).ToList();
                 foreach (var contactObj in contactInfo)
                 {
-                   // await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
+                    //await PublishMember(contactObj.Id, newId, personEntityObjectTypeId, mainAccountID, newId);
                 }
                 return newId;
             }

@@ -1,0 +1,62 @@
+.editAccount_butn {
+    background-color: #4A0D4A;
+    border: none;
+    border-radius: 6px;
+    color: white;
+}
+
+.view-profile-wrapper {
+    .kt-portlet {
+        height: 300px;
+    }
+
+    .profileInfo_container {
+        height: fit-content;
+        h6{
+            color: #1B101B;
+            font-size: 20px;
+            font-weight: 600;
+            display: inline-block;
+            img{
+                margin-right: 5px;
+            }
+        }
+        p{
+            font-size: 18px;
+            display: inline-block;
+            max-width: 70%;
+            vertical-align: top;
+            margin: 0px;
+            margin-left: 5px;
+            color: #9e9e9e;
+        }
+    }
+
+    .view-profile-action-buttons {
+        bottom: -32%;
+    }
+
+    .account-name {
+        color: #1B101B;
+    }
+
+    .jobTitle-label {
+        color: #B5B5C3;
+        font-size: 14px;
+        font-weight: 100;
+        display: block;
+       
+    }
+}
+.hide{
+    display: none;
+}
+input.editjobTitle ,input.editBranch{
+    background-color: transparent !important;
+    width: 60%;
+    display: inline-block;
+    margin: 0px 15px;
+}
+.Save_editMember{
+    margin: auto;
+}

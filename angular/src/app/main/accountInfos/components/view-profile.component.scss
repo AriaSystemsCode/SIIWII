@@ -228,15 +228,26 @@
 
 
 .share {
-    background-color: #6259CE !important;
-    color: white;
-    border-color: #6259CE;
+    // background-color: #6259CE !important;
+    // color: white;
+    // border-color: #6259CE;
 }
 
 .sync {
-    background-color: #F88011 !important;
+    // background-color: #F88011 !important;
     border-color: #F88011 !important;
-    color: white;
-
+    color: #F88011 !important;
+    border-radius: 6px;
 }
-
+.editAccount_butn{
+    background-color: #4A0D4A;
+    border: none;
+    border-radius: 6px;
+    color: white;
+}
+// .PrivateAccount_butn{
+//     color: #4A0D4A;
+//     padding-top: 6px;
+//     padding-bottom: 6px;
+//     border:1px solid #eeeeee;
+// }
