@@ -2013,9 +2013,9 @@ namespace onetouch.Accounts
 
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
      
-        public async Task PublishProfile()
+        public async Task PublishProfile(bool sync =false)
         {
-            await DoPublishProfile(false);
+            await DoPublishProfile(sync);
         }
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
         public async Task DoPublishProfile(bool sync)
