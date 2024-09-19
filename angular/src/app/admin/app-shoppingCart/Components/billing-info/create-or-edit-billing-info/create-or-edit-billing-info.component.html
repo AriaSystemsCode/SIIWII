@@ -1,7 +1,7 @@
 <div class="position-relative tab-cont thin-scroll">
 
     <div>
-    <div class="container-fluid pt-1 mb-3 "  *ngIf="createOrEditBillingInfo">
+    <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'" >
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
@@ -41,7 +41,7 @@
         ></app-address>
     </div>
     
-    <div class="container-fluid pt-1"  *ngIf="createOrEditBillingInfo">
+    <div class="container-fluid pt-1"   [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">  {{l("ARContact")}} : </span></h6>
         </div>
@@ -77,7 +77,7 @@
     [currentTab]="currentTab"
     ></app-address>
 </div>
-    <div class="container-fluid pt-1 mb-3 mt-3"  *ngIf="createOrEditBillingInfo">
+    <div class="container-fluid pt-1 mb-3 mt-3"   [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
         </div>
@@ -126,7 +126,7 @@
 </div>
 
 
-<div *ngIf="!createOrEditBillingInfo">
+<div  [ngClass]="!createOrEditBillingInfo ?  'd-block' : 'd-none'">
     <app-view-billing-info
     (showBillingEditMode)="onshowBillingEditMode($event)"
     (onshowSaveBtn)="onshowSaveBtn($event)"
