@@ -1,6 +1,6 @@
 <div class="position-relative tab-cont thin-scroll">
 <div >
-    <div class="container-fluid pt-1 mb-3 " *ngIf="createOrEditshippingInfO">
+    <div class="container-fluid pt-1 mb-3 "[ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
             <button 
@@ -30,7 +30,7 @@
           
     </div>
 
-    <div *ngIf="createOrEditshippingInfO"   [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
+    <div    [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
         <hr class="my-2" />
 
         <app-address 
@@ -45,7 +45,7 @@
         [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
         ></app-address>
     </div>
-    <div class="container-fluid pt-1" *ngIf="createOrEditshippingInfO">
+    <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
             <!--<button [disabled]="(!enableSAveShipTo)" (click)="createOrEditTransaction()"
@@ -72,7 +72,7 @@
        
    </div>
    
-   <div *ngIf="createOrEditshippingInfO "   [ngClass]="createOrEditshippingInfO  ?  'd-block' : 'd-none'">
+   <div   [ngClass]="createOrEditshippingInfO  ?  'd-block' : 'd-none'">
     <hr class="my-2" />
    <app-address 
    [appTransactionsForViewDto]="appTransactionsForViewDto"
@@ -89,7 +89,7 @@
    ></app-address>
 </div>
 
-<div class="row edit-mode " *ngIf="createOrEditshippingInfO">
+<div class="row edit-mode " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
     <div class="col-6 mb-4">
         <label class="label mt-1 mb-1">{{l("Store")}}</label>
 <input type="text" class="form-control w-100" (input)="enterStore()"  [(ngModel)]="storeVal" #store/>
@@ -119,7 +119,7 @@
 </div>
 
 
-<div *ngIf="!createOrEditshippingInfO">
+<div [ngClass]="!createOrEditshippingInfO   ?  'd-block' : 'd-none'">
     <app-view-shipping-information
     [activeTab]="activeTab"
     [currentTab]="currentTab" 
