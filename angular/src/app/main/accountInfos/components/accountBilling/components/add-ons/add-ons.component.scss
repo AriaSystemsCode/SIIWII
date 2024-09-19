@@ -29,6 +29,7 @@
   .progress-bar {
     width: 74px;height: 4px;left: 1px;gap: 0px;border-radius: 4px 4px 4px 4px;opacity: 0px;
     background: #D9D9D9;
+    position: relative;
   }
   
   .progress-bar-fill {
@@ -40,4 +41,16 @@
     /* Optional: space-between will ensure space between items, adjust as needed */
     justify-content: space-between;
     word-spacing: normal;
+   // align-items: flex-start;
+  }
+  .container-block {
+    display: flex;
+    align-items:  flex-start;
+    flex-direction: column; /* Aligns items vertically */
+    align-items: left;    /* Centers items horizontally */
+    //justify-content: center;
+    //text-align: left;
+    
+    //position: relative;
+    //left:auto;
   }

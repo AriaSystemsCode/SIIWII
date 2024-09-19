@@ -21,6 +21,8 @@ using onetouch.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Abp.Domain.Uow;
 using System.Security.Permissions;
+using Org.BouncyCastle.Crypto.Paddings;
+using NPOI.SS.Formula.Functions;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -75,8 +77,8 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCategoryFilter), e => e.FeatureCategory == input.FeatureCategoryFilter)
                         .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity))
                         .WhereIf(input.AppSubscriptionPlanHeaderFilter != null, e => e.AppSubscriptionPlanHeaderFk != null && e.AppSubscriptionPlanHeaderId == input.AppSubscriptionPlanHeaderFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter)
-                        .WhereIf(input.AddFeaturesOnly, e => e.IsAddOn == true);
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter);
+                        //.WhereIf(input.AddFeaturesOnly, e => e.IsAddOn == true);
 
                 var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails
                     .OrderBy(input.Sorting ?? "id asc")
@@ -84,7 +86,8 @@ namespace onetouch.AppSubScriptionPlan
 
                 var appSubscriptionPlanDetails = from o in pagedAndFilteredAppSubscriptionPlanDetails
                                                  join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll() on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
-                                                 from s1 in j1.DefaultIfEmpty()
+                                                 join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
+                                                 from s1 in j2.DefaultIfEmpty()
                                                      //join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
                                                      //from s2 in j2.DefaultIfEmpty()
 
@@ -108,15 +111,15 @@ namespace onetouch.AppSubScriptionPlan
                                                      o.FeatureCategory,
                                                      o.Trackactivity,
                                                      Id = o.Id,
-                                                     o.IsAddOn,
+                                                     s1.IsAddOn,
                                                      AppFeatureId = o.AppFeatureId,
                                                      o.AppSubscriptionPlanHeaderId
                                                      //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
                                                  };
 
-                var totalCount = await filteredAppSubscriptionPlanDetails.CountAsync();
-
-                var dbList = await appSubscriptionPlanDetails.ToListAsync();
+                //var totalCount = await filteredAppSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z=>z.isa).CountAsync();
+                var totalCount = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).CountAsync();
+                var dbList = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).ToListAsync();
                 var results = new List<GetAppSubscriptionPlanDetailForViewDto>();
 
                 foreach (var o in dbList)
@@ -153,8 +156,8 @@ namespace onetouch.AppSubScriptionPlan
                     if (input.AddFeaturesOnly)
                     {
                         var tenantHeader = await _appTenantSubscriptionPlanRepository.GetAll().
-                            Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodStartDate >= DateTime.Now.Date && DateTime.Now.Date <= z.CurrentPeriodEndDate &&
-                            z.Id == o.AppSubscriptionPlanHeaderId).FirstOrDefaultAsync();
+                            Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodStartDate <= DateTime.Now.Date && DateTime.Now.Date <= z.CurrentPeriodEndDate &&
+                            z.AppSubscriptionPlanHeaderId == o.AppSubscriptionPlanHeaderId).FirstOrDefaultAsync();
                         if (tenantHeader != null)
                         {
                             var activitySumConsumed = _appTenantActivitiesLogRepository.GetAll().Where(z => z.AppSubscriptionPlanHeaderId == o.AppSubscriptionPlanHeaderId

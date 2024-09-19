@@ -1,6 +1,10 @@
 <!-- <p>add-ons works!</p> -->
 <div>
-   
+    <div style=" display: flex;">
+        <span style="font-size: 3; left: 0;" #zerolabel> 0</span>
+         <span style="font-size: 3;" #progresslabel> 123</span>
+         <span style="font-size: 3; right: inherit;" #totallabel> 456</span>
+      </div>
 <div class="row align-items-center">
     <!--<Primeng-Datatable-Start>-->
     <div class="primeng-datatable-container col-12"
@@ -25,23 +29,41 @@ columnResizeMode="expand"
     </ng-template>
     <ng-template pTemplate="body" let-rowData>
         <tr><td style="width: 45px"><img src="assets/accounts/Feature-Icon.svg"/></td>
-            <td >
+            <td #rowreference>
+                
                 <div class="container">
                 <p [ngClass]="'AddOnsBoldText'" style="margin-top: 0px;">{{ rowData.appSubscriptionPlanDetail.featureName }}</p>
-                <div class="progress-bar" style="margin-top: 12px;">
-                    <div class="progress-bar-fill"
+               <div class="container-block">
+                <div class="progress-bar" style="margin-top: 12px;" #outerprogressbar>
+                    <div class="progress-bar-fill" #innerprogressbar
                      [ngStyle]="getProgressBarWidth(rowData)"></div>
-                  </div>
-                  </div>
+                                   
+
+                
+                    </div>
+                    <div class="container" style="margin-top: 1px;height: 6px;left:0px;"  #progressvalues>
+                        <span style="font-size: 6; " #zerolabel> 0</span>
+                         <span style="font-size:6; " #progresslabel> {{ rowData.featureUsedQty }}</span>
+                         <span style="font-size: 6; " #totallabel> {{ rowData.featureCreditQty }}</span>
+                      </div>
+</div>
+                </div>
+           
+                 
+                
+                 
                 <p [ngClass]="'AddOnsRegularText'">{{ rowData.appSubscriptionPlanDetail.featureDescription }}
+                   
+                </p>
+                
                     
-                </p></td>
+            </td>
             <td class="auto-width"><span [ngClass]="'price-txt'">$ {{ rowData.appSubscriptionPlanDetail.unitPrice }}/</span>{{ rowData.appSubscriptionPlanDetail.featurePeriodLimit }}</td>
             <td style="width: 30px">
                 <div  container="body">
                     
                      <button class="btn btn-add" 
-                     (click)="add()">
+                     (click)="add(rowData)">
                        {{l("Add2")}}
                      </button>
                      </div>
@@ -65,4 +87,7 @@ columnResizeMode="expand"
     >
     </p-paginator>
 </div>
+</div>
+<div class="col p-2 m-5 m-md-0" style="padding: 0;border-left: 4px solid #e7e8ef;" *ngIf="showSideBar">
+    <app-app-side-bar [entityTypeName]="'add-ons'" [id]="" (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
 </div>
