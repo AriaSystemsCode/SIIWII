@@ -856,6 +856,15 @@ namespace onetouch.AppEntities
                 }
                 else
                 {
+                    //P-SII-20240920.0004,1 MMT 09/22/2024 Color Code should not be added again on Tenant level if it's found on host level[Start]   
+                    if (AbpSession.TenantId!=null && input.EntityObjectTypeId==16)
+                    {
+                        var codeExist = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Code == input.Code && x.EntityObjectTypeId== 16
+                        && (x.TenantId == null || x.TenantId == AbpSession.TenantId));
+                        if (codeExist!=null)
+                            throw new UserFriendlyException("Code '" + input.Code + "' Already Exists.");
+                    }
+                    //P-SII-20240920.0004,1 MMT 09/22/2024 Color Code should not be added again on Tenant level if it's found on host level[End]   
                     entity = new AppEntity();
                 }
 
