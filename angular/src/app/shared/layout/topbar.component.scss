@@ -120,7 +120,7 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
         // position: static;
     }
 }
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 425px) {
     .navbar-nav {
         -webkit-box-orient: horizontal !important;
         display: flex !important;
@@ -144,6 +144,11 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
     }
 }
 
+@media only screen and (min-width: 425px) {
+    .navbar-expand-lg {
+margin-left: 5.7rem !important;
+    }
+}
 .Create-New {
     background-color: white !important;
     border-color: white !important;

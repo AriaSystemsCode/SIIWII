@@ -381,6 +381,43 @@ background-color: #1BC5BD !important;
         /* width: 100%; */
         height: 100%;
      }
+
+     @media (min-width: 425px) {
+        .kt-aside--minimize .kt-aside {
+            width: 70px !important;
+            -webkit-transition: all 0.3s ease !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .kt-aside--fixed .kt-aside {
+            position: fixed !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            z-index: 98 !important;
+        }
+
+        .kt-grid.kt-grid--hor-desktop.kt-grid--desktop {
+            display: -webkit-box !important;
+            display: -ms-flexbox !important;
+            display: flex !important;
+            -webkit-box-orient: vertical !important;
+            -webkit-box-direction: normal !important;
+            -ms-flex-direction: column !important;
+            flex-direction: column !important;
+        }
+
+        .kt-grid.kt-grid--hor-desktop.kt-grid--tablet {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+    }
+
     .kt-aside--minimize .kt-aside__brand-name{
         display: none;
     }

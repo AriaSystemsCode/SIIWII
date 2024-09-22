@@ -35,8 +35,14 @@ export class SideBarMenuComponent extends AppComponentBase implements OnInit, Af
                     mode: 'dropdown'
                 }
             },
-            tablet: 'accordion', // menu set to accordion in tablet mode
-            mobile: 'accordion' // menu set to accordion in mobile mode
+            tablet: {
+                default: 'dropdown',
+                state: {
+                    body: 'kt-aside--minimize',
+                    mode: 'dropdown'
+                }
+            }, // menu set to accordion in tablet mode
+            mobile: 'dropdown' // menu set to accordion in mobile mode
         },
 
         // accordion setup
@@ -58,12 +64,17 @@ export class SideBarMenuComponent extends AppComponentBase implements OnInit, Af
 
     ngOnInit() {
         this.menu = this._appNavigationService.getMenu();
-
+  console.log( this.menu.items)
         this.currentRouteUrl = this.router.url.split(/[?#]/)[0];
 
         this.router.events
             .pipe(filter(event => event instanceof NavigationEnd))
             .subscribe(event => this.currentRouteUrl = this.router.url.split(/[?#]/)[0]);
+
+
+       if(KTUtil.isInResponsiveRange('tablet')){
+        this.render.removeClass(document.body, 'kt-aside--minimize');
+       }
     }
 
     ngAfterViewInit(): void {

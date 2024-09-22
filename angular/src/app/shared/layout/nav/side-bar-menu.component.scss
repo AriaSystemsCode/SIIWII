@@ -69,3 +69,33 @@ aside-menu .kt-menu__nav > .kt-menu__item > .kt-menu__link .kt-menu__link-icon {
     color: #4a0d4a !important;
 }
 
+::ng-deep {
+    
+    // @media (min-width: 425px) {
+    //     .kt-aside--minimize .kt-aside , #kt_aside {
+    //         width: 70px !important;
+    //         -webkit-transition: all 0.3s ease !important;
+    //         transition: all 0.3s ease !important;
+    //     }
+    // }
+    // @media (min-width: 425px) {
+    //     .kt-grid.kt-grid--hor-desktop.kt-grid--desktop {
+    //         display: -webkit-box !important;
+    //         display: -ms-flexbox !important;
+    //         display: flex !important;
+    //         -webkit-box-orient: vertical !important;
+    //         -webkit-box-direction: normal !important;
+    //         -ms-flex-direction: column !important;
+    //         flex-direction: column !important;
+    //     }
+    // }
+    // @media (min-width: 425px) {
+    //     .kt-aside--fixed .kt-aside {
+    //         position: fixed !important;
+    //         top: 0 !important;
+    //         bottom: 0 !important;
+    //         left: 0 !important;
+    //         z-index: 98 !important;
+    //     }
+    // }
+}
