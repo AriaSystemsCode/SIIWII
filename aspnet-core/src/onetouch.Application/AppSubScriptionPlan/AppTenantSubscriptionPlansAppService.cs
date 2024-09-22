@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -99,7 +100,7 @@ namespace onetouch.AppSubScriptionPlan
             );
 
         }
-
+        [AllowAnonymous]
         public async Task<GetAppTenantSubscriptionPlanForViewDto> GetAppTenantSubscriptionPlanForView(long id)
         {
             var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAsync(id);
@@ -118,7 +119,7 @@ namespace onetouch.AppSubScriptionPlan
 
             return output;
         }
-
+        [AllowAnonymous]
         public async Task CreateOrEdit(CreateOrEditAppTenantSubscriptionPlanDto input)
         {
             if (input.Id == null)
