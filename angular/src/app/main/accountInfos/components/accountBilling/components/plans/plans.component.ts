@@ -25,6 +25,7 @@ export class PlansComponent extends AppComponentBase {
   visible: boolean;
   tenantId:any
   tenantDto:any
+  selectedPlanName: string = '';
   constructor( injector: Injector,
         private _appSubscriptionPlanHeadersServiceProxy: AppSubscriptionPlanHeadersServiceProxy,private _AppSubscriptionPlanDetailsServiceProxy:AppSubscriptionPlanDetailsServiceProxy,private AppTenantSubscriptionPlansServiceProxy : AppTenantSubscriptionPlansServiceProxy)
         {
@@ -119,19 +120,7 @@ yearlyClick()
 {
   this.isMonthlyPlan =false;
 }
-confirm() {
-  this.showConfirmDialog = true;
-}
 
-accept() {
-  this.showConfirmDialog = false;
-  // this.showToastMessage('Action confirmed!', 'success');
-}
-
-reject() {
-  this.showConfirmDialog = false;
-  // this.showToastMessage('Action rejected!', 'error');
-}
 
 getTenantData(id:any){
   this.AppTenantSubscriptionPlansServiceProxy.getAppTenantSubscriptionPlanForView(
@@ -147,23 +136,40 @@ id).subscribe(result => {
 
 
 
-showDialog() {
+showDialog(plan:any) {
   this.visible = true;
+  // this.tenantDto.appTenantSubscriptionPlanId  = plan.appSubscriptionPlanHeader.appTenantSubscriptionPlanId
+  this.tenantDto.appTenantSubscriptionPlan.id  = plan.appSubscriptionPlanHeader.id
   let tenantId = ''
   if (localStorage.getItem("SellerId") && localStorage.getItem("SellerId") != "undefined") {
     tenantId = JSON.parse(localStorage.getItem("SellerId"));
 }
+this.tenantDto.appTenantSubscriptionPlan.tenantId  = tenantId
+this.selectedPlanName = plan?.appSubscriptionPlanHeader?.name; 
+}
+
+confirm(){
+
   let body;
+  // this.tenantDto.tenantId = tenantId
+  console.log(this.tenantDto,'dtooooooo')
+  body = this.tenantDto.appTenantSubscriptionPlan
+
+  // this.showMainSpinner();
   this.AppTenantSubscriptionPlansServiceProxy.createOrEdit(
     body).subscribe(result => {
      
-       this.tenantDto = result
+      //  this.tenantDto = result
+      // this.hideMainSpinner();
+
+      this.notify.info("Successfully deleted.");
        console.log(this.tenantDto,'dddd')
     
     });
+
+  console.log(body,'body')
+
 }
-
-
 getPlanClass(planIndex: number): string {
   switch (planIndex) {
       case 0:

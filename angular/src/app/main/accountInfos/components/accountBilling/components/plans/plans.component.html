@@ -20,7 +20,7 @@
               <td *ngFor="let plan of plans;let i = index">
                 <div class="d-flex flex-column">
                   <p [ngClass]="getPlanClass(i)">{{ plan?.appSubscriptionPlanHeader?.name }}</p>
-                  <button [ngClass]="getPlanBtnClass(i)" (click)="showDialog()" [disabled]=" plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null" class="btn ">{{ plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'Selected' : 'Select'}}</button>
+                  <button [ngClass]="getPlanBtnClass(i)" (click)="showDialog(plan)" [disabled]=" plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null" class="btn ">{{ plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'Selected' : 'Select'}}</button>
                 </div>
               </td>
              
@@ -36,7 +36,7 @@
                 </ng-template>
                 <div class="p-4 con-body">
                   <p>
-                    Please press yes button to confirm changing your current subscription plan to (Gold Plan)
+                    Please press yes button to confirm changing your current subscription plan to ({{selectedPlanName}})
                 </p>
                 <p>
                   *Note:- you will be on the new plan starting from the next month.
@@ -45,7 +45,7 @@
            
            
                 <ng-template pTemplate="footer">
-                  <p-button  (click)="visible = false" label="Yes" class="p-button-text" ></p-button>
+                  <p-button  (click)="visible = false;confirm()" label="Yes" class="p-button-text" ></p-button>
                   <p-button  (click)="visible = false" label="Cancel" Class="p-button-no"></p-button>
               </ng-template>
             </p-dialog>
