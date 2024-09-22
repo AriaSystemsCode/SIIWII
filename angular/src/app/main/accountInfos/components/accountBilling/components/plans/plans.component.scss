@@ -34,6 +34,8 @@ border-radius: 0px 6px 6px 0px;
 opacity: 0px;
 border: 1px solid #eeeeeeee;
 box-shadow: 1px 1px 2px 0px #1616161A;
+color: #FFFFFF;
+
   }
 
   .container{  
@@ -55,6 +57,46 @@ color:  #1B101B;
 
 
 ::ng-deep {
+  
+
+.p-button-text {
+  button {
+    background-color: #4A0D4A !important;
+    color: white !important;
+    border-radius: 5px !important;
+  }
+
+}
+
+.p-button-no{
+  button {
+  background-color: white !important;
+  color: #4A0D4A !important;
+  border-radius: 5px !important;
+  }
+}
+
+  .p-dialog .p-dialog-header {
+    border:  none !important;
+  }
+  .con-msg {
+font-weight: 700 !important;
+font-size: 24px !important;
+line-height: 36px;
+
+color: #1B101B !important;
+
+
+
+  }
+  .con-body {
+
+font-weight: 500;
+font-size: 18px;
+line-height: 27px;
+
+color: #9E9E9E;
+  }
     .vertical-header-table {
       border-collapse: collapse;
       width: 100%;
@@ -71,7 +113,7 @@ color:  #1B101B;
 font-weight: 500;
 font-size: 12px;
 line-height: 18px;
-width: 235px !important;
+width: 215px !important;
 text-align: center;
 
 color: #9E9E9E;
@@ -196,5 +238,23 @@ margin-bottom: 0;
     }
 
   }
+
+
+
+
+
+.btn-yes {
+    background-color: #4A0D4A;
+    color: white;
+}
+
+.btn-no {
+    background-color: white;
+    color: #4A0D4A;
+}
+
+
+
+
 
 
