@@ -305,11 +305,26 @@ isAccManual :boolean = false
   shipFromData;
   shipToData;
   reloadAddresscomponentShipFrom(data) {
+    
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
     this.shipFromData=data;
+    this.contactIdShipFrom = data.compId;
+  
+
+    if( this.AddressComponentChild)
+    this.AddressComponentChild['first']?.getAddressList(data.compssin);
+
   }
-
+  }
   reloadAddresscomponentShipTo(data) {
+    
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
   this.shipToData=data;
-}
+  this.contactIdShipTo = data.compId;
+ 
 
+  if( this.AddressComponentChild)
+    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
+}
+  }
 }
