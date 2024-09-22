@@ -19,4 +19,8 @@ export class AppAddOnsSideBarComponent extends AppComponentBase implements OnIni
   ngOnInit(): void {
 
   }
+  
 }
+
+export class defultSideBar extends AppAddOnsSideBarComponent{}
+

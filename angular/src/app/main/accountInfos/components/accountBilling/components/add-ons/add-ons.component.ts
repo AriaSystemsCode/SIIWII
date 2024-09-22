@@ -28,6 +28,7 @@ export class AddOnsComponent extends AppComponentBase implements AfterViewInit  
   @ViewChildren('progresslabel') progresslabel!: QueryList<ElementRef>;
   @ViewChildren('rowreference') rowreference: QueryList<ElementRef>;
   @ViewChildren('progressvalues') progressvalue: QueryList<ElementRef>;
+  @ViewChild('addbtn') addbtn: ElementRef;
   tenantId = this.appSession.tenantId;
   tenantSubscriptionPlanId:Observable<number>;
   progressValue = 50  ;
@@ -78,7 +79,7 @@ add(inputRow: GetAppSubscriptionPlanDetailForViewDto){
 
   //this.onShowSideBar(true);
   this.showSideBar = true;
-
+  //this.addbtn.nativeElement.disabled = true;
 }
 
 showSideBar; 
