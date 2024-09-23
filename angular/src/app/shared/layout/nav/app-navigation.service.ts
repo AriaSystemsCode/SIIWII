@@ -63,7 +63,7 @@ export class AppNavigationService {
             // new AppMenuItem('DemoUiComponents', 'Pages.DemoUiComponents', 'flaticon-shapes', '/app/admin/demo-ui-components')
         )
         let adminMenu = new AppMenuItem('Administration', '', 'flaticon-interface-8', '', [], [])
-        let AppSubscriptionPlanHeaders=   new AppMenuItem('Subscriptions Plan', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders')
+        let AppSubscriptionPlanHeaders=   new AppMenuItem('Subscription Plans', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders')
         let AppSubscriptionPlanDetail=  new AppMenuItem('Subscription Plan Details', 'Pages.Administration.AppSubscriptionPlanDetails', 'flaticon-more', '/app/admin/appSubScriptionPlan/appSubscriptionPlanDetails')
         let AppTenantSubscriptionPlan = new AppMenuItem('Tenant Subscription Plans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans')
         let AppTenantActivityLog = new AppMenuItem('Tenant Activities Log', '', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantActivitiesLog')
