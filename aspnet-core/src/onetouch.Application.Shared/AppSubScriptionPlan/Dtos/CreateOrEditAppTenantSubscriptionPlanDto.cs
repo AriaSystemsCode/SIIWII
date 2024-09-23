@@ -13,7 +13,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         [StringLength(AppTenantSubscriptionPlanConsts.MaxTenantNameLength, MinimumLength = AppTenantSubscriptionPlanConsts.MinTenantNameLength)]
         public string TenantName { get; set; }
 
-        public long AppSubscriptionHeaderId { get; set; }
+        public long AppSubscriptionPlanHeaderId { get; set; }
 
         [Required]
         [StringLength(AppTenantSubscriptionPlanConsts.MaxSubscriptionPlanCodeLength, MinimumLength = AppTenantSubscriptionPlanConsts.MinSubscriptionPlanCodeLength)]
