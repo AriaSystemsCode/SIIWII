@@ -1079,21 +1079,21 @@ height: 48px;"
                             </div>
                         </div>
                     </p-accordionTab>
-                    <!-- order Preview tab -->
-                    <p-accordionTab class="shoppingCartAccordionTabBG" 
-                        *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
-                        <ng-template pTemplate="header">
-                            <div class="d-inline-block custom-header d-flex">
-                                <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
-                            </div>
-                        </ng-template> 
-                        <ng-template pTemplate="content">
-                            <app-order-preview 
-                                [appTransactionsForViewDto]="appTransactionsForViewDto"
-                                [transactionFormPath]="transactionFormPath"
-                                [orderId]="orderId"></app-order-preview>
-                        </ng-template>
-                    </p-accordionTab>
+                   <!-- order Preview tab -->
+                   <p-accordionTab class="shoppingCartAccordionTabBG" 
+                   *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
+                   <ng-template pTemplate="header">
+                       <div class="d-inline-block custom-header d-flex">
+                           <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
+                       </div>
+                   </ng-template> 
+                   <ng-template pTemplate="content">
+                       <app-order-preview 
+                           [appTransactionsForViewDto]="appTransactionsForViewDto"
+                           [transactionFormPath]="transactionFormPath"
+                           [orderId]="orderId"></app-order-preview>
+                   </ng-template>
+               </p-accordionTab>
                     <!-- order Preview tab -->
                 </p-accordion>
 

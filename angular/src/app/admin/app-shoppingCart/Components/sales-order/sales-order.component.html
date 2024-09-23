@@ -99,7 +99,7 @@
                         *ngFor="let item of selectedClassificationsShow; index as i"
                         [ngClass]="{ 'dimmed': tempDeselectedClassification.includes(item) }"
                       >
-                        <span>{{ item?.entityObjectClassificationName }}</span>
+                        <span>{{ item }}</span>
                         <a class="clear-icon" (click)="deSelectClass(item, i)">
                           <i class="fa fa-1x fa-times fa-1x"></i>
                         </a>
@@ -235,16 +235,16 @@ Cancel
                             <p
                                 class="previewValue classificationsValues  m-0 p-0  my-2"
                                 *ngFor="
-                                    let item of appTransactionsForViewDto?.entityClassifications
+                                    let item of appTransactionsForViewDto?.entityClassificationsNames?.items
                                 "
                             >
-                                {{ item?.entityObjectClassificationName}}
+                                {{ item}}
                             </p>
                             <p
                                 class="previewValue m-0 p-0 col-md-6 col-12 my-2"
                                 *ngIf="
-                             !appTransactionsForViewDto?.entityClassifications  ||  appTransactionsForViewDto?.entityClassifications
-                                    ?.length === 0
+                             !appTransactionsForViewDto?.entityClassificationsNames  ||  appTransactionsForViewDto?.entityClassificationsNames?.items
+                                    ?.length == 0
                             "
                             >
                                 -
@@ -277,7 +277,7 @@ Cancel
             *ngFor="let item of selectedCategoriesShow; index as i"
             [ngClass]="{ 'dimmed': tempDeselectedCategories.includes(item) }"
         >
-            <span>{{ item?.entityObjectCategoryName }}</span>
+            <span>{{ item }}</span>
             <a class="clear-icon" (click)="deSelectCat(item, i)">
                 <i class="fa fa-1x fa-times fa-1x"></i>
             </a>
@@ -434,18 +434,17 @@ Cancel
                             <p
                                 class="previewValue classificationsValues  m-0 p-0  my-2"
                                 *ngFor="
-                                    let item of appTransactionsForViewDto?.entityCategories
+                                    let item of appTransactionsForViewDto?.entityCategoriesNames?.items
                                 "
                             >
-                                {{ item?.entityObjectCategoryName}}
+                                {{ item}}
                             </p>
 
                     
                             <p
                                 class="previewValue   m-0 p-0 col-6 my-2"
                                 *ngIf="
-                                !appTransactionsForViewDto?.entityCategories  || appTransactionsForViewDto?.entityCategories
-                                    ?.length === 0
+                                !appTransactionsForViewDto?.entityCategoriesNames  || appTransactionsForViewDto?.entityCategoriesNames?.items.length == 0
                             "
                             >
                                 -
