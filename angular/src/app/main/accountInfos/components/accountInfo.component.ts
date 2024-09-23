@@ -25,6 +25,7 @@ import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/
 import { MembersListComponent } from '@app/main/members-list/components/members-list.component';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { Paginator } from 'primeng/paginator';
+import { Console, log } from 'console';
 
 @Component({
     selector:'app-account-info',
@@ -594,6 +595,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                 break;
             }
         }
+         
         let currentTabName : string
         currentTabName = this.accountInfoPageTabsEnum[number]
         if (!params)  params = {}
@@ -616,6 +618,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
               queryParamsHandling: 'merge', // remove to replace all query params by provided
             }
         );
+        
     }
     triggerProfile($event?){
         if($event) $event.stopPropagation() //prevent event bubbling
