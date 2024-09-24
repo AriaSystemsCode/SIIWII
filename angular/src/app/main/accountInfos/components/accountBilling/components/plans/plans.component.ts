@@ -143,8 +143,8 @@ showDialog(plan:any) {
   console.log(plan,'pppp')
   this.visible = true;
   this.tenantDto.appTenantSubscriptionPlan.subscriptionPlanCode  = plan.appSubscriptionPlanHeader.code
-  this.tenantDto.appTenantSubscriptionPlan.appSubscriptionPlanHeaderId  = this.plansubId
-  this.tenantDto.appTenantSubscriptionPlan.id  = plan.appSubscriptionPlanHeader.id
+  this.tenantDto.appTenantSubscriptionPlan.appSubscriptionPlanHeaderId  = plan.appSubscriptionPlanHeader.id
+  // this.tenantDto.appTenantSubscriptionPlan.id  = plan.appSubscriptionPlanHeader.id
   let tenantId = ''
   if (localStorage.getItem("SellerId") && localStorage.getItem("SellerId") != "undefined") {
     tenantId = JSON.parse(localStorage.getItem("SellerId"));
