@@ -1,6 +1,7 @@
 import { Component, Injector } from '@angular/core';
 import { AppSubscriptionPlanDetailsServiceProxy, AppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeadersServiceProxy, AppTenantSubscriptionPlansServiceProxy, GetAppSubscriptionPlanHeaderForViewDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
+import { finalize } from 'rxjs';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class PlansComponent extends AppComponentBase {
   tenantId:any
   tenantDto:any
   selectedPlanName: string = '';
+  plansubId:any
   constructor( injector: Injector,
         private _appSubscriptionPlanHeadersServiceProxy: AppSubscriptionPlanHeadersServiceProxy,private _AppSubscriptionPlanDetailsServiceProxy:AppSubscriptionPlanDetailsServiceProxy,private AppTenantSubscriptionPlansServiceProxy : AppTenantSubscriptionPlansServiceProxy)
         {
@@ -50,6 +52,7 @@ monthlyClick()
     this.plans.forEach(plan => {
       if(plan.appSubscriptionPlanHeader.appTenantSubscriptionPlanId != null) {
         this.getTenantData(plan.appSubscriptionPlanHeader.appTenantSubscriptionPlanId )
+this.plansubId = plan.appSubscriptionPlanHeader.appTenantSubscriptionPlanId
 
       }
 
@@ -137,8 +140,10 @@ id).subscribe(result => {
 
 
 showDialog(plan:any) {
+  console.log(plan,'pppp')
   this.visible = true;
-  // this.tenantDto.appTenantSubscriptionPlanId  = plan.appSubscriptionPlanHeader.appTenantSubscriptionPlanId
+  this.tenantDto.appTenantSubscriptionPlan.subscriptionPlanCode  = plan.appSubscriptionPlanHeader.code
+  this.tenantDto.appTenantSubscriptionPlan.appSubscriptionPlanHeaderId  = this.plansubId
   this.tenantDto.appTenantSubscriptionPlan.id  = plan.appSubscriptionPlanHeader.id
   let tenantId = ''
   if (localStorage.getItem("SellerId") && localStorage.getItem("SellerId") != "undefined") {
@@ -155,12 +160,15 @@ confirm(){
   console.log(this.tenantDto,'dtooooooo')
   body = this.tenantDto.appTenantSubscriptionPlan
 
-  // this.showMainSpinner();
+  this.showMainSpinner();
   this.AppTenantSubscriptionPlansServiceProxy.createOrEdit(
-    body).subscribe(result => {
-     
+    body)  .pipe(finalize(() => { 
+  this.hideMainSpinner();
+  this.getMonthStyle()
+    })).subscribe(result => {
+       
       //  this.tenantDto = result
-      // this.hideMainSpinner();
+    
 
       this.notify.info("Successfully deleted.");
        console.log(this.tenantDto,'dddd')
