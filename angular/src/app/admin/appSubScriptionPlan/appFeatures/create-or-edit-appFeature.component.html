@@ -54,7 +54,17 @@
 									<input type="text" #AppFeature_Description="ngModel" id="AppFeature_Description" class="form-control" [(ngModel)]="appFeature.description" name="Description"   minlength="0"  maxlength="250"  required/>
 								    <validation-messages [formCtrl]="AppFeature_Description"></validation-messages>
 								</div>
-					
+					<div class="form-group">
+						<label for="AppFeature_EntityStatusCode">{{l("Status")}}</label>
+						<p-dropdown [options]="featureStatusList" 
+            optionLabel="displayName"
+            optionValue="id"
+            name="firstAttachSelection">
+</p-dropdown>
+<!-- <select id="items" >
+    <option *ngFor="let item of featureStatusList" [value]="item.id">{{ item.displayName }}</option>
+  </select> -->
+						</div>
 								<div class="form-group">
 									<label for="AppFeature_UnitOfMeasurementCode">{{l("UnitOfMeasurementCode")}} *</label>
 									<input type="text" #AppFeature_UnitOfMeasurementCode="ngModel" id="AppFeature_UnitOfMeasurementCode" class="form-control" [(ngModel)]="appFeature.unitOfMeasurementCode" name="UnitOfMeasurementCode"   minlength="1"  maxlength="50"  required/>

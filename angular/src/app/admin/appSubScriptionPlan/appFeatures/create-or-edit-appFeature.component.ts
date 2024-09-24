@@ -1,7 +1,7 @@
 ﻿import { Component, ViewChild, Injector, Output, EventEmitter, OnInit} from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
-import { AppFeaturesServiceProxy, CreateOrEditAppFeatureDto } from '@shared/service-proxies/service-proxies';
+import { AppFeaturesServiceProxy, CreateOrEditAppFeatureDto, SycEntityObjectStatusLookupTableDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,9 +19,9 @@ import {Observable} from "@node_modules/rxjs";
 export class CreateOrEditAppFeatureComponent extends AppComponentBase implements OnInit {
     active = false;
     saving = false;
-    
+    featureStatusList: SycEntityObjectStatusLookupTableDto[];
     appFeature: CreateOrEditAppFeatureDto = new CreateOrEditAppFeatureDto();
-
+    selectedItem:"";
 
 
 
@@ -34,11 +34,15 @@ export class CreateOrEditAppFeatureComponent extends AppComponentBase implements
         private _router: Router
     ) {
         super(injector);
+        
     }
 
     ngOnInit(): void {
         this.show(this._activatedRoute.snapshot.queryParams['id']);
-        
+        this._appFeaturesServiceProxy.getFeatureStatusList()
+        .subscribe((res: any) => {
+            this.featureStatusList = res;
+        });
     }
 
     show(appFeatureId?: number): void {

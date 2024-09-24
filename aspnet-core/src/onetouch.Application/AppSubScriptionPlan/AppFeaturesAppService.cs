@@ -17,6 +17,8 @@ using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
 using onetouch.AppEntities;
+using onetouch.SystemObjects;
+using onetouch.SystemObjects.Dtos;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -27,12 +29,17 @@ namespace onetouch.AppSubScriptionPlan
         private readonly IAppFeaturesExcelExporter _appFeaturesExcelExporter;
         private readonly Helper _helper;
         private readonly IRepository<AppEntity, long> _appEntityRepository;
-        public AppFeaturesAppService(IRepository<AppFeature,long> appFeatureRepository, IAppFeaturesExcelExporter appFeaturesExcelExporter, Helper helper, IRepository<AppEntity, long> appEntityRepository)
+        private readonly ISycEntityObjectStatusesAppService _sycEntityObjectStatusesAppService;
+        public AppFeaturesAppService(IRepository<AppFeature,long> appFeatureRepository, IAppFeaturesExcelExporter appFeaturesExcelExporter, Helper helper, 
+            IRepository<AppEntity, long> appEntityRepository,
+             ISycEntityObjectStatusesAppService sycEntityObjectStatusesAppService
+            )
         {
             _appFeatureRepository = appFeatureRepository;
             _appFeaturesExcelExporter = appFeaturesExcelExporter;
             _helper = helper;
             _appEntityRepository = appEntityRepository;
+            _sycEntityObjectStatusesAppService = sycEntityObjectStatusesAppService;
         }
 
         public async Task<PagedResultDto<GetAppFeatureForViewDto>> GetAll(GetAllAppFeaturesInput input)
@@ -222,6 +229,9 @@ namespace onetouch.AppSubScriptionPlan
 
             return _appFeaturesExcelExporter.ExportToFile(appFeatureListDtos);
         }
-
+        public async Task<List<SycEntityObjectStatusLookupTableDto>> GetFeatureStatusList()
+        {
+            return await _sycEntityObjectStatusesAppService.GetAllSycEntityStatusForTableDropdown("STANDARDFEATURE");
+        }
     }
 }
