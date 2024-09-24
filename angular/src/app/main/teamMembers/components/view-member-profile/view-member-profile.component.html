@@ -96,7 +96,8 @@
                         <div class="col-md-12  align-items-baseline">
                             <h6 class="text-right "> <img src="../../assets/img/input_icons/outline-work.png" class=""> {{ ( "JobTitle" | localize ) + " :" }}</h6>
                             <p class="text-left old_editjobTitle" [ngClass]="{'hide':NoteditInfo}">{{memberData?.contact?.jobTitle}}</p>
-                            <input type="text" class="editjobTitle form-control form-control-sm aria-input-text" name="JobTitle" minlength="2" maxlength="100" [placeholder]="'PleaseEnterJobTitle' | localize " [ngClass]="{'hide':editInfo}">
+                            <input type="text" class="editjobTitle form-control form-control-sm aria-input-text"name="JobTitle" #JobTitleInput="ngModel" required name="JobTitle" minlength="2" maxlength="100" [(ngModel)]="editjobTitleValue" [placeholder]="'PleaseEnterJobTitle' | localize " [class.hide]="editInfo">
+                            <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
                         </div>
                         <hr class="header"  *ngIf="memberData?.contact?.joinDateIsPublic">
                         <div class="col-md-12 align-items-baseline" *ngIf="memberData?.contact?.joinDateIsPublic">
@@ -139,7 +140,7 @@
                                     {{ memberData?.countryName  }}
                                 </span>
                             </p>
-                            <input type="text" class="editBranch form-control form-control-sm aria-input-text"  [placeholder]="'PleaseSelectBranch' | localize "  [class.hide]="editInfo">
+                            <input type="text" class="editBranch form-control form-control-sm aria-input-text" [(ngModel)]="editBranchValue"  [placeholder]="'PleaseSelectBranch' | localize "  [class.hide]="editInfo">
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.phone1IsPublic">
                         <div class="col-md-12  align-items-baseline"  *ngIf="memberData?.contact?.phone1IsPublic">
@@ -162,7 +163,7 @@
                             </h6>
                             <p class="text-left ">{{memberData?.contact?.phone3Number}}</p>
                         </div>
-                        <button class="btn mb-3 mt-4 editAccount_butn Save_editMember"   [class.hide]="editInfo" (click)="Save_editMember()" >
+                        <button class="btn mb-3 mt-4 editAccount_butn Save_editMember"  type="submit" [class.hide]="editInfo" (click)="Save_editMember()" >
                             {{ "SaveChanges" | localize }}
                         </button>
                     </div>

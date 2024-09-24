@@ -1,5 +1,5 @@
-import { Component, ViewChild, Injector, Output, EventEmitter, OnInit } from '@angular/core';
-import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input } from '@angular/core';
+import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto ,CreateOrEditAccountInfoDto} from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -9,7 +9,7 @@ import { finalize } from 'rxjs/operators';
 import { ViewMemberProfileComponentInputsI } from '../../models/view-member-profile-model';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Observable } from 'rxjs';
-
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-view-member-profile',
@@ -18,11 +18,12 @@ import { Observable } from 'rxjs';
     animations: [appModuleAnimation()]
 })
 export class ViewMemberProfileComponent extends AppComponentBase implements OnInit {
-   
+
     editMode = false;
     @ViewChild('nav') slider: NgImageSliderComponent;
     memberData: ContactForEditDto;
-
+    newEditMemberInfo: ContactDto;
+    @Input('accountInfoTemp') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
 
     @Output() edit: EventEmitter<number> = new EventEmitter<number>()
     @Output() delete: EventEmitter<number> = new EventEmitter<number>()
@@ -46,6 +47,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy) {
         super(injector);
+        this.accountInfoTemp = new CreateOrEditAccountInfoDto();
+        //this.accountInfoTemp.entityClassifications = [];
+        //this.accountInfoTemp.entityCategories = [];
     }
     ngOnInit() {
         this.getAllAttachmentCategories()
@@ -56,9 +60,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         debugger
         //this.memberData?.contact.eMailAddress
         if (this.memberData?.contact.userName.includes("admin")) {
-            this.editInfo=false;
-            this.NoteditInfo=true;
-            //this.memberData?.contact.jobTitle = "lol";
+            this.editInfo = false;
+            this.NoteditInfo = true;
         } else {
             const memberId: number = this.memberData?.contact?.id;
             if (isNaN(memberId)) return
@@ -122,12 +125,20 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     CreateUserName() {
         debugger
     }
-    Save_editMember(){
+    editjobTitleValue: string = '';
+    editBranchValue: string = '';
+    Save_editMember() {
         debugger
-        this.editInfo=false;
-        this.NoteditInfo=true;
-        let accountInfo=this.memberData?.contact;
-       //accountInfoTemp
-        //this._AccountsServiceProxy.createOrEditMyAccount(accountInfo)
+        this.newEditMemberInfo = this.memberData.contact;
+        this.newEditMemberInfo.jobTitle = this.editjobTitleValue;
+        this.newEditMemberInfo.branchName = this.editBranchValue;
+        
+        
+        //accountInfoTemp
+        if (this.newEditMemberInfo.jobTitle != '' && this.newEditMemberInfo.branchName != '') {
+            this.editInfo = true;
+            this.NoteditInfo = false;
+            this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
+        }
     }
 }
