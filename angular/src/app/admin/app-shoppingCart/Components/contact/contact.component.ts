@@ -49,6 +49,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
+        
     }
 
     ngOnInit(): void {
@@ -95,12 +96,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
           this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = null;
         
         this.__selectedPhoneTypeValue = 0;
-        this.companyFilterValue = "";
-        this.companyNamePlaceholder = "Select Company Name";
-        this.contactNamePlaceholder = "Select Contact Name";
-        this.tempAccount = false;
-        this.tempContact = false;
-        this.contactFilterValue = "";
         }
     }
 
@@ -360,6 +355,12 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
     getAllCompaniesData() {
        
+        this.companyFilterValue = "";
+        this.companyNamePlaceholder = "Select Company Name";
+        this.contactNamePlaceholder = "Select Contact Name";
+        this.tempAccount = false;
+        this.tempContact = false;
+        this.contactFilterValue = "";
                 //////////////////////////////////////////////////// I36 -Temp Account scenario
                 if ((this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN == "0" || !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName) {
                     this.tempAccount = true;
@@ -431,8 +432,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
             (isValid) =
-                (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') &&
-                (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '' );
+               ( (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') &&
+                (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '' )
+                || this.tempAccount );
                 //(this.showDepartment ? (this.appTransactionsForViewDto?.buyerDepartment != undefined && this.appTransactionsForViewDto?.buyerDepartment != '') : true);
 
                 // (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail != '') &&
