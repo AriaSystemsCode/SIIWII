@@ -333,14 +333,14 @@
                             </div>
                             <div class="col-12 item-photos-body pt-4 pb-5 ml-5 pl-5">
                                 <div class="row pt-3 pb-3 pl-3">
-                                    <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A !important;
+                                    <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ;
     border-radius: 12px !important;" [ngClass]="{'upload':!attachment}"
                                         *ngFor="let attachment of attachmentsSrcs; index as i">
                                         <label *ngIf="!attachment"
                                             class="d-flex flex-column justify-content-center h-100 align-items-center"
                                             for="file_{{i}}">
                                             <div
-                                                class="align-items-end d-flex justify-content-center upload-image-icons ml-5 mb-3 mt-3">
+                                                class="align-items-end d-flex justify-content-center upload-image-icons mt-3">
                                                <!--  <div class="left-icon">
                                                     <i class="fa-photo-video fas "></i>
                                                 </div>
@@ -354,7 +354,7 @@
                                                     <i class="fas " > <img src="../../../assets/placeholders/cloud-add.png" /> </i>
                                                 </div>
                                             </div>
-                                            <div class="text-center  pl-5 ml-5">
+                                            <div class="text-center">
                                                 <p  style="font-weight: bold; color: black;
     white-space: nowrap;">
                                                     Choose a file or drag & drop it here
