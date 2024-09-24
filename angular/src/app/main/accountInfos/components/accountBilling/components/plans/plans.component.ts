@@ -144,12 +144,7 @@ showDialog(plan:any) {
   this.visible = true;
   this.tenantDto.appTenantSubscriptionPlan.subscriptionPlanCode  = plan.appSubscriptionPlanHeader.code
   this.tenantDto.appTenantSubscriptionPlan.appSubscriptionPlanHeaderId  = plan.appSubscriptionPlanHeader.id
-  // this.tenantDto.appTenantSubscriptionPlan.id  = plan.appSubscriptionPlanHeader.id
-  let tenantId = ''
-  if (localStorage.getItem("SellerId") && localStorage.getItem("SellerId") != "undefined") {
-    tenantId = JSON.parse(localStorage.getItem("SellerId"));
-}
-this.tenantDto.appTenantSubscriptionPlan.tenantId  = tenantId
+this.tenantDto.appTenantSubscriptionPlan.tenantId  = this.appSession.tenantId
 this.selectedPlanName = plan?.appSubscriptionPlanHeader?.name; 
 }
 
@@ -164,7 +159,7 @@ confirm(){
   this.AppTenantSubscriptionPlansServiceProxy.createOrEdit(
     body)  .pipe(finalize(() => { 
   this.hideMainSpinner();
-  this.getMonthStyle()
+  this.monthlyClick()
     })).subscribe(result => {
        
       //  this.tenantDto = result
