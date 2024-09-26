@@ -58,6 +58,88 @@ color:  #1B101B;
 
 ::ng-deep {
   
+::-webkit-scrollbar {
+    width: 4px !important; /* Set the width of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #888 !important; /* Set the color of the thumb (the draggable part) */
+    border-radius: 2px !important; /* Set the border radius to round the edges */
+}
+
+::-webkit-scrollbar-track {
+    background-color: #fff !important; /* Set the color of the track (the non-draggable part) */
+}
+.table-container {
+  width: 100%;
+}
+
+.vertical-header-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; // Ensure columns have equal width
+}
+.reg-border {
+
+}
+.vertical-header-table th,
+.vertical-header-table td {
+  padding: 10px;
+
+  text-align: center; // Center-align text in cells
+  width: 100%; // Ensures all columns share equal width
+}
+.head-pl ,.plan-header {
+
+  border: 1px solid #EEEEEE; // Add border for better visibility
+
+}
+.table-container {
+  width: 100%;
+}
+
+.vertical-header-table {
+  width: 100%;
+  border-collapse: collapse;
+  display: table; // Use table display for proper layout
+}
+
+.table-row {
+  display: flex; // Use flexbox for equal distribution
+}
+
+.table-cell {
+  flex: 1; // Each cell takes equal width
+  padding: 10px;
+  // border: 1px solid #ddd;
+  text-align: center;
+}
+
+.head-c{
+
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  align-items: center;
+  text-align: center;
+  // border: 1px solid #EEEEEE;
+  color: #1B101B;
+  
+  }
+
+
+  .head-pl{
+
+  font-style: normal;
+  font-weight: 600;
+
+  align-items: center;
+  text-align: center;
+  border: 1px solid #EEEEEE;
+  color: #1B101B;
+  
+  }
+
 
 .p-button-text {
   button {
@@ -97,45 +179,38 @@ line-height: 27px;
 
 color: #9E9E9E;
   }
-    .vertical-header-table {
-      border-collapse: collapse;
-      width: 100%;
-  }
   
-  .vertical-header-table td {
-
-    align-items: center;
-    text-align: center;
-    padding:  20px ;
-    
-    border: 1px solid #EEEEEE;
-
-font-weight: 500;
-font-size: 12px;
-line-height: 18px;
-width: 215px !important;
-text-align: center;
-
-color: #9E9E9E;
 
 
+.selet-plan {
+  border-left: 2px solid #837F7F !important;
+  border-top: 2px solid #837F7F !important;
+  border-right: 2px solid #837F7F !important;
+  
+}
 
+.last-row-border {
+  border-bottom: 2px solid #837F7F !important;
 
-      
-  }
+}
+.seletd-plan {
+  border-left: 2px solid #837F7F !important;
+  border-right: 2px solid #837F7F !important;
+}
 
+ 
   .top-left {
     border-bottom: none;
        
               height: 134px;
-              width: 158px;
+              // width: 200px;
     border-top-left-radius: 10px !important;
 }
   .top-right {
     border-bottom: none;
        
     height: 134px;
-    width: 200px;
+    // width: 200px;
 border-top-right-radius: 10px !important;
   }
   // .vertical-header-table tr:first-child td:first-child {
@@ -146,28 +221,18 @@ border-top-right-radius: 10px !important;
   //     border-top-right-radius: 10px; /* Top-right corner */
   // }
 }
+.plan-name {
+  white-space: nowrap;
 
-.head-c{
+}
 
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-
-  width: 158px;
-
-  align-items: center;
-  text-align: center;
-  
-  color: #1B101B;
-  
-  }
   
 
 .flex-column{
   p{
 
     font-weight: 800;
-    font-size: 20px;
+   
     line-height: 30px;
   }
   .btn {
@@ -178,7 +243,8 @@ border-top-right-radius: 10px !important;
     padding: 11px 25px;
     gap: 10px;
 color: #FFFFFF;
-  
+display: flex;
+justify-content: center;
     height: 46px;
   }
 }
@@ -188,6 +254,12 @@ color: #FFFFFF;
   .custom-p-free{
 color: #16B455;
 
+  }
+  .default-class {
+    color: #1B101B;
+  }
+  .default-class-b {
+    background-color: #1B101B;
   }
   .sil-btn { 
 background: #F6851D;
@@ -223,8 +295,16 @@ background: #1B101B;
                       }
   
   .plan {
-    border-left: 1px solid #EEEEEE;
-    border-right: 1px solid #EEEEEE;
+
+
+
+
+height: 50px;
+
+background: #EEEEEE;
+border-width: 0px 1px 1px 1px;
+border-style: solid;
+border-color: rgba(238, 238, 238, 0.933333);
 
     h2 {
 

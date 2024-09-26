@@ -9,296 +9,100 @@
         Yearly
     </button>
 </div>
-<div class="">
-  <div class="">
-    <table class="vertical-header-table">
-      <tbody>
-          <tr >
-              <td  class="top-left head-c" style="       font-size: 20px;
-              display: inline-block;
-              padding-top: 50px;">PLans</td> <!-- First vertical column for 'Code' -->
-              <td *ngFor="let plan of plans;let i = index">
-                <div class="d-flex flex-column">
-                  <p [ngClass]="getPlanClass(i)">{{ plan?.appSubscriptionPlanHeader?.name }}</p>
-                  <button [ngClass]="getPlanBtnClass(i)" (click)="showDialog(plan)" [disabled]=" plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null" class="btn ">{{ plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'Selected' : 'Select'}}</button>
-                </div>
-              </td>
-             
-            
-              <p-dialog header="Header" [(visible)]="visible" [modal]="true" [style]="{ width: '640px' }" [draggable]="false" >
-                <ng-template pTemplate="header">
-                  <div class="d-flex">
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z" fill="#F6851D"/>
-                    </svg>
-                     <span class="text-xl font-bold con-msg ml-2">Confirmation Messgae</span>
-                    </div>
-                </ng-template>
-                <div class="p-4 con-body">
-                  <p>
-                    Please press yes button to confirm changing your current subscription plan to ({{selectedPlanName}})
-                </p>
-                <p>
-                  *Note:- you will be on the new plan starting from the next month.
-              </p>
-                </div>
-           
-           
-                <ng-template pTemplate="footer">
-                  <p-button  (click)="visible = false;confirm()" label="Yes" class="p-button-text" ></p-button>
-                  <p-button  (click)="visible = false" label="Cancel" Class="p-button-no"></p-button>
-              </ng-template>
-            </p-dialog>
-              <!-- <div class="card flex justify-content-center">
-                <p-toast></p-toast>
-                <p-confirmDialog #cd [style]="{width: '50vw'}">
-                    <ng-template pTemplate="header">
-                        <h3>Header Content</h3>
-                    </ng-template>
-                    <ng-template pTemplate="footer">
-                        <button type="button" pButton icon="pi pi-times" label="No" (click)="cd.reject()"></button>
-                        <button type="button" pButton icon="pi pi-check" label="Yes" (click)="cd.accept()"></button>
-                    </ng-template>
-                </p-confirmDialog>
-                <p-button (click)="confirm1()" icon="pi pi-check" label="Confirm"></p-button>
-            </div> -->
-            
-<!-- 
-              <td >
-                <div class="d-flex flex-column">
-                  <p  class="custom-p-sil">Silver</p>
-                  <button class="btn sil-btn">Sellected</button>
-                </div>
-              </td>
-              <td >
-                <div class="d-flex flex-column">
-                  <p  class="custom-p-gold">Gold</p>
-                  <button class="btn gold-btn">Sellected</button>
-                </div>
-              </td>
-              <td  class="top-right" style="   
-             display: inline-block;">
-                <div class="d-flex flex-column">
-                  <p  class="custom-p-cu">Custom</p>
-                  <button class="btn cu-btn">Sellected</button>
-                </div>
-              </td> -->
-          </tr>
-          <tr>
-              <td class="head-c" style="font-size: 20px;">Prices</td> <!-- First vertical column for 'Name' -->
-              <td *ngFor="let plan of plans">{{ isMonthlyPlan ? plan?.appSubscriptionPlanHeader?.monthlyPrice : plan?.appSubscriptionPlanHeader?.yearlyPrice}}</td>
-          </tr>
-          <tr>
-              <td class="head-c" style="font-size: 20px;">Description</td> <!-- First vertical column for 'Category' -->
-              <td *ngFor="let product of plans">{{ product?.appSubscriptionPlanHeader.description }}</td>
-          </tr>
-    
-      </tbody>
-  </table>
-<!-- <div class="plan">
-  <h2 class="text-center ">Users</h2>
-    <table class="vertical-header-table">
-    <tbody>
- 
-        <tr *ngFor="let detail of plans[0]?.appSubscriptionPlanHeader?.appSubscriptionPlanDetails">
-        
-          <td  class="head-c"  *ngIf="detail.category == 'USER'">{{ detail.featureName }}</td>
-          <div *ngIf="detail.category == 'USER' ">
-          <td  *ngFor="let plan of plans">
-            <span *ngIf="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId == plan?.appSubscriptionPlanHeader?.appSubscriptionPlanDetails?.appSubscriptionPlanHeaderId">
-              <p  *ngIf="detail.category == 'USER'">{{ detail.featureLimit }}</p>
-            </span>
-          </td>
-        </div>
+<div class="table-container">
+  <div style="overflow-x: auto;">
+    <table class="vertical-header-table fixed-table">
+      <thead>
+        <tr>
+          <th class="head-pl "  [style.fontSize]="getFontSize()">Plans</th>
+          <th *ngFor="let plan of plans; let i = index"   [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'selet-plan' :'plan-header'" >
+            <div class="d-flex flex-column">
+              <p [ngClass]="getPlanClass(i)" class="plan-name" [style.fontSize]="getFontSize()">{{ plan?.appSubscriptionPlanHeader?.name }}</p>
+              <button [ngClass]="getPlanBtnClass(i)" (click)="showDialog(plan)" 
+                      [disabled]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null" class="btn">
+                {{ plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'Selected' : 'Select'}}
+              </button>
+            </div>
+          </th>
+
+          <th  class="plan-header">
+            <div class="d-flex flex-column">
+              <p  class="plan-name" [style.fontSize]="getFontSize()">Custom</p>
+              <button 
+                     class="btn btn-dark">
+               Contact Sales
+              </button>
+            </div>
+          </th>
         </tr>
-     
+      </thead>
+      <tbody>
+        <tr>
+          <td class="head-c plan-header"  [style.fontSize]="getFontSize()">Prices</td>
+          <td *ngFor="let plan of plans" [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'">
+            {{ isMonthlyPlan ? plan?.appSubscriptionPlanHeader?.monthlyPrice : plan?.appSubscriptionPlanHeader?.yearlyPrice }}
+          </td>
 
-    </tbody>
-</table>
-</div> -->
+          <td class="plan-header">-</td>
+        </tr>
+        <tr>
+          <td class="head-c plan-header"  [style.fontSize]="getFontSize()">Description</td>
+          <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'">{{ plan?.appSubscriptionPlanHeader.description }}</td>
+          <td class="plan-header">-</td>
 
-<!-- 
-<div class="plan">
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<h2 class="text-center">Acounts</h2>
-</div> -->
-<!-- <table class="vertical-header-table">
-  <tbody>
+  <div style="overflow: auto;">
+    <div *ngFor="let category of getUniqueCategories()">
+      <div class="plan">
+        <h2 class="text-center">{{ category }}</h2>
+      </div>
 
-      <tr>
-          <td class="head-c">Connect with Marketplace Accounts</td> 
-          <td *ngFor="let product of plans">{{ product.name }}</td>
-      </tr>
-   
+      <table class="vertical-header-table">
+        <tbody>
+          <tr *ngFor="let feature of getFeaturesByCategory(category)">
+            <td class="head-c plan-header">{{ feature.featureName }}</td>
+            <td *ngFor="let plan of plans ; let i = index"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header' " getLastPlanClass(i)  >
+              <span *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails">
+                <span *ngIf="detail.featureName === feature.featureName">{{ detail.featureLimit }} {{ detail.unitOfMeasurementName }}</span>
+              </span>
+            </td>
+          <td class="plan-header">-</td>
 
-      <tr>
-        <td class="head-c">Manual Acoount Creation</td> 
-        <td *ngFor="let product of plans">{{ product.name }}</td>
-    </tr>
- 
-
-  </tbody>
-</table> -->
-
-<div *ngFor="let category of getUniqueCategories()">
-  <!-- Dynamically display category name -->
-   <div  class="plan">
-  <h2 class="text-center ">{{ category }}</h2>
-</div>
-  <table class="vertical-header-table">
-    <tbody>
-      <!-- Dynamically create a row for each feature under the current category -->
-      <tr *ngFor="let feature of getFeaturesByCategory(category)">
-        <!-- First column: Feature name -->
-        <td class="head-c">{{ feature.featureName }}</td>
-        <!-- Loop through each plan to display the corresponding feature limit -->
-        <td *ngFor="let plan of plans">
-          <span *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails">
-            <!-- Check if the feature name matches the current feature being iterated -->
-            <span *ngIf="detail.featureName === feature.featureName">{{ detail.featureLimit }}</span>
-          </span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
-
-<!-- <div class="plan">
-<h2 class="text-center ">Marketplace plans</h2>
-</div>
-<table class="vertical-header-table">
-  <tbody>
-
-      <tr>
-          <td class="head-c">Share product to SIIWII Marketplace</td>
-          <td *ngFor="let product of plans">{{ product.name }}</td>
-      </tr>
-   
+<!-- </div> -->
 
 
- 
-
-  </tbody>
-</table>
-
-
-<div class="plan">
-<h2 class="text-center ">plans List</h2>
-</div>
-<table class="vertical-header-table">
-  <tbody>
-
-      <tr>
-          <td class="head-c">Product list creation</td> 
-          <td *ngFor="let product of plans">{{ product.name }}</td>
-      </tr>
-   
-      <tr>
-        <td class="head-c">Product list contents</td> 
-        <td *ngFor="let product of plans">{{ product.name }}</td>
-    </tr>
- 
+<p-dialog header="Header" [(visible)]="visible" [modal]="true" [style]="{ width: '640px' }" [draggable]="false" >
+  <ng-template pTemplate="header">
+    <div class="d-flex">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z" fill="#F6851D"/>
+      </svg>
+       <span class="text-xl font-bold con-msg ml-2">Confirmation Messgae</span>
+      </div>
+  </ng-template>
+  <div class="p-4 con-body">
+    <p>
+      Please press yes button to confirm changing your current subscription plan to ({{selectedPlanName}})
+  </p>
+  <p>
+    *Note:- you will be on the new plan starting from the next month.
+</p>
+  </div>
 
 
- 
-
-  </tbody>
-</table>
-<div class="plan">
-
-<h2 class="text-center">Linesheet</h2>
-</div>
-<table class="vertical-header-table">
-  <tbody>
-
-      <tr>
-          <td class="head-c">Generate Linesheet report</td> 
-          <td *ngFor="let product of plans">{{ product.name }}</td>
-      </tr>
-   
-      <tr>
-        <td class="head-c">Print linesheet PDF</td> 
-        <td *ngFor="let product of plans">{{ product.name }}</td>
-    </tr>
- 
-    <tr>
-      <td class="head-c">Custom linesheet layout</td>
-      <td *ngFor="let product of plans">{{ product.name }}</td>
-  </tr>
-
-
- 
-
-  </tbody>
-</table>
-
-<div class="plan">
-
-
-<h2 class="text-center ">Transactions</h2>
-</div>
-<table class="vertical-header-table">
-  <tbody>
-
-      <tr>
-          <td class="head-c">Sales order Transaction line</td> 
-          <td *ngFor="let product of plans">{{ product.name }}</td>
-      </tr>
-   
-      <tr>
-        <td class="head-c">Purshase order Transaction line</td> 
-        <td *ngFor="let product of plans">{{ product.name }}</td>
-    </tr>
- 
-
-
-
- 
-
-  </tbody>
-</table>
-
-<div class="plan">
-
-<h2 class="text-center ">Events</h2>
-</div>
-<table class="vertical-header-table">
-  <tbody>
-
-      <tr>
-          <td class="head-c">Event Creation</td> 
-          <td *ngFor="let product of plans">{{ product.name }}</td>
-      </tr>
-   
-
-
-
-
- 
-
-  </tbody>
-</table>
-
-<div class="plan">
-
-<h2 class="text-center ">Advertisement</h2>
-</div>
-<table class="vertical-header-table">
-  <tbody>
-
-      <tr>
-          <td class="head-c">Number of advertising</td> 
-          <td *ngFor="let product of plans">{{ product.name }}</td>
-      </tr>
-   
-
-
-
-
- 
-
-  </tbody>
-</table> -->
-</div>
-</div>
+  <ng-template pTemplate="footer">
+    <p-button  (click)="visible = false;confirm()" label="Yes" class="p-button-text" ></p-button>
+    <p-button  (click)="visible = false" label="Cancel" Class="p-button-no"></p-button>
+</ng-template>
+</p-dialog>

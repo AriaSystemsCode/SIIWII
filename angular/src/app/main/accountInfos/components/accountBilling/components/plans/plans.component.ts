@@ -195,7 +195,24 @@ getPlanBtnClass(planIndex: number): string {
       case 2:
           return 'gold-btn';  // Custom class for plan 2
       default:
-          return 'default-class';     // Fallback class
+          return 'default-class-b';     // Fallback class
   }
+}
+getLastPlanClass(planIndex: number): string {
+  if (planIndex == this.plans.length - 1) {
+   
+          return 'last-row-border';  
+      
+  }
+}
+getFontSize() {
+  const baseSize = 20; 
+  const maxCols = 4;
+  const minCols = 10; 
+
+  if (this.plans.length > maxCols) {
+    return `${baseSize - (this.plans.length - maxCols) * 3}px`; // Decrease by 2px for each extra column
+  }
+  return `${baseSize}px`;
 }
 }
