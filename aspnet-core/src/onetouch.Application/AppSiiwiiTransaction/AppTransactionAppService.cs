@@ -102,6 +102,9 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IEmailSender _emailSender;
         private readonly IAppItemsAppService _appItemsAppService;
         private readonly ISycEntityObjectTypesAppService _SycEntityObjectTypesAppService;
+        private readonly IAppEntitiesAppService _appEntitiesAppService;
+        private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
+        private readonly IRepository<SycEntityObjectClassification, long>  _sycEntityObjectClassificationRepository;
         //MMT37[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -121,8 +124,13 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionDetails, long> appMarketplaceTransctionDetailsRepository,
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionContacts, long> appMarketplaceTransctionContactsRepository,
              IRepository<AppEntitySharings, long> appEntitySharingsRepository, IMessageAppService messageAppService, IRepository<AppEntityAttachment, long> appEntityAttachment,
-             IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender, IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
+             IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender,IAppEntitiesAppService appEntitiesAppService, 
+             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository,
+             IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
         {
+            _sycEntityObjectClassificationRepository = sycEntityObjectClassificationRepository;
+            _sycEntityObjectCategory = sycEntityObjectCategory;
+            _appEntitiesAppService = appEntitiesAppService;
             _SycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
             _MessagesRepository = messagesRepository;
             _appAddressRepository = appAddressRepository;
@@ -3559,6 +3567,80 @@ namespace onetouch.AppSiiwiiTransaction
             return returnList;
 
         }
+        //MMT-Show Sub Categories and classification[Start]
+        public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppTransactionCategoriesFullNamesWithPaging(GetAppTransactionAttributesWithPagingInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                if (input.TransactionId != 0)
+                {
+                    // List<string> returnName = new List<string>();
+                    var returnRes = await _appEntitiesAppService.GetAppEntityCategoriesWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.TransactionId });
+                    {
+                        foreach (var cat in returnRes.Items)
+                        {
+                            cat.EntityObjectCategoryName = GetDepartmentName(cat.EntityObjectCategoryId);
+                        }
+                    }
+                    return returnRes;
+                }
+                return new PagedResultDto<AppEntityCategoryDto>();
+            }
+        }
+        private string GetDepartmentName(long departmentId)
+        {
+            string returnName = "";
+            var categoriesFiltered = _sycEntityObjectCategory.GetAll().Include(a => a.ParentFk).FirstOrDefault(a => a.Id == departmentId);
+            if (categoriesFiltered != null)
+            {
+                if (categoriesFiltered.ParentId != null)
+                {
+                    returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + GetDepartmentName(long.Parse(categoriesFiltered.ParentId.ToString()));
+                }
+                //else
+                returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + categoriesFiltered.Name;
+            }
+            return returnName;
+
+        }
+        private async Task<PagedResultDto<AppEntityClassificationDto>> GetAppTransactionClassificationsFullNamesWithPaging(GetAppTransactionAttributesWithPagingInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                
+                if (input.TransactionId != 0)
+                {
+                    //return await _appEntitiesAppService.GetAppEntityClassificationsNamesWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.ItemEntityId });
+                    var returnRes = await _appEntitiesAppService.GetAppEntityClassificationsWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.TransactionId });
+                    if (returnRes != null && returnRes.Items.Count > 0)
+                    {
+                        foreach (var clss in returnRes.Items)
+                        {
+                            clss.EntityObjectClassificationName = GetClassName(clss.EntityObjectClassificationId);
+                        }
+                    }
+                    return returnRes;
+                }
+                return new PagedResultDto<AppEntityClassificationDto>();
+            }
+        }
+        private string GetClassName(long classId)
+        {
+            string returnName = "";
+            var classFiltered = _sycEntityObjectClassificationRepository.GetAll().Include(a => a.ParentFk).FirstOrDefault(a => a.Id == classId);
+            if (classFiltered != null)
+            {
+                if (classFiltered.ParentId != null)
+                {
+                    returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + GetClassName(long.Parse(classFiltered.ParentId.ToString()));
+                }
+                //else
+                returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + classFiltered.Name;
+            }
+            return returnName;
+
+        }
+        //[End]
         public async Task<GetAppTransactionsForViewDto> GetAppTransactionsForView(long transactionId, GetAllAppTransactionsInputDto? input, TransactionPosition? position)
         {
 
@@ -3747,6 +3829,25 @@ namespace onetouch.AppSiiwiiTransaction
                                  !string.IsNullOrEmpty(arContact.ContactAddressCode) && !string.IsNullOrEmpty(arContact.ContactAddressLine1) &&
                                  !string.IsNullOrEmpty(apContact.ContactAddressCode) && !string.IsNullOrEmpty(apContact.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.PaymentTermsCode);
                         //MMT-Performance[End]
+                        //MMT-show
+                        viewTrans.EntityCategoriesNames = new PagedResultDto<string>
+                        {
+                            Items = (await GetAppTransactionCategoriesFullNamesWithPaging(new GetAppTransactionAttributesWithPagingInput
+                            {
+                                TransactionId = viewTrans.Id,
+                                Sorting = "Id"
+                            })).Items.Select(z => z.EntityObjectCategoryName).ToList()
+                        };
+                        viewTrans.EntityClassificationsNames = new PagedResultDto<string>
+                        {
+                            Items = (await GetAppTransactionClassificationsFullNamesWithPaging(new GetAppTransactionAttributesWithPagingInput
+                            {
+                                TransactionId = viewTrans.Id,
+                                Sorting = "Id"
+                            })).Items.Select(z => z.EntityObjectClassificationName).ToList()
+                        };
+
+                        //End
                         return viewTrans;
                     }
 
