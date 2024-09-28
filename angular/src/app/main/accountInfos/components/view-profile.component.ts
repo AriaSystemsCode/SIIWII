@@ -23,7 +23,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Input('isPublished') isPublished: boolean;
     @Input() viewMode: boolean;
     @Input() accountLevel: AccountLevelEnum;
-    @Input('appEntityName') appEntityName: string;
+   // @Input('connections') appEntityName: string;
     showEditConnected: boolean = false;
     priceLevel: string;
     allPriceLevel: SelectItem[] = [];
