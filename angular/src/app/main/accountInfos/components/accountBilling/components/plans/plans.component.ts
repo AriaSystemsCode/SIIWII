@@ -28,6 +28,7 @@ export class PlansComponent extends AppComponentBase {
   tenantDto:any
   selectedPlanName: string = '';
   plansubId:any
+  cols:any
   constructor( injector: Injector,
         private _appSubscriptionPlanHeadersServiceProxy: AppSubscriptionPlanHeadersServiceProxy,private _AppSubscriptionPlanDetailsServiceProxy:AppSubscriptionPlanDetailsServiceProxy,private AppTenantSubscriptionPlansServiceProxy : AppTenantSubscriptionPlansServiceProxy)
         {
@@ -88,12 +89,12 @@ getUniqueCategories() {
   const allDetails = this.plans.reduce((acc, plan) => {
     return [...acc, ...plan.appSubscriptionPlanHeader.appSubscriptionPlanDetails];
   }, []);
+  console.log(allDetails.length,'n,nkjnhkn')
 
   // Extract unique categories
   const uniqueCategories = allDetails
     .map(detail => detail.category)
     .filter((value, index, self) => value && index === self.indexOf(value));
-
   return uniqueCategories;
 }
 
@@ -110,6 +111,8 @@ getFeaturesByCategory(category: string) {
   const uniqueFeatures = filteredFeatures.filter((feature, index, self) =>
     index === self.findIndex(f => f.featureCode === feature.featureCode)
   );
+  this.cols = allDetails 
+  console.log(allDetails.length,'allDetailssssss')
 
   return uniqueFeatures;
 }
@@ -181,11 +184,21 @@ getPlanClass(planIndex: number): string {
           return 'custom-p-sil';  // Custom class for plan 1
       case 2:
           return 'custom-p-gold';  // Custom class for plan 2
+
+          case 3:
+            return 'custom-p-free';  // Custom class for plan 0
+
+            case 4:
+              return 'custom-p-sil';  // Custom class for plan 1
+              case 5:
+                return 'custom-p-gold';  // Custom class for plan 2
       default:
           return 'default-class';     // Fallback class
   }
 }
-
+hasFeature(plan: any, feature: any): boolean {
+  return plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails?.some((detail: any) => detail.featureName === feature.featureName);
+}
 getPlanBtnClass(planIndex: number): string {
   switch (planIndex) {
       case 0:
@@ -194,6 +207,12 @@ getPlanBtnClass(planIndex: number): string {
           return 'sil-btn';  // Custom class for plan 1
       case 2:
           return 'gold-btn';  // Custom class for plan 2
+          case 3:
+            return 'free-btn';  // Custom class for plan 0
+            case 4:
+              return 'sil-btn';  // Custom class for plan 1
+              case 5:
+                return 'gold-btn';  // Custom class for plan 0
       default:
           return 'default-class-b';     // Fallback class
   }
@@ -208,10 +227,10 @@ getLastPlanClass(planIndex: number): string {
 getFontSize() {
   const baseSize = 20; 
   const maxCols = 4;
-  const minCols = 10; 
+
 
   if (this.plans.length > maxCols) {
-    return `${baseSize - (this.plans.length - maxCols) * 3}px`; // Decrease by 2px for each extra column
+    return `${baseSize - (this.plans.length - maxCols) * 4}px`; 
   }
   return `${baseSize}px`;
 }

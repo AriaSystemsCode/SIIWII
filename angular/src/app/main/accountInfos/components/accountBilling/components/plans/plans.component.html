@@ -9,12 +9,14 @@
         Yearly
     </button>
 </div>
-<div class="table-container">
+<div class="table-container" >
   <div style="overflow-x: auto;">
+   
     <table class="vertical-header-table fixed-table">
+      
       <thead>
-        <tr>
-          <th class="head-pl "  [style.fontSize]="getFontSize()">Plans</th>
+        <tr >
+          <th class="head-pl head-c"  style="font-size: 20px;">Plans</th>
           <th *ngFor="let plan of plans; let i = index"   [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'selet-plan' :'plan-header'" >
             <div class="d-flex flex-column">
               <p [ngClass]="getPlanClass(i)" class="plan-name" [style.fontSize]="getFontSize()">{{ plan?.appSubscriptionPlanHeader?.name }}</p>
@@ -27,56 +29,81 @@
 
           <th  class="plan-header">
             <div class="d-flex flex-column">
-              <p  class="plan-name" [style.fontSize]="getFontSize()">Custom</p>
-              <button 
-                     class="btn btn-dark">
-               Contact Sales
-              </button>
+              <p  class="plan-name default-class" [style.fontSize]="getFontSize()">Custom</p>
+              <p style="font-size: 12px;">
+                For Custom Pricing, Please Contact <a href="mailto:customercare@siiwii.net">Siwii</a>
+              </p>
             </div>
           </th>
         </tr>
       </thead>
       <tbody>
+        
         <tr>
-          <td class="head-c plan-header"  [style.fontSize]="getFontSize()">Prices</td>
-          <td *ngFor="let plan of plans" [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'">
-            {{ isMonthlyPlan ? plan?.appSubscriptionPlanHeader?.monthlyPrice : plan?.appSubscriptionPlanHeader?.yearlyPrice }}
+          <td class="head-c plan-header"  style="font-size: 20px;" >Prices</td>
+          <td *ngFor="let plan of plans;let i = index" [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header '" class="text-col">
+            <span [ngClass]="getPlanClass(i)" [style.fontSize]="getFontSize()" class="pr-font">{{ isMonthlyPlan ? plan?.appSubscriptionPlanHeader?.monthlyPrice ==0 ? 'Free'  : plan?.appSubscriptionPlanHeader?.monthlyPrice : plan?.appSubscriptionPlanHeader?.yearlyPrice == 0 ? 'Free' :  plan?.appSubscriptionPlanHeader?.yearlyPrice }}</span>
           </td>
 
           <td class="plan-header">-</td>
         </tr>
         <tr>
           <td class="head-c plan-header"  [style.fontSize]="getFontSize()">Description</td>
-          <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'">{{ plan?.appSubscriptionPlanHeader.description }}</td>
+          
+          <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'" class="text-col">{{ plan?.appSubscriptionPlanHeader.description }}</td>
           <td class="plan-header">-</td>
 
         </tr>
       </tbody>
     </table>
+
   </div>
 
-  <div style="overflow: auto;">
-    <div *ngFor="let category of getUniqueCategories()">
+  <div class="scroll-container">
+    <div *ngFor="let category of getUniqueCategories(); let rindex = index">
       <div class="plan">
         <h2 class="text-center">{{ category }}</h2>
       </div>
-
+  
       <table class="vertical-header-table">
         <tbody>
-          <tr *ngFor="let feature of getFeaturesByCategory(category)">
+          <tr *ngFor="let feature of getFeaturesByCategory(category); let fIndex = index">
             <td class="head-c plan-header">{{ feature.featureName }}</td>
-            <td *ngFor="let plan of plans ; let i = index"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header' " getLastPlanClass(i)  >
-              <span *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails">
-                <span *ngIf="detail.featureName === feature.featureName">{{ detail.featureLimit }} {{ detail.unitOfMeasurementName }}</span>
-              </span>
+          
+            <td *ngFor="let plan of plans; let i = index"
+                [ngClass]="{
+                  'last-row-border': rindex === getUniqueCategories().length - 1 && fIndex === getFeaturesByCategory(category).length - 1 && plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null,
+                  'seletd-plan': plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null,
+                  'plan-header': plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId == null
+                }">
+          
+              <!-- Check if the feature exists in this plan -->
+              <ng-container *ngIf="hasFeature(plan, feature); else noFeature">
+                <!-- Find the matching detail for the feature -->
+                <ng-container *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails" [ngClass]="getLastPlanClass(i)">
+                  <!-- Display the feature limit if the feature matches -->
+                  <span *ngIf="detail.featureName === feature.featureName">
+                    {{ detail.featureLimit ? detail.featureLimit : '-' }} {{ detail.unitOfMeasurementName || '' }}
+                  </span>
+                </ng-container>
+              </ng-container>
+          
+              <!-- Fallback if the feature is not present in the plan -->
+              <ng-template #noFeature>
+                <span class="text-col">-</span>
+              </ng-template>
+              
             </td>
-          <td class="plan-header">-</td>
-
+          
+            <td class="plan-header">-</td>
           </tr>
+          
+          
         </tbody>
       </table>
     </div>
   </div>
+  
 </div>
 
 <!-- </div> -->
@@ -96,7 +123,7 @@
       Please press yes button to confirm changing your current subscription plan to ({{selectedPlanName}})
   </p>
   <p>
-    *Note:- you will be on the new plan starting from the next month.
+     <span class="star-col">*</span> Note:- you will be on the new plan starting from the next month.
 </p>
   </div>
 

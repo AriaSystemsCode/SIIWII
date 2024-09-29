@@ -57,21 +57,37 @@ color:  #1B101B;
 
 
 ::ng-deep {
+  .scroll-container {
+    height: 50vh;
+    overflow-y: auto;
+    box-sizing: border-box;  /* Ensure padding is inside the element */
+    padding: 0;              /* Remove padding from the scroll container */
+    margin: 0;               /* Optional: ensure no margins interfere */
+  }
   
 ::-webkit-scrollbar {
-    width: 4px !important; /* Set the width of the scrollbar */
+    width: 8px !important; /* Set the width of the scrollbar */
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #888 !important; /* Set the color of the thumb (the draggable part) */
-    border-radius: 2px !important; /* Set the border radius to round the edges */
+
+  border-radius: 20px;
+  background: #FFF;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  
 }
 
 ::-webkit-scrollbar-track {
-    background-color: #fff !important; /* Set the color of the track (the non-draggable part) */
+    background-color: #D9D9D9 !important; /* Set the color of the track (the non-draggable part) */
+    
 }
 .table-container {
   width: 100%;
+}
+.p-button:enabled:hover {
+  background: #fff !important;
+  color: #4A0D4A !important;
+  border: none !important;
 }
 
 .vertical-header-table {
@@ -79,8 +95,8 @@ color:  #1B101B;
   border-collapse: collapse;
   table-layout: fixed; // Ensure columns have equal width
 }
-.reg-border {
-
+.star-col {
+  color: #F6851D;
 }
 .vertical-header-table th,
 .vertical-header-table td {
@@ -145,19 +161,34 @@ color:  #1B101B;
   button {
     background-color: #4A0D4A !important;
     color: white !important;
-    border-radius: 5px !important;
+    border-radius: 12px !important;
+ 
+padding: 8px 32px;
+
+
   }
 
 }
-
+.pr-font{
+  font-weight: 700;
+}
 .p-button-no{
   button {
-  background-color: white !important;
+    border-radius: 12px;
+border: 1px solid rgba(238, 238, 238, 0.93);
+box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.10);
+
   color: #4A0D4A !important;
-  border-radius: 5px !important;
+ 
   }
 }
-
+.p-dialog {
+  border-radius: 20px;
+border: 1px solid #EEE;
+background: #FFF;
+padding: 24px 24px 32px 24px;
+box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.15);
+}
   .p-dialog .p-dialog-header {
     border:  none !important;
   }
@@ -167,7 +198,6 @@ font-size: 24px !important;
 line-height: 36px;
 
 color: #1B101B !important;
-
 
 
   }
@@ -189,6 +219,7 @@ color: #9E9E9E;
   
 }
 
+
 .last-row-border {
   border-bottom: 2px solid #837F7F !important;
 
@@ -198,7 +229,15 @@ color: #9E9E9E;
   border-right: 2px solid #837F7F !important;
 }
 
- 
+.text-col {
+
+
+color: #9E9E9E !important;
+
+
+
+
+ }
   .top-left {
     border-bottom: none;
        
@@ -258,7 +297,7 @@ color: #16B455;
   .default-class {
     color: #1B101B;
   }
-  .default-class-b {
+  .default-class-b ,.sales-btn {
     background-color: #1B101B;
   }
   .sil-btn { 
