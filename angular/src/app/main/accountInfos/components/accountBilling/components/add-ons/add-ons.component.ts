@@ -31,9 +31,12 @@ export class AddOnsComponent extends AppComponentBase implements AfterViewInit  
   @ViewChild('addbtn') addbtn: ElementRef;
   tenantId = this.appSession.tenantId;
   tenantSubscriptionPlanId:Observable<number>;
-  progressValue = 50  ;
+  // progressValue = 50  ;
   progress=0.1;
-  
+  addons: any[];
+  progressValue = 80; // Dynamic progress value (can be set dynamically)
+  radius = 23.6889; // Radius from the circle (same as the 'r' attribute in the <circle>)
+  circumference = 2 * Math.PI * this.radius; // Full circumference of the circle
   constructor( injector: Injector,
     private _appSubscriptionPlanDetailsServiceProxy: AppSubscriptionPlanDetailsServiceProxy,
     private _appTenantSubscriptionPlansServiceProxy:AppTenantSubscriptionPlansServiceProxy,
@@ -45,33 +48,54 @@ export class AddOnsComponent extends AppComponentBase implements AfterViewInit  
  /*  ngAfterViewInit(): void {
     throw new Error('Method not implemented.');
   } */
-    async ngOnInit()
+     ngOnInit()
     {
-      this.progress = 0.1;
-       
+      this.setProgress(this.progressValue);
+      // this.progress = 0.1;
+      // this.addons = [
+      //   {
+      //     id: '1000',
+      //     code: 'f230fh0g3',
+      //     name: 'Bamboo Watch',
+      //     description: 'Product Description',
+      //     image: 'bamboo-watch.jpg',
+      //     price: 65,
+      //     category: 'Accessories',
+      //     quantity: 24,
+      //     inventoryStatus: 'INSTOCK',
+      //     rating: 5
+      // },
+      // ]
+       this.getAppTenantAddOns()
     }
-    async getAppTenantAddOns(event?: LazyLoadEvent)
-{
-  if (this.primengTableHelper.shouldResetPaging(event)) {
-    this.paginator.changePage(0);
-    //return;
-}
 
-this.primengTableHelper.showLoadingIndicator();
-  this.tenantSubscriptionPlanId = this._appTenantSubscriptionPlansServiceProxy.getTenantSubscriptionPlanId(this.tenantId);
-  var header = await this.tenantSubscriptionPlanId.toPromise();
-  this._appSubscriptionPlanDetailsServiceProxy.getAll(
-    null,    null,    null,    null,  null ,    null,
-    null,    null,    null,    null,    null,    null, null,    null, 
-    null,    null, null,    null,
-    null,  header,  null,   true,null,     0,    100).subscribe(result => {
-    this.primengTableHelper.totalRecordsCount = result.totalCount;
-    this.primengTableHelper.records = result.items;
-    this.primengTableHelper.hideLoadingIndicator();
-    //this.cdr.detectChanges();
-});
 
-} 
+    getAppTenantAddOns() {
+      this._appTenantSubscriptionPlansServiceProxy.getTenantSubscriptionPlanId(this.tenantId).subscribe(
+        (tenantSubscriptionPlanId: number) => {
+          console.log(tenantSubscriptionPlanId, ' tenantSubscriptionPlanId');
+    
+          var header = tenantSubscriptionPlanId;
+    
+          this._appSubscriptionPlanDetailsServiceProxy.getAll(
+            null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, 
+            null, null, null, null,
+            null, header, null, true, null, 0, 100
+          ).subscribe(result => {
+            this.primengTableHelper.totalRecordsCount = result.totalCount;
+            this.addons = result.items;
+            console.log(this.addons,'lklklklkk')
+            // this.primengTableHelper.hideLoadingIndicator();
+            //this.cdr.detectChanges();
+          });
+        },
+        (error) => {
+          console.error('Error fetching subscription plan ID', error);
+        }
+      );
+    }
+
 reloadPage(): void {
   this.paginator.changePage(this.paginator.getPage());
 }
@@ -136,5 +160,25 @@ ngAfterViewChecked(): void {
 
   });
 }
+}
+
+
+setProgress(value: number) {
+  const circle = document.querySelector('.progress-ring__circle') as SVGCircleElement;
+
+  if (circle) {
+    // Calculate and set the stroke-dasharray (full length of the circle)
+    circle.style.strokeDasharray = `${this.circumference} ${this.circumference}`;
+
+    // Calculate the offset based on the progress value (the visible part)
+    const offset = this.circumference - (value / 100) * this.circumference;
+
+    // Apply the stroke-dashoffset to control how much of the circle is visible
+    circle.style.strokeDashoffset = `${offset}`;
+
+    // Optional: Rotate the progress circle so that it starts at the top
+    circle.style.transform = 'rotate(-90deg)';
+    circle.style.transformOrigin = '50% 50%';
+  }
 }
 }

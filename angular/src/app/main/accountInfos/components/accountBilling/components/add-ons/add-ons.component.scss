@@ -21,6 +21,7 @@
     background: var(--Primary-Color, #4A0D4A);
     color: #FFFFFF;
     font-family: Poppins;font-size: 16px;font-weight: 600;line-height: 24px;text-align: left;
+    text-align: center;
   }
   .price-txt
   {
@@ -53,4 +54,133 @@
     
     //position: relative;
     //left:auto;
+  }
+
+  ::ng-deep {
+    .p-inputnumber-buttons-stacked .p-inputnumber-input {
+      width: 28px !important;
+    }
+    .p-inputnumber-buttons-stacked .p-inputnumber-button-group .p-button.p-inputnumber-button {
+      width: 18px !important;
+    }
+    .p-inputtext{
+      border-radius: 2px 0px 0px 2px !important;
+border: 1px solid #ECECEC !important;
+background: #FFF !important;
+    }
+    .p-inputtext:enabled:focus {
+      box-shadow:  none !important;
+    }
+    .p-datatable .p-datatable-thead > tr > th {
+      border-radius: 10px 10px 0px 0px !important;
+      border: 1px solid #EEE !important;
+      background: rgba(248, 248, 248, 0.98) !important;
+      text-align: center !important;
+    }
+    .p-datatable .p-datatable-tbody > tr > td {
+      border: 1px solid #EEE !important;
+      text-align: center !important;
+
+    }
+    .first-col svg {
+      margin: auto;
+    }
+    .container {
+      margin-top: 15px;
+    }
+  }
+.table-bordered th, .table-bordered td{
+    border:  none !important;
+  }
+  .progress-circle {
+    margin: auto;
+    display: inline-block;
+    position: relative;
+    width: 52px;
+    height: 52px;
+  }
+  
+  .progress-ring {
+    transform: rotate(-90deg); /* Start progress at the top */
+  }
+  
+  .progress-ring__circle {
+    transition: stroke-dashoffset 0.35s ease; /* Smooth transition */
+    transform-origin: 50% 50%;
+    // stroke-dasharray: 148; /* To be calculated dynamically */
+    // stroke-dashoffset: 148; /* Initial value */
+  }
+  
+  .progress-ring__circle-bg {
+    opacity: 0.15;
+  }
+  
+  .progress-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: #4a0d4a;
+  }
+  
+
+  .summary {
+
+padding: 16px 4px;
+border-radius: 10px;
+border: none;
+background: #FFF;
+  }
+
+
+  .header {
+    padding: 10px;
+  }
+
+  .totals{
+    padding: 6px;
+  }
+
+  .add-p {
+    display: flex;
+padding: 9px 30px;
+justify-content: center;
+align-items: center;
+gap: 10px;
+border-radius: 6px;
+background: #4A0D4A;
+color: #FFF;
+margin: auto;
+  }
+
+  .add-head {
+    font-size: 20px;
+font-weight: 600;
+color: #1B101B;
+  }
+
+  .qty {
+    color: #1B101B;
+
+font-size: 16px;
+font-weight: 700;
+line-height: normal;
+  }
+
+  .head-th {
+    color: #777;
+font-family: Poppins;
+font-size: 12px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+  }
+
+  .feature {
+    color: #777;
+font-size: 12px;
+font-weight: 600;
+
   }
