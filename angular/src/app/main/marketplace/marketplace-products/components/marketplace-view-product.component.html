@@ -120,18 +120,7 @@
                                                 "
                                             >
                                                 <tr *ngIf="size.orderedQty !== 0">
-                                                    <!-- <td>
-                                                            <img
-                                                            style="width: 24px; height: 24px; border-radius: 6px;"
-                                                       
-                                                    
-                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                                    
-                                                    
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                                    
-                                                    />
-                                                </td> -->
                                                     <td>{{ size.label }}</td>
                                                     <td>{{ size.orderedQty }}</td>
                                                     <td>{{ size.price| currency:' ' }}</td>
@@ -204,19 +193,7 @@
                                                 "
                                             >
                                                 <tr>
-                                                    <td>
-                                                        <img
-                                                        style="width: 24px; height: 24px; border-radius: 6px;"
-                                                   
-                                                
-                                                    [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                    alt=" {{ order.color.colorName }}"
-                                               
-                                                
-                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                              
-                                                />
-                                            </td>
+                                            >
                                                     <td>{{ size.label }}</td>
                                                     <td>
                                                         {{
@@ -245,6 +222,29 @@
                                                         )
             
                                                         }}
+                                                    </td>
+                                                    <td>
+                                                        <a
+                                                          
+                                                            (click)="
+                                                                removeSize(
+                                                                    i,
+                                                                    size,
+                                                                    order,
+                                                                    orderIndex
+                                                                )
+                                                            "
+                                                     
+                                                        >
+                                                        <img
+                                           
+                                                        class="mt-2"
+                                                        src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
+                                                        style=" border-radius: 6px;"
+                                                    
+                                                    
+                                                    />
+                                                    </a>
                                                     </td>
                                                 </tr>
                                             </ng-container>
@@ -1062,19 +1062,7 @@
                                     "
                                 >
                                     <tr>
-                                        <td>
-                                            <img
-                                            style="width: 24px; height: 24px; border-radius: 6px;"
-                                       
-                                    
-                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                        alt=" {{ order.color.colorName }}"
-                                   
-                                    
-                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                  
-                                    />
-                                </td>
+                                
                                         <td>{{ size.label }}</td>
                                         <td>
                                             {{
@@ -1103,6 +1091,29 @@
                                             )
 
                                             }}
+                                        </td>
+                                        <td>
+                                            <a
+                                              
+                                                (click)="
+                                                    removeSize(
+                                                        i,
+                                                        size,
+                                                        order,
+                                                        orderIndex
+                                                    )
+                                                "
+                                         
+                                            >
+                                            <img
+                               
+                                            class="mt-2"
+                                            src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
+                                            style=" border-radius: 6px;"
+                                        
+                                        
+                                        />
+                                        </a>
                                         </td>
                                     </tr>
                                 </ng-container>
@@ -1994,19 +2005,7 @@
                                                     "
                                                 >
                                                     <tr>
-                                                        <td>
-                                                            <img
-                                                            style="width: 24px; height: 24px; border-radius: 6px;"
-                                                       
-                                                    
-                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                        alt=" {{ order.color.colorName }}"
-                                                   
-                                                    
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                                  
-                                                    />
-                                                </td>
+                                             
                                                         <td>{{ size.label }}</td>
                                                         <td>
                                                             {{
@@ -2035,6 +2034,30 @@
                                                             )
                 
                                                             }}
+                                                        </td>
+
+                                                        <td>
+                                                            <a
+                                                              
+                                                                (click)="
+                                                                    removeSize(
+                                                                        i,
+                                                                        size,
+                                                                        order,
+                                                                        orderIndex
+                                                                    )
+                                                                "
+                                                         
+                                                            >
+                                                            <img
+                                               
+                                                            class="mt-2"
+                                                            src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
+                                                            style=" border-radius: 6px;"
+                                                        
+                                                        
+                                                        />
+                                                        </a>
                                                         </td>
                                                     </tr>
                                                 </ng-container>
