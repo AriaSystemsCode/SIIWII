@@ -15,6 +15,7 @@ namespace onetouch.Accounts.Dtos
 
         //MMT10
         public bool IsPublished { get; set; }
+        public bool IsSync { get; set; }
         //MMT10
     }
 }

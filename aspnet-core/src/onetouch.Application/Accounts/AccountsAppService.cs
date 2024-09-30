@@ -656,10 +656,19 @@ namespace onetouch.Accounts
                 if (output.Account.CoverUrl != null) output.Account.CoverUrl = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.CoverUrl;
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
                 long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                var publishedRecord = await _appContactRepository.GetAll().Where(x => x.TenantId == null && x.PartnerId == account.Id &&
-                !x.IsProfileData && x.AccountId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId).FirstOrDefaultAsync();
+                //var publishedRecord = await _appContactRepository.GetAll().Where(x => x.TenantId == null && x.PartnerId == account.Id &&
+                //!x.IsProfileData && x.AccountId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId).FirstOrDefaultAsync();
+                var publishedRecord = await _appMarketplaceContactRepository.GetAll()
+                                  .AsNoTracking()
+                                  .FirstOrDefaultAsync(x => x.TenantId == null
+                                  && x.IsProfileData == true
+                                  && x.OwnerId == account.TenantId
+                                  && x.SSIN == account.SSIN);
+                output.IsSync = false;
+                output.IsPublished = false;
                 if (publishedRecord != null)
                 {
+                    output.IsSync = (publishedRecord.LastModificationTime != entity.LastModificationTime);
                     output.IsPublished = true;
                 }
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
@@ -2050,21 +2059,22 @@ namespace onetouch.Accounts
                                                 && x.OwnerId == contact.TenantId
                                                 && x.SSIN == contact.SSIN);
 
-                    // if profile already published-and not sync - return
-                    if (publishContact != null && !sync)
-                    {
-                        if (publishContact.IsHidden)
-                        { //restore hidden field
-                            publishContact.IsHidden = false;
-                            sync = true;
+                    //// if profile already published-and not sync - return
+                    //if (publishContact != null && !sync)
+                    //{
+                    //    if (publishContact.IsHidden)
+                    //    { //restore hidden field
+                    //        publishContact.IsHidden = false;
+                    //        sync = true;
 
-                        }
-                        else
-                        {
-                            // if profile already published-and not sync - return
-                            return;
-                        }
-                    }
+                    //    }
+                    //    else
+                    //    {
+                    //        // if profile already published-and not sync - return
+                    //        sync = true;
+                    //        //return;
+                    //    }
+                    //}
                     
 
                     CreateOrEditMarketplaceAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditMarketplaceAccountInfoDto();
