@@ -362,10 +362,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     loadInitData(){
-        if(this.accountInfoTemp){
+        if(this.accountInfoTemp)
         this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
-    //    this.accountInfoTemp.languageId=;
-        }
+
         this.defineAccountTypes();
         this.getLanguages();
         this.getCurrencies();
@@ -486,7 +485,21 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         if(!this.accountInfoTemp.contactPaymentMethods) this.accountInfoTemp.contactPaymentMethods = []
         if(!this.accountInfoTemp.branches) this.accountInfoTemp.branches = []
 
-        if(!this.accountInfoTemp.id)  this.changeTab(this.accountInfoPageTabsEnum.ProfileCreateOrEdit)
+        if(!this.accountInfoTemp.id) 
+            {
+               this.changeTab(this.accountInfoPageTabsEnum.ProfileCreateOrEdit)
+               if(!this.accountInfoTemp.languageId){
+
+                this._AccountsServiceProxy.getMyAccountForEdit().subscribe(result=>{
+                    if(result){
+                        this.languageIdName=result.languageName;
+                        this.accountInfoTemp.languageId=result.accountInfo.languageId;
+
+                    }
+
+                })
+               }
+            }
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;
         this.setDefaultPhoneTypes();
