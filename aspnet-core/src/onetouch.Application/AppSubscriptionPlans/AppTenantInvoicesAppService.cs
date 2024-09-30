@@ -99,7 +99,7 @@ namespace onetouch.AppSubscriptionPlans
                             PayDate = o.PayDate,
                             Id = o.Id,
                             Attachment = !string.IsNullOrEmpty(o.Attachment) ? (pathSource + o.Attachment) : null,
-                            DisplayName = o.DisplayName.TrimEnd() + Path.GetExtension(o.Attachment), //Path.GetFileNameWithoutExtension(templateFileName) + DateTime.Now.ToString("yyyyMMddhhmmss") + Path.GetExtension(templateFileName);
+                            DisplayName = !string.IsNullOrEmpty(o.DisplayName) ?(o.DisplayName.TrimEnd() + Path.GetExtension(o.Attachment)):""
                         }
                     };
 

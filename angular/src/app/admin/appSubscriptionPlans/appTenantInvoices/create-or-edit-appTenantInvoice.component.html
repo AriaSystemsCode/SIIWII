@@ -30,7 +30,19 @@
         <div class="kt-portlet kt-portlet--mobile">
             <div class="kt-portlet__body">              
                 
-                
+                <div class="form-group">
+					<label for="AppTenantInvoice_TenantId">{{l("TenantName")}}</label>
+					<p-dropdown [options]="TenantList"
+					optionLabel="name"
+					placeholder="Select Tenant" 
+					(onChange)="onChange($event)"
+					optionLabel="name"
+					optionValue="id"
+					[(ngModel)]="appTenantInvoice.tenantId"
+					name="tenantSelection" >
+		</p-dropdown>
+					
+				</div>
 								<div class="form-group">
 									<label for="AppTenantInvoice_InvoiceNumber">{{l("InvoiceNumber")}} *</label>
 									<input type="text" #AppTenantInvoice_InvoiceNumber="ngModel" id="AppTenantInvoice_InvoiceNumber" class="form-control" [(ngModel)]="appTenantInvoice.invoiceNumber" name="InvoiceNumber"   minlength="0"  maxlength="12"  required/>
@@ -68,10 +80,10 @@
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
                         <span>{{l("Save")}}</span>
                     </button>
-                    <button *ngIf="!this.appTenantInvoice.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
+                    <!-- <button *ngIf="!this.appTenantInvoice.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
                         <span>{{l("SaveAndNew")}}</span>
-                    </button>
+                    </button> -->
 				</div>
 		    </div>
         </div>
