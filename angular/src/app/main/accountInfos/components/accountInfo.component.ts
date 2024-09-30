@@ -362,6 +362,10 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     loadInitData(){
+        if(this.accountInfoTemp){
+        this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
+    //    this.accountInfoTemp.languageId=;
+        }
         this.defineAccountTypes();
         this.getLanguages();
         this.getCurrencies();
