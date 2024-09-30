@@ -195,14 +195,14 @@
                             <ng-template pTemplate="header">
                                 <tr>
                                     <th style="width: 130px" [hidden]="!isGrantedAny('Pages.Administration.AppSubscriptionPlanDetails.Edit', 'Pages.Administration.AppSubscriptionPlanDetails.Delete')">{{l('Actions')}}</th>
-                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanHeaderFk.">
-                                        {{l('')}}
-                                        <p-sortIcon field="appSubscriptionPlanHeader"></p-sortIcon>
+                                    <th style="width: 150px" pSortableColumn="appSubscriptionPlanHeaderCode">
+                                        {{l('AppSubscriptionPlanCode')}}
+                                        <p-sortIcon field="appSubscriptionPlanDetail.appSubscriptionPlanHeaderCode"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="appFeatureFk.description">
+                                    <!-- <th style="width: 150px" pSortableColumn="appFeatureFk.description">
                                         {{l('Description')}}
                                         <p-sortIcon field="appFeatureDescription"></p-sortIcon>
-                                    </th>
+                                    </th> -->
                                     <th style="width: 150px" pSortableColumn="featureCode">
                                         {{l('FeatureCode')}}
                                         <p-sortIcon field="appSubscriptionPlanDetail.featureCode"></p-sortIcon>
@@ -300,12 +300,12 @@
                                     </td>
                                     <td style="width:150px">
 												<!-- <span class="ui-column-title"> {{l('')}}</span> -->
-												{{record.appSubscriptionPlanHeader}}
+												{{record.appSubscriptionPlanDetail.appSubscriptionPlanHeaderCode}}
 											</td>
-                                    <td style="width:150px">
-												<!-- <span class="ui-column-title"> {{l('Description')}}</span> -->
+                                    <!-- <td style="width:150px">
+												 <span class="ui-column-title"> {{l('Description')}}</span> 
 												{{record.appFeatureDescription}}
-											</td>
+											</td> -->
                                     <td style="width:150px">
 											<!-- <span class="ui-column-title"> {{l('FeatureCode')}}</span> -->
 											{{record.appSubscriptionPlanDetail.featureCode}}

@@ -88,6 +88,9 @@ namespace onetouch.AppEntities
 		Task<bool> IsCodeExisting(AppEntityDto input);
 		Task<LookupLabelDto> ConvertAppEntityDtoToLookupLabelDto(AppEntityDto input);
         Task<AppEntityDto> ConvertAppLookupLabelDtoToEntityDto(LookupLabelDto input);
-
+		//MMT-43
+		Task<List<LookupLabelDto>> GetAllUOMForTableDropdown();
+		//Task<List<LookupLabelDto>> GetAllFeatureCategoryForTableDropdown();
+		//MMT-43
     }
 }

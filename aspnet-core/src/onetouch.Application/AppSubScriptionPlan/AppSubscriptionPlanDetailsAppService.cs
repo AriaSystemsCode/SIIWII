@@ -97,6 +97,7 @@ namespace onetouch.AppSubScriptionPlan
                                                  o.Trackactivity,
                                                  Id = o.Id,
                                                  AppFeatureId = o.AppFeatureId,
+                                                 s1.Code
                                                  //AppSubscriptionPlanHeader = o1 == null ? "" : o1.ToString(),
                                                  //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
                                              };
@@ -130,7 +131,8 @@ namespace onetouch.AppSubScriptionPlan
                         FeatureCategory = o.FeatureCategory,
                         Trackactivity = o.Trackactivity,
                         Id = o.Id,
-                        AppFeatureId = o.AppFeatureId
+                        AppFeatureId = o.AppFeatureId,
+                        AppSubscriptionPlanHeaderCode = o.Code
                     },
                    // AppSubscriptionPlanHeader = o.AppSubscriptionPlanHeader,
                    // AppFeatureDescription = o.AppFeatureDescription
@@ -206,8 +208,8 @@ namespace onetouch.AppSubScriptionPlan
         protected virtual async Task Create(CreateOrEditAppSubscriptionPlanDetailDto input)
         {
             var appSubscriptionPlanDetail = ObjectMapper.Map<AppSubscriptionPlanDetail>(input);
-
-            await _appSubscriptionPlanDetailRepository.InsertAsync(appSubscriptionPlanDetail);
+            appSubscriptionPlanDetail.Category = appSubscriptionPlanDetail.FeatureCategory;
+              await _appSubscriptionPlanDetailRepository.InsertAsync(appSubscriptionPlanDetail);
 
         }
 

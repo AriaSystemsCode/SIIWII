@@ -1,7 +1,7 @@
-﻿import { Component, ViewChild, Injector, Output, EventEmitter, OnInit} from '@angular/core';
+﻿import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, HostListener, ElementRef} from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
-import { AppFeaturesServiceProxy, CreateOrEditAppFeatureDto, SycEntityObjectStatusLookupTableDto } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppEntityCategoryDto, AppFeaturesServiceProxy, CreateOrEditAppFeatureDto, LookupLabelDto, SycEntityObjectStatusLookupTableDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,10 +20,17 @@ export class CreateOrEditAppFeatureComponent extends AppComponentBase implements
     active = false;
     saving = false;
     featureStatusList: SycEntityObjectStatusLookupTableDto[];
+    unitOfMeasurementList: LookupLabelDto[];
+    featureCategoryList: LookupLabelDto[];
     appFeature: CreateOrEditAppFeatureDto = new CreateOrEditAppFeatureDto();
+    value: string = '';
+    
     selectedItem:"";
-
-
+    options: { label: string, value: string }[] = [
+        { label: this.l("Absolute"), value: this.l("Absolute") },
+        { label: this.l("Monthly"), value: this.l("Monthly") },
+        { label: this.l('Yearly'), value: this.l('Yearly')}
+      ];
 
 
 
@@ -31,6 +38,7 @@ export class CreateOrEditAppFeatureComponent extends AppComponentBase implements
         injector: Injector,
         private _activatedRoute: ActivatedRoute,        
         private _appFeaturesServiceProxy: AppFeaturesServiceProxy,
+        private _appEntitiesServiceProxy:AppEntitiesServiceProxy,
         private _router: Router
     ) {
         super(injector);
@@ -43,6 +51,17 @@ export class CreateOrEditAppFeatureComponent extends AppComponentBase implements
         .subscribe((res: any) => {
             this.featureStatusList = res;
         });
+
+ this._appEntitiesServiceProxy.getAllUOMForTableDropdown()
+.subscribe((resuom: any) => {
+    this.unitOfMeasurementList = resuom;
+});
+ this._appEntitiesServiceProxy.getAllFeatureCategoryForTableDropdown()
+.subscribe((resuom: any) => {
+    this.featureCategoryList = resuom;
+});
+this.appFeature.entityCategories=[];
+
     }
 
     show(appFeatureId?: number): void {
@@ -75,7 +94,8 @@ export class CreateOrEditAppFeatureComponent extends AppComponentBase implements
             }))
             .subscribe(x => {
                  this.saving = false;               
-                 this.notify.info(this.l('SavedSuccessfully'));
+                 this.message.info(this.l("AppFeature")+" "+this.appFeature.code+" "+this.l('SavedSuccessfully'), this.l("AppFeature"));
+                 //this.notify.info(this.l('SavedSuccessfully'));
                  this._router.navigate( ['/app/admin/appSubScriptionPlan/appFeatures']);
             })
     }
@@ -94,7 +114,30 @@ export class CreateOrEditAppFeatureComponent extends AppComponentBase implements
             });
     }
 
-
+    onInputChange(event: any) {
+        let input = event.target.value;
+        // Remove invalid characters and limit to two decimal places
+        input = input.replace(/[^0-9.]/g, '');
+        const decimalSplit = input.split('.');
+        
+        if (decimalSplit[1] && decimalSplit[1].length > 2) {
+          input = `${decimalSplit[0]}.${decimalSplit[1].substring(0, 2)}`;
+        }
+    
+        this.value = input;
+      }
+      old_price =0;
+      currencyCheck() : boolean
+      {
+        let pattern = /^\d+\.?\d{0,2}$/;
+        let result = pattern.test(this.appFeature.unitPrice.toString());
+        if (!result) 
+          this.appFeature.unitPrice = this.old_price;
+        else 
+          this.old_price = this.appFeature.unitPrice;
+        return result;
+      }
+    
 
 
 
