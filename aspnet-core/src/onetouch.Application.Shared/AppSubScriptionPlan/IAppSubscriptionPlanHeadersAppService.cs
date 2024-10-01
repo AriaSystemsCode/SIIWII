@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using onetouch.AppSubScriptionPlan.Dtos;
 using onetouch.Dto;
+using onetouch.SystemObjects.Dtos;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -20,6 +22,7 @@ namespace onetouch.AppSubScriptionPlan
         Task Delete(EntityDto<long> input);
 
         Task<FileDto> GetAppSubscriptionPlanHeadersToExcel(GetAllAppSubscriptionPlanHeadersForExcelInput input);
+        Task<List<SycEntityObjectStatusLookupTableDto>> GetPlanStatusList();
 
     }
 }

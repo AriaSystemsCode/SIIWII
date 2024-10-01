@@ -129,7 +129,7 @@ namespace onetouch.AppSubScriptionPlan
                         TenantName = o.TenantName,
                         UserId = o.UserId,
                         ActivityType = o.ActivityType,
-                        AppSubscriptionPlanHeaderId = long.Parse(o.AppSubscriptionPlanHeaderId.ToString()),
+                        AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId !=null ? long.Parse(o.AppSubscriptionPlanHeaderId.ToString()):0,
                         AppSubscriptionPlanCode = o.AppSubscriptionPlanCode,
                         ActivityDateTime = o.ActivityDateTime,
                         UserName = o.UserName,
@@ -566,7 +566,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.RemainingQty = 0;
                     obj.Price = featureDetail.UnitPrice;
                     obj.Reference = reference;
-                    obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderId;
+                    obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? 0 : tenantPlan.AppSubscriptionPlanHeaderId;
                     obj.AppSubscriptionPlanCode = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderFk.Code;
                     obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString();
                     obj.Name = obj.Code;

@@ -142,6 +142,7 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
         CountoModule,
         NgxChartsModule,
         NgImageSliderModule,
+        AppTenantActivitiesLogComponent
     ],
     providers: [
         {

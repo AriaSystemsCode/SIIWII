@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
@@ -20,6 +21,7 @@ namespace onetouch.AppSubScriptionPlan
         Task Delete(EntityDto<long> input);
 
         Task<FileDto> GetAppTenantSubscriptionPlansToExcel(GetAllAppTenantSubscriptionPlansForExcelInput input);
-
+        Task<List<TenantInformation>> GetTenantsList();
+        Task<GetAppTenantSubscriptionPlanForEditOutput> GetAppTenantSubscriptionPlanByTenantIdForEdit(long input);
     }
 }

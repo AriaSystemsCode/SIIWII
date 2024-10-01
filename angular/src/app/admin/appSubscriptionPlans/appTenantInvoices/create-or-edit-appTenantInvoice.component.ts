@@ -1,7 +1,7 @@
 ﻿import { Component, ViewChild, Injector, Output, EventEmitter, OnInit} from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
-import { AppTenantInvoicesServiceProxy, CreateOrEditAppTenantInvoiceDto } from '@shared/service-proxies/service-proxies';
+import { AppTenantInvoicesServiceProxy, AppTenantSubscriptionPlansServiceProxy, CreateOrEditAppTenantInvoiceDto, TenantInformation } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -21,7 +21,8 @@ export class CreateOrEditAppTenantInvoiceComponent extends AppComponentBase impl
     saving = false;
     
     appTenantInvoice: CreateOrEditAppTenantInvoiceDto = new CreateOrEditAppTenantInvoiceDto();
-
+    TenantList: TenantInformation[];
+    //private _appTenantSubscriptionPlansServiceProxy: any;
 
 
 
@@ -31,6 +32,7 @@ export class CreateOrEditAppTenantInvoiceComponent extends AppComponentBase impl
         injector: Injector,
         private _activatedRoute: ActivatedRoute,        
         private _appTenantInvoicesServiceProxy: AppTenantInvoicesServiceProxy,
+        private _appTenantSubscriptionPlansServiceProxy: AppTenantSubscriptionPlansServiceProxy,
         private _router: Router
     ) {
         super(injector);
@@ -38,9 +40,20 @@ export class CreateOrEditAppTenantInvoiceComponent extends AppComponentBase impl
 
     ngOnInit(): void {
         this.show(this._activatedRoute.snapshot.queryParams['id']);
-        
+        this._appTenantSubscriptionPlansServiceProxy.getTenantsList()
+        .subscribe((tenantLst: any) => {
+            this.TenantList = tenantLst;
+        });
     }
-
+    onChange(op: any){
+        const pos = this.TenantList.findIndex(z=>z.id==op.value);
+        var tenObj = this.TenantList[pos];
+       if (tenObj != undefined)
+       {
+         this.appTenantInvoice.tenantName = tenObj.name;
+        // this.appTenantSubscriptionPlan.tenantId = op.value;
+       }
+     }
     show(appTenantInvoiceId?: number): void {
 
         if (!appTenantInvoiceId) {

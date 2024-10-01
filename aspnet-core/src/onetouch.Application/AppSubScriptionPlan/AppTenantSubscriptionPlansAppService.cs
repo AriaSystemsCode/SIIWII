@@ -16,6 +16,11 @@ using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Abp.MultiTenancy;
+using onetouch.Authorization.Users;
+using onetouch.MultiTenancy;
+using Abp.Domain.Uow;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -25,12 +30,14 @@ namespace onetouch.AppSubScriptionPlan
         private readonly IRepository<AppTenantSubscriptionPlan, long> _appTenantSubscriptionPlanRepository;
         private readonly IAppTenantSubscriptionPlansExcelExporter _appTenantSubscriptionPlansExcelExporter;
         private readonly Helper _helper;
+        private IRepository<Tenant> _TenantRepository { get; set; }
         public AppTenantSubscriptionPlansAppService(IRepository<AppTenantSubscriptionPlan, long> appTenantSubscriptionPlanRepository, 
-            IAppTenantSubscriptionPlansExcelExporter appTenantSubscriptionPlansExcelExporter, Helper helper)
+            IAppTenantSubscriptionPlansExcelExporter appTenantSubscriptionPlansExcelExporter, Helper helper, IRepository<Tenant> TenantRepository)
         {
             _appTenantSubscriptionPlanRepository = appTenantSubscriptionPlanRepository;
             _appTenantSubscriptionPlansExcelExporter = appTenantSubscriptionPlansExcelExporter;
             _helper = helper;
+            _TenantRepository = TenantRepository;
         }
 
         public async Task<PagedResultDto<GetAppTenantSubscriptionPlanForViewDto>> GetAll(GetAllAppTenantSubscriptionPlansInput input)
@@ -80,7 +87,7 @@ namespace onetouch.AppSubScriptionPlan
                     {
 
                         TenantName = o.TenantName,
-                        AppSubscriptionHeaderId = o.AppSubscriptionPlanHeaderId,
+                        AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                         SubscriptionPlanCode = o.SubscriptionPlanCode,
                         CurrentPeriodStartDate = o.CurrentPeriodStartDate,
                         CurrentPeriodEndDate = o.CurrentPeriodEndDate,
@@ -100,9 +107,10 @@ namespace onetouch.AppSubScriptionPlan
 
         }
 
+        [AllowAnonymous]
         public async Task<GetAppTenantSubscriptionPlanForViewDto> GetAppTenantSubscriptionPlanForView(long id)
         {
-            var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAsync(id);
+            var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(a => a.AppSubscriptionPlanHeaderFk).FirstOrDefaultAsync(z => z.Id == id);
 
             var output = new GetAppTenantSubscriptionPlanForViewDto { AppTenantSubscriptionPlan = ObjectMapper.Map<AppTenantSubscriptionPlanDto>(appTenantSubscriptionPlan) };
 
@@ -112,13 +120,25 @@ namespace onetouch.AppSubScriptionPlan
         [AbpAuthorize(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Edit)]
         public async Task<GetAppTenantSubscriptionPlanForEditOutput> GetAppTenantSubscriptionPlanForEdit(EntityDto<long> input)
         {
-            var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.FirstOrDefaultAsync(input.Id);
+            var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(a=>a.AppSubscriptionPlanHeaderFk).FirstOrDefaultAsync(z=>z.Id==input.Id);
 
             var output = new GetAppTenantSubscriptionPlanForEditOutput { AppTenantSubscriptionPlan = ObjectMapper.Map<CreateOrEditAppTenantSubscriptionPlanDto>(appTenantSubscriptionPlan) };
 
             return output;
         }
+        public async Task<GetAppTenantSubscriptionPlanForEditOutput> GetAppTenantSubscriptionPlanByTenantIdForEdit(long input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                GetAppTenantSubscriptionPlanForEditOutput output = new GetAppTenantSubscriptionPlanForEditOutput();
+                var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(a => a.AppSubscriptionPlanHeaderFk).FirstOrDefaultAsync(z => z.TenantId == input);
+                if (appTenantSubscriptionPlan != null)
+                    output = new GetAppTenantSubscriptionPlanForEditOutput { AppTenantSubscriptionPlan = ObjectMapper.Map<CreateOrEditAppTenantSubscriptionPlanDto>(appTenantSubscriptionPlan) };
 
+                return output;
+            }
+        }
+        //[AbpAuthorize(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Edit)]
         public async Task CreateOrEdit(CreateOrEditAppTenantSubscriptionPlanDto input)
         {
             if (input.Id == null)
@@ -142,7 +162,7 @@ namespace onetouch.AppSubScriptionPlan
             var entitySubPlanObjectType = await _helper.SystemTables.GetObjectStandardSubscriptionPlan();
             appTenantSubscriptionPlan.EntityObjectTypeId = entitySubPlanObjectType.Id;
             appTenantSubscriptionPlan.EntityObjectTypeCode = entitySubPlanObjectType.Code;
-            appTenantSubscriptionPlan.TenantId = null;
+           // appTenantSubscriptionPlan.TenantId = null;
             appTenantSubscriptionPlan.Name = input.TenantName + " " + input.SubscriptionPlanCode;
             appTenantSubscriptionPlan.Code = input.TenantId.ToString() + " " + input.SubscriptionPlanCode;
             await _appTenantSubscriptionPlanRepository.InsertAsync(appTenantSubscriptionPlan);
@@ -185,7 +205,7 @@ namespace onetouch.AppSubScriptionPlan
                              AppTenantSubscriptionPlan = new AppTenantSubscriptionPlanDto
                              {
                                  TenantName = o.TenantName,
-                                 AppSubscriptionHeaderId = o.AppSubscriptionPlanHeaderId,
+                                 AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                                  SubscriptionPlanCode = o.SubscriptionPlanCode,
                                  CurrentPeriodStartDate = o.CurrentPeriodStartDate,
                                  CurrentPeriodEndDate = o.CurrentPeriodEndDate,
@@ -199,6 +219,19 @@ namespace onetouch.AppSubScriptionPlan
 
             return _appTenantSubscriptionPlansExcelExporter.ExportToFile(appTenantSubscriptionPlanListDtos);
         }
+        public async Task<List<TenantInformation>> GetTenantsList()
+        { 
+            var tenantList = await _TenantRepository.GetAll().OrderBy(z=>z.Name).ToListAsync();
+            List<TenantInformation> listInfo = new List<TenantInformation>();
+            if (tenantList != null && tenantList.Count > 0)
+            { 
+                foreach (var tenant in tenantList)
+                {
+                    listInfo.Add(new TenantInformation {Id = tenant.Id, Name = tenant.Name });
+                }
+            }
+            return listInfo;
 
+        }
     }
 }

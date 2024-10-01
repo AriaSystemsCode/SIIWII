@@ -37,7 +37,7 @@ namespace onetouch.AppSubScriptionPlan
             _lookup_appFeatureRepository = lookup_appFeatureRepository;
 
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>> GetAll(GetAllAppSubscriptionPlanDetailsInput input)
         {
 
@@ -63,7 +63,7 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureBillingCodeFilter), e => e.FeatureBillingCode == input.FeatureBillingCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCategoryFilter), e => e.FeatureCategory == input.FeatureCategoryFilter)
                         .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity))
-                        //.WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanHeaderFilter), e => e.AppSubscriptionPlanHeaderFk != null && e.AppSubscriptionPlanHeaderFk. == input.AppSubscriptionPlanHeaderFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanHeaderFilter), e => e.AppSubscriptionPlanHeaderId == long.Parse(input.AppSubscriptionPlanHeaderFilter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter);
 
             var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails
@@ -97,6 +97,7 @@ namespace onetouch.AppSubScriptionPlan
                                                  o.Trackactivity,
                                                  Id = o.Id,
                                                  AppFeatureId = o.AppFeatureId,
+                                                 s1.Code
                                                  //AppSubscriptionPlanHeader = o1 == null ? "" : o1.ToString(),
                                                  //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
                                              };
@@ -130,7 +131,8 @@ namespace onetouch.AppSubScriptionPlan
                         FeatureCategory = o.FeatureCategory,
                         Trackactivity = o.Trackactivity,
                         Id = o.Id,
-                        AppFeatureId = o.AppFeatureId
+                        AppFeatureId = o.AppFeatureId,
+                        AppSubscriptionPlanHeaderCode = o.Code
                     },
                    // AppSubscriptionPlanHeader = o.AppSubscriptionPlanHeader,
                    // AppFeatureDescription = o.AppFeatureDescription
@@ -206,8 +208,8 @@ namespace onetouch.AppSubScriptionPlan
         protected virtual async Task Create(CreateOrEditAppSubscriptionPlanDetailDto input)
         {
             var appSubscriptionPlanDetail = ObjectMapper.Map<AppSubscriptionPlanDetail>(input);
-
-            await _appSubscriptionPlanDetailRepository.InsertAsync(appSubscriptionPlanDetail);
+            appSubscriptionPlanDetail.Category = appSubscriptionPlanDetail.FeatureCategory;
+              await _appSubscriptionPlanDetailRepository.InsertAsync(appSubscriptionPlanDetail);
 
         }
 

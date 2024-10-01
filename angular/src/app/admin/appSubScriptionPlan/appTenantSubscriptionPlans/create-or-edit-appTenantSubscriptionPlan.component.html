@@ -32,28 +32,51 @@
                 
                 
 								<div class="form-group">
-									<label for="AppTenantSubscriptionPlan_TenantId">{{l("TenantId")}}</label>
-									<input type="number" #AppTenantSubscriptionPlan_TenantId="ngModel" id="AppTenantSubscriptionPlan_TenantId" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.tenantId" name="TenantId"  />
-								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_TenantId"></validation-messages>
+									<label for="AppTenantSubscriptionPlan_TenantId">{{l("TenantName")}}</label>
+									<!-- <input type="number" #AppTenantSubscriptionPlan_TenantId="ngModel" id="AppTenantSubscriptionPlan_TenantId" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.tenantId" name="TenantId"  /> -->
+								    <!-- <validation-messages [formCtrl]="AppTenantSubscriptionPlan_TenantId"></validation-messages> -->
+									<p-dropdown [options]="TenantList"
+									optionLabel="name"
+									placeholder="Select Tenant" 
+									(onChange)="onChange($event)"
+									optionLabel="name"
+									optionValue="id"
+									[(ngModel)]="appTenantSubscriptionPlan.tenantId"
+									name="tenantSelection" >
+						</p-dropdown>
+									
 								</div>
 					
-								<div class="form-group">
+								<div class="form-group m-form__group">
+									<label for="AppSubscriptionPlanHeader">{{l("AppSubscriptionPlanHeader")}}</label>
+									<div class="input-group">
+										<input class="form-control" id="AppSubscriptionPlanHeader" name="appSubscriptionPlanHeader" [(ngModel)]="appTenantSubscriptionPlan.subscriptionPlanCode" type="text" disabled>     
+										<div class="input-group-append">
+											<button class="btn btn-primary blue" (click)="openSelectAppSubscriptionPlanHeaderModal()" type="button"><i class="fa fa-search"></i> {{l("Pick")}}</button>
+										</div> <div class="input-group-prepend">
+											<button class="btn btn-danger btn-icon" type="button" (click)="setAppSubscriptionPlanHeaderIdNull()"><i class="fa fa-times"></i></button>
+										</div>
+									</div>
+								</div>
+								<input class="form-control" name="AppSubscriptionHeaderId" [(ngModel)]="appTenantSubscriptionPlan.appSubscriptionPlanHeaderId" type="text" required hidden>
+								<input class="form-control" name="AppSubscriptionHeaderCode" [(ngModel)]="appTenantSubscriptionPlan.appSubscriptionPlanHeaderCode" type="text" required hidden>
+								<!-- <div class="form-group">
 									<label for="AppTenantSubscriptionPlan_TenantName">{{l("TenantName")}} *</label>
 									<input type="text" #AppTenantSubscriptionPlan_TenantName="ngModel" id="AppTenantSubscriptionPlan_TenantName" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.tenantName" name="TenantName"   minlength="1"  maxlength="50"  required/>
 								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_TenantName"></validation-messages>
-								</div>
+								</div> -->
 					
-								<div class="form-group">
+								<!-- <div class="form-group">
 									<label for="AppTenantSubscriptionPlan_AppSubscriptionHeaderId">{{l("AppSubscriptionHeaderId")}}</label>
-									<input type="number" #AppTenantSubscriptionPlan_AppSubscriptionHeaderId="ngModel" id="AppTenantSubscriptionPlan_AppSubscriptionHeaderId" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.appSubscriptionHeaderId" name="AppSubscriptionHeaderId"  />
+									<input type="number" #AppTenantSubscriptionPlan_AppSubscriptionHeaderId="ngModel" id="AppTenantSubscriptionPlan_AppSubscriptionHeaderId" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.appSubscriptionPlanHeaderId" name="AppSubscriptionHeaderId"  />
 								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_AppSubscriptionHeaderId"></validation-messages>
-								</div>
+								</div> -->
 					
-								<div class="form-group">
+								<!-- <div class="form-group">
 									<label for="AppTenantSubscriptionPlan_SubscriptionPlanCode">{{l("SubscriptionPlanCode")}} *</label>
 									<input type="text" #AppTenantSubscriptionPlan_SubscriptionPlanCode="ngModel" id="AppTenantSubscriptionPlan_SubscriptionPlanCode" class="form-control" [(ngModel)]="appTenantSubscriptionPlan.subscriptionPlanCode" name="SubscriptionPlanCode"   minlength="1"  maxlength="30"  required/>
 								    <validation-messages [formCtrl]="AppTenantSubscriptionPlan_SubscriptionPlanCode"></validation-messages>
-								</div>
+								</div> -->
 					
 								<div class="form-group">
 									<label for="AppTenantSubscriptionPlan_CurrentPeriodStartDate">{{l("CurrentPeriodStartDate")}}</label>
@@ -89,14 +112,16 @@
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
                         <span>{{l("Save")}}</span>
                     </button>
-                    <button *ngIf="!this.appTenantSubscriptionPlan.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
+                   <!--  <button *ngIf="!this.appTenantSubscriptionPlan.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
                         <span>{{l("SaveAndNew")}}</span>
-                    </button>
+                    </button> -->
 				</div>
 		    </div>
         </div>
     </div>
   </div>
-  
+  <appSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModal #appSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModal (modalSave)="getNewAppSubscriptionPlanHeaderId()"></appSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModal>
+  <!-- <appSubscriptionPlanDetailAppFeatureLookupTableModal #appSubscriptionPlanDetailAppFeatureLookupTableModal (modalSave)="getNewAppFeatureId()"></appSubscriptionPlanDetailAppFeatureLookupTableModal> -->
+	
 </div>

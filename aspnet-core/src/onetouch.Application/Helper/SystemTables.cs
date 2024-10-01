@@ -282,7 +282,18 @@ namespace onetouch.Helpers
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "LANGUAGE");
             return obj.Id;
         }
-
+        //MMT-43
+        public async Task<long> GetEntityObjectTypeUOMId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "UOM");
+            return obj.Id;
+        }
+        public async Task<long> GetEntityObjectTypeFeatureCategoryId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "FEATURECAT");
+            return obj.Id;
+        }
+        //MMT-43
         public async Task<long> GetObjectLookupId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "LOOKUP");
