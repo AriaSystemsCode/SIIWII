@@ -1,14 +1,15 @@
-<div class="orderForm  position-relative">
+<div class="orderForm position-relative">
     <div class="container-fluid orderInfoForm thin-scroll">
-
-        <div class="row"  [ngClass]="showReport ?  'd-block' : 'd-none'">
-            <iframe id="pdfViewer" class="w-100 pt-4" [ngStyle]="{
-                'height':
-                !loadingError ?
-                '800px':
-                '0px'
-            }" frameborder="0" (error)="loadingError=true">
-            </iframe>
+        <div class="row " [ngClass]="showReport ? 'd-block' : 'd-none'">
+            <iframe
+                id="pdfViewer"
+                class="w-100 pt-4"
+                [ngStyle]="{
+                    height: !loadingError ? '800px' : '0px'
+                }"
+                frameborder="0"
+                (error)="loadingError = true"
+            ></iframe>
             <div *ngIf="loadingError">
                 <p>
                     Unable to display PDF file.
@@ -18,5 +19,16 @@
                 </p>
             </div>
         </div>
+
+ 
     </div>
+
+           <!-- Download button for mobile and tablet -->
+           <div class="download-section d-flex d-lg-none justify-content-center pt-4"      [ngStyle]="{
+            height: !loadingError ? '150px' : '0px' 
+        }" *ngIf="transactionFormPath">
+            <a class="btn btnPdf  mt-3" [href]="transactionFormPath" target="_blank">
+                Download PDF
+            </a>
+        </div>
 </div>
