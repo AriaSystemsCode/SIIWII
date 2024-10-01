@@ -55,12 +55,16 @@
                                         <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
                                             <!-- attributes -->
                                             <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
-                                                [ngClass]="{'active':activeExisttingVariation}"
+                                                [ngClass]="{'active':activeExisttingVariation , 
+                                             'text-white' : activeExisttingVariation , 
+                                            'text-purple' : !activeExisttingVariation}"
                                                 (click)="getExistingVariations()" *ngIf="showExisttingVariation" >
                                                 Existing Variations
                                             </a>
                                             <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg" *ngIf="!showExisttingVariation || showNewVariation"
-                                            [ngClass]="{'active':activeNewVariation}"
+                                            [ngClass]="{'active':activeNewVariation , 
+                                             'text-white' : activeNewVariation , 
+                                            'text-purple' : !activeNewVariation}"
                                             (click)="getNewVariations()"  >
                                         New Variations
                                         </a>
@@ -403,9 +407,12 @@
                             <div class="align-items-baseline d-flex flex-row justify-content-start">
                                 <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
                                     <!-- attributes -->
-                                    <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
+                                    <a  class="aria-tag  border mb-3 mr-3 pr-4 pl-4 position-relative pt-2 pb-2 rounded-lg"
                                         *ngFor="let selectedExtraAttribute of selectedExtraAttributes;index  as i"
-                                        [ngClass]="{'active':i == activeExtraAttributeIndex}"
+                                        [ngClass]="{'active':i == activeExtraAttributeIndex  , 
+                                             'text-white' : i == activeExtraAttributeIndex  , 
+                                            'text-purple' :i != activeExtraAttributeIndex }"
+
                                         (click)="setActiveExtraAttribute(i)"
                                         [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE' &&  selectedExtraAttribute?.entityObjectTypeCode!=='CLOSURE'"   >
                                         {{selectedExtraAttribute.name | localize}}
@@ -546,7 +553,7 @@
                                     >
                                     </p-selectButton> -->
                                     <div class="d-flex flex-row mb-3 w-100" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.displayedSelectedValues?.length">
-                                        <div class="d-flex flex-column justify-content-between m-4 position-relative col-1 m-0 p-0" style="border-radius: 5px;border: 1px solid #EEEEEE;    background-color: white;"
+                                        <div class="d-flex flex-column justify-content-between m-4 position-relative col-1 m-0 p-0" style="border-radius: 6px;border: 1px solid #EEEEEE;    background-color: white;"
                                             *ngFor="let item of selectedExtraAttributes[activeExtraAttributeIndex].displayedSelectedValues;index as i">
                                             <div class="d-flex flex-column" style="align-items: center; cursor: pointer;" title="{{item.label}}">
                             

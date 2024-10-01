@@ -178,9 +178,10 @@ label.checkbox {
     overflow-x: scroll;
     .row-item {
         background-color: $white !important;;
-        border: 1px solid #3699FF48!important;
+        border: 1px solid #ECECEC !important;
         height: 60px;
         width: 200px !important;
+        border-radius: 8px !important;
     }
     font: normal normal normal 13px/20px Poppins;
 }
