@@ -1452,6 +1452,8 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
     }
         this.selectedVaritaions = [];
         this.primengTableHelper.records = this.variationMatrices;
+
+
         this.getExistingVariations();
         this.setSelectionVariations();
 
@@ -1518,6 +1520,18 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
                 : this.variationMatrices,
             appItemSizesScaleInfo,
         };
+        for (let index = 0; index < this.appSizeScales?.appSizeScalesDetails.length; index++) {
+            const sizeScale = this.appSizeScales?.appSizeScalesDetails[index];
+
+            let notdeleteSize =  this.variationMatrices.some(matrix => {       return matrix.entityExtraData?.some((item) => {   return item.entityObjectTypeCode == 'SIZE'   && item.attributeCode  == sizeScale.sizeCode }) });
+
+            if(!notdeleteSize){
+                this.appSizeScales?.appSizeScalesDetails?.splice(index,1);
+                this.appSizeRatios?.appSizeScalesDetails?.splice(index,1);
+                index--;
+            }
+
+            }
         this.applyVariations.emit(body);
     }
 
