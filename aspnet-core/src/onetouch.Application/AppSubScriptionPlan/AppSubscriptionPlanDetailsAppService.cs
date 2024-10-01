@@ -119,7 +119,7 @@ namespace onetouch.AppSubScriptionPlan
 
                 //var totalCount = await filteredAppSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z=>z.isa).CountAsync();
                 var totalCount = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).CountAsync();
-                var dbList = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).ToListAsync();
+                var dbList = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).Distinct().ToListAsync();
                 var results = new List<GetAppSubscriptionPlanDetailForViewDto>();
 
                 foreach (var o in dbList)
