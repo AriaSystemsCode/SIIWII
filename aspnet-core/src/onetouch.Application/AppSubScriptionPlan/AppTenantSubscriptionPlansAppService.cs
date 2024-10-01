@@ -82,7 +82,7 @@ namespace onetouch.AppSubScriptionPlan
                     {
 
                         TenantName = o.TenantName,
-                        AppSubscriptionHeaderId = o.AppSubscriptionPlanHeaderId,
+                        AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                         SubscriptionPlanCode = o.SubscriptionPlanCode,
                         CurrentPeriodStartDate = o.CurrentPeriodStartDate,
                         CurrentPeriodEndDate = o.CurrentPeriodEndDate,
@@ -133,7 +133,7 @@ namespace onetouch.AppSubScriptionPlan
 
             return output;
         }
-
+        //[AbpAuthorize(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Edit)]
         public async Task CreateOrEdit(CreateOrEditAppTenantSubscriptionPlanDto input)
         {
             if (input.Id == null)
@@ -200,7 +200,7 @@ namespace onetouch.AppSubScriptionPlan
                              AppTenantSubscriptionPlan = new AppTenantSubscriptionPlanDto
                              {
                                  TenantName = o.TenantName,
-                                 AppSubscriptionHeaderId = o.AppSubscriptionPlanHeaderId,
+                                 AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                                  SubscriptionPlanCode = o.SubscriptionPlanCode,
                                  CurrentPeriodStartDate = o.CurrentPeriodStartDate,
                                  CurrentPeriodEndDate = o.CurrentPeriodEndDate,
