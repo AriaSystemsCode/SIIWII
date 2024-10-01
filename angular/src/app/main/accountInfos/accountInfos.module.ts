@@ -47,8 +47,8 @@ import { ActivityLogComponent } from './components/accountBilling/components/act
 import { TenantInvoicesComponent } from './components/accountBilling/components/tenant-invoices/tenant-invoices.component';
 import { PlansComponent } from './components/accountBilling/components/plans/plans.component';
 import { MainModule } from '../main.module';
-
-
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -100,7 +100,9 @@ import { MainModule } from '../main.module';
         SelectAddressModule,
         MembersListSharedModule,
         AccountModule,
-        MyMembersModule,MainModule
+        MyMembersModule,MainModule,
+        ConfirmDialogModule,
+        DialogModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

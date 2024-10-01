@@ -7,7 +7,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
     {
         public string TenantName { get; set; }
 
-        public long AppSubscriptionHeaderId { get; set; }
+        public long AppSubscriptionPlanHeaderId { get; set; }
 
         public string SubscriptionPlanCode { get; set; }
 

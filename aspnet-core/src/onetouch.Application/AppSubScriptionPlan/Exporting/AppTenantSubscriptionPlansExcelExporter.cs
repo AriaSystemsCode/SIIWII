@@ -47,7 +47,7 @@ namespace onetouch.AppSubScriptionPlan.Exporting
                     AddObjects(
                         sheet, 2, appTenantSubscriptionPlans,
                         _ => _.AppTenantSubscriptionPlan.TenantName,
-                        _ => _.AppTenantSubscriptionPlan.AppSubscriptionHeaderId,
+                        _ => _.AppTenantSubscriptionPlan.AppSubscriptionPlanHeaderId,
                         _ => _.AppTenantSubscriptionPlan.SubscriptionPlanCode,
                         _ => _timeZoneConverter.Convert(_.AppTenantSubscriptionPlan.CurrentPeriodStartDate, _abpSession.TenantId, _abpSession.GetUserId()),
                         _ => _timeZoneConverter.Convert(_.AppTenantSubscriptionPlan.CurrentPeriodEndDate, _abpSession.TenantId, _abpSession.GetUserId()),

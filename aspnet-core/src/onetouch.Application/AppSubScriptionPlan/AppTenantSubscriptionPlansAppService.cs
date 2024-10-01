@@ -82,7 +82,7 @@ namespace onetouch.AppSubScriptionPlan
                     {
 
                         TenantName = o.TenantName,
-                        AppSubscriptionHeaderId = o.AppSubscriptionPlanHeaderId,
+                        AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                         SubscriptionPlanCode = o.SubscriptionPlanCode,
                         CurrentPeriodStartDate = o.CurrentPeriodStartDate,
                         CurrentPeriodEndDate = o.CurrentPeriodEndDate,
@@ -104,7 +104,6 @@ namespace onetouch.AppSubScriptionPlan
         [AllowAnonymous]
         public async Task<long?> GetTenantSubscriptionPlanId(long tenantId)
         {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
                 .Where(z => z.TenantId == tenantId && (z.CurrentPeriodStartDate <= DateTime.Now.Date && z.CurrentPeriodEndDate >= DateTime.Now.Date)).FirstOrDefaultAsync();
@@ -116,8 +115,6 @@ namespace onetouch.AppSubScriptionPlan
             }
         }
         public async Task<GetAppTenantSubscriptionPlanForViewDto> GetAppTenantSubscriptionPlanForView(long id)
-        {
-            var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAsync(id);
 
             var output = new GetAppTenantSubscriptionPlanForViewDto { AppTenantSubscriptionPlan = ObjectMapper.Map<AppTenantSubscriptionPlanDto>(appTenantSubscriptionPlan) };
 
@@ -133,7 +130,7 @@ namespace onetouch.AppSubScriptionPlan
 
             return output;
         }
-
+        //[AbpAuthorize(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Edit)]
         public async Task CreateOrEdit(CreateOrEditAppTenantSubscriptionPlanDto input)
         {
             if (input.Id == null)
@@ -200,7 +197,7 @@ namespace onetouch.AppSubScriptionPlan
                              AppTenantSubscriptionPlan = new AppTenantSubscriptionPlanDto
                              {
                                  TenantName = o.TenantName,
-                                 AppSubscriptionHeaderId = o.AppSubscriptionPlanHeaderId,
+                                 AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                                  SubscriptionPlanCode = o.SubscriptionPlanCode,
                                  CurrentPeriodStartDate = o.CurrentPeriodStartDate,
                                  CurrentPeriodEndDate = o.CurrentPeriodEndDate,
