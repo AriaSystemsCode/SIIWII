@@ -33,7 +33,8 @@ export class AddOnsComponent extends AppComponentBase implements AfterViewInit  
   tenantSubscriptionPlanId:Observable<number>;
   // progressValue = 50  ;
   progress=0.1;
-  addons: any[];
+  addons: GetAppSubscriptionPlanDetailForViewDto[];
+  cart: GetAppSubscriptionPlanDetailForViewDto[] = []; // Cart items
   progressValue = 80; // Dynamic progress value (can be set dynamically)
   radius = 23.6889; // Radius from the circle (same as the 'r' attribute in the <circle>)
   circumference = 2 * Math.PI * this.radius; // Full circumference of the circle
@@ -71,6 +72,8 @@ export class AddOnsComponent extends AppComponentBase implements AfterViewInit  
 
 
     getAppTenantAddOns() {
+    this.showMainSpinner();
+
       this._appTenantSubscriptionPlansServiceProxy.getTenantSubscriptionPlanId(this.tenantId).subscribe(
         (tenantSubscriptionPlanId: number) => {
           console.log(tenantSubscriptionPlanId, ' tenantSubscriptionPlanId');
@@ -83,8 +86,10 @@ export class AddOnsComponent extends AppComponentBase implements AfterViewInit  
             null, null, null, null,
             null, header, null, true, null, 0, 100
           ).subscribe(result => {
-            this.primengTableHelper.totalRecordsCount = result.totalCount;
+            // this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.addons = result.items;
+        this.hideMainSpinner();
+
             console.log(this.addons,'lklklklkk')
             // this.primengTableHelper.hideLoadingIndicator();
             //this.cdr.detectChanges();
@@ -126,44 +131,45 @@ getProgressBarWidth(inputRow: GetAppSubscriptionPlanDetailForViewDto)
 ngAfterViewInit()
 {}
 ngAfterViewChecked(): void {
-  //return;
-  if (this.rowreference && this.rowreference.length>0
-    && this.progresslabel && this.progresslabel.length>0 && this.zerolabel
-    && this.zerolabel.length>0 && this.totallabel &&  this.totallabel.length>0)
-  {
-    this.rowreference.forEach((row, indexrow) => {
+//   //return;
+//   if (this.rowreference && this.rowreference.length>0
+//     && this.progresslabel && this.progresslabel.length>0 && this.zerolabel
+//     && this.zerolabel.length>0 && this.totallabel &&  this.totallabel.length>0)
+//   {
+//     this.rowreference.forEach((row, indexrow) => {
 
-       this.progressvalue.toArray()[indexrow].nativeElement.left=this.outerprogressbar.toArray()[indexrow].nativeElement.left;       
-       this.renderer.setStyle(this.progressvalue.toArray()[indexrow].nativeElement,'left','0px');
-   // const progressbarObj =   this.innerprogressbar[indexrow];
-   // if(progressbarObj)
-   // {
-      //const progressbarObj =   row.nativeElement.children.getElementsByClassName('progress-bar');
-      //const el1Right =  this.innerprogressbar[indexrow].nativeElement.getBoundingClientRect().right;
-       if (this.progresslabel.toArray()[indexrow])
-       {
-        this.renderer.setStyle(this.progresslabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
-        this.progresslabel.toArray()[indexrow].nativeElement.left= this.innerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().right;//-this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().width;
-       }
-      if(this.zerolabel.toArray()[indexrow])
-      {
-      this.zerolabel.toArray()[indexrow].nativeElement.left=0; //this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().left;    ;
-      this.renderer.setStyle(this.zerolabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
+//        this.progressvalue.toArray()[indexrow].nativeElement.left=this.outerprogressbar.toArray()[indexrow].nativeElement.left;       
+//        this.renderer.setStyle(this.progressvalue.toArray()[indexrow].nativeElement,'left','0px');
+//    // const progressbarObj =   this.innerprogressbar[indexrow];
+//    // if(progressbarObj)
+//    // {
+//       //const progressbarObj =   row.nativeElement.children.getElementsByClassName('progress-bar');
+//       //const el1Right =  this.innerprogressbar[indexrow].nativeElement.getBoundingClientRect().right;
+//        if (this.progresslabel.toArray()[indexrow])
+//        {
+//         this.renderer.setStyle(this.progresslabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
+//         this.progresslabel.toArray()[indexrow].nativeElement.left= this.innerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().right;//-this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().width;
+//        }
+//       if(this.zerolabel.toArray()[indexrow])
+//       {
+//       this.zerolabel.toArray()[indexrow].nativeElement.left=0; //this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().left;    ;
+//       this.renderer.setStyle(this.zerolabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
       
-      }
-      if(this.totallabel.toArray()[indexrow])
-      {
-      this.totallabel.toArray()[indexrow].nativeElement.left= this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().right;//-this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().width; 
-      this.renderer.setStyle(this.totallabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
-      }
+//       }
+//       if(this.totallabel.toArray()[indexrow])
+//       {
+//       this.totallabel.toArray()[indexrow].nativeElement.left= this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().right;//-this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().width; 
+//       this.renderer.setStyle(this.totallabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
+//       }
    
 
-  });
-}
+//   });
+// }
 }
 
 
 setProgress(value: number) {
+  
   const circle = document.querySelector('.progress-ring__circle') as SVGCircleElement;
 
   if (circle) {
@@ -180,5 +186,49 @@ setProgress(value: number) {
     circle.style.transform = 'rotate(-90deg)';
     circle.style.transformOrigin = '50% 50%';
   }
+}
+
+addToCart(record: GetAppSubscriptionPlanDetailForViewDto) {
+  // Check if the item already exists in the cart based on a unique property like `featureName`
+  const existingItem = this.cart.find(cartItem => cartItem.appSubscriptionPlanDetail?.featureName === record.appSubscriptionPlanDetail?.featureName);
+
+  if (!existingItem) {
+    // If the item does not exist, add it to the cart
+    const newRecord = new GetAppSubscriptionPlanDetailForViewDto();
+    newRecord.init({
+      ...record,
+      featureUsedQty: 1  
+    });
+    this.cart.push(newRecord);
+  }
+}
+
+
+removeRecord(record: GetAppSubscriptionPlanDetailForViewDto) {
+  this.cart = this.cart.filter(
+    item => 
+      item.appSubscriptionPlanDetail?.featureName !== record.appSubscriptionPlanDetail?.featureName ||
+      item.featureUsedQty !== record.featureUsedQty
+  );
+  this.totalQuantity
+  this.totalAmount
+}
+
+
+clearCart() {
+  this.cart = [];
+}
+
+get totalQuantity(): number {
+  return this.cart.reduce((acc, item) => acc + (item.featureUsedQty || 0), 0);
+}
+
+// Getter to calculate total amount
+get totalAmount(): number {
+  return this.cart.reduce((acc, item) => acc + (item.appSubscriptionPlanDetail.unitPrice * (item.featureUsedQty || 0)), 0);
+}
+
+isRecordInCart(record: any): boolean {
+  return this.cart.some(cartItem => cartItem?.appSubscriptionPlanDetail?.featureName === record?.appSubscriptionPlanDetail?.featureName);
 }
 }

@@ -17,11 +17,17 @@
   }
   .btn-add
   {
-    width: Fixed (120px)px;height: Hug (42px)px;padding: 9px 43px 9px 43px;gap: 10px;border-radius: 6px 6px 6px 6px;opacity: 0px;
+    width: 120px;
+    height: 42px;
+    padding: 9px 43px 9px 43px;
+    gap: 10px;
+    border-radius: 6px 6px 6px 6px;
+    opacity: 0px;
     background: var(--Primary-Color, #4A0D4A);
     color: #FFFFFF;
     font-family: Poppins;font-size: 16px;font-weight: 600;line-height: 24px;text-align: left;
     text-align: center;
+  
   }
   .price-txt
   {
@@ -57,8 +63,27 @@
   }
 
   ::ng-deep {
+    .p-datatable {
+      margin-bottom: 20px;
+    }
+    .container{
+    ::-webkit-scrollbar {
+      width: 8px !important; /* Adjust the width as necessary */
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      border-radius: 20px !important;
+      background: #FFF !important;
+      box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) !important;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background-color: #D9D9D9 !important; /* Set the color of the track */
+    }
+  }
     .p-inputnumber-buttons-stacked .p-inputnumber-input {
-      width: 28px !important;
+      width: 35px !important;
+      padding-right: 0 !important;
     }
     .p-inputnumber-buttons-stacked .p-inputnumber-button-group .p-button.p-inputnumber-button {
       width: 18px !important;
@@ -88,6 +113,27 @@ background: #FFF !important;
     .container {
       margin-top: 15px;
     }
+
+
+    .p-datatable-gridlines td {
+      width: 33.33%; /* Adjust this based on the number of columns */
+      text-align: center; /* Center text if needed */
+  }
+
+  .p-datatable-gridlines {
+    display: table;
+    width: 100%;
+}
+
+.p-datatable-gridlines td {
+    flex: 1; /* This makes each column take an equal share of the available space */
+    text-align: center; /* Center align the text */
+}
+.p-button:enabled:hover {
+  background: #4A0D4A !important;
+  color: #ffffff !important;
+  border-color: #4A0D4A !important;
+}
   }
 .table-bordered th, .table-bordered td{
     border:  none !important;
@@ -153,8 +199,21 @@ border-radius: 6px;
 background: #4A0D4A;
 color: #FFF;
 margin: auto;
+width: 90%;
+position: sticky;
+bottom: 0px;
   }
+.noCart {
 
+  position: absolute;
+  bottom: 10px;
+  width: 90%;
+
+}
+.hasCart {
+  position: sticky;
+  bottom: 0px;
+}
   .add-head {
     font-size: 20px;
 font-weight: 600;
@@ -183,4 +242,8 @@ line-height: normal;
 font-size: 12px;
 font-weight: 600;
 
+  }
+
+  .measure {
+    color: #CACACA;
   }
