@@ -96,7 +96,7 @@ background: #FFF !important;
     .p-inputtext:enabled:focus {
       box-shadow:  none !important;
     }
-    .p-datatable .p-datatable-thead > tr > th {
+    .p-datatable .p-datatable-thead > tr > th , .table-bordered thead th, .table-bordered thead td{
       border-radius: 10px 10px 0px 0px !important;
       border: 1px solid #EEE !important;
       background: rgba(248, 248, 248, 0.98) !important;

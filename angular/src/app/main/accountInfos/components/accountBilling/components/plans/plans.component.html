@@ -27,12 +27,12 @@
             </div>
           </th>
 
-          <th  class="plan-header">
+          <th  class="plan-header position-relative">
             <div class="d-flex flex-column">
-              <p  class="plan-name default-class" [style.fontSize]="getFontSize()">Custom</p>
-              <p style="font-size: 12px;">
+              <p  class="plan-name default-class" style="position: absolute ; top: 25px;left: 50%; transform: translate(-50%, -50%);" [style.fontSize]="getFontSize()">Custom</p>
+              <!-- <p style="font-size: 12px;">
                 For Custom Pricing, Please Contact <a href="mailto:customercare@siiwii.net">Siwii</a>
-              </p>
+              </p> -->
             </div>
           </th>
         </tr>
@@ -51,7 +51,9 @@
           <td class="head-c plan-header"  [style.fontSize]="getFontSize()">Description</td>
           
           <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'" class="text-col">{{ plan?.appSubscriptionPlanHeader.description }}</td>
-          <td class="plan-header">-</td>
+          <td class="plan-header">
+            For Custom Pricing, Please Contact <a href="mailto:customercare@siiwii.net">Siwii</a>
+          </td>
 
         </tr>
       </tbody>

@@ -1,6 +1,6 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Injector, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Injector, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import {AppSubscriptionPlanDetailDto, AppSubscriptionPlanDetailsServiceProxy, GetAppSubscriptionPlanDetailForViewDto } from '@shared/service-proxies/service-proxies';
+import {AddOnsInputDto, AppSubscriptionPlanDetailDto, AppSubscriptionPlanDetailsServiceProxy, AppTenantActivitiesLogServiceProxy, GetAppSubscriptionPlanDetailForViewDto } from '@shared/service-proxies/service-proxies';
 import {AppTenantSubscriptionPlansServiceProxy} from '@shared/service-proxies/service-proxies';
 import { LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
@@ -10,64 +10,39 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { ProgressComponent } from "@app/shared/common/progress/progress.component";
 import { forEach } from 'lodash';
 import { left } from '@devexpress/analytics-core/analytics-elements-metadata';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-ons',
   templateUrl: './add-ons.component.html',
   styleUrls: ['./add-ons.component.scss']
 })
-export class AddOnsComponent extends AppComponentBase implements AfterViewInit  {
-  @ViewChild("ProgressModal", { static: true }) 
-  ProgressModal: ProgressComponent;
-  @ViewChild('dataTable', { static: true }) dataTable: Table;
-  @ViewChild('paginator', { static: true }) paginator: Paginator;
-  @ViewChildren('outerprogressbar') outerprogressbar!: QueryList<ElementRef>;
-  @ViewChildren('innerprogressbar') innerprogressbar!: QueryList<ElementRef>;
-  @ViewChildren('zerolabel') zerolabel!: QueryList<ElementRef>;
-  @ViewChildren('totallabel') totallabel!: QueryList<ElementRef>;
-  @ViewChildren('progresslabel') progresslabel!: QueryList<ElementRef>;
-  @ViewChildren('rowreference') rowreference: QueryList<ElementRef>;
-  @ViewChildren('progressvalues') progressvalue: QueryList<ElementRef>;
-  @ViewChild('addbtn') addbtn: ElementRef;
+export class AddOnsComponent extends AppComponentBase implements OnInit  {
+ 
   tenantId = this.appSession.tenantId;
   tenantSubscriptionPlanId:Observable<number>;
-  // progressValue = 50  ;
+ 
   progress=0.1;
   addons: GetAppSubscriptionPlanDetailForViewDto[];
   cart: GetAppSubscriptionPlanDetailForViewDto[] = []; // Cart items
-  progressValue = 80; // Dynamic progress value (can be set dynamically)
-  radius = 23.6889; // Radius from the circle (same as the 'r' attribute in the <circle>)
-  circumference = 2 * Math.PI * this.radius; // Full circumference of the circle
+  purshasedAddons: AddOnsInputDto[] = [];
+  
+ 
   constructor( injector: Injector,
     private _appSubscriptionPlanDetailsServiceProxy: AppSubscriptionPlanDetailsServiceProxy,
     private _appTenantSubscriptionPlansServiceProxy:AppTenantSubscriptionPlansServiceProxy,
-    private el: ElementRef, private renderer: Renderer2)
+    private el: ElementRef, private AppTenantActivitiesLogServiceProxy:AppTenantActivitiesLogServiceProxy )
     {
       super(injector);
       
     }
- /*  ngAfterViewInit(): void {
-    throw new Error('Method not implemented.');
-  } */
+
      ngOnInit()
     {
-      this.setProgress(this.progressValue);
-      // this.progress = 0.1;
-      // this.addons = [
-      //   {
-      //     id: '1000',
-      //     code: 'f230fh0g3',
-      //     name: 'Bamboo Watch',
-      //     description: 'Product Description',
-      //     image: 'bamboo-watch.jpg',
-      //     price: 65,
-      //     category: 'Accessories',
-      //     quantity: 24,
-      //     inventoryStatus: 'INSTOCK',
-      //     rating: 5
-      // },
-      // ]
+      
        this.getAppTenantAddOns()
+   
+
     }
 
 
@@ -101,92 +76,6 @@ export class AddOnsComponent extends AppComponentBase implements AfterViewInit  
       );
     }
 
-reloadPage(): void {
-  this.paginator.changePage(this.paginator.getPage());
-}
-add(inputRow: GetAppSubscriptionPlanDetailForViewDto){
-
-  //this.onShowSideBar(true);
-  this.showSideBar = true;
-  //this.addbtn.nativeElement.disabled = true;
-}
-
-showSideBar; 
-//showHideSideBarTitle;
-onShowSideBar(showSideBar:boolean)
-{
-
-  this.showSideBar = showSideBar;
-  //this.showHideSideBarTitle = !this.showSideBar ? "Summary" : "Hide Summary";
-}
-getProgressBarWidth(inputRow: GetAppSubscriptionPlanDetailForViewDto)
-{
-  var widthCalc = 1;
-  if (inputRow.featureCreditQty!=0)
-     widthCalc = (inputRow.featureUsedQty/inputRow.featureCreditQty) *100;
-  
-  return {'width.%': widthCalc};
-}
-
-ngAfterViewInit()
-{}
-ngAfterViewChecked(): void {
-//   //return;
-//   if (this.rowreference && this.rowreference.length>0
-//     && this.progresslabel && this.progresslabel.length>0 && this.zerolabel
-//     && this.zerolabel.length>0 && this.totallabel &&  this.totallabel.length>0)
-//   {
-//     this.rowreference.forEach((row, indexrow) => {
-
-//        this.progressvalue.toArray()[indexrow].nativeElement.left=this.outerprogressbar.toArray()[indexrow].nativeElement.left;       
-//        this.renderer.setStyle(this.progressvalue.toArray()[indexrow].nativeElement,'left','0px');
-//    // const progressbarObj =   this.innerprogressbar[indexrow];
-//    // if(progressbarObj)
-//    // {
-//       //const progressbarObj =   row.nativeElement.children.getElementsByClassName('progress-bar');
-//       //const el1Right =  this.innerprogressbar[indexrow].nativeElement.getBoundingClientRect().right;
-//        if (this.progresslabel.toArray()[indexrow])
-//        {
-//         this.renderer.setStyle(this.progresslabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
-//         this.progresslabel.toArray()[indexrow].nativeElement.left= this.innerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().right;//-this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().width;
-//        }
-//       if(this.zerolabel.toArray()[indexrow])
-//       {
-//       this.zerolabel.toArray()[indexrow].nativeElement.left=0; //this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().left;    ;
-//       this.renderer.setStyle(this.zerolabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
-      
-//       }
-//       if(this.totallabel.toArray()[indexrow])
-//       {
-//       this.totallabel.toArray()[indexrow].nativeElement.left= this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().right;//-this.outerprogressbar.toArray()[indexrow].nativeElement.getBoundingClientRect().width; 
-//       this.renderer.setStyle(this.totallabel.toArray()[indexrow].nativeElement, 'font-size', '7px');
-//       }
-   
-
-//   });
-// }
-}
-
-
-setProgress(value: number) {
-  
-  const circle = document.querySelector('.progress-ring__circle') as SVGCircleElement;
-
-  if (circle) {
-    // Calculate and set the stroke-dasharray (full length of the circle)
-    circle.style.strokeDasharray = `${this.circumference} ${this.circumference}`;
-
-    // Calculate the offset based on the progress value (the visible part)
-    const offset = this.circumference - (value / 100) * this.circumference;
-
-    // Apply the stroke-dashoffset to control how much of the circle is visible
-    circle.style.strokeDashoffset = `${offset}`;
-
-    // Optional: Rotate the progress circle so that it starts at the top
-    circle.style.transform = 'rotate(-90deg)';
-    circle.style.transformOrigin = '50% 50%';
-  }
-}
 
 addToCart(record: GetAppSubscriptionPlanDetailForViewDto) {
   // Check if the item already exists in the cart based on a unique property like `featureName`
@@ -231,4 +120,61 @@ get totalAmount(): number {
 isRecordInCart(record: any): boolean {
   return this.cart.some(cartItem => cartItem?.appSubscriptionPlanDetail?.featureName === record?.appSubscriptionPlanDetail?.featureName);
 }
+
+
+purchaseAddons() {
+
+
+
+  Swal.fire({
+    title: "",
+    text: "Are you sure you Want this purshased Add ons ?",
+    icon: "info",
+    showCancelButton: true,
+    confirmButtonText:
+        "Yes",
+    cancelButtonText: "No",
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    backdrop: true,
+    customClass: {
+        popup: "popup-class",
+        icon: "icon-class",
+        content: "content-class",
+        actions: "actions-class",
+        confirmButton: "confirm-button-class2",
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.showMainSpinner();
+      const mappedCart = this.cart.map((record: any) => {
+        let addOn = new AddOnsInputDto();
+        addOn.featureCode = record.appSubscriptionPlanDetail?.featureCode;
+        addOn.featureName = record.appSubscriptionPlanDetail?.featureName;
+        addOn.price = record.appSubscriptionPlanDetail?.unitPrice || 0;
+        addOn.qty = record.featureUsedQty || 1;
+        return addOn;
+      });
+    
+      let body = [...mappedCart];  
+    
+      
+      console.log(body, 'Mapped Cart Body');
+    
+     
+      this.AppTenantActivitiesLogServiceProxy.addCreditActivityLog(body).subscribe(result => {
+        this.hideMainSpinner();
+        this.notify.info("Add ons Purshased Successfully .");
+        console.log('Purchase successful', result);
+      });
+    }
+  });
+
+
+  console.log(this.cart, 'heee');  // Log cart to check values
+
+  
+}
+
+
 }

@@ -168,7 +168,8 @@ confirm(){
       //  this.tenantDto = result
     
 
-      this.notify.info("Successfully deleted.");
+      this.notify.info(`Your subscription plan has been successfully updated to <strong>[${this.selectedPlanName}]</strong>.<br><br>Note: You will be on the new plan starting from the next billing period.`);
+
        console.log(this.tenantDto,'dddd')
     
     });
@@ -230,7 +231,7 @@ getFontSize() {
 
 
   if (this.plans.length > maxCols) {
-    return `${baseSize - (this.plans.length - maxCols) * 4}px`; 
+    return `${baseSize - 8}px`; 
   }
   return `${baseSize}px`;
 }
