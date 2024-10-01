@@ -115,7 +115,7 @@ namespace onetouch.AppSubScriptionPlan
                 if (AbpSession.TenantId != null)
                 {
                     var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
-                        .Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodEndDate >= DateTime.Now.Date && DateTime.Now.Date >= z.CurrentPeriodStartDate).FirstOrDefaultAsync();
+                        .Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodEndDate.Date >= DateTime.Now.Date && DateTime.Now.Date >= z.CurrentPeriodStartDate.Date).FirstOrDefaultAsync();
                     if (tenantPlan != null)
                     {
                         var plan = results.Where(z => z.AppSubscriptionPlanHeader.Id == tenantPlan.AppSubscriptionPlanHeaderId).FirstOrDefault();
