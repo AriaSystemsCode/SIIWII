@@ -102,12 +102,12 @@ columnResizeMode="expand"
                 <!-- Table Header -->
                 <ng-template pTemplate="header">
                     <tr>
-                        <th colspan="3">{{ record?.appSubscriptionPlanDetail?.featureCategory }}</th>
+                        <th colspan="2">{{ record?.appSubscriptionPlanDetail?.featureCategory }}</th>
                     </tr>
                 </ng-template>
 
                 <!-- Table Body -->
-                <ng-template pTemplate="body">
+                <ng-template pTemplate="body" let record>
                     <tr>
                         <td>
                             <div class="d-flex gap-2 first-col">
@@ -117,19 +117,7 @@ columnResizeMode="expand"
                                 <h5>{{ record?.appSubscriptionPlanDetail?.featureName }}</h5>
                             </div>
                         </td>
-                        <td>
-                            <div class="d-flex flex-column gap-2 justify-content-center">
-                                <h5>Current Usage</h5>
-
-                                <div class="progress-circle">
-                                    <svg class="progress-ring" width="52" height="52">
-                                        <circle class="progress-ring__circle-bg" cx="26" cy="26" r="23.6889" stroke="#949494" stroke-width="4.62222" opacity="0.15" fill="transparent"></circle>
-                                        <circle class="progress-ring__circle" cx="26" cy="26" r="23.6889" stroke="#4A0D4A" stroke-width="4.62222" fill="transparent"></circle>
-                                    </svg>
-                                    <div class="progress-label">{{ record?.featureUsedQty / record?.featureLimit}}%</div>
-                                </div>
-                            </div>
-                        </td>
+                      
                         <td>
                             <div class="d-flex flex-column gap-2 justify-content-center">
                                 <p>${{ record?.appSubscriptionPlanDetail?.unitPrice }}/ <span class="measure"> {{ record?.appSubscriptionPlanDetail?.unitOfMeasurementName }}</span></p>
