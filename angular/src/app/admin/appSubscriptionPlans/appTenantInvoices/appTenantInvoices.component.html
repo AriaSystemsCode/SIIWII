@@ -115,6 +115,10 @@
                                         {{l('InvoiceNumber')}}
                                         <p-sortIcon field="appTenantInvoice.invoiceNumber"></p-sortIcon>
                                     </th>
+                                    <th style="width: 150px" pSortableColumn="tenantName">
+                                        {{l('TenantName')}}
+                                        <p-sortIcon field="appTenantInvoice.tenantName"></p-sortIcon>
+                                    </th>
                                     <th style="width: 150px" pSortableColumn="invoiceDate">
                                         {{l('InvoiceDate')}}
                                         <p-sortIcon field="appTenantInvoice.invoiceDate"></p-sortIcon>
@@ -167,29 +171,33 @@
                                         </div>
                                     </td>
                                     <td style="width:150px">
-											<span class="ui-column-title"> {{l('InvoiceNumber')}}</span>
+											<!-- <span class="ui-column-title"> {{l('InvoiceNumber')}}</span> -->
 											{{record.appTenantInvoice.invoiceNumber}}
 										</td>
+                                        <td style="width:150px">
+											<!-- <span class="ui-column-title"> {{l('InvoiceNumber')}}</span> -->
+											{{record.appTenantInvoice.tenantName}}
+										</td>
                                     <td style="width:150px">
-										<span class="ui-column-title"> {{l('InvoiceDate')}}</span>
+										<!-- <span class="ui-column-title"> {{l('InvoiceDate')}}</span> -->
                                         <span *ngIf="record.appTenantInvoice.invoiceDate">
 											{{record.appTenantInvoice.invoiceDate |  momentFormat:'L' }}
                                         </span>
                                         <span *ngIf="!record.appTenantInvoice.invoiceDate">-</span>
                                     </td>
                                     <td style="width:150px">
-											<span class="ui-column-title"> {{l('Amount')}}</span>
+											<!-- <span class="ui-column-title"> {{l('Amount')}}</span> -->
 											{{record.appTenantInvoice.amount}}
 										</td>
                                     <td style="width:150px">
-										<span class="ui-column-title"> {{l('DueDate')}}</span>
+										<!-- <span class="ui-column-title"> {{l('DueDate')}}</span> -->
                                         <span *ngIf="record.appTenantInvoice.dueDate">
 											{{record.appTenantInvoice.dueDate |  momentFormat:'L' }}
                                         </span>
                                         <span *ngIf="!record.appTenantInvoice.dueDate">-</span>
                                     </td>
                                     <td style="width:150px">
-										<span class="ui-column-title"> {{l('PayDate')}}</span>
+										<!-- <span class="ui-column-title"> {{l('PayDate')}}</span> -->
                                         <span *ngIf="record.appTenantInvoice.payDate">
 											{{record.appTenantInvoice.payDate |  momentFormat:'L' }}
                                         </span>

@@ -22,6 +22,6 @@ namespace onetouch.AppSubScriptionPlan
 
         Task<FileDto> GetAppTenantSubscriptionPlansToExcel(GetAllAppTenantSubscriptionPlansForExcelInput input);
         Task<List<TenantInformation>> GetTenantsList();
-
+        Task<GetAppTenantSubscriptionPlanForEditOutput> GetAppTenantSubscriptionPlanByTenantIdForEdit(long input);
     }
 }

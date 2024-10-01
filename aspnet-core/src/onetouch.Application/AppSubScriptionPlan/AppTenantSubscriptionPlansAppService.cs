@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authorization;
 using Abp.MultiTenancy;
 using onetouch.Authorization.Users;
 using onetouch.MultiTenancy;
+using Abp.Domain.Uow;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -105,6 +106,7 @@ namespace onetouch.AppSubScriptionPlan
             );
 
         }
+
         [AllowAnonymous]
         public async Task<GetAppTenantSubscriptionPlanForViewDto> GetAppTenantSubscriptionPlanForView(long id)
         {
@@ -123,6 +125,18 @@ namespace onetouch.AppSubScriptionPlan
             var output = new GetAppTenantSubscriptionPlanForEditOutput { AppTenantSubscriptionPlan = ObjectMapper.Map<CreateOrEditAppTenantSubscriptionPlanDto>(appTenantSubscriptionPlan) };
 
             return output;
+        }
+        public async Task<GetAppTenantSubscriptionPlanForEditOutput> GetAppTenantSubscriptionPlanByTenantIdForEdit(long input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                GetAppTenantSubscriptionPlanForEditOutput output = new GetAppTenantSubscriptionPlanForEditOutput();
+                var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(a => a.AppSubscriptionPlanHeaderFk).FirstOrDefaultAsync(z => z.TenantId == input);
+                if (appTenantSubscriptionPlan != null)
+                    output = new GetAppTenantSubscriptionPlanForEditOutput { AppTenantSubscriptionPlan = ObjectMapper.Map<CreateOrEditAppTenantSubscriptionPlanDto>(appTenantSubscriptionPlan) };
+
+                return output;
+            }
         }
         //[AbpAuthorize(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Edit)]
         public async Task CreateOrEdit(CreateOrEditAppTenantSubscriptionPlanDto input)
@@ -207,7 +221,7 @@ namespace onetouch.AppSubScriptionPlan
         }
         public async Task<List<TenantInformation>> GetTenantsList()
         { 
-            var tenantList = await _TenantRepository.GetAll().ToListAsync();
+            var tenantList = await _TenantRepository.GetAll().OrderBy(z=>z.Name).ToListAsync();
             List<TenantInformation> listInfo = new List<TenantInformation>();
             if (tenantList != null && tenantList.Count > 0)
             { 

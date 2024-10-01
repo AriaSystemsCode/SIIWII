@@ -77,7 +77,8 @@ namespace onetouch.AppSubscriptionPlans
                                             ? o.EntityAttachments[0].AttachmentFk.Attachment : null),
                                             DisplayName = ((o.EntityAttachments != null && o.EntityAttachments.Count > 0
                                                            && o.EntityAttachments[0] != null && o.EntityAttachments[0].AttachmentFk != null)
-                                            ? o.EntityAttachments[0].AttachmentFk.Name : null)
+                                            ? o.EntityAttachments[0].AttachmentFk.Name : null),
+                                            o.TenantId
                                         };
 
                 var totalCount = await filteredAppTenantInvoices.CountAsync();
@@ -99,7 +100,8 @@ namespace onetouch.AppSubscriptionPlans
                             PayDate = o.PayDate,
                             Id = o.Id,
                             Attachment = !string.IsNullOrEmpty(o.Attachment) ? (pathSource + o.Attachment) : null,
-                            DisplayName = !string.IsNullOrEmpty(o.DisplayName) ?(o.DisplayName.TrimEnd() + Path.GetExtension(o.Attachment)):""
+                            DisplayName = !string.IsNullOrEmpty(o.DisplayName) ?(o.DisplayName.TrimEnd() + Path.GetExtension(o.Attachment)):"",
+                            TenantName = o.TenantId!=null?(TenantManager.GetById(int.Parse(o.TenantId.ToString()))).Name.TrimEnd():""
                         }
                     };
 

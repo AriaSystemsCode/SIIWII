@@ -92,6 +92,14 @@ export class CreateOrEditAppTenantSubscriptionPlanComponent extends AppComponent
           this.selectedTenant = op.value;
          // this.appTenantSubscriptionPlan.tenantId = op.value;
         }
+        this._appTenantSubscriptionPlansServiceProxy.getAppTenantSubscriptionPlanByTenantIdForEdit(op.value).subscribe((tenantSubscription: any) => {
+            //this.appTenantSubscriptionPlan = tenantSubscription;
+            if(tenantSubscription.appSubscriptionPlanHeaderId != 0 )
+        {
+            this.show(tenantSubscription.appTenantSubscriptionPlan.id);
+        }
+        });
+        
       }
     openSelectAppSubscriptionPlanHeaderModal()
     {
