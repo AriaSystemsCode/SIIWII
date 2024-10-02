@@ -185,7 +185,7 @@
                     <div class="d-flex align-items-center   w-100">
                         <h6 class="previewTitle m-0 p-0  col-6">Phone :</h6>
                         <p class=" previewValue text-nowrap  m-0 p-0  col-6"
-                            *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber ? appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber : appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber">
+                            *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber || appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber">
                             {{appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber ? appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber  : appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber}}
                         </p>
                         <p class=" previewValue text-nowrap  m-0 p-0  col-6"
