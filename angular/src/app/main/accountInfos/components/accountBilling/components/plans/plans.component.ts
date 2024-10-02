@@ -71,23 +71,23 @@ this.plansubId = plan.appSubscriptionPlanHeader.appTenantSubscriptionPlanId
 
 }
 
-getDetailsForPlan(planId: number) {
-  this.allDetails = [];  // Clear previous details
+// getDetailsForPlan(planId: number) {
+//   this.allDetails = [];  // Clear previous details
 
-  // Find the plan with the matching planId
-  const selectedPlan = this.plans.find(plan => plan.appSubscriptionPlanHeader.id === planId);
+//   // Find the plan with the matching planId
+//   const selectedPlan = this.plans.find(plan => plan.appSubscriptionPlanHeader.id === planId);
 
-  if (selectedPlan) {
-    // Filter the details for that specific plan
-    selectedPlan.appSubscriptionPlanHeader.appSubscriptionPlanDetails.forEach(detail => {
-      if (selectedPlan.appSubscriptionPlanHeader.id === detail.appSubscriptionPlanHeaderId) {
-        this.allDetails.push(detail);
-      }
-    });
-  }
+//   if (selectedPlan) {
+//     // Filter the details for that specific plan
+//     selectedPlan.appSubscriptionPlanHeader.appSubscriptionPlanDetails.forEach(detail => {
+//       if (selectedPlan.appSubscriptionPlanHeader.id === detail.appSubscriptionPlanHeaderId) {
+//         this.allDetails.push(detail);
+//       }
+//     });
+//   }
 
   
-}
+// }
 getUniqueCategories() {
   const allDetails = this.plans.reduce((acc, plan) => {
     return [...acc, ...plan.appSubscriptionPlanHeader.appSubscriptionPlanDetails];
@@ -136,7 +136,7 @@ getTenantData(id:any){
 id).subscribe(result => {
   this.tenantId = id
    this.tenantDto = result
- 
+ console.log( this.tenantDto,' this.tenantDto')
 
 });
 }
