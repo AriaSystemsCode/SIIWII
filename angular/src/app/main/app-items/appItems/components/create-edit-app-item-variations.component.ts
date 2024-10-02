@@ -1532,7 +1532,15 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
             }
 
             }
-        this.applyVariations.emit(body);
+
+            this.appSizeScales?.appSizeScalesDetails?.forEach((item, index) => {
+                item.d1Position = index.toString(); 
+            }); 
+
+                this.appSizeRatios?.appSizeScalesDetails?.forEach((item, index) => {
+                    item.d1Position = index.toString(); 
+                   }); 
+                this.applyVariations.emit(body);
     }
 
     
