@@ -301,3 +301,8 @@ label.checkbox {
   border: 1px solid #4A0D4A;
   border-radius: 12px;
 }
+
+a.nav-link.active {
+  border: 1px solid #4A0D4A !important;
+  border-top-left-radius: 12px;
+}

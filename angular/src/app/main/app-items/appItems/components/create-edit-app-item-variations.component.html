@@ -483,7 +483,7 @@
                                 <tabset>
                                     <tab (deselect)="sizeScalesChanged(sizeScaleComponent.mapMatrixGridToAppSizeScaleDto(),sizeScaleComponent?.sizeScaleForm?.form?.valid)">
                                         <ng-template tabHeading >
-                                            <span class="tab-item pl-4 pr-4" style="color: black;">{{'SelectSizes' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold" style="color: black;">{{'SelectSizes' | localize}}</span>
                                         </ng-template>
                                         <app-size-scale
                                             #sizeScaleComponent
@@ -495,7 +495,7 @@
                                     </tab>
                                     <tab >
                                         <ng-template tabHeading>
-                                            <span class="tab-item pl-4 pr-4"  style="color: black;">{{'ViewSelectedSizes' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold"  style="color: black;">{{'ViewSelectedSizes' | localize}}</span>
                                         </ng-template>
                                         <app-size-scale
                                             #viewSelectedSizesComponent
@@ -507,7 +507,7 @@
                                     </tab>
                                     <tab (selectTab)="showSizeRatio()" >
                                         <ng-template tabHeading>
-                                            <span class="tab-item pl-4 pr-4"  style="color: black;">{{'SizeRatio' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold"  style="color: black;">{{'SizeRatio' | localize}}</span>
                                         </ng-template>
                                         <app-size-ratio
                                             #sizeRatioComponent
