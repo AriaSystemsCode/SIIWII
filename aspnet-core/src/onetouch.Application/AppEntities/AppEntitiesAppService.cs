@@ -778,7 +778,7 @@ namespace onetouch.AppEntities
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
                     Symbol = appEntity.EntityExtraData != null & appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ? appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
-                }).OrderBy(a=>a.Code)
+                })//.OrderBy(a=>a.Code)
                 .ToListAsync();
         }
         public async Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode)
