@@ -185,7 +185,7 @@ confirm(){
       //  this.tenantDto = result
     
 
-      this.notify.info(`Your subscription plan has been successfully updated to <strong>[${this.selectedPlanName}]</strong>.<br><br>Note: You will be on the new plan starting from the next billing period.`);
+      this.notify.info(`Your subscription plan has been successfully updated to [${this.selectedPlanName}] , Note: You will be on the new plan starting from the next billing period.`);
 
        console.log(this.tenantDto,'dddd')
     
