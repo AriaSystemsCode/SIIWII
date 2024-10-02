@@ -89,7 +89,9 @@ color:  #1B101B;
   color: #4A0D4A !important;
   border: none !important;
 }
-
+.p-dialog .p-dialog-footer {
+  padding: 0 !important;
+}
 .vertical-header-table {
   width: 100%;
   border-collapse: collapse;

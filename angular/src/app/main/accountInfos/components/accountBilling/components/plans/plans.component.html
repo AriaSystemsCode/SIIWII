@@ -42,7 +42,7 @@
         <tr>
           <td class="head-c plan-header"  style="font-size: 20px;" >Prices</td>
           <td *ngFor="let plan of plans;let i = index" [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header '" class="text-col">
-            <span [ngClass]="getPlanClass(i)" [style.fontSize]="getFontSize()" class="pr-font">{{ isMonthlyPlan ? plan?.appSubscriptionPlanHeader?.monthlyPrice ==0 ? 'Free'  : plan?.appSubscriptionPlanHeader?.monthlyPrice : plan?.appSubscriptionPlanHeader?.yearlyPrice == 0 ? 'Free' :  plan?.appSubscriptionPlanHeader?.yearlyPrice }}</span>
+            <span [ngClass]="getPlanClass(i)" [style.fontSize]="getFontSize()" class="pr-font"> ${{ isMonthlyPlan ? plan?.appSubscriptionPlanHeader?.monthlyPrice ==0 ? 'Free'  : plan?.appSubscriptionPlanHeader?.monthlyPrice : plan?.appSubscriptionPlanHeader?.yearlyPrice == 0 ? 'Free' :  plan?.appSubscriptionPlanHeader?.yearlyPrice }}</span>
           </td>
 
           <td class="plan-header">-</td>
@@ -50,9 +50,9 @@
         <tr>
           <td class="head-c plan-header"  [style.fontSize]="getFontSize()">Description</td>
           
-          <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'" class="text-col">{{ plan?.appSubscriptionPlanHeader.description }}</td>
+          <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'" class="text-col">{{ plan?.appSubscriptionPlanHeader?.description }}</td>
           <td class="plan-header">
-            For Custom Pricing, Please Contact <a href="mailto:customercare@siiwii.net">Siwii</a>
+            For More Inquiries and Custom Pricing , Please email <a href="mailto:customercare@siiwii.net" style="overflow-wrap: break-word; font-size: 12px;">customercare.siiwii.net</a>
           </td>
 
         </tr>
@@ -82,10 +82,10 @@
               <!-- Check if the feature exists in this plan -->
               <ng-container *ngIf="hasFeature(plan, feature); else noFeature">
                 <!-- Find the matching detail for the feature -->
-                <ng-container *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails" [ngClass]="getLastPlanClass(i)">
+                <ng-container *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails" >
                   <!-- Display the feature limit if the feature matches -->
-                  <span *ngIf="detail.featureName === feature.featureName">
-                    {{ detail.featureLimit ? detail.featureLimit : '-' }} {{ detail.unitOfMeasurementName || '' }}
+                  <span *ngIf="detail?.featureName === feature?.featureName">
+                    {{ detail.featureLimit ? detail?.featureLimit : '-' }} {{ detail.featureLimit ? detail?.unitOfMeasurementName : ''  }}
                   </span>
                 </ng-container>
               </ng-container>

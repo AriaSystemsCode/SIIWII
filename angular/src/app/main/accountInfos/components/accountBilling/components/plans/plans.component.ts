@@ -43,6 +43,8 @@ this.monthlyClick()
 } 
 monthlyClick()
 {
+  this.showMainSpinner();
+
   this.isMonthlyPlan =true;
   this._appSubscriptionPlanHeadersServiceProxy.getAll(
     null,    null,    1,    null,  null ,    null,
@@ -57,6 +59,7 @@ this.plansubId = plan.appSubscriptionPlanHeader.appTenantSubscriptionPlanId
 
       }
 
+      this.hideMainSpinner();
 
     });
     console.log(this.allDetails, 'Filtered details');
@@ -83,13 +86,13 @@ getDetailsForPlan(planId: number) {
     });
   }
 
-  console.log(this.allDetails, 'Filtered details for plan with ID: ' + planId);
+  
 }
 getUniqueCategories() {
   const allDetails = this.plans.reduce((acc, plan) => {
     return [...acc, ...plan.appSubscriptionPlanHeader.appSubscriptionPlanDetails];
   }, []);
-  console.log(allDetails.length,'n,nkjnhkn')
+
 
   // Extract unique categories
   const uniqueCategories = allDetails
@@ -112,7 +115,7 @@ getFeaturesByCategory(category: string) {
     index === self.findIndex(f => f.featureCode === feature.featureCode)
   );
   this.cols = allDetails 
-  console.log(allDetails.length,'allDetailssssss')
+
 
   return uniqueFeatures;
 }
@@ -133,7 +136,7 @@ getTenantData(id:any){
 id).subscribe(result => {
   this.tenantId = id
    this.tenantDto = result
-   console.log(this.tenantDto,'dddd')
+ 
 
 });
 }
@@ -142,14 +145,28 @@ id).subscribe(result => {
 
 
 
-showDialog(plan:any) {
-  console.log(plan,'pppp')
+showDialog(plan: any) {
+  console.log(plan, 'pppp');
+
+
+  if (!this.tenantDto) {
+    this.tenantDto = {};
+  }
+
+  if (!this.tenantDto.appTenantSubscriptionPlan) {
+    this.tenantDto.appTenantSubscriptionPlan = {};
+  }
+
+
+  this.tenantDto.appTenantSubscriptionPlan.subscriptionPlanCode = plan?.appSubscriptionPlanHeader?.code;
+  this.tenantDto.appTenantSubscriptionPlan.appSubscriptionPlanHeaderId = plan?.appSubscriptionPlanHeader?.id;
+  this.tenantDto.appTenantSubscriptionPlan.tenantId = this.appSession.tenantId;
+
+  this.selectedPlanName = plan?.appSubscriptionPlanHeader?.name;
+
   this.visible = true;
-  this.tenantDto.appTenantSubscriptionPlan.subscriptionPlanCode  = plan.appSubscriptionPlanHeader.code
-  this.tenantDto.appTenantSubscriptionPlan.appSubscriptionPlanHeaderId  = plan.appSubscriptionPlanHeader.id
-this.tenantDto.appTenantSubscriptionPlan.tenantId  = this.appSession.tenantId
-this.selectedPlanName = plan?.appSubscriptionPlanHeader?.name; 
 }
+
 
 confirm(){
 
@@ -178,6 +195,7 @@ confirm(){
 
 }
 getPlanClass(planIndex: number): string {
+
   switch (planIndex) {
       case 0:
           return 'custom-p-free';  // Custom class for plan 0
@@ -187,18 +205,19 @@ getPlanClass(planIndex: number): string {
           return 'custom-p-gold';  // Custom class for plan 2
 
           case 3:
-            return 'custom-p-free';  // Custom class for plan 0
+            return 'default-class';  // Custom class for plan 0
 
             case 4:
-              return 'custom-p-sil';  // Custom class for plan 1
+              return 'custom-p-free';  // Custom class for plan 1
               case 5:
-                return 'custom-p-gold';  // Custom class for plan 2
+                return 'custom-p-sil';  // Custom class for plan 2
       default:
           return 'default-class';     // Fallback class
-  }
+
+}
 }
 hasFeature(plan: any, feature: any): boolean {
-  return plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails?.some((detail: any) => detail.featureName === feature.featureName);
+  return plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails?.some((detail: any) => detail?.featureName === feature?.featureName);
 }
 getPlanBtnClass(planIndex: number): string {
   switch (planIndex) {
@@ -209,22 +228,16 @@ getPlanBtnClass(planIndex: number): string {
       case 2:
           return 'gold-btn';  // Custom class for plan 2
           case 3:
-            return 'free-btn';  // Custom class for plan 0
+            return 'default-class-b';  // Custom class for plan 0
             case 4:
-              return 'sil-btn';  // Custom class for plan 1
+              return 'free-btn';  // Custom class for plan 1
               case 5:
-                return 'gold-btn';  // Custom class for plan 0
+                return 'sil-btn';  // Custom class for plan 0
       default:
           return 'default-class-b';     // Fallback class
   }
 }
-getLastPlanClass(planIndex: number): string {
-  if (planIndex == this.plans.length - 1) {
-   
-          return 'last-row-border';  
-      
-  }
-}
+
 getFontSize() {
   const baseSize = 20; 
   const maxCols = 4;

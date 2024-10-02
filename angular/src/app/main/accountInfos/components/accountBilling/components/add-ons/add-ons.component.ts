@@ -164,14 +164,16 @@ purchaseAddons() {
      
       this.AppTenantActivitiesLogServiceProxy.addCreditActivityLog(body).subscribe(result => {
         this.hideMainSpinner();
-        this.notify.info("Add ons Purshased Successfully .");
+        this.notify.info("Addons Purshased Successfully .");
+        this.cart = []
+        this.getAppTenantAddOns()
         console.log('Purchase successful', result);
       });
     }
   });
 
 
-  console.log(this.cart, 'heee');  // Log cart to check values
+  console.log(this.cart, 'heee');  
 
   
 }
