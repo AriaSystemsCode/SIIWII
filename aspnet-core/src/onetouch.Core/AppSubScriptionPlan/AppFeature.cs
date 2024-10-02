@@ -56,6 +56,6 @@ namespace onetouch.AppSubScriptionPlan
 
         [ForeignKey("UnitOfMeasurementId")]
         public virtual AppEntity UnitOfMeasurementFk { get; set; }
-
+        public virtual bool IsAddOn { get; set; }
     }
 }

@@ -4399,9 +4399,6 @@ namespace onetouch.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<bool>("IsAddOn")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -4449,7 +4446,42 @@ namespace onetouch.Migrations
                         });
                 });
 
-            modelBuilder.Entity("onetouch.AppSubScriptionPlan.oldAppTenantsActivitiesLog", b =>
+            modelBuilder.Entity("onetouch.AppTenantPlans.AppTenantPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PlanId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlanId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("AppTenantPlans", t =>
+                        {
+                            t.HasTrigger("AppTenantPlans_Trigger");
+                        });
+                });
+
+            modelBuilder.Entity("onetouch.AppTenantsActivitiesLogs.AppTenantsActivitiesLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -4515,41 +4547,6 @@ namespace onetouch.Migrations
                     b.ToTable("AppTenantsActivitiesLogs", t =>
                         {
                             t.HasTrigger("AppTenantsActivitiesLogs_Trigger");
-                        });
-                });
-
-            modelBuilder.Entity("onetouch.AppTenantPlans.AppTenantPlan", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AddDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("PlanId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("TenantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlanId");
-
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("AppTenantPlans", t =>
-                        {
-                            t.HasTrigger("AppTenantPlans_Trigger");
                         });
                 });
 
@@ -7472,6 +7469,9 @@ namespace onetouch.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IsAddOn")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("TrackActivity")
                         .HasColumnType("bit");
 
@@ -8599,7 +8599,7 @@ namespace onetouch.Migrations
                         .HasForeignKey("AppFeatureId");
 
                     b.HasOne("onetouch.AppSubScriptionPlan.AppSubscriptionPlanHeader", "AppSubscriptionPlanHeaderFk")
-                        .WithMany()
+                        .WithMany("AppSubscriptionPlanDetails")
                         .HasForeignKey("AppSubscriptionPlanHeaderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -8609,7 +8609,16 @@ namespace onetouch.Migrations
                     b.Navigation("AppSubscriptionPlanHeaderFk");
                 });
 
-            modelBuilder.Entity("onetouch.AppSubScriptionPlan.oldAppTenantsActivitiesLog", b =>
+            modelBuilder.Entity("onetouch.AppTenantPlans.AppTenantPlan", b =>
+                {
+                    b.HasOne("onetouch.SycPlans.SycPlan", "PlanFk")
+                        .WithMany()
+                        .HasForeignKey("PlanId");
+
+                    b.Navigation("PlanFk");
+                });
+
+            modelBuilder.Entity("onetouch.AppTenantsActivitiesLogs.AppTenantsActivitiesLog", b =>
                 {
                     b.HasOne("onetouch.SycApplications.SycApplication", "ApplicationFk")
                         .WithMany()
@@ -8640,15 +8649,6 @@ namespace onetouch.Migrations
                     b.Navigation("TenantFk");
 
                     b.Navigation("TransactionFk");
-                });
-
-            modelBuilder.Entity("onetouch.AppTenantPlans.AppTenantPlan", b =>
-                {
-                    b.HasOne("onetouch.SycPlans.SycPlan", "PlanFk")
-                        .WithMany()
-                        .HasForeignKey("PlanId");
-
-                    b.Navigation("PlanFk");
                 });
 
             modelBuilder.Entity("onetouch.Authorization.Roles.Role", b =>
@@ -9415,6 +9415,11 @@ namespace onetouch.Migrations
                     b.Navigation("AppTransactionContacts");
 
                     b.Navigation("AppTransactionDetails");
+                });
+
+            modelBuilder.Entity("onetouch.AppSubScriptionPlan.AppSubscriptionPlanHeader", b =>
+                {
+                    b.Navigation("AppSubscriptionPlanDetails");
                 });
 #pragma warning restore 612, 618
         }

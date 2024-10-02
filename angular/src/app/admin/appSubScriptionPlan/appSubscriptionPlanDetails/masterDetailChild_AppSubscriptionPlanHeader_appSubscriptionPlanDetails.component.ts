@@ -1,4 +1,4 @@
-﻿import {AppConsts} from '@shared/AppConsts';
+import {AppConsts} from '@shared/AppConsts';
 import { Component, Injector, ViewEncapsulation, ViewChild, Input } from '@angular/core';
 import { ActivatedRoute , Router} from '@angular/router';
 import { AppSubscriptionPlanDetailsServiceProxy, AppSubscriptionPlanDetailDto  } from '@shared/service-proxies/service-proxies';
@@ -113,7 +113,7 @@ export class MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDeta
             this.featureCategoryFilter,
             this.trackactivityFilter,
             null,
-            this.appSubscriptionPlanHeaderId,
+            this.appSubscriptionPlanHeaderId,false,
             this.primengTableHelper.getSorting(this.dataTable),
             this.primengTableHelper.getSkipCount(this.paginator, event),
             this.primengTableHelper.getMaxResultCount(this.paginator, event)

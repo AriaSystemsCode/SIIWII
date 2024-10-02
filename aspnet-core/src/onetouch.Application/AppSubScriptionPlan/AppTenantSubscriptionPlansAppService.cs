@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Abp.Domain.Uow;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -80,7 +82,7 @@ namespace onetouch.AppSubScriptionPlan
                     {
 
                         TenantName = o.TenantName,
-                        AppSubscriptionHeaderId = o.AppSubscriptionPlanHeaderId,
+                        AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                         SubscriptionPlanCode = o.SubscriptionPlanCode,
                         CurrentPeriodStartDate = o.CurrentPeriodStartDate,
                         CurrentPeriodEndDate = o.CurrentPeriodEndDate,
@@ -99,10 +101,20 @@ namespace onetouch.AppSubScriptionPlan
             );
 
         }
-
-        public async Task<GetAppTenantSubscriptionPlanForViewDto> GetAppTenantSubscriptionPlanForView(long id)
+        [AllowAnonymous]
+        public async Task<long?> GetTenantSubscriptionPlanId(long tenantId)
         {
-            var appTenantSubscriptionPlan = await _appTenantSubscriptionPlanRepository.GetAsync(id);
+            {
+                var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
+                .Where(z => z.TenantId == tenantId && (z.CurrentPeriodStartDate <= DateTime.Now.Date && z.CurrentPeriodEndDate >= DateTime.Now.Date)).FirstOrDefaultAsync();
+                if (tenantPlan != null)
+                    return tenantPlan.AppSubscriptionPlanHeaderId;
+                else
+                    return null;
+
+            }
+        }
+        public async Task<GetAppTenantSubscriptionPlanForViewDto> GetAppTenantSubscriptionPlanForView(long id)
 
             var output = new GetAppTenantSubscriptionPlanForViewDto { AppTenantSubscriptionPlan = ObjectMapper.Map<AppTenantSubscriptionPlanDto>(appTenantSubscriptionPlan) };
 
@@ -118,7 +130,7 @@ namespace onetouch.AppSubScriptionPlan
 
             return output;
         }
-
+        //[AbpAuthorize(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Edit)]
         public async Task CreateOrEdit(CreateOrEditAppTenantSubscriptionPlanDto input)
         {
             if (input.Id == null)
@@ -185,7 +197,7 @@ namespace onetouch.AppSubScriptionPlan
                              AppTenantSubscriptionPlan = new AppTenantSubscriptionPlanDto
                              {
                                  TenantName = o.TenantName,
-                                 AppSubscriptionHeaderId = o.AppSubscriptionPlanHeaderId,
+                                 AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
                                  SubscriptionPlanCode = o.SubscriptionPlanCode,
                                  CurrentPeriodStartDate = o.CurrentPeriodStartDate,
                                  CurrentPeriodEndDate = o.CurrentPeriodEndDate,
