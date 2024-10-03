@@ -72,7 +72,7 @@
                     <input *ngIf="!selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
                       name="selectedAdd"  [id]="address.id"/> 
                  <label> {{address?.addressLine1+' ,'}}{{address?.addressLine2+' ,'}}{{address?.city+' ,'}}{{address?.state+' ,'}}{{address?.countryCode +' ,'}}{{address?.postalCode}}</label>
-                 <div class="pull-right"  *ngIf="showAddBtn">
+                 <div class="pull-right mt-2"  *ngIf="showAddBtn">
                     <button (click)="editAddress(address.id)">
                         {{l("Edit")}}
                         <i class="fas fa-edit ml-1 mr-1"></i>
