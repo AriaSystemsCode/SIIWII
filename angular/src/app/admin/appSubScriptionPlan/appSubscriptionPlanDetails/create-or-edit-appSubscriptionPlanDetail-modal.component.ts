@@ -1,12 +1,13 @@
 ﻿import { Component, ViewChild, Injector, Output, EventEmitter, OnInit} from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
-import { AppFeaturesServiceProxy, AppSubscriptionPlanDetailsServiceProxy, CreateOrEditAppSubscriptionPlanDetailDto } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppFeaturesServiceProxy, AppSubscriptionPlanDetailsServiceProxy, CreateOrEditAppSubscriptionPlanDetailDto, LookupLabelDto, SycEntityObjectStatusDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import * as moment from 'moment';
 
 import { AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent } from './appSubscriptionPlanDetail-appSubscriptionPlanHeader-lookup-table-modal.component';
 import { AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent } from './appSubscriptionPlanDetail-appFeature-lookup-table-modal.component';
+
 
 
 
@@ -24,22 +25,32 @@ export class CreateOrEditAppSubscriptionPlanDetailModalComponent extends AppComp
 
     active = false;
     saving = false;
-
+    options: { label: string, value: string }[] = [
+        { label: this.l("Absolute"), value: this.l("Absolute") },
+        { label: this.l("Monthly"), value: this.l("Monthly") },
+        { label: this.l('Yearly'), value: this.l('Yearly')}
+      ];
+    avalailbilityList: { label: string, value: string }[] = [
+        { label: this.l('Unlimited'), value: this.l('Unlimited')},
+        { label: this.l('Limited'), value: this.l('Limited')}];
     appSubscriptionPlanDetail: CreateOrEditAppSubscriptionPlanDetailDto = new CreateOrEditAppSubscriptionPlanDetailDto();
 
     appSubscriptionPlanHeader = '';
     appFeatureDescription = '';
-
-
+    featureStatusList: SycEntityObjectStatusDto[];
+    featureCategoryList:LookupLabelDto[];
 
     constructor(
         injector: Injector,
+        private _appEntitiesServiceProxy:AppEntitiesServiceProxy,
         private _appSubscriptionPlanDetailsServiceProxy: AppSubscriptionPlanDetailsServiceProxy,
         private _appFeatureProxy: AppFeaturesServiceProxy
     ) {
         super(injector);
     }
-    
+   
+       
+       
     show(appSubscriptionPlanDetailId?: number): void {
     
 
@@ -113,6 +124,8 @@ export class CreateOrEditAppSubscriptionPlanDetailModalComponent extends AppComp
         this.appFeatureDescription = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.displayName;
         this._appFeatureProxy.getAppFeatureForView(this.appSubscriptionPlanDetail.appFeatureId )
         .subscribe(result => {
+            
+            //
             this.appSubscriptionPlanDetail.featureCode = result.appFeature.code;
             this.appSubscriptionPlanDetail.unitPrice = result.appFeature.unitPrice;
             this.appSubscriptionPlanDetail.featureBillingCode = result.appFeature.billingCode;
@@ -120,11 +133,14 @@ export class CreateOrEditAppSubscriptionPlanDetailModalComponent extends AppComp
             this.appSubscriptionPlanDetail.featureCategory = result.appFeature.category;
             this.appSubscriptionPlanDetail.featurePeriodLimit= result.appFeature.featurePeriodLimit;
             this.appSubscriptionPlanDetail.isFeatureBillable = result.appFeature.billable;
-            this.appSubscriptionPlanDetail.unitOfMeasurementCode = result.appFeature.unitOfMeasurementCode;
+            this.appSubscriptionPlanDetail.unitOfMeasurmentCode = result.appFeature.unitOfMeasurementCode;
             this.appSubscriptionPlanDetail.unitOfMeasurementName = result.appFeature.unitOfMeasurementName;
             this.appSubscriptionPlanDetail.trackactivity = result.appFeature.trackActivity;
             this.appSubscriptionPlanDetail.featureDescription = result.appFeature.description;
             this.appSubscriptionPlanDetail.featureName = result.appFeature.name;
+            this.appSubscriptionPlanDetail.featureStatus =  result.appFeature.featureStatus;
+            this.appSubscriptionPlanDetail.notes = result.appFeature.notes;
+            //
             this.active = true;
             this.modal.show();
         });
@@ -144,6 +160,13 @@ export class CreateOrEditAppSubscriptionPlanDetailModalComponent extends AppComp
     }
     
      ngOnInit(): void {
-        
+        this._appFeatureProxy.getFeatureStatusList()
+        .subscribe((res: any) => {
+            this.featureStatusList = res;
+        });
+        this._appEntitiesServiceProxy.getAllFeatureCategoryForTableDropdown()
+.subscribe((resuom: any) => {
+    this.featureCategoryList = resuom;
+});
      }    
 }

@@ -502,6 +502,36 @@ namespace onetouch.AppEntities
                 })
                 .ToListAsync();
         }
+        //MMT-43
+        public async Task<List<LookupLabelDto>> GetAllUOMForTableDropdown()
+        {
+            var uOMId = await _helper.SystemTables.GetEntityObjectTypeUOMId();
+
+            return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeId == uOMId && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                .OrderBy("Name asc")
+                .Select(appEntity => new LookupLabelDto
+                {
+                    Value = appEntity.Id,
+                    Label = appEntity.Name.ToString(),
+                    Code = appEntity.Code,
+                })
+                .ToListAsync();
+        }
+        public async Task<List<LookupLabelDto>> GetAllFeatureCategoryForTableDropdown()
+        {
+            var catId = await _helper.SystemTables.GetEntityObjectTypeFeatureCategoryId();
+
+            return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeId == catId && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                .OrderBy("Name asc")
+                .Select(appEntity => new LookupLabelDto
+                {
+                    Value = appEntity.Id,
+                    Label = appEntity.Name.ToString(),
+                    Code = appEntity.Code,
+                })
+                .ToListAsync();
+        }
+        //MMT-43
 
         //public async Task<List<LookupLabelDto>> GetAllAccountTypesForTableDropdown()
         //{

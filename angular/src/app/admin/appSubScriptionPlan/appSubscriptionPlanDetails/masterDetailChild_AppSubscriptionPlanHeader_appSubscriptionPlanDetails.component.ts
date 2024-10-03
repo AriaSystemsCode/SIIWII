@@ -1,4 +1,4 @@
-import {AppConsts} from '@shared/AppConsts';
+﻿import {AppConsts} from '@shared/AppConsts';
 import { Component, Injector, ViewEncapsulation, ViewChild, Input } from '@angular/core';
 import { ActivatedRoute , Router} from '@angular/router';
 import { AppSubscriptionPlanDetailsServiceProxy, AppSubscriptionPlanDetailDto  } from '@shared/service-proxies/service-proxies';
@@ -16,7 +16,7 @@ import { FileDownloadService } from '@shared/utils/file-download.service';
 import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistory/entity-type-history-modal.component';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-
+import { AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent } from './appSubscriptionPlanDetail-appFeature-lookup-table-modal.component';
 
 @Component({
     templateUrl: './masterDetailChild_AppSubscriptionPlanHeader_appSubscriptionPlanDetails.component.html',
@@ -112,8 +112,8 @@ export class MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDeta
             this.featureBillingCodeFilter,
             this.featureCategoryFilter,
             this.trackactivityFilter,
+            this.appSubscriptionPlanHeaderId,
             null,
-            this.appSubscriptionPlanHeaderId,false,
             this.primengTableHelper.getSorting(this.dataTable),
             this.primengTableHelper.getSkipCount(this.paginator, event),
             this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -185,5 +185,26 @@ undefined,
             this._fileDownloadService.downloadTempFile(result);
          });
     }
-    
+    getNewAppFeatureId() {
+       /*  this.apps.appSubscriptionPlanDetail.appFeatureId = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.id;
+        this.appFeatureDescription = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.displayName;
+        this._appFeatureProxy.getAppFeatureForView(this.appSubscriptionPlanDetail.appFeatureId )
+        .subscribe(result => {
+            this.appSubscriptionPlanDetail.featureCode = result.appFeature.code;
+            this.appSubscriptionPlanDetail.unitPrice = result.appFeature.unitPrice;
+            this.appSubscriptionPlanDetail.featureBillingCode = result.appFeature.billingCode;
+            this.appSubscriptionPlanDetail.unitPrice = result.appFeature.unitPrice;
+            this.appSubscriptionPlanDetail.featureCategory = result.appFeature.category;
+            this.appSubscriptionPlanDetail.featurePeriodLimit= result.appFeature.featurePeriodLimit;
+            this.appSubscriptionPlanDetail.isFeatureBillable = result.appFeature.billable;
+            this.appSubscriptionPlanDetail.unitOfMeasurementCode = result.appFeature.unitOfMeasurementCode;
+            this.appSubscriptionPlanDetail.unitOfMeasurementName = result.appFeature.unitOfMeasurementName;
+            this.appSubscriptionPlanDetail.trackactivity = result.appFeature.trackActivity;
+            this.appSubscriptionPlanDetail.featureDescription = result.appFeature.description;
+            this.appSubscriptionPlanDetail.featureName = result.appFeature.name;
+            this.active = true;
+            this.modal.show();
+        }); */
+       // this.appSubscriptionPlanDetail.availability = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.;
+    }
 }

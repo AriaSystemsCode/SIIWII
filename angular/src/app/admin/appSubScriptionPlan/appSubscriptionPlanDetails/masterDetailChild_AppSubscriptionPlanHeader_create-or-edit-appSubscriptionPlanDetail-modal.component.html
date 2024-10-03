@@ -11,15 +11,39 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                 
+               <div class="modal-body">
+				 	<!-- <div class="form-group m-form__group">
+                        <label for="AppSubscriptionPlanHeader">{{l("AppSubscriptionPlanHeader")}}</label>
+                        <div class="input-group">
+                            <input class="form-control" id="AppSubscriptionPlanHeader" name="appSubscriptionPlanHeader" [(ngModel)]="appSubscriptionPlanDetail.appSubscriptionPlanHeader" type="text" disabled>     
+                            <div class="input-group-append">
+                                <button class="btn btn-primary blue" (click)="openSelectAppSubscriptionPlanHeaderModal()" type="button"><i class="fa fa-search"></i> {{l("Pick")}}</button>
+                            </div> <div class="input-group-prepend">
+                                <button class="btn btn-danger btn-icon" type="button" (click)="setAppSubscriptionPlanHeaderIdNull()"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <input class="form-control" name="appSubscriptionPlanDetail.appSubscriptionPlanHeaderId" [(ngModel)]="appSubscriptionPlanDetail.appSubscriptionPlanHeaderId" type="text" required hidden>-->
+				
+					 <div class="form-group m-form__group">
+                        <label for="AppFeatureCode">{{l("AppFeature")}}</label>
+                        <div class="input-group">
+                            <input class="form-control" id="AppFeatureCode" name="appFeatureCode" [(ngModel)]="appSubscriptionPlanDetail.featureCode" type="text" disabled>     
+                            <div class="input-group-append">
+                                <button class="btn btn-primary blue" (click)="openSelectAppFeatureModal()" type="button"><i class="fa fa-search"></i> {{l("Pick")}}</button>
+                            </div> <div class="input-group-prepend">
+                                <button class="btn btn-danger btn-icon" type="button" (click)="setAppFeatureIdNull()"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                   <!-- <input  class="form-control" name="appSubscriptionPlanDetail.appFeatureId" [(ngModel)]="appSubscriptionPlanDetail.appFeatureId" type="text"  hidden>-->
 
 
-								<div class="form-group">
+								<!-- <div class="form-group">
 									<label for="AppSubscriptionPlanDetail_FeatureCode">{{l("FeatureCode")}} *</label>
 									<input type="text" #AppSubscriptionPlanDetail_FeatureCode="ngModel" id="AppSubscriptionPlanDetail_FeatureCode" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureCode" name="FeatureCode"   minlength="1"  maxlength="50"  required/>
 								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureCode"></validation-messages>
-								</div>
+								</div> -->
 					
 								<div class="form-group">
 									<label for="AppSubscriptionPlanDetail_FeatureName">{{l("FeatureName")}} *</label>
@@ -29,11 +53,16 @@
 					
 								<div class="form-group">
 									<label for="AppSubscriptionPlanDetail_Availability">{{l("Availability")}} *</label>
-									<input type="text" #AppSubscriptionPlanDetail_Availability="ngModel" id="AppSubscriptionPlanDetail_Availability" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.availability" name="Availability"   minlength="1"  maxlength="30"  required/>
-								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_Availability"></validation-messages>
+									<!-- <input type="text" #AppSubscriptionPlanDetail_Availability="ngModel" id="AppSubscriptionPlanDetail_Availability" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.availability" name="Availability"   minlength="1"  maxlength="30"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_Availability"></validation-messages> -->
+									<p-dropdown [options]="avalailbilityList" 
+				optionLabel="label"
+				optionValue="value"
+				name="availability" [(ngModel)]="appSubscriptionPlanDetail.availability" >
+	</p-dropdown>
 								</div>
 					
-								<div class="form-group">
+								<div class="form-group" *ngIf="appSubscriptionPlanDetail.availability==l('Limited')">
 									<label for="AppSubscriptionPlanDetail_FeatureLimit">{{l("FeatureLimit")}}</label>
 									<input type="number" #AppSubscriptionPlanDetail_FeatureLimit="ngModel" id="AppSubscriptionPlanDetail_FeatureLimit" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureLimit" name="FeatureLimit"   />
 									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureLimit"></validation-messages>
@@ -48,23 +77,25 @@
 									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_RollOver"></validation-messages>
 								</div>
 					
-								<div class="form-group">
-									<label for="AppSubscriptionPlanDetail_UnitPrice">{{l("UnitPrice")}}</label>
-									<input type="number" #AppSubscriptionPlanDetail_UnitPrice="ngModel" id="AppSubscriptionPlanDetail_UnitPrice" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.unitPrice" name="UnitPrice"   />
-									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_UnitPrice"></validation-messages>
-								</div>
+								
 					
 								<div class="form-group">
 									<label for="AppSubscriptionPlanDetail_FeaturePeriodLimit">{{l("FeaturePeriodLimit")}} *</label>
-									<input type="text" #AppSubscriptionPlanDetail_FeaturePeriodLimit="ngModel" id="AppSubscriptionPlanDetail_FeaturePeriodLimit" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featurePeriodLimit" name="FeaturePeriodLimit"   minlength="1"  maxlength="30"  required/>
-								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeaturePeriodLimit"></validation-messages>
+									<!-- <input type="text" #AppSubscriptionPlanDetail_FeaturePeriodLimit="ngModel" id="AppSubscriptionPlanDetail_FeaturePeriodLimit" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featurePeriodLimit" name="FeaturePeriodLimit"   minlength="1"  maxlength="30"  required/>
+								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeaturePeriodLimit"></validation-messages> -->
+									<p-dropdown [options]="options" 
+									optionLabel="label"
+									optionValue="value"
+									name="featurePeriodLimit" [(ngModel)]="appSubscriptionPlanDetail.featurePeriodLimit" >
+						</p-dropdown>
 								</div>
+				
 					
-								<div class="form-group">
+								<!-- <div class="form-group">
 									<label for="AppSubscriptionPlanDetail_Category">{{l("Category")}} *</label>
 									<input type="text" #AppSubscriptionPlanDetail_Category="ngModel" id="AppSubscriptionPlanDetail_Category" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.category" name="Category"   minlength="1"  maxlength="50"  required/>
 								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_Category"></validation-messages>
-								</div>
+								</div> -->
 					
 								<div class="form-group">
 									<label for="AppSubscriptionPlanDetail_FeatureDescription">{{l("FeatureDescription")}}</label>
@@ -74,8 +105,13 @@
 					
 								<div class="form-group">
 									<label for="AppSubscriptionPlanDetail_FeatureStatus">{{l("FeatureStatus")}}</label>
-									<input type="text" #AppSubscriptionPlanDetail_FeatureStatus="ngModel" id="AppSubscriptionPlanDetail_FeatureStatus" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureStatus" name="FeatureStatus"   minlength="1"  maxlength="30" />
-								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureStatus"></validation-messages>
+									<!-- <input type="text" #AppSubscriptionPlanDetail_FeatureStatus="ngModel" id="AppSubscriptionPlanDetail_FeatureStatus" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureStatus" name="FeatureStatus"   minlength="1"  maxlength="30" /> -->
+								    <!-- <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureStatus"></validation-messages> -->
+									<p-dropdown [options]="featureStatusList"							
+									optionLabel="displayName"
+									optionValue="id"
+									name="featureStatus" [(ngModel)]="appSubscriptionPlanDetail.featureStatus" >
+						            </p-dropdown>
 								</div>
 					
 								<div class="form-group">
@@ -84,11 +120,11 @@
 								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_UnitOfMeasurementName"></validation-messages>
 								</div>
 					
-								<div class="form-group">
+								<!-- <div class="form-group">
 									<label for="AppSubscriptionPlanDetail_UnitOfMeasurmentCode">{{l("UnitOfMeasurmentCode")}} *</label>
 									<input type="text" #AppSubscriptionPlanDetail_UnitOfMeasurmentCode="ngModel" id="AppSubscriptionPlanDetail_UnitOfMeasurmentCode" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.unitOfMeasurmentCode" name="UnitOfMeasurmentCode"   minlength="1"  maxlength="30"  required/>
 								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_UnitOfMeasurmentCode"></validation-messages>
-								</div>
+								</div> -->
 					
 								<br/><div class="m-checkbox-list">
 									<label for="AppSubscriptionPlanDetail_IsFeatureBillable" class="kt-checkbox">
@@ -98,8 +134,12 @@
 									</label>
 									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_IsFeatureBillable"></validation-messages>
 								</div>
-					
-								<div class="form-group">
+								<div class="form-group" *ngIf="appSubscriptionPlanDetail.isFeatureBillable">
+									<label for="AppSubscriptionPlanDetail_UnitPrice">{{l("UnitPrice")}}</label>
+									<input type="number" #AppSubscriptionPlanDetail_UnitPrice="ngModel" id="AppSubscriptionPlanDetail_UnitPrice" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.unitPrice" name="UnitPrice"   />
+									<validation-messages [formCtrl]="AppSubscriptionPlanDetail_UnitPrice"></validation-messages>
+								</div>
+								<div class="form-group" *ngIf="appSubscriptionPlanDetail.isFeatureBillable">
 									<label for="AppSubscriptionPlanDetail_FeatureBillingCode">{{l("FeatureBillingCode")}}</label>
 									<input type="text" #AppSubscriptionPlanDetail_FeatureBillingCode="ngModel" id="AppSubscriptionPlanDetail_FeatureBillingCode" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureBillingCode" name="FeatureBillingCode"   minlength="1"  maxlength="50" />
 								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureBillingCode"></validation-messages>
@@ -107,8 +147,13 @@
 					
 								<div class="form-group">
 									<label for="AppSubscriptionPlanDetail_FeatureCategory">{{l("FeatureCategory")}}</label>
-									<input type="text" #AppSubscriptionPlanDetail_FeatureCategory="ngModel" id="AppSubscriptionPlanDetail_FeatureCategory" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureCategory" name="FeatureCategory"   minlength="0"  maxlength="50" />
-								    <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureCategory"></validation-messages>
+									<!-- <input type="text" #AppSubscriptionPlanDetail_FeatureCategory="ngModel" id="AppSubscriptionPlanDetail_FeatureCategory" class="form-control" [(ngModel)]="appSubscriptionPlanDetail.featureCategory" name="FeatureCategory"   minlength="0"  maxlength="50" /> -->
+								    <!-- <validation-messages [formCtrl]="AppSubscriptionPlanDetail_FeatureCategory"></validation-messages> -->
+									<p-dropdown [options]="featureCategoryList" 
+									optionLabel="label"
+									optionValue="code"
+									name="categorySelection" [(ngModel)]="appSubscriptionPlanDetail.featureCategory" >
+						</p-dropdown>
 								</div>
 					
 								<br/><div class="m-checkbox-list">
@@ -137,3 +182,4 @@
     </div>
 
 </div>
+<appSubscriptionPlanDetailAppFeatureLookupTableModal #appSubscriptionPlanDetailAppFeatureLookupTableModal (modalSave)="getNewAppFeatureId()"></appSubscriptionPlanDetailAppFeatureLookupTableModal>

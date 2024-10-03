@@ -18,6 +18,9 @@ using onetouch.Storage;
 using onetouch.Helpers;
 using Abp.Domain.Uow;
 using Abp.EntityFrameworkCore.Extensions;
+using Org.BouncyCastle.Crypto;
+using onetouch.SystemObjects;
+using onetouch.SystemObjects.Dtos;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -28,13 +31,15 @@ namespace onetouch.AppSubScriptionPlan
         private readonly IAppSubscriptionPlanHeadersExcelExporter _appSubscriptionPlanHeadersExcelExporter;
         private readonly IRepository<AppTenantSubscriptionPlan, long> _appTenantSubscriptionPlanRepository;
         private readonly Helper _helper;
-        public AppSubscriptionPlanHeadersAppService(IRepository<AppSubscriptionPlanHeader, long> appSubscriptionPlanHeaderRepository,
+        private readonly ISycEntityObjectStatusesAppService _sycEntityObjectStatusesAppService;
+        public AppSubscriptionPlanHeadersAppService(IRepository<AppSubscriptionPlanHeader, long> appSubscriptionPlanHeaderRepository, ISycEntityObjectStatusesAppService sycEntityObjectStatusesAppService,
             IAppSubscriptionPlanHeadersExcelExporter appSubscriptionPlanHeadersExcelExporter, Helper helper, IRepository<AppTenantSubscriptionPlan, long> appTenantSubscriptionPlanRepository)
         {
             _appSubscriptionPlanHeaderRepository = appSubscriptionPlanHeaderRepository;
             _appSubscriptionPlanHeadersExcelExporter = appSubscriptionPlanHeadersExcelExporter;
             _appTenantSubscriptionPlanRepository = appTenantSubscriptionPlanRepository;
             _helper = helper;
+            _sycEntityObjectStatusesAppService= sycEntityObjectStatusesAppService;
         }
         [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAppSubscriptionPlanHeaderForViewDto>> GetAll(GetAllAppSubscriptionPlanHeadersInput input)
@@ -110,7 +115,7 @@ namespace onetouch.AppSubScriptionPlan
                 if (AbpSession.TenantId != null)
                 {
                     var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
-                        .Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodEndDate >= DateTime.Now.Date && DateTime.Now.Date >= z.CurrentPeriodStartDate).FirstOrDefaultAsync();
+                        .Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodEndDate.Date >= DateTime.Now.Date && DateTime.Now.Date >= z.CurrentPeriodStartDate.Date).FirstOrDefaultAsync();
                     if (tenantPlan != null)
                     {
                         var plan = results.Where(z => z.AppSubscriptionPlanHeader.Id == tenantPlan.AppSubscriptionPlanHeaderId).FirstOrDefault();
@@ -129,7 +134,11 @@ namespace onetouch.AppSubScriptionPlan
 
             }
         }
+        public async Task<List<SycEntityObjectStatusLookupTableDto>> GetPlanStatusList()
+        {
+            return await _sycEntityObjectStatusesAppService.GetAllSycEntityStatusForTableDropdown("STANDARDSUBSCRIPTIONPLAN");
 
+        }
         public async Task<GetAppSubscriptionPlanHeaderForViewDto> GetAppSubscriptionPlanHeaderForView(long id)
         {
             var appSubscriptionPlanHeader = await _appSubscriptionPlanHeaderRepository.GetAsync(id);

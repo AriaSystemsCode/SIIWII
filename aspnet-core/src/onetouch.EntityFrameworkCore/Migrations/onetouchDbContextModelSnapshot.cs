@@ -7459,6 +7459,14 @@ namespace onetouch.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("CategoryCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long?>("CategoryId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -7490,6 +7498,8 @@ namespace onetouch.Migrations
 
                     b.Property<decimal?>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("UnitOfMeasurementId");
 
@@ -9140,6 +9150,10 @@ namespace onetouch.Migrations
 
             modelBuilder.Entity("onetouch.AppSubScriptionPlan.AppFeature", b =>
                 {
+                    b.HasOne("onetouch.AppEntities.AppEntity", "CategoryFk")
+                        .WithMany()
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("onetouch.AppEntities.AppEntity", null)
                         .WithOne()
                         .HasForeignKey("onetouch.AppSubScriptionPlan.AppFeature", "Id")
@@ -9151,6 +9165,8 @@ namespace onetouch.Migrations
                         .HasForeignKey("UnitOfMeasurementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CategoryFk");
 
                     b.Navigation("UnitOfMeasurementFk");
                 });

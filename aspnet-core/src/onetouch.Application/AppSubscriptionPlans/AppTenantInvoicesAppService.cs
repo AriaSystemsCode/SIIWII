@@ -21,6 +21,7 @@ using NPOI.HPSF;
 using Microsoft.Extensions.Configuration;
 using onetouch.Configuration;
 using System.IO;
+using Abp.Domain.Uow;
 
 namespace onetouch.AppSubscriptionPlans
 {
@@ -43,71 +44,75 @@ namespace onetouch.AppSubscriptionPlans
 
         public async Task<PagedResultDto<GetAppTenantInvoiceForViewDto>> GetAll(GetAllAppTenantInvoicesInput input)
         {
-           // var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + "-1" + @"\" ;
-            string pathSource = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/"+"-1" + @"/"; 
-            var filteredAppTenantInvoices = _appTenantInvoiceRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.InvoiceNumber.Contains(input.Filter))
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.InvoiceNumberFilter), e => e.InvoiceNumber == input.InvoiceNumberFilter)
-                        .WhereIf(input.MinInvoiceDateFilter != null, e => e.InvoiceDate >= input.MinInvoiceDateFilter)
-                        .WhereIf(input.MaxInvoiceDateFilter != null, e => e.InvoiceDate <= input.MaxInvoiceDateFilter)
-                        .WhereIf(input.MinDueDateFilter != null, e => e.DueDate >= input.MinDueDateFilter)
-                        .WhereIf(input.MaxDueDateFilter != null, e => e.DueDate <= input.MaxDueDateFilter)
-                        .WhereIf(input.MinPayDateFilter != null, e => e.PayDate >= input.MinPayDateFilter)
-                        .WhereIf(input.MaxPayDateFilter != null, e => e.PayDate <= input.MaxPayDateFilter)
-                        .WhereIf(input.TenantId != null, e => e.TenantId== input.TenantId); 
-            var pagedAndFilteredAppTenantInvoices = filteredAppTenantInvoices
-                .OrderBy(input.Sorting ?? "id asc")
-                .PageBy(input);
-
-            var appTenantInvoices = from o in pagedAndFilteredAppTenantInvoices
-                                    select new
-                                    {
-
-                                        o.InvoiceNumber,
-                                        o.InvoiceDate,
-                                        o.Amount,
-                                        o.DueDate,
-                                        o.PayDate,
-                                        Id = o.Id,
-                                        Attachment = ((o.EntityAttachments !=null && o.EntityAttachments.Count > 0
-                                                       && o.EntityAttachments[0] !=null && o.EntityAttachments[0].AttachmentFk!=null)
-                                        ? o.EntityAttachments[0].AttachmentFk.Attachment: null),
-                                        DisplayName = ((o.EntityAttachments != null && o.EntityAttachments.Count > 0
-                                                       && o.EntityAttachments[0] != null && o.EntityAttachments[0].AttachmentFk != null)
-                                        ? o.EntityAttachments[0].AttachmentFk.Name : null)
-                                    };
-
-            var totalCount = await filteredAppTenantInvoices.CountAsync();
-
-            var dbList = await appTenantInvoices.ToListAsync();
-            var results = new List<GetAppTenantInvoiceForViewDto>();
-
-            foreach (var o in dbList)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var res = new GetAppTenantInvoiceForViewDto()
+                // var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + "-1" + @"\" ;
+                string pathSource = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + "-1" + @"/";
+                var filteredAppTenantInvoices = _appTenantInvoiceRepository.GetAll().Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                            .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.InvoiceNumber.Contains(input.Filter))
+                            .WhereIf(!string.IsNullOrWhiteSpace(input.InvoiceNumberFilter), e => e.InvoiceNumber == input.InvoiceNumberFilter)
+                            .WhereIf(input.MinInvoiceDateFilter != null, e => e.InvoiceDate >= input.MinInvoiceDateFilter)
+                            .WhereIf(input.MaxInvoiceDateFilter != null, e => e.InvoiceDate <= input.MaxInvoiceDateFilter)
+                            .WhereIf(input.MinDueDateFilter != null, e => e.DueDate >= input.MinDueDateFilter)
+                            .WhereIf(input.MaxDueDateFilter != null, e => e.DueDate <= input.MaxDueDateFilter)
+                            .WhereIf(input.MinPayDateFilter != null, e => e.PayDate >= input.MinPayDateFilter)
+                            .WhereIf(input.MaxPayDateFilter != null, e => e.PayDate <= input.MaxPayDateFilter)
+                            .WhereIf(input.TenantId != null, e => e.TenantId == input.TenantId);
+                var pagedAndFilteredAppTenantInvoices = filteredAppTenantInvoices
+                    .OrderBy(input.Sorting ?? "id asc")
+                    .PageBy(input);
+
+                var appTenantInvoices = from o in pagedAndFilteredAppTenantInvoices
+                                        select new
+                                        {
+
+                                            o.InvoiceNumber,
+                                            o.InvoiceDate,
+                                            o.Amount,
+                                            o.DueDate,
+                                            o.PayDate,
+                                            Id = o.Id,
+                                            Attachment = ((o.EntityAttachments != null && o.EntityAttachments.Count > 0
+                                                           && o.EntityAttachments[0] != null && o.EntityAttachments[0].AttachmentFk != null)
+                                            ? o.EntityAttachments[0].AttachmentFk.Attachment : null),
+                                            DisplayName = ((o.EntityAttachments != null && o.EntityAttachments.Count > 0
+                                                           && o.EntityAttachments[0] != null && o.EntityAttachments[0].AttachmentFk != null)
+                                            ? o.EntityAttachments[0].AttachmentFk.Name : null),
+                                            o.TenantId
+                                        };
+
+                var totalCount = await filteredAppTenantInvoices.CountAsync();
+
+                var dbList = await appTenantInvoices.ToListAsync();
+                var results = new List<GetAppTenantInvoiceForViewDto>();
+
+                foreach (var o in dbList)
                 {
-                    AppTenantInvoice = new AppTenantInvoiceDto
+                    var res = new GetAppTenantInvoiceForViewDto()
                     {
+                        AppTenantInvoice = new AppTenantInvoiceDto
+                        {
 
-                        InvoiceNumber = o.InvoiceNumber,
-                        InvoiceDate = o.InvoiceDate,
-                        Amount = o.Amount,
-                        DueDate = o.DueDate,
-                        PayDate = o.PayDate,
-                        Id = o.Id,
-                        Attachment = !string.IsNullOrEmpty(o.Attachment) ? (pathSource + o.Attachment): null,
-                        DisplayName = o.DisplayName.TrimEnd()+ Path.GetExtension(o.Attachment), //Path.GetFileNameWithoutExtension(templateFileName) + DateTime.Now.ToString("yyyyMMddhhmmss") + Path.GetExtension(templateFileName);
-                    }
-                };
+                            InvoiceNumber = o.InvoiceNumber,
+                            InvoiceDate = o.InvoiceDate,
+                            Amount = o.Amount,
+                            DueDate = o.DueDate,
+                            PayDate = o.PayDate,
+                            Id = o.Id,
+                            Attachment = !string.IsNullOrEmpty(o.Attachment) ? (pathSource + o.Attachment) : null,
+                            DisplayName = !string.IsNullOrEmpty(o.DisplayName) ?(o.DisplayName.TrimEnd() + Path.GetExtension(o.Attachment)):"",
+                            TenantName = o.TenantId!=null?(TenantManager.GetById(int.Parse(o.TenantId.ToString()))).Name.TrimEnd():""
+                        }
+                    };
 
-                results.Add(res);
+                    results.Add(res);
+                }
+
+                return new PagedResultDto<GetAppTenantInvoiceForViewDto>(
+                    totalCount,
+                    results
+                );
             }
-
-            return new PagedResultDto<GetAppTenantInvoiceForViewDto>(
-                totalCount,
-                results
-            );
-
         }
 
         public async Task<GetAppTenantInvoiceForViewDto> GetAppTenantInvoiceForView(long id)
