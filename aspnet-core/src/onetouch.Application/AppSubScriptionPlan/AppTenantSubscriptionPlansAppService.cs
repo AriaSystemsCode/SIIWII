@@ -234,9 +234,14 @@ namespace onetouch.AppSubScriptionPlan
 
         }
 
-        public Task<long?> GetTenantSubscriptionPlanId(long tenantId)
+        public async Task<long?> GetTenantSubscriptionPlanId(long tenantId)
         {
-            throw new NotImplementedException();
+            var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
+               .Where(z => z.TenantId == tenantId && (z.CurrentPeriodStartDate <= DateTime.Now.Date && z.CurrentPeriodEndDate >= DateTime.Now.Date)).FirstOrDefaultAsync();
+            if (tenantPlan != null)
+                return tenantPlan.AppSubscriptionPlanHeaderId;
+            else
+                return null;
         }
     }
 }
