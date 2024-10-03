@@ -32,7 +32,7 @@
     <text name="ActivityType">Activity type</text>
     <text name="AppSubscriptionPlanHeaderId">App subscription plan header id</text>
     <text name="AppSubscriptionPlanCode">App subscription plan code</text>
-    <text name="ActivityDateTime">Activity date time</text>
+    <text name="ActivityDateTime">Activity Date/Time</text>
     <text name="Invoiced">Invoiced</text>
     <text name="NotInvoiced">Not invoiced</text>
     <text name="Reference">Reference</text>
@@ -2553,5 +2553,6 @@
     <text name="MessageBody">Message body</text>
     <text name="InvalidEmailFormate">Invalid email formate</text>
     <text name="TransactionHasBeenSent">Transaction has been sent</text>
+    <text name="AccountBilling"> Account Billing</text>
   </texts>  
 </localizationDictionary>
