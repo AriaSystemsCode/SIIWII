@@ -159,7 +159,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         if ($event?.id)
             this.orderId = $event?.id;
         
-        if (this.orderId)
+        if (this.orderId) {
             if($event.entityObjectStatusCode =="DRAFT") {
                 this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.createOrEdit);
 
@@ -167,6 +167,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
                 
             }
+        }
     }
 
     reloadPage(): void {
