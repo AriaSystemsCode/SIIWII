@@ -30,7 +30,7 @@
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns" let-index="rowIndex">
                 <tr [pReorderableRow]="index">
-                    <td pReorderableRowHandle class="position-relative" [ngClass]="{'col-3':cols?.rowHeaderColumn?.label?.toUpperCase() =='CURRENCY'}">
+                    <td pReorderableRowHandle class="position-relative" style="background-color: white !important;" [ngClass]="{'col-3':cols?.rowHeaderColumn?.label?.toUpperCase() =='CURRENCY'}">
                         <div class="ml-2" *ngIf="!rowHeaderIsEditable || (rowHeaderIsEditable && !rowHeaderFormInput);else elseRowHeaderTemp">
                             {{ rowData?.rowHeader?.label | localize }}
                         </div>
@@ -88,6 +88,8 @@
                                         [disabled]="rowData?.rowValues[i].disabled"
                                         [min]="cellSelectionFormInput.min"
                                         [pattern]="cellSelectionFormInput.pattern"
+                                        style="    border: 1px solid #ECECEC !important;
+    border-radius: 8px;"
                                     />
                                 </span>
                                 <span *ngSwitchCase="FormInputType.Checkbox">

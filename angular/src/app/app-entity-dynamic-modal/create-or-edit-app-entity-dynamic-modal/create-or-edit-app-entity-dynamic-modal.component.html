@@ -116,7 +116,7 @@
                                                         <div class="flex-grow-1 mr-1">
                                                             <p-multiSelect
                                                                 [options]="extraAttr.lookupData"
-                                                                [styleClass]="'w-100'"
+                                                                [styleClass]="'w-100 custom-dropdown'"
                                                                 [(ngModel)]="extraAttr.selectedValues"
                                                                 name="extraAttr_{{extraAttr.name}}"
                                                                 [placeholder]="l('Select') + ' ' + extraAttr.name"
@@ -129,7 +129,7 @@
                                                         <div *ngIf="!isSize">
                                                             <p-dropdown
                                                             [options]="extraAttr.lookupData"
-                                                            [styleClass]="'w-100'"
+                                                            [styleClass]="'w-100 custom-dropdown'"
                                                             [(ngModel)]="extraAttr.selectedValues"
                                                             name="extraAttr_{{extraAttr.name}}"
                                                             [placeholder]="l('Select') + ' ' + extraAttr.name"
@@ -139,7 +139,7 @@
                                                         <div *ngIf="isSize && !isHost">
                                                             <p-dropdown
                                                             [options]="sizes"
-                                                            [styleClass]="'w-100'"
+                                                            [styleClass]="'w-100 custom-dropdown'"
                                                             [(ngModel)]="extraAttr.selectedValues"
                                                             name="extraAttr_{{extraAttr.name}}"
                                                             [placeholder]="l('Select') + ' ' + extraAttr.name"
@@ -201,16 +201,31 @@
                                 </div>
 
                            
-                            <div class="row align-items-baseline mb-5 item-photos" *ngIf="visual.image">
-                                <div class="col-12 item-photos-header pt-4 pb-2">
+                            <div class="row align-items-baseline mb-5 item-photos m-3 p-3" *ngIf="visual.image" 
+                            [ngStyle]="{
+                                'border': attachmentsSrcs  && attachmentsSrcs?.length >0  && attachmentsSrcs[0]!='' ? 'none': '2px solid #EEEEEEEE' 
+                            }"
+                             style=" border-radius: 12px;">
+                                <div class="col-12 item-photos-header pt-4 pb-2"  style="    background-color: white !important;">
                                     <div class="d-flex flex-wrap justify-content-between">
-                                        <div>
-                                            <h6>
+                                          <!--  <h6>
                                                 {{ 'EntityPhotos' | localize}}
-                                            </h6>
+                                            </h6>-->
+                                        
+
+                                        <div style="display: flex; align-items: center;" *ngIf="! (attachmentsSrcs  && attachmentsSrcs?.length >0 && attachmentsSrcs[0]!='' )">
+                                            <img src="../../../assets/placeholders/Group 15.png" style="margin-right: 15px;" />
+                                            <div style="    line-height: 0.5;" class="pt-3">
+                                                <p style="font-weight: bold; color: black;">
+                                                    {{ 'Upload files' | localize }}
+                                                </p>
+                                                <p>
+                                                    {{ 'Select and upload the files' | localize }}
+                                                </p>
+                                            </div>
                                         </div>
                                         <div>
-                                        
+                                         <!--
                                             <input type="text" (change)="changeFn($event)" id="AspectRatio" [placeholder]="l('AspectRatio')" class="form-control form-control-sm" [(ngModel)]="aspectRatio" name="aspectRatio" />
                                             <br/>
                                             
@@ -218,37 +233,50 @@
                                             
                                                 <option *ngFor="let attCat of attCategories let i=index" value={{i}}    [selected]="attCat.sycAttachmentCategory.code===productImageCategory.sycAttachmentCategory.code" >{{ attCat?.sycAttachmentCategory?.name }}</option>
 
-                                            </select>
-                                        </div>
-                                        <div>
+                                            </select>-->
+                                        </div> 
+                                        <!-- <div>
                                             <button (click)="removeAllAttachments()" type="button" class="bg-white btn btn-hover-primary p-1 text-center" [disabled]="attachmentsSrcs.length == 1">
                                                 <i class="flaticon-delete m-0 p-0"></i>
                                             </button>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
-                                <div class="col-12 item-photos-body pt-4 pb-5" >
-                                    <div class="row pt-3 pb-3 pl-3">
-                                        <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of attachmentsSrcs; index as i">
+                                <div class="col-12 item-photos-body" 
+                                [ngStyle]="{
+                                    'border': attachmentsSrcs  &&attachmentsSrcs?.length >0 && attachmentsSrcs[0]!=''  ? 'none': '2px dashed #EEEEEE' 
+                                }"
+                                style="    background-color: white !important;border-radius: 12px;">
+                                    <div class="row">
+                                        <div class="image-wrapper" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of attachmentsSrcs; index as i">
                                             <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" for="file_{{i}}">
-                                                <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons">
-                                                    <div class="left-icon">
-                                                        <i class="fa-photo-video fas " ></i>
-                                                    </div>
+                                                <div class="align-items-end d-flex justify-content-center  upload-image-icons ml-5 mb-3 mt-3">
+                                                   <!--  <div class="left-icon">
+                                                        <i class="fa-photo-video fas " ></i> 
+                                                    </div>-->
                                                     <div class="middle-icon">
-                                                        <i class="fa-clipboard-list fas " ></i>
+                                                        <i class="fas " > <img src="../../../assets/placeholders/cloud-add.png" /> </i>
                                                     </div>
-                                                    <div class="right-icon">
-                                                        <i class="fas fa-file-video "></i>
-                                                    </div>
+                                                  <!--  <div class="right-icon">
+                                                         <i class="fas fa-file-video "></i> 
+                                                    </div>-->
                                                 </div>
-                                                <div class="text-center">
-                                                    <a class="btn btn-primary btn-sm mb-3 upload-btn">
-                                                        {{ 'AddAttachedFile' | localize}}
-                                                    </a>
+                                                <div class="text-center pl-5 ml-5">
+                                                    <p  style="font-weight: bold; color: black;
+    white-space: nowrap;">
+                                                    Choose a file or drag & drop it here
                                                     <p >
-                                                        {{ 'YouCanSendUpTo25MBInAttachments' | localize}}.
+                                                    <p >
+                                                        <!-- {{ 'YouCanSendUpTo25MBInAttachments' | localize}}. -->
+
+                                                        {{ 'File an be JPEG, PNG, PDf, and MP4 formats, up to 25 MB' | localize}}.   
                                                     </p>
+                                                    <p style="color: #F6851D !important;">*Image Aspect-Ratio is 16:9 </p>
+
+                                                    <a class="btn btn-primary btn-sm mb-3 upload-btn" style="color: white !important; background-color: #4A0D4A !important;">
+                                                        <!-- {{ 'AddAttachedFile' | localize}} -->
+                                                        {{ 'Browse File' | localize}}
+                                                    </a>
                                                 </div>
                                                 <input type="file" id="file_{{i}}" class="fileImage" #file (change)="fileChange($event,productImageCategory,i,aspectRatio,true)">
                                             </label>
