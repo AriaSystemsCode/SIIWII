@@ -233,5 +233,10 @@ namespace onetouch.AppSubScriptionPlan
             return listInfo;
 
         }
+
+        public Task<long?> GetTenantSubscriptionPlanId(long tenantId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

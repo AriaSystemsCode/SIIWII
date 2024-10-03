@@ -76,7 +76,7 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureBillingCodeFilter), e => e.FeatureBillingCode == input.FeatureBillingCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCategoryFilter), e => e.FeatureCategory == input.FeatureCategoryFilter)
                         .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity))
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanHeaderFilter), e => e.AppSubscriptionPlanHeaderId == long.Parse(input.AppSubscriptionPlanHeaderFilter))
+                        .WhereIf(input.AppSubscriptionPlanHeaderFilter!=null, e => e.AppSubscriptionPlanHeaderId == long.Parse(input.AppSubscriptionPlanHeaderFilter.ToString()))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter);
                         //.WhereIf(input.AddFeaturesOnly, e => e.IsAddOn == true);
 

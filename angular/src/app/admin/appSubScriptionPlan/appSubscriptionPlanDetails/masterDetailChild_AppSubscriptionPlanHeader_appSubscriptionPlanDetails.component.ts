@@ -113,7 +113,7 @@ export class MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDeta
             this.featureCategoryFilter,
             this.trackactivityFilter,
             this.appSubscriptionPlanHeaderId,
-            null,
+            null,false, 
             this.primengTableHelper.getSorting(this.dataTable),
             this.primengTableHelper.getSkipCount(this.paginator, event),
             this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -185,26 +185,5 @@ undefined,
             this._fileDownloadService.downloadTempFile(result);
          });
     }
-    getNewAppFeatureId() {
-       /*  this.apps.appSubscriptionPlanDetail.appFeatureId = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.id;
-        this.appFeatureDescription = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.displayName;
-        this._appFeatureProxy.getAppFeatureForView(this.appSubscriptionPlanDetail.appFeatureId )
-        .subscribe(result => {
-            this.appSubscriptionPlanDetail.featureCode = result.appFeature.code;
-            this.appSubscriptionPlanDetail.unitPrice = result.appFeature.unitPrice;
-            this.appSubscriptionPlanDetail.featureBillingCode = result.appFeature.billingCode;
-            this.appSubscriptionPlanDetail.unitPrice = result.appFeature.unitPrice;
-            this.appSubscriptionPlanDetail.featureCategory = result.appFeature.category;
-            this.appSubscriptionPlanDetail.featurePeriodLimit= result.appFeature.featurePeriodLimit;
-            this.appSubscriptionPlanDetail.isFeatureBillable = result.appFeature.billable;
-            this.appSubscriptionPlanDetail.unitOfMeasurementCode = result.appFeature.unitOfMeasurementCode;
-            this.appSubscriptionPlanDetail.unitOfMeasurementName = result.appFeature.unitOfMeasurementName;
-            this.appSubscriptionPlanDetail.trackactivity = result.appFeature.trackActivity;
-            this.appSubscriptionPlanDetail.featureDescription = result.appFeature.description;
-            this.appSubscriptionPlanDetail.featureName = result.appFeature.name;
-            this.active = true;
-            this.modal.show();
-        }); */
-       // this.appSubscriptionPlanDetail.availability = this.appSubscriptionPlanDetailAppFeatureLookupTableModal.;
-    }
+   
 }
