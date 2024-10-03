@@ -153,8 +153,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     }
 
     onSelectionChange($event) {
-        console.log($event,'$event$event$event$event$event')
-        console.log($event.entityObjectStatusCode,'$jjj')
+ 
         /* if($event.entityObjectStatusCode!="DRAFT")
              return ; */
         if ($event?.id)
