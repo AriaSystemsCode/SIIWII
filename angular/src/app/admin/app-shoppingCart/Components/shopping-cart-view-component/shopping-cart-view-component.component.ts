@@ -117,7 +117,7 @@ export class ShoppingCartViewComponentComponent
       
   }
 
-  show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: number = 0) {
+  show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode= ShoppingCartMode.createOrEdit) {
 
     this.showMainSpinner();
     if( ! (this.companeyNames && this.companeyNames?.length>0)){
@@ -158,9 +158,7 @@ export class ShoppingCartViewComponentComponent
     this.shoppingCartMode = 0;
 
     this.onshare = false;
-    console.log(this.shoppingCartMode,'this.shoppingCartModeeeeeeeeeeeeeeeeeeee')
-    console.log(shoppingCartMode,'ShoppingCartMode')
-    console.log(ShoppingCartMode.createOrEdit,'ShoppingCartMode.createOrEdit')
+
 
     if (shoppingCartMode == ShoppingCartMode.createOrEdit) {
       this.showTabs = false;
