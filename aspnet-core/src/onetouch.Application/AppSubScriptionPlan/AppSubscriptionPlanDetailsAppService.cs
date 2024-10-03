@@ -76,7 +76,7 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureBillingCodeFilter), e => e.FeatureBillingCode == input.FeatureBillingCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCategoryFilter), e => e.FeatureCategory == input.FeatureCategoryFilter)
                         .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity))
-                        .WhereIf(input.AppSubscriptionPlanHeaderFilter != null, e => e.AppSubscriptionPlanHeaderFk != null && e.AppSubscriptionPlanHeaderId == input.AppSubscriptionPlanHeaderFilter)
+                        .WhereIf(input.AppSubscriptionPlanHeaderFilter!=null, e => e.AppSubscriptionPlanHeaderId == long.Parse(input.AppSubscriptionPlanHeaderFilter.ToString()))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter);
                         //.WhereIf(input.AddFeaturesOnly, e => e.IsAddOn == true);
 
@@ -247,8 +247,8 @@ namespace onetouch.AppSubScriptionPlan
         protected virtual async Task Create(CreateOrEditAppSubscriptionPlanDetailDto input)
         {
             var appSubscriptionPlanDetail = ObjectMapper.Map<AppSubscriptionPlanDetail>(input);
-
-            await _appSubscriptionPlanDetailRepository.InsertAsync(appSubscriptionPlanDetail);
+            appSubscriptionPlanDetail.Category = appSubscriptionPlanDetail.FeatureCategory;
+              await _appSubscriptionPlanDetailRepository.InsertAsync(appSubscriptionPlanDetail);
 
         }
 

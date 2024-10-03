@@ -9,7 +9,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
     public class CreateOrEditAppFeatureDto : EntityDto<int?>
     {
 
-        //public int Id { get; set; }
+        public bool IsAddOn { get; set; }
 
         [Required]
         [StringLength(AppFeatureConsts.MaxCodeLength, MinimumLength = AppFeatureConsts.MinCodeLength)]
@@ -23,12 +23,12 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         [StringLength(AppFeatureConsts.MaxDescriptionLength, MinimumLength = AppFeatureConsts.MinDescriptionLength)]
         public string Description { get; set; }
 
-        [Required]
-        [StringLength(AppFeatureConsts.MaxUnitOfMeasurementCodeLength, MinimumLength = AppFeatureConsts.MinUnitOfMeasurementCodeLength)]
+        //[Required]
+       // [StringLength(AppFeatureConsts.MaxUnitOfMeasurementCodeLength, MinimumLength = AppFeatureConsts.MinUnitOfMeasurementCodeLength)]
         public string UnitOfMeasurementCode { get; set; }
 
-        [Required]
-        [StringLength(AppFeatureConsts.MaxUnitOfMeasurementNameLength, MinimumLength = AppFeatureConsts.MinUnitOfMeasurementNameLength)]
+        //[Required]
+        //[StringLength(AppFeatureConsts.MaxUnitOfMeasurementNameLength, MinimumLength = AppFeatureConsts.MinUnitOfMeasurementNameLength)]
         public string UnitOfMeasurementName { get; set; }
 
         [Required]
@@ -44,13 +44,19 @@ namespace onetouch.AppSubScriptionPlan.Dtos
 
         //[Required]
         //[StringLength(AppFeatureConsts.MaxCategoryLength, MinimumLength = AppFeatureConsts.MinCategoryLength)]
-        //public string Category { get; set; }
-
+        public long CategoryId { get; set; }
+        // public string CategoryName { get; set; }
+                
         public bool TrackActivity { get; set; }
 
         public string EntityStatusCode { set; get; }
         public int? EntityStatusId{ get; set; }
 
         public virtual IList<AppEntityCategoryDto> EntityCategories { get; set; }
+        [Required]
+        
+        public long? UnitOfMeasurementId { get; set; }
+        public string Notes { get; set; }
+
     }
 }
