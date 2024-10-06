@@ -184,11 +184,25 @@ debugger
   reloadAddresscomponentAPContact(data) {
 
     this.apContactdata=data;
+
+        if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
+
+    this.contactIdApContact = this.apContactdata?.compId;
+      if( this.AddressComponentChild)
+        this.AddressComponentChild['first']?.getAddressList(this.apContactdata?.compssin);
+    }
   }
 
    
   reloadAddresscomponentARContact(data) {
     this.arContactdata=data;
+    if(this.currentTab == ShoppingCartoccordionTabs.BillingInfo){
+
+    this.contactIdARContact = this.arContactdata?.compId;
+
+    if( this.AddressComponentChild)
+    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.arContactdata?.compssin) : this.AddressComponentChild['last'].getAddressList(this.arContactdata?.compssin);
+    }
   }
 
   createOrEditTransaction() {
