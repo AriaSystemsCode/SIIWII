@@ -314,7 +314,6 @@ isAccManual :boolean = false
   reloadAddresscomponentShipTo(data) {
   this.shipToData=data;
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-  this.contactIdShipTo = data.compId;
   if( this.AddressComponentChild)
     this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
 }
