@@ -1157,7 +1157,7 @@ namespace onetouch.AppItems
 
                             //if (attributeIDs.Count > 0)
                             //{ 
-                            var extraDataAttrDto = new ExtraDataAttrDto();
+                            var extraDataAttrDto = new ExtraDataAttrDto();    
                             extraDataAttrDto.extraAttrName = firstAttributeValue;
                             extraDataAttrDto.selectedValuesTotalCount = firstattributeValuesCount;
                             extraDataAttrDto.extraAttributeId = long.Parse(firstAttributeID);
