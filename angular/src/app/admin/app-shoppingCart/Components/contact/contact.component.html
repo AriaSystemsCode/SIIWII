@@ -8,7 +8,7 @@
                 <p-dropdown [filter]="true"   [filterValue]="companyFilterValue" (onFilter)="handleCompanySearch($event)" class="w-100" [placeholder]="tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder" 
                   [options]="companeyNames"
                     *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo && activeTab!=shoppingCartoccordionTabs.SellerContactInfo" [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
-                    [ngClass]="{'tempAccount': tempAccount}" 
+                    [ngClass]=" tempAccount ? 'tempAccount' : ''" 
                     optionLabel="name" name="selectedCompany"  [virtualScroll]="true" [itemSize]="30" (onChange)="onChangeCompany();companyFilterValue=''" ></p-dropdown>
                   
                 <div *ngIf="activeTab==shoppingCartoccordionTabs.orderInfo || activeTab==shoppingCartoccordionTabs.SellerContactInfo">

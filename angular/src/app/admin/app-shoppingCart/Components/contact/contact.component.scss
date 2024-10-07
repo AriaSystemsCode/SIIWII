@@ -11,6 +11,20 @@ img {
     .aria-select-primeng.p-dropdown {
         min-width: 5.5em !important;
     }
+    .tempAccount  {
+        .p-dropdown {
+            background-color: red !important;
+            color: #ffff !important;
+        }
+        .p-dropdown:not(.p-disabled):hover {
+            background-color: red !important;
+            color: #ffff !important;
+        }
+        .p-dropdown .p-dropdown-label.p-placeholder {
+            color: #ffff !important;
+        }
+    
+    }
 }
 
 .previewTitle {
@@ -24,3 +38,4 @@ font-weight: 600;
     font-style: normal;
     font-weight: 600;
 }
+
