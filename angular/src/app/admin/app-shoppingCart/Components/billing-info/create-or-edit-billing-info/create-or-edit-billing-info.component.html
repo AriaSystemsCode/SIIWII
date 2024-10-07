@@ -35,6 +35,8 @@
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
         [showAddressType]="false"
+        [currentTab]="currentTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
         [canChange]="canChange"
         ></app-address>
     </div>
@@ -71,6 +73,8 @@
     (updateSelectedAddress)="updateArContact($event)"
     [selectedAddressDetails]="arContactSelectedAdd"
     [showAddressType]="false"
+    [currentTab]="currentTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
     [canChange]="canChange"
     ></app-address>
 </div>

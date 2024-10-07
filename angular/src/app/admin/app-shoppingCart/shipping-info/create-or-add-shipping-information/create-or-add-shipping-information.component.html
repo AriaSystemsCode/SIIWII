@@ -40,7 +40,8 @@
             [selectedAddressDetails]="shipFromSelectedAdd"
             [showAddressType]="false"
             [canChange]="canChange"
-         
+            [currentTab]="currentTab"
+            [appTransactionsForViewDto]="appTransactionsForViewDto"
             [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
             ></app-address>
         </div>
@@ -81,7 +82,8 @@
        [selectedAddressDetails]="shipToSelectedAdd"
        [showAddressType]="false"
        [canChange]="canChange"
-    
+       [currentTab]="currentTab"
+       [appTransactionsForViewDto]="appTransactionsForViewDto"
        [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) "
        ></app-address>
     </div>
