@@ -928,4 +928,8 @@ export class AppItemsViewComponent
     getTimezoneOffset() {
         this.timezoneOffset = new Date().getTimezoneOffset();
     }
+
+    _goBack(){
+        this.goBack("app/main/products");
+    }
 }

@@ -184,6 +184,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         this.getUserPreferenceForListView();
         this.initFilterForm()
         this.getAllForAccountInfo()
+
     }
 
    async getAllForAccountInfo() {
@@ -301,7 +302,24 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
             this.paginator.changePage(0);
             return;
         }
-        const filters = this.filterForm.value;
+       
+        const savedState = sessionStorage.getItem('appItemsState');
+        if (savedState) {
+            const state = JSON.parse(savedState);
+    
+            // Restore filter values
+            this.filterForm.patchValue(state.filters);
+            this.filterForm.markAsTouched(); // or markAsDirty()
+
+    
+            // Restore page number and rows per page
+           // this.paginator.changePage(state.page);
+            // this.paginator.rows = state.pageSize;
+    
+            // Remove the saved state (optional)
+//            sessionStorage.removeItem('appItemsState');
+        }
+       const filters=this.filterForm.value;
         const filterBody = this.filterBody
         filterBody.categoryFilters = filters?.categories?.map(dept=>dept.data?.sycEntityObjectCategory?.id)
         filterBody.classificationFilters = filters?.classifications?.map(_class=>_class?.data?.sycEntityObjectClassification?.id)
@@ -381,6 +399,10 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
                     this.loading = false;
                     if (!this.active) this.active = true;
 
+                    if(savedState)
+               sessionStorage.removeItem('appItemsState');
+
+
                 })
             )
             .subscribe((result) => {
@@ -447,6 +469,8 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         }
         if(event.event == AppItemBrowseEvents.Delete) this.deleteItemHandler(index)
         this.eventTriggered.emit(event)
+
+        this.saveStateBeforeNavigation();
     }
 
     bulkShareItems(){
@@ -545,5 +569,15 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     onFinishImport($event) {
         if ($event)
             this.reloadPage();
+    }
+
+    saveStateBeforeNavigation() {
+        const state = {
+            filters: this.filterForm.value,  // Capture filter form values
+            page: this.paginator.getPage(),  // Current page number
+            pageSize: this.paginator.rows  // Rows per page
+        };
+        // Store the state in session storage
+        sessionStorage.setItem('appItemsState', JSON.stringify(state));
     }
 }
