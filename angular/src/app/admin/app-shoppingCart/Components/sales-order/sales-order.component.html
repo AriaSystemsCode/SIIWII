@@ -115,7 +115,7 @@
                     <div *ngIf="allClassFilteredRecords.length != 0 &&  !showExistClass " (click)="showExistClass = true;showClassBtn= false" class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add Classification</div>
                     </div>
                     
-
+                    <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length != 0" (click)="showClassBtn = true ; toggleAppCodes() " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Classification</div>
 
                    
                 </div>
@@ -296,6 +296,7 @@ Cancel
     <div *ngIf="filteredRecords.length != 0 && !showExistCat" (click)="showExistCat = true;showCatBtn= false" class="d-flex p-y-1 px-4 rounded cat">
         <span class="mr-2">+</span> Add Categories
     </div>
+    <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length != 0" (click)="showCatBtn = true; toggleAppCatCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
 </div>
                       
                         
