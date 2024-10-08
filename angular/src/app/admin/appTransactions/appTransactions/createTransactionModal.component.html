@@ -300,7 +300,7 @@
     (ngModelChange)="handleBuyerNameChange($event)"
      (click)="loadInitialContacts()"
     [disabled]="buyerComapnyId === 0"
-    [placeholder]="orderForm.controls['buyerContactName']?.value || 'Please Select Buyer Name'"
+    [placeholder]=" 'Please Select Buyer Name'"
     field="name"
     [forceSelection]="false">
     
@@ -599,7 +599,7 @@
                         formControlName="sellerContactName"
                         [(ngModel)]="selectedSellerContact"
                         (completeMethod)="handleSellerNameSearch($event)"
-                        (ngModelChange)="handleSellerNameChange($event)"
+                        (change)="handleSellerNameChange($event)"
                          (click)="loadInitialSellerContacts()"
                        
                         [placeholder]=" 'Please Select Seller Contact Name'"
