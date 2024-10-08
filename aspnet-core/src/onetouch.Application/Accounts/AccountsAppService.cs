@@ -309,7 +309,7 @@ namespace onetouch.Accounts
                                         },
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
                                         AvaliableConnectionName="Follow",
-                                        ConnectionName=""
+                                        ConnectionName="" 
                                     };
 
                     var accountsList = await _accounts.ToListAsync();
@@ -590,6 +590,7 @@ namespace onetouch.Accounts
                 accountDto.Status = (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.PartnerId == account.Id) > 0 || _appContactRepository.GetAll().Count(x => x.Id == account.PartnerId && x.TenantId == null) > 0);
 
                 accountDto.Connections = _appContactRepository.GetAll().Count(c => c.TenantId == entity.TenantId && c.PartnerId == id);
+                int ConnectionCount = _appContactRepository.GetAll().Count(c => c.TenantId != entity.TenantId && c.SSIN == entity.SSIN && c.IsDeleted== false);
                 accountDto.EntityId = entity.Id;
                 var firstAddress = account.AppContactAddresses.FirstOrDefault();
                 if (account.AppContactAddresses.Count() > 0 && firstAddress.AddressFk != null)
@@ -636,7 +637,7 @@ namespace onetouch.Accounts
                         .Select(x => x.AttachmentFk.Attachment).ToArray();
                 }
 
-                var output = new GetAccountForViewDto { Account = accountDto };
+                var output = new GetAccountForViewDto { Account = accountDto , ConnectionCount = ConnectionCount };
 
                 if (output.Account.CountryId != null && output.Account.CountryId != 0)
                 {
@@ -655,10 +656,19 @@ namespace onetouch.Accounts
                 if (output.Account.CoverUrl != null) output.Account.CoverUrl = @"attachments/" + (entity.TenantId == null ? -1 : entity.TenantId) + @"/" + output.Account.CoverUrl;
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
                 long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
-                var publishedRecord = await _appContactRepository.GetAll().Where(x => x.TenantId == null && x.PartnerId == account.Id &&
-                !x.IsProfileData && x.AccountId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId).FirstOrDefaultAsync();
+                //var publishedRecord = await _appContactRepository.GetAll().Where(x => x.TenantId == null && x.PartnerId == account.Id &&
+                //!x.IsProfileData && x.AccountId == null && x.EntityFk.EntityObjectStatusId != cancelledStatusId).FirstOrDefaultAsync();
+                var publishedRecord = await _appMarketplaceContactRepository.GetAll()
+                                  .AsNoTracking()
+                                  .FirstOrDefaultAsync(x => x.TenantId == null
+                                  && x.IsProfileData == true
+                                  && x.OwnerId == account.TenantId
+                                  && x.SSIN == account.SSIN);
+                output.IsSync = false;
+                output.IsPublished = false;
                 if (publishedRecord != null)
                 {
+                    output.IsSync = (publishedRecord.LastModificationTime != entity.LastModificationTime);
                     output.IsPublished = true;
                 }
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
@@ -1972,11 +1982,21 @@ namespace onetouch.Accounts
             if (contact != null)
             {
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-                {    
+                {
                     //check if account has published styles
 
-                    var appMarketplaceContact = await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
+                    var itemsList = await _appEntityRepository.GetAll()
+                                .Where(e => e.TenantId == null && e.TenantOwner == AbpSession.TenantId && e.EntityObjectTypeCode == "LISTING")
+                                .CountAsync();
 
+                    if (itemsList > 0)
+                    {
+                    // account has published styles and should not be private or hidden 
+                    }
+                    else
+                    {
+                        var appMarketplaceContact = await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
+                    }
                     //var publishedContact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == null && x.IsProfileData == false && x.PartnerId == contact.Id);
                     //if (publishedContact != null)
                     //{
@@ -2039,8 +2059,23 @@ namespace onetouch.Accounts
                                                 && x.OwnerId == contact.TenantId
                                                 && x.SSIN == contact.SSIN);
 
-                    // if profile already published-and not sync - return
-                    if (publishContact != null && !sync) return;
+                    //// if profile already published-and not sync - return
+                    //if (publishContact != null && !sync)
+                    //{
+                    //    if (publishContact.IsHidden)
+                    //    { //restore hidden field
+                    //        publishContact.IsHidden = false;
+                    //        sync = true;
+
+                    //    }
+                    //    else
+                    //    {
+                    //        // if profile already published-and not sync - return
+                    //        sync = true;
+                    //        //return;
+                    //    }
+                    //}
+                    
 
                     CreateOrEditMarketplaceAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditMarketplaceAccountInfoDto();
                     ObjectMapper.Map(contact, createOrEditAccountInfoDto);
