@@ -20,7 +20,7 @@ $green:#1BC5BD;
 $green-1:#60C453;
 $purple : #ab47bc;
 $purple-dark : #745482;
-
+$new-paginatorColor:#d4d4d4;
 
 // general
 $primary-color : $blue;
@@ -37,16 +37,18 @@ $input-bg : $grey;
 $scrollbar-color : $grey-3;
 
 //paginator
-$pagiantor-paginate-btns-bg : $blue-light;
+$pagiantor-paginate-btns-bg : $new-paginatorColor;
 $pagiantor-paginate-btns-bg-disabled : $grey-1;
 $pagiantor-page-color : $black;
+$new-pagiantor-page-color:#9e9e9e;
 $pagiantor-page-border-color : transparent;
+$new-pagiantor-page-border-color:#dfe3e8;
 $pagiantor-page-bg : transparent;
 $pagiantor-page-color-active : $blue;
 $pagiantor-page-border-color-active : $blue;
 $pagiantor-page-bg-active : $white;
 $paginator-bg : transparent;
-
+$new-primaryColor:#4A0D4A;
 
 // p-checkbox
 $checkbox-color :#333;

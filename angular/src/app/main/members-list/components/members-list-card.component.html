@@ -1,4 +1,4 @@
-<div class="single-item mr-1 row align-items-center" >
+<div class="single-item mr-1 row align-items-center memberCard_container shadowContainer" >
     <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
         'background-image':
         member.imageUrl ?
@@ -12,34 +12,30 @@
     <div class="single-item-body col " [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
         <div class="row justify-content-between row">
             <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" >
-                <h3 (click)="clickCardHandler()" class="text-capitalize text-primary card-name" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0 text-dark'">
+                <h3 (click)="clickCardHandler()" class="text-capitalize card-name" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
                     <div *ngIf="member.firstName || member.surName ">
                         {{member.firstName}}  {{member.surName}}
                     </div>
                 </h3>
 
-                <div class="mb-1 text-dark " >
+                <div class="mb-1" >
                     <div class="d-flex flex-column" >
 
                         <div class="d-flex justify-content-between" [ngClass]=" singleItemPerRowMode ? 'flex-row' : 'flex-column' ">
-                            <div >
+                            <div class="jobDetails">
                                 {{ member?.jobTitle + ( member?.accountName && member?.jobTitle ? ' ' + l('at') + ' ' : ''   ) + member?.accountName }}
                              </div>
                             <div  *ngIf="member.eMailAddress && singleItemPerRowMode"> | </div>
                             <div *ngIf="member.eMailAddress">
-                               <b>{{ "Email" | localize }} : </b> {{member.eMailAddress}}
+                               <span class="email">{{ "Email" | localize }} : </span> <span class="emailDetails">{{member.eMailAddress}}</span>
                             </div>
                         </div>
                     </div>
                     <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex" >
 
-                        <div  *ngIf="showActiveStatus && member?.userId">
-                            <span class="connected text-success" *ngIf="member.isActive == true">
-                                <span class="mr-1">
-                                    <i
-                                        class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
-                                    ></i>
-                                </span>
+                        <div  *ngIf="showActiveStatus && member?.userId" class="activeStatus">
+                            <span class="connected" *ngIf="member.isActive == true">
+                                <img src="../../assets/img/input_icons/true_.png" class="">
                                 {{'Active' | localize }}
                             </span>
                             <span class="text-muted" *ngIf="member.isActive == false">
