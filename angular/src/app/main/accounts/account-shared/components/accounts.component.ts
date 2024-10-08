@@ -9,6 +9,7 @@
 } from "@angular/core";
 import {
     AccountsServiceProxy,
+    MarketplaceAccountsServiceProxy,
     AccountDto,
     GetAccountForViewDto,
     TreeNodeOfGetSycEntityObjectCategoryForViewDto,
@@ -88,6 +89,7 @@ export class AccountsComponent
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
+        private _marketplaceAccountsServiceProxy:MarketplaceAccountsServiceProxy,
         private _importService: MainImportService,
         private _abpSessionService: AbpSessionService,
         private _formBuilder: FormBuilder,
@@ -107,6 +109,7 @@ export class AccountsComponent
         if (changes.defaultMainFilter.firstChange) {
             this.initFilterForm();
             this.setMainPageFilter(this.defaultMainFilter);
+            debugger
             this.getAccounts({
                 rows: this.primengTableHelper.defaultRecordsCountPerPage,
             });
@@ -133,6 +136,7 @@ export class AccountsComponent
             .pipe(debounceTime(1500))
             .subscribe((status) => {
                 if (status) {
+                    debugger
                     this.getAccounts({
                         rows: this.primengTableHelper
                             .defaultRecordsCountPerPage,
@@ -164,6 +168,7 @@ export class AccountsComponent
     }
 
     accountTypeChanges() {
+        debugger
         this.getAccounts();
     }
     resetList() {
@@ -172,6 +177,7 @@ export class AccountsComponent
     }
 
     getAccounts(event?: LazyLoadEvent) {
+        
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
@@ -200,7 +206,7 @@ export class AccountsComponent
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner();
         this.loading = true;
-        this._accountsServiceProxy
+        this._marketplaceAccountsServiceProxy
             .getAll(
                 filters.search || undefined,
                 filters?.mainFilterType?.value || undefined,

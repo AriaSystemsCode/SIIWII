@@ -155,7 +155,7 @@
                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.MembersList)" [ngClass]="currentTab == accountInfoPageTabsEnum.MembersList?'active':''">
                       <!-- <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.MembersList" src="assets/payment/payment-icon-active.svg">
                       <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.MembersList" src="assets/payment/payment-icon.svg">-->
-                      <i *ngIf="currentTab == accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3" style="color: #3699ff;width: 22px;"> </i>   
+                      <i *ngIf="currentTab == accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3"> </i>   
                       <i *ngIf="currentTab != accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3" style="color: #595d6e;width: 22px;"> </i>   
                       <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                         {{l("MyTeamMembers")}}
