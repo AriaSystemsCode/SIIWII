@@ -47,15 +47,19 @@ namespace onetouch.AppSubScriptionPlan
 
         public virtual decimal? UnitPrice { get; set; }
 
-        //[Required]
-        //[StringLength(AppFeatureConsts.MaxCategoryLength, MinimumLength = AppFeatureConsts.MinCategoryLength)]
-        //public virtual string Category { get; set; }
+        [Required]
+        [StringLength(AppFeatureConsts.MaxCategoryLength, MinimumLength = AppFeatureConsts.MinCategoryLength)]
+        public virtual string CategoryCode { get; set; }
+
+        public virtual long? CategoryId { get; set; }
 
         public virtual bool TrackActivity { get; set; }
-        //public long EntityId { get; set; }
+        //public long EntityId { get; set; }9
 
         [ForeignKey("UnitOfMeasurementId")]
         public virtual AppEntity UnitOfMeasurementFk { get; set; }
-
+        public virtual bool IsAddOn { get; set; }
+        [ForeignKey("CategoryId")]
+        public virtual AppEntity CategoryFk { get; set; }
     }
 }

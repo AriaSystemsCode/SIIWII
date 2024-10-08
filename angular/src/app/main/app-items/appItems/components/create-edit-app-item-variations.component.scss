@@ -68,16 +68,16 @@ label.checkbox {
 }
 
 .image-wrapper {
-    border: 1px solid $grey-1;
+   // border: 1px solid $grey-1;
     &.upload {
         border: none;
-        filter: grayscale(1);
+       // filter: grayscale(1);
     }
-    width: 200px;
+    width: 290px;
     height: 276px;
     background-color: white;
     margin-right: 2rem;
-    border-radius: 6px;
+  //  border-radius: 6px;
     cursor: pointer;
     img {
         max-height: 100%;
@@ -131,7 +131,7 @@ label.checkbox {
         cursor: pointer;
         box-shadow: 0px 0px 6px #0000001A;
         @extend %transition-all-3ms;
-        filter: none;
+      //  filter: none;
         .upload-btn.btn {
             background-color: $blue!important;
             color: $white!important;
@@ -158,16 +158,16 @@ label.checkbox {
 .select-default-image {
     display: none;
     position: absolute;
-    bottom: -30px;
+    bottom: -42px;
 }
 
 
 .item-photos {
     .item-photos-header {
-        background-color: #3699FF1A;
+       // background-color: #3699FF1A;
     }
     .item-photos-body {
-        background-color: #F5FAFF;
+       // background-color: #F5FAFF;
     }
 }
 
@@ -178,9 +178,10 @@ label.checkbox {
     overflow-x: scroll;
     .row-item {
         background-color: $white !important;;
-        border: 1px solid #3699FF48!important;
+        border: 1px solid #ECECEC !important;
         height: 60px;
         width: 200px !important;
+        border-radius: 8px !important;
     }
     font: normal normal normal 13px/20px Poppins;
 }
@@ -294,4 +295,14 @@ label.checkbox {
 
 .default-border{
   border: 1px solid #4A0D4A !important;
+}
+
+.imgBorder{
+  border: 1px solid #4A0D4A;
+  border-radius: 12px;
+}
+
+a.nav-link.active {
+  border: 1px solid #4A0D4A !important;
+  border-top-left-radius: 12px;
 }

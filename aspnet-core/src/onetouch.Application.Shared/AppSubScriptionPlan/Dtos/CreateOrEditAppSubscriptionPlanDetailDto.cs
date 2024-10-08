@@ -29,9 +29,9 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         [StringLength(AppSubscriptionPlanDetailConsts.MaxFeaturePeriodLimitLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinFeaturePeriodLimitLength)]
         public string FeaturePeriodLimit { get; set; }
 
-        [Required]
-        [StringLength(AppSubscriptionPlanDetailConsts.MaxCategoryLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinCategoryLength)]
-        public string Category { get; set; }
+        //[Required]
+        //[StringLength(AppSubscriptionPlanDetailConsts.MaxCategoryLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinCategoryLength)]
+        //public string Category { get; set; }
 
         [StringLength(AppSubscriptionPlanDetailConsts.MaxFeatureDescriptionLength, MinimumLength = AppSubscriptionPlanDetailConsts.MinFeatureDescriptionLength)]
         public string FeatureDescription { get; set; }

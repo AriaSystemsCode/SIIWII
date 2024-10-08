@@ -127,7 +127,9 @@
                             border-radius: 5px;
                         "><span class="text-danger">*</span>{{ 'ProductDescription' | localize}}</h6>
                             <p class="hint m-0 p-0 pl-5 ml-5">
-                                <i class="pr-2 fa fa-bell"></i>  {{ 'BuyersMayAlsoBeInterestedInTheseItemSpecifics' | localize}}</p>
+                                <!-- <i class="pr-2 fa fa-bell"></i>  -->
+                                <img  class="mr-2"  src="../../../../../assets/Items/Vector2.png"/>
+                                 {{ 'BuyersMayAlsoBeInterestedInTheseItemSpecifics' | localize}}</p>
                         </div>
                         <div class="row mt-4 pl-5 ml-5">
                             <!-- <div class="col-lg-2 col-md-3 col-sm-4 col-6">
@@ -164,13 +166,13 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
-                        <div class="row align-items-baseline mb-4">
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <h6>{{ 'Categories' | localize}}</h6>
+                        <div class="row align-items-baseline mb-4 border p-4 rounded-lg" style="border-radius: 12px;">
+                            <div class="">
+                                <h6  class="font-weight-bold">{{ 'Categories' | localize}}:</h6>
                             </div>
-                            <div class="col">
+                            <div>
                                 <div
-                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0  border rounded-lg thin-scroll">
+                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0   rounded-lg thin-scroll">
                                     <div class="mb-3" *ngIf="!categories?.length;else categoriesElse">{{
                                         'NoCategoriesSelected' | localize}} ...</div>
                                     <ng-template #categoriesElse>
@@ -198,8 +200,8 @@
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <a class="text-primary pointer font-weight-bold" (click)="openSelectCategoriesModal()">
-                                    {{ categories?.length ? 'Add' : 'Select' }}
+                                <a class="text-primary pointer font-weight-bold border p-3" style="border-radius: 6px;" (click)="openSelectCategoriesModal()">
+                                    <span *ngIf="categories?.length" class="mr-1">+</span>     {{ categories?.length ? 'Add' : 'Select' }}
                                     {{ 'Categories' | localize}}
                                 </a>
                             </div>
@@ -210,13 +212,13 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
-                        <div class="row align-items-baseline mb-4">
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <h6>{{ 'Classifications' | localize}} </h6>
+                        <div class="row align-items-baseline mb-4 border p-4 rounded-lg"  style="border-radius: 12px;">
+                            <div class="">
+                                <h6  class="font-weight-bold">{{ 'Classifications' | localize}}:</h6>
                             </div>
-                            <div class="col">
+                            <div>
                                 <div
-                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0  border rounded-lg thin-scroll">
+                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0   rounded-lg thin-scroll">
                                     <div class="mb-3" *ngIf="!classifications?.length;else classificationElse">
                                         {{ 'NoClassificationsSelected' | localize}} ...
                                     </div>
@@ -245,8 +247,8 @@
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <a class="text-primary pointer font-weight-bold" (click)="openSelectClassificationsModal()">
-                                    {{ classifications?.length ? 'Add' : 'Select' }}
+                                <a class="text-primary pointer font-weight-bold border p-3"  style="border-radius: 6px;" (click)="openSelectClassificationsModal()">
+                                    <span *ngIf="categories?.length" class="mr-1">+</span>   {{ classifications?.length ? 'Add' : 'Select' }}
                                     {{ 'Classifications' | localize}}
                                 </a>
                             </div>
@@ -257,13 +259,13 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
-                        <div class="row align-items-baseline mb-4">
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <h6>{{ 'Departments' | localize}}</h6>
+                        <div class="row align-items-baseline mb-4 border p-4 rounded-lg"  style="border-radius: 12px;">
+                            <div class="">
+                                <h6 class="font-weight-bold">{{ 'Departments' | localize}}:</h6>
                             </div>
-                            <div class="col">
+                            <div>
                                 <div
-                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0  border rounded-lg thin-scroll">
+                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0   rounded-lg thin-scroll">
                                     <div class="mb-3" *ngIf="!departments?.length;else departmentsElse">{{
                                         'NoDepartmentsSelected' | localize}} ...</div>
                                     <ng-template #departmentsElse>
@@ -291,8 +293,8 @@
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <a class="text-primary pointer font-weight-bold" (click)="openSelectDepartmentsModal()">
-                                    {{ departments?.length ? 'Add' : 'Select' }}
+                                <a class="text-primary pointer font-weight-bold border p-3"  style="border-radius: 6px;" (click)="openSelectDepartmentsModal()">
+                                    <span *ngIf="categories?.length" class="mr-1">+</span>   {{ departments?.length ? 'Add' : 'Select' }}
                                     {{ 'Departments' | localize}}
                                 </a>
                             </div>
@@ -312,8 +314,9 @@
                                         border-radius: 5px;">
                                           <span class="text-danger">*</span>  {{ 'ProductPhotos' | localize}}
                                         </h6>
-                                            <p class="hint m-0 p-0 pl-5 ml-5">
-                                                <i class="pr-2 fa fa-bell"></i>   {{ 'YouCanChangeTheVariationTypeToAddMorePhotos' | localize}}
+                                            <p class="hint m-0 p-0 pl-5 ml-5 mt-4">
+                                                <!-- <i class="pr-2 fa fa-bell"></i>  -->
+                                                <img  class="mr-2"  src="../../../../../assets/Items/Vector2.png"/>  {{ 'YouCanChangeTheVariationTypeToAddMorePhotos' | localize}}
                                         </p>
                                     </div>
                                     <div>
@@ -330,14 +333,15 @@
                             </div>
                             <div class="col-12 item-photos-body pt-4 pb-5 ml-5 pl-5">
                                 <div class="row pt-3 pb-3 pl-3">
-                                    <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}"
+                                    <div class="image-wrapper mb-5" style="border: 1px solid #4A0D4A ;
+    border-radius: 12px !important;" [ngClass]="{'upload':!attachment}"
                                         *ngFor="let attachment of attachmentsSrcs; index as i">
                                         <label *ngIf="!attachment"
                                             class="d-flex flex-column justify-content-center h-100 align-items-center"
                                             for="file_{{i}}">
                                             <div
-                                                class="align-items-end d-flex justify-content-center mb-4 upload-image-icons">
-                                                <div class="left-icon">
+                                                class="align-items-end d-flex justify-content-center upload-image-icons mt-3">
+                                               <!--  <div class="left-icon">
                                                     <i class="fa-photo-video fas "></i>
                                                 </div>
                                                 <div class="middle-icon">
@@ -345,15 +349,29 @@
                                                 </div>
                                                 <div class="right-icon">
                                                     <i class="fas fa-file-video "></i>
+                                                </div> -->
+                                                <div class="middle-icon">
+                                                    <i class="fas " > <img src="../../../assets/placeholders/cloud-add.png" /> </i>
                                                 </div>
                                             </div>
                                             <div class="text-center">
-                                                <a class="btn        btn-sm mb-3 upload-btn">
+                                                <p  style="font-weight: bold; color: black;
+    white-space: nowrap;">
+                                                    Choose a file or drag & drop it here
+                                                    <p >
+                                                <!-- <a class="btn        btn-sm mb-3 upload-btn">
                                                     {{ 'AddAttachedFile' | localize}}
-                                                </a>
+                                                </a> -->
                                                 <p>
-                                                    {{ 'YouCanSendUpTo25MBInAttachments' | localize}}.
+                                                    <!-- {{ 'YouCanSendUpTo25MBInAttachments' | localize}}. -->
+                                                    {{ 'File an be JPEG, PNG, PDf, and MP4 formats, up to 25 MB' | localize}}.   
                                                 </p>
+                                                <p style="color: #F6851D !important;">*Image Aspect-Ratio is 16:9 </p>
+
+                                                <a class="btn btn-primary btn-sm mb-3 upload-btn" style="color: white !important; background-color: #4A0D4A !important;">
+                                                    <!-- {{ 'AddAttachedFile' | localize}} -->
+                                                    {{ 'Browse File' | localize}}
+                                                </a>
                                             </div>
                                         </label>
                                         <a *ngIf="attachment"
@@ -372,17 +390,20 @@
                                                 </div>
                                                 <div class="bg-white kt-avatar__upload" for="file"
                                                     (click)="removePhoto(i)">
-                                                    <i class="fa fa-times text-danger"></i>
+                                                    <!-- <i class="fa fa-times text-danger"></i> -->
+                                                    <img  class="mr-2"  src="../../../../../assets/Items/Frame 1707478667.png"/>
                                                 </div>
                                             </div>
                                             <!-- <img *ngIf="!appItem.entityAttachments && !appItem.entityAttachments.length" src="../../../../../assets/img/Untitled.png"/> -->
                                             <img *ngIf="attachment" [src]="attachment" />
                                             <a class="select-default-image p-2"
+                                            style="    border: 1px solid #EEEEEEEE !important;
+    border-radius: 12px;"
                                                 [ngClass]="{'d-block' : defaultImageIndex == i}"
                                                 (click)="setDefaultImage(i)">
-                                                <i class="fa fa-check-circle mr-2"
-                                                    [ngClass]="defaultImageIndex == i? 'text-success':'text-grey' "></i>
-                                                {{ 'IsDefaultImage' | localize}}
+                                                <i class="fa fa-check-square mr-2"
+                                                    [ngClass]="defaultImageIndex == i? 'text-purple':'text-grey' "> </i>
+                                             <label class="text-purple">  {{ 'Default Image' | localize}}</label> 
                                             </a>
                                         </a>
                                         <input type="file" id="file_{{i}}" class="d-none" #file
@@ -410,8 +431,8 @@
                             </div>
                             <div class=" ml-4 pl-4 row pt-4" *ngIf="defaultCurrencyMSRPPriceIndex > -1"
                                 style="gap:20px">
-                                <div class="row">
-                                    <h6>
+                                <div class="row mr-5 pr-5">
+                                    <h6 class="font-weight-bold">
                                         <span class="text-danger">*</span>
                                         {{ 'MSRP' | localize}}
                                     </h6>
@@ -440,7 +461,7 @@
                                         </div> -->
                                     </div>
                                 </div>
-                                <div *ngIf="defaultCurrencyMSRPPriceIndex > -1">
+                               <!--  <div *ngIf="defaultCurrencyMSRPPriceIndex > -1">
                                     <div class="d-flex align-items-baseline">
                                         <button class="btn mr-5 ml-5" type="button"
                                             (click)="showAdvancedPricingModal()" style="
@@ -451,20 +472,32 @@
                                             {{'AdvancedPricing' | localize}}
                                         </button>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
-                            <div class="col-2 ml-4 pl-4">
-                                <h6><span class="text-danger">*</span>
+                            <div class="d-flex flex-row ml-5 pl-5 mr-5 pr-5">
+                                <h6  class="font-weight-bold ml-5 pl-5 mr-3"><span class="text-danger">*</span>
                                     {{ 'AvailableQuantity' | localize}}
                                 </h6>
                                 <p-inputNumber [ariaRequired]="true" mode="decimal" #AppItem_StockAvailability="ngModel"
                                     [(ngModel)]="appItem.stockAvailability" name="stockAvailability" [min]="0"
                                     [disabled]="appItem?.variationItems?.length || sellVariationChecked"
-                                    (ngModelChange)="stockAvailabilityChanged($event)" class="bg-input">
+                                    (ngModelChange)="stockAvailabilityChanged($event)" class="bg-input custom-style" >
                                 </p-inputNumber>
                                 <span class="ml-2">
                                     <validation-messages [formCtrl]="AppItem_StockAvailability"></validation-messages>
                                 </span>
+                            </div>
+                            <div *ngIf="defaultCurrencyMSRPPriceIndex > -1">
+                                <div class="d-flex align-items-baseline ml-5 pl-5">
+                                    <button class="btn mr-5 ml-5" type="button"
+                                        (click)="showAdvancedPricingModal()" style="
+                                        background-color: #4A0D4A;
+                                        border-radius: 5px;
+                                        color: white;
+                                    ">
+                                        {{'AdvancedPricing' | localize}}
+                                    </button>
+                                </div>
                             </div>
                             <div class="col-10 pl-4 ml-4 mt-4">
                                 <span>
@@ -501,7 +534,8 @@
                                     ">{{"CreateVariation" | localize}}
                                     </button>
                                     <div class="hint w-50 ml-3">
-                                        <i class="pr-2 fa fa-bell"></i> {{
+                                        <!-- <i class="pr-2 fa fa-bell"></i>  -->
+                                         <img  class="mr-2"  src="../../../../../assets/Items/Vector2.png"/> {{
                                         'IfYouSellMultipleVariationsOfYourItem,YouCanListAllOfThemInOneMulti-Quantity,Fixed-priceListing.ThisSavesYouTimeAndMoney.'
                                         | localize}}
                                     </div>
@@ -546,7 +580,7 @@
                             <p-accordion>
                                 <p-accordionTab>
                                     <ng-template pTemplate="header">
-                                        <div class="d-inline-block custom-header">
+                                        <div class="d-inline-block custom-header p-3">
                                             <h6 class="mb-1 font-weight-bold">{{extraAttributeObject.value.header | localize}}</h6>
                                             <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p>
                                         </div>

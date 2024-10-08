@@ -16,6 +16,11 @@ using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
 using onetouch.Helpers;
+using Abp.Domain.Uow;
+using Abp.EntityFrameworkCore.Extensions;
+using Org.BouncyCastle.Crypto;
+using onetouch.SystemObjects;
+using onetouch.SystemObjects.Dtos;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -24,19 +29,25 @@ namespace onetouch.AppSubScriptionPlan
     {
         private readonly IRepository<AppSubscriptionPlanHeader, long> _appSubscriptionPlanHeaderRepository;
         private readonly IAppSubscriptionPlanHeadersExcelExporter _appSubscriptionPlanHeadersExcelExporter;
+        private readonly IRepository<AppTenantSubscriptionPlan, long> _appTenantSubscriptionPlanRepository;
         private readonly Helper _helper;
-        public AppSubscriptionPlanHeadersAppService(IRepository<AppSubscriptionPlanHeader, long> appSubscriptionPlanHeaderRepository,
-            IAppSubscriptionPlanHeadersExcelExporter appSubscriptionPlanHeadersExcelExporter, Helper helper)
+        private readonly ISycEntityObjectStatusesAppService _sycEntityObjectStatusesAppService;
+        public AppSubscriptionPlanHeadersAppService(IRepository<AppSubscriptionPlanHeader, long> appSubscriptionPlanHeaderRepository, ISycEntityObjectStatusesAppService sycEntityObjectStatusesAppService,
+            IAppSubscriptionPlanHeadersExcelExporter appSubscriptionPlanHeadersExcelExporter, Helper helper, IRepository<AppTenantSubscriptionPlan, long> appTenantSubscriptionPlanRepository)
         {
             _appSubscriptionPlanHeaderRepository = appSubscriptionPlanHeaderRepository;
             _appSubscriptionPlanHeadersExcelExporter = appSubscriptionPlanHeadersExcelExporter;
+            _appTenantSubscriptionPlanRepository = appTenantSubscriptionPlanRepository;
             _helper = helper;
+            _sycEntityObjectStatusesAppService= sycEntityObjectStatusesAppService;
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAppSubscriptionPlanHeaderForViewDto>> GetAll(GetAllAppSubscriptionPlanHeadersInput input)
         {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
 
-            var filteredAppSubscriptionPlanHeaders = _appSubscriptionPlanHeaderRepository.GetAll()
+                var filteredAppSubscriptionPlanHeaders = _appSubscriptionPlanHeaderRepository.GetAll().IncludeIf( AbpSession.TenantId!=null , z=>z.AppSubscriptionPlanDetails)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Description.Contains(input.Filter) || e.BillingCode.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.Name.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.DescriptionFilter), e => e.Description == input.DescriptionFilter)
                         .WhereIf(input.IsStandardFilter.HasValue && input.IsStandardFilter > -1, e => (input.IsStandardFilter == 1 && e.IsStandard) || (input.IsStandardFilter == 0 && !e.IsStandard))
@@ -51,61 +62,83 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), e => e.Name == input.NameFilter);
 
-            var pagedAndFilteredAppSubscriptionPlanHeaders = filteredAppSubscriptionPlanHeaders
-                .OrderBy(input.Sorting ?? "id asc")
-                .PageBy(input);
+                var pagedAndFilteredAppSubscriptionPlanHeaders = filteredAppSubscriptionPlanHeaders
+                    .OrderBy(input.Sorting ?? "id asc")
+                    .PageBy(input);
 
-            var appSubscriptionPlanHeaders = from o in pagedAndFilteredAppSubscriptionPlanHeaders
-                                             select new
-                                             {
+                var appSubscriptionPlanHeaders = from o in pagedAndFilteredAppSubscriptionPlanHeaders
+                                                 select new
+                                                 {
 
-                                                 o.Description,
-                                                 o.IsStandard,
-                                                 o.IsBillable,
-                                                 o.Discount,
-                                                 o.BillingCode,
-                                                 o.MonthlyPrice,
-                                                 o.YearlyPrice,
-                                                 o.Code,
-                                                 o.Name,
-                                                 Id = o.Id
-                                             };
+                                                     o.Description,
+                                                     o.IsStandard,
+                                                     o.IsBillable,
+                                                     o.Discount,
+                                                     o.BillingCode,
+                                                     o.MonthlyPrice,
+                                                     o.YearlyPrice,
+                                                     o.Code,
+                                                     o.Name,
+                                                     Id = o.Id,
+                                                     o.AppSubscriptionPlanDetails
+                                                 };
 
-            var totalCount = await filteredAppSubscriptionPlanHeaders.CountAsync();
+                var totalCount = await filteredAppSubscriptionPlanHeaders.CountAsync();
 
-            var dbList = await appSubscriptionPlanHeaders.ToListAsync();
-            var results = new List<GetAppSubscriptionPlanHeaderForViewDto>();
+                var dbList = await appSubscriptionPlanHeaders.ToListAsync();
+                var results = new List<GetAppSubscriptionPlanHeaderForViewDto>();
 
-            foreach (var o in dbList)
-            {
-                var res = new GetAppSubscriptionPlanHeaderForViewDto()
+                foreach (var o in dbList)
                 {
-                    AppSubscriptionPlanHeader = new AppSubscriptionPlanHeaderDto
+                    var res = new GetAppSubscriptionPlanHeaderForViewDto()
                     {
+                        AppSubscriptionPlanHeader = new AppSubscriptionPlanHeaderDto
+                        {
 
-                        Description = o.Description,
-                        IsStandard = o.IsStandard,
-                        IsBillable = o.IsBillable,
-                        Discount = o.Discount,
-                        BillingCode = o.BillingCode,
-                        MonthlyPrice = o.MonthlyPrice,
-                        YearlyPrice = o.YearlyPrice,
-                        Code = o.Code,
-                        Name = o.Name,
-                        Id = o.Id,
+                            Description = o.Description,
+                            IsStandard = o.IsStandard,
+                            IsBillable = o.IsBillable,
+                            Discount = o.Discount,
+                            BillingCode = o.BillingCode,
+                            MonthlyPrice = o.MonthlyPrice,
+                            YearlyPrice = o.YearlyPrice,
+                            Code = o.Code,
+                            Name = o.Name,
+                            Id = o.Id,
+                            AppSubscriptionPlanDetails =ObjectMapper.Map<List<AppSubscriptionPlanDetailDto>>(o.AppSubscriptionPlanDetails),
+                        }
+                    };
+
+                    results.Add(res);
+                }
+                //MMT
+                if (AbpSession.TenantId != null)
+                {
+                    var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll()
+                        .Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodEndDate.Date >= DateTime.Now.Date && DateTime.Now.Date >= z.CurrentPeriodStartDate.Date).FirstOrDefaultAsync();
+                    if (tenantPlan != null)
+                    {
+                        var plan = results.Where(z => z.AppSubscriptionPlanHeader.Id == tenantPlan.AppSubscriptionPlanHeaderId).FirstOrDefault();
+                        if (plan != null)
+                            plan.AppSubscriptionPlanHeader.AppTenantSubscriptionPlanId= tenantPlan.Id;
+
                     }
-                };
+                          
+                }
+                   // AppTenantSubscriptionPlanId
+                //MMT
+                return new PagedResultDto<GetAppSubscriptionPlanHeaderForViewDto>(
+                    totalCount,
+                    results
+                );
 
-                results.Add(res);
             }
-
-            return new PagedResultDto<GetAppSubscriptionPlanHeaderForViewDto>(
-                totalCount,
-                results
-            );
+        }
+        public async Task<List<SycEntityObjectStatusLookupTableDto>> GetPlanStatusList()
+        {
+            return await _sycEntityObjectStatusesAppService.GetAllSycEntityStatusForTableDropdown("STANDARDSUBSCRIPTIONPLAN");
 
         }
-
         public async Task<GetAppSubscriptionPlanHeaderForViewDto> GetAppSubscriptionPlanHeaderForView(long id)
         {
             var appSubscriptionPlanHeader = await _appSubscriptionPlanHeaderRepository.GetAsync(id);

@@ -722,3 +722,43 @@ border: 1px solid #D9D9D9 !important;
 .p-datepicker{
     z-index: 999999999999 !important;
 }
+
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler{
+    order: 2;
+}
+
+.custom-dropdown {
+    background-color: #F8F8F8 !important;
+}
+
+.bg-input .p-inputnumber-input{
+    background-color: #EEEEEE !important;
+    border-radius: 8px !important;
+     border: 1px solid #EEEEEE !important;
+   }
+   thead.p-datatable-thead {
+    background-color: #F8F8F8 !important;
+}
+
+.p-table {
+    border-collapse: collapse; 
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+    border: 1px solid #ECECEC !important;
+    border-radius: 12px !important;
+}
+.table-transparent-rows .p-datatable .p-datatable-tbody > tr > td, .table-transparent-header .p-datatable .p-datatable-thead > tr > th{
+    border-color: #ECECEC !important;
+}
+
+.variation-table .p-datatable .p-datatable-thead > tr > th, .variation-table .p-datatable.p-datatable-hoverable-rows .p-datatable-tbody > tr:not(.p-highlight):hover, .variation-table .p-datatable .p-datatable-tbody > tr.p-highlight {
+    padding: 20px !important;
+    border: 1px solid #ECECEC !important;
+    border-radius: 12px !important;
+}
+
+.p-accordion .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link {
+    background-color: #FAFAFAFA !important;
+}

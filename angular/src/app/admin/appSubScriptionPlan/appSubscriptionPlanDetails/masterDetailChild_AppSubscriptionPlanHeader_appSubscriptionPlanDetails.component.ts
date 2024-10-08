@@ -16,7 +16,7 @@ import { FileDownloadService } from '@shared/utils/file-download.service';
 import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistory/entity-type-history-modal.component';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-
+import { AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent } from './appSubscriptionPlanDetail-appFeature-lookup-table-modal.component';
 
 @Component({
     templateUrl: './masterDetailChild_AppSubscriptionPlanHeader_appSubscriptionPlanDetails.component.html',
@@ -112,8 +112,8 @@ export class MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDeta
             this.featureBillingCodeFilter,
             this.featureCategoryFilter,
             this.trackactivityFilter,
-            null,
             this.appSubscriptionPlanHeaderId,
+            null,false, 
             this.primengTableHelper.getSorting(this.dataTable),
             this.primengTableHelper.getSkipCount(this.paginator, event),
             this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -185,5 +185,5 @@ undefined,
             this._fileDownloadService.downloadTempFile(result);
          });
     }
-    
+   
 }
