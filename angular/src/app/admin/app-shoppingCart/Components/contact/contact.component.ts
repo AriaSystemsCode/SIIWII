@@ -229,8 +229,15 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
          });
      } */
     onchangePhoneType($event) {
-        if ($event?.value)
+        if ($event?.value) {
+            console.log($event,'helllo')
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.value?.phoneTypeId);
+        if ($event?.value?.phoneNumber) {
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = $event?.value?.phoneNumber
+        }else {
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  null
+        }
+        }
         else
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.phoneTypeId);
         if (indx >= 0)
