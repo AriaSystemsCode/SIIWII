@@ -442,7 +442,7 @@
             </Item5>
           </Controls>
         </Item1>
-        <Item2 Ref="228" ControlType="DetailBand" Name="Detail" HeightF="105.85746" Dpi="254" BackColor="LightGray">
+        <Item2 Ref="228" ControlType="DetailBand" Name="Detail" HeightF="105.85746" KeepTogether="true" Dpi="254" BackColor="LightGray">
           <HierarchyPrintOptions Ref="229" Indent="50.8" />
           <MultiColumn Ref="230" ColumnCount="12" Layout="AcrossThenDown" Mode="UseColumnCount" />
           <SortFields>
