@@ -1,13 +1,17 @@
 .type {
-    background-color: #F8F8F8;
-    padding: 8px 5px;
+   
+    padding: 6px 16px;
 
     border-radius: 6px;
-    border: 1px;
+    border: 1px solid #EEE;
+    background: #F8F8F8;
     color: #9E9E9E;
-    Width: 134px;
-    min-Width: 120px;
-    Height: 35px;
+font-size: 13px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+height: 35px;
+ 
 }
 .summary-sec {
     padding-left: 20px;
@@ -57,7 +61,10 @@ td {
     height: 46px;
     border-radius: 6px;
     padding: 11px 16px 11px 16px !important;
-    background-color:#EEEEEE !important    ;
+
+border: 1px solid rgba(238, 238, 238, 0.93);
+background: #FFF;
+box-shadow: 2px 2px 6px 0px rgba(22, 22, 22, 0.05);
     color: #4A0D4A !important;
     display: flex;
     align-items: center;

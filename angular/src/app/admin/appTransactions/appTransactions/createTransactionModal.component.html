@@ -41,8 +41,8 @@
                     <div
                     class="enter d-flex align-items-center justify-content-start gap-2"
                 >
-                    <span class="mr-2">Entered By :</span>
-                    <a href="http://" class="entered" target="_blank" rel="noopener noreferrer">{{
+                    <span class="mr-2 spEnterd">Entered By :</span>
+                    <a  class="enteredBy"  rel="noopener noreferrer">{{
                         fullName
                     }}</a>
                 </div>
@@ -77,9 +77,9 @@
                             formControlName="enteredDate"
                             [showIcon]="true"
                             [readonlyInput]="false"
-                            
+                            (focus)="onFocus()" (blur)="onBlur()"
                             (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
-                         
+                            [ngClass]="isFocused ? 'focused-calendar' : ''"
                          
                         ></p-calendar>
                         <img  src="../../../../../assets/icons/calendar.png"  (click)="openCalendar(calendar1)"  alt="" srcset="">
@@ -181,10 +181,10 @@
             <div class="sellerHeader">
                 <span>Buyer Information</span>
             </div>
-            <form [formGroup]="orderForm" class="form mt-3 ">
+            <form [formGroup]="orderForm" class="form ">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="flex align-items-center gap-1 my-2" *ngIf="formType?.toUpperCase() != 'PO'">
+                        <div class="flex align-items-center gap-1 temm" *ngIf="formType?.toUpperCase() != 'PO'">
                             <!-- <p-checkbox
                                 value="Buyer"
                                 [disabled]="isBuyer"

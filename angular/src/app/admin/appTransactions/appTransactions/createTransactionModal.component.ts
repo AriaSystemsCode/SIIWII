@@ -122,7 +122,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     showAddTextBtn:boolean = false
     showAddSellBtn:boolean = false
     showAddBuyBtn:boolean = false
-    
+    isFocused: boolean = false;
     @ViewChild('calendar1') calendar1: Calendar;
     @ViewChild('calendar2') calendar2: Calendar;
     @ViewChild('calendar3') calendar3: Calendar;
@@ -175,7 +175,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     openCalendar(calendar: Calendar) {
         calendar.inputfieldViewChild.nativeElement.click();
       }
-
+      onFocus() {
+        this.isFocused = true;
+      }
+      
+      onBlur() {
+        this.isFocused = false;
+      }
       
     ngOnChanges(){
         // this.loadInitialContacts();

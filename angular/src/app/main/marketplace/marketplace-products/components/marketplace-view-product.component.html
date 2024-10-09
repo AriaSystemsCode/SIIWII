@@ -321,14 +321,15 @@
                     </div>
                      
                         <div class="d-flex">
-                            <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;">{{productDetails?.name}}</p>
-                            <h6 class="type ml-1 pt-2 text-center">
-                                {{
+                            <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 4px;">{{productDetails?.name}}</p>
+                            <div class="type ml-3 pt-2 text-center">
+                                <p class="mb-0">  {{
                                     productDetails?.orderByPrePack === false
                                         ? "By Size"
                                         : "By Prepack"
-                                }}
-                            </h6>
+                                }}</p>
+                              
+                            </div>
                         </div>
                         <div class="price mb-4">
                             <!-- show msrp price and range in this product has no special pricing -->
@@ -413,7 +414,7 @@
                             <div class="editQtyContainer">
                                 <div class="fieldset">
                                     <div class="input-group">
-                                      <input type="number" min="0" class="form-control inputs form-text" id="editQty" style="width: 267px;
+                                      <input type="number" min="0" class="form-control inputs form-text" id="editQty" style="max-width: 267px;
                                       height: 44px;
                                       border-radius: 8px;
                                       border: 2px solid #4A0D4A;"

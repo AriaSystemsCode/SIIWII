@@ -13,7 +13,7 @@
                 </div>
                 <div class="col-md-12">
                     <div
-                        class="d-flex align-items-center justify-content-between"
+                        class="d-flex align-items-center main-c "
                     >
                         <div class="share">
                             <p-dropdown
@@ -26,10 +26,10 @@
                         </div>
                         <div
                             class="sarch d-flex align-items-center justify-content-center"
-                            style="gap: 5px"
+                            style="gap: 7px"
                         >
                          
-                            <span class="p-input-icon-right w-100">
+                            <span class="p-input-icon-right group-srch">
                                 <i class="pi pi-search"></i>
                                 <input
                                     id="_searchInput"
@@ -46,51 +46,45 @@
                             [options]="currencies"
                             [(ngModel)]="selectedCurrrency"
                             optionLabel="code"
-                            class="w-50 mr-2"
+                            class="cur "
                             (onChange)="handleCurrencyChange($event)"
                         ></p-dropdown>
-                        </div>
-                        <div
-                            class="sort d-flex align-items-center justify-content-between"
-                            style="gap: 5px ; white-space: nowrap;"
-                        >
-                         
-
-                            <p-dropdown
-                                [options]="sortingData"
-                                [(ngModel)]="selectedSort"
-                                placeholder="Sort by"
-                                optionLabel="label"
-                                class="sortBy"
-                                (onChange)="handleSortingChange($event)"
-                            ></p-dropdown>
-                            <p-button
-                            icon="pi pi-sliders-h"
-                            [label]="
-                                isFilterHidden
-                                    ? 'Show Filters '
-                                    : 'Hide Filters'
-                            "
-                            (click)="toggleFilters()"
-                            class="filterBtn d-lg-block d-md-none"
-                            styleClass="p-button-outlined p-button-secondary"
-                           
-                        ></p-button>
-                        <p-button
-                        icon="pi pi-sliders-h"
+                        <p-dropdown
+                        [options]="sortingData"
+                        [(ngModel)]="selectedSort"
+                        placeholder="Sort by"
+                        optionLabel="label"
+                        class="sortBy"
+                        (onChange)="handleSortingChange($event)"
+                    ></p-dropdown>
+                    <p-button
+                    icon="pi pi-sliders-h"
+                    [label]="
+                        isFilterHidden
+                            ? 'Show Filters '
+                            : 'Hide Filters'
+                    "
+                    (click)="toggleFilters()"
+                    class="filterBtn d-lg-block d-none"
+                    styleClass="p-button-outlined p-button-secondary"
                    
-                        (click)="toggleFilters()"
-                        class="filterBtn d-lg-none d-md-block"
+                ></p-button>
+                <p-button
+                icon="pi pi-sliders-h"
+           
+                (click)="toggleFilters()"
+                class="filterBtn d-lg-none d-block"
+                styleClass="p-button-outlined p-button-secondary"
+               
+            ></p-button>
+                    <p-button
+                        icon="pi pi-refresh"
+                        (click)="resetProducts($event)"
                         styleClass="p-button-outlined p-button-secondary"
-                       
+                        class="resBtn"
                     ></p-button>
-                            <p-button
-                                icon="pi pi-refresh"
-                                (click)="resetProducts($event)"
-                                styleClass="p-button-outlined p-button-secondary"
-                                class="resBtn"
-                            ></p-button>
                         </div>
+                     
                     </div>
                 </div>
                 <div *ngIf="!isFilterHidden" class="col-lg-3 col-5 my-3 text-dark">
@@ -206,7 +200,7 @@
             <p-button
                 icon="pi pi-refresh"
                 (click)="resetProducts($event)"
-                styleClass=" "
+                styleClass="p-button-outlined p-button-secondary"
                 class="resBtn"
             ></p-button>
         </div>
