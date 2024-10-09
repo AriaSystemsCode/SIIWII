@@ -117,7 +117,7 @@ export class ShoppingCartViewComponentComponent
       
   }
 
-  show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode = ShoppingCartMode.createOrEdit) {
+  show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, shoppingCartMode: ShoppingCartMode= ShoppingCartMode.createOrEdit) {
 
     this.showMainSpinner();
     if( ! (this.companeyNames && this.companeyNames?.length>0)){
@@ -155,8 +155,10 @@ export class ShoppingCartViewComponentComponent
     this.loadNotesComp = true;
     this.showCarousel = showCarousel;
     this.validateOrder = validateOrder;
-    this.shoppingCartMode = shoppingCartMode;
+    this.shoppingCartMode = 0;
+
     this.onshare = false;
+
 
     if (shoppingCartMode == ShoppingCartMode.createOrEdit) {
       this.showTabs = false;

@@ -5,3 +5,26 @@
         }
     }
 }
+@media (min-width: 992px) {
+    .download-section {
+        display: none;
+    }
+    .orderInfoForm  {
+        display: block;
+    }
+}
+
+
+@media (max-width: 992px) {
+    .download-section {
+        display: block;
+    }
+    .orderInfoForm  {
+        display: none;
+    }
+}
+.btnPdf {
+    background-color: #4A0D4A;
+    color: #fff;
+    height: 35px;
+}
