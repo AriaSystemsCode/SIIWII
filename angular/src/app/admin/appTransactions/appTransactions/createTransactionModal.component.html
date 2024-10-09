@@ -599,7 +599,7 @@
                         formControlName="sellerContactName"
                         [(ngModel)]="selectedSellerContact"
                         (completeMethod)="handleSellerNameSearch($event)"
-                        (change)="handleSellerNameChange($event)"
+                        (ngModelChange)="handleSellerNameChange($event)"
                          (click)="loadInitialSellerContacts()"
                        
                         [placeholder]=" 'Please Select Seller Contact Name'"

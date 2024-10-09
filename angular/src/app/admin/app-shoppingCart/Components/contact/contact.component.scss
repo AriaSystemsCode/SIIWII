@@ -11,6 +11,13 @@ img {
     .aria-select-primeng.p-dropdown {
         min-width: 5.5em !important;
     }
+
+
+    .tempCon {
+        .p-icon-wrapper {
+            display: none !important;
+        }
+    }
 }
 
 .previewTitle {
@@ -24,3 +31,4 @@ font-weight: 600;
     font-style: normal;
     font-weight: 600;
 }
+
