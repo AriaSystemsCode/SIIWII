@@ -645,7 +645,11 @@ this.hideMainSpinner();
     indx = this.minimizedOrders?.findIndex(x => x.orderId == orderId);
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
-    this.show(orderId, this.showCarousel, this.validateOrder, this.shoppingCartMode);
+    if(this.appTransactionsForViewDto?.entityStatusCode =="DRAFT") {
+      this.show(orderId, this.showCarousel, this.validateOrder, ShoppingCartMode.createOrEdit);
+    } else {
+        this.show(orderId, this.showCarousel, this.validateOrder, ShoppingCartMode.view);
+}
   }
 
   onProceedToCheckout() {
