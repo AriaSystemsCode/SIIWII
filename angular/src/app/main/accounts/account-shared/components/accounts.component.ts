@@ -96,7 +96,7 @@ export class AccountsComponent
         private _abpSessionService: AbpSessionService,
         private _formBuilder: FormBuilder,
         private _emailingTemplateAppService: EmailingTemplateServiceProxy,
-       // MarketplaceAccountsModule
+       // MarketplaceAccountsModule  
     ) {
         super(injector);
         this.overridePrimeTableSetting();
