@@ -14,7 +14,8 @@ import {
     GetAccountForViewDto,
     TreeNodeOfGetSycEntityObjectCategoryForViewDto,
     TreeNodeOfGetSycEntityObjectClassificationForViewDto,
-    EmailingTemplateServiceProxy
+    EmailingTemplateServiceProxy,
+    GetMarketplaceAccountForViewDto
 } from "@shared/service-proxies/service-proxies";
 import { AbpSessionService } from "abp-ng2-module";
 import { AppComponentBase } from "@shared/common/app-component-base";
@@ -54,7 +55,8 @@ export class AccountsComponent
     _entityTypeFullName = "onetouch.AppItems.AppItem";
     entityHistoryEnabled = false;
 
-    accounts: GetAccountForViewDto[] = [];
+   // accounts: GetAccountForViewDto[] = [];
+    accounts:GetMarketplaceAccountForViewDto[]=[];
     sortingOptions: SelectItem[];
 
     active: boolean = false;
@@ -93,7 +95,8 @@ export class AccountsComponent
         private _importService: MainImportService,
         private _abpSessionService: AbpSessionService,
         private _formBuilder: FormBuilder,
-        private _emailingTemplateAppService: EmailingTemplateServiceProxy
+        private _emailingTemplateAppService: EmailingTemplateServiceProxy,
+       // MarketplaceAccountsModule
     ) {
         super(injector);
         this.overridePrimeTableSetting();
