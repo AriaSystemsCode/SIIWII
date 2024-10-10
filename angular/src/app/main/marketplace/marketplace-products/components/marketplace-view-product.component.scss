@@ -57,7 +57,8 @@ td {
 }
 
 .description button{
-    width: 195px;
+    // width: 195px;
+    white-space: nowrap;
     height: 46px;
     border-radius: 6px;
     padding: 11px 16px 11px 16px !important;
@@ -343,7 +344,9 @@ background-color: white;
 input:checked + .slider {
     background-color: #2DC74F !important;
 }
-
+input:not(:checked) + .slider {
+    background-color: #ccc !important; /* Or any other color when not checked */
+}
 input:focus + .slider {
     box-shadow: 0 0 1px #2DC74F;
 }
@@ -360,24 +363,35 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
-@media only screen and (max-width: 992px) {
-    .web {
-        margin-top: 15px;
+::ng-deep {
+    @media only screen and (max-width: 992px) {
+        .editQty {
+            max-width: 145px;
+        }
+        .web {
+            margin-top: 15px;
+        }
+        .summaryWeb{
+    display: none;
+        }
+        .summaryTab{
+            display: block;
+            margin-top: 25px;
+            padding-right: 20px;
+                }
+                .p-tabview-title {
+                    font-size: 12px !important;
+                }
+                
     }
-    .summaryWeb{
-display: none;
-    }
-    .summaryTab{
-        display: block;
-        margin-top: 25px;
-            }
-            .p-tabview-title {
-                font-size: 11px;
-            }
 }
 
 
+
 @media only screen and (min-width: 992px) {
+    .editQty {
+        max-width: 267px;
+    }
     .web {
         margin-top: -50px;
     }
@@ -435,9 +449,17 @@ font-weight: 600;
 }
 
 ::ng-deep {
-    .p-button {
-        background-color: #4A0D4A !important;
-        border: 1px solid #4A0D4A;
+    // .p-button {
+    //     background-color: #4A0D4A !important;
+    //     border: 1px solid #4A0D4A;
+    // }
+    .p-inputnumber-button {
+        background: #F8F8F8 !important;
+        border: 1px solid #F8F8F8 !important; 
+    }
+    .p-icon-wrapper {
+        color: #777777 !important;
+        fill: #777777 !important;
     }
     .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
         background-color: #4A0D4A !important;
@@ -452,6 +474,12 @@ font-weight: 600;
         border: 1px solid #E2E2E2 !important;
     }
 @media only screen and (max-width: 567px) {
+    td {
+        font-size: 10px !important;
+    }
+    .editQty {
+        max-width: 145px;
+    }
     .tabView-mob {
         .p-tabview .p-tabview-nav , .p-tabview .p-tabview-nav li {
             height: 45 !important;
@@ -474,7 +502,10 @@ font-weight: 600;
         max-width: 160px !important;
     }
     .table-mob {
-    
+        .p-tabview .p-tabview-nav {
+       
+            padding: 0 !important;
+        }
         .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link{
             background-color: #4A0D4A !important
         }
@@ -485,7 +516,9 @@ font-weight: 600;
             border-radius: 6px !important;
             height: 33px !important;
             min-width: 150px !important;
-            /* margin: auto; */
+             margin: 0 !important; 
+        color: white !important;
+
         }
   
         .p-tabview-title {
@@ -493,12 +526,13 @@ font-weight: 600;
             margin-top: 11px;
         }
     }
+   
     .p-tabview .p-tabview-nav {
-        padding: 8px 14px !important;
+       
         border: 1px solid #E2E2E2 !important;
-        border-top-left-radius: 6px !important;
-        border-top-right-radius: 6px !important;
-        padding: 5px !important;
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+        padding: 8px 14px !important;
         background: #FFF !important;
         min-height: 35px !important;
         .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
@@ -509,7 +543,11 @@ font-weight: 600;
     .p-tabview .p-tabview-panels {
         padding: 5px !important;
     }
+    .p-tabview .p-tabview-nav li {
+        margin-right: 65px !important;
+    }
     .tabPanel-custom {
+    
         .p-tabview .p-tabview-nav li .p-tabview-nav-link {
             width: 80px !important;
             height: 66px !important;
@@ -547,17 +585,52 @@ font-weight: 600;
             }
         }
     }
-
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+        // width: 80px !important;
+        width: 66px !important;
+        // height: 66px !important;
+        padding: 0 !important;
+        border: none !important;
+        margin: 0 10px;
+        padding-left: 10px !important;
+     
+        svg {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 10px !important;
+            margin-top: 10px !important;
+        }
+        .p-tabview .p-tabview-nav li:nth-child(2) .p-tabview-nav-link {
+            border-left: 1px solid #eee !important;
+        }
+    }
     .table-mob {
         
         .p-tabview .p-tabview-nav li {
-            width: 100% !important;
+            // width: 100% !important;
             height: 35px !important;
             margin: 0 !important;
             // border-right:  1px solid #eee !important;
         }
+        .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+            width: 185px !important;
+        }
     }
-
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+        // width: 217px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+.sm-tab {
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+        width: 200px !important;
+        height: 30px !important;
+    }
+    .table-mob .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        width: 182px !important;
+        color: white !important;
+    }
+}
     .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
         // background-color: white !important; 
         color: #777 !important;
@@ -599,7 +672,7 @@ font-weight: 600;
         width: 140px  !important;
         // border-right: 1px solid #eee !important ;
         // border-bottom: 1px solid #eee !important ;
-        height: 99px !important;
+        // height: 99px !important;
         align-items: center !important;
         fill:#777777 !important;
         svg{
