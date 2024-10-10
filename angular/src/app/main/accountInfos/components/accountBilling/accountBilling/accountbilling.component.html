@@ -1,0 +1,45 @@
+<div  dropdown container="body" class="body-c" >
+  <div class="container" style="width: Hug (862px)px;  height: Hug (37px)px;  top: 28px;  left: 24px;  gap: 240px;  border-radius: 4px 4px 0px 0px; opacity: 0px;">
+    <p class="align-paragraph" style="color: #1B101B;font-size: 24px;font-weight: 700;" >Account Billing</p>
+    <!--<br/>
+    <br/>
+    <br/>  -->   
+     <div class="absolute-item"> 
+    <button id="invoicebtn" [ngClass]= "{'billing-option-btn': !isInvoice, 'billing-option-btn-clicked': isInvoice}"
+    class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.InvoicesOption,'invoicebtn')">
+        Invoices
+     </button> 
+    <!-- </div> -->
+    <!-- <div  class="absolute-item"> -->
+    <button id="actlogbtn" [ngClass]= "{'billing-option-btn': !isActivityLog, 'billing-option-btn-clicked': isActivityLog}"
+    class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.ActivityLogOption,'actlogbtn')">
+        Activity Log
+    </button>
+    <!-- </div> -->
+    <!-- <div style="billing-btn-frame" class="absolute-item"> -->
+    <button id="addonbtn" [ngClass]= "{'billing-option-btn': !isAddOn, 'billing-option-btn-clicked': isAddOn}"
+    class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.AddOnsOption,'addonbtn')" >
+        Add-ons
+    </button>
+    <!-- </div> -->
+    <!--<div style="billing-btn-frame" class="absolute-item">-->
+    <button id="planbtn" [ngClass]= "{'billing-option-btn': !isPlan, 'billing-option-btn-clicked': isPlan}" class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.PlansOption,'planbtn')" >
+        Plans
+    </button>
+    </div>
+    <br/>
+    <br/>
+    <br/> 
+    </div>
+     <div class="tab1" *ngIf="currentTab == billingOptionsTabs.PlansOption">
+        <app-plans></app-plans>
+      </div>
+      <div class="tab2" *ngIf="currentTab == billingOptionsTabs.AddOnsOption">
+        <app-add-ons></app-add-ons>
+      </div>
+      <div class="tab3" *ngIf="currentTab == billingOptionsTabs.ActivityLogOption">
+        <app-activity-log></app-activity-log>
+      </div>
+      <div class="tab4" *ngIf="currentTab == billingOptionsTabs.InvoicesOption">
+        <app-tenant-invoices></app-tenant-invoices>
+      </div>

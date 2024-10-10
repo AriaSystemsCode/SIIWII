@@ -2241,7 +2241,7 @@ namespace onetouch.AppItems
             {
                 appItem = await _appItemRepository.InsertAsync(appItem);
 
-                var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
+                //var available = await _appTenantActivitiesLogAppService.IsFeatureAvailable("CREATE-PRODUCT");
                 //if (available == true)
                 {
                     await _appTenantActivitiesLogAppService.AddUsageActivityLog("CREATE-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
@@ -2252,7 +2252,7 @@ namespace onetouch.AppItems
             {
                 //await CurrentUnitOfWork.SaveChangesAsync();
                 appItem = await _appItemRepository.UpdateAsync(appItem);
-                var availableFeature = await _appTenantActivitiesLogAppService.IsFeatureAvailable("EDIT-PRODUCT");
+               // var availableFeature = await _appTenantActivitiesLogAppService.IsFeatureAvailable("EDIT-PRODUCT");
                 //if (availableFeature == true)
                     await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
             }

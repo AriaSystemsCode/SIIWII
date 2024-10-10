@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
@@ -25,5 +26,6 @@ namespace onetouch.AppSubScriptionPlan
         Task<bool> AddUsageActivityLog(string featureCode, string? relatedEntityCode, long? relatedEntityId, long? relatedEntityOvbjectTypeId, string? relatedEntityObjectTypeCode, string reference, int qty);
         Task<bool> AddPlanRenewalBalances(DateTime startdate);
         Task<bool> IsFeatureAvailable(string featureCode);
+        Task<bool> AddCreditActivityLog(List<AddOnsInputDto> AddOnsList);
     }
 }

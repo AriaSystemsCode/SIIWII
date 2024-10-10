@@ -5,6 +5,7 @@ namespace onetouch.AppSubscriptionPlans.Dtos
 {
     public class GetAllAppTenantInvoicesInput : PagedAndSortedResultRequestDto
     {
+        public long? TenantId { set; get; }   
         public string Filter { get; set; }
 
         public string InvoiceNumberFilter { get; set; }
