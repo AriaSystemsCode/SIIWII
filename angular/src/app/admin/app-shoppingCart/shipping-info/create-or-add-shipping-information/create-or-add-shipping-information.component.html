@@ -1,155 +1,162 @@
 <div class="position-relative tab-cont thin-scroll">
-<div >
-    <div class="container-fluid pt-1 mb-3 "[ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-        <div class="header p-2 my-2 d-flex  justify-content-between">
-            <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
-            <button 
-            [disabled]="!(shippingTabValid)" (click)="createOrEditTransaction()" 
-            class="continuebtn text-center btn float-right"  *ngIf="!showSaveBtn ">
-                 {{l("Continue")}}
-            </button>
+    <div >
+        <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditshippingInfO ?  'd-block' : 'd-none'">
+            <div class="header p-2 my-2 d-flex  justify-content-between">
+                <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
+                <button 
+                [disabled]="!(shippingTabValid)" (click)="createOrEditTransaction()" 
+                class="continuebtn text-center btn float-right"  *ngIf="!showSaveBtn ">
+                     {{l("Continue")}}
+                </button>
+        
+            </div>
+            <hr class="my-2" />
+            <div class="InfoForm pr-3 thin-scroll">
+                <div class="row ml-1"> 
+                    <app-contact  
+                    class="w-100"
+                    [shipInfoIndex]="1"
+                    (loadAddressComponent)="reloadAddresscomponentShipFrom($event)"
+                    [isCreateOrEdit]="createOrEditshippingInfO"
+                    [activeTab]="activeTab"
+                    [currentTab]="currentTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                    (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                    (formValidityChanged)="isContactFormValid($event,1)"
+                ></app-contact>
+                </div>
+            </div>
+            
+        </div>
     
+        <div   [ngClass]="createOrEditshippingInfO ?  'd-block' : 'd-none'"> 
+            <hr class="my-2" />
+    
+            <app-address 
+      
+            [isCreateOredit]="createOrEditshippingInfO"
+            [contactId]="contactIdShipFrom"
+            (updateSelectedAddress)="updateShipFromAddress($event)"
+            [selectedAddressDetails]="shipFromSelectedAdd"
+            [showAddressType]="false"
+            [canChange]="canChange"
+            [currentTab]="currentTab"
+            [appTransactionsForViewDto]="appTransactionsForViewDto"
+            [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
+            ></app-address>
         </div>
-        <hr class="my-2" />
-        <div class="InfoForm pr-3 thin-scroll">
-            <div class="row ml-1"> 
-                <app-contact  
-                class="w-100"
-                [shipInfoIndex]="1"
-                (loadAddressComponent)="reloadAddresscomponentShipFrom($event)"
-                [isCreateOrEdit]="createOrEditshippingInfO"
-                [activeTab]="activeTab"
-                [currentTab]="currentTab"
-                [appTransactionsForViewDto]="appTransactionsForViewDto"
-                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
-                (formValidityChanged)="isContactFormValid($event,1)"
-            ></app-contact>
+        <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO ?  'd-block' : 'd-none'">
+            <div class="header p-2 my-2 d-flex  justify-content-between">
+                <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
+                <!--<button [disabled]="(!enableSAveShipTo)" (click)="createOrEditTransaction()"
+                 class="continuebtn text-center btn float-right">
+                     {{l("Continue")}}
+                </button>-->
             </div>
-        </div>
-  
-          
-    </div>
-
-    <div    [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'"> 
-        <hr class="my-2" />
-
-        <app-address 
-        [appTransactionsForViewDto]="appTransactionsForViewDto"
-        [isCreateOredit]="createOrEditshippingInfO"
-        [contactId]="contactIdShipFrom"
-        (updateSelectedAddress)="updateShipFromAddress($event)"
-        [selectedAddressDetails]="shipFromSelectedAdd"
-        [showAddressType]="false"
-        [canChange]="canChange"
-        [currentTab]="currentTab"
-        [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
-        ></app-address>
-    </div>
-    <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-        <div class="header p-2 my-2 d-flex  justify-content-between">
-            <h6><span  class="headertxt">  {{l("ShipTo")}} : </span></h6>
-            <!--<button [disabled]="(!enableSAveShipTo)" (click)="createOrEditTransaction()"
-             class="continuebtn text-center btn float-right">
-                 {{l("Continue")}}
-            </button>-->
-        </div>
-        <hr class="my-2" />
-        <div class="InfoForm pr-3 thin-scroll">
-            <div class="row ml-1"> 
-                <app-contact  
-                class="w-100"
-                [shipInfoIndex]="2"
-                (loadAddressComponent)="reloadAddresscomponentShipTo($event)"
-                [isCreateOrEdit]="createOrEditshippingInfO"
-                [activeTab]="activeTab"
-                [currentTab]="currentTab"
-                [appTransactionsForViewDto]="appTransactionsForViewDto"
-                (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
-                (formValidityChanged)="isContactFormValid($event,2)"
-            ></app-contact>
+            <hr class="my-2" />
+            <div class="InfoForm pr-3 thin-scroll">
+                <div class="row ml-1"> 
+                    <app-contact  
+                    class="w-100"
+                    [shipInfoIndex]="2"
+                    (loadAddressComponent)="reloadAddresscomponentShipTo($event)"
+                    [isCreateOrEdit]="createOrEditshippingInfO"
+                    [activeTab]="activeTab"
+                    [currentTab]="currentTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+                    (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
+                    (formValidityChanged)="isContactFormValid($event,2)"
+                ></app-contact>
+                </div>
             </div>
-        </div>
+           
+       </div>
+       <hr class="my-2" />
        
-   </div>
-   
-   <div   [ngClass]="createOrEditshippingInfO  ?  'd-block' : 'd-none'">
-    <hr class="my-2" />
-   <app-address 
-   [appTransactionsForViewDto]="appTransactionsForViewDto"
-   [isCreateOredit]="createOrEditshippingInfO"
-   [contactId]="contactIdShipTo"
-   (updateSelectedAddress)="updateShipToAddress($event)"
-   [selectedAddressDetails]="shipToSelectedAdd"
-   [showAddressType]="false"
-   [canChange]="canChange"
-   [currentTab]="currentTab"
-   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) "
-
-
-   ></app-address>
-</div>
-
-<div class="row edit-mode " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-    <div class="col-6 mb-4">
-        <label class="label mt-1 mb-1">{{l("Store")}}</label>
-<input type="text" class="form-control w-100" (input)="enterStore()"  [(ngModel)]="storeVal" #store/>
+       <div   [ngClass]="createOrEditshippingInfO ?  'd-block' : 'd-none'">
+       <app-address 
+ 
+       [isCreateOredit]="createOrEditshippingInfO"
+       [contactId]="contactIdShipTo"
+       (updateSelectedAddress)="updateShipToAddress($event)"
+       [selectedAddressDetails]="shipToSelectedAdd"
+       [showAddressType]="false"
+       [canChange]="canChange"
+       [currentTab]="currentTab"
+       [appTransactionsForViewDto]="appTransactionsForViewDto"
+       [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) "
+       ></app-address>
     </div>
-    <div class="col-6 mb-4">
-        <label class="label mt-1 mb-1">{{l("ShipVia")}}</label>
-        <p-dropdown
-        (onChange)="selectShipVia($event)"
-        id="shipVia"
-        [(ngModel)]="appTransactionsForViewDto.shipViaId"
-        [options]="shipViaList"
-        name="shipVia"
-        styleClass="form-control aria-select"
-        [required]="true"
-        [placeholder]="'PleaseSelect' | localize"
-    >
-    </p-dropdown>
-    <p class="text-danger" *ngIf="!appTransactionsForViewDto.shipViaId">
-       <small>
-         Please select ship via option
-       </small>
-    </p>
-    </div>
-</div>
-
     
-</div>
+    <div class="row edit-mode " *ngIf="createOrEditshippingInfO">
+        <div class="col-6 mb-4">
+            <label class="label mt-1 mb-1">{{l("Store")}}</label>
+    <input type="text" class="form-control w-100" (input)="enterStore()"  [(ngModel)]="storeVal" #store/>
+        </div>
+        <div class="col-6 mb-4">
+            <label class="label mt-1 mb-1">{{l("ShipVia")}}</label>
+            <p-dropdown
+            (onChange)="selectShipVia($event)"
+            id="shipVia"
+            [(ngModel)]="appTransactionsForViewDto.shipViaId"
+            [options]="shipViaList"
+            name="shipVia"
+            styleClass="form-control aria-select"
+            [required]="true"
+            [placeholder]="'PleaseSelect' | localize"
+        >
+        </p-dropdown>
+        <p class="text-danger" *ngIf="!appTransactionsForViewDto.shipViaId">
+           <small>
+             Please select ship via option
+           </small>
+        </p>
+        </div>
+    </div>
+    
+        
+    </div>
+    
+    
+    <div *ngIf="!createOrEditshippingInfO">
+        <app-view-shipping-information
+        [activeTab]="activeTab"
+        [currentTab]="currentTab" 
+        (showShippingEditMode)="onshowShippingEditMode($event)"
+         (onshowSaveBtn)="onshowSaveBtn($event)"
+        [contactIdFrom]="contactIdShipFrom"
+        [contactIdTo]="contactIdShipTo"
+        [selectedAddressDetailsFrom]="shipFromSelectedAdd"
+        [selectedAddressDetailsTo]="shipToSelectedAdd"
+        [appTransactionsForViewDto]="appTransactionsForViewDto"
+        [createOrEditshippingInfO]="createOrEditshippingInfO" 
+        [canChange]="canChange"
+        (isContactsValid_1)="isContactFormValid($event,1)"
+        (isContactsValid_2)="isContactFormValid($event,2)">
+    </app-view-shipping-information>
+    </div>
 
 
-<div [ngClass]="!createOrEditshippingInfO   ?  'd-block' : 'd-none'">
-    <app-view-shipping-information
-    [activeTab]="activeTab"
-    [currentTab]="currentTab" 
-    (showShippingEditMode)="onshowShippingEditMode($event)"
-     (onshowSaveBtn)="onshowSaveBtn($event)"
-    [contactIdFrom]="contactIdShipFrom"
-    [contactIdTo]="contactIdShipTo"
-    [selectedAddressDetailsFrom]="shipFromSelectedAdd"
-    [selectedAddressDetailsTo]="shipToSelectedAdd"
-    [appTransactionsForViewDto]="appTransactionsForViewDto"
-    [createOrEditshippingInfO]="createOrEditshippingInfO" 
-    [canChange]="canChange"
-    (isContactsValid_1)="isContactFormValid($event,1)"
-    (isContactsValid_2)="isContactFormValid($event,2)">
-</app-view-shipping-information>
-</div>
-<div class="d-flex justify-content-end">
-    <button *ngIf="showSaveBtn" (click)="save()"
-    [disabled]="!(shippingTabValid)"
-    class="previewbtn text-center btn ">
-    Save
-    <!-- <i class="pi pi-check"></i> -->
-</button>
-<button
-*ngIf="showSaveBtn"
-(click)="cancel()"
-class="cancelbtn text-center btn float-right"
->
-Cancel
-<!-- <i class="pi pi-times"></i> -->
-</button>
-</div>
-</div>
+
+    <div class="container-fluid pt-1 mb-3 " *ngIf="createOrEditshippingInfO">
+        <div class="header p-2 my-2 d-flex  justify-content-end">
+      
+            <button *ngIf="showSaveBtn" (click)="save()"
+            [disabled]="!(shippingTabValid)"
+            class="previewbtn text-center btn float-right">
+            Save
+           
+        </button>
+        <button
+        *ngIf="showSaveBtn"
+        (click)="cancel()"
+        class="cancelbtn text-center btn float-right"
+    >
+        Cancel
+    
+    </button>
+        </div>
+   
+        
+    </div>
+    </div>

@@ -1,13 +1,13 @@
 <div class="position-relative tab-cont thin-scroll">
 
     <div>
-    <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'" >
+    <div class="container-fluid pt-1 mb-3 "  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
                  {{l("Continue")}}
             </button>
-   
+     
 
         </div>
         <hr class="my-2" />
@@ -26,7 +26,6 @@
             ></app-contact>
             </div>
         </div>
-     
     </div>
         <hr class="my-2" />
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
@@ -36,12 +35,13 @@
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
         [showAddressType]="false"
-        [canChange]="canChange"
         [currentTab]="currentTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+        [canChange]="canChange"
         ></app-address>
     </div>
     
-    <div class="container-fluid pt-1"   [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+    <div class="container-fluid pt-1"  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">  {{l("ARContact")}} : </span></h6>
         </div>
@@ -73,11 +73,12 @@
     (updateSelectedAddress)="updateArContact($event)"
     [selectedAddressDetails]="arContactSelectedAdd"
     [showAddressType]="false"
-    [canChange]="canChange"
     [currentTab]="currentTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [canChange]="canChange"
     ></app-address>
 </div>
-    <div class="container-fluid pt-1 mb-3 mt-3"   [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+    <div class="container-fluid pt-1 mb-3 mt-3"  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
         </div>
@@ -103,30 +104,10 @@
             </div>
         </div>
         </div>
-
-        <div class="d-flex justify-content-end">
-            <button
-            *ngIf="showSaveBtn"
-            [disabled]="!(isContactsValid)"
-            (click)="save()"
-            class="previewbtn text-center btn float-right"
-        >
-            Save
-            <!-- <i class="pi pi-check"></i> -->
-        </button>
-        <button
-        *ngIf="showSaveBtn"
-        (click)="cancel()"
-        class="cancelbtn text-center btn float-right"
-    >
-        Cancel
-        <!-- <i class="pi pi-times"></i> -->
-    </button>
-        </div>
 </div>
 
 
-<div  [ngClass]="!createOrEditBillingInfo ?  'd-block' : 'd-none'">
+<div *ngIf="!createOrEditBillingInfo">
     <app-view-billing-info
     (showBillingEditMode)="onshowBillingEditMode($event)"
     (onshowSaveBtn)="onshowSaveBtn($event)"
@@ -142,5 +123,29 @@
     (isContactsValid_1)="isContactFormValid($event,1)"
     (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-billing-info>
+</div>
+
+
+<div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+    <div class="header p-2 my-2 d-flex  justify-content-end">
+<button
+*ngIf="showSaveBtn"
+[disabled]="!(isContactsValid)"
+(click)="save()"
+class="previewbtn text-center btn float-right"
+>
+Save
+
+</button>
+<button
+*ngIf="showSaveBtn"
+(click)="cancel()"
+class="cancelbtn text-center btn float-right"
+>
+Cancel
+
+</button>
+
+</div>
 </div>
 </div>
