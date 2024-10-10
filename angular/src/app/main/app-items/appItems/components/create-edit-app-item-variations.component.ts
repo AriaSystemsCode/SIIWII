@@ -1445,13 +1445,11 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
             return !sectedRecordsPositions.includes(variation.position) || !variation.ssin ;   
         });
 
-        this.variationMatrices.map((item, index) => {
-            item.position = index + 1;
-            return item;
-        });
     }
         this.selectedVaritaions = [];
         this.primengTableHelper.records = this.variationMatrices;
+
+
         this.getExistingVariations();
         this.setSelectionVariations();
 
@@ -1518,7 +1516,27 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
                 : this.variationMatrices,
             appItemSizesScaleInfo,
         };
-        this.applyVariations.emit(body);
+        for (let index = 0; index < this.appSizeScales?.appSizeScalesDetails.length; index++) {
+            const sizeScale = this.appSizeScales?.appSizeScalesDetails[index];
+
+            let notdeleteSize =  this.variationMatrices.some(matrix => {       return matrix.entityExtraData?.some((item) => {   return item.entityObjectTypeCode == 'SIZE'   && item.attributeCode  == sizeScale.sizeCode }) });
+
+            if(!notdeleteSize){
+                this.appSizeScales?.appSizeScalesDetails?.splice(index,1);
+                this.appSizeRatios?.appSizeScalesDetails?.splice(index,1);
+                index--;
+            }
+
+            }
+
+            this.appSizeScales?.appSizeScalesDetails?.forEach((item, index) => {
+                item.d1Position = index.toString(); 
+            }); 
+
+                this.appSizeRatios?.appSizeScalesDetails?.forEach((item, index) => {
+                    item.d1Position = index.toString(); 
+                   }); 
+                this.applyVariations.emit(body);
     }
 
     
@@ -2543,8 +2561,8 @@ currentExtraAttr?.displayedSelectedValues?.forEach(item => {
         });
          }
         
-    } 
-
+    }
+   
 }
 export interface ApplyVariationOutput {
     variation: VariationItemDto[];

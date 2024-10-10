@@ -2,7 +2,7 @@
     <form #ProductVariationForm="ngForm" >
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal">
             <div class="kt-subheader kt-grid__item " >
-                <div [class]="containerClass" style="background-color: #EEEEEEEE;">
+                <div [class]="containerClass" style="background-color: #FAFAFAFA;">
                   <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
                         {{ 'VariationCombinations' | localize }}
@@ -55,12 +55,16 @@
                                         <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
                                             <!-- attributes -->
                                             <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
-                                                [ngClass]="{'active':activeExisttingVariation}"
+                                                [ngClass]="{'active':activeExisttingVariation , 
+                                             'text-white' : activeExisttingVariation , 
+                                            'text-purple' : !activeExisttingVariation}"
                                                 (click)="getExistingVariations()" *ngIf="showExisttingVariation" >
                                                 Existing Variations
                                             </a>
                                             <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg" *ngIf="!showExisttingVariation || showNewVariation"
-                                            [ngClass]="{'active':activeNewVariation}"
+                                            [ngClass]="{'active':activeNewVariation , 
+                                             'text-white' : activeNewVariation , 
+                                            'text-purple' : !activeNewVariation}"
                                             (click)="getNewVariations()"  >
                                         New Variations
                                         </a>
@@ -338,7 +342,7 @@
                                                             placeholder="Price"
                                                            [name]="'price_'+record.position+index"
                                                             class="form-control rounded-lg pt-3 pb-3 row-item"
-                                                            [(ngModel)]=" record.appItemPriceInfos[pricingFilter.variationCorrespondingIndex[record.position-1]].price">
+                                                            [(ngModel)]=" record.appItemPriceInfos[pricingFilter.variationCorrespondingIndex[index]].price">
                                                         </div>
                                                     </td>
 
@@ -387,7 +391,7 @@
                             </p>
                         </div> -->
                         <div class="mb-2 position-relative">
-                            <h6 class="font-weight-bold p-4" style="background-color: #EEEEEEEE;
+                            <h6 class="font-weight-bold p-4" style="background-color: #FAFAFAFA;
                             border-radius: 5px;">{{ "Attributes" | localize }} </h6>
                                     <button [disabled]="shouldDisableCreateVarButton()"
                                         class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="right: 0px;
@@ -403,9 +407,12 @@
                             <div class="align-items-baseline d-flex flex-row justify-content-start">
                                 <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
                                     <!-- attributes -->
-                                    <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg"
+                                    <a  class="aria-tag  border mb-3 mr-3 pr-4 pl-4 position-relative pt-2 pb-2 rounded-lg"
                                         *ngFor="let selectedExtraAttribute of selectedExtraAttributes;index  as i"
-                                        [ngClass]="{'active':i == activeExtraAttributeIndex}"
+                                        [ngClass]="{'active':i == activeExtraAttributeIndex  , 
+                                             'text-white' : i == activeExtraAttributeIndex  , 
+                                            'text-purple' :i != activeExtraAttributeIndex }"
+
                                         (click)="setActiveExtraAttribute(i)"
                                         [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE' &&  selectedExtraAttribute?.entityObjectTypeCode!=='CLOSURE'"   >
                                         {{selectedExtraAttribute.name | localize}}
@@ -476,7 +483,7 @@
                                 <tabset>
                                     <tab (deselect)="sizeScalesChanged(sizeScaleComponent.mapMatrixGridToAppSizeScaleDto(),sizeScaleComponent?.sizeScaleForm?.form?.valid)">
                                         <ng-template tabHeading >
-                                            <span class="tab-item pl-4 pr-4" style="color: black;">{{'SelectSizes' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold" style="color: black;">{{'SelectSizes' | localize}}</span>
                                         </ng-template>
                                         <app-size-scale
                                             #sizeScaleComponent
@@ -488,7 +495,7 @@
                                     </tab>
                                     <tab >
                                         <ng-template tabHeading>
-                                            <span class="tab-item pl-4 pr-4"  style="color: black;">{{'ViewSelectedSizes' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold"  style="color: black;">{{'ViewSelectedSizes' | localize}}</span>
                                         </ng-template>
                                         <app-size-scale
                                             #viewSelectedSizesComponent
@@ -500,7 +507,7 @@
                                     </tab>
                                     <tab (selectTab)="showSizeRatio()" >
                                         <ng-template tabHeading>
-                                            <span class="tab-item pl-4 pr-4"  style="color: black;">{{'SizeRatio' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold"  style="color: black;">{{'SizeRatio' | localize}}</span>
                                         </ng-template>
                                         <app-size-ratio
                                             #sizeRatioComponent
@@ -546,7 +553,7 @@
                                     >
                                     </p-selectButton> -->
                                     <div class="d-flex flex-row mb-3 w-100" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.displayedSelectedValues?.length">
-                                        <div class="d-flex flex-column justify-content-between m-4 position-relative col-1 m-0 p-0" style="border-radius: 5px;border: 1px solid #EEEEEE;    background-color: white;"
+                                        <div class="d-flex flex-column justify-content-between m-4 position-relative col-1 m-0 p-0" style="border-radius: 6px;border: 1px solid #EEEEEE;    background-color: white;"
                                             *ngFor="let item of selectedExtraAttributes[activeExtraAttributeIndex].displayedSelectedValues;index as i">
                                             <div class="d-flex flex-column" style="align-items: center; cursor: pointer;" title="{{item.label}}">
                             
@@ -647,19 +654,22 @@
                         <p-accordion>
                             <p-accordionTab [selected]="showVariationPhotos" >
                                 <ng-template pTemplate="header">
-                                    <div  class="d-inline-block custom-header ml-3 pb-5">
+                                    <div  class="d-inline-block custom-header ml-3 p-3">
                                         <h6 class="mb-1">
-                                            {{ "AddVariationPhotos" | localize }}
+                                            {{defaultExtraAttrForAttachments?.name | localize}} {{ " Photos" | localize }}
                                         </h6>
                                     </div>
                                 </ng-template>
                                 <div *ngIf="showVariationPhotos" class="row align-items-baseline mb-3 item-photos" >
-                                    <div class="col-12 item-photos-header pt-4 pb-2 pl-4">
+                                    <div class="col-11 m-4 item-photos-header ml-0 pl-0">
                                         <div class="d-flex flex-wrap justify-content-between">
-                                            <div class="p-2 mb-2">
+                                            <div class="mb-2">
                                                 <div class="btn-group dropdown" dropdown >
                                                     <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 avoidClick" 
-                                                        dropdownToggle> {{defaultExtraAttrForAttachments?.name | localize}}
+                                                        dropdownToggle>
+                                                        <p class="hint m-0 p-0 pl-5 ml-5">
+                                                            <img  class="mr-2"  src="../../../../../assets/Items/Vector2.png"/>
+                                                             {{ 'You can change the variation type to add more photos' | localize}}</p>
                                                     </button>
                                                     <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
                                                         <li *ngFor="let extraAttr of selectedExtraAttributes;let i = index"  [hidden]=" extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE' && extraAttr?.entityObjectTypeCode!=='CLOSURE'">
@@ -681,7 +691,7 @@
                                         </div>
                                     </div>
                                     <div class="col-12 item-photos-body pt-4 pb-5" >
-                                        <div>
+                                        <div class="col-1" style="border-radius: 10px;">
                                             <!-- <a
                                             class="mr-4 aria-tag p-2"
                                             *ngFor="let attachmentObj of defaultExtraAttrForAttachments?.selectedValuesAttachments | keyvalue"
@@ -700,10 +710,11 @@
 </p-dropdown>
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
-                                            <div class="image-wrapper mb-5" [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i">
-                                                <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" for="variation_file_{{i}}" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'default-border':'' ">
-                                                    <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons">
-                                                        <div class="left-icon">
+                                            <div class="image-wrapper mb-5"   [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i">
+                                                <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" style="border: 1px dashed #DADADA !important;
+    border-radius: 12px !important;" for="variation_file_{{i}}" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'default-border':'' ">
+                                                    <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons mt-3">
+                                                        <!-- <div class="left-icon">
                                                             <i class="fa-photo-video fas" ></i>
                                                         </div>
                                                         <div class="middle-icon">
@@ -711,15 +722,29 @@
                                                         </div>
                                                         <div class="right-icon">
                                                             <i class="fas fa-file-video "></i>
+                                                        </div> -->
+                                                        <div class="middle-icon">
+                                                            <i class="fas " > <img src="../../../assets/placeholders/cloud-add.png" /> </i>
                                                         </div>
                                                     </div>
                                                     <div class="text-center">
-                                                        <a class="btn btn-primary btn-sm mb-3 upload-btn">
-                                                            {{ "AddAttachedFile" | localize }}
-                                                        </a>
-                                                        <p >
-                                                            {{ "YouCanSendUpTo25MBInAttachments" | localize }} .
+                                                        <p  style="font-weight: bold; color: black;
+    white-space: nowrap;">
+                                                    Choose a file or drag & drop it here
                                                         </p>
+                                                        <!-- <a class="btn btn-primary btn-sm mb-3 upload-btn">
+                                                            {{ "AddAttachedFile" | localize }}
+                                                        </a> -->
+                                                        <p>
+                                                            <!-- {{ 'YouCanSendUpTo25MBInAttachments' | localize}}. -->
+                                                            {{ 'File an be JPEG, PNG, PDf, and MP4 formats, up to 25 MB' | localize}}.   
+                                                        </p>
+                                                        <p style="color: #F6851D !important;">*Image Aspect-Ratio is 16:9 </p>
+
+                                                <a class="btn btn-primary btn-sm mb-3 upload-btn" style="color: white !important; background-color: #4A0D4A !important;">
+                                                    <!-- {{ 'AddAttachedFile' | localize}} -->
+                                                    {{ 'Browse File' | localize}}
+                                                </a>
                                                     </div>
                                                 </label>
                                                 <a  *ngIf="attachment" class="d-flex flex-column justify-content-center h-100 align-items-center kt-avatar" >
@@ -736,10 +761,15 @@
                                                             <i class="fa fa-times text-danger"></i>
                                                         </div>
                                                     </div>
-                                                    <img *ngIf="attachment" [src]="attachment"/>
-                                                    <a class="select-default-image p-2" [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}"  (click)="setDefaultImage(i)">
-                                                        <i class="fa fa-check-circle mr-2" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'text-success':'text-grey' "></i>
-                                                        {{ "IsDefaultImage" | localize }}
+                                                    <img *ngIf="attachment" [src]="attachment"  
+                                                    class="w-75" 
+                                                    [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
+    />
+                                                    <a class="select-default-image p-2 col-12 text-center" [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}"  style="    color: #4A0D4A !important;
+                                                    border: 1px solid #EEEEEEEE !important;
+                                                    border-radius: 12px;" (click)="setDefaultImage(i)">
+                                                        <i class="fa fa-check-square" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'text-success':'text-grey' "></i>
+                                                        {{ "Default Image" | localize }}
                                                     </a>
                                                 </a>
                                                 <input type="file" id="variation_file_{{i}}"  name="file"  class="d-none" #file (change)="fileChange($event)">

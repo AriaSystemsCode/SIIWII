@@ -9,10 +9,10 @@
                         {{cols?.rowHeaderColumn?.label | localize}}
                         <span class="text-danger" *ngIf="cols?.rowHeaderColumn?.required">*</span>
                     </th>
-                    <!-- <th *ngFor="let col of columns" pReorderableColumn [pReorderableColumnDisabled]="!col.reorederable"> -->
+                    <!-- <th *ngFor="let col of columns" pReorderableColumn [pReorderableColumnDisabled]="!col?.reorederable"> -->
                     <th *ngFor="let col of columns;let index = index" pReorderableColumn class="position-relative" >
-                        {{col.label | localize}}
-                        <span class="text-danger" *ngIf="col.required">*</span>
+                        {{col?.label | localize}}
+                        <span class="text-danger" *ngIf="col?.required">*</span>
                         <span *ngIf="canRemoveCols"
                             class="d-block bg-danger text-white position-absolute aria-tag-action remove-column rounded-circle"
                             (click)="removeColumns([index])">
@@ -30,7 +30,7 @@
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns" let-index="rowIndex">
                 <tr [pReorderableRow]="index">
-                    <td pReorderableRowHandle class="position-relative" [ngClass]="{'col-3':cols?.rowHeaderColumn?.label?.toUpperCase() =='CURRENCY'}">
+                    <td pReorderableRowHandle class="position-relative" style="background-color: white !important;" [ngClass]="{'col-3':cols?.rowHeaderColumn?.label?.toUpperCase() =='CURRENCY'}">
                         <div class="ml-2" *ngIf="!rowHeaderIsEditable || (rowHeaderIsEditable && !rowHeaderFormInput);else elseRowHeaderTemp">
                             {{ rowData?.rowHeader?.label | localize }}
                         </div>
@@ -42,13 +42,13 @@
                                         [styleClass]="rowHeaderFormInput.customClass +' w-100 aria-select-primeng'"
                                         [style]="rowHeaderFormInput.customStyle"
                                         [filter]="true" 
-                                        [name]="'rowData.rowHeader.value-'+index" 
-                                        [(ngModel)]="rowData.rowHeader.value"
+                                        [name]="'rowData?.rowHeader.value-'+index" 
+                                        [(ngModel)]="rowData?.rowHeader.value"
                                         [placeholder]="'Select' | localize"
                                         [required]="rowHeaderFormInput.required"
                                         [appendTo]="'body'"
                                         [baseZIndex]="1051"
-                                        [disabled]="rowData.rowHeader.disabled"
+                                        [disabled]="rowData?.rowHeader.disabled"
                                     >
                                         <!-- <ng-template let-item pTemplate="selectedItem">
                                             <span style="vertical-align:middle">{{item.label}}</span>
@@ -76,31 +76,33 @@
                                 <span *ngSwitchCase="FormInputType.Number">
                                     <input 
                                         type="number" 
-                                        [id]="rowData.rowHeader.value+index"
-                                        [ngModel]="convertTodecimal(rowData.rowValues[i].value)"
+                                        [id]="rowData?.rowHeader.value+index"
+                                        [ngModel]="convertTodecimal(rowData?.rowValues[i].value)"
                                         [ngModelOptions]="{updateOn:'blur'}"
-                                        (ngModelChange)="rowData.rowValues[i].value=convertTodecimal($event)" 
+                                        (ngModelChange)="rowData?.rowValues[i].value=convertTodecimal($event)" 
                                         [ngClass]="cellSelectionFormInput.customClass"
                                         [ngStyle]="cellSelectionFormInput.customStyle"
                                         [name]="cellSelectionFormInput.name+'rowData-'+index+'-'+i" 
                                         [placeholder]="'Enter' | localize"
                                         [required]="cellSelectionFormInput.required" 
-                                        [disabled]="rowData.rowValues[i].disabled"
+                                        [disabled]="rowData?.rowValues[i].disabled"
                                         [min]="cellSelectionFormInput.min"
                                         [pattern]="cellSelectionFormInput.pattern"
+                                        style="    border: 1px solid #ECECEC !important;
+    border-radius: 8px;"
                                     />
                                 </span>
                                 <span *ngSwitchCase="FormInputType.Checkbox">
                                     <input 
                                         type="checkbox" 
-                                        [(ngModel)]='rowData.rowValues[i].value' 
+                                        [(ngModel)]='rowData?.rowValues[i].value' 
                                         [ngClass]="cellSelectionFormInput.customClass"
                                         [ngStyle]="cellSelectionFormInput.customStyle"
                                         [name]="cellSelectionFormInput.name+'rowData-'+index+'-'+i" 
                                         [placeholder]="'Enter' | localize"
                                         [required]="cellSelectionFormInput.required" 
                                         (ngModelChange)="_cellChange.emit()"
-                                        [disabled]="rowData.rowValues[i].disabled"
+                                        [disabled]="rowData?.rowValues[i].disabled"
                                     />
                                 </span>
                             </div>

@@ -288,7 +288,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     }
     defineSortingOptions() {
         this.sortingOptions = [
-            { label: "", value: "id" },
+            { label: this.l("Product Id"), value: "id" },
             { label: this.l("ProductName"), value: "name" },
             { label: this.l("ProductCode"), value: "code" },
         ];
