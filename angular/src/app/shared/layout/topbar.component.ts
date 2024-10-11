@@ -541,12 +541,16 @@ export class TopBarComponent
         let email = this.appSession.user.emailAddress;
         let url = "https://app.testing.siiwii.net";
         let tenantName =this.appSession.tenant.name;
+        //let tenantName =this.appSession.tenancyName;
+        let firstName=btoa(this.appSession.user.name);
+        let lastName=btoa(this.appSession.user.surname);
+        let relatedTenantId=this.appSession.tenantId;
         const htmlContent: string = `<div><img src="../../assets/img/input_icons/alarm.png" class="alarmInfo"><p class="text-left alarmInfo_title">A registration mail has been Sent to ` + email + ` </p> </div><p class="pleaseClick">*Please Click on the register link in the email in order to create the new <label>` + accountname + ` </label>  account .</p> `;
         var tenantId;
         if (this.appSession?.tenantId)
             tenantId = this.appSession?.tenantId?.toString();
         else tenantId = null;
-        let link = url + "/account/editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type;
+        let link = url + "/account/editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type+"&firstName="+firstName+"&lastName="+lastName+"&relatedTenantId="+relatedTenantId;
         Swal.fire({
             title: "",
             html: htmlContent,
@@ -566,7 +570,7 @@ export class TopBarComponent
             },
         }).then((result) => {
             if (result.isConfirmed) {
-                debugger
+                debugger 
                 this._accountsServiceProxy.sendRegistrationEmail(email, tenantId, type, link , tenantName).subscribe(
                     response => {
                         console.log('Email sent successfully', response);
