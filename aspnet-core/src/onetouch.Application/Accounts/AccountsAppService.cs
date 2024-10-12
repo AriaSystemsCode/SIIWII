@@ -1976,8 +1976,9 @@ namespace onetouch.Accounts
         //MARIAM
         //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
-        public async Task UnPublishProfile()
+        public async Task<Boolean> UnPublishProfile()
         {
+            Boolean ret = false; 
             var contact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.AccountId == null);
             if (contact != null)
             {
@@ -2027,19 +2028,23 @@ namespace onetouch.Accounts
                     //}
                 }
             }
-
+            ret = true;
+            return ret;
         }
         //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
 
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
      
-        public async Task PublishProfile(bool sync =false)
+        public async Task<Boolean> PublishProfile(bool sync =false)
         {
-            await DoPublishProfile(sync);
+            Boolean ret = false;
+            ret = await DoPublishProfile(sync);
+            return ret;
         }
         [AbpAuthorize(AppPermissions.Pages_Accounts_Publish)]
-        public async Task DoPublishProfile(bool sync)
+        public async Task<Boolean> DoPublishProfile(bool sync)
         {
+            Boolean ret = false;
             sync = true;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -2082,6 +2087,8 @@ namespace onetouch.Accounts
                     var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto, sync);
                 }
             }
+            ret = true;
+            return ret;
         }
 
         public async Task ApplyRelationOnProfile(long input)
@@ -2975,7 +2982,7 @@ namespace onetouch.Accounts
         {
             var localizedString = L("RegistrationLink");
             //link = "https://app.testing.siiwii.net/account/register-tenant?editionId=1&subscriptionStartType=2";
-            var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartnerByType", new List<string>() { tenantName, localizedString, link }, "en");
+            var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartnerByType", new List<string>() { tenantName, link, localizedString }, "en");
             await SendMessage(new SendMailDto() { To = email, Subject = template.MessageSubject, Body = template.MessageBody, IsBodyHtml = true });
         }
 

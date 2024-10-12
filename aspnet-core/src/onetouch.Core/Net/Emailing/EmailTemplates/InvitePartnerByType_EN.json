@@ -5,7 +5,7 @@
 <html>
 <head />
 <body>
-    <p>Hello,<br><br>We've given you access to our portal so that you can manage your journey with us and get to know all the possibilities offered by {param1}-product/service.<br><br>If you want to create an account, please click on the following link: <a href=\"{param2}/account/select-edition?tenantid ={param3}\">{param2}/account/select-edition?tenantid={param3}</a><br><br>This link will direct you to the SIIWII Portal Registration page.<br><br>See you there!<br><br>Kind Regards,<br><br>SIIWII Portal-{param1}</p>
+    <p>Hello,<br><br>We've given you access to our portal so that you can manage your journey with us and get to know all the possibilities offered by {param1}-product/service.<br><br>If you want to create an account, please click on the following link: <a href=\"{param2}\">{param3}</a><br><br>This link will direct you to the SIIWII Portal Registration page.<br><br>See you there!<br><br>Kind Regards,<br><br>SIIWII Portal-{param1}</p>
 </body>
 </html>"
 
