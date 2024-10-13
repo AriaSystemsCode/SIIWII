@@ -662,6 +662,7 @@ namespace onetouch.Accounts
                                   .AsNoTracking()
                                   .FirstOrDefaultAsync(x => x.TenantId == null
                                   && x.IsProfileData == true
+                                  && x.IsHidden == false
                                   && x.OwnerId == account.TenantId
                                   && x.SSIN == account.SSIN);
                 output.IsSync = false;
