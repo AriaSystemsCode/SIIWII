@@ -718,3 +718,6 @@ span.p-tabview-title {
     padding-bottom: 6px !important;
     border:1px solid #eeeeee !important;
 }
+.p-button:enabled:hover {
+    background: unset !important;
+}

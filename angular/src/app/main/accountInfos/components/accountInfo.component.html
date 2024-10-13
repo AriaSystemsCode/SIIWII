@@ -676,6 +676,8 @@
                     (delete)="askToConfirmDeleteAccount()"
                     (publish)="publishProfile()"
                     (unPublish)="unPublishProfile()"
+                    [isSync]="isSync"
+                    [connectionCount]="connectionCount"
                 ></app-view-profile>
             </div>
             <div class="tab6" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.CreateOrEditMember}" >

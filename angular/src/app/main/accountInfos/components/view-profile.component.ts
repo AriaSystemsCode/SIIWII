@@ -21,6 +21,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @ViewChild('nav') slider: NgImageSliderComponent;
     @Input('accountData') accountData: AccountDto;
     @Input('isPublished') isPublished: boolean;
+    @Input('isSync') isSync: boolean;
+    @Input('connectionCount') connectionCount: number;
     @Input() viewMode: boolean;
     @Input() accountLevel: AccountLevelEnum;
    // @Input('connections') appEntityName: string;
@@ -313,7 +315,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     }
 
-
+    showPrivate=true;
+    showHide=true;
+    hidUshare=false;
     openShareAccountsModal() {
         //I40-shareAccount
         // const alreadyShared: boolean = true;
@@ -328,6 +332,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         // this._publishAccountService.screen = 1
         debugger
         this._AccountsServiceProxy.publishProfile(false);
+        this.connectionCount==0 ? this.showHide = false : this.showPrivate = false
+        this.hidUshare=true;
     }
 
     syncAccount() {
@@ -336,9 +342,18 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this._AccountsServiceProxy.publishProfile(true);
 
     }
+    showShare=true;
     UnShareAccount() {
         debugger
-        this._AccountsServiceProxy.unPublishProfile();
+        this._AccountsServiceProxy.unPublishProfile().subscribe(
+            (response) => {
+                this.showShare = false;
+                this.hidUshare=true;
+              console.log('API call successful:', response); // Success handling
+            },
+            (error) => {
+              console.log('API call error:', error); // Error handling
+            })
     }
 
 }

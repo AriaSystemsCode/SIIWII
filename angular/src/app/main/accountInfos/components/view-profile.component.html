@@ -36,12 +36,20 @@
                                                 {{ "Edit" | localize }}
                                             </button>
                                             <!-- *ngIf="isPublished && appEntityName='lol'" -->
-                                            <button class="btn transparent-button" (click)="UnShareAccount()"  *ngIf="isPublished">
+                                            <button class="btn transparent-button" (click)="UnShareAccount()"  *ngIf="isPublished&&connectionCount!=0" [class.hide]="hidUshare">
                                                 <img src="../../assets/img/input_icons/privateAccount.png" class="" >
                                                 {{ "Private" | localize }}
                                             </button>
-                                            <button class="btn transparent-button" (click)="UnShareAccount()" *ngIf="!isPublished">
+                                            <button class="btn transparent-button" (click)="UnShareAccount()" *ngIf="isPublished&&connectionCount==0" [class.hide]="hidUshare">
                                                 <img src="../../assets/img/input_icons/hideAccount.png" class="">
+                                                {{ "Hide" | localize }}
+                                            </button>
+                                            <button class="btn transparent-button alaa" (click)="UnShareAccount()" [ngClass]="{'hide':showPrivate}">
+                                                <img src="../../assets/img/input_icons/privateAccount.png" class="">
+                                                {{ "Private" | localize }}
+                                            </button>
+                                            <button class="btn transparent-button alaa" (click)="UnShareAccount()"  [class.hide]="showHide">
+                                                <img src="../../assets/img/input_icons/hideAccount.png">
                                                 {{ "Hide" | localize }}
                                             </button>
                                             <!--  <button class="btn mb-3 mt-4 w-100 btn-danger" (click)="deleteAccount()" >
@@ -57,10 +65,13 @@
 
                                             <button pButton pRipple label="Share"
                                                 class="share btn transparent-button" icon="pi pi-share-alt"
-                                                (click)="openShareAccountsModal()" *ngIf="!isPublished"></button>
+                                                (click)="openShareAccountsModal()"  *ngIf="!isPublished"></button>
+                                                <button pButton pRipple label="Share"
+                                                class="share btn transparent-button" icon="pi pi-share-alt"
+                                                (click)="openShareAccountsModal()" [ngClass]="{'hide':showShare}"></button>
                                             <button pButton pRipple label="Sync" class="sync btn" icon="pi pi-sync"
                                                 (click)="syncAccount()" [loading]="btnLoader"
-                                                [disabled]="!accountData?.showSync"></button>
+                                                [disabled]="!accountData?.showSync&&!isSync"></button>
 
                                         </div>
 

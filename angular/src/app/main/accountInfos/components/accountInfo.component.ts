@@ -115,6 +115,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     accountDataForView : AccountDto
     isPublished:boolean;
+    isSync:boolean;
+    connectionCount:number;
     imgCropperModalRef : BsModalRef
     firstLoad:boolean = true
 
@@ -439,6 +441,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             }
         )
         this.isPublished= result ? result.isPublished : false;
+        this.isSync= result ? result.isSync : false;
+        this.connectionCount=result ? result.connectionCount : 0;
         this.accountDataForView = result ? result.account : undefined
         this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
         if(this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
@@ -455,6 +459,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
             ()=>this.hideMainSpinner()
         )
         this.isPublished= result ? result.isPublished : false;
+        this.isSync= result ? result.isSync : false;
+        this.connectionCount=result ? result.connectionCount : 0; 
         this.accountDataForView = result ? result.account : undefined
         this.isRecordOwner = this.accountDataForView?.partnerId == this.appSession.user?.accountId
         if(this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
