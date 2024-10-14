@@ -25,7 +25,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Input('connectionCount') connectionCount: number;
     @Input() viewMode: boolean;
     @Input() accountLevel: AccountLevelEnum;
-   // @Input('connections') appEntityName: string;
+    // @Input('connections') appEntityName: string;
     showEditConnected: boolean = false;
     priceLevel: string;
     allPriceLevel: SelectItem[] = [];
@@ -315,9 +315,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     }
 
-    showPrivate=true;
-    showHide=true;
-    hidUshare=false;
+    showPrivate = true;
+    showHide = true;
+    hidUshare = false;
     openShareAccountsModal() {
         //I40-shareAccount
         // const alreadyShared: boolean = true;
@@ -331,28 +331,49 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         // this._publishAccountService._accountId = this.accountData.id;
         // this._publishAccountService.screen = 1
         debugger
-        this._AccountsServiceProxy.publishProfile(false);
-        this.connectionCount==0 ? this.showHide = false : this.showPrivate = false
-        this.hidUshare=true;
+        this._AccountsServiceProxy.publishProfile(false).subscribe(
+            (response) => {
+                console.log("share called")
+                this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
+                this.hidUshare = true;
+                this.hideshowShare=true;
+                this.showShare=true;
+            },
+            (error) => {
+                console.log('API call error:', error); // Error handling
+            });;
+       
     }
-
+    showIsSync = false;
     syncAccount() {
         //I40-syncAccount
-        this.btnLoader = true;
-        this._AccountsServiceProxy.publishProfile(true);
+        debugger
+        //this.btnLoader = true;
+        this._AccountsServiceProxy.publishProfile(true).subscribe(
+            (response) => {
+                console.log("sync called")
+            },
+            (error) => {
+                console.log('API call error:', error); // Error handling
+            });
+        this.showIsSync = false;
 
     }
-    showShare=true;
+    showShare = true;
+    hideshowShare=false;
     UnShareAccount() {
         debugger
         this._AccountsServiceProxy.unPublishProfile().subscribe(
             (response) => {
                 this.showShare = false;
-                this.hidUshare=true;
-              console.log('API call successful:', response); // Success handling
+                this.hidUshare = true;
+                this.hideshowShare=true;
+                this.showHide=true;
+                this.showPrivate=true;
+                console.log('API call successful:', response); // Success handling
             },
             (error) => {
-              console.log('API call error:', error); // Error handling
+                console.log('API call error:', error); // Error handling
             })
     }
 

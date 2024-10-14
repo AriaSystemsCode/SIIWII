@@ -38,6 +38,7 @@ import { MainImportService } from "@shared/components/import-steps/services/main
 
 @Component({
     selector: "app-accounts",
+    providers:[MarketplaceAccountsServiceProxy],
     templateUrl: "./accounts.component.html",
     styleUrls: ["./accounts.component.scss"],
     animations: [appModuleAnimation()],

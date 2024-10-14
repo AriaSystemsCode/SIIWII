@@ -99,12 +99,12 @@
                                             <a (click)="showImportAccounts()" style="
                                                     padding-right: 3px;
                                                     padding-left: 9px;
-                                                    background-color: #6259CE !important;
+                                                    
                                                 " [title]="
                                                     'Import Accounts' | localize
                                                 " class="btn font-weight-normal toolbar-btn pr-0 transparent-button">
                                                 <i class="d-inline-block w-100 fa-file-import fas icon-center"
-                                                    style="color: white !important;"></i>
+                                                    style="color: #4a0d4a !important;"></i>
                                             </a>
                                             <!-- Iteration-8 -->
                                         </ng-container>
@@ -132,6 +132,12 @@
                                         </a>
                                     </div>
                                 </div>
+                            
+                            </div>
+                            <div class="col-6 col-md-3 col-sm-4 left-aside-filters pt-4 mt-2 filters_container">
+                                <app-accounts-list-filters [filterForm]="filterForm"></app-accounts-list-filters>
+                            </div> 
+                            <div class="col">
                                 <div class="d-flex justify-content-between">
                                     <div class="font-weight-normal list-toolbar-data-summary" *ngIf="active">
                                         {{
@@ -200,63 +206,62 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-sm-4 border-dashed-right left-aside-filters pt-4 mt-2">
-                                <app-accounts-list-filters [filterForm]="filterForm"></app-accounts-list-filters>
-                            </div>
-                            <div class="col d-flex flex-column justify-content-between">
-                                <div class="row pt-5 pl-5 pr-2">
-                                    <div *ngFor="
-                                            let account of accounts;
-                                            index as i;
-                                            let last = last
-                                        " class="col-12 mb-5" [ngClass]="{
-                                            'col-md-12 single-item-per-row-layout':
-                                                singleItemPerRowMode,
-                                            'col-md-6': !singleItemPerRowMode,
-                                            ' pb-5':
-                                                singleItemPerRowMode && !last
-                                        }">
-                                        <app-account-card [account]="account" [fromMarketplace]="fromMarketplace"
-                                            [singleItemPerRowMode]="
-                                                singleItemPerRowMode
-                                            " (deleteMe)="
-                                                askToConfirmDelete(
-                                                    $event,
-                                                    account.account,
-                                                    i
-                                                )
-                                            " (connectMe)="
-                                                connect(account.account)
-                                            " (disconnectMe)="
-                                                disconnect(account.account)
-                                            " [isHost]="isHost"></app-account-card>
+                                <div class="col d-flex flex-column justify-content-between">
+                             
+                                    <div class="row pt-5 pl-5 pr-2">
+                                        <div *ngFor="
+                                                let account of accounts;
+                                                index as i;
+                                                let last = last
+                                            " class="col-12 mb-5" [ngClass]="{
+                                                'col-md-12 single-item-per-row-layout':
+                                                    singleItemPerRowMode,
+                                                'col-md-6': !singleItemPerRowMode,
+                                                ' pb-5':
+                                                    singleItemPerRowMode && !last
+                                            }">
+                                            <app-account-card [account]="account" [fromMarketplace]="fromMarketplace"
+                                                [singleItemPerRowMode]="
+                                                    singleItemPerRowMode
+                                                " (deleteMe)="
+                                                    askToConfirmDelete(
+                                                        $event,
+                                                        account.account,
+                                                        i
+                                                    )
+                                                " (connectMe)="
+                                                    connect(account.account)
+                                                " (disconnectMe)="
+                                                    disconnect(account.account)
+                                                " [isHost]="isHost"></app-account-card>
+                                        </div>
+                                        <div class="font-weight-normal mt-5 p-5 text-center w-100"
+                                            *ngIf="accounts.length == 0 && !loading">
+                                            {{ "NoDataFound" | localize }}
+                                        </div>
                                     </div>
-                                    <div class="font-weight-normal mt-5 p-5 text-center w-100"
-                                        *ngIf="accounts.length == 0 && !loading">
-                                        {{ "NoDataFound" | localize }}
-                                    </div>
-                                </div>
-                                <div class="primeng-paging-container custom-paginator">
-                                    <p-paginator [rows]="
-                                            primengTableHelper.defaultRecordsCountPerPage
-                                        " #paginator (onPageChange)="getAccounts($event)" [totalRecords]="
+                                    <div class="primeng-paging-container custom-paginator">
+                                        <p-paginator [rows]="
+                                                primengTableHelper.defaultRecordsCountPerPage
+                                            " #paginator (onPageChange)="getAccounts($event)" [totalRecords]="
+                                                primengTableHelper.totalRecordsCount
+                                            " [rowsPerPageOptions]="
+                                                primengTableHelper.predefinedRecordsCountPerPage
+                                            ">
+                                        </p-paginator>
+    
+                                        <div class="total-records-count text-right mr-3">
+                                            {{
+                                            l(
+                                            "TotalRecordsCount",
                                             primengTableHelper.totalRecordsCount
-                                        " [rowsPerPageOptions]="
-                                            primengTableHelper.predefinedRecordsCountPerPage
-                                        ">
-                                    </p-paginator>
-
-                                    <div class="total-records-count text-right mr-3">
-                                        {{
-                                        l(
-                                        "TotalRecordsCount",
-                                        primengTableHelper.totalRecordsCount
-                                        )
-                                        }}
+                                            )
+                                            }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                           
                         </div>
                     </div>
                 </div>

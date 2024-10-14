@@ -495,9 +495,9 @@ span.p-tabview-title {
 
 .p-button,
 .p-button:hover {
-    background-color: #F8F8F8;
-    border: #F8F8F8;
-    color: black;
+    // background-color: #F8F8F8;
+    // border: #F8F8F8;
+    // color: black;
 }
 
 .p-datepicker:not(.p-datepicker-inline) {
@@ -505,12 +505,12 @@ span.p-tabview-title {
 }
 
 .fa-angle-down:before {
-    color: #6259CE !important;
+    color: #1b101b !important;
 }
 
 .text-captitalize,
 .text-capitalize {
-    color: #6259CE !important;
+    color: #1b101b !important;
 }
 
 
@@ -720,4 +720,7 @@ span.p-tabview-title {
 }
 .p-button:enabled:hover {
     background: unset !important;
+}
+.border-bottom{
+    border-bottom: 1px solid #eeeeee;
 }

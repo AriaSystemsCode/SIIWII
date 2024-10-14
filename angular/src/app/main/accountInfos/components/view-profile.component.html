@@ -36,11 +36,11 @@
                                                 {{ "Edit" | localize }}
                                             </button>
                                             <!-- *ngIf="isPublished && appEntityName='lol'" -->
-                                            <button class="btn transparent-button" (click)="UnShareAccount()"  *ngIf="isPublished&&connectionCount!=0" [class.hide]="hidUshare">
+                                            <button class="btn transparent-button" (click)="UnShareAccount()"  *ngIf="isPublished&&connectionCount==0" [class.hide]="hidUshare">
                                                 <img src="../../assets/img/input_icons/privateAccount.png" class="" >
                                                 {{ "Private" | localize }}
                                             </button>
-                                            <button class="btn transparent-button" (click)="UnShareAccount()" *ngIf="isPublished&&connectionCount==0" [class.hide]="hidUshare">
+                                            <button class="btn transparent-button" (click)="UnShareAccount()" *ngIf="isPublished&&connectionCount!=0" [class.hide]="hidUshare">
                                                 <img src="../../assets/img/input_icons/hideAccount.png" class="">
                                                 {{ "Hide" | localize }}
                                             </button>
@@ -64,14 +64,19 @@
 
 
                                             <button pButton pRipple label="Share"
-                                                class="share btn transparent-button" icon="pi pi-share-alt"
-                                                (click)="openShareAccountsModal()"  *ngIf="!isPublished"></button>
+                                                class="share btn transparent-button alaa" icon="pi pi-share-alt"
+                                                (click)="openShareAccountsModal()"  *ngIf="!isPublished" [class.hide]="hideshowShare"></button>
+                                                
                                                 <button pButton pRipple label="Share"
-                                                class="share btn transparent-button" icon="pi pi-share-alt"
+                                                class="share btn transparent-button lol" icon="pi pi-share-alt"
                                                 (click)="openShareAccountsModal()" [ngClass]="{'hide':showShare}"></button>
-                                            <button pButton pRipple label="Sync" class="sync btn" icon="pi pi-sync"
+                                            <!-- <button pButton pRipple label="Sync" class="sync btn" icon="pi pi-sync"
                                                 (click)="syncAccount()" [loading]="btnLoader"
-                                                [disabled]="!accountData?.showSync&&!isSync"></button>
+                                                [disabled]="!accountData?.showSync&&!isSync"></button> -->
+                                                <button pButton pRipple label="Sync" class="sync btn" icon="pi pi-sync"
+                                                (click)="syncAccount()" [loading]="btnLoader"
+                                                [disabled]="!isSync||showIsSync"></button>
+                                                
 
                                         </div>
 
