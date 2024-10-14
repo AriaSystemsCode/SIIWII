@@ -7,7 +7,7 @@
     </div>
 
     <div class="single-item-photo" #photoDiv (click)="viewItemHandler()"
-    [ngStyle]="{'width.px': singleItemPerRowMode ? '215' : 'auto'}"
+    [ngStyle]="{'width': singleItemPerRowMode ? '215px' : 'auto'}"
     >
         <img class="w-100" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl" alt=""
             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"  
