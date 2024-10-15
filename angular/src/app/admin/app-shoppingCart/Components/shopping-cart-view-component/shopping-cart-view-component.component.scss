@@ -389,6 +389,9 @@ input.ng-invalid.ng-touched {
     }
   
 @media only screen and (max-width: 992px) {
+    h1 {
+        font-size: 26px !important;
+    }
     .parentDiv {
         margin: 2em 2em 0em 7em;
     }
@@ -418,7 +421,7 @@ input.ng-invalid.ng-touched {
         border-radius: 0 !important;
         padding: 0;
          width: 140px  !important;
-         height: 100px !important;
+         height: 82px !important;
          padding: 8px;
          .tab-header {
             background-color: #4A0D4A !important;
@@ -596,9 +599,10 @@ input.ng-invalid.ng-touched {
         width: 140px  !important;
         // border-right: 1px solid #eee !important ;
         // border-bottom: 1px solid #eee !important ;
-        height: 99px !important;
+        height: 82px !important;
         align-items: center !important;
         fill:#777777 !important;
+        padding-top: 5px !important;
         svg{
             fill: #777 !important;
 
