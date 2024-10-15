@@ -39,12 +39,16 @@
     color: #4A0D4A !important;
     font-weight: 500;
     border-radius: 3px;
+    width: 120px;
+    height: 40px !important;
 }
 
 .submitBtn{
     // background-color: $light-color !important;
     color: white;
     background-color: #4A0D4A !important;
+    height: 40px !important;
+    width: 120px;
 }
 .edition_label{
     font-size: 20px;
@@ -58,4 +62,7 @@
     color: #1B101B;
     width: 100%;
     margin-bottom: 20px;
+}
+.form-control{
+    border: 1px solid #e2e5ec !important;
 }

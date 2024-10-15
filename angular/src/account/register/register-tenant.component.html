@@ -3,24 +3,25 @@
 </h3>
 
 <h4 *ngIf="model.edition" class="text-left edition_label register_label_margin">
-    {{ "Edition" | localize }}: {{ accountTypeLabel }}
+    {{ "Edition" | localize }}: {{ accountTypeLabel }} {{ "Edition" | localize }}
 </h4>
-
+ 
 <div class="Login_container kt-login__form" [@routerTransition]>
     <form #registerForm="ngForm" role="form" novalidate (submit)="save()" class="kt-form mt-2">
         <h5 *ngIf="model.edition" class="Personal_Info text-left">
-            {{ accountTypeLabel }}  {{ "Information" | localize }} 
-            <!-- {{"PersonalInformations"|localize}} -->
-          
+          <label *ngIf="accountTypeLabel.includes('PERSONAL')"> {{ accountTypeLabel }}</label>
+          <label *ngIf="!accountTypeLabel.includes('PERSONAL')">{{ "Account" | localize }}</label>
+          {{ "Information" | localize }} 
         </h5>
 
         <div class="form-group row">
-            <div class="col-9 col-lg-12 pl-0 p-0 MB20 p_relative">
+            <div class="col-9 col-lg-12 pl-0 p-0 MB20">
                 <label class="sub_titleLog"> {{"WorkSpaceName"| localize}} <span class="StarInfo">*</span></label>
+                <div class="p_relative">
                 <img src="../../assets/img/input_icons/workSpaceIcon.png" class="User_icon icon-width">
                 <input #tenancyName="ngModel" class="MT0 form-control" autoFocus type="text"
-                    placeholder="{{ 'WorkspaceName' | localize }} " [(ngModel)]="model.tenancyName" name="tenancyName"
-                    required maxlength="64" [pattern]="domainPattern" />
+                    placeholder="{{ 'EnterYourWorkSpaceName' | localize }} " [(ngModel)]="model.tenancyName" name="tenancyName"
+                    required maxlength="64" [pattern]="domainPattern" /></div>
             </div>
             <!-- <div class="col-1 pl-0 pt-3">
                         <a class="_tooltip pt-1">
@@ -60,12 +61,13 @@
             </div>
  -->
 
-        <div *ngIf="model.edition" class="form-group col-9 col-lg-12 m-0 MB20 p_relative">
+        <div *ngIf="model.edition" class="form-group col-9 col-lg-12 m-0 MB20">
             <label class="sub_titleLog"> {{"AccountName"| localize}} <span class="StarInfo">*</span></label>
+            <div class="p_relative">
             <img src="../../assets/img/input_icons/user.png" class="User_icon icon-width">
             <input #nameInput="ngModel" class="MT0 form-control" type="text"
-                placeholder="{{ 'AccountName' | localize }} *" [(ngModel)]="model.name" name="Name" required
-                maxlength="128" />
+                placeholder="{{ 'EnterAccountName' | localize }} *" [(ngModel)]="model.name" name="Name" required
+                maxlength="128" /></div>
             <validation-messages [formCtrl]="nameInput"></validation-messages>
         </div>
 
@@ -80,22 +82,26 @@
 
         <div class="row MB20 PR2L10">
             <label  *ngIf="!accountTypeLabel.includes('PERSONAL')" class="Personal_Info co-lg-12 MT20"> {{"AdminInformation" | localize}} </label>
-            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 pr-2 p_relative">
+            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 pr-2">
                 <label class="sub_titleLog"> {{"FirstName" | localize}} <span class="StarInfo">*</span></label>
+                <div class="p_relative">
                 <img src="../../assets/img/input_icons/user.png" class="User_icon icon-width SmallUser_icon">
                 <input #firstNameInput="ngModel" class="MT0 form-control" type="text"
-                    placeholder="{{ 'FirstName' | localize }} *" [(ngModel)]="model.firstName" name="adminFirstName"
-                    required />
+                    [placeholder]="('EnterYourFirstName' | localize )" [(ngModel)]="model.firstName" name="adminFirstName"
+                    required /></div>
+                    <!-- firstName.length > 0 ? firstName : ('EnterYourFirstName' | localize ) -->
                 <span class="form-text text-danger">
                     <validation-messages [formCtrl]="firstNameInput"></validation-messages>
                 </span>
             </div>
-            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 p_relative">
+            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6">
                 <label class="sub_titleLog"> {{ "lastName" | localize }} <span class="StarInfo">*</span></label>
+                <div class="p_relative">
                 <img src="../../assets/img/input_icons/user.png" class="User_icon icon-width SmallUser_icon">
                 <input #lastNameInput="ngModel" class="MT0 form-control" type="text"
-                    placeholder="{{ 'LastName' | localize }} *" [(ngModel)]="model.lastName" name="adminLastName"
-                    required />
+                   [placeholder]="('EnterYourLastName' | localize )" [(ngModel)]="model.lastName" name="adminLastName"
+                    required/></div>
+                    <!-- lastName.length > 0  ? lastName : ( 'EnterYourLastName' | localize ) -->
                 <span class="form-text text-danger">
                     <validation-messages [formCtrl]="lastNameInput"></validation-messages>
                 </span>
@@ -103,26 +109,28 @@
         </div>
 
 
-        <div class="form-group MB20 p_relative">
+        <div class="form-group MB20">
             <label class="sub_titleLog" *ngIf="!accountTypeLabel.includes('PERSONAL')"> {{"AdminEmailAddressL" | localize}}<span class="StarInfo">*</span></label>
             <label class="sub_titleLog" *ngIf="accountTypeLabel.includes('PERSONAL')"> {{"PersonalEmailAddressL" | localize}}<span class="StarInfo">*</span></label>
+            <div class="p_relative">
             <img src="../../assets/img/input_icons/letter.png" class="User_icon icon-width">
             <input #adminEmailAddressInput="ngModel" class="MT0 form-control" type="email"
-                [placeholder]=" !accountTypeLabel.includes('PERSONAL')?  'Admin Email*'    :  'Personal Email*'"
-                [(ngModel)]="model.adminEmailAddress" name="adminEmailAddress" required maxlength="256" email />
+                [placeholder]="!accountTypeLabel.includes('PERSONAL') ? ('EnterTheAdminEmailAddress' | localize) : ( 'EnterYourPersonalEmailAdress '| localize)"
+                [(ngModel)]="model.adminEmailAddress" name="adminEmailAddress" required maxlength="256" email /></div>
 
             <span class="form-text text-danger">
                 <validation-messages [formCtrl]="adminEmailAddressInput"></validation-messages>
             </span>
         </div>
-        <div class="row MB20 PR2L10 ng-tns-c369-1 p_relative">
+        <div class="row MB20 PR2L10 ng-tns-c369-1">
             <div class="form-group MB20 col-lg-6 pr-2">
                 <label class="sub_titleLog" *ngIf="accountTypeLabel.includes('PERSONAL')">{{" Password" | localize}} <span class="StarInfo">*</span></label>
                 <label class="sub_titleLog" *ngIf="!accountTypeLabel.includes('PERSONAL')">{{" AdminPassword" | localize}} <span class="StarInfo">*</span></label>
+                <div class="p_relative">
                 <img src="../../assets/img/input_icons/lock.png" class="User_icon icon-width SmallUser_icon">
                 <input type="password" name="Password" class="MT0 form-control" [(ngModel)]="model.adminPassword"
                     #Password="ngModel"
-                    [placeholder]=" !accountTypeLabel.includes('PERSONAL') ? 'Admin Password'  :  'Password'  "
+                    [placeholder]="'EnterYourPassword' | localize "
                     validateEqual="PasswordRepeat" reverse="true"
                     [requireDigit]="passwordComplexitySetting.requireDigit" [requireLowercase]="
                         passwordComplexitySetting.requireLowercase
@@ -132,7 +140,7 @@
                         passwordComplexitySetting.requireNonAlphanumeric
                     " [requiredLength]="passwordComplexitySetting.requiredLength" required pPassword
                     [promptLabel]="l('PleaseEnterYourNewPassword')" [weakLabel]="l('weak')" [mediumLabel]="l('medium')"
-                    [strongLabel]="l('strong')" />
+                    [strongLabel]="l('strong')" /></div>
 
                 <div [hidden]="
                         registerForm.form.valid || registerForm.form.pristine
@@ -175,16 +183,17 @@
 
             <div class="form-group MB20 col-lg-6">
                 <label class="sub_titleLog"> {{"PasswordRepeat" | localize}}<span class="StarInfo">*</span></label>
+                <div class="p_relative">
                 <img src="../../assets/img/input_icons/lock.png" class="User_icon icon-width SmallUser_icon">
                 <input type="password" name="PasswordRepeat" class="MT0 form-control" [ngModel]="model.passwordRepeat"
-                    #PasswordRepeat="ngModel" placeholder="{{ 'PasswordRepeat' | localize }}" validateEqual="Password"
+                    #PasswordRepeat="ngModel" placeholder="{{'EnterYourConfirmPassword' | localize}}" validateEqual="Password"
                     reverse="false" [requireDigit]="passwordComplexitySetting.requireDigit" [requireLowercase]="
                         passwordComplexitySetting.requireLowercase
                     " [requireUppercase]="
                         passwordComplexitySetting.requireUppercase
                     " [requireNonAlphanumeric]="
                         passwordComplexitySetting.requireNonAlphanumeric
-                    " [requiredLength]="passwordComplexitySetting.requiredLength" required />
+                    " [requiredLength]="passwordComplexitySetting.requiredLength" required /></div>
                 <div [hidden]="
                         registerForm.form.valid || registerForm.form.pristine
                     " class="form-group">
@@ -231,7 +240,7 @@
         </div>
         <div class="kt-login__actions">
             <button [disabled]="saving" routerLink="/account/login" type="button"
-                class="backBtn btn btn-light btn-elevate kt-login__btn-secondary">
+                class="backBtn btn shadowContainer btn-elevate kt-login__btn-secondary">
                 {{"Back" | localize}}
             </button>
             <button type="submit" class="submitBtn btn  kt-login__btn-primary" [disabled]="!registerForm.form.valid"

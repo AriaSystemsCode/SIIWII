@@ -2578,5 +2578,13 @@
 		<text name="registrationmailSentto">A registration mail has been Sent*Please Click on the register link in the email in order to create the new to</text>
 		<text name="clickRegisterToCreate"> </text>
 		<text name="CreateUserName"> Create Username</text>
-  </texts>  
+		<text name="EnterYourWorkSpaceName">Enter Your Work Space Name</text>
+		<text name="EnterAccountName">Enter Account Name</text>
+		<text name="EnterYourPersonalEmailAdress">Enter Your Personal Email Adress</text>
+		<text name="EnterTheAdminEmailAddress">Enter The Admin Email Address</text>
+		<text name="EnterYourPassword">Enter Your Password</text>
+		<text name="EnterYourConfirmPassword">Enter Your Confirm Password</text>
+		<text name="EnterYourFirstName">Enter Your First Name</text>
+		<text name="EnterYourLastName">Enter Your Last Name</text>
+	</texts>  
 </localizationDictionary>

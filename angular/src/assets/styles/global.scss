@@ -595,7 +595,7 @@ span.p-tabview-title {
 .User_icon,
 .Lock_icon {
     position: absolute;
-    top: 54%;
+    top: 30%;
     right: 2%;
 }
 
@@ -723,4 +723,7 @@ span.p-tabview-title {
 }
 .border-bottom{
     border-bottom: 1px solid #eeeeee;
+}
+.form-control{
+    border: 1px solid #e2e5ec !important;
 }

@@ -538,7 +538,8 @@ export class TopBarComponent
         debugger
         let type = accout_type;
         let accountname = account_name;
-        let email = this.appSession.user.emailAddress;
+        //let email = this.appSession.user.emailAddress;
+        let email='alaasaid1699@gmail.com';
         let url = "https://app.testing.siiwii.net";
         let tenantName =this.appSession.tenant.name;
         //let tenantName =this.appSession.tenancyName;
@@ -550,7 +551,7 @@ export class TopBarComponent
         if (this.appSession?.tenantId)
             tenantId = this.appSession?.tenantId?.toString();
         else tenantId = null;
-        let link = url + "/account/editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type+"&firstName="+firstName+"&lastName="+lastName+"&relatedTenantId="+relatedTenantId;
+        let link = url + "/account/register-tenant?editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type+"&firstName="+firstName+"&lastName="+lastName+"&relatedTenantId="+relatedTenantId;
         Swal.fire({
             title: "",
             html: htmlContent,

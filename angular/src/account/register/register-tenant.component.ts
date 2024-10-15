@@ -39,7 +39,11 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
     saving = false;
     domainPattern = Patterns.domainName
     accountType;
+
    accountTypeLabel:string="";
+   relatedTenantId;
+lastName:string="";
+firstName:string=";"
  //  accountTypes:SelectItem[] = [];
 
     constructor(
@@ -83,6 +87,15 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
 
         this.accountType=this._activatedRoute.snapshot.queryParams['accountType'];
         this.accountTypeLabel=this._activatedRoute.snapshot.queryParams['accountTypeLabel'];
+        this.relatedTenantId=this._activatedRoute.snapshot.queryParams['relatedTenantId'];
+        this.lastName=atob(this._activatedRoute.snapshot.queryParams['lastName']);
+        this.firstName=atob(this._activatedRoute.snapshot.queryParams['firstName']);
+        if(this.lastName.length>0){
+            this.model.lastName=this.lastName;
+        }
+        if(this.firstName.length>0){
+            this.model.firstName=this.firstName;
+        }
     }
 
     ngAfterViewInit() {
@@ -119,7 +132,8 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
        this.model.editionId =Number(this.accountType);
        this.model.accountTypeId=this.accountType;
        this.model.accountType = this.accountTypeLabel;
-
+//this.model.firstName=this.firstName;
+//this.model.lastName=this.lastName;
 
          
             this._tenantRegistrationService.registerTenant(this.model)
