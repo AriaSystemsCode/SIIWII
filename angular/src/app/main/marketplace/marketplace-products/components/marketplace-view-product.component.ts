@@ -398,20 +398,29 @@ export class MarketplaceViewProductComponent
     }
 
     removeSize(sizeIndex: number, size, color, orderIndex: number) {
-        console.log(
-            ">> size",
-            this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty
-        );
         this.currentIndex = color.colorIndex;
+        let amount=0;
+
+        if (this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex]) {
         this.totalOrderQTY =
             this.totalOrderQTY -
             this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty;
-        let amount =
+         amount =
             this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty *
             this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
+        }
+        else{
+            this.totalOrderQTY =
+            this.totalOrderQTY -
+            (this.orderSummary[orderIndex].color.sizes[sizeIndex].sizeRatio * this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks);
+
+         amount =
+           this.orderSummary[orderIndex].color.sizes[sizeIndex].sizeRatio * this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks *
+            this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
+        }
+
         this.totlaOrderPrices = this.totlaOrderPrices - amount;
         this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty = 0;
-        
         this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks=0;
 
         if (sizeIndex == 0 && this.orderSummary[orderIndex].color.sizes?.length > 0) {
@@ -472,7 +481,6 @@ export class MarketplaceViewProductComponent
 
             sum = sum + multiby;
         });
-        this.totalOrderQTY =sum;
         return sum;
     }
 
@@ -492,8 +500,6 @@ export class MarketplaceViewProductComponent
             let amount = multiby * item.price;
             sum = sum + amount;
         });
-        
-        this.totlaOrderPrices = sum;
         return sum;
     }
 
