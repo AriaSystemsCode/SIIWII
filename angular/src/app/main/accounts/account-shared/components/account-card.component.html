@@ -69,8 +69,8 @@
                              {{ account.account.zipCode ? account.account.zipCode  : "NotSpecified" | localize }}
                         </span>
                     </span>
-                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex mt-3 pt-3">
-                        <span >
+                    <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex mt-3" >
+                        <span style="width: 100%;text-align: right;">
                             <!-- <button *ngIf="account.account.status == false && !isHost && !isRecordOwner"
                                 class="btn btn-outline-primary mr-2 action-button"
                                 (click)="connect()"
@@ -83,13 +83,8 @@
                                 <i class="fa fa-user-plus pl-2"> </i>
                             </button> -->
                             <button *ngIf="!account.connectionName && fromMarketplace"
-                            class="btn btn-outline-primary mr-2 action-button"
-                            (click)="createRelation(account.avaliableConnectionName)"
-                            style="    background-color: #6259CE !important;
-                            border: none !important;
-                            color: white !important;
-                            width: 115px;padding: 5px;"
-                            >
+                            class="btn mr-2 action-button relation_button"
+                            (click)="createRelation(account.avaliableConnectionName)" >
                             <!-- <img src="../../assets/img/input_icons/true-relation.png" class=""> -->
                             {{account.avaliableConnectionName }}
                             <i class="fa fa-user-plus pl-2"> </i>
@@ -148,15 +143,10 @@
                                 {{account.connectionName}}
                             </span>
                         </div>
-                        <span >
+                        <span style="float: right;width: 100%; ">
                             <button *ngIf="!account.connectionName && fromMarketplace"
-                                class="btn btn-outline-primary mt-4"
-                                (click)="createRelation(account.avaliableConnectionName)"
-                                 style="    background-color: #6259CE !important;
-                                border: none !important;
-                                color: white !important;
-                                width: 115px;padding: 5px;"
-                                >
+                                class="btn relation_button mt-4"
+                                (click)="createRelation(account.avaliableConnectionName)">
                                 {{ account.avaliableConnectionName | localize }}
                             </button>
                         </span>
