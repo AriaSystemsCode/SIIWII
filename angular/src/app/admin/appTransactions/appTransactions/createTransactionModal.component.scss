@@ -1,22 +1,27 @@
 ::ng-deep {
+    @media only screen and (min-width: 768px) {
     .p-datepicker:not(.p-datepicker-inline) {
         width: 305px !important;
     }
+    .p-datepicker-calendar {
+        width: 286px !important;
+    }
+}
     .focused-calendar .p-datepicker-trigger {
         border-bottom-right-radius: 8px !important;
     }
    
     
 .p-datepicker-calendar {
-    width: 286px !important;
+    // width: 286px !important;
     .p-datepicker table td {
         padding: 5px !important;
     }
-    thead {
-        .ng-tns-c20-13{
-            width: 40px !important;
-        }
-    }
+    // thead {
+    //     .ng-tns-c20-13{
+    //         width: 40px !important;
+    //     }
+    // }
     .p-datepicker table td > span {
         width: 30px !important;
     }
@@ -125,11 +130,11 @@ font-weight: 600 !important;
 border: 2px solid #4A0D4A !important;
 background: #FFF !important;
     }
-    .form-control:active {
-        border-radius: 8px !important;
-        border: 1px solid #A07DA0 !important;
-        background: #FFF !important;
-    }
+    // .form-control:active {
+    //     border-radius: 8px !important;
+    //     border: 1px solid #A07DA0 !important;
+    //     background: #FFF !important;
+    // }
 
     .form-control:hover {
         border-radius: 8px !important;
@@ -212,6 +217,7 @@ background: #F8F8F8;
     
 
 }
+
 .p-calendar-w-btn .p-datepicker-trigger {
     width: 48px !important;
     height: 44px !important;
@@ -283,6 +289,31 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
         }
 
         
+    }
+    @media  (min-width: 567px) and  (max-width: 778px) {
+        .col-md-6 {
+            width: 50% !important;
+            max-width: 50%;
+        }
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 265px !important;
+        }
+    
+       
+        
+    .p-datepicker-calendar {
+        width: 245px !important;
+        .p-datepicker table td {
+            padding: 5px !important;
+        }
+    
+       
+    }
+    }
+    @media  only screen and (max-width: 426px) { 
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 77% !important;
+        }
     }
 }
 

@@ -71,12 +71,12 @@
         [currentTab]="currentTab"
         ></app-address>
         <div class="row view-mode mt-2 mb-2">
-            <div class="col-6" *ngIf="appTransactionsForViewDto?.buyerStore">
+            <div class="col-md-6 col-12" *ngIf="appTransactionsForViewDto?.buyerStore">
                 <label class="label mt-1 mb-1  w-50">{{l("Store")}}</label>
                 <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto.buyerStore}}</label>
         
             </div>
-            <div class="col-6" *ngIf="appTransactionsForViewDto?.shipViaCode">
+            <div class="col-md-6 col-12" *ngIf="appTransactionsForViewDto?.shipViaCode">
                 <label class="label mt-1 mb-1 w-50">{{l("ShipVia")}}</label>
                 <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto?.shipViaCode}}</label>
                 <!-- <label class="label mt-1 mb-1 w-50">{{l("Store")}}</label> -->

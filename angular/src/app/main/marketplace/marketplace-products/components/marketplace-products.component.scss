@@ -17,7 +17,7 @@ height: 46px !important;
    width: 74.5%;
     }
     .share {
-        width: 23.5%;
+        width: 24.5%;
         // border: 2px solid #D9D9D9 !important;
         border-radius: 10px;
         
@@ -31,7 +31,7 @@ height: 46px !important;
 
 }
 .main-c {
-    gap: 25px;
+    gap: 12px;
 }
 .cur {
     width: 97px;
@@ -74,6 +74,15 @@ height: 46px !important;
 }
 }
 ::ng-deep{
+    .filterBtn .p-button.p-button-secondary.p-button-outlined {
+        height: 46px;
+        white-space: nowrap;
+        border-radius: 6px;
+        border: 1px solid #EBEBEB;
+        background: #FFF;
+        box-shadow: 1px 1px 6px 0px rgba(22, 22, 22, 0.05);
+        color: #1B101B !important;
+    }
     .web {
         .sortBy {
             width: 32%;

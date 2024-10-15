@@ -156,6 +156,10 @@ button[disabled] {
 
 
 ::ng-deep {
+    .p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler {
+        width: 14px !important;
+        height: 14px !important;
+    }
     .form-control , .form-control:focus, .form-control:active {
 //         background: #FFF !important;
 //         border-radius: 8px !important;
@@ -212,8 +216,9 @@ color: #9E9E9E !important;
 }
 
 .imgIcon {
-    width: 21px;
-    height: 27px;
+    width: 30px;
+    height: 30px;
+    border-radius: 12px;
     cursor: pointer;
 }
 
@@ -358,7 +363,9 @@ input.ng-invalid.ng-touched {
 }
 
 ::ng-deep .tablet {
-
+    .p-tabview .p-tabview-panels {
+        border: 1px solid #E2E2E2 !important;
+    }
     @media  (min-width: 567px) and  (max-width: 678px) {
         .p-tabview .p-tabview-nav li {
             border-radius: 0 !important;
@@ -619,14 +626,17 @@ input.ng-invalid.ng-touched {
     .web {
         display: flex;
     }
-    .parentDiv {
-        margin: 2em 2em 0em 7em;
-    }
+  
     .tablet {
         display: none;
     }
 }
+@media only screen and (min-width: 576px) {
 
+  .parentDiv {
+        margin: 2em 2em 0em 10em;
+    }
+}
 .bgPurple {
     background:  #4A0D4A !important;
     color: white;

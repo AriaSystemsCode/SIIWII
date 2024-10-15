@@ -664,6 +664,15 @@ border: 1px solid #D9D9D9 !important;
 border: 1px solid #D9D9D9 !important;
 }
 ::ng-deep {
+    .primeng-datatable-container .primeng-paging-container .p-paginator .p-paginator-rpp-options {
+        margin-left: 0 !important;
+    }
+    .primeng-datatable-container .primeng-paging-container .p-paginator .p-dropdown {
+        min-width: auto !important;
+    }
+    .kt-header-mobile {
+        display: none !important;
+    }
     .p-dropdown {
         border-radius: 8px !important;
         border: 1px rgba(238, 238, 238, 0.93) !important;

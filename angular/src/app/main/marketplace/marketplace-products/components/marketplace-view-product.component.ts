@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, OnDestroy, OnInit, Output, ViewChild, ViewChildren } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Injector, OnDestroy, OnInit, Output, ViewChild, ViewChildren } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AppItemViewInput } from "@app/main/app-items/app-item-view/models/app-item-view-input";
 import { AppConsts } from "@shared/AppConsts";
@@ -43,6 +43,7 @@ export class MarketplaceViewProductComponent
     //     appItemForViewDto: new AppItemForViewDto(),
     //     publish: false,
     // };
+    activeTabIndex: number = 0;
     filterText = ''
     showIconClose : boolean = false
     productBodyData: any;
@@ -62,6 +63,7 @@ export class MarketplaceViewProductComponent
     filteredColors: any[] = [];
     handleSCreenSelect :number = 0
     chk_Order_by_prepack:boolean [] =[]
+    visible: boolean = false;
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -411,8 +413,12 @@ export class MarketplaceViewProductComponent
             this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
         this.totlaOrderPrices = this.totlaOrderPrices - amount;
         this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty = 0;
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks = 0;
     }
-
+ 
+    
+ 
+    
     // total ordered QTY in order by size
     calculateOrderedQTYSum(sizes): number {
         let sum = 0;
@@ -482,7 +488,20 @@ export class MarketplaceViewProductComponent
         });
         return sum;
     }
-
+    goToSummary(){
+        this.activeTabIndex = 1; 
+        setTimeout(() => {
+            const targetElement = document.getElementById("targetDiv2");
+        if (targetElement) {
+            targetElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }
+          }, 100); // Adjust the delay as needed based on your tab switch animation
+       
+    }
+   
     scrollToTargetDiv() {
         const targetElement = document.getElementById("targetDiv");
         if (targetElement) {
@@ -491,6 +510,7 @@ export class MarketplaceViewProductComponent
                 block: "start",
             });
         }
+        
     }
 
     addToShoppingCart() {
@@ -612,48 +632,29 @@ export class MarketplaceViewProductComponent
 
         this.router.navigateByUrl("app/main/marketplace/products");
     }
+    
     onEditpecialPrice(updatedSpecialPrice) {
-        Swal.fire({
-            title: "",
-            text: "The price assigned to the ordered Items will be updated ",
-            icon: "info",
-            showCancelButton: false,
-            confirmButtonText: "Ok",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            backdrop: true,
-            customClass: {
-                popup: 'popup-class',
-                icon: 'icon-class',
-                content: 'content-class',
-                actions: 'actions-class',
-                confirmButton: 'confirm-button-class2',
-
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.productDetails.variations.map((variation: any) => {
-                    if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
-                        variation.selectedValues.forEach((value) => {
-                            value.edRestAttributes.forEach((attr) => {
-                                if (attr.extraAttrName === "SIZE") {
-                                    attr.values.forEach((sizeValue) => {
-                                        sizeValue.price = updatedSpecialPrice;
-                                    });
-                                }
+        
+        this.productDetails.variations.map((variation: any) => {
+            if (variation.extraAttrName === this.productDetails?.variations[0]?.extraAttrName) {
+                variation.selectedValues.forEach((value) => {
+                    value.edRestAttributes.forEach((attr) => {
+                        if (attr.extraAttrName === "SIZE") {
+                            attr.values.forEach((sizeValue) => {
+                                sizeValue.price = updatedSpecialPrice;
                             });
+                        }
+                    });
 
-                        });
-                    }
-
-                    this.calculateTotalOrderPriceAndQty(this.orderSummary);
                 });
-
-               // this.productDetails.minSpecialPrice = updatedSpecialPrice;
-                this.productDetails.maxSpecialPrice = updatedSpecialPrice;
-                this.showEditSpecialPrice = true
             }
+
+            this.calculateTotalOrderPriceAndQty(this.orderSummary);
         });
+
+       // this.productDetails.minSpecialPrice = updatedSpecialPrice;
+        this.productDetails.maxSpecialPrice = updatedSpecialPrice;
+        this.showEditSpecialPrice = true
     }
     onChangechk_Order_by_prepack() {
         if (!(this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex])) {

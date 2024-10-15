@@ -19,7 +19,9 @@
         </div>
         <!-- <hr class="my-2" /> -->
         <div class="row ">
-            <h6 class="col-6 mt-4" ><span class="headertxt previewTitle ml3"> Entered By : </span></h6>
+            <h6 class="col-6 mt-4 pl-3" ><span class="headertxt previewTitle ml-2 white-space-nowrap" style="white-space: nowrap;"> Entered By :  <span style="color: #888;
+               
+                font-size: 14px; margin-left: 5px; ">{{fullName}}</span></span></h6>
             <div class="col-6"    *ngIf="!createOrEditorderInfo &&  !showSaveBtn &&  canChange">
                 <button
              
@@ -62,8 +64,8 @@
                 [showDepartment]="activeTab == shoppingCartoccordionTabs.BuyerContactInfo"
             ></app-contact>
 
-            <div class="row">
-                <div *ngIf="!createOrEditorderInfo" class="col-md-6 col-12 mt-3">
+            <div class="row pl-2">
+                <div *ngIf="!createOrEditorderInfo" class="col-md-6 col-12 mt-2">
                  
                         <div
                             class="d-flex align-items-center   w-100"
@@ -86,16 +88,16 @@
                      [editMode]=true
                      [code]="classification?.code"
                      (getCodeValue)="getClassCodeValue($event)" ></app-codes>
-                <div class="col-md-12 mt-3">
+                <div class="col-md-12 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Classifications</label> 
+                        <div class="d-flex"> <label class="label p mr-2 ">Classifications</label> 
                              <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0" (click)="showClassBtn = true ; toggleAppCodes() " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Classification</div>
                 <div class="d-flex">
 
                     <div class="d-flex" *ngIf="showSelectedClass || appTransactionsForViewDto?.entityClassifications?.length != 0
                     ">
                         <div
-                        class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
+                        class="previewValue classificationsValues m-0 p-0  d-flex justify-content-between position-relative"
                         *ngFor="let item of selectedClassificationsShow; index as i"
                         [ngClass]="{ 'dimmed': tempDeselectedClassification.includes(item) }"
                       >
@@ -201,9 +203,29 @@ Cancel
                         <div class="three-dots"></div>
                     </button>
                     <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right" *dropdownMenu>
-                        <li><a (click)="addAsNewChildClass(node);showClassBtn = true;showExistClass= false">{{ "AddSubClassification" | localize }}</a></li>
-                        <li><a (click)="EditClass(node);showClassBtn = true;showExistClass= false">{{ "Edit" | localize }}</a></li>
-                        <li><a (click)="deleteClass(node)">{{ "Delete" | localize }}</a></li>
+                        <li><a (click)="addAsNewChildClass(node);showClassBtn = true;showExistClass= false"> <svg class="mx-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <g clip-path="url(#clip0_83_2876)">
+                              <path d="M6.99984 13.3332C6.99984 13.5984 7.10519 13.8527 7.29273 14.0403C7.48027 14.2278 7.73462 14.3332 7.99984 14.3332C8.26505 14.3332 8.51941 14.2278 8.70694 14.0403C8.89448 13.8527 8.99984 13.5984 8.99984 13.3332V8.99984H13.3332C13.5984 8.99984 13.8527 8.89448 14.0403 8.70694C14.2278 8.51941 14.3332 8.26505 14.3332 7.99984C14.3332 7.73462 14.2278 7.48027 14.0403 7.29273C13.8527 7.10519 13.5984 6.99984 13.3332 6.99984H8.99984V2.6665C8.99984 2.40129 8.89448 2.14693 8.70694 1.9594C8.51941 1.77186 8.26505 1.6665 7.99984 1.6665C7.73462 1.6665 7.48027 1.77186 7.29273 1.9594C7.10519 2.14693 6.99984 2.40129 6.99984 2.6665V6.99984H2.6665C2.40129 6.99984 2.14693 7.10519 1.9594 7.29273C1.77186 7.48027 1.6665 7.73462 1.6665 7.99984C1.6665 8.26505 1.77186 8.51941 1.9594 8.70694C2.14693 8.89448 2.40129 8.99984 2.6665 8.99984H6.99984V13.3332Z" fill="#777777"/>
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_83_2876">
+                                <rect width="16" height="16" fill="white"/>
+                              </clipPath>
+                            </defs>
+                          </svg>{{ "AddSubClassification" | localize }}</a></li>
+                        <li><a (click)="EditClass(node);showClassBtn = true;showExistClass= false">   <svg class="mx-2" xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                            <g clip-path="url(#clip0_83_2871)">
+                              <path d="M8.2749 2.66666H5.4749C4.3548 2.66666 3.79474 2.66666 3.36692 2.88464C2.9906 3.07639 2.68464 3.38235 2.49289 3.75867C2.2749 4.1865 2.2749 4.74655 2.2749 5.86666V11.4667C2.2749 12.5868 2.2749 13.1468 2.49289 13.5746C2.68464 13.951 2.9906 14.2569 3.36692 14.4487C3.79474 14.6667 4.3548 14.6667 5.4749 14.6667H11.0749C12.195 14.6667 12.7551 14.6667 13.1829 14.4487C13.5592 14.2569 13.8652 13.951 14.0569 13.5746C14.2749 13.1468 14.2749 12.5868 14.2749 11.4667V8.66666M6.27488 10.6667H7.39125C7.71737 10.6667 7.88043 10.6667 8.03388 10.6298C8.16993 10.5972 8.29999 10.5433 8.41928 10.4702C8.55384 10.3877 8.66914 10.2724 8.89974 10.0418L15.2749 3.66666C15.8272 3.11437 15.8272 2.21894 15.2749 1.66666C14.7226 1.11437 13.8272 1.11437 13.2749 1.66665L6.89973 8.04182C6.66912 8.27242 6.55382 8.38772 6.47137 8.52228C6.39826 8.64157 6.34439 8.77163 6.31172 8.90768C6.27488 9.06113 6.27488 9.22419 6.27488 9.55031V10.6667Z" stroke="#777777" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_83_2871">
+                                <rect width="16" height="16" fill="white" transform="translate(0.941406)"/>
+                              </clipPath>
+                            </defs>
+                          </svg> {{ "Edit" | localize }}</a></li>
+                        <li><a (click)="deleteClass(node)"> <svg class="mx-2" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M5.40909 2.33333H8.59091C8.59091 1.94656 8.4233 1.57563 8.12494 1.30214C7.82659 1.02865 7.42194 0.875 7 0.875C6.57806 0.875 6.17341 1.02865 5.87506 1.30214C5.5767 1.57563 5.40909 1.94656 5.40909 2.33333ZM4.45455 2.33333C4.45455 1.71449 4.72273 1.121 5.20009 0.683417C5.67746 0.245833 6.3249 0 7 0C7.6751 0 8.32254 0.245833 8.79991 0.683417C9.27727 1.121 9.54545 1.71449 9.54545 2.33333H13.5227C13.6493 2.33333 13.7707 2.37943 13.8602 2.46147C13.9497 2.54352 14 2.6548 14 2.77083C14 2.88687 13.9497 2.99815 13.8602 3.08019C13.7707 3.16224 13.6493 3.20833 13.5227 3.20833H12.6891L11.9146 11.7268C11.8583 12.3464 11.55 12.9241 11.0508 13.3452C10.5516 13.7662 9.89801 14 9.21964 14H4.78036C4.10199 14 3.44842 13.7662 2.94923 13.3452C2.45004 12.9241 2.14171 12.3464 2.08536 11.7268L1.31091 3.20833H0.477273C0.350692 3.20833 0.229296 3.16224 0.13979 3.08019C0.0502839 2.99815 0 2.88687 0 2.77083C0 2.6548 0.0502839 2.54352 0.13979 2.46147C0.229296 2.37943 0.350692 2.33333 0.477273 2.33333H4.45455ZM6.04545 5.6875C6.04545 5.57147 5.99517 5.46019 5.90566 5.37814C5.81616 5.29609 5.69476 5.25 5.56818 5.25C5.4416 5.25 5.32021 5.29609 5.2307 5.37814C5.14119 5.46019 5.09091 5.57147 5.09091 5.6875V10.6458C5.09091 10.7619 5.14119 10.8731 5.2307 10.9552C5.32021 11.0372 5.4416 11.0833 5.56818 11.0833C5.69476 11.0833 5.81616 11.0372 5.90566 10.9552C5.99517 10.8731 6.04545 10.7619 6.04545 10.6458V5.6875ZM8.43182 5.25C8.30524 5.25 8.18384 5.29609 8.09434 5.37814C8.00483 5.46019 7.95455 5.57147 7.95455 5.6875V10.6458C7.95455 10.7619 8.00483 10.8731 8.09434 10.9552C8.18384 11.0372 8.30524 11.0833 8.43182 11.0833C8.5584 11.0833 8.6798 11.0372 8.7693 10.9552C8.85881 10.8731 8.90909 10.7619 8.90909 10.6458V5.6875C8.90909 5.57147 8.85881 5.46019 8.7693 5.37814C8.6798 5.29609 8.5584 5.25 8.43182 5.25Z" fill="#777777"/>
+                          </svg> {{ "Delete" | localize }}</a></li>
                     </ul>
                 </div>
             </div>
@@ -227,9 +249,9 @@ Cancel
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
-                            class="align-items-center big-scroll categoriesClassificationsContainer px-3  d-flex h-100 row   w-100 "
+                            class="align-items-center big-scroll categoriesClassificationsContainer   d-flex  row   w-100 "
                         >
-                            <h6 class="previewTitle  m-0 p-0 pr-2 my-2">
+                            <h6 class="previewTitle  m-0 p-0 pr-2 ">
                                 Classifications :
                             </h6>
                             <p
@@ -241,7 +263,7 @@ Cancel
                                 {{ item}}
                             </p>
                             <p
-                                class="previewValue m-0 p-0 col-md-6 col-12 my-2"
+                                class="previewValue m-0 p-0 col-6 my-2"
                                 *ngIf="
                              !appTransactionsForViewDto?.entityClassificationsNames  ||  appTransactionsForViewDto?.entityClassificationsNames?.items
                                     ?.length == 0
@@ -265,15 +287,15 @@ Cancel
                      [editMode]=true
                      [code]="category?.code"
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
-                <div class="col-md-12 mt-3">
+                <div class="col-md-12 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1 mr-2 mt-2">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCatCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
+                        <div class="d-flex"> <label class="label pt-1 mr-2 ">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCatCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
 <div class="d-flex">
 
 
     <div class="d-flex" *ngIf="showSelectedCat || appTransactionsForViewDto?.entityCategories?.length != 0">
         <div
-            class="previewValue classificationsValues m-0 p-0 my-2 d-flex justify-content-between position-relative"
+            class="previewValue classificationsValues m-0 p-0  d-flex justify-content-between position-relative"
             *ngFor="let item of selectedCategoriesShow; index as i"
             [ngClass]="{ 'dimmed': tempDeselectedCategories.includes(item) }"
         >
@@ -393,17 +415,37 @@ Cancel
                             >
                                 <li>
                                     <a (click)="addAsNewChild(node); showCatBtn = true; showExistCat = false">
-                                        {{ "AddSubcategory" | localize }}
+                                        <svg class="mx-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <g clip-path="url(#clip0_83_2876)">
+                                              <path d="M6.99984 13.3332C6.99984 13.5984 7.10519 13.8527 7.29273 14.0403C7.48027 14.2278 7.73462 14.3332 7.99984 14.3332C8.26505 14.3332 8.51941 14.2278 8.70694 14.0403C8.89448 13.8527 8.99984 13.5984 8.99984 13.3332V8.99984H13.3332C13.5984 8.99984 13.8527 8.89448 14.0403 8.70694C14.2278 8.51941 14.3332 8.26505 14.3332 7.99984C14.3332 7.73462 14.2278 7.48027 14.0403 7.29273C13.8527 7.10519 13.5984 6.99984 13.3332 6.99984H8.99984V2.6665C8.99984 2.40129 8.89448 2.14693 8.70694 1.9594C8.51941 1.77186 8.26505 1.6665 7.99984 1.6665C7.73462 1.6665 7.48027 1.77186 7.29273 1.9594C7.10519 2.14693 6.99984 2.40129 6.99984 2.6665V6.99984H2.6665C2.40129 6.99984 2.14693 7.10519 1.9594 7.29273C1.77186 7.48027 1.6665 7.73462 1.6665 7.99984C1.6665 8.26505 1.77186 8.51941 1.9594 8.70694C2.14693 8.89448 2.40129 8.99984 2.6665 8.99984H6.99984V13.3332Z" fill="#777777"/>
+                                            </g>
+                                            <defs>
+                                              <clipPath id="clip0_83_2876">
+                                                <rect width="16" height="16" fill="white"/>
+                                              </clipPath>
+                                            </defs>
+                                          </svg>               {{ "AddSubcategory" | localize }}
                                     </a>
                                 </li>
                                 <li>
                                     <a (click)="EditCat(node); showCatBtn = true; showExistCat = false">
-                                        {{ "Edit" | localize }}
+                                        <svg class="mx-2" xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                                            <g clip-path="url(#clip0_83_2871)">
+                                              <path d="M8.2749 2.66666H5.4749C4.3548 2.66666 3.79474 2.66666 3.36692 2.88464C2.9906 3.07639 2.68464 3.38235 2.49289 3.75867C2.2749 4.1865 2.2749 4.74655 2.2749 5.86666V11.4667C2.2749 12.5868 2.2749 13.1468 2.49289 13.5746C2.68464 13.951 2.9906 14.2569 3.36692 14.4487C3.79474 14.6667 4.3548 14.6667 5.4749 14.6667H11.0749C12.195 14.6667 12.7551 14.6667 13.1829 14.4487C13.5592 14.2569 13.8652 13.951 14.0569 13.5746C14.2749 13.1468 14.2749 12.5868 14.2749 11.4667V8.66666M6.27488 10.6667H7.39125C7.71737 10.6667 7.88043 10.6667 8.03388 10.6298C8.16993 10.5972 8.29999 10.5433 8.41928 10.4702C8.55384 10.3877 8.66914 10.2724 8.89974 10.0418L15.2749 3.66666C15.8272 3.11437 15.8272 2.21894 15.2749 1.66666C14.7226 1.11437 13.8272 1.11437 13.2749 1.66665L6.89973 8.04182C6.66912 8.27242 6.55382 8.38772 6.47137 8.52228C6.39826 8.64157 6.34439 8.77163 6.31172 8.90768C6.27488 9.06113 6.27488 9.22419 6.27488 9.55031V10.6667Z" stroke="#777777" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </g>
+                                            <defs>
+                                              <clipPath id="clip0_83_2871">
+                                                <rect width="16" height="16" fill="white" transform="translate(0.941406)"/>
+                                              </clipPath>
+                                            </defs>
+                                          </svg>     {{ "Edit" | localize }}
                                     </a>
                                 </li>
                                 <li>
                                     <a (click)="deleteCat(node)">
-                                        {{ "Delete" | localize }}
+                                        <svg class="mx-2" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                            <path d="M5.40909 2.33333H8.59091C8.59091 1.94656 8.4233 1.57563 8.12494 1.30214C7.82659 1.02865 7.42194 0.875 7 0.875C6.57806 0.875 6.17341 1.02865 5.87506 1.30214C5.5767 1.57563 5.40909 1.94656 5.40909 2.33333ZM4.45455 2.33333C4.45455 1.71449 4.72273 1.121 5.20009 0.683417C5.67746 0.245833 6.3249 0 7 0C7.6751 0 8.32254 0.245833 8.79991 0.683417C9.27727 1.121 9.54545 1.71449 9.54545 2.33333H13.5227C13.6493 2.33333 13.7707 2.37943 13.8602 2.46147C13.9497 2.54352 14 2.6548 14 2.77083C14 2.88687 13.9497 2.99815 13.8602 3.08019C13.7707 3.16224 13.6493 3.20833 13.5227 3.20833H12.6891L11.9146 11.7268C11.8583 12.3464 11.55 12.9241 11.0508 13.3452C10.5516 13.7662 9.89801 14 9.21964 14H4.78036C4.10199 14 3.44842 13.7662 2.94923 13.3452C2.45004 12.9241 2.14171 12.3464 2.08536 11.7268L1.31091 3.20833H0.477273C0.350692 3.20833 0.229296 3.16224 0.13979 3.08019C0.0502839 2.99815 0 2.88687 0 2.77083C0 2.6548 0.0502839 2.54352 0.13979 2.46147C0.229296 2.37943 0.350692 2.33333 0.477273 2.33333H4.45455ZM6.04545 5.6875C6.04545 5.57147 5.99517 5.46019 5.90566 5.37814C5.81616 5.29609 5.69476 5.25 5.56818 5.25C5.4416 5.25 5.32021 5.29609 5.2307 5.37814C5.14119 5.46019 5.09091 5.57147 5.09091 5.6875V10.6458C5.09091 10.7619 5.14119 10.8731 5.2307 10.9552C5.32021 11.0372 5.4416 11.0833 5.56818 11.0833C5.69476 11.0833 5.81616 11.0372 5.90566 10.9552C5.99517 10.8731 6.04545 10.7619 6.04545 10.6458V5.6875ZM8.43182 5.25C8.30524 5.25 8.18384 5.29609 8.09434 5.37814C8.00483 5.46019 7.95455 5.57147 7.95455 5.6875V10.6458C7.95455 10.7619 8.00483 10.8731 8.09434 10.9552C8.18384 11.0372 8.30524 11.0833 8.43182 11.0833C8.5584 11.0833 8.6798 11.0372 8.7693 10.9552C8.85881 10.8731 8.90909 10.7619 8.90909 10.6458V5.6875C8.90909 5.57147 8.85881 5.46019 8.7693 5.37814C8.6798 5.29609 8.5584 5.25 8.43182 5.25Z" fill="#777777"/>
+                                          </svg>    {{ "Delete" | localize }}
                                     </a>
                                 </li>
                             </ul>
@@ -429,9 +471,9 @@ Cancel
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
-                            class="categoriesClassificationsContainer d-flex align-items-center big-scroll px-3    h-100 row   w-100"
+                            class="categoriesClassificationsContainer d-flex align-items-center big-scroll   row   w-100"
                         >
-                            <h6 class="previewTitle  m-0 p-0 pr-2 my-2">Categories :</h6>
+                            <h6 class="previewTitle  m-0 p-0 pr-2">Categories :</h6>
                             <p
                                 class="previewValue classificationsValues  m-0 p-0  my-2"
                                 *ngFor="
@@ -456,7 +498,7 @@ Cancel
                 <!-- categories -->
 
                 <!-- dates -->
-                <div class="col-md-6 mt-3 position-relative">
+                <div class="col-md-6 mt-2 position-relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Entered Date</label>
                         <div class="">
@@ -482,7 +524,7 @@ Cancel
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-3 position-relative">
+                <div class="col-md-6 mt-2 position-relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Start Date</label>
                         <p-calendar
@@ -505,7 +547,7 @@ Cancel
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-3 position-relative">
+                <div class="col-md-6 mt-2 position-relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Avaialable Date</label>
                         <p-calendar
@@ -531,7 +573,7 @@ Cancel
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-3 position-relative">
+                <div class="col-md-6 mt-2 position-relative">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Complete Date</label>
                         <p-calendar
@@ -561,7 +603,7 @@ Cancel
                 <!-- dates -->
               
                 <!-- currency -->
-                <div class="col-md-6 mt-3">
+                <div class="col-md-6 mt-2">
                     <div *ngIf="createOrEditorderInfo">
                         <label class="label">Currency</label>
                         <p-dropdown
@@ -577,8 +619,8 @@ Cancel
                         <div
                             class="d-flex align-items-center  "
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-md-6 col-12 my-2">Currency :</h6>
-                            <p class="previewValue  m-0 p-0 col-md-6 col-12 my-2">
+                            <h6 class="previewTitle  m-0 p-0 col-6  my-2">Currency :</h6>
+                            <p class="previewValue  m-0 p-0 col-6 my-2">
                                 {{ appTransactionsForViewDto?.currencyCode }}
                             </p>
                         </div>
@@ -587,7 +629,7 @@ Cancel
                 <!-- currency -->
 
                 <!-- exchange rate -->
-                <div class="col-md-6 mt-3">
+                <div class="col-md-6 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="formGroup">
                         <label class="label">Exchange Rate</label>
                         <input
@@ -602,10 +644,10 @@ Cancel
                         <div
                             class="d-flex align-items-center   w-100"
                         >
-                            <h6 class="previewTitle  m-0 p-0 col-md-6 col-12 my-2">
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">
                                 Exchange Rate :
                             </h6>
-                            <p class="previewValue  m-0 p-0 col-md-6 col-12 my-2">
+                            <p class="previewValue  m-0 p-0 col-6  my-2">
                                 {{ appTransactionsForViewDto?.currencyExchangeRate }}
                             </p>
                         </div>
@@ -617,15 +659,7 @@ Cancel
         <hr class="my-2" />
         <div class="d-flex justify-content-end">
 
-    <button
-    *ngIf="showSaveBtn"
-    [disabled]="!(isContactsValid && isSalesOrderValidForm())"
-    (click)="save()"
-    class="previewbtn text-center btn float-right"
->
-    Save
-    <!-- <i class="pi pi-check"></i> -->
-</button>
+ 
 <button
 *ngIf="showSaveBtn"
 (click)="cancel()"
@@ -633,6 +667,15 @@ class="cancelbtn text-center btn float-right"
 >
 Cancel
 <!-- <i class="pi pi-times"></i> -->
+</button>
+<button
+*ngIf="showSaveBtn"
+[disabled]="!(isContactsValid && isSalesOrderValidForm())"
+(click)="save()"
+class="previewbtn text-center btn float-right"
+>
+Save
+<!-- <i class="pi pi-check"></i> -->
 </button>
 </div>
     </div>

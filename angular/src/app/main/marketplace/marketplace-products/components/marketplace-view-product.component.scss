@@ -14,7 +14,7 @@ height: 35px;
  
 }
 .summary-sec {
-    padding-left: 20px;
+    padding-left: 15px !important;
     // padding-right: 2px;
 }
 .details-sec {
@@ -43,7 +43,10 @@ td {
     vertical-align:initial !important
 
 }
-
+.textarea.form-control {
+    min-height: 100px !important;
+    padding: 7px !important;
+}
 .showRoomLink{
     max-width: 257px;
     max-height: 40px;
@@ -61,7 +64,7 @@ td {
     white-space: nowrap;
     height: 46px;
     border-radius: 6px;
-    padding: 11px 16px 11px 16px !important;
+    // padding: 11px 16px 11px 16px !important;
 
 border: 1px solid rgba(238, 238, 238, 0.93);
 background: #FFF;
@@ -364,6 +367,34 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 ::ng-deep {
+    .p-dialog {
+        border-radius: 20px;
+      border: 1px solid #EEE;
+      background: #FFF;
+      padding: 15px;
+      margin: 10px;
+      box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.15);
+      }
+        .p-dialog .p-dialog-header {
+          border:  none !important;
+          background: white !important;
+          padding: 0 !important;
+        }
+    .p-button-text {
+        button {
+            background-color: #4A0D4A !important;
+            border:  none !important;
+            border-radius: 6px !important;
+            padding: 8px 32px;
+        }
+      
+    }
+    .p-inputnumber-buttons-stacked .p-inputnumber-input {
+        max-width: 133px !important;
+        border-radius: 10px !important;
+border: 1px solid #D9D9D9 !important;
+background: #FFF !important;
+    }
     @media only screen and (max-width: 992px) {
         .editQty {
             max-width: 145px;
@@ -380,9 +411,12 @@ input:checked + .slider:before {
             padding-right: 20px;
                 }
                 .p-tabview-title {
-                    font-size: 12px !important;
+                    font-size: 10px !important;
                 }
                 
+    }
+    .summary-sec {
+        padding-left: 0 !important;
     }
 }
 
@@ -473,7 +507,30 @@ font-weight: 600;
         z-index: 0 !important;
         border: 1px solid #E2E2E2 !important;
     }
+    @media only screen and (min-width: 575px) and (max-width: 1024px) {
+        .pageHeader {
+            margin-top: 70px !important;
+        }
+    }
+    @media only screen and (min-width: 768px) and (max-width: 922px) { 
+.left-sec {
+padding: 0 !important;
+}
+     }
+    @media only screen and (min-width: 1024px) and (max-width: 1250px) { 
+
+
+        
+            .col-6 {
+                max-width: 40% !important;
+                margin-left: 3px !important;
+            
+        }
+    }
 @media only screen and (max-width: 567px) {
+    .showRoomLink {
+        margin-bottom: 5px !important;
+    }
     td {
         font-size: 10px !important;
     }
@@ -513,16 +570,15 @@ font-weight: 600;
         .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
             /* color: #777 !important; */
             border: none !important;
-            border-radius: 6px !important;
-            height: 33px !important;
-            min-width: 150px !important;
+            border-top-right-radius: 0px !important;
+            min-width: 135px !important;
              margin: 0 !important; 
         color: white !important;
 
         }
   
         .p-tabview-title {
-            font-size:  11px !important;
+            font-size:  10px !important;
             margin-top: 11px;
         }
     }
@@ -574,7 +630,7 @@ font-weight: 600;
         .p-tabview .p-tabview-nav li .p-tabview-nav-link {
             // width: 80px !important;
             width: 100% !important;
-            height: 66px !important;
+            // height: 66px !important;
             padding: 0 !important;
             border: none !important;
             svg {
@@ -607,13 +663,13 @@ font-weight: 600;
     .table-mob {
         
         .p-tabview .p-tabview-nav li {
-            // width: 100% !important;
+            width: 100% !important;
             height: 35px !important;
             margin: 0 !important;
             // border-right:  1px solid #eee !important;
         }
         .p-tabview .p-tabview-nav li .p-tabview-nav-link {
-            width: 185px !important;
+            width: 100% !important;
         }
     }
     .p-tabview .p-tabview-nav li .p-tabview-nav-link {
@@ -637,7 +693,7 @@ font-weight: 600;
         border: none!important;
         border-radius: 6px !important;
         padding: 0 !important;
-         width: 66px  !important;
+        //  width: 66px  !important;
          height: 66px !important;
          margin: auto !important;
         //  margin-top: 0 !important;

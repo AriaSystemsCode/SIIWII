@@ -88,7 +88,11 @@ box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
         max-width: 750px !important;
     }
 }
-
+@media (max-width: 1023px) { 
+    .menu-tab {
+        margin-top: 200px !important;
+    }
+}
 @media (max-width: 1024px) {
     .navbar-expand-lg .navbar-collapse {
 
@@ -104,10 +108,10 @@ right: 30px;
 @media only screen and (min-width: 625px) and (max-width: 1023px) {
     .navbar-nav {
         flex-direction: row !important;
-        gap: 25px !important;
+        gap: 10px !important;
     }
     .sec-section{
-        width: 150px !important;
+        width: 120px !important;
 
         gap: 10px !important;
     }
@@ -262,11 +266,21 @@ right: 30px;
     border: 1px solid #FFFFFF;
 }
 
-// @media (max-width: 567px) {
 
-//     .navbar {
-//         border-radius: 20px 20px 0px 0px !important;
-//     background: #4A0D4A;
-//     box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
-//     }
-//     }
+
+@media (max-width: 567px) {
+
+    .navbar {
+        margin-left: 0 !important;
+      
+    }
+    }
+
+
+    @media (min-width: 567px) {
+
+        .navbar {
+            margin-left: 95px !important;
+          
+        }
+        }
