@@ -252,7 +252,18 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
     // spinnericon {
     //     display: none !important;
 
+
     // }
+    .text-danger {
+        color: #C83532ed !important;
+    }
+    .was-validated .form-control:invalid, .form-control.is-invalid {
+        border: 1px solid#C83532ed !important;
+
+    }
+    // .is-invalid {
+    //     border: 1px solid red !important;
+    //   }
     p-autocomplete .p-autocomplete{
         width: 100% !important;
         .p-button:focus {
@@ -298,9 +309,11 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
         .p-datepicker:not(.p-datepicker-inline) {
             width: 265px !important;
         }
-    
+  
        
-        
+        input.form-control.ng-dirty.ng-invalid.ng-touched {
+            border: 1px solid red !important;
+          } 
     .p-datepicker-calendar {
         width: 245px !important;
         .p-datepicker table td {

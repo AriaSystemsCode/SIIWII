@@ -380,6 +380,9 @@
                                 formControlName="buyerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['buyerContactPhoneNumber'].invalid && orderForm.controls['buyerContactPhoneNumber'].touched
+                                  }"
                             />
                             <small
                                 class="text-danger"
@@ -430,6 +433,9 @@
                                 formControlName="buyerContactEMailAddress"
                                 minlength="5"
                                 maxlength="100"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['buyerContactEMailAddress'].invalid && orderForm.controls['buyerContactEMailAddress'].touched
+                                  }"
                             />
                             
                             <small
@@ -604,7 +610,8 @@
                        
                         [placeholder]=" 'Please Select Seller Contact Name'"
                         field="name"
-                        [forceSelection]="false">
+                        [forceSelection]="false" 
+                        >
                         
                       
                     </p-autoComplete>
@@ -638,6 +645,9 @@
                                 formControlName="sellerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['sellerContactPhoneNumber'].invalid && orderForm.controls['sellerContactPhoneNumber'].touched
+                                  }"
                             />
                             <!-- <small
                                 class="text-danger"
@@ -687,6 +697,9 @@
                                 formControlName="sellerContactEMailAddress"
                                 minlength="5"
                                 maxlength="100"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['sellerContactEMailAddress'].invalid && orderForm.controls['sellerContactEMailAddress'].touched
+                                  }"
                             />
                             <small
                             class="text-danger"
