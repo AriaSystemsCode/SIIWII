@@ -551,7 +551,7 @@ export class TopBarComponent
         if (this.appSession?.tenantId)
             tenantId = this.appSession?.tenantId?.toString();
         else tenantId = null;
-        let link = url + "/account/register-tenant?editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type+"&firstName="+firstName+"&lastName="+lastName+"&relatedTenantId="+relatedTenantId;
+        let link = url + "/account/select-edition?editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type+"&firstName="+firstName+"&lastName="+lastName+"&relatedTenantId="+relatedTenantId;
         Swal.fire({
             title: "",
             html: htmlContent,

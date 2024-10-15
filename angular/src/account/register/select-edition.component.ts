@@ -37,6 +37,9 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
     accountType;
     accountTypeLabel:string="";
     accountTypes:SelectItem[] = [];
+    firstName:string="";
+    lastName:string="";
+    relatedTenantId;
     constructor(
         injector: Injector,
         private _tenantRegistrationService: TenantRegistrationServiceProxy,
@@ -51,7 +54,11 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
     ngOnInit() {
 
         this.tenantid = this._activatedRoute.snapshot.queryParams['tenantid'];
-
+        this.relatedTenantId=this._activatedRoute.snapshot.queryParams['relatedTenantId'];
+        this.lastName=this._activatedRoute.snapshot.queryParams['lastName'];
+        this.firstName=this._activatedRoute.snapshot.queryParams['firstName'];
+        this.accountTypeLabel=this._activatedRoute.snapshot.queryParams['accountTypeLabel'];
+        this.accountType=this._activatedRoute.snapshot.queryParams['accountType'];
         this.isUserLoggedIn = abp.session.userId > 0;
 
         this._tenantRegistrationService.getEditionsForSelect()
@@ -70,36 +77,37 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
     getAccountTypes(){
         this._tenantRegistrationService.getEditionsForSelect()
     .subscribe((result) => {
-        for (let i = 0; i < result.editionsWithFeatures.length; i++) {
-            const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
-            const accountTypeValue = result.editionsWithFeatures[i].edition.id;
-            this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
+        debugger
+    //     for (let i = 0; i < result.editionsWithFeatures.length; i++) {
+    //         const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
+    //         const accountTypeValue = result.editionsWithFeatures[i].edition.id;
+    //         this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
 
-            if(accountTypeLabel.toUpperCase().includes('PERSONAL'))
-             this.changeAccountType(this.accountTypes[i]) 
-    }
+    //         if(accountTypeLabel.toUpperCase().includes('PERSONAL'))
+    //          this.changeAccountType(this.accountTypes[i]) 
+    // }
     });
     }
 
-      changeAccountType($event){
-        debugger ;
-         let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
+    //   changeAccountType($event){
+    //     debugger ;
+    //      let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
 
-         if(indx>=0){
-         this.accountTypeLabel= this.accountTypes[indx].label.toString();
-         this.accountType=this.accountTypes[indx].value;
-         }
-         else
-         this.accountTypeLabel='';
+    //      if(indx>=0){
+    //      this.accountTypeLabel= this.accountTypes[indx].label.toString();
+    //      this.accountType=this.accountTypes[indx].value;
+    //      }
+    //      else
+    //      this.accountTypeLabel='';
 
          
-         this.showMainSpinner()
-         this._editionServiceProxy.getEditionForEditNoPermission($event.value)
-         .subscribe((result:GetEditionEditOutput) => {
-            this.editionsSelectOutput.allFeatures = result.features;
-           this.hideMainSpinner();
-         }); 
-    }
+    //      this.showMainSpinner()
+    //      this._editionServiceProxy.getEditionForEditNoPermission($event.value)
+    //      .subscribe((result:GetEditionEditOutput) => {
+    //         this.editionsSelectOutput.allFeatures = result.features;
+    //        this.hideMainSpinner();
+    //      }); 
+    //}
 
     isFree(edition: EditionSelectDto): boolean {
         return this._editionHelperService.isEditionFree(edition);
