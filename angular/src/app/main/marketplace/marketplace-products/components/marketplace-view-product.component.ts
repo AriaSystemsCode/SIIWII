@@ -340,11 +340,11 @@ export class MarketplaceViewProductComponent
         let qty = 0;
         let price = 0;
         orders.map((order: any) => {
-            order.color.sizes.map((size) => {
+            order.color.sizes.map((size,index) => {
                 if (this.productDetails.orderByPrePack) {
 
                     let multiby =
-                        size.sizeRatio * order.color.sizes[0].orderedPrePacks;
+                        size.sizeRatio * order.color.sizes[index].orderedPrePacks;
                     let priceMultibly = multiby * size.price;
                     qty = qty + multiby;
                     price = price + priceMultibly;
@@ -382,10 +382,10 @@ export class MarketplaceViewProductComponent
         } else {
             let qty = 0;
             let price = 0;
-            this.orderSummary[i].color.sizes.map((size) => {
+            this.orderSummary[i].color.sizes.map((size,index) => {
                 let multiby =
                     size.sizeRatio *
-                    this.orderSummary[i].color.sizes[0].orderedPrePacks;
+                    this.orderSummary[i].color.sizes[index].orderedPrePacks;
                 let priceMultibly = multiby * size.price;
                 qty = qty + multiby;
                 price = price + priceMultibly;
@@ -411,7 +411,19 @@ export class MarketplaceViewProductComponent
             this.orderSummary[orderIndex].color.sizes[sizeIndex].price;
         this.totlaOrderPrices = this.totlaOrderPrices - amount;
         this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedQty = 0;
+        
+        this.orderSummary[orderIndex].color.sizes[sizeIndex].orderedPrePacks=0;
+
+        if (sizeIndex == 0 && this.orderSummary[orderIndex].color.sizes?.length > 0) {
+            const sizes = this.colorsData[this.currentIndex].sizes;
+            const preorderIndex = (this.orderType == 'SO'  &&  this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[this.currentIndex]) ? sizes.findIndex(size => size.orderedQty) : sizes.findIndex(size => size.orderedPrePacks)  ;
+        
+            if (preorderIndex > 0) {
+                const [preorderItem] = sizes.splice(preorderIndex, 1);
+                    sizes.unshift(preorderItem);
+            }
     }
+}
 
     // total ordered QTY in order by size
     calculateOrderedQTYSum(sizes): number {
@@ -448,7 +460,7 @@ export class MarketplaceViewProductComponent
     // totla ordered prepack QTY
     calculatePrepackOrderedQTYSum(prepackSizes: any, orderIndex: number) {
         let sum = 0;
-        prepackSizes.forEach((item) => {
+        prepackSizes.forEach((item,index) => {
             let multiby;
             if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item.orderedPrePacks;
@@ -456,18 +468,18 @@ export class MarketplaceViewProductComponent
             else
                 multiby =
                     item.sizeRatio *
-                    this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
+                    this.orderSummary[orderIndex]?.color.sizes[index].orderedPrePacks;
 
             sum = sum + multiby;
         });
-
+        this.totalOrderQTY =sum;
         return sum;
     }
 
     // totla amount for each size in order by prepack
     getTotalPrepackSizeAmount(prepackSizes: any, orderIndex: number) {
         let sum = 0;
-        prepackSizes.forEach((item) => {
+        prepackSizes.forEach((item,index) => {
             let multiby;
             if (this.orderType == 'SO' && this.productDetails?.orderByPrePack && !this.chk_Order_by_prepack[orderIndex])
                 multiby = item.orderedPrePacks;
@@ -475,11 +487,13 @@ export class MarketplaceViewProductComponent
             else
                 multiby =
                     item.sizeRatio *
-                    this.orderSummary[orderIndex]?.color.sizes[0].orderedPrePacks;
+                    this.orderSummary[orderIndex]?.color.sizes[index].orderedPrePacks;
 
             let amount = multiby * item.price;
             sum = sum + amount;
         });
+        
+        this.totlaOrderPrices = sum;
         return sum;
     }
 

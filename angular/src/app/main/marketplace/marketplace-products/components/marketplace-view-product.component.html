@@ -192,7 +192,7 @@
                                                     let i = index
                                                 "
                                             >
-                                                <tr>
+                                                <tr *ngIf="size.orderedPrePacks !== 0">
                                             >
                                                     <td>{{ size.label }}</td>
                                                     <td>
@@ -713,7 +713,7 @@
                                     <td
                                         *ngFor="
                                             let size of filteredColors[currentIndex]
-                                                .sizes
+                                                ?.sizes
                                         "
                                     >
                                         {{ size.label }}
@@ -725,7 +725,7 @@
                                     <td
                                         *ngFor="
                                             let size of filteredColors[currentIndex]
-                                                .sizes
+                                                ?.sizes
                                         "
                                     >
                                         {{ size.sizeRatio }}
@@ -762,7 +762,7 @@
                                                 {{
                                                     filteredColors[currentIndex]
                                                         ?.sizes[0]
-                                                        .noOfAvailablePrepacks
+                                                        ?.noOfAvailablePrepacks
                                                 }}
                                             </td>
                                             <td>
@@ -820,7 +820,7 @@
                                             <td>
                                                 
                                                 <p-inputNumber
-                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0].orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
+                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex].sizes[0].orderedPrePacks) : filteredColors[currentIndex].sizes[i].orderedPrePacks"
                                                    
                                                     mode="decimal"
                                                     [showButtons]="true"
@@ -1061,7 +1061,7 @@
                                         let i = index
                                     "
                                 >
-                                    <tr>
+                                    <tr *ngIf="size.orderedPrePacks !== 0">  
                                 
                                         <td>{{ size.label }}</td>
                                         <td>
@@ -1665,7 +1665,7 @@
                                                 <td
                                                     *ngFor="
                                                         let size of filteredColors[currentIndex]
-                                                            .sizes
+                                                            ?.sizes
                                                     "
                                                 >
                                                     {{ size.label }}
@@ -1677,7 +1677,7 @@
                                                 <td
                                                     *ngFor="
                                                         let size of filteredColors[currentIndex]
-                                                            .sizes
+                                                            ?.sizes
                                                     "
                                                 >
                                                     {{ size.sizeRatio }}
@@ -1714,7 +1714,7 @@
                                                             {{
                                                                 filteredColors[currentIndex]
                                                                     ?.sizes[0]
-                                                                    .noOfAvailablePrepacks
+                                                                    ?.noOfAvailablePrepacks
                                                             }}
                                                         </td>
                                                         <td>
@@ -2004,7 +2004,7 @@
                                                         let i = index
                                                     "
                                                 >
-                                                    <tr>
+                                                    <tr *ngIf="size.orderedPrePacks !== 0">
                                              
                                                         <td>{{ size.label }}</td>
                                                         <td>
