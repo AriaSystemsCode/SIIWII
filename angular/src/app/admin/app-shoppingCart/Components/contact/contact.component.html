@@ -79,7 +79,7 @@
           
             <p-autoComplete
             #autoComplete
-            [dropdown]="true"
+            [dropdown]="!tempAccount"
             [suggestions]="filteredContacts"  
             [ngModelOptions]="{standalone: true}"
             *ngIf="activeTab != shoppingCartoccordionTabs.orderInfo"
