@@ -1,4 +1,4 @@
-<div class="position-relative tab-cont thin-scroll">
+<div class="position-relative  thin-scroll">
 
     <div>
     <div class="container-fluid pt-1 mb-3 "  *ngIf="createOrEditBillingInfo">
@@ -27,7 +27,7 @@
             </div>
         </div>
     </div>
-        <hr class="my-2" />
+      
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
         <app-address 
         [isCreateOredit]="createOrEditBillingInfo"
@@ -128,24 +128,24 @@
 
 <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
     <div class="header p-2 my-2 d-flex  justify-content-end">
-<button
-*ngIf="showSaveBtn"
-[disabled]="!(isContactsValid)"
-(click)="save()"
-class="previewbtn text-center btn float-right"
->
-Save
 
-</button>
 <button
 *ngIf="showSaveBtn"
 (click)="cancel()"
-class="cancelbtn text-center btn float-right"
+class="cancelbtn text-center btn "
 >
 Cancel
 
 </button>
+<button
+*ngIf="showSaveBtn"
+[disabled]="!(isContactsValid)"
+(click)="save()"
+class="previewbtn text-center btn "
+>
+Save
 
+</button>
 </div>
 </div>
 </div>

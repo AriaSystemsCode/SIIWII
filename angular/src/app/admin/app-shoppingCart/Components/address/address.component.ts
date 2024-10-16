@@ -93,6 +93,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     }
 
     getAddressList(companySsin){
+        console.log(this.selectedAddress,'this.selectedAddressss meeeeee')
         this.showMainSpinner()
         this._AppTransactionServiceProxy.getCompanyAddresses(companySsin,null).subscribe(result => {
             this.savedAddressesList=null;

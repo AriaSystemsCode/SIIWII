@@ -84,7 +84,7 @@
 .primeng-datatable-container .primeng-paging-container .p-paginator .p-dropdown {
   border: 1px solid #d6d6d6;
   height: 35px;
-  min-width: 60px;
+  /* min-width: 60px; */
 }
 .primeng-datatable-container .primeng-paging-container .p-paginator a {
   display: inline-block;
@@ -127,7 +127,7 @@
 }
 .primeng-datatable-container .primeng-paging-container .p-paginator .p-paginator-rpp-options {
   float: left;
-  margin-left: 100px;
+  /* margin-left: 100px; */
 }
 .primeng-datatable-container .p-paginator .p-paginator-page,
 .primeng-datatable-container .p-paginator .p-paginator-pages,
