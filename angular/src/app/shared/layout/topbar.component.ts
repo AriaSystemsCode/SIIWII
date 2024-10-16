@@ -538,8 +538,7 @@ export class TopBarComponent
         debugger
         let type = accout_type;
         let accountname = account_name;
-        //let email = this.appSession.user.emailAddress;
-        let email='alaasaid1699@gmail.com';
+        let email = this.appSession.user.emailAddress;
         let url = "https://app.testing.siiwii.net";
         let tenantName =this.appSession.tenant.name;
         //let tenantName =this.appSession.tenancyName;
