@@ -40,6 +40,10 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
 isAccManual :boolean = false
+visible: boolean = false;
+cancelBtn: boolean = false;
+saveBtn: boolean = false;
+SuccessMsg: boolean = false;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -202,7 +206,9 @@ isAccManual :boolean = false
     this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
     this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
+      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) ;
+        this.SuccessMsg = true
+      }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));

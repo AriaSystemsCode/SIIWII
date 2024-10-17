@@ -167,7 +167,7 @@
                     </div>
                 </div>
                 <div class="p-4 text-right border-left d-flex">
-                    <button type="button" class="btn  bgPurple border-0  "
+                    <button    *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'" type="button" class="btn  bgPurple border-0  "
                         style="height: 37px;white-space: nowrap;" (click)="onContinueShopping()"
                         [disabled]="!isOwnedByMe"
                         [ngClass]="{ disabled:!isOwnedByMe}">
@@ -669,7 +669,7 @@ height: 48px;"
                 href="javascript:;">
              
 
-                    <button type="button" class="btn  border-0  "
+                    <button type="button" class="btn  border-0  "    *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
                     style="height: 37px;white-space: nowrap;" (click)="onContinueShopping()"
                     [disabled]="!isOwnedByMe"
                     [ngClass]="{ disabled:!isOwnedByMe}">

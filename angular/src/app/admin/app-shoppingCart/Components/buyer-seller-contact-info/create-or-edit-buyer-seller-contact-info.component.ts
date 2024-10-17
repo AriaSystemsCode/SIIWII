@@ -28,6 +28,10 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   @Input("canChange")  canChange:boolean=true;
+  visible: boolean = false;
+  cancelBtn: boolean = false;
+  saveBtn: boolean = false;
+  SuccessMsg: boolean = false;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy
@@ -64,7 +68,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   createOrEditTransaction() {
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
+      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true);  this.SuccessMsg = true}))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
