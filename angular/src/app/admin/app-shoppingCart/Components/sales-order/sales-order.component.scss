@@ -333,3 +333,28 @@ img {
 //     right: 3px !important;
 
 // }
+
+
+ ::ng-deep  {
+    .p-datepicker table {
+        width: 100% !important;
+
+    }
+    @media only screen and (min-width: 768px) {
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 27% !important;
+        }
+    }
+    @media  (min-width: 567px) and  (max-width: 778px) {
+        @media only screen and (min-width: 768px) {
+            .p-datepicker:not(.p-datepicker-inline) {
+                width: 34% !important;
+            }
+        }
+    }
+    @media  only screen and (max-width: 426px) { 
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 84% !important;
+        }
+    }
+}

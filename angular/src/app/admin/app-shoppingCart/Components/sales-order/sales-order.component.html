@@ -90,7 +90,7 @@
                      (getCodeValue)="getClassCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label p mr-2 ">Classifications</label> 
+                        <div class="d-flex"> <label class="label pt-2 mr-2 ">Classifications</label> 
                              <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0" (click)="showClassBtn = true ; toggleAppCodes() " class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Classification</div>
                 <div class="d-flex">
 
@@ -101,7 +101,7 @@
                         *ngFor="let item of selectedClassificationsShow; index as i"
                         [ngClass]="{ 'dimmed': tempDeselectedClassification.includes(item) }"
                       >
-                        <span>{{ item }}</span>
+                        <span class="mt-2">{{ item }}</span>
                         <a class="clear-icon" (click)="deSelectClass(item, i)">
                           <i class="fa fa-1x fa-times fa-1x"></i>
                         </a>
@@ -289,7 +289,7 @@ Cancel
                      (getCodeValue)="getCodeValue($event)" ></app-codes>
                 <div class="col-md-12 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-1 mr-2 ">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCatCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
+                        <div class="d-flex"> <label class="label pt-2 mr-2 ">Categories</label>  <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0" (click)="showCatBtn = true; toggleAppCatCodes()"  class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New Categories</div>
 <div class="d-flex">
 
 
@@ -299,7 +299,7 @@ Cancel
             *ngFor="let item of selectedCategoriesShow; index as i"
             [ngClass]="{ 'dimmed': tempDeselectedCategories.includes(item) }"
         >
-            <span>{{ item }}</span>
+            <span class="mt-2">{{ item }}</span>
             <a class="clear-icon" (click)="deSelectCat(item, i)">
                 <i class="fa fa-1x fa-times fa-1x"></i>
             </a>
