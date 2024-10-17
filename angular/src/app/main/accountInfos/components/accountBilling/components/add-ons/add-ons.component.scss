@@ -88,11 +88,14 @@
     .p-inputnumber-buttons-stacked .p-inputnumber-button-group .p-button.p-inputnumber-button {
       width: 18px !important;
     }
-    .p-inputtext{
-      border-radius: 2px 0px 0px 2px !important;
-border: 1px solid #ECECEC !important;
-background: #FFF !important;
+    .orderedSummary {
+      .p-inputtext{
+        border-radius: 2px 0px 0px 2px !important;
+  border: 1px solid #ECECEC !important;
+  background: #FFF !important;
+      }
     }
+
     .p-inputtext:enabled:focus {
       box-shadow:  none !important;
     }
@@ -129,11 +132,11 @@ background: #FFF !important;
     flex: 1; /* This makes each column take an equal share of the available space */
     text-align: center; /* Center align the text */
 }
-.p-button:enabled:hover {
-  background: #4A0D4A !important;
-  color: #ffffff !important;
-  border-color: #4A0D4A !important;
-}
+// .p-button:enabled:hover {
+//   background: #4A0D4A !important;
+//   color: #ffffff !important;
+//   border-color: #4A0D4A !important;
+// }
   }
 .table-bordered th, .table-bordered td{
     border:  none !important;

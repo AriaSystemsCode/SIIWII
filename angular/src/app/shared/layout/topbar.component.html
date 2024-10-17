@@ -1,7 +1,8 @@
 ...<!-- Navbar -->
 <nav
-    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5 ml-0"
+    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
     [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
+  
 >
     <!-- Container wrapper -->
     <div class="container ml-0 position-md-absolute position-lg-static ">
@@ -28,7 +29,7 @@
         ></button> -->
         <a
         class="navbar-brand pt-0"
-        style="margin-left: 25px;"
+       
         [routerLink]="['/app/main/Home']"
         routerLinkActive="header-link-active"
         (click)="userClick('Home')"
@@ -263,7 +264,7 @@
                     <a class="nav-link active d-flex flex-column text-center">
                         <div
                             dropdown
-                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3"
+                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3 "
                             style=" height: 40px; color: white"
                         >
                             <div
@@ -303,7 +304,7 @@
                                 [attr.aria-label]="l('Languages')"
                             >
                                 <ul
-                                    class="kt-nav kt-margin-t-10 kt-margin-b-10"
+                                    class="kt-nav kt-margin-t-10 kt-margin-b-10 menu-tab"
                                 >
                                     <li class="kt-nav__item">
                                         <a class="kt-nav__link">

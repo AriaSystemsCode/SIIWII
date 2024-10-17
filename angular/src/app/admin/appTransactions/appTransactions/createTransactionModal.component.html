@@ -36,20 +36,20 @@
     </div>
     <form  [formGroup]="orderForm" class="form mt-3  calendar-form">
         <div class="row">
-            <div class="col-md-6 pt-4">
+            <div class="col-12 col-md-6 pt-4">
                 <div class="mb-3 pt-2">
                     <div
                     class="enter d-flex align-items-center justify-content-start gap-2"
                 >
-                    <span class="mr-2">Entered By :</span>
-                    <a href="http://" class="entered" target="_blank" rel="noopener noreferrer">{{
+                    <span class="mr-2 spEnterd">Entered By :</span>
+                    <a  class="enteredBy"  rel="noopener noreferrer">{{
                         fullName
                     }}</a>
                 </div>
                 <span class="date">{{ dt }}</span>
                 </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <div class="mb-3">
                         <label for="" class="form-label"
                             >Reference  #
@@ -66,7 +66,7 @@
                     
                     </div>
                 </div>
-                <div class="col-md-6 ">
+                <div class="col-12 col-md-6 ">
                     <div class="mb-3 ">
                         <label class="form-label">Entered Date*</label>
                         <div class="position-relative">
@@ -77,16 +77,16 @@
                             formControlName="enteredDate"
                             [showIcon]="true"
                             [readonlyInput]="false"
-                            
+                            (focus)="onFocus()" (blur)="onBlur()"
                             (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
-                         
+                            [ngClass]="isFocused ? 'focused-calendar' : ''"
                          
                         ></p-calendar>
                         <img  src="../../../../../assets/icons/calendar.png"  (click)="openCalendar(calendar1)"  alt="" srcset="">
                            </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <div class="mb-3 ">
                         <label class="form-label">Start Date*</label>
                         <div class="position-relative">
@@ -117,7 +117,7 @@
                     </small>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <div class="mb-3 relative">
                         <label class="form-label">Complete Date*</label>
                         <div class="position-relative">
@@ -145,7 +145,7 @@
                     </small>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <div class="mb-3 ">
                         <label class="form-label">Available Date*</label>
                         <div class="position-relative">
@@ -181,10 +181,10 @@
             <div class="sellerHeader">
                 <span>Buyer Information</span>
             </div>
-            <form [formGroup]="orderForm" class="form mt-3 ">
+            <form [formGroup]="orderForm" class="form ">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="flex align-items-center gap-1 my-2" *ngIf="formType?.toUpperCase() != 'PO'">
+                        <div class="flex align-items-center gap-1 temm" *ngIf="formType?.toUpperCase() != 'PO'">
                             <!-- <p-checkbox
                                 value="Buyer"
                                 [disabled]="isBuyer"
@@ -380,6 +380,9 @@
                                 formControlName="buyerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['buyerContactPhoneNumber'].invalid && orderForm.controls['buyerContactPhoneNumber'].touched
+                                  }"
                             />
                             <small
                                 class="text-danger"
@@ -430,6 +433,9 @@
                                 formControlName="buyerContactEMailAddress"
                                 minlength="5"
                                 maxlength="100"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['buyerContactEMailAddress'].invalid && orderForm.controls['buyerContactEMailAddress'].touched
+                                  }"
                             />
                             
                             <small
@@ -604,7 +610,8 @@
                        
                         [placeholder]=" 'Please Select Seller Contact Name'"
                         field="name"
-                        [forceSelection]="false">
+                        [forceSelection]="false" 
+                        >
                         
                       
                     </p-autoComplete>
@@ -638,6 +645,9 @@
                                 formControlName="sellerContactPhoneNumber"
                                 minlength="5"
                                 maxlength="20"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['sellerContactPhoneNumber'].invalid && orderForm.controls['sellerContactPhoneNumber'].touched
+                                  }"
                             />
                             <!-- <small
                                 class="text-danger"
@@ -687,6 +697,9 @@
                                 formControlName="sellerContactEMailAddress"
                                 minlength="5"
                                 maxlength="100"
+                                [ngClass]="{
+                                    'is-invalid': orderForm.controls['sellerContactEMailAddress'].invalid && orderForm.controls['sellerContactEMailAddress'].touched
+                                  }"
                             />
                             <small
                             class="text-danger"

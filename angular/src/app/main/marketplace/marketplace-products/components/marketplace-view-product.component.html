@@ -1,15 +1,15 @@
 <div
     [@routerTransition]
-   
-    class="wrapper kt-container web"
+    style="margin-top: -50px"
+    class="wrapper kt-container web -5 pt-lg-2 pl-0 pr-lg-4 pr-0"
 >
     <div
-        class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
+        class=" "
     >
-        <h6 class="pageHeader mt-3">Marketplace Product Detail View</h6>
+        <h6 class="pageHeader mt-lg-4 mt-5 pt-2 ml-md-5 ml-2 pl-lg-4 mb-2">Marketplace Product Detail View</h6>
         <div class="d-md-block d-none">
-        <div class="row mt-lg-2 mt-8">
-            <div class="col-lg-3 col-6 pr-0">
+        <div class="row mt-lg-2 mt-8 mx-auto">
+            <div class="col-lg-3 col-6 pr-xl-0 pl-xl-5 left-sec">
                 <app-product-detail-images
                     [productImages]="productImages"
                     [colorAttachmentForMainIamge]="colorAttachmentForMainIamge"
@@ -192,7 +192,7 @@
                                                     let i = index
                                                 "
                                             >
-                                                <tr>
+                                                <tr *ngIf="size.orderedPrePacks !== 0">
                                             >
                                                     <td>{{ size.label }}</td>
                                                     <td>
@@ -293,7 +293,7 @@
                 </div>
             </div>
             <div class="col-6 bg-white details-sec">
-                <div class="details mx-3 d-flex flex-column">
+                <div class="details  d-flex flex-column">
                  
                     <div
                         class="ssin_price align-items-center justify-content-between"
@@ -301,9 +301,9 @@
                     <div class="mt-4">
                         <div class="d-flex  justify-content-between">
                             <div class="d-flex ">
-                                <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 24px;">
+                                <p class="ssin font-weight-bold text-black" style="font-size: 20px;margin-right: 10px;"  *ngIf="productDetails?.manufacturerCode">
                                     {{ productDetails?.manufacturerCode }}
-                                </h5>
+                                </p>
                                 
                     
                          
@@ -320,22 +320,23 @@
                             </div>
                     </div>
                      
-                        <div class="d-flex">
-                            <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;">{{productDetails?.name}}</p>
-                            <h6 class="type ml-1 pt-2 text-center">
-                                {{
+                        <div class="d-flex mb-1 align-items-center">
+                            <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 4px;white-space: break-space !important;">{{productDetails?.name}}</p>
+                            <div class="type ml-3 pt-2 text-center">
+                                <p class="mb-0 " style="white-space: nowrap;">  {{
                                     productDetails?.orderByPrePack === false
                                         ? "By Size"
                                         : "By Prepack"
-                                }}
-                            </h6>
+                                }}</p>
+                              
+                            </div>
                         </div>
                         <div class="price mb-4">
                             <!-- show msrp price and range in this product has no special pricing -->
                             <div
-                                class="msrp d-flex mb-2"
+                                class="msrp d-flex "
                             >
-                                <h5 class="mr-2" style="color: black !important;">MSRP:  </h5>
+                                <h5 class="mr-2" style="color: black !important;font-size: 16px;">MSRP:  </h5>
                                 <h5>
                                     <!-- {{
                                         productDetails?.appItemPriceInfos[0]
@@ -372,83 +373,28 @@
                                 <h5> /EAC </h5>
                             </div>
                             <div 
-                            class="msrp d-flex justify-content-between"
+                            class="msrp d-flex justify-content-between align-items-center"
                         >
                         <div>
                             <div class="msrp d-flex align-items-center ">
-                            <h5 class="mr-2" style="color: black !important;">Special Price:  </h5>
-
-                           <!--  <h5 *ngIf="showEditSpecialPrice"> 
-                                    
-                                {{ productDetails?.minSpecialPrice| currency:' ' }}
-                            </h5>
-                            <<span
-                                *ngIf="
-                                    productDetails?.minSpecialPrice !==
-                                    productDetails?.maxSpecialPrice && showEditSpecialPrice
-                                "
-                            >
-                                -
-                            </span> 
-                            <h5
-                                *ngIf="
-                                productDetails?.minSpecialPrice !==
-                                productDetails?.maxSpecialPrice  && showEditSpecialPrice"
-                                
-                            >
-                                {{ productDetails?.maxSpecialPrice }}
-                            </h5> -->
-                            
+                            <h5 class="mr-2" style="color: black !important;font-size: 14px;white-space: nowrap;;">Special Price:  </h5>
+                              
+                         
                             
                             <h5 *ngIf="showEditSpecialPrice"> 
                                     
                                 {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
                             </h5>
 
-                            <!-- <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" /> -->
-                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="ml-4  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
-
-                            <label class="ml-3"
-                            *ngIf="!showEditSpecialPrice">
-                            <div class="editQtyContainer">
-                                <div class="fieldset">
-                                    <div class="input-group">
-                                      <input type="number" min="0" class="form-control inputs form-text" id="editQty" style="width: 267px;
-                                      height: 44px;
-                                      border-radius: 8px;
-                                      border: 2px solid #4A0D4A;"
-                                             [(ngModel)]="updatedSpecialPrice">
-                                             <div  class="input-group-append position-absolute " style="right: -6px;  z-index: 99999;">
-                                                <button class="btn ml-0 pl-2 pt-3 pb-3" (click)="showEditSpecialPrice= true">
-                                                  <i class="clear-text fa fa-1x fa-times fa-2x" style="color: #777777;"></i>
-                                                </button>
-                                              </div>
-                                      <div class="input-group-append position-absolute" style="
-                                       z-index: 99999;     height: 41px;
-    right: 15%;
-    top: 5px;">
-                                        <button class="btn btn-save  mr-0 pr-0" (click)="onEditpecialPrice(updatedSpecialPrice)" 
-                                                [ngClass]="{ 'disabled': updatedSpecialPrice < 0 ||
-                                               updatedSpecialPrice == productDetails.maxSpecialPrice }"
-                                                [disabled]="updatedSpecialPrice < 0 ||
-                                               updatedSpecialPrice == productDetails.maxSpecialPrice ">
-                                          <i class="fa fa-check fa-2x" style="color: #777777;"></i>
-                                        </button>
-                                      </div>
-                                    </div>
-                                    
-                                  </div>
-                            </div>
-
-                        </label>
+                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="mx-1  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
 
                         
                         </div>
                         </div>
-                        <div class="description d-flex">
+                        <div *ngIf="showEditSpecialPrice" class="description d-flex ">
                             <button
                                 (click)="scrollToTargetDiv()"
-                                class="btn text-primary m-0 p-0"
+                                class="btn text-primary p-2"
                             >
                                 <a style="text-decoration: none;font-weight: bold;"
                                     >Product description</a
@@ -457,7 +403,54 @@
                         </div>
                     </div>
                    
+                 <div      class="msrp d-flex justify-content-between"   *ngIf="!showEditSpecialPrice">
+                    <label class="ml-3"
+                  >
+                    <div class="editQtyContainer">
+                        <div class="fieldset">
+                            <div class="input-group">
+                              <input type="number" min="0" class="form-control inputs form-text editQty" id="editQty" style="
+                              height: 44px;
+                              border-radius: 8px;
+                              border: 2px solid #4A0D4A;"
+                                     [(ngModel)]="updatedSpecialPrice">
+                                     <div  class="input-group-append position-absolute " style="right: -8px;  z-index: 99;">
+                                        <button class="btn ml-0 pl-2 pt-3 pb-3" (click)="showEditSpecialPrice= true">
+                                          <i class="clear-text fa fa-1x fa-times fa-2x" style="color: #777777;"></i>
+                                        </button>
+                                      </div>
+                              <div class="input-group-append position-absolute" style="
+                               z-index: 99;     height: 43px;
+right: 40px;
+top: 4px;">
+                                <button class="btn btn-save  mr-0 pr-0" style="background-color: #4A0D4A !important;
+                                padding-left: 9px;
+                                border-radius: 0px;" (click)=" visible = true ;" 
+                                        [ngClass]="{ 'disabled': updatedSpecialPrice < 0 ||
+                                       updatedSpecialPrice == productDetails.maxSpecialPrice }"
+                                        [disabled]="updatedSpecialPrice < 0 ||
+                                       updatedSpecialPrice == productDetails.maxSpecialPrice ">
+                                  <i class="fa fa-check fa-2x" style="color: #777777;"></i>
+                                </button>
+                              </div>
+                            </div>
+                            
+                          </div>
+                    </div>
                  
+                </label>
+
+                <div  class="description d-flex">
+                    <button
+                        (click)="scrollToTargetDiv()"
+                        class="btn text-primary m-0 p-0"
+                    >
+                        <a style="text-decoration: none;font-weight: bold;"
+                            >Product description</a
+                        >
+                    </button>
+                </div>
+                 </div>
                         </div>
                         </div>
                     </div>
@@ -713,7 +706,7 @@
                                     <td
                                         *ngFor="
                                             let size of filteredColors[currentIndex]
-                                                .sizes
+                                                ?.sizes
                                         "
                                     >
                                         {{ size.label }}
@@ -725,7 +718,7 @@
                                     <td
                                         *ngFor="
                                             let size of filteredColors[currentIndex]
-                                                .sizes
+                                                ?.sizes
                                         "
                                     >
                                         {{ size.sizeRatio }}
@@ -739,10 +732,12 @@
                         <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"   class="p-4 font-weight-bold" style="color:black !important" >Order by prepack</span>
                           <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack" class="switch switch-container my-4 font-weight-bold" >
                             <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked (change)="onChangechk_Order_by_prepack()">
-                            <span class="slider round"></span>
+                            <span  class="slider round"></span> 
+                       
                         </label>
 
                         <p-tabView *ngIf="productDetails?.orderByPrePack" [activeIndex]="chk_Order_by_prepack[currentIndex]? 0 : 1">
+                          
                             <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack[currentIndex]" >
                                 <table
                                     *ngIf="productDetails?.orderByPrePack"
@@ -762,7 +757,7 @@
                                                 {{
                                                     filteredColors[currentIndex]
                                                         ?.sizes[0]
-                                                        .noOfAvailablePrepacks
+                                                        ?.noOfAvailablePrepacks
                                                 }}
                                             </td>
                                             <td>
@@ -793,7 +788,7 @@
                                     </tbody>
                                 </table>
                             </p-tabPanel>
-                            <p-tabPanel [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])  ? 'Order By Size' : 'View Ordered Quantity By Size'" >
+                            <p-tabPanel class="sm-tab" [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])  ? 'Order By Size' : 'View Ordered Quantity By Size'" >
                                 <table
                                     class="table text-center table-bordered table-white"
                                 >
@@ -820,7 +815,7 @@
                                             <td>
                                                 
                                                 <p-inputNumber
-                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0].orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
+                                                [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex].sizes[0].orderedPrePacks) : filteredColors[currentIndex].sizes[i].orderedPrePacks"
                                                    
                                                     mode="decimal"
                                                     [showButtons]="true"
@@ -1061,7 +1056,7 @@
                                         let i = index
                                     "
                                 >
-                                    <tr>
+                                    <tr *ngIf="size.orderedPrePacks !== 0">  
                                 
                                         <td>{{ size.label }}</td>
                                         <td>
@@ -1208,10 +1203,10 @@
 
         <div class="d-block d-md-none">
 
-            <p-tabView class="tabPanel-custom">
+            <p-tabView [(activeIndex)]="activeTabIndex" >
                 <p-tabPanel >
-                    <ng-template pTemplate="header">
-                        <div class="tab-header d-flex flex-column align-items-center">
+                    <ng-template pTemplate="header" class="tabPanel-custom">
+                        <div class="tab-header d-flex flex-column align-items-center ">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 38 20" class="mt-1">
                             <path d="M0.667969 2.66634C0.667969 2.18011 0.861123 1.7138 1.20494 1.36998C1.54876 1.02616 2.01507 0.833008 2.5013 0.833008H35.5013C35.9875 0.833008 36.4538 1.02616 36.7977 1.36998C37.1415 1.7138 37.3346 2.18011 37.3346 2.66634C37.3346 3.15257 37.1415 3.61889 36.7977 3.9627C36.4538 4.30652 35.9875 4.49967 35.5013 4.49967H2.5013C2.01507 4.49967 1.54876 4.30652 1.20494 3.9627C0.861123 3.61889 0.667969 3.15257 0.667969 2.66634ZM0.667969 9.99967C0.667969 9.51344 0.861123 9.04713 1.20494 8.70331C1.54876 8.3595 2.01507 8.16634 2.5013 8.16634H35.5013C35.9875 8.16634 36.4538 8.3595 36.7977 8.70331C37.1415 9.04713 37.3346 9.51344 37.3346 9.99967C37.3346 10.4859 37.1415 10.9522 36.7977 11.296C36.4538 11.6399 35.9875 11.833 35.5013 11.833H2.5013C2.01507 11.833 1.54876 11.6399 1.20494 11.296C0.861123 10.9522 0.667969 10.4859 0.667969 9.99967ZM2.5013 15.4997C2.01507 15.4997 1.54876 15.6928 1.20494 16.0366C0.861123 16.3805 0.667969 16.8468 0.667969 17.333C0.667969 17.8192 0.861123 18.2856 1.20494 18.6294C1.54876 18.9732 2.01507 19.1663 2.5013 19.1663H24.5013C24.9875 19.1663 25.4538 18.9732 25.7977 18.6294C26.1415 18.2856 26.3346 17.8192 26.3346 17.333C26.3346 16.8468 26.1415 16.3805 25.7977 16.0366C25.4538 15.6928 24.9875 15.4997 24.5013 15.4997H2.5013Z" />
                             </svg>
@@ -1228,7 +1223,7 @@
                         ></app-product-detail-images>
                         </div>
                         <div class="col-12 bg-white details-sec mt-4">
-                            <div class="details mx-3 d-flex flex-column">
+                            <div class="details  d-flex flex-column">
                              
                                 <div
                                     class="ssin_price align-items-center justify-content-between"
@@ -1236,9 +1231,9 @@
                                 <div class="mt-4">
                                     <div class="d-flex  justify-content-between">
                                         <div class="d-flex ">
-                                            <h5 class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 18px;margin-top: 8px;">
+                                            <p class="ssin font-weight-bold text-black" *ngIf="productDetails?.manufacturerCode" style="font-size: 18px;margin-top: 8px;">
                                                 {{ productDetails?.manufacturerCode }}
-                                            </h5>
+                                            </p>
                                      
                                         </div>
                                         <button class="btn m-0 p-0 showRoomLink"  [disabled]="!productBodyData?.sellerSSIN"
@@ -1253,17 +1248,18 @@
                                         </button>
                                         </div>
                                 </div>
-                                 <div class="d-flex justify-content-between" style="font-size: 12px;white-space: nowrap;">
+                                 <div class="d-flex justify-content-between" style="font-size: 12px;">
 
                                     <div class="d-flex">
-                                        <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;">{{productDetails?.name}}</p>
-                                        <h6 class="type ml-2 pt-2 text-center" style="font-size: 12px;">
-                                            {{
+                                        <p style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 8px;white-space: break-space !important;">{{productDetails?.name}}</p>
+                                        <div class="type ml-3 pt-2 text-center">
+                                            <p class="mb-0" style="white-space: nowrap;">  {{
                                                 productDetails?.orderByPrePack === false
                                                     ? "By Size"
                                                     : "By Prepack"
-                                            }}
-                                        </h6>
+                                            }}</p>
+                                          
+                                        </div>
                                     </div>
                                 
                                  </div>
@@ -1310,100 +1306,84 @@
                                             <h5> /EAC </h5>
                                         </div>
                                         <div 
-                                      
-                                        class="msrp d-flex justify-content-between"
-                                    >
-                                    <div>
-                                        <div class="msrp d-flex align-items-center mt-1">
-                                        <h5 class="mr-2" style="color: black !important;font-size: 12px;">Special Price:  </h5>
-                                        <h5 *ngIf="showEditSpecialPrice"> 
-                                            <!-- {{
-                                                productDetails?.appItemPriceInfos[0]
-                                                    .currencySymbol
-                                            }} -->
-                                                {{
-                                                    currencySymbol
-                                                 }}
-                                                
-                                                 {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
-
-                                        </h5>
-                                     <!--    <span
-                                            *ngIf="
-                                                productDetails?.minSpecialPrice !==
-                                                productDetails?.maxSpecialPrice && showEditSpecialPrice
-                                            "
-                                        >
-                                            -
-                                        </span> -->
-                                        <!-- <h5
-                                            *ngIf="
-                                            productDetails?.minSpecialPrice !==
-                                            productDetails?.maxSpecialPrice  && showEditSpecialPrice"
-                                            
-                                        > -->
-                                            <!-- {{
-                                                productDetails?.appItemPriceInfos[0]
-                                                    ?.currencySymbol
-                                            }} -->
-                                                {{
-                                                    currencySymbol
-                                                 }}
-                                                
-                                            <!-- {{ productDetails?.maxSpecialPrice }}
-                                        </h5> -->
-                                        <!-- <img *ngIf="orderType == 'SO'  && (productDetails?.minSpecialPrice == productDetails?.maxSpecialPrice  && showEditSpecialPrice) "  class="ml-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.minSpecialPrice" /> -->
-                                        <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="ml-4  poniter" style="cursor: pointer;width: 28px;height: 28px;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : 0  " />
-
-                                        <label class="ml-3"
-                                        *ngIf="!showEditSpecialPrice">
-                                        <div class="editQtyContainer">
-                                            <div class="fieldset">
-                                                <div class="input-group">
-                                                  <input type="number" min="0" class="form-control inputs form-text" id="editQty" style="width: 267px;
-                                                  height: 44px;
-                                                  border-radius: 8px;
-                                                  border: 2px solid #4A0D4A;"
-                                                         [(ngModel)]="updatedSpecialPrice">
-                                                         <div  class="input-group-append position-absolute " style="right: -6px;  z-index: 99999;">
-                                                            <button class="btn ml-0 pl-2 pt-3 pb-3" (click)="showEditSpecialPrice= true">
-                                                              <i class="clear-text fa fa-1x fa-times fa-2x" style="color: #777777;"></i>
-                                                            </button>
-                                                          </div>
-                                                  <div class="input-group-append position-absolute" style="
-                                                   z-index: 99999;     height: 41px; 
-                right: 15%;
-                top: 5px;">
-                                                    <button class="btn btn-save  mr-0 pr-0" (click)="onEditpecialPrice(updatedSpecialPrice)" 
-                                                            [ngClass]="{ 'disabled': updatedSpecialPrice <= 0 ||
-                                                           updatedSpecialPrice == productDetails.maxSpecialPrice }"
-                                                            [disabled]="updatedSpecialPrice <= 0 ||
-                                                           updatedSpecialPrice == productDetails.maxSpecialPrice ">
-                                                      <i class="fa fa-check fa-2x" style="color: #777777;"></i>
-                                                    </button>
-                                                  </div>
-                                                </div>
-                                                
-                                              </div>
-                                        </div>
-            
-                                    </label>
-            
+                            class="msrp d-flex justify-content-between"
+                        >
+                        <div>
+                            <div class="msrp d-flex align-items-center ">
+                            <h5 class="mr-2" style="color: black !important;font-size: 12px;">Special Price:  </h5>
+                              
+                         
+                            
+                            <h5 *ngIf="showEditSpecialPrice"> 
                                     
-                                    </div>
-                                    </div>
-                                    <div class="description d-flex">
-                                        <button
-                                            (click)="scrollToTargetDiv()"
-                                            class="btn text-primary m-0 p-0"
-                                            style="width: 150px;"
-                                        >
-                                            <a style="text-decoration: none;font-weight: bold;"
-                                                >Product description</a
-                                            >
+                                {{ productDetails?.maxSpecialPrice ? productDetails?.maxSpecialPrice : "0" | currency:' ' }}
+                            </h5>
+
+                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice"  class="mx-2  poniter" style="cursor: pointer;" src="../../../../../assets/Items//edit-svgrepo-com 1.png"  (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+
+                        
+                        </div>
+                        </div>
+                        <div *ngIf="showEditSpecialPrice" class="description d-flex">
+                            <button
+                                (click)="goToSummary()"
+                                class="btn text-primary m-0 p-0"
+                            >
+                                <a style="text-decoration: none;font-weight: bold;"
+                                    >Product description</a
+                                >
+                            </button>
+                        </div>
+                    </div>
+                   
+                 <div      class="msrp d-flex justify-content-between"   *ngIf="!showEditSpecialPrice">
+                    <label class="ml-3"
+                  >
+                    <div class="editQtyContainer">
+                        <div class="fieldset">
+                            <div class="input-group">
+                              <input type="number" min="0" class="form-control inputs form-text editQty" id="editQty" style="
+                              height: 44px;
+                              border-radius: 8px;
+                              border: 2px solid #4A0D4A;"
+                                     [(ngModel)]="updatedSpecialPrice">
+                                     <div  class="input-group-append position-absolute " style="right: -8px;  z-index: 99999;">
+                                        <button class="btn ml-0 pl-2 pt-3 pb-3" (click)="showEditSpecialPrice= true">
+                                          <i class="clear-text fa fa-1x fa-times fa-2x" style="color: #777777;"></i>
                                         </button>
-                                    </div>
-                                </div>
+                                      </div>
+                              <div class="input-group-append position-absolute" style="
+                               z-index: 99999;     height: 43px;
+right: 40px;
+top: 4px;">
+                                <button class="btn btn-save  mr-0 pr-0" style="background-color: #4A0D4A !important;
+                                padding-left: 9px;
+                                border-radius: 0px;" (click)="showEditSpecialPrice= true;visible = true" 
+                                        [ngClass]="{ 'disabled': updatedSpecialPrice < 0 ||
+                                       updatedSpecialPrice == productDetails.maxSpecialPrice }"
+                                        [disabled]="updatedSpecialPrice < 0 ||
+                                       updatedSpecialPrice == productDetails.maxSpecialPrice ">
+                                  <i class="fa fa-check fa-2x" style="color: #777777;"></i>
+                                </button>
+                              </div>
+                            </div>
+                            
+                          </div>
+                    </div>
+
+                </label>
+
+                <div  class="description d-flex">
+                    <button
+                        (click)="scrollToTargetDiv()"
+                        class="btn text-primary m-0 p-0"
+                    >
+                        <a style="text-decoration: none;font-weight: bold;"
+                            >Product description</a
+                        >
+                    </button>
+                </div>
+                 </div>
                                
                              
                                     </div>
@@ -1665,7 +1645,7 @@
                                                 <td
                                                     *ngFor="
                                                         let size of filteredColors[currentIndex]
-                                                            .sizes
+                                                            ?.sizes
                                                     "
                                                 >
                                                     {{ size.label }}
@@ -1677,7 +1657,7 @@
                                                 <td
                                                     *ngFor="
                                                         let size of filteredColors[currentIndex]
-                                                            .sizes
+                                                            ?.sizes
                                                     "
                                                 >
                                                     {{ size.sizeRatio }}
@@ -1695,7 +1675,7 @@
                                     </label>
             
                                     <p-tabView  *ngIf="productDetails?.orderByPrePack" [activeIndex]="chk_Order_by_prepack[currentIndex]? 0 : 1" class="table-mob">
-                                        <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack[currentIndex]" class="tabView-mob">
+                                        <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack[currentIndex]" class="tabView-mob" >
                                             <table
                                                 *ngIf="productDetails?.orderByPrePack"
                                                 class="table text-center table-bordered table-white"
@@ -1714,7 +1694,7 @@
                                                             {{
                                                                 filteredColors[currentIndex]
                                                                     ?.sizes[0]
-                                                                    .noOfAvailablePrepacks
+                                                                    ?.noOfAvailablePrepacks
                                                             }}
                                                         </td>
                                                         <td>
@@ -2004,7 +1984,7 @@
                                                         let i = index
                                                     "
                                                 >
-                                                    <tr>
+                                                    <tr *ngIf="size.orderedPrePacks !== 0">
                                              
                                                         <td>{{ size.label }}</td>
                                                         <td>
@@ -2112,7 +2092,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <div id="targetDiv" class="bg-white rounded p-4 my-4">
+                        <div id="targetDiv2" class="bg-white rounded p-4 my-4">
                             <h4>Product Details</h4>
                             <hr />
                             <div class="row">
@@ -2188,7 +2168,22 @@
         ></button>
     </ng-template>
 </p-confirmDialog>
-
+<p-dialog  [(visible)]="visible" [modal]="true"   [style]="{ 'width': '425px', 'border-radius': '20px' }" [draggable]="false" >
+                     
+    <div class="p-2 con-body">
+      <p>
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z" fill="#F6851D"/>
+            </svg>  <span style="font-size: 24px;color: #1B101B; font-weight: 700;">the price assigned to the ordered Items will be updated </span> 
+    </p>
+ 
+    </div>
+  
+    <div class="p-2 d-flex justify-content-center">
+        <p-button  (click)="visible = false; onEditpecialPrice(updatedSpecialPrice)" label="Yes" class="p-button-text " ></p-button>
+    </div>
+  
+  </p-dialog>
 <!-- <app-app-items-view
     [productId]="productId"
     [appItemViewInput]="appItemViewInput"

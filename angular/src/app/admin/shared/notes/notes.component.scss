@@ -27,3 +27,10 @@
     }
 
 }
+
+::ng-deep {
+  textarea.form-control {
+    min-height: 100px !important;
+    padding: 5px !important;
+}
+}
