@@ -1728,6 +1728,10 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     input.StatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 }
+                if (input.EntityTypeIdFilter == 0)
+                {
+                    input.EntityTypeIdFilter = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
+                }
 
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(x => x.AppTransactionContacts).ThenInclude(s => s.ContactAddressFk)
                     .Include(z => z.AppTransactionDetails)
