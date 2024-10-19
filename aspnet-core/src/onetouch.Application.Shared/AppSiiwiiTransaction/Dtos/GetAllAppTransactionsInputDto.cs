@@ -27,6 +27,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string BuyerSSIN { get; set; }
         public long StatusId { get; set; }
         public bool fromExport { set; get; } = false;
+        public bool hasParentItems { set; get; } = false;
     }
   
 }
