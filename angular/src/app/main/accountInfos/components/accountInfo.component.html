@@ -163,9 +163,15 @@
                       <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
                         {{l("Contacts")}}
                       </span>
+                      
                     </a>
                   </li>
-
+                  <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile">
+                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)">
+                      <img class="sidebar-menu-item-img"  src="assets/accounts/billingoptions.svg">
+                      <span>{{l("AccountBilling")}}</span>
+                    </a>
+                  </li>
                 <!-- Sara Start -->
 
 
@@ -693,6 +699,11 @@
                     (delete)="onDeleteMemberHandler($event)"
                 ></app-view-member-profile>
             </div>
+            <div class="tab8" *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling">
+                <app-accountbilling             
+                ></app-accountbilling>
+              </div>
+
           </div>
         </div>
       </div>

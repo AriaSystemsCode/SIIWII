@@ -34,7 +34,7 @@
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div  [ngClass]="{'kt-portlet kt-portlet--mobile':!isModal}" style="background-color: transparent !important;">
                     <div [ngClass]="{'kt-portlet__body':!isModal}">
-                        <div class="row view-profile-wrapper" style="margin: 0px imo !important;background-color: transparent;">
+                        <div class="row view-profile-wrapper" style="margin: 0px imo !important;background-color: transparent; position: relative !important;">
                            
                         <!-- /////////////////////////////////////////////// -->
 
@@ -48,17 +48,20 @@
                             </app-image-display>
                         </div>
 
-<div class="row w-100" style="height: 60px;">
+<div class="row w-100" style="height: 60px;position: absolute;
+top: 50%;
+left: 3%;">
                             <div class="col-md-2 ">
                                 <div class="dev-logo">
                                     <app-image-display
                                         [image]="logoPhoto"
                                         [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                         [classList]="'logo-profile'"
-                                        [staticHeight]="74"
+                                        [staticHeight]="150"
                                     >
                                     </app-image-display>
                                 </div>
+                                <p class="pl-5" style="font-size: 24px;font-weight: 700;color: white"><a>{{appSession?.tenancyName}}</a></p>
                                 <!-- <img [src]="logoPhoto"  onerror="this.src='../../../assets/placeholders/_logo-placeholder.png';" class="logo-profile ml-4"> -->
                             </div>
                         </div>
@@ -72,7 +75,7 @@
                         </div>
                          <div class="row ">
                         <div class="col-12 list-toolbar  pb-4">
-                            <div class="row mb-3 justify-content-between" >
+                            <div class="row mb-3 justify-content-between pt-2" >
                                 <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
                                         <button class="dropdown-toggle btn btn-sm font-weight-normal p-0" style="border: 1px solid #D9D9D9 !important;
@@ -107,7 +110,7 @@
                                 </div>
 
 
-                                <div class="mb-4 mb-md-0 list-toolbar-search">
+                                <div class="mb-4 mb-md-0 list-toolbar-search" style="margin-left: -145px;">
                                     <div class="kt-input-icon kt-input-icon--left">
                                         <input type="text" formControlName="search" class="form-control" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch" style="border: 1px solid #D9D9D9 !important;
                                         background-color: white !important;">
@@ -149,7 +152,7 @@
                                     </div>
                                     <!-- <div class="list-toolbar-divider"></div> -->
 
-                                <div class="text-center" >
+                                <div class="text-center" style="margin-right: 15px;" >
                                     <a style="padding-right: 4px;padding-left: 10px;" [title]="'ResetData' | localize" class="btn icon-box  font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
                                         <i  class="d-inline-block w-100 flaticon2-reload icon-center" style="color: #4A0D4A !important;"></i>
                                     </a>
@@ -171,7 +174,7 @@
                             ></app-items-filters>
                         </div>
                         <div  class="col d-flex flex-column  app-items-container thin-scroll"   >
-                            <div class="d-flex justify-content-between" >
+                            <div class="d-flex justify-content-between pl-5" >
                                 <div class="font-weight-normal list-toolbar-data-summary" [ngStyle]="{ visibility : loading ? 'hidden' : 'visible' }" style="border: 1px solid #D9D9D9 !important;
                                 color: #D9D9D9 !important;
                                 border-radius: 5px;
@@ -181,7 +184,8 @@
                                     {{ primengTableHelper?.totalRecordsCount }} {{"Results" | localize }}
                                 </div>
 
-                                <div>
+                                <div style="margin-right: 15px;background-color: white;
+    padding: 5px;">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown >
                                         <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 "
                                         type="button"
@@ -209,7 +213,7 @@
                                 </div>
                             </div>
                             <div class="row  pl-5 pr-2">
-                                <div *ngFor="let item of items;index as i" class="col-12 mb-5 " [ngClass]="singleItemPerRowMode?'col-md-12 single-item-per-row-layout' : 'col-md-3'">
+                                <div *ngFor="let item of items;index as i" class="col-12 mb-5 p-0 " [ngClass]="singleItemPerRowMode?'col-md-12 single-item-per-row-layout' : 'col-md-3'">
                                     <app-item-card
                                         [item]="item"
                                         [filterForm]="filterForm"

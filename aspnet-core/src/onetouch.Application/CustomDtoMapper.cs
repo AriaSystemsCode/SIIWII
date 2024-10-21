@@ -139,8 +139,8 @@ namespace onetouch
             configuration.CreateMap<AppTenantSubscriptionPlanDto, AppTenantSubscriptionPlan>().ReverseMap();
             configuration.CreateMap<CreateOrEditAppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
             configuration.CreateMap<AppSubscriptionPlanHeaderDto, AppSubscriptionPlanHeader>().ReverseMap();
-            configuration.CreateMap<CreateOrEditAppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap();
-            configuration.CreateMap<AppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap();
+            configuration.CreateMap<CreateOrEditAppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap().ForMember(z=>z.FeatureCategory,z=>z.MapFrom(s=>s.Category));
+            configuration.CreateMap<AppSubscriptionPlanDetailDto, AppSubscriptionPlanDetail>().ReverseMap().ForMember(z => z.Category, z => z.MapFrom(s => s.FeatureCategory));
 
             configuration.CreateMap<CreateOrEditMaintainanceDto, Maintainance>().ReverseMap();
             configuration.CreateMap<MaintainanceDto, Maintainance>().ReverseMap();
@@ -941,7 +941,9 @@ namespace onetouch
             configuration.CreateMap<AppEntity, AppTransactionHeaders>();
             configuration.CreateMap<AppEntity, AppTransactionDetails>();
             configuration.CreateMap<CreateOrEditAppFeatureDto, AppFeature>().ReverseMap();
-            configuration.CreateMap<AppFeatureDto, AppFeature>().ReverseMap();
+            configuration.CreateMap<AppFeatureDto, AppFeature>().ReverseMap()
+                .ForMember(z=>z.FeatureStatus, z=>z.MapFrom(ss=>ss.EntityObjectStatusCode))
+                .ForMember(z=>z.Category, z=>z.MapFrom(s=>s.CategoryCode));
         }
     }
 }

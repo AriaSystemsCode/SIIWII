@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
+    ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
-    <text name="AppMarketplaceContact">App marketplace contact</text>
+	<text name="AppMarketplaceContact">App marketplace contact</text>
     <text name="AppMarketplaceAppContact">App marketplace app contact</text>
     <text name="onetouch.AppMarketplaceContact.AppMarketplaceAppContact">AppMarketplaceAppContact</text>
     <text name="AppMarketplaceAppContactsHeaderInfo">App marketplace app contacts header info</text>
@@ -9,8 +9,6 @@
     <text name="EditAppMarketplaceAppContact">Edit app marketplace app contact</text>
     <text name="DeleteAppMarketplaceAppContact">Delete app marketplace app contact</text>
     <text name="AppMarketplaceAppContacts">App marketplace app contacts</text>
-
-		
     <text name="SycCurrencyExchangeRates">Currency Exchange Rate</text>
     <text name="onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates">SycCurrencyExchangeRates</text>
     <text name="CurrencyCode">Currency code</text>
@@ -22,7 +20,6 @@
     <text name="CreateNewSycCurrencyExchangeRates">Create new currency exchange rate</text>
     <text name="EditSycCurrencyExchangeRates">Edit currency exchange rate</text>
     <text name="DeleteSycCurrencyExchangeRates">Delete currency exchange rate</text>
-
     <text name="AppSubscriptionPlans">App subscription plans</text>
     <text name="AppTenantInvoice">App tenant invoice</text>
     <text name="onetouch.AppSubscriptionPlans.AppTenantInvoice">AppTenantInvoice</text>
@@ -2586,5 +2583,11 @@
 		<text name="EnterYourConfirmPassword">Enter Your Confirm Password</text>
 		<text name="EnterYourFirstName">Enter Your First Name</text>
 		<text name="EnterYourLastName">Enter Your Last Name</text>
-	</texts>  
+		  <text name="AppFeatureDescription">App feature description</text>
+    <text name="PickAppFeature">Pick app feature</text>
+	 <text name="AccountBilling"> Account Billing</text>
+	<text name="Absolute">Absolute</text>
+	<text name="IsAddOn">Add-On</text>
+	<text name="Limited">Limited</text>
+  </texts>  
 </localizationDictionary>

@@ -1,10 +1,11 @@
 <form #sizeScaleForm="ngForm" >
     <div class="row" >
         <div class="dimension-input" *ngIf="appSizeScaleDto">
+            <span class="font-weight-bold"  style="color: black;">{{ 'EnterSizeScaleName' | localize }}</span>
             <input
-                class="form-control"
+                class="form-control mb-3"
                 type="text"
-                placeholder="{{ 'EnterSizeScaleName' | localize }} "
+                placeholder="{{ 'Size Name' | localize }} "
                 [(ngModel)]="appSizeScaleDto.name" 
                 name="appSizeScaleDtoName"
                 #sizeScaleName="ngModel"
@@ -13,10 +14,12 @@
             />
             <validation-messages [formCtrl]="sizeScaleName" *ngIf="sizeScaleName.touched"></validation-messages>
             <ng-container *ngIf="!readOnly || (readOnly && appSizeScaleDto.dimesion2Name)">
+                <span class="font-weight-bold"  style="color: black;white-space: nowrap;">{{ 'EnterSecondDimensionName' | localize }}</span>
+
                 <input 
-                    class="form-control mt-4"
+                    class="form-control"
                     type="text"
-                    placeholder="{{ 'EnterSecondDimensionName' | localize }} *"
+                    placeholder="{{ 'Dimension ' | localize }}"
                     [(ngModel)]="appSizeScaleDto.dimesion2Name" 
                     (ngModelChange)="dimension2NameOnChange($event)"
                     name="SizeScaleSecondDimension"
@@ -27,15 +30,16 @@
                 <validation-messages [formCtrl]="dimension2Name" *ngIf="dimension2Name.touched"></validation-messages>
             </ng-container>
             <div class="sizescale-name pt-2" *ngIf="!readOnly && appSizeScaleDto?.dimesion2Name && appSizeScaleDto?.dimesion1Name">
-                <div class="text-primary mt-2">*{{'IndividualSizesWillBeDisplayedAs' | localize}} "{{appSizeScaleDto?.dimesion1Name||'FirstDimensionName' | localize}} - {{appSizeScaleDto?.dimesion2Name || 'SecondDimensionName'| localize }}" </div>
+                <!-- <div class="text-primary mt-2">*{{'IndividualSizesWillBeDisplayedAs' | localize}} "{{appSizeScaleDto?.dimesion1Name||'FirstDimensionName' | localize}} - {{appSizeScaleDto?.dimesion2Name || 'SecondDimensionName'| localize }}" </div> -->
             </div>
         </div>
-        <div class="col flex-column">
+        <div class="col flex-column ml-3">
             <div class="dimension-input mb-2" *ngIf="appSizeScaleDto">
+                <span class="font-weight-bold"  style="color: black;">{{ 'EnterFirstDimensionName' | localize }}</span>
                 <input
-                    class="form-control"
+                    class="form-control mb-3"
                     type="text"
-                    placeholder="{{ 'EnterFirstDimensionName' | localize }} *"
+                    placeholder="{{ 'Dimension ' | localize }}"
                     [(ngModel)]="appSizeScaleDto.dimesion1Name" 
                     (ngModelChange)="dimension1NameOnChange($event)"
                     name="SizeScaleFirstDimension"
@@ -82,10 +86,19 @@
             </div>
         </div>
         <div class="align-items-center buttons-list col-2 d-flex flex-column" *ngIf="!readOnly">
-            <button class="btn btn-primary w-100" (click)="openSelectSizeScaleModal()">{{'SelectSizeScale' | localize}}</button>
-            <button class="btn btn-primary w-100" (click)="createOrEdit(false)" [disabled]="!appSizeScaleDto?.sizeScaleId">{{'SaveSizeScale' | localize}}</button>
-            <button class="btn btn-primary w-100" (click)="createOrEdit(true)" style="background-color: #eba461 !important;
-            border: none !important;">{{'SaveAsNewSizeScale' | localize}}</button>
+            <button class="btn  w-100" (click)="openSelectSizeScaleModal()"  style="background-color: #4A0D4A !important; color:white !important;
+                border: 1px solid #4A0D4A !important;
+                border-radius: 12px;font-weight: bold;">{{'SelectSizeScale' | localize}}</button>
+            <button class="btn  w-100" (click)="createOrEdit(false)" [disabled]="!appSizeScaleDto?.sizeScaleId" style="    background-color: white !important;
+            border: 1px solid #EEEEEEEE !important;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #4A0D4A !important;">{{'SaveSizeScale' | localize}}</button>
+            <button class="btn  w-100" (click)="createOrEdit(true)" style="border: 1px solid #F6851D !important;
+            border-radius: 12px;
+            font-weight: bold;
+            color: white !important;
+            background-color: #F6851D !important;">{{'SaveAsNewSizeScale' | localize}}</button>
         </div>
     </div>
 </form>

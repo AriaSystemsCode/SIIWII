@@ -19,6 +19,8 @@ using System.Runtime.Caching;
 using NPOI.OpenXmlFormats.Shared;
 using Microsoft.AspNetCore.Authorization;
 using onetouch.Helpers;
+using Twilio.Rest.Video.V1.Room.Participant;
+using Abp.Domain.Uow;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -129,7 +131,7 @@ namespace onetouch.AppSubScriptionPlan
                         TenantName = o.TenantName,
                         UserId = o.UserId,
                         ActivityType = o.ActivityType,
-                        AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
+                        AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId !=null ? long.Parse(o.AppSubscriptionPlanHeaderId.ToString()):0,
                         AppSubscriptionPlanCode = o.AppSubscriptionPlanCode,
                         ActivityDateTime = o.ActivityDateTime,
                         UserName = o.UserName,
@@ -264,7 +266,7 @@ namespace onetouch.AppSubScriptionPlan
                                  TenantName = o.TenantName,
                                  UserId = o.UserId,
                                  ActivityType = o.ActivityType,
-                                 AppSubscriptionPlanHeaderId = o.AppSubscriptionPlanHeaderId,
+                                 AppSubscriptionPlanHeaderId = long.Parse(o.AppSubscriptionPlanHeaderId.ToString()),
                                  AppSubscriptionPlanCode = o.AppSubscriptionPlanCode,
                                  ActivityDateTime = o.ActivityDateTime,
                                  UserName = o.UserName,
@@ -338,7 +340,7 @@ namespace onetouch.AppSubScriptionPlan
                                     obj.Year = DateTime.Now.Date.Year.ToString("0000");
                                     obj.FeatureCode = featureCode;
                                     obj.FeatureName = featureDetail.FeatureName;
-                                    obj.ActivityDateTime = DateTime.Now.Date;
+                                    obj.ActivityDateTime = DateTime.Now;
                                     obj.ActivityType = "Overage";
                                     obj.Amount = 0;
                                     obj.Billable = featureDetail.IsFeatureBillable;
@@ -353,7 +355,7 @@ namespace onetouch.AppSubScriptionPlan
                                     obj.Reference = "Overage";
                                     obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;
                                     obj.AppSubscriptionPlanCode = tenantPlan.AppSubscriptionPlanHeaderFk.Code;
-                                    obj.Code = featureDetail.Code.TrimEnd()+" "+DateTime.Now.ToString();
+                                    obj.Code = featureDetail.FeatureCode.TrimEnd()+" "+DateTime.Now.ToString();
                                     obj.Name = obj.Code;
                                     obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
@@ -376,13 +378,77 @@ namespace onetouch.AppSubScriptionPlan
             }
             return false;
         }
+        
+        public async Task<bool> AddCreditActivityLog(List<AddOnsInputDto> AddOnsList)
+        {
+            bool returnVal = true;
+            if (AddOnsList != null && AddOnsList.Count > 0)
+            {
+                if (AbpSession.TenantId == null)
+                    return true;
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+                    var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(z => z.AppSubscriptionPlanHeaderFk).Where(z => z.TenantId == AbpSession.TenantId &&
+                (DateTime.Now.Date >= z.CurrentPeriodStartDate.Date && z.CurrentPeriodEndDate.Date >= DateTime.Now.Date)).FirstOrDefaultAsync();
+                    if (AbpSession.UserId != null && AbpSession.UserId > 0 && tenantPlan != null)// && tenantPlan != null)
+                    {
+                        foreach (var addOns in AddOnsList)
+                        {
+
+                            AppTenantActivitiesLog obj = new AppTenantActivitiesLog();
+                            obj.TenantId = AbpSession.TenantId;
+                            var tenant = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
+                            obj.TenantName = tenant.Name;
+                            obj.UserId = long.Parse(AbpSession.UserId.ToString());
+                            var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
+                            obj.UserName = user.UserName;
+                            obj.Month = DateTime.Now.Date.Month.ToString("00");
+                            obj.Year = DateTime.Now.Date.Year.ToString("0000");
+                            obj.FeatureCode = addOns.FeatureCode;
+                            obj.FeatureName = addOns.FeatureName;
+                            obj.ActivityDateTime = DateTime.Now;
+                            obj.ActivityType = "Purchased Add-on";
+                            obj.CreditOrUsage = "Credit";
+                            obj.Amount = addOns.Qty * addOns.Price;
+                            obj.Billable = true;
+                            obj.Invoiced = false;
+                            obj.CreditId = null;
+                            obj.InvoiceNumber = "";
+                            obj.ConsumedQty = 0;
+                            obj.Qty = addOns.Qty;
+                            obj.RemainingQty = addOns.Qty;
+                            obj.Price = addOns.Price;
+                            obj.Reference = "Purchased Add-on feature";
+                            obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? 0 : tenantPlan.AppSubscriptionPlanHeaderId;
+                            obj.AppSubscriptionPlanCode = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderFk.Code;
+                            obj.Code = addOns.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString();
+                            obj.Name = obj.Code;
+                            obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
+                            var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
+                            obj.EntityObjectTypeId = entityActivityObjectType.Id;
+                            obj.EntityObjectTypeCode = entityActivityObjectType.Code;
+                            obj.RelatedEntityCode = "Purchased Add-on feature"; 
+                            obj.RelatedEntityId = null;
+                            obj.RelatedEntityObjectTypeId = null;
+                            obj.RelatedEntityObjectTypeCode = null;
+                            await _appTenantActivityLogRepository.InsertAsync(obj);
+                        }
+                        //if (featureC
+                    }
+                }
+            }
+            return returnVal;
+
+        }
         [AllowAnonymous]
         public async Task<bool> AddUsageActivityLog(string featureCode,string? relatedEntityCode, long? relatedEntityId, long? relatedEntityOvbjectTypeId,string? relatedEntityObjectTypeCode, string reference, int qty)
         {
+            if (AbpSession.TenantId == null)
+                return true;
             
             var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(z=>z.AppSubscriptionPlanHeaderFk).Where(z => z.TenantId == AbpSession.TenantId &&
             (z.CurrentPeriodStartDate <= DateTime.Now.Date && DateTime.Now.Date <= z.CurrentPeriodEndDate)).FirstOrDefaultAsync();
-            if (AbpSession.UserId !=null && AbpSession.UserId>0 && tenantPlan != null)
+            if (AbpSession.UserId !=null && AbpSession.UserId>0)// && tenantPlan != null)
             {
                 //if (featureCode.Contains("User Logged"))
                 //{
@@ -416,14 +482,19 @@ namespace onetouch.AppSubScriptionPlan
                 //    obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                 //    var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
                 //    obj.EntityObjectTypeId = entityActivityObjectType.Id;
-                //    obj.EntityObjectTypeCode = entityActivityObjectType.Code;
+                //    obj.EntityObjectTy
+                //    peCode = entityActivityObjectType.Code;
                 //    obj.Code = featureCode.Trim()+" " + DateTime.Now.ToString();
-                    
+
                 //    await _appTenantActivityLogRepository.InsertAsync(obj);
                 //    return true;
                 //}
-                var featureDetail = await _appSubscriptionPlanDetailRepository.GetAll().Where(z => z.AppSubscriptionPlanHeaderId == tenantPlan.AppSubscriptionPlanHeaderId &&
-               z.FeatureCode == featureCode).FirstOrDefaultAsync();
+                AppSubscriptionPlanDetail featureDetail = null;
+                if (tenantPlan != null)
+                {
+                    featureDetail = await _appSubscriptionPlanDetailRepository.GetAll().Where(z => z.AppSubscriptionPlanHeaderId == tenantPlan.AppSubscriptionPlanHeaderId &&
+                 z.FeatureCode == featureCode).FirstOrDefaultAsync();
+                }
                 if (featureDetail != null)
                 {
                     long? creditId = null;
@@ -469,7 +540,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.Year = DateTime.Now.Date.Year.ToString("0000");
                     obj.FeatureCode = featureCode;
                     obj.FeatureName = featureDetail.FeatureName;
-                    obj.ActivityDateTime = DateTime.Now.Date;
+                    obj.ActivityDateTime = DateTime.Now;
                     obj.ActivityType = "Usage";
                     obj.CreditOrUsage = "Usage";
                     obj.Amount = qty * featureDetail.UnitPrice;
@@ -482,9 +553,9 @@ namespace onetouch.AppSubScriptionPlan
                     obj.RemainingQty = 0;
                     obj.Price = featureDetail.UnitPrice;
                     obj.Reference = reference;
-                    obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;
-                    obj.AppSubscriptionPlanCode = tenantPlan.AppSubscriptionPlanHeaderFk.Code;
-                    obj.Code = featureDetail.Code.TrimEnd() + " " + DateTime.Now.ToString();
+                    obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? 0 : tenantPlan.AppSubscriptionPlanHeaderId;
+                    obj.AppSubscriptionPlanCode = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderFk.Code;
+                    obj.Code = featureDetail.FeatureCode.TrimEnd() + " " + DateTime.Now.ToString();
                     obj.Name = obj.Code;
                     obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
@@ -509,7 +580,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.Year = DateTime.Now.Date.Year.ToString("0000");
                     obj.FeatureCode = featureCode;
                     obj.FeatureName = "Not Found";
-                    obj.ActivityDateTime = DateTime.Now.Date;
+                    obj.ActivityDateTime = DateTime.Now;
                     obj.ActivityType = "Usage";
                     obj.CreditOrUsage = "Usage";
                     obj.Amount = 0;
@@ -522,8 +593,8 @@ namespace onetouch.AppSubScriptionPlan
                     obj.RemainingQty = 0;
                     obj.Price = 0;
                     obj.Reference = reference;
-                    obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;
-                    obj.AppSubscriptionPlanCode = tenantPlan.AppSubscriptionPlanHeaderFk.Code;
+                    obj.AppSubscriptionPlanHeaderId = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderId;
+                    obj.AppSubscriptionPlanCode = tenantPlan == null ? null : tenantPlan.AppSubscriptionPlanHeaderFk.Code;
                     obj.Name = user.Name.TrimEnd() + " " + featureCode;
                     obj.ObjectId = await _helper.SystemTables.GetObjectTenantActivityLogId();
                     var entityActivityObjectType = await _helper.SystemTables.GetEntityObjectTypeActLog();
@@ -543,7 +614,7 @@ namespace onetouch.AppSubScriptionPlan
         public async Task<bool> AddPlanRenewalBalances(DateTime startdate)
         {
             var tenantPlan = await _appTenantSubscriptionPlanRepository.GetAll().Include(z=>z.AppSubscriptionPlanHeaderFk).Where(z => z.TenantId == AbpSession.TenantId &&
-            (z.CurrentPeriodStartDate >= DateTime.Now.Date && z.CurrentPeriodEndDate >= DateTime.Now.Date)).FirstOrDefaultAsync();
+            (z.CurrentPeriodStartDate <= DateTime.Now.Date && z.CurrentPeriodEndDate >= DateTime.Now.Date)).FirstOrDefaultAsync();
             if (tenantPlan != null)
             {
                 tenantPlan.CurrentPeriodStartDate = startdate;
@@ -577,7 +648,7 @@ namespace onetouch.AppSubScriptionPlan
                         obj.Year = DateTime.Now.Date.Year.ToString("0000");
                         obj.FeatureCode = det.FeatureCode;
                         obj.FeatureName = det.FeatureName;
-                        obj.ActivityDateTime = DateTime.Now.Date;
+                        obj.ActivityDateTime = DateTime.Now;
                         obj.ActivityType = "Plan Renewal Credit";
                         obj.CreditOrUsage = "Credit";
                         obj.Amount = 0;
@@ -586,8 +657,8 @@ namespace onetouch.AppSubScriptionPlan
                         //obj.CreditId = long.Parse(creditId.ToString());
                         obj.InvoiceNumber = "";
                         obj.ConsumedQty = 0;
-                        obj.Qty = det.FeatureLimit+ rolledOverQty;
-                        obj.RemainingQty = det.FeatureLimit;
+                        obj.Qty = long.Parse(det.FeatureLimit.ToString())+ rolledOverQty;
+                        obj.RemainingQty = long.Parse(det.FeatureLimit.ToString());
                         obj.Price = det.UnitPrice;
                         obj.Reference = "Plan Renewal Credit";
                         obj.AppSubscriptionPlanHeaderId = tenantPlan.AppSubscriptionPlanHeaderId;
@@ -606,5 +677,6 @@ namespace onetouch.AppSubScriptionPlan
 
             return true;
         }
+       
     }
 }

@@ -17,7 +17,7 @@
 
 .form-control {
     &:hover {
-        border-color: lighten( $blue, 50% );
+       // border-color: lighten( $blue, 50% );
     }
 }
 
@@ -43,11 +43,13 @@
 
 .image-wrapper {
     border: 1px solid $grey-1;
+    border: 1px dashed #DADADA;
     &.upload {
         border: none;
         filter: grayscale(1);
+        border: 1px dashed #DADADA !important;
     }
-    width: 200px;
+    width: 290px;
     height: 276px;
     background-color: white;
     margin-right: 2rem;
@@ -63,7 +65,7 @@
     .upload-image-icons {
         position: relative;
         width: 150px;
-        height: 90px;
+        height: 60px;
         @extend %transition-all-3ms;
     }
     i {
@@ -90,8 +92,11 @@
         right: 0;
     }
     .upload-btn.btn {
-        background-color: #c8c8c8!important;
-        color: #000!important;
+       // background-color: #c8c8c8!important;
+       // color: #000!important;
+        background-color: #4A0D4A !important;
+    color: white !important;
+    border-radius: 5px;
         border-color: #c8c8c8!important;
         font-weight: 500;
         @extend %transition-all-3ms;
@@ -101,15 +106,26 @@
         z-index: 0;
         @extend %transition-all-3ms;
     }
+
+    .view-img-overlay  .kt-avatar__upload {
+            opacity: 1; /* Always visible */
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2; /* Ensure it's on top */
+            display: block; /* Ensure visibility */
+        
+    }
+
+    &{     filter: none !important;
+    }
     &:hover {
         cursor: pointer;
         box-shadow: 0px 0px 6px #0000001A;
         @extend %transition-all-3ms;
-        filter: none;
+        filter: none !important;
         .upload-btn.btn {
-            background-color: $blue!important;
+           // background-color: $blue!important;
             color: $white!important;
-            border-color: $blue!important;
+           // border-color: $blue!important;
             font-weight: 500;
             @extend %transition-all-3ms;
         }
@@ -132,15 +148,15 @@
 .select-default-image {
     display: none;
     position: absolute;
-    bottom: -30px;
+    bottom: -45px;
 }
 
 .item-photos {
     .item-photos-header {
-        background-color: #3699FF1A;
+      // background-color: #3699FF1A;
     }
     .item-photos-body {
-        background-color: #F5FAFF;
+      //  background-color: #F5FAFF;
     }
 }
 
@@ -159,4 +175,30 @@ textarea.ng-pristine.ng-invalid.ng-touched {
 .aria-tag-wrapper {
     max-height: 300px;
     overflow-y: scroll;
+}
+
+.text-danger {
+    color: #F6851D !important;
+}
+
+
+.text-primary {
+    color: #4A0D4A !important;
+}
+
+.aria-tag
+{
+    background-color: #EEEEEE;
+}
+
+
+.bg-input{
+ background-color: #EEEEEE !important;
+ border-radius: 8px !important;
+  border: 1px solid #EEEEEE !important;
+}
+
+
+.text-purple{
+    color: #4A0D4A !important;
 }

@@ -78,6 +78,7 @@ export class CreateOrEditCategoryDynamicModalComponent extends AppComponentBase 
         }
     }
     getCodeValue(code: string) {
+        if(this.category?.code)
         this.category.code= code;
     }
     checkNameExistance(){

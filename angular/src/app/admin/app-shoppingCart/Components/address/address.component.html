@@ -20,7 +20,7 @@
         </div>
         <div class="col-md-12 mb-3" >
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
-            <textarea class="form-control w-50  d-inline-block ml-4" readonly>{{selectedAddress?.addressLine1+' ,'}}{{selectedAddress?.addressLine2+' ,'}}{{selectedAddress?.city+' ,'}}{{selectedAddress?.state+' ,'}}{{selectedAddress?.countryName+' ,'}}{{selectedAddress?.postalCode}}</textarea>
+            <textarea class="form-control w-50  d-inline-block ml-4" style="min-height: 80px;" readonly>{{selectedAddress?.addressLine1+' ,'}}{{selectedAddress?.addressLine2+' ,'}}{{selectedAddress?.city+' ,'}}{{selectedAddress?.state+' ,'}}{{ selectedAddress?.countryName ? selectedAddress?.countryName : selectedAddress?.countryCode  +' ,'}}{{selectedAddress?.postalCode}}</textarea>
             <div class="pull-right">
             <button *ngIf="canChange"  class="savebtn text-center btn float-right" (click)="showAddressList()">
                 {{l("Change")}}
@@ -42,7 +42,7 @@
         <div class="col-md-12">
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}} :</label>
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="selectedAddressDetails">
-                {{selectedAddressDetails?.addressLine1+' ,'}}{{selectedAddressDetails?.addressLine2+' ,'}}{{selectedAddressDetails?.city+' ,'}}{{selectedAddressDetails?.state+' ,'}}{{selectedAddressDetails?.countryName+' ,'}}{{selectedAddressDetails?.postalCode}}
+                {{selectedAddressDetails?.addressLine1+' ,'}}{{selectedAddressDetails?.addressLine2+' ,'}}{{selectedAddressDetails?.city+' ,'}}{{selectedAddressDetails?.state+' ,'}}{{selectedAddressDetails?.countryName  ? selectedAddressDetails?.countryName : selectedAddressDetails?.countryCode+' ,'}}{{selectedAddressDetails?.postalCode}}
             </label>
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
             </div>
@@ -71,8 +71,8 @@
                  [checked]="address.id==selectedAddress.id" name="selectedAdd"  [id]="address.id"/> 
                     <input *ngIf="!selectedAddress" class="form-control" type="radio" (change)="selectAddress(address.id)"
                       name="selectedAdd"  [id]="address.id"/> 
-                 <label>{{address.name}}</label>
-                 <div class="pull-right">
+                 <label> {{address?.addressLine1+' ,'}}{{address?.addressLine2+' ,'}}{{address?.city+' ,'}}{{address?.state+' ,'}}{{address?.countryCode +' ,'}}{{address?.postalCode}}</label>
+                 <div class="pull-right mt-2"  *ngIf="showAddBtn">
                     <button (click)="editAddress(address.id)">
                         {{l("Edit")}}
                         <i class="fas fa-edit ml-1 mr-1"></i>
@@ -86,14 +86,16 @@
             </li>
         </ul>
         <label class="noAddressMsg" *ngIf="savedAddressesList.length==0"> No Addresses found</label>
+        <div class="d-flex justify-content-end" *ngIf="showAddBtn">
         <button class=" mb-3 ml-2 add-new-add-btn" (click)="openAddAddressForm()">
             <i class="fa fa-plus mr-2" aria-hidden="true"></i>{{l("AddANewAddress")}} 
         </button>
+    </div>
         </div>
 </div>
 
 <div class="address-wrapper p-2 add-edit-mode" *ngIf="openAddNewAddForm">
-    <div class="address-form">
+    <div class="address-form" *ngIf="showAddBtn">
         <div class="adrress-title">
             <h3 *ngIf="!addressIdForEdit">{{l("AddNewAddressDetails")}}</h3>
             <h3 *ngIf="addressIdForEdit">{{l("EditAddress")}}</h3>

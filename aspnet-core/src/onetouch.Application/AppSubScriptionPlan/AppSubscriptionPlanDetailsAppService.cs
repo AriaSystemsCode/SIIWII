@@ -1,4 +1,5 @@
 ﻿using onetouch.AppSubScriptionPlan;
+using onetouch.AppSubScriptionPlan;
 
 using System;
 using System.Linq;
@@ -17,7 +18,11 @@ using Abp.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Abp.UI;
 using onetouch.Storage;
-using onetouch.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Abp.Domain.Uow;
+using System.Security.Permissions;
+using Org.BouncyCastle.Crypto.Paddings;
+using NPOI.SS.Formula.Functions;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -27,21 +32,31 @@ namespace onetouch.AppSubScriptionPlan
         private readonly IRepository<AppSubscriptionPlanDetail, long> _appSubscriptionPlanDetailRepository;
         private readonly IAppSubscriptionPlanDetailsExcelExporter _appSubscriptionPlanDetailsExcelExporter;
         private readonly IRepository<AppSubscriptionPlanHeader, long> _lookup_appSubscriptionPlanHeaderRepository;
-        private readonly Helper _helper;
-        public AppSubscriptionPlanDetailsAppService(IRepository<AppSubscriptionPlanDetail, long> appSubscriptionPlanDetailRepository
-            , IAppSubscriptionPlanDetailsExcelExporter appSubscriptionPlanDetailsExcelExporter, IRepository<AppSubscriptionPlanHeader, long> lookup_appSubscriptionPlanHeaderRepository, Helper helper)
+        private readonly IRepository<AppFeature, long> _lookup_appFeatureRepository;
+        private readonly IRepository<AppTenantActivitiesLog, long> _appTenantActivitiesLogRepository;
+        private readonly IRepository<AppTenantSubscriptionPlan, long> _appTenantSubscriptionPlanRepository;
+        public AppSubscriptionPlanDetailsAppService(IRepository<AppSubscriptionPlanDetail, long> appSubscriptionPlanDetailRepository,
+            IAppSubscriptionPlanDetailsExcelExporter appSubscriptionPlanDetailsExcelExporter,
+            IRepository<AppSubscriptionPlanHeader, long> lookup_appSubscriptionPlanHeaderRepository, 
+            IRepository<AppFeature, long> lookup_appFeatureRepository,
+            IRepository<AppTenantSubscriptionPlan, long> appTenantSubscriptionPlanRepository,
+            IRepository<AppTenantActivitiesLog, long> appTenantActivitiesLogRepository)
         {
             _appSubscriptionPlanDetailRepository = appSubscriptionPlanDetailRepository;
             _appSubscriptionPlanDetailsExcelExporter = appSubscriptionPlanDetailsExcelExporter;
             _lookup_appSubscriptionPlanHeaderRepository = lookup_appSubscriptionPlanHeaderRepository;
-            _helper = helper;
+            _lookup_appFeatureRepository = lookup_appFeatureRepository;
+            _appTenantActivitiesLogRepository= appTenantActivitiesLogRepository;
+            _appTenantSubscriptionPlanRepository = appTenantSubscriptionPlanRepository;
         }
-
+        [AllowAnonymous]
         public async Task<PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>> GetAll(GetAllAppSubscriptionPlanDetailsInput input)
         {
-
-            var filteredAppSubscriptionPlanDetails = _appSubscriptionPlanDetailRepository.GetAll()
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var filteredAppSubscriptionPlanDetails = _appSubscriptionPlanDetailRepository.GetAll()
                         .Include(e => e.AppSubscriptionPlanHeaderFk)
+                        .Include(e => e.AppFeatureFk)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.FeatureCode.Contains(input.Filter) || e.FeatureName.Contains(input.Filter) || e.Availability.Contains(input.Filter) || e.FeaturePeriodLimit.Contains(input.Filter) || e.Category.Contains(input.Filter) || e.FeatureDescription.Contains(input.Filter) || e.FeatureStatus.Contains(input.Filter) || e.UnitOfMeasurementName.Contains(input.Filter) || e.UnitOfMeasurmentCode.Contains(input.Filter) || e.FeatureBillingCode.Contains(input.Filter) || e.FeatureCategory.Contains(input.Filter) || e.Notes.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCodeFilter), e => e.FeatureCode == input.FeatureCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureNameFilter), e => e.FeatureName == input.FeatureNameFilter)
@@ -61,80 +76,114 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureBillingCodeFilter), e => e.FeatureBillingCode == input.FeatureBillingCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCategoryFilter), e => e.FeatureCategory == input.FeatureCategoryFilter)
                         .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity))
-                        //.WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanHeaderFilter), e => e.AppSubscriptionPlanHeaderFk != null && e..AppSubscriptionPlanHeaderFk. == input.AppSubscriptionPlanHeaderFilter)
-                        .WhereIf(input.AppSubscriptionPlanHeaderIdFilter.HasValue, e => false || e.AppSubscriptionPlanHeaderId == input.AppSubscriptionPlanHeaderIdFilter.Value);
+                        .WhereIf(input.AppSubscriptionPlanHeaderFilter!=null, e => e.AppSubscriptionPlanHeaderId == long.Parse(input.AppSubscriptionPlanHeaderFilter.ToString()))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter);
+                        //.WhereIf(input.AddFeaturesOnly, e => e.IsAddOn == true);
 
-            var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails
-                .OrderBy(input.Sorting ?? "id asc")
-                .PageBy(input);
+                var pagedAndFilteredAppSubscriptionPlanDetails = filteredAppSubscriptionPlanDetails
+                    .OrderBy(input.Sorting ?? "id asc")
+                    .PageBy(input);
 
-            var appSubscriptionPlanDetails = from o in pagedAndFilteredAppSubscriptionPlanDetails
-                                             join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll() on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
-                                             from s1 in j1.DefaultIfEmpty()
+                var appSubscriptionPlanDetails = from o in pagedAndFilteredAppSubscriptionPlanDetails
+                                                 join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll() on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
+                                                 join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
+                                                 from s1 in j2.DefaultIfEmpty()
+                                                     //join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
+                                                     //from s2 in j2.DefaultIfEmpty()
 
-                                             select new
-                                             {
+                                                 select new
+                                                 {
 
-                                                 o.FeatureCode,
-                                                 o.FeatureName,
-                                                 o.Availability,
-                                                 o.FeatureLimit,
-                                                 o.RollOver,
-                                                 o.UnitPrice,
-                                                 o.FeaturePeriodLimit,
-                                                 o.Category,
-                                                 o.FeatureDescription,
-                                                 o.FeatureStatus,
-                                                 o.UnitOfMeasurementName,
-                                                 o.UnitOfMeasurmentCode,
-                                                 o.IsFeatureBillable,
-                                                 o.FeatureBillingCode,
-                                                 o.FeatureCategory,
-                                                 o.Trackactivity,
-                                                 Id = o.Id,
-                                                 AppSubscriptionPlanHeader = (s1 == null ? 0 : s1.Id)
-                                             };
+                                                     o.FeatureCode,
+                                                     o.FeatureName,
+                                                     o.Availability,
+                                                     o.FeatureLimit,
+                                                     o.RollOver,
+                                                     o.UnitPrice,
+                                                     o.FeaturePeriodLimit,
+                                                     o.Category,
+                                                     o.FeatureDescription,
+                                                     o.FeatureStatus,
+                                                     o.UnitOfMeasurementName,
+                                                     o.UnitOfMeasurmentCode,
+                                                     o.IsFeatureBillable,
+                                                     o.FeatureBillingCode,
+                                                     o.FeatureCategory,
+                                                     o.Trackactivity,
+                                                     Id = o.Id,
+                                                     s1.IsAddOn,
+                                                     AppFeatureId = o.AppFeatureId,
+                                                     o.AppSubscriptionPlanHeaderId
+                                                     //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
+                                                 };
 
-            var totalCount = await filteredAppSubscriptionPlanDetails.CountAsync();
+                //var totalCount = await filteredAppSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z=>z.isa).CountAsync();
+                var totalCount = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).CountAsync();
+                var dbList = await appSubscriptionPlanDetails.WhereIf(input.AddFeaturesOnly, z => z.IsAddOn).Distinct().ToListAsync();
+                var results = new List<GetAppSubscriptionPlanDetailForViewDto>();
 
-            var dbList = await appSubscriptionPlanDetails.ToListAsync();
-            var results = new List<GetAppSubscriptionPlanDetailForViewDto>();
-
-            foreach (var o in dbList)
-            {
-                var res = new GetAppSubscriptionPlanDetailForViewDto()
+                foreach (var o in dbList)
                 {
-                    AppSubscriptionPlanDetail = new AppSubscriptionPlanDetailDto
+                    var res = new GetAppSubscriptionPlanDetailForViewDto()
                     {
+                        AppSubscriptionPlanDetail = new AppSubscriptionPlanDetailDto
+                        {
 
-                        FeatureCode = o.FeatureCode,
-                        FeatureName = o.FeatureName,
-                        Availability = o.Availability,
-                        FeatureLimit = o.FeatureLimit,
-                        RollOver = o.RollOver,
-                        UnitPrice = o.UnitPrice,
-                        FeaturePeriodLimit = o.FeaturePeriodLimit,
-                        Category = o.Category,
-                        FeatureDescription = o.FeatureDescription,
-                        FeatureStatus = o.FeatureStatus,
-                        UnitOfMeasurementName = o.UnitOfMeasurementName,
-                        UnitOfMeasurmentCode = o.UnitOfMeasurmentCode,
-                        IsFeatureBillable = o.IsFeatureBillable,
-                        FeatureBillingCode = o.FeatureBillingCode,
-                        FeatureCategory = o.FeatureCategory,
-                        Trackactivity = o.Trackactivity,
-                        Id = o.Id,
-                    },
-                    AppSubscriptionPlanHeader = o.AppSubscriptionPlanHeader.ToString()
-                };
+                            FeatureCode = o.FeatureCode,
+                            FeatureName = o.FeatureName,
+                            Availability = o.Availability,
+                            FeatureLimit = int.Parse(o.FeatureLimit.ToString()),
+                            RollOver = o.RollOver,
+                            UnitPrice = o.UnitPrice,
+                            FeaturePeriodLimit = o.FeaturePeriodLimit,
+                            Category = o.Category,
+                            FeatureDescription = o.FeatureDescription,
+                            FeatureStatus = o.FeatureStatus,
+                            UnitOfMeasurementName = o.UnitOfMeasurementName,
+                            UnitOfMeasurmentCode = o.UnitOfMeasurmentCode,
+                            IsFeatureBillable = o.IsFeatureBillable,
+                            FeatureBillingCode = o.FeatureBillingCode,
+                            FeatureCategory = o.FeatureCategory,
+                            Trackactivity = o.Trackactivity,
+                            Id = o.Id,
+                            IsAddOn = o.IsAddOn,
+                            AppFeatureId = o.AppFeatureId
+                        },
+                        
+                        // AppSubscriptionPlanHeader = o.AppSubscriptionPlanHeader,
+                        // AppFeatureDescription = o.AppFeatureDescription
+                    };
+                    if (input.AddFeaturesOnly)
+                    {
+                        var tenantHeader = await _appTenantSubscriptionPlanRepository.GetAll().
+                            Where(z => z.TenantId == AbpSession.TenantId && z.CurrentPeriodStartDate <= DateTime.Now.Date && DateTime.Now.Date <= z.CurrentPeriodEndDate &&
+                            z.AppSubscriptionPlanHeaderId == o.AppSubscriptionPlanHeaderId).FirstOrDefaultAsync();
+                        if (tenantHeader != null)
+                        {
+                            var activitySumConsumed = _appTenantActivitiesLogRepository.GetAll().Where(z => z.AppSubscriptionPlanHeaderId == o.AppSubscriptionPlanHeaderId
+                            && z.TenantId == AbpSession.TenantId && z.FeatureCode == o.FeatureCode &&
+                            z.ActivityDateTime <= tenantHeader.CurrentPeriodEndDate && z.ActivityDateTime >= tenantHeader.CurrentPeriodStartDate &&
+                              z.CreditOrUsage == "Credit").Sum(z => z.ConsumedQty);
 
-                results.Add(res);
+                          var activitySumBalance = _appTenantActivitiesLogRepository.GetAll().Where(z => z.AppSubscriptionPlanHeaderId == o.AppSubscriptionPlanHeaderId
+                          && z.TenantId == AbpSession.TenantId && z.FeatureCode == o.FeatureCode &&
+                          z.ActivityDateTime <= tenantHeader.CurrentPeriodEndDate && z.ActivityDateTime >= tenantHeader.CurrentPeriodStartDate &&
+                            z.CreditOrUsage == "Credit").Sum(z => z.ConsumedQty + z.RemainingQty);
+
+                            res.FeatureCreditQty = activitySumBalance;
+                            res.FeatureUsedQty = activitySumConsumed;
+
+                         }
+                    }
+
+                    results.Add(res);
+                }
+
+                return new PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>(
+                    totalCount,
+                    results
+                );
             }
-
-            return new PagedResultDto<GetAppSubscriptionPlanDetailForViewDto>(
-                totalCount,
-                results
-            );
 
         }
 
@@ -147,7 +196,13 @@ namespace onetouch.AppSubScriptionPlan
             if (output.AppSubscriptionPlanDetail.AppSubscriptionPlanHeaderId != null)
             {
                 var _lookupAppSubscriptionPlanHeader = await _lookup_appSubscriptionPlanHeaderRepository.FirstOrDefaultAsync((long)output.AppSubscriptionPlanDetail.AppSubscriptionPlanHeaderId);
-                output.AppSubscriptionPlanHeader = _lookupAppSubscriptionPlanHeader?.Code.ToString();
+                output.AppSubscriptionPlanHeader = _lookupAppSubscriptionPlanHeader.Code!=null? _lookupAppSubscriptionPlanHeader.Code.ToString():"";
+            }
+
+            if (output.AppSubscriptionPlanDetail.AppFeatureId != null)
+            {
+                var _lookupAppFeature = await _lookup_appFeatureRepository.FirstOrDefaultAsync((int)output.AppSubscriptionPlanDetail.AppFeatureId);
+                output.AppFeatureDescription = _lookupAppFeature?.Description?.ToString();
             }
 
             return output;
@@ -163,7 +218,13 @@ namespace onetouch.AppSubScriptionPlan
             if (output.AppSubscriptionPlanDetail.AppSubscriptionPlanHeaderId != null)
             {
                 var _lookupAppSubscriptionPlanHeader = await _lookup_appSubscriptionPlanHeaderRepository.FirstOrDefaultAsync((long)output.AppSubscriptionPlanDetail.AppSubscriptionPlanHeaderId);
-                output.AppSubscriptionPlanHeader = _lookupAppSubscriptionPlanHeader?.Code.ToString();
+                output.AppSubscriptionPlanHeader = _lookupAppSubscriptionPlanHeader.Code!=null? _lookupAppSubscriptionPlanHeader.Code.ToString():"";
+            }
+
+            if (output.AppSubscriptionPlanDetail.AppFeatureId != null)
+            {
+                var _lookupAppFeature = await _lookup_appFeatureRepository.FirstOrDefaultAsync((int)output.AppSubscriptionPlanDetail.AppFeatureId);
+                output.AppFeatureDescription = _lookupAppFeature?.Description?.ToString();
             }
 
             return output;
@@ -173,6 +234,7 @@ namespace onetouch.AppSubScriptionPlan
         {
             if (input.Id == null)
             {
+                input.Id = 0;
                 await Create(input);
             }
             else
@@ -185,17 +247,8 @@ namespace onetouch.AppSubScriptionPlan
         protected virtual async Task Create(CreateOrEditAppSubscriptionPlanDetailDto input)
         {
             var appSubscriptionPlanDetail = ObjectMapper.Map<AppSubscriptionPlanDetail>(input);
-            var appSubscriptionPlanObjectId = await _helper.SystemTables.GetObjectStandardSubscriptionPlanId();
-            appSubscriptionPlanDetail.ObjectId = appSubscriptionPlanObjectId;
-            var StatusId = input.EntityStatusCode == "ACTIVE" ? await _helper.SystemTables.GetEntityObjectStatusItemActive() : await _helper.SystemTables.GetEntityObjectStatusItemDraft();
-            appSubscriptionPlanDetail.EntityObjectStatusId = StatusId;
-            var entitySubPlanObjectType = await _helper.SystemTables.GetObjectStandardSubscriptionPlan();
-            appSubscriptionPlanDetail.EntityObjectTypeId = entitySubPlanObjectType.Id;
-            appSubscriptionPlanDetail.EntityObjectTypeCode = entitySubPlanObjectType.Code;
-            appSubscriptionPlanDetail.TenantId = null;
-            appSubscriptionPlanDetail.Code = input.FeatureCode;
-            appSubscriptionPlanDetail.Name = input.FeatureName;
-            await _appSubscriptionPlanDetailRepository.InsertAsync(appSubscriptionPlanDetail);
+            appSubscriptionPlanDetail.Category = appSubscriptionPlanDetail.FeatureCategory;
+              await _appSubscriptionPlanDetailRepository.InsertAsync(appSubscriptionPlanDetail);
 
         }
 
@@ -218,6 +271,7 @@ namespace onetouch.AppSubScriptionPlan
 
             var filteredAppSubscriptionPlanDetails = _appSubscriptionPlanDetailRepository.GetAll()
                         .Include(e => e.AppSubscriptionPlanHeaderFk)
+                        .Include(e => e.AppFeatureFk)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.FeatureCode.Contains(input.Filter) || e.FeatureName.Contains(input.Filter) || e.Availability.Contains(input.Filter) || e.FeaturePeriodLimit.Contains(input.Filter) || e.Category.Contains(input.Filter) || e.FeatureDescription.Contains(input.Filter) || e.FeatureStatus.Contains(input.Filter) || e.UnitOfMeasurementName.Contains(input.Filter) || e.UnitOfMeasurmentCode.Contains(input.Filter) || e.FeatureBillingCode.Contains(input.Filter) || e.FeatureCategory.Contains(input.Filter) || e.Notes.Contains(input.Filter))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCodeFilter), e => e.FeatureCode == input.FeatureCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureNameFilter), e => e.FeatureName == input.FeatureNameFilter)
@@ -236,12 +290,16 @@ namespace onetouch.AppSubScriptionPlan
                         .WhereIf(input.IsFeatureBillableFilter.HasValue && input.IsFeatureBillableFilter > -1, e => (input.IsFeatureBillableFilter == 1 && e.IsFeatureBillable) || (input.IsFeatureBillableFilter == 0 && !e.IsFeatureBillable))
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureBillingCodeFilter), e => e.FeatureBillingCode == input.FeatureBillingCodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCategoryFilter), e => e.FeatureCategory == input.FeatureCategoryFilter)
-                        .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity));
-                        //.WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanHeaderFilter), e => e.AppSubscriptionPlanHeaderFk != null && e.AppSubscriptionPlanHeaderFk. == input.AppSubscriptionPlanHeaderFilter);
+                        .WhereIf(input.TrackactivityFilter.HasValue && input.TrackactivityFilter > -1, e => (input.TrackactivityFilter == 1 && e.Trackactivity) || (input.TrackactivityFilter == 0 && !e.Trackactivity))
+                        //.WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanHeaderFilter), e => e.AppSubscriptionPlanHeaderFk != null && e.AppSubscriptionPlanHeaderFk. == input.AppSubscriptionPlanHeaderFilter)
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppFeatureDescriptionFilter), e => e.AppFeatureFk != null && e.AppFeatureFk.Description == input.AppFeatureDescriptionFilter);
 
             var query = (from o in filteredAppSubscriptionPlanDetails
-                         join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll() on o.AppSubscriptionPlanHeaderId equals o1.Id into j1
-                         from s1 in j1.DefaultIfEmpty()
+                         join o1 in _lookup_appSubscriptionPlanHeaderRepository.GetAll() on o.AppSubscriptionPlanHeaderId equals o1.Id into j2
+                         from s1 in j2.DefaultIfEmpty()
+
+                         //join o2 in _lookup_appFeatureRepository.GetAll() on o.AppFeatureId equals o2.Id into j2
+                         //from s2 in j2.DefaultIfEmpty()
 
                          select new GetAppSubscriptionPlanDetailForViewDto()
                          {
@@ -250,7 +308,7 @@ namespace onetouch.AppSubScriptionPlan
                                  FeatureCode = o.FeatureCode,
                                  FeatureName = o.FeatureName,
                                  Availability = o.Availability,
-                                 FeatureLimit = o.FeatureLimit,
+                                 FeatureLimit = int.Parse(o.FeatureLimit.ToString()),
                                  RollOver = o.RollOver,
                                  UnitPrice = o.UnitPrice,
                                  FeaturePeriodLimit = o.FeaturePeriodLimit,
@@ -263,9 +321,11 @@ namespace onetouch.AppSubScriptionPlan
                                  FeatureBillingCode = o.FeatureBillingCode,
                                  FeatureCategory = o.FeatureCategory,
                                  Trackactivity = o.Trackactivity,
-                                 Id = o.Id
+                                 Id = o.Id,
+                                 AppFeatureId = o.AppFeatureId,
                              },
-                             AppSubscriptionPlanHeader = s1 == null || s1 == null ? "" : s1.ToString()
+                             //AppSubscriptionPlanHeader = s1 == null || s1. == null ? "" : s1..ToString(),
+                             //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
                          });
 
             var appSubscriptionPlanDetailListDtos = await query.ToListAsync();
@@ -278,7 +338,8 @@ namespace onetouch.AppSubScriptionPlan
         {
             var query = _lookup_appSubscriptionPlanHeaderRepository.GetAll().WhereIf(
                    !string.IsNullOrWhiteSpace(input.Filter),
-                  e => (e.Code.Contains(input.Filter) || e.Name.Contains(input.Filter)));
+                  e => e.Code != null && e.Code.Contains(input.Filter)
+               );
 
             var totalCount = await query.CountAsync();
 
@@ -292,11 +353,41 @@ namespace onetouch.AppSubScriptionPlan
                 lookupTableDtoList.Add(new AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto
                 {
                     Id = appSubscriptionPlanHeader.Id,
-                    DisplayName = appSubscriptionPlanHeader.Name.ToString()
+                    DisplayName = appSubscriptionPlanHeader.Code!=null? appSubscriptionPlanHeader.Code.ToString():""
                 });
             }
 
             return new PagedResultDto<AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto>(
+                totalCount,
+                lookupTableDtoList
+            );
+        }
+
+        [AbpAuthorize(AppPermissions.Pages_Administration_AppSubscriptionPlanDetails)]
+        public async Task<PagedResultDto<AppSubscriptionPlanDetailAppFeatureLookupTableDto>> GetAllAppFeatureForLookupTable(GetAllForLookupTableInput input)
+        {
+            var query = _lookup_appFeatureRepository.GetAll().WhereIf(
+                   !string.IsNullOrWhiteSpace(input.Filter),
+                  e => e.Description != null && e.Description.Contains(input.Filter)
+               );
+
+            var totalCount = await query.CountAsync();
+
+            var appFeatureList = await query
+                .PageBy(input)
+                .ToListAsync();
+
+            var lookupTableDtoList = new List<AppSubscriptionPlanDetailAppFeatureLookupTableDto>();
+            foreach (var appFeature in appFeatureList)
+            {
+                lookupTableDtoList.Add(new AppSubscriptionPlanDetailAppFeatureLookupTableDto
+                {
+                    Id = appFeature.Id,
+                    DisplayName = appFeature.Description?.ToString()
+                });
+            }
+
+            return new PagedResultDto<AppSubscriptionPlanDetailAppFeatureLookupTableDto>(
                 totalCount,
                 lookupTableDtoList
             );

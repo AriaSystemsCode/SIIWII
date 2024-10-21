@@ -4315,12 +4315,17 @@ namespace onetouch.Accounts
                 }
             }
             //MMT37
-            if (string.IsNullOrEmpty(entity.SSIN))
+            var contactObjectOrg = await _appContactRepository.GetAll().Where(x => x.Id == contact.Id).FirstOrDefaultAsync();
+            if (contactObjectOrg == null  || string.IsNullOrEmpty(contactObjectOrg.SSIN))
             {
                 entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
                 entity.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
                 contact.SSIN = entity.SSIN;
+            }
+            else {
+                entity.SSIN = contactObjectOrg.SSIN;
+                contact.SSIN = contactObjectOrg.SSIN;
             }
             //MMT37
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
@@ -4742,7 +4747,19 @@ namespace onetouch.Accounts
                 throw new UserFriendlyException(L("CodeIsAlreadyExists", input.Code));
 
             }
-            return ObjectMapper.Map<AppAddressDto>(value);
+            //return ObjectMapper.Map<AppAddressDto>(value);
+            var returnObj = ObjectMapper.Map<AppAddressDto>(value);
+            if (input.CountryId != null)
+            {
+                var countryObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeCountryId();
+                var country = await _appEntityRepository.GetAll().Where(z => z.Id == input.CountryId && z.EntityObjectTypeId == countryObjectTypeId).FirstOrDefaultAsync();
+                if (country != null)
+                {
+                    returnObj.CountryCode = country.Code;
+                    returnObj.CountryIdName = country.Name;
+                }
+            }
+            return returnObj;
         }
 
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]

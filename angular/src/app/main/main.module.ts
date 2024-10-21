@@ -57,6 +57,7 @@ import { AppTenantSubscriptionPlansComponent } from '@app/admin/appSubScriptionP
 import { CreateOrEditAppTenantSubscriptionPlanComponent } from '@app/admin/appSubScriptionPlan/appTenantSubscriptionPlans/create-or-edit-appTenantSubscriptionPlan.component';
 import { ViewAppTenantSubscriptionPlanComponent } from '@app/admin/appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
 import { AppTenantActivitiesLogComponent } from "@app/admin/appSubScriptionPlan/appTenantActivitiesLog/appTenantActivitiesLog.component";
+import { AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetail-appFeature-lookup-table-modal.component";
 
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 
@@ -109,6 +110,7 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
         CreateOrEditAppSubscriptionPlanDetailModalComponent,
         ViewAppSubscriptionPlanDetailModalComponent,
         AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableModalComponent,
+        AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent,
         MasterDetailChild_AppSubscriptionPlanHeader_ViewAppSubscriptionPlanDetailModalComponent,
         MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDetailsComponent,
         MasterDetailChild_AppSubscriptionPlanHeader_CreateOrEditAppSubscriptionPlanDetailModalComponent,
@@ -140,6 +142,7 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
         CountoModule,
         NgxChartsModule,
         NgImageSliderModule,
+        AppTenantActivitiesLogComponent
     ],
     providers: [
         {

@@ -33,15 +33,31 @@ if(this.entityId!==0){
 changeDisabledMode(){
   this.disabledModeOn=!this.disabledModeOn;
 }
-getCurentDayFormeted(){
-  let currentFormatedDate='';
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const currentdate = new Date(); 
-  const amPm = currentdate.getHours() >= 12 ? 'PM' : 'AM';
-  const hours = (currentdate.getHours() % 12) || 12;
+// getCurentDayFormeted(){
+//   let currentFormatedDate='';
+//   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+//   const currentdate = new Date(); 
+//   const amPm = currentdate.getHours() >= 12 ? 'PM' : 'AM';
+//   const hours = (currentdate.getHours() % 12) || 12;
 
-  currentFormatedDate=months[currentdate.getMonth()]+' '+currentdate.getDay()+' '+currentdate.getFullYear()+' , '+
-  + hours + ":" +currentdate.getMinutes()+' '+amPm +'\r\n';
+//   currentFormatedDate=months[currentdate.getMonth()]+' '+currentdate.getDay()+' '+currentdate.getFullYear()+' , '+
+//   + hours + ":" +currentdate.getMinutes()+' '+amPm +'\r\n';
+//   return currentFormatedDate;
+// }
+getCurentDayFormeted(): string {
+  let currentFormatedDate = '';
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const currentdate = new Date();
+  const amPm = currentdate.getHours() >= 12 ? 'PM' : 'AM';
+  const hours = (currentdate.getHours() % 12) || 12; // Convert to 12-hour format
+
+  // Ensure two digits for minutes
+  const minutes = currentdate.getMinutes().toString().padStart(2, '0');
+
+  // Use getDate() to get the day of the month
+  currentFormatedDate = months[currentdate.getMonth()] + ' ' + currentdate.getDate() + ' ' + currentdate.getFullYear() + ' , ' +
+    hours + ":" + minutes + ' ' + amPm + '\r\n';
+  
   return currentFormatedDate;
 }
 addCurrentDate(){

@@ -134,10 +134,10 @@
                                         {{l('TenantName')}}
                                         <p-sortIcon field="appTenantSubscriptionPlan.tenantName"></p-sortIcon>
                                     </th>
-                                    <th style="width: 150px" pSortableColumn="appSubscriptionHeaderId">
+                                    <!-- <th style="width: 150px" pSortableColumn="appSubscriptionHeaderId">
                                         {{l('AppSubscriptionHeaderId')}}
                                         <p-sortIcon field="appTenantSubscriptionPlan.appSubscriptionHeaderId"></p-sortIcon>
-                                    </th>
+                                    </th> -->
                                     <th style="width: 150px" pSortableColumn="subscriptionPlanCode">
                                         {{l('SubscriptionPlanCode')}}
                                         <p-sortIcon field="appTenantSubscriptionPlan.subscriptionPlanCode"></p-sortIcon>
@@ -194,37 +194,37 @@
                                         </div>
                                     </td>
                                     <td style="width:150px">
-											<span class="ui-column-title"> {{l('TenantName')}}</span>
+											<!-- <span class="ui-column-title"> {{l('TenantName')}}</span> -->
 											{{record.appTenantSubscriptionPlan.tenantName}}
 										</td>
-                                    <td style="width:150px">
-											<span class="ui-column-title"> {{l('AppSubscriptionHeaderId')}}</span>
+                                    <!-- <td style="width:150px">
+											<span class="ui-column-title"> {{l('AppSubscriptionHeaderId')}}</span> 
 											{{record.appTenantSubscriptionPlan.appSubscriptionHeaderId}}
-										</td>
+										</td> -->
                                     <td style="width:150px">
-											<span class="ui-column-title"> {{l('SubscriptionPlanCode')}}</span>
+											<!-- <span class="ui-column-title"> {{l('SubscriptionPlanCode')}}</span> -->
 											{{record.appTenantSubscriptionPlan.subscriptionPlanCode}}
 										</td>
                                     <td style="width:150px">
-										<span class="ui-column-title"> {{l('CurrentPeriodStartDate')}}</span>
+										<!-- <span class="ui-column-title"> {{l('CurrentPeriodStartDate')}}</span> -->
                                         <span *ngIf="record.appTenantSubscriptionPlan.currentPeriodStartDate">
 											{{record.appTenantSubscriptionPlan.currentPeriodStartDate |  momentFormat:'L' }}
                                         </span>
                                         <span *ngIf="!record.appTenantSubscriptionPlan.currentPeriodStartDate">-</span>
                                     </td>
                                     <td style="width:150px">
-										<span class="ui-column-title"> {{l('CurrentPeriodEndDate')}}</span>
+										<!-- <span class="ui-column-title"> {{l('CurrentPeriodEndDate')}}</span> -->
                                         <span *ngIf="record.appTenantSubscriptionPlan.currentPeriodEndDate">
 											{{record.appTenantSubscriptionPlan.currentPeriodEndDate |  momentFormat:'L' }}
                                         </span>
                                         <span *ngIf="!record.appTenantSubscriptionPlan.currentPeriodEndDate">-</span>
                                     </td>
                                     <td style="width:150px">
-											<span class="ui-column-title"> {{l('BillingPeriod')}}</span>
+											<!-- <span class="ui-column-title"> {{l('BillingPeriod')}}</span> -->
 											{{record.appTenantSubscriptionPlan.billingPeriod}}
 										</td>
                                     <td style="width:150px">
-										<span class="ui-column-title"> {{l('AllowOverAge')}}</span>
+										<!-- <span class="ui-column-title"> {{l('AllowOverAge')}}</span> -->
                                         <div *ngIf="record.appTenantSubscriptionPlan.allowOverAge" class="text-center"><i class="fa fa-check-circle kt--font-success" title="True"></i></div>
 										<div *ngIf="!record.appTenantSubscriptionPlan.allowOverAge" class="text-center"><i class="fa fa-times-circle" title="False"></i></div>
                                     </td>

@@ -46,6 +46,14 @@ import { PublishService } from '../app-items/app-item-shared/services/publish.se
 import { ShareAccountComponent } from './components/share-account.component';
 
 
+import { AccountBillingComponent } from './components/accountBilling/AccountBilling/accountbilling.component';
+import { AddOnsComponent } from './components/accountBilling/components/add-ons/add-ons.component';
+import { ActivityLogComponent } from './components/accountBilling/components/activity-log/activity-log.component';
+import { TenantInvoicesComponent } from './components/accountBilling/components/tenant-invoices/tenant-invoices.component';
+import { PlansComponent } from './components/accountBilling/components/plans/plans.component';
+import { MainModule } from '../main.module';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -59,6 +67,11 @@ import { ShareAccountComponent } from './components/share-account.component';
         ViewOthersProfileComponent,
         ViewProfileComponent,
         ShareAccountComponent,
+        AccountBillingComponent,
+        AddOnsComponent,
+        ActivityLogComponent,
+        TenantInvoicesComponent,
+        PlansComponent
     ],
     imports: [
         CommonModule,
@@ -93,7 +106,9 @@ import { ShareAccountComponent } from './components/share-account.component';
         SelectAddressModule,
         MembersListSharedModule,
         AccountModule,
-        MyMembersModule
+        MyMembersModule,MainModule,
+        ConfirmDialogModule,
+        DialogModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

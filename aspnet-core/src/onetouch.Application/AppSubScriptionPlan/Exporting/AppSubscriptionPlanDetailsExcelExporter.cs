@@ -51,7 +51,8 @@ namespace onetouch.AppSubScriptionPlan.Exporting
                         L("FeatureBillingCode"),
                         L("FeatureCategory"),
                         L("Trackactivity"),
-                        (L("AppSubscriptionPlanHeader")) + L("")
+                        (L("AppSubscriptionPlanHeader")) + L(""),
+                        (L("AppFeature")) + L("Description")
                         );
 
                     AddObjects(
@@ -72,7 +73,8 @@ namespace onetouch.AppSubScriptionPlan.Exporting
                         _ => _.AppSubscriptionPlanDetail.FeatureBillingCode,
                         _ => _.AppSubscriptionPlanDetail.FeatureCategory,
                         _ => _.AppSubscriptionPlanDetail.Trackactivity,
-                        _ => _.AppSubscriptionPlanHeader
+                        _ => _.AppSubscriptionPlanHeader,
+                        _ => _.AppFeatureDescription
                         );
 
                 });

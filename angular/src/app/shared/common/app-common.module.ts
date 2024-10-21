@@ -73,6 +73,7 @@ import { AppSideBarComponent } from "./app-side-bar/app-side-bar.component";
 import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app-transaction-side-bar/app-transaction-side-bar.component";
 import { SendMessageModalComponent } from "@app/main/Messages/SendMessage-Modal.Component";
 import { EditorModule } from 'primeng/editor';
+import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-ons-side-bar/app-add-ons-side-bar.component";
 
 @NgModule({
     imports: [
@@ -140,7 +141,8 @@ import { EditorModule } from 'primeng/editor';
         GenericFormModalComponent,
         SelectionModalComponent,
         AppSideBarComponent,AppTransactionSideBarComponent,
-        SendMessageModalComponent
+        SendMessageModalComponent,
+        AppAddOnsSideBarComponent
 
     ],
     exports: [

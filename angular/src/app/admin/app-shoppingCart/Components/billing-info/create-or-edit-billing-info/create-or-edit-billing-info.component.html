@@ -7,23 +7,7 @@
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
                  {{l("Continue")}}
             </button>
-            <button
-            *ngIf="showSaveBtn"
-            [disabled]="!(isContactsValid)"
-            (click)="save()"
-            class="previewbtn text-center btn float-right"
-        >
-            Save
-            <i class="pi pi-check"></i>
-        </button>
-        <button
-        *ngIf="showSaveBtn"
-        (click)="cancel()"
-        class="cancelbtn text-center btn float-right"
-    >
-        Cancel
-        <i class="pi pi-times"></i>
-    </button>
+     
 
         </div>
         <hr class="my-2" />
@@ -51,6 +35,8 @@
         (updateSelectedAddress)="updateApContact($event)"
         [selectedAddressDetails]="apContactSelectedAdd"
         [showAddressType]="false"
+        [currentTab]="currentTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
         [canChange]="canChange"
         ></app-address>
     </div>
@@ -87,6 +73,8 @@
     (updateSelectedAddress)="updateArContact($event)"
     [selectedAddressDetails]="arContactSelectedAdd"
     [showAddressType]="false"
+    [currentTab]="currentTab"
+                    [appTransactionsForViewDto]="appTransactionsForViewDto"
     [canChange]="canChange"
     ></app-address>
 </div>
@@ -135,5 +123,29 @@
     (isContactsValid_1)="isContactFormValid($event,1)"
     (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-billing-info>
+</div>
+
+
+<div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
+    <div class="header p-2 my-2 d-flex  justify-content-end">
+<button
+*ngIf="showSaveBtn"
+[disabled]="!(isContactsValid)"
+(click)="save()"
+class="previewbtn text-center btn float-right"
+>
+Save
+
+</button>
+<button
+*ngIf="showSaveBtn"
+(click)="cancel()"
+class="cancelbtn text-center btn float-right"
+>
+Cancel
+
+</button>
+
+</div>
 </div>
 </div>

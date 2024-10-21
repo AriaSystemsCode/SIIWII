@@ -45,17 +45,17 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string? SellerContactPhoneNumber { get; set; }
 
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string BuyerContactName { get; set; }
+        public virtual string? BuyerContactName { get; set; }
 
         [StringLength(AppTransactionConst.MaxSellerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
-        public virtual string SellerContactName { get; set; }
+        public virtual string? SellerContactName { get; set; }
         public virtual string PriceLevel { get; set; }
         public virtual string? BuyerContactSSIN { set; get; }
         
-        public virtual string BuyerBranchSSIN { set; get; }
-        public virtual string BuyerBranchName { set; get; }
-        public virtual string SellerBranchSSIN { set; get; }
-        public virtual string SellerBranchName { set; get; }
+        public virtual string? BuyerBranchSSIN { set; get; }
+        public virtual string? BuyerBranchName { set; get; }
+        public virtual string? SellerBranchSSIN { set; get; }
+        public virtual string? SellerBranchName { set; get; }
         public virtual string? SellerContactSSIN { set; get; }
         public virtual TransactionType TransactionType { set; get; }
         public string EntityStatusCode { set; get; }
@@ -86,6 +86,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual bool lFromPlaceOrder { set; get; } = false;
        
         public virtual decimal CurrencyExchangeRate { get; set; }
+        //Iteration#42[Start]
+        public virtual string? Reference { set; get; }
+        public virtual DateTime EnteredDate { set; get; }
+        //Iteration#42[End]
     }
     public enum OrderCreatorRole
     { 

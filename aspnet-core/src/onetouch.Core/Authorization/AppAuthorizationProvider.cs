@@ -40,7 +40,7 @@ namespace onetouch.Authorization
             appTenantActivitiesLog.CreateChildPermission(AppPermissions.Pages_AppTenantActivitiesLog_Edit, L("EditAppTenantActivityLog"), multiTenancySides: MultiTenancySides.Host);
             appTenantActivitiesLog.CreateChildPermission(AppPermissions.Pages_AppTenantActivitiesLog_Delete, L("DeleteAppTenantActivityLog"), multiTenancySides: MultiTenancySides.Host);
 
-            var appSubscriptionPlanHeaders = pages.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders, L("AppSubscriptionPlanHeaders"), multiTenancySides: MultiTenancySides.Host);
+            var appSubscriptionPlanHeaders = pages.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders, L("AppSubscriptionPlanHeaders"));
             appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Create, L("CreateNewAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
             appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Edit, L("EditAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
             appSubscriptionPlanHeaders.CreateChildPermission(AppPermissions.Pages_AppSubscriptionPlanHeaders_Delete, L("DeleteAppSubscriptionPlanHeader"), multiTenancySides: MultiTenancySides.Host);
@@ -166,7 +166,7 @@ namespace onetouch.Authorization
             sycCurrencyExchangeRates.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates_Edit, L("EditSycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
             sycCurrencyExchangeRates.CreateChildPermission(AppPermissions.Pages_Administration_SycCurrencyExchangeRates_Delete, L("DeleteSycCurrencyExchangeRates"), multiTenancySides: MultiTenancySides.Host);
 
-            var appTenantInvoices = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices, L("AppTenantInvoices"), multiTenancySides: MultiTenancySides.Host);
+            var appTenantInvoices = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices, L("AppTenantInvoices"));
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Create, L("CreateNewAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Edit, L("EditAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);
             appTenantInvoices.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantInvoices_Delete, L("DeleteAppTenantInvoice"), multiTenancySides: MultiTenancySides.Host);
@@ -176,9 +176,9 @@ namespace onetouch.Authorization
             //  appTenantActivitiesLog.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantActivitiesLog_Edit, L("EditAppTenantActivityLog"), multiTenancySides: MultiTenancySides.Host);
             //  appTenantActivitiesLog.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantActivitiesLog_Delete, L("DeleteAppTenantActivityLog"), multiTenancySides: MultiTenancySides.Host);
 
-            var appTenantSubscriptionPlans = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans, L("AppTenantSubscriptionPlans"), multiTenancySides: MultiTenancySides.Host);
+            var appTenantSubscriptionPlans = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans, L("AppTenantSubscriptionPlans"));
             appTenantSubscriptionPlans.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Create, L("CreateNewAppTenantSubscriptionPlan"), multiTenancySides: MultiTenancySides.Host);
-            appTenantSubscriptionPlans.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Edit, L("EditAppTenantSubscriptionPlan"), multiTenancySides: MultiTenancySides.Host);
+            appTenantSubscriptionPlans.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Edit, L("EditAppTenantSubscriptionPlan"));
             appTenantSubscriptionPlans.CreateChildPermission(AppPermissions.Pages_Administration_AppTenantSubscriptionPlans_Delete, L("DeleteAppTenantSubscriptionPlan"), multiTenancySides: MultiTenancySides.Host);
 
             var appSubscriptionPlanDetails = administration.CreateChildPermission(AppPermissions.Pages_Administration_AppSubscriptionPlanDetails, L("AppSubscriptionPlanDetails"), multiTenancySides: MultiTenancySides.Host);

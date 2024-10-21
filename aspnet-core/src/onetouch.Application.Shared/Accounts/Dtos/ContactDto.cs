@@ -90,5 +90,6 @@ namespace onetouch.Accounts.Dtos
 		public int? TenantId { get; set; }
 		public int? AttachmentSourceTenantId { get; set; }
 		public bool UseDTOTenant { get; set; }
+		public string? SSIN { get; set; }
 	}
 }

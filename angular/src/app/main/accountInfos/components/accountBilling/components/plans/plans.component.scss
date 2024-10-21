@@ -1,0 +1,381 @@
+.period-btn {
+    width: Hug (150px)px;
+height: Hug (37px)px;
+padding: 8px 53px 8px 53px;
+gap: 10px;
+border-radius: 0px 6px 6px 0px;
+border: 1px 0px 0px 0px;
+opacity: 0px;
+border: 1px solid #eeeeeeee;
+// background: var(--Primary-Color, btnBackColor);
+  }
+  .selected-month-btn{
+    background: var(--Primary-Color, #4A0D4A);
+    width: Hug (152px)px;
+height: Hug (37px)px;
+padding: 8px 46px 8px 46px;
+gap: 10px;
+border-radius: 6px 0px 0px 6px;
+opacity: 0px;
+border: 1px solid #eeeeeeee;
+box-shadow: 1px 1px 2px 0px #1616161A;
+
+color: #FFFFFF;
+
+  }
+
+  .selected-year-btn{
+    background: var(--Primary-Color, #4A0D4A);
+    width: Hug (152px)px;
+height: Hug (37px)px;
+padding: 8px 46px 8px 46px;
+gap: 10px;
+border-radius: 0px 6px 6px 0px;
+opacity: 0px;
+border: 1px solid #eeeeeeee;
+box-shadow: 1px 1px 2px 0px #1616161A;
+color: #FFFFFF;
+
+  }
+
+  .container{  
+    text-align: center;  
+   
+    }
+    .align-paragraph {
+        margin: 0; 
+        font-family: Poppins;
+font-size: 20px;
+font-weight: 600;
+line-height: 30px;
+text-align: left;
+color:  #1B101B;
+
+//background: var(--Header-Text-Color, #1B101B);
+
+    }
+
+
+::ng-deep {
+  .scroll-container {
+    height: 50vh;
+    overflow-y: auto;
+    box-sizing: border-box;  /* Ensure padding is inside the element */
+    padding: 0;              /* Remove padding from the scroll container */
+    margin: 0;               /* Optional: ensure no margins interfere */
+  }
+  
+::-webkit-scrollbar {
+    width: 8px !important; /* Set the width of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+
+  border-radius: 20px;
+  background: #FFF;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  
+}
+
+::-webkit-scrollbar-track {
+    background-color: #D9D9D9 !important; /* Set the color of the track (the non-draggable part) */
+    
+}
+.table-container {
+  width: 100%;
+}
+.p-button:enabled:hover {
+  background: #fff !important;
+  color: #4A0D4A !important;
+  border: none !important;
+}
+.p-dialog .p-dialog-footer {
+  padding: 0 !important;
+}
+.vertical-header-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; // Ensure columns have equal width
+}
+.star-col {
+  color: #F6851D;
+}
+.vertical-header-table th,
+.vertical-header-table td {
+  padding: 10px;
+
+  text-align: center; // Center-align text in cells
+  width: 100%; // Ensures all columns share equal width
+}
+.head-pl ,.plan-header {
+
+  border: 1px solid #EEEEEE; // Add border for better visibility
+
+}
+.table-container {
+  width: 100%;
+}
+
+.vertical-header-table {
+  width: 100%;
+  border-collapse: collapse;
+  display: table; // Use table display for proper layout
+}
+
+.table-row {
+  display: flex; // Use flexbox for equal distribution
+}
+
+.table-cell {
+  flex: 1; // Each cell takes equal width
+  padding: 10px;
+  // border: 1px solid #ddd;
+  text-align: center;
+}
+
+.head-c{
+
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  align-items: center;
+  text-align: center;
+  // border: 1px solid #EEEEEE;
+  color: #1B101B;
+  
+  }
+
+
+  .head-pl{
+
+  font-style: normal;
+  font-weight: 600;
+
+  align-items: center;
+  text-align: center;
+  border: 1px solid #EEEEEE;
+  color: #1B101B;
+  
+  }
+
+
+.p-button-text {
+  button {
+    background-color: #4A0D4A !important;
+    color: white !important;
+    border-radius: 12px !important;
+ 
+padding: 8px 32px;
+
+
+  }
+
+}
+.pr-font{
+  font-weight: 700;
+}
+.p-button-no{
+  button {
+    border-radius: 12px;
+border: 1px solid rgba(238, 238, 238, 0.93);
+box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.10);
+
+  color: #4A0D4A !important;
+ 
+  }
+}
+.p-dialog {
+  border-radius: 20px;
+border: 1px solid #EEE;
+background: #FFF;
+padding: 24px 24px 32px 24px;
+box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.15);
+}
+  .p-dialog .p-dialog-header {
+    border:  none !important;
+  }
+  .con-msg {
+font-weight: 700 !important;
+font-size: 24px !important;
+line-height: 36px;
+
+color: #1B101B !important;
+
+
+  }
+  .con-body {
+
+font-weight: 500;
+font-size: 18px;
+line-height: 27px;
+
+color: #9E9E9E;
+  }
+  
+
+
+.selet-plan {
+  border-left: 2px solid #837F7F !important;
+  border-top: 2px solid #837F7F !important;
+  border-right: 2px solid #837F7F !important;
+  
+}
+
+
+.last-row-border {
+  border-bottom: 2px solid #837F7F !important;
+
+}
+.seletd-plan {
+  border-left: 2px solid #837F7F !important;
+  border-right: 2px solid #837F7F !important;
+}
+
+.text-col {
+
+
+color: #9E9E9E !important;
+
+
+
+
+ }
+  .top-left {
+    border-bottom: none;
+       
+              height: 134px;
+              // width: 200px;
+    border-top-left-radius: 10px !important;
+}
+  .top-right {
+    border-bottom: none;
+       
+    height: 134px;
+    // width: 200px;
+border-top-right-radius: 10px !important;
+  }
+  // .vertical-header-table tr:first-child td:first-child {
+  //     border-top-left-radius: 10px; /* Top-left corner */
+  // }
+  
+  // .vertical-header-table tr:first-child td:last-child {
+  //     border-top-right-radius: 10px; /* Top-right corner */
+  // }
+}
+.plan-name {
+  white-space: nowrap;
+
+}
+
+  
+
+.flex-column{
+  p{
+
+    font-weight: 800;
+   
+    line-height: 30px;
+  }
+  .btn {
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 11px 25px;
+    gap: 10px;
+color: #FFFFFF;
+display: flex;
+justify-content: center;
+    height: 46px;
+  }
+}
+.free-btn { 
+  background: #16B455;
+  }
+  .custom-p-free{
+color: #16B455;
+
+  }
+  .default-class {
+    color: #1B101B;
+  }
+  .default-class-b ,.sales-btn {
+    background-color: #1B101B;
+  }
+  .sil-btn { 
+background: #F6851D;
+
+
+    }
+    .custom-p-sil{
+  color: #F6851D;
+  
+    }
+
+
+    .gold-btn { 
+
+background: #4A0D4A;
+      
+          }
+          .custom-p-gold{
+        color: #4A0D4A;
+        
+          }
+
+
+          .cu-btn { 
+
+background: #1B101B;
+
+
+                      }
+                      .custom-p-cu{
+                    color: #1B101B;
+                    
+                      }
+  
+  .plan {
+
+
+
+
+height: 50px;
+
+background: #EEEEEE;
+border-width: 0px 1px 1px 1px;
+border-style: solid;
+border-color: rgba(238, 238, 238, 0.933333);
+
+    h2 {
+
+
+font-weight: 700;
+font-size: 20px;
+line-height: 30px;
+color: #1B101B;
+padding: 10px;
+margin-bottom: 0;
+    }
+
+  }
+
+
+
+
+
+.btn-yes {
+    background-color: #4A0D4A;
+    color: white;
+}
+
+.btn-no {
+    background-color: white;
+    color: #4A0D4A;
+}
+
+
+
+
+
+

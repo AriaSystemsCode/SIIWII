@@ -31,11 +31,11 @@
             <div class="kt-portlet__body">              
                 
                 
-								<div class="form-group">
+								<!-- <div class="form-group">
 									<label for="AppFeature_Id">{{l("Id")}}</label>
 									<input type="number" #AppFeature_Id="ngModel" id="AppFeature_Id" class="form-control" [(ngModel)]="appFeature.id" name="Id"  />
 								    <validation-messages [formCtrl]="AppFeature_Id"></validation-messages>
-								</div>
+								</div> -->
 					
 								<div class="form-group">
 									<label for="AppFeature_Code">{{l("Code")}} *</label>
@@ -54,8 +54,29 @@
 									<input type="text" #AppFeature_Description="ngModel" id="AppFeature_Description" class="form-control" [(ngModel)]="appFeature.description" name="Description"   minlength="0"  maxlength="250"  required/>
 								    <validation-messages [formCtrl]="AppFeature_Description"></validation-messages>
 								</div>
-					
-								<div class="form-group">
+					<div class="form-group">
+						<label for="AppFeature_EntityStatusCode">{{l("Status")}}</label>
+						<p-dropdown [options]="featureStatusList" 
+            optionLabel="displayName"
+            optionValue="id"
+            name="statusSelection" [(ngModel)]="appFeature.entityStatusId" >
+</p-dropdown>
+<!-- <select id="items" >
+    <option *ngFor="let item of featureStatusList" [value]="item.id">{{ item.displayName }}</option>
+  </select> -->
+						</div>
+						<div class="form-group">
+							<label for="AppFeature_UnitOfMeasurementCode">{{l("UnitOfMeasurementCode")}}</label>
+							<p-dropdown [options]="unitOfMeasurementList" 
+				optionLabel="label"
+				optionValue="value"
+				name="uomSelection" [(ngModel)]="appFeature.unitOfMeasurementId" >
+	</p-dropdown>
+	<!-- <select id="items" >
+		<option *ngFor="let item of featureStatusList" [value]="item.id">{{ item.displayName }}</option>
+	  </select> -->
+							</div>
+								<!-- <div class="form-group">
 									<label for="AppFeature_UnitOfMeasurementCode">{{l("UnitOfMeasurementCode")}} *</label>
 									<input type="text" #AppFeature_UnitOfMeasurementCode="ngModel" id="AppFeature_UnitOfMeasurementCode" class="form-control" [(ngModel)]="appFeature.unitOfMeasurementCode" name="UnitOfMeasurementCode"   minlength="1"  maxlength="50"  required/>
 								    <validation-messages [formCtrl]="AppFeature_UnitOfMeasurementCode"></validation-messages>
@@ -65,12 +86,17 @@
 									<label for="AppFeature_UnitOfMeasurementName">{{l("UnitOfMeasurementName")}} *</label>
 									<input type="text" #AppFeature_UnitOfMeasurementName="ngModel" id="AppFeature_UnitOfMeasurementName" class="form-control" [(ngModel)]="appFeature.unitOfMeasurementName" name="UnitOfMeasurementName"   minlength="1"  maxlength="250"  required/>
 								    <validation-messages [formCtrl]="AppFeature_UnitOfMeasurementName"></validation-messages>
-								</div>
+								</div> -->
 					
 								<div class="form-group">
-									<label for="AppFeature_FeaturePeriodLimit">{{l("FeaturePeriodLimit")}} *</label>
-									<input type="text" #AppFeature_FeaturePeriodLimit="ngModel" id="AppFeature_FeaturePeriodLimit" class="form-control" [(ngModel)]="appFeature.featurePeriodLimit" name="FeaturePeriodLimit"   minlength="1"  maxlength="50"  required/>
-								    <validation-messages [formCtrl]="AppFeature_FeaturePeriodLimit"></validation-messages>
+									<label for="AppFeature_FeaturePeriodLimit">{{l("FeaturePeriodLimit")}}</label>
+									<p-dropdown [options]="options" 
+				optionLabel="label"
+				optionValue="value"
+				name="uomLimit" [(ngModel)]="appFeature.featurePeriodLimit" >
+	</p-dropdown>
+									<!-- <input type="text" #AppFeature_FeaturePeriodLimit="ngModel" id="AppFeature_FeaturePeriodLimit" class="form-control" [(ngModel)]="appFeature.featurePeriodLimit" name="FeaturePeriodLimit"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppFeature_FeaturePeriodLimit"></validation-messages> -->
 								</div>
 					
 								<br/><div class="m-checkbox-list">
@@ -82,22 +108,28 @@
 									<validation-messages [formCtrl]="AppFeature_Billable"></validation-messages>
 								</div>
 					
-								<div class="form-group">
+								<div class="form-group" *ngIf="appFeature.billable">
 									<label for="AppFeature_BillingCode">{{l("BillingCode")}}</label>
 									<input type="text" #AppFeature_BillingCode="ngModel" id="AppFeature_BillingCode" class="form-control" [(ngModel)]="appFeature.billingCode" name="BillingCode"   minlength="0"  maxlength="50" />
 								    <validation-messages [formCtrl]="AppFeature_BillingCode"></validation-messages>
 								</div>
 					
-								<div class="form-group">
-									<label for="AppFeature_UnitPrice">{{l("UnitPrice")}}</label>
-									<input type="number" #AppFeature_UnitPrice="ngModel" id="AppFeature_UnitPrice" class="form-control" [(ngModel)]="appFeature.unitPrice" name="UnitPrice"  />
+								<div class="form-group" *ngIf="appFeature.billable">
+									<label for="AppFeature_UnitPrice">{{l("UnitPrice")}} $</label>
+									<input  type="number"  (keyup)="currencyCheck()" step="0.01"  #AppFeature_UnitPrice="ngModel" id="AppFeature_UnitPrice" 
+									class="form-control" [(ngModel)]="appFeature.unitPrice" name="UnitPrice"  />
 								    <validation-messages [formCtrl]="AppFeature_UnitPrice"></validation-messages>
 								</div>
 					
 								<div class="form-group">
 									<label for="AppFeature_Category">{{l("Category")}} *</label>
-									<input type="text" #AppFeature_Category="ngModel" id="AppFeature_Category" class="form-control" [(ngModel)]="appFeature.category" name="Category"   minlength="1"  maxlength="50"  required/>
-								    <validation-messages [formCtrl]="AppFeature_Category"></validation-messages>
+									<p-dropdown [options]="featureCategoryList" 
+									optionLabel="label"
+									optionValue="value"
+									name="categorySelection" [(ngModel)]="appFeature.categoryId" >
+						</p-dropdown>
+									<!-- <input type="text" #AppFeature_Category="ngModel" id="AppFeature_Category" class="form-control" [(ngModel)]="appFeature.category" name="Category"   minlength="1"  maxlength="50"  required/>
+								    <validation-messages [formCtrl]="AppFeature_Category"></validation-messages> -->
 								</div>
 					
 								<br/><div class="m-checkbox-list">
@@ -108,6 +140,19 @@
 									</label>
 									<validation-messages [formCtrl]="AppFeature_TrackActivity"></validation-messages>
 								</div>
+								<br/><div class="m-checkbox-list">
+									<label for="AppFeature_IsAddOn" class="kt-checkbox">
+										<input #AppFeature_IsAddOn="ngModel" id="AppFeature_IsAddOn" type="checkbox" name="IsAddOn" [(ngModel)]="appFeature.isAddOn"> 
+										{{l("IsAddOn")}}
+										<span></span>
+									</label>
+									<validation-messages [formCtrl]="AppFeature_IsAddOn"></validation-messages>
+								</div>
+								<div class="form-group">
+									<label for="AppFeature_Notes">{{l("Notes")}}</label>
+									<input type="text" #AppFeature_Notes="ngModel" id="AppFeature_Notes" class="form-control" [(ngModel)]="appFeature.notes" name="Notes"   minlength="0"  maxlength="250" />
+								    <validation-messages [formCtrl]="AppFeature_Notes"></validation-messages>
+								</div>
 					
             </div>
               <div class="kt-portlet__foot">
@@ -116,10 +161,10 @@
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
                         <span>{{l("Save")}}</span>
                     </button>
-                    <button *ngIf="!this.appFeature.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
+                    <!-- <button *ngIf="!this.appFeature.id" (click)="saveAndNew()" class="btn btn-primary blue float-right"
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> 
                         <span>{{l("SaveAndNew")}}</span>
-                    </button>
+                    </button> -->
 				</div>
 		    </div>
         </div>

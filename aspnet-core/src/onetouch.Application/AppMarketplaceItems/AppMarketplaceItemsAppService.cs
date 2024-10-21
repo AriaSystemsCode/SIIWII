@@ -510,6 +510,7 @@ namespace onetouch.AppMarketplaceItems
 
                     var output = new GetAppMarketplaceItemDetailForViewDto { AppItem = ObjectMapper.Map<AppMarketplaceItemForViewDto>(appItem) };
                     //
+                    output.AppItem.HasPriceLevel = (!string.IsNullOrEmpty(level) && level != "MSRP") ? true : false;
                     var brandId = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108) != null ?
                         appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108).AttributeValueId : 0;
                     if (brandId != 0)
@@ -830,6 +831,13 @@ namespace onetouch.AppMarketplaceItems
                                 {
                                     MarketplaceExtraDataSelectedValues extraDataSelectedValues = new MarketplaceExtraDataSelectedValues();
                                     extraDataSelectedValues.value = varItem;
+
+                                    //Iteration#42,1 MMT 08/20/2024 Add new property for the code[Start]
+                                    var extraAttrObj = firstattributeCodes.Where(z => z.AttributeValue == varItem).FirstOrDefault();
+                                    if (extraAttrObj != null)
+                                        extraDataSelectedValues.Code = extraAttrObj.AttributeCode;
+                                    //Iteration#42,1 MMT 08/20/2024 Add new property for the code[End]
+
                                     extraDataSelectedValues.DefaultEntityAttachment = new AppEntityAttachmentDto();
                                     //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[Start]
                                     var codeItemVar = varAppItems.Where(x => x.EntityExtraData
@@ -839,14 +847,23 @@ namespace onetouch.AppMarketplaceItems
                                     if (codeItemVar != null) 
                                     {
                                         var varColor = codeItemVar.EntityExtraData.Where(x=>x.AttributeId ==201).FirstOrDefault();
-                                        if (varColor != null)
-                                            extraDataSelectedValues.ColorHexaCode = varColor.AttributeValue;
-
-                                        var varColorImage = codeItemVar.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
-                                        if (varColorImage != null)
+                                        if (varColor != null && !string.IsNullOrEmpty(varColor.AttributeValue))
                                         {
-                                            string tenantId =null;
+                                            extraDataSelectedValues.ColorHexaCode = varColor.AttributeValue;
+                                        }
+                                        else
+                                        {
+                                            extraDataSelectedValues.ColorHexaCode = "";
+                                        }
+                                        var varColorImage = codeItemVar.EntityExtraData.Where(x => x.AttributeId == 202).FirstOrDefault();
+                                        if (varColorImage != null && !string.IsNullOrEmpty(varColorImage.AttributeValue))
+                                        {
+                                            string tenantId = null;
                                             extraDataSelectedValues.ColorImage = imagesUrl + (tenantId == null ? "-1" : tenantId.ToString()) + @"/" + varColorImage.AttributeValue;
+                                        }
+                                        else
+                                        {
+                                            extraDataSelectedValues.ColorImage = "";
                                         }
                                         if (codeItemVar.EntityAttachments != null && codeItemVar.EntityAttachments.Count() > 0)
                                         {
@@ -1073,11 +1090,15 @@ namespace onetouch.AppMarketplaceItems
                                                 var codeItems = varAppItems.Where(x => x.EntityExtraData
                                                                                        .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                        a.AttributeId == long.Parse(secondAttId)
-                                                                                       ).Any()).ToList();
+                                                                                       ).Any()).ToList().Where(x => x.EntityExtraData
+                                                                                   .Where(a => a.AttributeId == firstAttributeIdLong & a.AttributeValue == varItem).Any()).ToList();
                                                 var itemVarSum = codeItems.Where(x =>
                                                 x.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
                                                 (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).Sum(a => a.StockAvailability);
-                                                attlook.StockAvailability = itemVarSum;
+                                                if (codeItems.Count!=0)
+                                                  attlook.StockAvailability = itemVarSum;
+                                                else
+                                                    attlook.StockAvailability = null;
                                                 //SSIN
                                                 var itemSsin = varAppItems.Where(x => x.EntityExtraData
                                                                                        .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
@@ -1189,8 +1210,9 @@ namespace onetouch.AppMarketplaceItems
 
 
                                             eDRestAttributes.Values.ForEach(a => a.NoOfAvailablePrepacks = minPrepack);
+                                            eDRestAttributes.Values.RemoveAll(z=>z.StockAvailability==null);
                                             // eDRestAttributes.Values = lookupLabelDtoList.Select(r => new LookupLabelDto() { Label = r.Split(',')[0], Value = long.Parse(r.Split(',')[1]) }).ToList();
-                                            eDRestAttributes.TotalCount = secondAttributeValuesFor1st.Count;//variationsLists[loop_counter + 3].Split('|').ToList().Count;
+                                            eDRestAttributes.TotalCount = eDRestAttributes.Values.Count; //secondAttributeValuesFor1st.Count;//variationsLists[loop_counter + 3].Split('|').ToList().Count;
                                             extraDataSelectedValues.EDRestAttributes.Add(eDRestAttributes);
                                         }
                                         firstAttributeRelatedAdded = true;

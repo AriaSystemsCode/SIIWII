@@ -84,6 +84,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
 
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
+   
   }
 
   isContactsValid: boolean = false;

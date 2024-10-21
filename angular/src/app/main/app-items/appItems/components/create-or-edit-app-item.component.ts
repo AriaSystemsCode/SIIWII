@@ -34,6 +34,7 @@ import {
     CurrencyInfoDto,
     LookupLabelDto,
     AppEntitiesServiceProxy,
+    VariationListToDeleteDto,
     
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
@@ -123,6 +124,7 @@ export class CreateOrEditAppItemComponent
     defaultCurrencyMSRPPriceIndex = -1;
     showAdvancedPricing: boolean = false;
     PriceValidMsg: string = "";
+    oldnonLookupValues;
 
     constructor(
         injector: Injector,
@@ -321,7 +323,12 @@ export class CreateOrEditAppItemComponent
                     entityDepartments: res.appItem.entityDepartments.items,
                     entityClassifications:
                         res.appItem.entityClassifications.items,
+                        nonLookupValues: res.nonLookupValues
                 });
+let x=  this.appItem.nonLookupValues;
+               // this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(x)) : [];
+                this.oldnonLookupValues = this.appItem.nonLookupValues && this.appItem.nonLookupValues.length > 0 ? 
+    x.map(item => new LookupLabelDto(item)) : [];
                 this.categoriesTotalCount =
                     res.appItem.entityCategories.totalCount;
                 this.departmentsTotalCount =
@@ -494,6 +501,8 @@ export class CreateOrEditAppItemComponent
                             stockAvailability:undefined,
                             value:extraAttr.selectedValues,
                             isHostRecord:false,
+                            hexaCode:undefined,
+                            image:undefined
                         })
                         result.items.push(tempAtt)
                     }
@@ -535,10 +544,34 @@ export class CreateOrEditAppItemComponent
         });
     }
     removeAllVariations() {
-        this.formTouched = true;
+    this.formTouched = true;
+    this._appItemsServiceProxy.getItemVariationsToDelete(this.id,undefined)
+    .subscribe((res:VariationListToDeleteDto) => {
+        if (res && res?.variationsInUse?.length >0) {
+            Swal.fire({
+                title: "",
+                text:  res?.variationsInUse?.length==1 ? "Variation '"+res?.variationsInUse[0]?.code?.toString() + "' Is in use" :  "More than one variation in use",
+                icon: "info",
+                confirmButtonText:
+                    "Ok",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                backdrop: true,
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class2",
+                },
+            });
+        }
+        else{
         this.appItem.variationItems = [];
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
         this.appItem.appItemSizesScaleInfo = [];
+        }
+    });
     }
     resetExtraData() {
         this.appItem.entityExtraData = [];
@@ -671,7 +704,8 @@ export class CreateOrEditAppItemComponent
         );
         let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
             this.selectCategoriesHandler(modalRef);
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit)subs.unsubscribe();
         });
     }
     removeCategory(
@@ -895,7 +929,8 @@ export class CreateOrEditAppItemComponent
         );
         let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
             this.selectClassificationsHandler(modalRef);
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+          if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
 
@@ -1112,7 +1147,7 @@ export class CreateOrEditAppItemComponent
         // create app attachment entity
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
         att.index = index;
-        att.fileName = file.name;
+        att.fileName = file?.name;
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
         const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
@@ -1364,6 +1399,11 @@ export class CreateOrEditAppItemComponent
     }
 
     applyVariations($event: ApplyVariationOutput) {
+        let x=this.appItem.nonLookupValues;
+       // this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(x)) : [];
+        this.oldnonLookupValues = this.appItem.nonLookupValues && this.appItem.nonLookupValues.length > 0 ? 
+             x.map(item => new LookupLabelDto(item)) : [];
+
         this.appItem.variationItems = $event.variation;
         this.appItem.appItemSizesScaleInfo = $event.appItemSizesScaleInfo;
         this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
@@ -1408,6 +1448,7 @@ export class CreateOrEditAppItemComponent
         if ($event?.target?.files.length == 0)
             return;
         this.displayVariations = false;
+        this.appItem.nonLookupValues=this.oldnonLookupValues;
     }
 
     allCurrencies: CurrencyInfoDto[] = [];
@@ -1552,7 +1593,8 @@ export class CreateOrEditAppItemComponent
             //     }
             // }
 
-            if (!modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
     askToPublish() {
@@ -1633,10 +1675,13 @@ export class CreateOrEditAppItemComponent
                         this.appItem.variationItems[i].code = this.appItem.code;
                     else this.appItem.variationItems[i].code = "";
                 }
+
+                if(this.appItem?.variationItems[i]?.entityExtraData[j]?.attributeValue ){
                 this.appItem.variationItems[i].code +=
                     "-" +
                     this.appItem?.variationItems[i]?.entityExtraData[j]
                         ?.attributeValue;
+                }
             }
         }
     }
