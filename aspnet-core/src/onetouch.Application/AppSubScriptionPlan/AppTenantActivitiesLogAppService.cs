@@ -546,7 +546,7 @@ namespace onetouch.AppSubScriptionPlan
                     obj.Amount = qty * featureDetail.UnitPrice;
                     obj.Billable = featureDetail.IsFeatureBillable;
                     obj.Invoiced = false;
-                    obj.CreditId = long.Parse(creditId.ToString());
+                    obj.CreditId = creditId!=null? long.Parse(creditId.ToString()): null;
                     obj.InvoiceNumber = "";
                     obj.ConsumedQty = 0;
                     obj.Qty = qty;
