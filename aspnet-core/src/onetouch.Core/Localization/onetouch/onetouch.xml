@@ -2033,7 +2033,6 @@
 		<text name="ProductsCatalogDetailsShow/Hide">Products catalog details show/hide</text>
 		<text name="PrintAndFinish">Print and finish</text>
 		<text name="PreparedForAccount">Prepared for account</text>
-		<text name="EnterAccountName">Enter account name</text>
 		<text name="NoListingsInThisProductList.CannotPrint.">No listings in this product list. Cannot print.</text>
 		<text name="DeleteThisList">Delete this list</text>
 		<text name="EditProductsList">Edit product list</text>
