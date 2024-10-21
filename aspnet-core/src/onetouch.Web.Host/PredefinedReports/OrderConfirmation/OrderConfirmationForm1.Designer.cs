@@ -169,6 +169,7 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.XRLabel label19;
         private DevExpress.XtraReports.UI.XRLabel label17;
         private DevExpress.XtraReports.UI.XRLabel label16;
+        private DevExpress.XtraReports.UI.XRLabel label50;
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow2;
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow3;
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow1;
@@ -230,16 +231,6 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.UI.XRLabel label45;
         private DevExpress.XtraReports.UI.XRLabel label46;
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
-        private DevExpress.XtraReports.UI.XRLabel label46;
-        private DevExpress.XtraReports.UI.XRLabel label45;
-        private DevExpress.XtraReports.UI.XRLabel label43;
-        private DevExpress.XtraReports.UI.XRLabel label44;
-        private DevExpress.XtraReports.UI.XRLabel label34;
-        private DevExpress.XtraReports.UI.XRLabel label38;
-        private DevExpress.XtraReports.UI.XRLabel label37;
-        private DevExpress.XtraReports.UI.XRLabel label36;
-        private DevExpress.XtraReports.UI.XRLabel label35;
-        private DevExpress.XtraReports.UI.XRLabel label39;
         private DevExpress.XtraReports.UI.CalculatedField calculatedField1;
         private DevExpress.XtraReports.Parameters.Parameter TransactionId;
         private DevExpress.XtraReports.Parameters.Parameter attachmentBaseUrl;
