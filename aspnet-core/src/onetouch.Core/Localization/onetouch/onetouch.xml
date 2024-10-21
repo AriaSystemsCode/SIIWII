@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>    <text name="AppFeatureDescription">App feature description</text>
+	<texts>
+    <text name="AppFeatureDescription">App feature description</text>
     <text name="PickAppFeature">Pick app feature</text>
 
     <text name="SycCurrencyExchangeRates">Currency Exchange Rate</text>
