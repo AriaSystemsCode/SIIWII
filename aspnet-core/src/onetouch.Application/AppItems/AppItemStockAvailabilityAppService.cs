@@ -304,7 +304,7 @@ namespace onetouch.AppItems
                                join i in _appItemRepository.GetAll().AsNoTracking().Include(x => x.ParentFk).Where(x => x.ItemType == 0)
                                on r.Code.Replace(" ", string.Empty) equals i.Code.Replace(" ", string.Empty) into j1
                                from j in j1
-                               select new { item = j, code = j.Code.Replace(" ", string.Empty), parentCode = j.ParentFk.Code };
+                               select new { item = j, code = j.Code.Replace(" ", string.Empty), parentCode = (j.ParentFk !=null ? j.ParentFk.Code : null) };
 
 
                 var resJoin = resJoin1.ToList().OrderBy(z => z.code);
