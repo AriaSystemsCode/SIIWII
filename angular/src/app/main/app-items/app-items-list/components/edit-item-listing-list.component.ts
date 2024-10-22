@@ -82,7 +82,7 @@ export class EditItemListingListComponent
     canDelete: boolean;
     isRecordOwner: boolean;
     StateEnum = StateEnum;
-
+    visible:boolean = false
     constructor(
         injector: Injector,
         _location: Location,
@@ -667,5 +667,10 @@ export class EditItemListingListComponent
                 console.log(">>", res);
                 this.getAppItemListForEdit()
             });
+    }
+
+
+    sync() {
+
     }
 }

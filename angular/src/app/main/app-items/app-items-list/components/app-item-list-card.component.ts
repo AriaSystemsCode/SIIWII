@@ -28,6 +28,7 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
     canEdit : boolean
     canPrint : boolean
     canDelete : boolean
+    visible:boolean = false
     constructor(
         injector:Injector,
         private _appItemsListsServiceProxy: AppItemsListsServiceProxy,
@@ -66,6 +67,9 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
     unPublish(){
         if (!this.canPublish) return
         this.unPublishMe.emit()
+    }
+    sync() {
+
     }
 
 }

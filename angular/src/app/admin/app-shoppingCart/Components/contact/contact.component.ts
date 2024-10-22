@@ -42,6 +42,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     defaultcontactNamePlaceholder: string = "Select Contact Name";
     contactFilterValue: string = "";
     filteredContacts :any[]=[]
+    filteredBranches :any[]=[]
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -136,7 +137,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
     }
 
-    onChangeCompany() {
+    onChangeCompany(event) {
         var tempContact:boolean=false;
         
         if (this.tempAccount && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany) {
@@ -510,11 +511,13 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
 
-    handleCompanySearch($event) {
+    handleCompanySearch(event) {
+        console.log(event,'eveny')
+        console.log(event.query,'query')
         setTimeout(() => {
             this._AppTransactionServiceProxy
                 .getRelatedAccounts(
-                    $event.filter,
+                    event.query,
                     undefined,
                     undefined,
                     undefined,
@@ -537,11 +540,24 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 )
                 .subscribe((res: any) => {
                     this.companeyNames = [...res.items];
-                    // this.sellerCompanies = [...res.items];
+                    // this.filteredContacts = this.companeyNames.filter(contact =>
+                    //     contact.name.toLowerCase().includes(event.query.toLowerCase())
+                    // );
+                    // // this.sellerCompanies = [...res.items];
                 });
         }, 1000);
     }
+    handleBranchSearch(event){
+    this._AppTransactionServiceProxy.getAccountBranches(this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN).subscribe(result => {
+        this.allBranches = result;
+        console.log(this.allBranches,'braaaanchhh')
+        this.filteredBranches = this.allBranches.filter(contact =>
+            contact.name.toLowerCase().includes(event.query.toLowerCase())
+        );
 
+    
+    });
+}
     ngDoCheck() {
         this.isValidForm();
     }

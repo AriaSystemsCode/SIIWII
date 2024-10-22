@@ -20,14 +20,19 @@ $default-font-weight: 400;
     background-size: contain;
     background-image: url("../../../../../assets/placeholders/card-placeholder.png");
     position: relative;
+    background-image: initial;
     .count {
         position: absolute;
         left: 0;
-        bottom: 0;
-        background-color: $primary-color;
+        bottom: 4px;
+        background-color: #4A0D4A;
         color: $white;
-        padding: 5px;
+        // padding: 5px;
+        padding-top: 2px;
         border-radius: 4px;
+        width: 24px;
+        height: 24px;
+        text-align: center;
     }
 }
 
@@ -85,6 +90,7 @@ a.btn {
         align-items: center;
         justify-content: start;
         gap: 5px;
+        margin-bottom: 5px;
     }
     .private-dot{
         border-radius: 50%;
@@ -108,3 +114,75 @@ a.btn {
         padding-top: 3px;
     }
 }
+
+
+.viewBtn {
+
+padding: 10.05px 21.1px;
+color: #4A0D4A;
+background: #FFFFFF;
+border: 1px solid rgba(238, 238, 238, 0.933333);
+border-radius: 6px;
+
+
+}
+.item-text {
+white-space: nowrap;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+
+
+color: #595959;
+
+
+}
+
+::ng-deep {
+    .p-progressbar .p-progressbar-value {
+        border: 0 none;
+        margin: 0;
+        background: #4A0D4A !important;
+      }
+    .p-dialog {
+
+
+padding: 24px 24px 32px !important;
+min-width: 350px !important;
+height: 214.5px !important;
+
+background: #FFFFFF !important;
+border: 1px solid #EEEEEE !important;
+box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15) !important;
+border-radius: 10px !important;
+
+      }
+        .p-dialog .p-dialog-header {
+          border:  none !important;
+          background: white !important;
+          padding: 0 !important;
+        }
+
+
+ 
+
+}
+.p-button-no {
+    color: #4A0D4A !important;
+    border-radius: 8px !important;
+background: #FFF !important;
+box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25) !important;
+border:  none !important;
+display: flex !important;
+padding: 8px 32px !important;
+align-items: center !important;
+}
+.msg-text {
+    font-weight: 700 !important;
+    font-size: 22px !important;
+    line-height: 36px !important;
+    
+    color: #1B101B !important;
+    
+    
+        }
