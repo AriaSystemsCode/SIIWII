@@ -43,6 +43,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     contactFilterValue: string = "";
     filteredContacts :any[]=[]
     filteredBranches :any[]=[]
+    createManual: boolean = false;
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,

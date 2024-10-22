@@ -19,7 +19,7 @@
                     [dropdown]="true"
                     [suggestions]="companeyNames"  
                     [ngModelOptions]="{standalone: true}"
-                  
+                     
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     (completeMethod)="handleCompanySearch($event)"
                     (onSelect)="onChangeCompany($event)"
@@ -208,6 +208,7 @@
             name="istemp"
             class="m-2"
             formControlName="istemp"
+            [(ngModel)]="createManual"
          
         />
         <div class="tooltip-container">

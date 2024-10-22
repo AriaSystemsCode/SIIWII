@@ -60,3 +60,15 @@ border-radius: 10px;
     visibility: visible;
     opacity: 1;
 }
+
+
+:host ::ng-deep .tempCon .p-inputtext {
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-right: 1px solid #e2e5ec !important;
+    width: 100% !important;
+}
+:host ::ng-deep .tempCon .p-inputtext:enabled:focus {
+    border: 1px solid #e2e5ec !important;
+    border-right: 1px solid #e2e5ec !important;
+}

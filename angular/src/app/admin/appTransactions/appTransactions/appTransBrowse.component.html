@@ -203,20 +203,34 @@
                             </div>
 
                             <div class="row mb-2 ">
-                                <div class="col-sm-12 d-flex justify-content-end">
+                                <div class="col-sm-12 d-flex justify-content-between">
+                                    <div>
+                                        <button id="monthlybtn" class="mr-2" [ngClass]="{'period-btn': !showHeader, 'selected-month-btn': showHeader}"
+                                        (click)="showDetails = false;showHeader = true">
+                                            Header
+                                        </button>
+                                        <button id="yearlybtn" [ngClass]="{'period-btn': showHeader, 'selected-year-btn': !showHeader}"
+                                        (click)="showHeader = false;showDetails = true">
+                                            Details
+                                        </button>
+                               
+                                    </div>
                                     <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown"
                                         (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
                                             class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
                                     <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown"
                                         (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
                                             class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+
+
+                                            
                                 </div>
                             </div>
                         </div>
                         </div>
                     </form>
 
-                    <div class="row align-items-center pt-5  mt-4">
+                    <div  class="row align-items-center pt-5  mt-4" [ngClass]="showHeader ? 'd-block' : 'd-none' ">
                         <!--<Primeng-Datatable-Start>-->
 
 
@@ -430,6 +444,31 @@
                             </div>
                         </div>
                         <!--<Primeng-Datatable-End>-->
+                    </div>   
+
+                    <div class="row align-items-center pt-5  mt-4" [ngClass]="showDetails ? 'd-block' : 'd-none' " >
+                        <p-table [value]="products" selectionMode="single" [(selection)]="selectedProduct" dataKey="code" [tableStyle]="{'min-width': '50rem'}">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-product>
+                                <tr [pSelectableRow]="product">
+                                    <td>{{product.code}}</td>
+                                    <td>{{product.name}}</td>
+                                    <td>{{product.category}}</td>
+                                    <td>{{product.quantity}}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                    <div>
+                        
+
                     </div>
                 </div>
             </div>
