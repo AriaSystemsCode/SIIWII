@@ -67,7 +67,8 @@
 .leftImage img {
     cursor: pointer;
     width: 100%;
-    height: 100%;
+    height: auto;
+    display: block;
 }
 .center-dev {
     align-items: center;
