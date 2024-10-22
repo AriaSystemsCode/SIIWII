@@ -37,5 +37,6 @@ namespace onetouch.AppSiiwiiTransaction
         Task<string> GetUserDefaultRole(string transType);
         Task<Byte[]> GetTransactionOrderConfirmation(long transactionId);
         Task<bool> IsManualCompany(string companySSIN);
+        Task<List<DataView>> GetAppTransactionVariationsDetail(long transactionId);
     }
 }

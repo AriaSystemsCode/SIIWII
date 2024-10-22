@@ -5409,6 +5409,44 @@ namespace onetouch.AppSiiwiiTransaction
                 return returnCode;
             }
         }
+        public async Task<List<DataView>> GetAppTransactionVariationsDetail(long transactionId)
+        {
+            List<DataView> returnList = new List<DataView>();
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var transDetail = await _appTransactionDetails.GetAll().Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
+                  .Where(a => a.TransactionId == transactionId && a.ParentId!= null).ToListAsync();
+                if (transDetail != null && transDetail.Count() > 0)
+                {
+                    foreach (var variation in transDetail)
+                    {
+                        DataView sizeColorDetailView = new DataView();
+                        sizeColorDetailView.LineId = variation.Id;
+                        sizeColorDetailView.code = variation.Code;
+                        sizeColorDetailView.ManufacturerCode = variation.ManufacturerCode;
+                        sizeColorDetailView.name = variation.Name;
+                        sizeColorDetailView.Qty = variation.Quantity;
+                        sizeColorDetailView.NoOfPrePacks = (variation.NoOfPrePacks == null ? 0 : (long)variation.NoOfPrePacks);
+
+                        sizeColorDetailView.Price = variation.NetPrice;
+                        sizeColorDetailView.Amount = variation.Amount;
+                        sizeColorDetailView.Image = "";
+
+                        if (variation.EntityAttachments.Count() > 0)
+                        {
+                            var lineAttachmentDefault = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
+                            var lineAttachment = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
+                            sizeColorDetailView.Image = (lineAttachmentDefault == null ?
+                                       (lineAttachment != null ? "attachments/" + variation.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
+                                        : "attachments/" + (variation.TenantId.HasValue ? variation.TenantId : -1) + "/" +
+                                        lineAttachmentDefault.AttachmentFk.Attachment);
+                        }
+                        returnList.Add(sizeColorDetailView);
+                    }
+                }
+            }
+            return returnList;
+        }
     }
 
 }
