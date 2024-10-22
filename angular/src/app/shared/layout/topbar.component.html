@@ -560,7 +560,7 @@
             <!-- Collapsible wrapper -->
 
             <!-- Left links -->
-            <ul class="navbar-nav bottom-navbar ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav bottom-navbar ms-auto my-2 mb-lg-0">
                 <li class="nav-item pt-2">
                     <a
                         class="navbar-brand pt-0 navbar-brand-sm"
@@ -638,7 +638,7 @@
                                         "
                                     >
                                         {{ unreadMessageCount }}
-                                        ali ali
+                                     
                                     </span>
                                 </div>
                             </span>
@@ -664,6 +664,20 @@
                     </a>
                 </li>
 
+                <li class="nav-item pt-2 ">
+                    <a class="nav-link active d-flex flex-column text-center" (click)="visible = true">
+                        <img
+                        style="width: 25px;"
+                        class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle"
+                        alt="Pic"
+                        [src]="
+                        profilePicture
+                            ? profilePicture
+                            : 'assets/common/images/default-profile-picture.png'
+                    "
+                    />
+                    </a>
+                </li>
                 <!--  <li class="nav-item pt-1">
             <a class="nav-link active d-flex flex-column text-center">
                 <div
@@ -942,3 +956,33 @@
 <app-shopping-cart-view-component #shoppingCartModal  (refreshShoppingCartData)="getShoppingCartInfo()" ></app-shopping-cart-view-component>
 
 <createTransactionModal *ngIf="!isHost"   (modalClose)="closeModal($event)" (refreshShoppingCartData)="getShoppingCartInfo()" [roles]="roles" [modalheaderName]="modalheaderName" [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"   ></createTransactionModal>
+
+
+<p-dialog
+    [style]="{ width: '40vw' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
+    [baseZIndex]="10000"
+    [modal]="true"
+    
+    [(visible)]="visible"
+    [draggable]="false"
+    [closable]="true"
+    position="bottom"
+   
+>
+
+
+<li class="kt-nav__item p-4 log-li">
+    <a
+        class="kt-nav__link"
+        (click)="logout();visible = false"
+    >
+        <span class="kt-nav__link-icon">
+        <img              src="../../../assets/icons/log-out-02.svg" alt="" srcset="">
+        </span>
+        <span class="kt-nav__link-text log-txt">
+            {{ "Logout" | localize }}
+        </span>
+    </a>
+</li>
+</p-dialog>

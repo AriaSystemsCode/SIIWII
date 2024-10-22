@@ -188,8 +188,22 @@ right: 30px;
     color: #f6851d;
     font-weight: bold;
 }
-
+.log-li {
+    border-top: 1px solid #EEE;
+    border-bottom: 1px solid #EEE;
+}
 ::ng-deep {
+    .p-dialog {
+        border-radius: 12px;
+      border: 1px solid #EEE;
+      background: #FFF;
+      padding: 24px 24px 32px 24px;
+      box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.15);
+      }
+        .p-dialog .p-dialog-header {
+          border:  none !important;
+          background-color: #fff !important;
+        }
     .p-menu .p-submenu-header {
         display: none !important;
     }
@@ -204,7 +218,13 @@ right: 30px;
         width: 100% !important;
     }
 }
-
+.log-txt {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    margin-left: 5px;
+    color: #595959 !important;
+}
 .wrapper {
     padding: 0px 10px;
     .user {
