@@ -61,6 +61,7 @@ using onetouch.EntityFrameworkCore.Repositories;
 using onetouch.SycSegmentIdentifierDefinitions.Dtos;
 using onetouch.Authorization.Accounts;
 using onetouch.Accounts;
+using onetouch.SycIdentifierDefinitions;
 
 
 //using NUglify.Helpers;
@@ -108,6 +109,7 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
         private readonly IRepository<SycEntityObjectClassification, long>  _sycEntityObjectClassificationRepository;
         private readonly IAccountsAppService _accountAppService;
+        private readonly ISycIdentifierDefinitionsAppService _sycIdentifierDefinitionsAppService;
         //MMT37[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -129,8 +131,9 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppEntitySharings, long> appEntitySharingsRepository, IMessageAppService messageAppService, IRepository<AppEntityAttachment, long> appEntityAttachment,
              IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender,IAppEntitiesAppService appEntitiesAppService, 
              IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
-             IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
+             IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService)
         {
+            _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
             _accountAppService = accountAppService;
             _sycEntityObjectClassificationRepository = sycEntityObjectClassificationRepository;
             _sycEntityObjectCategory = sycEntityObjectCategory;
@@ -242,6 +245,76 @@ namespace onetouch.AppSiiwiiTransaction
                     var buyerAccountProfile = await _appContactRepository.GetAll().Where(z => z.TenantId != null && z.IsProfileData == true && z.SSIN == input.BuyerCompanySSIN && z.PartnerId == null).FirstOrDefaultAsync();
                     if (buyerAccountProfile != null)
                         buyerTenantId = buyerAccountProfile.TenantId;
+                }
+            }
+            if (input.lFromPlaceOrder)
+            {
+                //I45
+                if (input.TransactionType == TransactionType.SalesOrder)
+                {
+                    var buyerContact = input.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Buyer).FirstOrDefault();
+                    if (buyerContact != null && string.IsNullOrEmpty(buyerContact.CompanySSIN) && input.CreateManualAccount)
+                    {
+                        CreateOrEditAccountInfoDto accountInput = new CreateOrEditAccountInfoDto();
+                        accountInput.PriceLevel = input.PriceLevel;
+                        accountInput.CurrencyId = input.CurrencyId;
+                        accountInput.LanguageId = input.LanguageId;
+                        accountInput.Name = buyerContact.CompanyName;
+                        accountInput.Phone1TypeId = buyerContact.ContactPhoneTypeId;
+                        accountInput.Phone1Number = buyerContact.ContactPhoneNumber;
+                        accountInput.TenantId = AbpSession.TenantId;
+                        accountInput.ReturnId = true;
+                        var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                        if (tenantObj != null)
+                        {
+                            string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("TENANTCONTACT");
+                            accountInput.Code = tenantObj.TenancyName.Trim() + "-M" + sequance;
+                        }
+                        accountInput.AccountLevel = AccountLevelEnum.Manual;
+                        var businessType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+                        if (businessType != null)
+                        {
+                            accountInput.AccountTypeId = businessType.Id;
+                            accountInput.AccountType = businessType.Code;
+                        }
+                        // var accountSSIN = await CreateManualAccount(accountInput);
+                        var account = await _accountAppService.CreateOrEditAccount(accountInput);
+                        if (account != null && account.AccountInfo != null && account.AccountInfo.Id != 0)
+                        {
+                            input.BuyerCompanySSIN = account.AccountInfo.SSIN;
+                            buyerContact.CompanySSIN = account.AccountInfo.SSIN;
+                        }
+
+                    }
+                    if (buyerContact != null && !string.IsNullOrEmpty(buyerContact.CompanySSIN) && string.IsNullOrEmpty(buyerContact.ContactSSIN) && (input.CreateManualAccount || input.CreateManualContact))
+                    {
+                        var accountObj = await _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.SSIN == input.BuyerCompanySSIN).FirstOrDefaultAsync();
+                        ContactDto contactDto = new ContactDto();
+                        contactDto.AccountId = accountObj.Id;
+                        contactDto.Name = buyerContact.ContactName;
+                        contactDto.FirstName = buyerContact.ContactName;
+                        contactDto.LastName = buyerContact.ContactName;
+                        contactDto.EMailAddress = buyerContact.ContactEmail;
+                        contactDto.UserId = null;
+                        contactDto.UserName = null;
+                        contactDto.TradeName = "";
+                        contactDto.Phone1TypeId = buyerContact.ContactPhoneTypeId;
+                        contactDto.Phone1Number = buyerContact.ContactPhoneNumber;
+                        contactDto.TenantId = AbpSession.TenantId;
+                        contactDto.ParentId = accountObj.Id;
+                        var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                        if (tenantObj != null)
+                        {
+                            string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("MANUALACCOUNTCONTACT");
+                            contactDto.Code = tenantObj.TenancyName.Trim() + "-C" + sequance;
+                        }
+                        ContactDto savedContactDto = await _accountAppService.CreateOrEditContact(contactDto);
+                        if (savedContactDto != null)
+                        {
+                            input.BuyerContactSSIN = savedContactDto.SSIN;
+                            buyerContact.ContactSSIN = savedContactDto.SSIN;
+                        }
+                    }
                 }
             }
             if (input.Id == 0)
@@ -370,7 +443,11 @@ namespace onetouch.AppSiiwiiTransaction
                     appTrans.PaymentTermsName = appTrans.PaymentTermsFk.Name;
                 //Iteration#37 -MMT [End]
                 if (input.lFromPlaceOrder)
+                {
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                  
+                }
+                //I45
                 else
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
 
@@ -1229,29 +1306,7 @@ namespace onetouch.AppSiiwiiTransaction
                 //XX
                 if (input.lFromPlaceOrder)
                 {
-                    //XX
-                    if (string.IsNullOrEmpty(input.BuyerCompanySSIN) && input.CreateManualAccount)
-                    {
-                        CreateOrEditAccountInfoDto account = new CreateOrEditAccountInfoDto();
-                        account.PriceLevel = input.PriceLevel;
-                        account.CurrencyId = input.CurrencyId;
-                        account.LanguageId = input.LanguageId;
-                        account.Name = input.BuyerCompanyName;
-                        account.TenantId = AbpSession.TenantId;
-                        var businessType =await _helper.SystemTables.GetEntityObjectTypeParetner();
-                        if (businessType != null)
-                        {
-                            account.AccountTypeId = businessType.Id;
-                            account.AccountType = businessType.Code;
-                        }
-                        var accountId =  await CreateManualAccount(account);
-                        if (accountId != null && accountId != 0)
-                        { 
-                            //_acc
-                        }
-                        //account.Code = 
-                    }
-                    //XX
+                  
                     await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == appTrans.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
                     if (buyerTenantId != null)
                     {
@@ -5474,14 +5529,14 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return returnList;
         }
-        public async Task<long> CreateManualAccount(CreateOrEditAccountInfoDto manualAccountInfo)
+        public async Task<string> CreateManualAccount(CreateOrEditAccountInfoDto manualAccountInfo)
         {
             var account =  await _accountAppService.CreateOrEditAccount(manualAccountInfo);
-            if (account.AccountInfo.Id != 0)
+            if (account != null && account.AccountInfo!=null && account.AccountInfo.Id != 0)
             {
-                return long.Parse(account.AccountInfo.Id.ToString());
+                return account.AccountInfo.SSIN;
             }
-            return 0;
+            return "";
         }
     }
 
