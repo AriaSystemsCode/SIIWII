@@ -59,6 +59,8 @@ using System.Net.Mail;
 using Abp.Net.Mail;
 using onetouch.EntityFrameworkCore.Repositories;
 using onetouch.SycSegmentIdentifierDefinitions.Dtos;
+using onetouch.Authorization.Accounts;
+using onetouch.Accounts;
 
 
 //using NUglify.Helpers;
@@ -105,6 +107,7 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
         private readonly IRepository<SycEntityObjectClassification, long>  _sycEntityObjectClassificationRepository;
+        private readonly IAccountsAppService _accountAppService;
         //MMT37[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -125,9 +128,10 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionContacts, long> appMarketplaceTransctionContactsRepository,
              IRepository<AppEntitySharings, long> appEntitySharingsRepository, IMessageAppService messageAppService, IRepository<AppEntityAttachment, long> appEntityAttachment,
              IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender,IAppEntitiesAppService appEntitiesAppService, 
-             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository,
+             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
         {
+            _accountAppService = accountAppService;
             _sycEntityObjectClassificationRepository = sycEntityObjectClassificationRepository;
             _sycEntityObjectCategory = sycEntityObjectCategory;
             _appEntitiesAppService = appEntitiesAppService;
@@ -1225,6 +1229,29 @@ namespace onetouch.AppSiiwiiTransaction
                 //XX
                 if (input.lFromPlaceOrder)
                 {
+                    //XX
+                    if (string.IsNullOrEmpty(input.BuyerCompanySSIN) && input.CreateManualAccount)
+                    {
+                        CreateOrEditAccountInfoDto account = new CreateOrEditAccountInfoDto();
+                        account.PriceLevel = input.PriceLevel;
+                        account.CurrencyId = input.CurrencyId;
+                        account.LanguageId = input.LanguageId;
+                        account.Name = input.BuyerCompanyName;
+                        account.TenantId = AbpSession.TenantId;
+                        var businessType =await _helper.SystemTables.GetEntityObjectTypeParetner();
+                        if (businessType != null)
+                        {
+                            account.AccountTypeId = businessType.Id;
+                            account.AccountType = businessType.Code;
+                        }
+                        var accountId =  await CreateManualAccount(account);
+                        if (accountId != null && accountId != 0)
+                        { 
+                            //_acc
+                        }
+                        //account.Code = 
+                    }
+                    //XX
                     await _appShoppingCartRepository.DeleteAsync(s => s.TransactionId == appTrans.Id && s.TenantId == AbpSession.TenantId && s.CreatorUserId == AbpSession.UserId);
                     if (buyerTenantId != null)
                     {
@@ -5446,6 +5473,15 @@ namespace onetouch.AppSiiwiiTransaction
                 }
             }
             return returnList;
+        }
+        public async Task<long> CreateManualAccount(CreateOrEditAccountInfoDto manualAccountInfo)
+        {
+            var account =  await _accountAppService.CreateOrEditAccount(manualAccountInfo);
+            if (account.AccountInfo.Id != 0)
+            {
+                return long.Parse(account.AccountInfo.Id.ToString());
+            }
+            return 0;
         }
     }
 
