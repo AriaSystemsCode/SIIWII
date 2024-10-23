@@ -6,22 +6,31 @@
             [styleClass]="'purple-selection'" [ngStyle]="{'right.px': !singleItemPerRowMode ? 50 : 0}"></p-inputSwitch>
     </div>
 
-    <div class="single-item-photo" #photoDiv (click)="viewItemHandler()">
-        <img class="w-100" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl" alt="" style="height: 300px;"
-            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"   [ngStyle]="{ 'height.px': photoDiv.clientHeight }" />
+    <div class="single-item-photo" #photoDiv (click)="viewItemHandler()"
+    [ngStyle]="{'width': singleItemPerRowMode ? '215px' : 'auto'}"
+    >
+        <img class="w-100" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl" alt=""
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"  
+            [ngStyle]="{'height.px': singleItemPerRowMode ? bodyDiv.clientHeight : 200 }" />
     </div>
-    <div class="single-item-body col d-flex position-static p-0 pl-2">
+    <div class="single-item-body col d-flex position-static p-0 pl-2" #bodyDiv
+         [ngStyle]="{'height': singleItemPerRowMode ? 'fit-content' : 'auto'}"
+    >
         <div class="row w-100">
 
             <div class="pl-2 pr-0 pt-3 w-100"
                 [ngStyle]="{'margin-right.px':browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections ? 0 : 0}">
 
-                <div class="row d-flex justify-content-between p-3  flex-nowrap">
+                <div class="d-flex  p-3  flex-nowrap"
+                [ngClass]="{ 'justify-content-between': !singleItemPerRowMode }"
+                >
                     <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" style="white-space: nowrap;" (click)="viewItemHandler()">
                         {{item.appItem.code | textSubstring:6}}
                     </h4>
-                    <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;" *ngIf="!singleItemPerRowMode">
-                        <div class="price pt-2" style="float: right;
+                    <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;">
+                        <div class="price pt-2" 
+                        [ngClass]="{ 'pl-5 ml-5': singleItemPerRowMode }"
+                         style="float: right;
                         clear: both;">
                             {{ "MSRP" | localize }}:
                             {{ tenantDefaultCurrency.symbol
@@ -30,14 +39,14 @@
                     </h6>
                 </div>
 
-                <p class="mb-2 product-name pl-2" style="color: #9E9E9E;">
+                <p class="mb-2 product-name pl-3" style="color: #9E9E9E;">
                     {{ item?.appItem?.name | textSubstring: 60 }}
                 </p>
 
                
 
-                <div class="row pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode &&  item.entityObjectCategoryNames?.length >  0 ">
-                    <p class="pt-2 product-name pl-2" style="color: #9E9E9E;">
+                <div class="pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode &&  item.entityObjectCategoryNames?.length >  0 ">
+                    <p class="pt-2 product-name" style="color: #9E9E9E;">
                         Categories:
                     </p>
                     <div class="row details">
@@ -52,8 +61,8 @@
                     </div>
                 </div>
 
-                <div class="row pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode && item?.entityClassificationNames?.length >  0  ">
-                    <p class="pt-2 product-name pl-2" style="color: #9E9E9E;">
+                <div class="pl-3 d-flex flex-nowrap" *ngIf="singleItemPerRowMode && item?.entityClassificationNames?.length >  0  ">
+                    <p class="pt-2 product-name" style="color: #9E9E9E;">
                         Classifications : </p>
                     <div class="row details">
                         <div
