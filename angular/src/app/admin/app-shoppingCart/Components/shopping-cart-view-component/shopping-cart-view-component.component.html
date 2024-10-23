@@ -398,16 +398,7 @@
                                             </ng-template>
                                             <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
                                                 <tr [ttRow]="rowNode">
-                                                    <!--  <td style="width:150px" class="td-tree">
-                                                <p-treeTableToggler [rowNode]="rowNode" class="branch-name"></p-treeTableToggler>
-                                                {{rowData.code}}
-                                            </td>
-                                            <td>{{ rowData.name }}</td>
-                                            <td>{{ rowData.quantity }}</td>
-                                            <td>{{ rowData.price }}</td>
-                                            <td>{{ rowData.amount }}</td>
-                                            <td>{{ rowData.image }}</td> -->
-                                                    <!-- style="white-space: nowrap;  overflow: hidden;" -->
+                                              
                                                     <td *ngFor="let col of cols; let i = index" class="p-treeTable"
                                                         [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                         <p-treeTableToggler [rowNode]="rowNode"
@@ -498,9 +489,101 @@
 
                                                 </tr>
                                             </ng-template>
-
+                                           <ng-template>
+                                            
+                                           </ng-template>
                                         </p-treeTable>
+                                        <button (click)="addNewLine()" class="addNbtn">
+                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M2.5 2.5V5M2.5 5V8.33333C2.5 8.77536 2.67559 9.19928 2.98816 9.51184C3.30072 9.8244 3.72464 10 4.16667 10H7.5M2.5 5H7.5M17.5 2.5V5M17.5 5V8.33333C17.5 8.77536 17.3244 9.19928 17.0118 9.51184C16.6993 9.8244 16.2754 10 15.8333 10H7.5M17.5 5H7.5M7.5 10V5M7.5 5V2.5M12.5 2.5V10M10 12.5V15M10 15V17.5M10 15H12.5M10 15H7.5" stroke="#777777" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                                <span> Add new line</span>
+                                        </button>
+
+
+                                        <div  class="" style="display: flex; justify-content: space-evenly;gap: 30px;">
+                                            <div class="mb-3 w-100">
+                                                <label for="" class="form-label"
+                                                    >Product Variation Code</label
+                                                >
+                                                    <div>
+                                                        <p-dropdown
+                                                     
+                                                        [virtualScroll]="true" [itemSize]="30"
+                                                        
+                                                            [filter]="true"
+                                                            optionLabel="name"
+                                                            placeholder="Please Select "
+                                                         
+                                                        ></p-dropdown>
+                                                    </div>
+                                              
+                                    
+                                                             
+                                                            </div>
+                                                  
+                                   
+                        
+                                            <div class="mb-3 w-100">
+                                                <label for="" class="form-label"
+                                                    >Quantity</label
+                                                >
+                                                    <div>
+                                                        <input
+                                                        type="text"
+                                                        name=""
+                                                        id=""
+                                                        
+                                                        class="form-control"
+                                                        placeholder="Enter Qty"
+                                                        />
+                                                    </div>
+                                                   
+                                                            
+                                             </div>
+                                               
+                        
+                        
+                        
+                                                        <div class="mb-3 w-100">
+                                                            <label for="" class="form-label"
+                                                                >Price</label
+                                                            >
+                                                                <div>
+                                                                    <p-dropdown
+                                                                  
+                                                                    [virtualScroll]="true" [itemSize]="30"
+                                                                   
+                                                                      
+                                                                        [filter]="true"
+                                                                        optionLabel="name"
+                                                                        placeholder="$"
+                                                                   
+                                                                    ></p-dropdown>
+                                                                </div>
+                                                               
+                                                                        </div>
+    
+    
+    
+                                                                        
+                                                        <div class="mb-3 w-100">
+                                                            <label for="" 
+                                                                >Amout</label
+                                                            >
+                                                                <div>
+                                                                <p>100</p>
+                                                                </div>
+                                                               
+                                                                        </div>
+                                                               
+                        
+                                                                    </div>
                                     </div>
+
+
+
+                            
                                 </div>
                             </div>
                         </p-accordionTab>
@@ -1093,6 +1176,12 @@ height: 48px;"
                                         </ng-template>
 
                                     </p-treeTable>
+                                    <button class="addNbtn">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2.5 2.5V5M2.5 5V8.33333C2.5 8.77536 2.67559 9.19928 2.98816 9.51184C3.30072 9.8244 3.72464 10 4.16667 10H7.5M2.5 5H7.5M17.5 2.5V5M17.5 5V8.33333C17.5 8.77536 17.3244 9.19928 17.0118 9.51184C16.6993 9.8244 16.2754 10 15.8333 10H7.5M17.5 5H7.5M7.5 10V5M7.5 5V2.5M12.5 2.5V10M10 12.5V15M10 15V17.5M10 15H12.5M10 15H7.5" stroke="#777777" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            <span> Add new line</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>

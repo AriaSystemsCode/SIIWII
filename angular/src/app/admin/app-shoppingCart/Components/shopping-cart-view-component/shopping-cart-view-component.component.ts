@@ -1,6 +1,7 @@
 import {
   Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild
   , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
@@ -92,7 +93,8 @@ export class ShoppingCartViewComponentComponent
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     private userClickService: UserClickService,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     super(injector);
 
@@ -916,6 +918,20 @@ this.hideMainSpinner();
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
-
+addNewLine() {
+  this.shoppingCartTreeNodes.push({
+    data: {
+        manufacturerCode: '',
+        name: '',
+        qty: '',
+        price: '',
+        amount: '',
+        image: ''
+    },
+    children: [], // No children, since this is a parent node,
+    leaf: true  // Indicates it’s a parent and currently has no children
+});
+this.cdr.detectChanges();
+}
 
 }

@@ -446,8 +446,8 @@
                         <!--<Primeng-Datatable-End>-->
                     </div>   
 
-                    <div class="row align-items-center pt-5  mt-4" [ngClass]="showDetails ? 'd-block' : 'd-none' " >
-                        <p-table [value]="variationDetails" selectionMode="single" [(selection)]="selectedProduct" dataKey="code" [tableStyle]="{'min-width': '50rem'}">
+                    <div class="row align-items-center pt-5  mt-4 detailTab" [ngClass]="showDetails ? 'd-block' : 'd-none' " >
+                        <p-table [value]="variationDetails"  dataKey="code" [tableStyle]="{'min-width': '50rem'}">
                             <ng-template pTemplate="header">
                                 <tr>
                                     <th>     {{l('TransactionType')}}</th>
@@ -464,7 +464,7 @@
                                 <tr [pSelectableRow]="product">
                                     <td>{{product.code}}</td>
                                     <td>{{product.name}}</td>
-                                    <td>{{product.image}}</td>
+                                    <td> <img [src]=" product.image" alt="" srcset="" class="itemImg"      onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
                                     <td>{{product.code}}</td>
                                     <td>{{product.name}}</td>
                                     <td>{{product.qty}}</td>

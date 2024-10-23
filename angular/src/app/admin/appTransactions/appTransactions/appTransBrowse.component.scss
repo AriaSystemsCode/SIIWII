@@ -125,14 +125,25 @@ font-weight: 700;
 color: #FFFFFF;
 
   }
-::ng-deep {
+::ng-deep .detailTab {
     .p-datatable .p-datatable-thead > tr > th {
         border: 1px solid #E5E5E5 !important;
         font-weight: 700 !important;
         color: #1B101B !important;
+        text-align: center;
+
     }
     .p-datatable .p-datatable-tbody > tr > td {
         border: 1px solid #E5E5E5 !important;
         font-weight: 400 !important;
+        text-align: center;
     }
+}
+
+.itemImg {
+
+width: 50px;
+height: 50px;
+border-radius: 12px;
+
 }
