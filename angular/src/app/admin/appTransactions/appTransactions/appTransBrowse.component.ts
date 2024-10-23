@@ -52,6 +52,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
     products:any
     selectedProduct: any;
+    variationDetails: any[];
+
     constructor(
         injector: Injector,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
@@ -103,6 +105,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     ngOnInit(): void {
         this.setPageMainFilters();
         this.initFilterForm();
+        this.getVariationDetail()
         // this.getAppTransactions();
     }
     initFilterForm() {
@@ -265,6 +268,21 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 this.fullName =
                     this.appSession.user.name + this.appSession.user.surname;
                 this.display = true;
+            });
+    }
+
+
+    getVariationDetail(id?: number) {
+        // this.showMainSpinner();
+        this._appTransactionServiceProxy
+            .getAppTransactionVariationsDetail(419479)
+            .pipe(finalize(() => {
+                // this.hideMainSpinner()
+            }))
+            .subscribe((res: any) => {
+                this.variationDetails = res
+                console.log(res,'detaiiils')
+             
             });
     }
 

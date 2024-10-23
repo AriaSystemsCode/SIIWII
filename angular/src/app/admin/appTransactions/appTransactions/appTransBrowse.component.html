@@ -447,21 +447,29 @@
                     </div>   
 
                     <div class="row align-items-center pt-5  mt-4" [ngClass]="showDetails ? 'd-block' : 'd-none' " >
-                        <p-table [value]="products" selectionMode="single" [(selection)]="selectedProduct" dataKey="code" [tableStyle]="{'min-width': '50rem'}">
+                        <p-table [value]="variationDetails" selectionMode="single" [(selection)]="selectedProduct" dataKey="code" [tableStyle]="{'min-width': '50rem'}">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th>Code</th>
+                                    <th>     {{l('TransactionType')}}</th>
+                                    <th>  {{l('Transaction #')}}</th>
+                                    <th>Image</th>
+                                    <th>Variation Code</th>
                                     <th>Name</th>
-                                    <th>Category</th>
-                                    <th>Quantity</th>
+                                    <th>Qty.</th>
+                                    <th>Price</th>
+                                    <th>Amount</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-product>
                                 <tr [pSelectableRow]="product">
                                     <td>{{product.code}}</td>
                                     <td>{{product.name}}</td>
-                                    <td>{{product.category}}</td>
-                                    <td>{{product.quantity}}</td>
+                                    <td>{{product.image}}</td>
+                                    <td>{{product.code}}</td>
+                                    <td>{{product.name}}</td>
+                                    <td>{{product.qty}}</td>
+                                    <td>{{product.price}}</td>
+                                    <td>{{product.amount}}</td>
                                 </tr>
                             </ng-template>
                         </p-table>

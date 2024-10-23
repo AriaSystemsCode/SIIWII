@@ -21584,63 +21584,6 @@ export class AppTenantSubscriptionPlansServiceProxy {
     }
 
     /**
-     * @param tenantId (optional) 
-     * @return Success
-     */
-    getTenantSubscriptionPlanId(tenantId: number | undefined): Observable<number> {
-        let url_ = this.baseUrl + "/api/services/app/AppTenantSubscriptionPlans/GetTenantSubscriptionPlanId?";
-        if (tenantId === null)
-            throw new Error("The parameter 'tenantId' cannot be null.");
-        else if (tenantId !== undefined)
-            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetTenantSubscriptionPlanId(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetTenantSubscriptionPlanId(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<number>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<number>;
-        }));
-    }
-
-    protected processGetTenantSubscriptionPlanId(response: HttpResponseBase): Observable<number> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
      * @param id (optional) 
      * @return Success
      */
@@ -22044,6 +21987,63 @@ export class AppTenantSubscriptionPlansServiceProxy {
             else {
                 result200 = <any>null;
             }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @return Success
+     */
+    getTenantSubscriptionPlanId(tenantId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppTenantSubscriptionPlans/GetTenantSubscriptionPlanId?";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantSubscriptionPlanId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantSubscriptionPlanId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetTenantSubscriptionPlanId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -24515,6 +24515,126 @@ export class AppTransactionServiceProxy {
     }
 
     protected processGetUserDefaultRole(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param transactionId (optional) 
+     * @return Success
+     */
+    getAppTransactionVariationsDetail(transactionId: number | undefined): Observable<DataView[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAppTransactionVariationsDetail?";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppTransactionVariationsDetail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppTransactionVariationsDetail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<DataView[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<DataView[]>;
+        }));
+    }
+
+    protected processGetAppTransactionVariationsDetail(response: HttpResponseBase): Observable<DataView[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(DataView.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createManualAccount(body: CreateOrEditAccountInfoDto | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/CreateManualAccount";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateManualAccount(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateManualAccount(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processCreateManualAccount(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -78809,6 +78929,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     lFromPlaceOrder!: boolean;
     currencyExchangeRate!: number;
     reference!: string | undefined;
+    createManualAccount!: boolean;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     name!: string | undefined;
@@ -78919,6 +79040,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.lFromPlaceOrder = _data["lFromPlaceOrder"];
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
+            this.createManualAccount = _data["createManualAccount"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.name = _data["name"];
@@ -79055,6 +79177,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["lFromPlaceOrder"] = this.lFromPlaceOrder;
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
+        data["createManualAccount"] = this.createManualAccount;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["name"] = this.name;
@@ -79168,6 +79291,7 @@ export interface IGetAppTransactionsForViewDto {
     lFromPlaceOrder: boolean;
     currencyExchangeRate: number;
     reference: string | undefined;
+    createManualAccount: boolean;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     name: string | undefined;
@@ -79238,6 +79362,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     currencyExchangeRate!: number;
     reference!: string | undefined;
     enteredDate!: moment.Moment;
+    createManualAccount!: boolean;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     name!: string | undefined;
@@ -79329,6 +79454,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
             this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
+            this.createManualAccount = _data["createManualAccount"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.name = _data["name"];
@@ -79446,6 +79572,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
         data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
+        data["createManualAccount"] = this.createManualAccount;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["name"] = this.name;
@@ -79544,6 +79671,7 @@ export interface ICreateOrEditAppTransactionsDto {
     currencyExchangeRate: number;
     reference: string | undefined;
     enteredDate: moment.Moment;
+    createManualAccount: boolean;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     name: string | undefined;
@@ -79818,6 +79946,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     lFromPlaceOrder!: boolean;
     currencyExchangeRate!: number;
     reference!: string | undefined;
+    createManualAccount!: boolean;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     name!: string | undefined;
@@ -79937,6 +80066,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.lFromPlaceOrder = _data["lFromPlaceOrder"];
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
+            this.createManualAccount = _data["createManualAccount"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.name = _data["name"];
@@ -80082,6 +80212,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["lFromPlaceOrder"] = this.lFromPlaceOrder;
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
+        data["createManualAccount"] = this.createManualAccount;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["name"] = this.name;
@@ -80204,6 +80335,7 @@ export interface IGetAllAppTransactionsForViewDto {
     lFromPlaceOrder: boolean;
     currencyExchangeRate: number;
     reference: string | undefined;
+    createManualAccount: boolean;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     name: string | undefined;
@@ -80610,6 +80742,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     currencyExchangeRate!: number;
     reference!: string | undefined;
     enteredDate!: moment.Moment;
+    createManualAccount!: boolean;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     code!: string | undefined;
@@ -80720,6 +80853,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
             this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
+            this.createManualAccount = _data["createManualAccount"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.code = _data["code"];
@@ -80856,6 +80990,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
         data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
+        data["createManualAccount"] = this.createManualAccount;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["code"] = this.code;
@@ -80961,6 +81096,7 @@ export interface IGetOrderDetailsForViewDto {
     currencyExchangeRate: number;
     reference: string | undefined;
     enteredDate: moment.Moment;
+    createManualAccount: boolean;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     code: string | undefined;
