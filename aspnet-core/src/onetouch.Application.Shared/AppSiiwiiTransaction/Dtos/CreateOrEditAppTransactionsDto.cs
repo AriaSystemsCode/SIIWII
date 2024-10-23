@@ -91,6 +91,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual DateTime EnteredDate { set; get; }
         //Iteration#42[End]
         public virtual bool CreateManualAccount { set; get; } = false;
+        public virtual bool CreateManualContact { set; get; } = false;
     }
     public enum OrderCreatorRole
     { 
