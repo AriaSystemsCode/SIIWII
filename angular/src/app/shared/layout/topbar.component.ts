@@ -159,7 +159,7 @@ export class TopBarComponent
     transactionType: string = "";
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
     currencySymbol: string = "";
-
+    visible:boolean =false;
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
