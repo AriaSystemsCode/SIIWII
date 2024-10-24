@@ -680,6 +680,9 @@ this.showMainSpinner();
             return this.setDefaultExtraAttributeForVariationAttachment(
                 this.selectedExtraAttributes[0]
             );
+            this.setDefaultExtraAttributeForVariationAttachment(
+                this.selectedExtraAttributes[0]
+            );
         const oldVariationsExtraAttrs = oldVariations[0]?.entityExtraData.map(
             (item) => item.attributeId
         );
