@@ -126,7 +126,7 @@
 }
 .primeng-datatable-container .primeng-paging-container .p-paginator .p-paginator-rpp-options {
   float: right;
-  margin-right: 100px;
+  /* margin-right: 100px; */
 }
 .p-paginator .p-paginator-page,
 .p-paginator .p-paginator-pages,

@@ -1,7 +1,8 @@
 ...<!-- Navbar -->
 <nav
-    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5 ml-lg-5 ml-0"
+    class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
     [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
+  
 >
     <!-- Container wrapper -->
     <div class="container ml-0 position-md-absolute position-lg-static ">
@@ -28,7 +29,7 @@
         ></button> -->
         <a
         class="navbar-brand pt-0"
-        style="margin-left: 25px;"
+       
         [routerLink]="['/app/main/Home']"
         routerLinkActive="header-link-active"
         (click)="userClick('Home')"
@@ -263,7 +264,7 @@
                     <a class="nav-link active d-flex flex-column text-center">
                         <div
                             dropdown
-                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3"
+                            class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3 "
                             style=" height: 40px; color: white"
                         >
                             <div
@@ -303,7 +304,7 @@
                                 [attr.aria-label]="l('Languages')"
                             >
                                 <ul
-                                    class="kt-nav kt-margin-t-10 kt-margin-b-10"
+                                    class="kt-nav kt-margin-t-10 kt-margin-b-10 menu-tab"
                                 >
                                     <li class="kt-nav__item">
                                         <a class="kt-nav__link">
@@ -559,7 +560,7 @@
             <!-- Collapsible wrapper -->
 
             <!-- Left links -->
-            <ul class="navbar-nav bottom-navbar ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav bottom-navbar ms-auto my-2 mb-lg-0">
                 <li class="nav-item pt-2">
                     <a
                         class="navbar-brand pt-0 navbar-brand-sm"
@@ -637,7 +638,7 @@
                                         "
                                     >
                                         {{ unreadMessageCount }}
-                                        ali ali
+                                     
                                     </span>
                                 </div>
                             </span>
@@ -663,6 +664,20 @@
                     </a>
                 </li>
 
+                <li class="nav-item pt-2 ">
+                    <a class="nav-link active d-flex flex-column text-center" (click)="visible = true">
+                        <img
+                        style="width: 25px;"
+                        class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle"
+                        alt="Pic"
+                        [src]="
+                        profilePicture
+                            ? profilePicture
+                            : 'assets/common/images/default-profile-picture.png'
+                    "
+                    />
+                    </a>
+                </li>
                 <!--  <li class="nav-item pt-1">
             <a class="nav-link active d-flex flex-column text-center">
                 <div
@@ -941,3 +956,33 @@
 <app-shopping-cart-view-component #shoppingCartModal  (refreshShoppingCartData)="getShoppingCartInfo()" ></app-shopping-cart-view-component>
 
 <createTransactionModal *ngIf="!isHost"   (modalClose)="closeModal($event)" (refreshShoppingCartData)="getShoppingCartInfo()" [roles]="roles" [modalheaderName]="modalheaderName" [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"   ></createTransactionModal>
+
+
+<p-dialog
+    [style]="{ width: '40vw' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
+    [baseZIndex]="10000"
+    [modal]="true"
+    
+    [(visible)]="visible"
+    [draggable]="false"
+    [closable]="true"
+    position="bottom"
+   
+>
+
+
+<div class="kt-nav__item p-4 log-li">
+    <a
+        class="kt-nav__link"
+        (click)="logout();visible = false"
+    >
+        <span class="kt-nav__link-icon">
+        <img              src="../../../assets/icons/log-out-02.svg" alt="" srcset="">
+        </span>
+        <span class="kt-nav__link-text log-txt">
+            {{ "Logout" | localize }}
+        </span>
+    </a>
+</div>
+</p-dialog>

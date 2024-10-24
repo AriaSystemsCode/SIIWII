@@ -132,6 +132,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             }
     }
     ngOnInit(): void {
+        
         if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
             this.getAppTransactionList();
             this.getAppTransactionClassList()

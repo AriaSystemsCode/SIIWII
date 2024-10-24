@@ -240,7 +240,7 @@ getPlanBtnClass(planIndex: number): string {
 
 getFontSize() {
   const baseSize = 20; 
-  const maxCols = 4;
+  const maxCols = 3;
 
 
   if (this.plans.length > maxCols) {
