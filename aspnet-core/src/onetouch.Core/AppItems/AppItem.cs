@@ -79,5 +79,10 @@ namespace onetouch.AppItems
         [ForeignKey("SycIdentifierId")]
         public SycIdentifierDefinition SycIdentifierIdFk { get; set; }
         //MMT
+        //Iteration#45[Start]
+        [StringLength(AppItemConsts.MaxCodeLength, MinimumLength = AppItemConsts.MinCodeLength)]
+        public virtual string ManufacturerCode { get; set; }
+        //Iteration#45[End]
+        
     }
 }
