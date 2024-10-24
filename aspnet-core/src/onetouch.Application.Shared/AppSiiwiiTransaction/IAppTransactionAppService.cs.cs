@@ -38,6 +38,6 @@ namespace onetouch.AppSiiwiiTransaction
         Task<Byte[]> GetTransactionOrderConfirmation(long transactionId);
         Task<bool> IsManualCompany(string companySSIN);
         Task<List<DataView>> GetAppTransactionVariationsDetail(long transactionId);
-        Task<bool> IsOrderConfirmationNeedsReprint(long transactionId)
+        Task<bool> IsOrderConfirmationNeedsReprint(long transactionId);
     }
 }
