@@ -19,17 +19,19 @@
         <div class="row w-100">
 
             <div class="pl-2 pr-0 pt-3 w-100"
+            style="line-height: 1;"
                 [ngStyle]="{'margin-right.px':browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections ? 0 : 0}">
 
-                <div class="d-flex  p-3  flex-nowrap"
-                [ngClass]="{ 'justify-content-between': !singleItemPerRowMode }"
+                <div class="p-3  flex-nowrap"
+                [ngClass]="{ 'justify-content-between': !singleItemPerRowMode ,
+                'd-flex': !singleItemPerRowMode }"
                 >
                     <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold" style="white-space: nowrap;" (click)="viewItemHandler()">
-                        {{item.appItem.code | textSubstring:6}}
+                        <!-- {{item.appItem.code | textSubstring:6}} -->
+                        {{item.appItem.code }}
                     </h4>
                     <h6 class="m-0 mb-2 cursor-pointer" style="color: #9E9E9E;">
                         <div class="price pt-2" 
-                        [ngClass]="{ 'pl-5 ml-5': singleItemPerRowMode }"
                          style="float: right;
                         clear: both;">
                             {{ "MSRP" | localize }}:
@@ -39,7 +41,7 @@
                     </h6>
                 </div>
 
-                <p class="mb-2 product-name pl-3" style="color: #9E9E9E;">
+                <p class="mb-2 product-name pl-3" style="color: #9E9E9E;line-height: 21px;">
                     {{ item?.appItem?.name | textSubstring: 60 }}
                 </p>
 
