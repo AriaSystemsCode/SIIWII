@@ -109,5 +109,9 @@ namespace onetouch.AppSiiwiiTransaction
         public virtual string? Reference { set; get; }
         public virtual DateTime EnteredDate { set; get; }
         //Iteration#42[End]
+        //Iteration#45[Start]
+        public virtual DateTime OrderConfirmationTimeStamp { get; set; }
+        public virtual DateTime TimeStamp { get; set; }
+        //Iteration#45[End]
     }
 }
