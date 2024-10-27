@@ -221,7 +221,7 @@
                                                             "
                                                         />
                                                         <div
-                                    *ngIf="!img?.colorImage"
+                                                        *ngIf="!img?.colorImage && img?.colorHexaCode "
                                     class="colorBox"
                                     [ngStyle]="{'background-color':img?.colorHexaCode}"
                                     [ngClass]="{
@@ -239,6 +239,27 @@
                                     imageSelectedIndex = 0
                                 "
                                 ></div>
+
+                                <img
+                                *ngIf="!img?.colorImage && !img?.colorHexaCode "
+                                [src]="defaultLogo"
+            class="colorBox"
+            [ngClass]="{
+                leftImageBorder:
+                    appItemForViewDto
+                        .variations[0]
+                        .selectedValues[
+                        varitaionSelectedIndex
+                    ] == img
+            }"
+            (click)="
+            showImagesOfVaritaionSelectedValues(
+                img
+            );
+            imageSelectedIndex = 0
+        "
+       />
+
                                                     </div>
                                                 </ng-template>
                                             </p-carousel>
@@ -302,7 +323,7 @@
 
 
                                                         <div
-                                    *ngIf="!img?.colorImage"
+                                    *ngIf="!img?.colorImage && img?.colorHexaCode "
                                     class="colorBox"
                                     [ngStyle]="{'background-color':img?.colorHexaCode}"
                                     [ngClass]="{
@@ -320,6 +341,25 @@
                                     imageSelectedIndex = 0
                                 "
                                 ></div>
+                                <img
+                                *ngIf="!img?.colorImage && !img?.colorHexaCode "
+                                [src]="defaultLogo"
+            class="colorBox"
+            [ngClass]="{
+                leftImageBorder:
+                    appItemForViewDto
+                        .variations[0]
+                        .selectedValues[
+                        varitaionSelectedIndex
+                    ] == img
+            }"
+            (click)="
+            showImagesOfVaritaionSelectedValues(
+                img
+            );
+            imageSelectedIndex = 0
+        "
+       />
                                                     </div>
                                                 </div>
                                             </div>

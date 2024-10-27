@@ -2485,6 +2485,7 @@ namespace onetouch.AppSiiwiiTransaction
                         || (colorId > 0 && x.AttributeValueId == colorId))).Count() > 0)
                             .ToList();
                         double oldQty = 0;
+                        long orgNoOfPrepacks = 0;
                         foreach (var e in itemsList)
                         {
                             if ((long)e.NoOfPrePacks > 0)
@@ -2492,9 +2493,10 @@ namespace onetouch.AppSiiwiiTransaction
                                // e.Quantity = qty / (e.Quantity / (long)e.NoOfPrePacks);
                                // e.NoOfPrePacks = qty;
                                 oldQty += e.Quantity;
+                                orgNoOfPrepacks = (long)e.NoOfPrePacks;
                             }
                         };
-                        long? NewNoOfPrePack = qty/(((long?)oldQty) / itemMajor.NoOfPrePacks);
+                        long? NewNoOfPrePack = qty/(((long?)oldQty) / orgNoOfPrepacks);
                         foreach (var e in itemsList)
                         {
                             if ((long)e.NoOfPrePacks > 0)
@@ -2504,7 +2506,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 e.Amount = e.NetPrice * decimal.Parse(e.Quantity.ToString());
                             }
                         };
-                        itemMajor.NoOfPrePacks = NewNoOfPrePack;
+                        itemMajor.NoOfPrePacks = itemMajor.NoOfPrePacks + NewNoOfPrePack - orgNoOfPrepacks;
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }
