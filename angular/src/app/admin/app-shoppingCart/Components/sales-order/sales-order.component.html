@@ -1,22 +1,15 @@
 <div class="orderForm  position-relative">
     <div class="container-fluid orderInfoForm thin-scroll">
-        <div
+        <!-- <div
             class="header p-2  d-flex align-items-center  justify-content-end"
         >
-            <!-- <h6><span class="headertxt"> Entered By : </span> {{ fullName }}</h6> -->
 
-            <button
-                [disabled]="!(isContactsValid && isSalesOrderValidForm())"
-                *ngIf="createOrEditorderInfo && !showSaveBtn"
-                (click)="createOrEditTransaction()"
-                class="continuebtn text-center btn float-right"
-            >
-                Continue
-            </button>
+
+   
      
        
  
-        </div>
+        </div> -->
         <!-- <hr class="my-2" /> -->
         <div class="row ">
             <h6 class="col-6 mt-4 pl-3" ><span class="headertxt previewTitle ml-2 white-space-nowrap" style="white-space: nowrap;"> Entered By :  <span style="color: #888;
@@ -658,7 +651,14 @@ Cancel
         </div>
         <hr class="my-2" />
         <div class="d-flex justify-content-end">
-
+            <button
+            [disabled]="!(isContactsValid && isSalesOrderValidForm())"
+            *ngIf="createOrEditorderInfo && !showSaveBtn"
+            (click)="createOrEditTransaction()"
+            class="continuebtn text-center btn float-right"
+        >
+            Continue
+        </button>
  
 <button
 *ngIf="showSaveBtn"

@@ -488,7 +488,7 @@
                             required
                             class="form-control"
                             placeholder="Enter Branch Name"
-                            formControlName="buyerCompanyBranch"
+                            formControlName="buyerBranchName"
                             *ngIf="isBuyerTempAccount"    />
             
                                         <small
@@ -496,7 +496,7 @@
                                             *ngIf="
                                                 submitted &&
                                                 orderForm
-                                                    .get('buyerCompanyBranch')
+                                                    .get('buyerBranchName')
                                                     ?.hasError('required')
                                             "
                                         >
@@ -511,18 +511,18 @@
                   <div class="col-md-6 d-flex price-sec"      *ngIf="isBuyerTempAccount" >
                     <div class="mb-3 w-100">
                         <label for="" class="form-label"
-                            >Price level</label
+                            >{{l("PriceLevel")}}</label
                         >
                             <div>
                                 <p-dropdown
                            
-                                [virtualScroll]="true" [itemSize]="30"
-                                 
-                                    formControlName="PriceLevel"
-                                    [filter]="true"
-                                    optionLabel="name"
+                           
+                                [options]="allPriceLevel" 
+                              [(ngModel)]="accountInfoTemp.priceLevel"
+                                    formControlName="priceLevel"
+                                    (change)="changePrice($event)"
                                     placeholder="msrp"
-                                    [required]="isBuyerTempAccount"
+                                 
                                 ></p-dropdown>
                             </div>
                            
@@ -531,7 +531,7 @@
                                             *ngIf="
                                                 submitted &&
                                                 orderForm
-                                                    .get('PriceLevel')
+                                                    .get('priceLevel')
                                                     ?.hasError('required')
                                             "
                                         >
@@ -544,22 +544,17 @@
 
                                 <div class="mb-3 w-100">
                                     <label for="" class="form-label"
-                                        >Currency</label
+                                        >  {{l("Currency")}}</label
                                     >
                                         <div>
-                                            <p-dropdown
-                                          
-                                            [virtualScroll]="true" [itemSize]="30"
-                                           
-                                                formControlName="Currency"
-                                                [filter]="true"
-                                                optionLabel="name"
-                                                placeholder="USD"
-                                                [required]="isBuyerTempAccount"
-                                            ></p-dropdown>
+                                            <p-dropdown [options]="allCurrencies"  
+                                            (onChange)="changeTouchState($event)"
+                                        [(ngModel)]="accountInfoTemp.currencyId" 
+                                            placeholder="USD"             ></p-dropdown>
+                                        
                                         </div>
                                        
-                                                    <small
+                                                    <!-- <small
                                                         class="text-danger"
                                                         *ngIf="
                                                             submitted &&
@@ -569,7 +564,7 @@
                                                         "
                                                     >
                                                     Currency is required
-                                                    </small>
+                                                    </small> -->
                                                 </div>
                                        
 

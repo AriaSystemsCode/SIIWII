@@ -24604,7 +24604,7 @@ export class AppTransactionServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createManualAccount(body: CreateOrEditAccountInfoDto | undefined): Observable<number> {
+    createManualAccount(body: CreateOrEditAccountInfoDto | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/CreateManualAccount";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -24627,14 +24627,71 @@ export class AppTransactionServiceProxy {
                 try {
                     return this.processCreateManualAccount(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<number>;
+                    return _observableThrow(e) as any as Observable<string>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<number>;
+                return _observableThrow(response_) as any as Observable<string>;
         }));
     }
 
-    protected processCreateManualAccount(response: HttpResponseBase): Observable<number> {
+    protected processCreateManualAccount(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param transactionId (optional) 
+     * @return Success
+     */
+    isOrderConfirmationNeedsReprint(transactionId: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/IsOrderConfirmationNeedsReprint?";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processIsOrderConfirmationNeedsReprint(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processIsOrderConfirmationNeedsReprint(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processIsOrderConfirmationNeedsReprint(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -78930,6 +78987,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     currencyExchangeRate!: number;
     reference!: string | undefined;
     createManualAccount!: boolean;
+    createManualContact!: boolean;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     name!: string | undefined;
@@ -79041,6 +79099,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
             this.createManualAccount = _data["createManualAccount"];
+            this.createManualContact = _data["createManualContact"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.name = _data["name"];
@@ -79178,6 +79237,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
         data["createManualAccount"] = this.createManualAccount;
+        data["createManualContact"] = this.createManualContact;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["name"] = this.name;
@@ -79292,6 +79352,7 @@ export interface IGetAppTransactionsForViewDto {
     currencyExchangeRate: number;
     reference: string | undefined;
     createManualAccount: boolean;
+    createManualContact: boolean;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     name: string | undefined;
@@ -79363,6 +79424,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     reference!: string | undefined;
     enteredDate!: moment.Moment;
     createManualAccount!: boolean;
+    createManualContact!: boolean;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     name!: string | undefined;
@@ -79455,6 +79517,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             this.reference = _data["reference"];
             this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.createManualAccount = _data["createManualAccount"];
+            this.createManualContact = _data["createManualContact"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.name = _data["name"];
@@ -79573,6 +79636,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
         data["reference"] = this.reference;
         data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["createManualAccount"] = this.createManualAccount;
+        data["createManualContact"] = this.createManualContact;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["name"] = this.name;
@@ -79672,6 +79736,7 @@ export interface ICreateOrEditAppTransactionsDto {
     reference: string | undefined;
     enteredDate: moment.Moment;
     createManualAccount: boolean;
+    createManualContact: boolean;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     name: string | undefined;
@@ -79947,6 +80012,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     currencyExchangeRate!: number;
     reference!: string | undefined;
     createManualAccount!: boolean;
+    createManualContact!: boolean;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     name!: string | undefined;
@@ -80067,6 +80133,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
             this.createManualAccount = _data["createManualAccount"];
+            this.createManualContact = _data["createManualContact"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.name = _data["name"];
@@ -80213,6 +80280,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
         data["createManualAccount"] = this.createManualAccount;
+        data["createManualContact"] = this.createManualContact;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["name"] = this.name;
@@ -80336,6 +80404,7 @@ export interface IGetAllAppTransactionsForViewDto {
     currencyExchangeRate: number;
     reference: string | undefined;
     createManualAccount: boolean;
+    createManualContact: boolean;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     name: string | undefined;
@@ -80743,6 +80812,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     reference!: string | undefined;
     enteredDate!: moment.Moment;
     createManualAccount!: boolean;
+    createManualContact!: boolean;
     tenantId!: number | undefined;
     attachmentSourceTenantId!: number | undefined;
     code!: string | undefined;
@@ -80854,6 +80924,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             this.reference = _data["reference"];
             this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.createManualAccount = _data["createManualAccount"];
+            this.createManualContact = _data["createManualContact"];
             this.tenantId = _data["tenantId"];
             this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
             this.code = _data["code"];
@@ -80991,6 +81062,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
         data["reference"] = this.reference;
         data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["createManualAccount"] = this.createManualAccount;
+        data["createManualContact"] = this.createManualContact;
         data["tenantId"] = this.tenantId;
         data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
         data["code"] = this.code;
@@ -81097,6 +81169,7 @@ export interface IGetOrderDetailsForViewDto {
     reference: string | undefined;
     enteredDate: moment.Moment;
     createManualAccount: boolean;
+    createManualContact: boolean;
     tenantId: number | undefined;
     attachmentSourceTenantId: number | undefined;
     code: string | undefined;
@@ -83020,6 +83093,7 @@ export class AppItem implements IAppItem {
     ssin!: string | undefined;
     sycIdentifierId!: number | undefined;
     sycIdentifierIdFk!: SycIdentifierDefinition;
+    manufacturerCode!: string | undefined;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -83100,6 +83174,7 @@ export class AppItem implements IAppItem {
             this.ssin = _data["ssin"];
             this.sycIdentifierId = _data["sycIdentifierId"];
             this.sycIdentifierIdFk = _data["sycIdentifierIdFk"] ? SycIdentifierDefinition.fromJS(_data["sycIdentifierIdFk"]) : <any>undefined;
+            this.manufacturerCode = _data["manufacturerCode"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -83178,6 +83253,7 @@ export class AppItem implements IAppItem {
         data["ssin"] = this.ssin;
         data["sycIdentifierId"] = this.sycIdentifierId;
         data["sycIdentifierIdFk"] = this.sycIdentifierIdFk ? this.sycIdentifierIdFk.toJSON() : <any>undefined;
+        data["manufacturerCode"] = this.manufacturerCode;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -83221,6 +83297,7 @@ export interface IAppItem {
     ssin: string | undefined;
     sycIdentifierId: number | undefined;
     sycIdentifierIdFk: SycIdentifierDefinition;
+    manufacturerCode: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

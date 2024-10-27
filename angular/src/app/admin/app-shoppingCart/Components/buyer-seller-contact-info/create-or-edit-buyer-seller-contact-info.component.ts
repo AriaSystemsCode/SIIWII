@@ -32,6 +32,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   cancelBtn: boolean = false;
   saveBtn: boolean = false;
   SuccessMsg: boolean = false;
+  isTempAcc :boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy

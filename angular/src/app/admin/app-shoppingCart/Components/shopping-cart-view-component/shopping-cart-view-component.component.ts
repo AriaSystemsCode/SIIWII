@@ -87,6 +87,7 @@ export class ShoppingCartViewComponentComponent
   shareDone:boolean=false;
   openActions:boolean =false
   temp: TreeNode<any>[] = null;
+  addLine:boolean=true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,

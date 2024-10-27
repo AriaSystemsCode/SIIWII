@@ -43,7 +43,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     contactFilterValue: string = "";
     filteredContacts :any[]=[]
     filteredBranches :any[]=[]
-    createManual: boolean = false;
+    createManualComp: boolean = false;
+    @Output() isTempAcc = new EventEmitter<boolean>();
+
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -366,6 +368,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 //////////////////////////////////////////////////// I36 -Temp Account scenario
                 if ((this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN == "0" || !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName) {
                     this.tempAccount = true;
+                    this.isTempAcc.emit(this.tempAccount)
                     this.companyNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName + "*";
 
                     this.companyFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName;
