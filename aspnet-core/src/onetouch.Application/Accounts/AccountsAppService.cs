@@ -315,7 +315,12 @@ namespace onetouch.Accounts
                     var accountsList = await _accounts.ToListAsync();
                     var totalCount = await filteredAccounts.CountAsync();
 
-                   // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
+                    foreach (var account in accountsList)
+                    {
+                        account.AvaliableConnectionName = GetAction(account.Account.AccountType);
+                        account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                    }
+                    // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
 
                     //foreach (var account in accountsList)
                     //{
@@ -337,6 +342,38 @@ namespace onetouch.Accounts
 
             }
         }
+
+
+        public string GetAction(string accountTypeCode)
+        {
+
+            int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
+            var tenant = TenantManager.GetById(((int)currentTenant)).Edition;
+            var currentTenantEdition = tenant == null ? "Personal" : tenant.Name;
+            currentTenantEdition = currentTenantEdition == null ? "" : currentTenantEdition;
+            string action = "";
+            if (!string.IsNullOrEmpty(accountTypeCode))
+            {
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = "MPActionCONNECTED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionFOLLOWED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = "MPActionJOINED"; }
+
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = " MPActionEMPLOYED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionCONNECTED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = "MPActionJOINED"; }
+
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = "MPActionINVITED"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionINVITED"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "GROUP") { action = ""; }
+
+
+            }
+
+
+
+            return action;
+        }
+
 
         //public bool checkArray(long[] ids, string names)
         //{ bool ret = false;
@@ -669,7 +706,7 @@ namespace onetouch.Accounts
                 output.IsPublished = false;
                 if (publishedRecord != null)
                 {
-                    output.IsSync = (publishedRecord.LastModificationTime != entity.LastModificationTime);
+                    output.IsSync = (publishedRecord.LastModificationTime < entity.LastModificationTime);
                     output.IsPublished = true;
                 }
                 //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]

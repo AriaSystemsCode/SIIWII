@@ -13,8 +13,9 @@ using onetouch.AppMarketplaceContacts.Dtos;
 namespace onetouch.AppMarketplaceAccounts
 {
     public interface IMarketplaceAccountsAppService //: IApplicationService 
-    {   Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input);
-
+    {   
+        Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input);
+        Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10);
 
 
     }
