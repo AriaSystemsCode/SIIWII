@@ -63,11 +63,13 @@ export class AppNavigationService {
             // new AppMenuItem('DemoUiComponents', 'Pages.DemoUiComponents', 'flaticon-shapes', '/app/admin/demo-ui-components')
         )
         let adminMenu = new AppMenuItem('Administration', '', 'flaticon-interface-8', '', [], [])
-        let AppSubscriptionPlanHeaders=   new AppMenuItem('Subscriptions Plan', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders')
+        let AppSubscriptionPlanHeaders=   new AppMenuItem('Subscription Plans', 'Pages.AppSubscriptionPlanHeaders', 'flaticon-more', '/app/main/appSubScriptionPlan/appSubscriptionPlanHeaders')
         let AppSubscriptionPlanDetail=  new AppMenuItem('Subscription Plan Details', 'Pages.Administration.AppSubscriptionPlanDetails', 'flaticon-more', '/app/admin/appSubScriptionPlan/appSubscriptionPlanDetails')
         let AppTenantSubscriptionPlan = new AppMenuItem('Tenant Subscription Plans', 'Pages.Administration.AppTenantSubscriptionPlans', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantSubscriptionPlans')
+        if (this.isHost) {
         let AppTenantActivityLog = new AppMenuItem('Tenant Activities Log', '', 'flaticon-more', '/app/admin/appSubScriptionPlan/appTenantActivitiesLog')
-
+        adminMenu.items.push(AppTenantActivityLog);
+        }
             if (!this.isHost) {
             adminMenu.items.push(
                 new AppMenuItem('AccountProfile', 'Pages.Accounts', 'flaticon-more', '/app/main/account')
@@ -79,7 +81,7 @@ export class AppNavigationService {
                     AppSubscriptionPlanHeaders,
                     AppSubscriptionPlanDetail,
                     AppTenantSubscriptionPlan,
-                    AppTenantActivityLog,
+                 //   AppTenantActivityLog,
                 new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [
                 new AppMenuItem('AppTenantPlans', 'Pages.Administration.AppTenantPlans', 'flaticon-more', '/app/admin/appTenantPlans/appTenantPlans'),
                 new AppMenuItem('AppTransactions', 'Pages.Administration.AppTransactions', 'flaticon-more', '/app/admin/appTransactions/appTransactions'),

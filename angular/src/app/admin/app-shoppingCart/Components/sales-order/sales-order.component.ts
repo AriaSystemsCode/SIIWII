@@ -39,8 +39,8 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     classification : CreateOrEditSycEntityObjectClassificationDto
 
     selectedCategories: AppEntityCategoryDto[]=[];
-    selectedCategoriesShow: AppEntityCategoryDto[]=[];
-    selectedClassificationsShow: AppEntityClassificationDto[]=[];
+    selectedCategoriesShow: any;
+    selectedClassificationsShow: any;
 
     classificationsFiles: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
     categoriesFiles: any[];
@@ -141,9 +141,9 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         if(!this.classification) {
             this.classification = new CreateOrEditSycEntityObjectClassificationDto()
         }
-        if(this.parentClassification && this.parentClassification.id ) {
-            this.classification.parentId = this.parentClassification.id
-        }
+        // if(this.parentClassification && this.parentClassification.id ) {
+        //     this.classification.parentId = this.parentClassification.id
+        // }
         // DepartmentFlag: false
         // EntityId: 165420
         // Sorting: name
@@ -184,11 +184,11 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
             if (this.appTransactionsForViewDto?.entityCategories) {
                 this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
-                this.selectedCategoriesShow = [...this.selectedCategories];
+                this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
             }
             if (this.appTransactionsForViewDto?.entityClassifications) {
                 this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
-                this.selectedClassificationsShow= [...this.selectedClassification];
+                this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
             }
         }
         console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
@@ -694,57 +694,58 @@ onNodeSelectCat(event: any) {
     this.processNodeSelectionCat(event.node, false);
   }
   
-
   processNodeSelectionCat(node: any, isSelected: boolean) {
-    if (!node?.data?.sycEntityObjectCategory) {
+    const category = node?.data?.sycEntityObjectCategory;
+    if (!category) {
       console.warn('Invalid node data:', node);
       return;
     }
   
-    const categoryy = node.data.sycEntityObjectCategory;
     const newCategory = new AppEntityCategoryDto({
-      entityObjectCategoryId: categoryy.id || 0,
-      entityObjectCategoryCode: categoryy.code || '',
-      entityObjectCategoryName: categoryy.name || '',
       id: 0,
+      entityObjectCategoryId: category.id || 0,
+      entityObjectCategoryCode: category.code || '',
+      entityObjectCategoryName: category.name || '',
     });
   
-    // Initialize entity categories if not present
-    if (!this.appTransactionsForViewDto?.entityCategories) {
-      this.appTransactionsForViewDto.entityCategories = [];
-    }
+    this.appTransactionsForViewDto.entityCategories ||= [];
   
     if (isSelected) {
-      // Check if the category already exists in the selected list
-      const categoriesExists = this.appTransactionsForViewDto.entityCategories.some(
-        (existingCategory) =>
-          existingCategory.entityObjectCategoryId ===
-          newCategory.entityObjectCategoryId
-      );
-  
-      if (!categoriesExists) {
-        this.appTransactionsForViewDto.entityCategories.push(newCategory);
-        this.selectedCategories.push(newCategory);
+      if (node.leaf) {  // Check if it's a leaf node
+        const leafCategory = new AppEntityCategoryDto({
+          id: 0,
+          entityObjectCategoryId: category.id,
+          entityObjectCategoryCode: category.code,
+          entityObjectCategoryName: this.getPath(node),  // Use the provided path
+        });
+        
+        // Add the leaf category if not already in selected categories
+        if (!this.selectedCategories.some(
+            cat => cat.entityObjectCategoryId === leafCategory.entityObjectCategoryId)) {
+          this.selectedCategories.push(leafCategory);
+        }
+      } else {
+        // Add the category if not already in selected categories
+        if (!this.appTransactionsForViewDto.entityCategories.some(
+            cat => cat.entityObjectCategoryId === newCategory.entityObjectCategoryId)) {
+          this.appTransactionsForViewDto.entityCategories.push(newCategory);
+          this.selectedCategories.push(newCategory);
+        }
       }
     } else {
       // Remove the category when unselected
       this.selectedCategories = this.selectedCategories.filter(
-        (existingCategory) =>
-          !(existingCategory instanceof AppEntityCategoryDto &&
-            existingCategory.entityObjectCategoryId ===
-              newCategory.entityObjectCategoryId)
+        cat => cat.entityObjectCategoryId !== newCategory.entityObjectCategoryId
       );
-  
       this.appTransactionsForViewDto.entityCategories = this.appTransactionsForViewDto.entityCategories.filter(
-        (existingCategory) =>
-          existingCategory.entityObjectCategoryId !==
-          newCategory.entityObjectCategoryId
+        cat => cat.entityObjectCategoryId !== newCategory.entityObjectCategoryId
       );
     }
   
     // Handle parent-child selection/deselection relationships
     this.ensureParentChildSelectionCat(node, isSelected);
   }
+  
   
   // Function to manage parent-child relationships during selection
   ensureParentChildSelectionCat(node: any, isSelected: boolean) {
@@ -810,34 +811,32 @@ onNodeSelectCat(event: any) {
     
     
     saveSelection() {
-
+ 
         this.selectedCategories = this.selectedCategories.filter(
             (cat) => cat instanceof AppEntityCategoryDto
         );
     
-
-        this.selectedCategoriesShow = this.selectedCategories;
+ 
+        this.selectedCategoriesShow = this.selectedCategories.map(
+            (cat) => cat.entityObjectCategoryName 
+        );
     
-     
+  
         this.appTransactionsForViewDto.entityCategories = this.selectedCategories.map((item) => {
             return new AppEntityCategoryDto({
                 entityObjectCategoryId: item.entityObjectCategoryId || 0,
                 entityObjectCategoryCode: item.entityObjectCategoryCode || '',
-                entityObjectCategoryName: item.entityObjectCategoryName || '',
+                entityObjectCategoryName: item.entityObjectCategoryName || "",
                 id: 0, 
             });
         });
     
-    
-        // this.showSelectedCat = true;
+
         this.showExistCat = false;
-    
-    
-        this.closeDropdown();
-        this.treeSelect.hide();
-        this.getAppTransactionList();
-    }
-    
+        this.treeSelect.hide();  
+        this.getAppTransactionList();  
+   }
+   
     
     
     cancelSelection() {
@@ -845,7 +844,10 @@ onNodeSelectCat(event: any) {
         this.treeSelect.hide();
         this.showExistCat = false
         this.tempDeselectedCategories =[]
-
+        if (this.appTransactionsForViewDto?.entityCategories) {
+            this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
+            this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
+        }
     }
 
     saveCat(category: any) {
@@ -936,9 +938,19 @@ onNodeSelectCat(event: any) {
         this.showSelectedClass= true
     }
 
-
+    getPath(item: any): any {
+        if (!item.parent) {
+            return item.label;
+        }
+    
+        // Recursively build the path including all ancestor nodes
+        const parentPath = this.getPath(item.parent);
+        return parentPath ? parentPath + "-" + item.label : item.label;
+    }
 // Handles when a node is selected
 onNodeSelect(event: any) {
+    console.log(">>evvvvvvvvvvvvvvvvvvvv", event.node);
+
     this.processNodeSelection(event.node, true);
   }
   
@@ -947,60 +959,64 @@ onNodeSelect(event: any) {
     this.processNodeSelection(event.node, false);
   }
   
-  // Common method to process the selection or deselection of a node
   processNodeSelection(node: any, isSelected: boolean) {
-    if (!node?.data?.sycEntityObjectClassification) {
+    const classification = node?.data?.sycEntityObjectClassification;
+  
+    if (!classification) {
       console.warn('Invalid node data:', node);
       return;
     }
   
-    const classification = node.data.sycEntityObjectClassification;
     const newClassification = new AppEntityClassificationDto({
+      id: 0,
       entityObjectClassificationId: classification.id || 0,
       entityObjectClassificationCode: classification.code || '',
       entityObjectClassificationName: classification.name || '',
-      id: 0,
     });
   
-    // Initialize entity classifications if not present
-    if (!this.appTransactionsForViewDto?.entityClassifications) {
-      this.appTransactionsForViewDto.entityClassifications = [];
-    }
+    this.appTransactionsForViewDto.entityClassifications ||= [];
   
-    // Handling node addition (when selected)
     if (isSelected) {
-      const classificationExists = this.appTransactionsForViewDto.entityClassifications.some(
-        (classificate) =>
-          classificate.entityObjectClassificationId ===
-          newClassification.entityObjectClassificationId
-      );
+      if (node.leaf) { // Check if it's a leaf node
+        const leafClassification = new AppEntityClassificationDto({
+          id: 0,
+          entityObjectClassificationId: classification.id,
+          entityObjectClassificationCode: classification.code,
+          entityObjectClassificationName: this.getPath(node), // Use the provided path
+        });
   
-      if (!classificationExists) {
-        this.appTransactionsForViewDto.entityClassifications.push(newClassification);
-        this.selectedClassification.push(newClassification);
+        // Add the leaf classification if not already in selected classifications
+        if (!this.selectedClassification.some(
+            classificate => classificate.entityObjectClassificationId === leafClassification.entityObjectClassificationId)) {
+          this.selectedClassification.push(leafClassification);
+        }
+      } else {
+        // Add the classification if not already in selected classifications
+        if (!this.appTransactionsForViewDto.entityClassifications.some(
+            classificate => classificate.entityObjectClassificationId === newClassification.entityObjectClassificationId)) {
+          this.appTransactionsForViewDto.entityClassifications.push(newClassification);
+          this.selectedClassification.push(newClassification);
+        }
       }
     } else {
-      // Handling node removal (when unselected)
+      // Remove the classification when unselected
       this.selectedClassification = this.selectedClassification.filter(
-        (classificate) =>
-          !(classificate instanceof AppEntityClassificationDto &&
-            classificate.entityObjectClassificationId ===
-              newClassification.entityObjectClassificationId)
+        classificate => classificate.entityObjectClassificationId !== newClassification.entityObjectClassificationId
       );
-  
       this.appTransactionsForViewDto.entityClassifications = this.appTransactionsForViewDto.entityClassifications.filter(
-        (classificate) =>
-          classificate.entityObjectClassificationId !==
-          newClassification.entityObjectClassificationId
+        classificate => classificate.entityObjectClassificationId !== newClassification.entityObjectClassificationId
       );
     }
   
-    // Ensure parent or child specific handling
+    // Handle parent-child selection/deselection relationships
     this.ensureParentChildSelection(node, isSelected);
-  
-    console.log(this.selectedClassification, 'Current selected classification');
   }
   
+
+
+getParentNode(node: TreeNode): TreeNode | null {
+    return node?.parent || null; // Return the parent if it exists, otherwise null
+}
   // Additional function to handle parent-child selection relationships
   ensureParentChildSelection(node: any, isSelected: boolean) {
     // Check if the node is a parent or has children
@@ -1063,8 +1079,12 @@ onNodeSelect(event: any) {
         this.selectedClassification = this.selectedClassification.filter(
             item => item instanceof AppEntityClassificationDto
         );
-    
-        this.selectedClassificationsShow = this.selectedClassification;
+        this.selectedClassificationsShow = this.selectedClassification.map(
+            (cat) => cat.entityObjectClassificationName
+        );
+        
+         
+        // this.selectedClassificationsShow = this.selectedClassification;
 
 
         this.appTransactionsForViewDto.entityClassifications = this.selectedClassification.map(item => {
@@ -1096,6 +1116,10 @@ onNodeSelect(event: any) {
         this.showExistClass = false
      
         this.tempDeselectedClassification =[]
+        if (this.appTransactionsForViewDto?.entityClassifications) {
+            this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
+            this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
+        }
 
     }
     closeDropdown() {
@@ -1239,8 +1263,16 @@ cancelClass(){
         this.showSaveBtn = false;
         this.tempDeselectedCategories =[]
         this.tempDeselectedClassification=[]
-
-
+        this.getAppTransactionList()
+        this.getAppTransactionClassList()
+        if (this.appTransactionsForViewDto?.entityClassifications) {
+            this.selectedClassification = this.appTransactionsForViewDto.entityClassifications;
+            this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
+        }
+        if (this.appTransactionsForViewDto?.entityCategories) {
+            this.selectedCategories = this.appTransactionsForViewDto.entityCategories;
+            this.selectedCategoriesShow = [...this.appTransactionsForViewDto.entityCategoriesNames?.items];
+        }
     }
     onUpdateAppTransactionsForViewDto($event) {
         this.appTransactionsForViewDto = $event;

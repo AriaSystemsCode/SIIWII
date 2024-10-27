@@ -502,6 +502,36 @@ namespace onetouch.AppEntities
                 })
                 .ToListAsync();
         }
+        //MMT-43
+        public async Task<List<LookupLabelDto>> GetAllUOMForTableDropdown()
+        {
+            var uOMId = await _helper.SystemTables.GetEntityObjectTypeUOMId();
+
+            return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeId == uOMId && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                .OrderBy("Name asc")
+                .Select(appEntity => new LookupLabelDto
+                {
+                    Value = appEntity.Id,
+                    Label = appEntity.Name.ToString(),
+                    Code = appEntity.Code,
+                })
+                .ToListAsync();
+        }
+        public async Task<List<LookupLabelDto>> GetAllFeatureCategoryForTableDropdown()
+        {
+            var catId = await _helper.SystemTables.GetEntityObjectTypeFeatureCategoryId();
+
+            return await _appEntityRepository.GetAll().Where(x => x.EntityObjectTypeId == catId && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                .OrderBy("Name asc")
+                .Select(appEntity => new LookupLabelDto
+                {
+                    Value = appEntity.Id,
+                    Label = appEntity.Name.ToString(),
+                    Code = appEntity.Code,
+                })
+                .ToListAsync();
+        }
+        //MMT-43
 
         //public async Task<List<LookupLabelDto>> GetAllAccountTypesForTableDropdown()
         //{
@@ -778,7 +808,7 @@ namespace onetouch.AppEntities
                     Label = appEntity.Name.ToString(),
                     Code = appEntity.Code,
                     Symbol = appEntity.EntityExtraData != null & appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ? appEntity.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
-                }).OrderBy(a=>a.Code)
+                })//.OrderBy(a=>a.Code)
                 .ToListAsync();
         }
         public async Task<CurrencyInfoDto> GetCurrencyInfo(string currencyCode)
@@ -856,6 +886,15 @@ namespace onetouch.AppEntities
                 }
                 else
                 {
+                    //P-SII-20240920.0004,1 MMT 09/22/2024 Color Code should not be added again on Tenant level if it's found on host level[Start]   
+                    if (AbpSession.TenantId!=null && input.EntityObjectTypeId==16)
+                    {
+                        var codeExist = await _appEntityRepository.GetAll().FirstOrDefaultAsync(x => x.Code == input.Code && x.EntityObjectTypeId== 16
+                        && (x.TenantId == null || x.TenantId == AbpSession.TenantId));
+                        if (codeExist!=null)
+                            throw new UserFriendlyException("Code '" + input.Code + "' Already Exists.");
+                    }
+                    //P-SII-20240920.0004,1 MMT 09/22/2024 Color Code should not be added again on Tenant level if it's found on host level[End]   
                     entity = new AppEntity();
                 }
 

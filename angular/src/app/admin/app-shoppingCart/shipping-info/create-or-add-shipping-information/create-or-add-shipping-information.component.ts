@@ -116,6 +116,14 @@ isAccManual :boolean = false
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressLine1=addObj?.selectedAddressObj?.addressLine1;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressLine2=addObj?.selectedAddressObj?.addressLine2;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressName=addObj?.selectedAddressObj?.name;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressPostalCode=addObj?.selectedAddressObj?.postalCode;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressState=addObj?.selectedAddressObj?.state;
+   this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressDetail= addObj?.selectedAddressObj;
+
+
 
     }
     if (this.shippingTabValid) {
@@ -306,10 +314,21 @@ isAccManual :boolean = false
   shipToData;
   reloadAddresscomponentShipFrom(data) {
     this.shipFromData=data;
-  }
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+      this.contactIdShipFrom = this.shipFromData.compId;
 
+        if( this.AddressComponentChild)
+      this.AddressComponentChild['first']?.getAddressList(this.shipFromData.compssin);
+  }
+}
   reloadAddresscomponentShipTo(data) {
   this.shipToData=data;
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
+      this.contactIdShipTo = this.shipToData.compId;
+
+  if( this.AddressComponentChild)
+    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
 }
+  }
 
 }

@@ -8,7 +8,8 @@ namespace onetouch.AppSubscriptionPlans.Dtos
 {
     public class CreateOrEditAppTenantInvoiceDto : EntityDto<long?>
     {
-
+        [Required]
+        public long TenantId { set; get; }    
         [Required]
         [StringLength(AppTenantInvoiceConsts.MaxInvoiceNumberLength, MinimumLength = AppTenantInvoiceConsts.MinInvoiceNumberLength)]
         public string InvoiceNumber { get; set; }

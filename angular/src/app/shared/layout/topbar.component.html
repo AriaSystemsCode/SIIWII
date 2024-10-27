@@ -4,7 +4,7 @@
     [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }"
 >
     <!-- Container wrapper -->
-    <div class="container ml-0 position-md-absolute position-lg-static p-2">
+    <div class="container ml-0 position-md-absolute position-lg-static ">
         <!-- Navbar brand -->
 
         <!--  <a
@@ -126,7 +126,7 @@
     > -->
         <a
             class="nav-link active d-flex flex-column text-center"
-            class="navbar-brand pt-0 d-block d-md-none m-0 rightSearch"
+            class="navbar-brand pt-0 d-block d-sm-none m-0 rightSearch"
             routerLinkActive="header-link-active" *ngIf="showSearch"
         >
             <img
@@ -136,7 +136,7 @@
         </a>
 
         <!-- Collapsible wrapper -->
-        <div class="ml-4 d-md-flex d-none sec-section" style="justify-content: center;margin-left: 35px;">
+        <div class="ml-4 d-sm-flex d-none sec-section" style="justify-content: center;margin-left: 35px;">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -208,8 +208,8 @@
             <!-- Left links -->
         </div>
 
-        <div class="rightList ml-4 ml-lg-0 navbar-collapse d-md-block d-none">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-md-flex d-none " style="justify-content: space-around;">
+        <div class="rightList ml-4 ml-lg-0 navbar-collapse d-sm-block d-none">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-sm-flex d-none " style="justify-content: space-around;">
                 <div class="border-left text-white  d-md-block  mt-1" style="height: 55px;"></div>
                 <li class="nav-item pl-3 pt-2">
                     <a
@@ -554,7 +554,7 @@
 
         <!-- Mobile UI-->
         <div
-            class="navbar navbar-expand-lg topbar fixed-bottom d-md-none d-block"
+            class="navbar navbar-expand-lg topbar fixed-bottom d-sm-none d-block"
         >
             <!-- Collapsible wrapper -->
 

@@ -6131,6 +6131,122 @@ export class AppEntitiesServiceProxy {
     /**
      * @return Success
      */
+    getAllUOMForTableDropdown(): Observable<LookupLabelDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllUOMForTableDropdown";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllUOMForTableDropdown(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllUOMForTableDropdown(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<LookupLabelDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<LookupLabelDto[]>;
+        }));
+    }
+
+    protected processGetAllUOMForTableDropdown(response: HttpResponseBase): Observable<LookupLabelDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(LookupLabelDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getAllFeatureCategoryForTableDropdown(): Observable<LookupLabelDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllFeatureCategoryForTableDropdown";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllFeatureCategoryForTableDropdown(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllFeatureCategoryForTableDropdown(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<LookupLabelDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<LookupLabelDto[]>;
+        }));
+    }
+
+    protected processGetAllFeatureCategoryForTableDropdown(response: HttpResponseBase): Observable<LookupLabelDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(LookupLabelDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getAllAccountTypesForTableDropdown(): Observable<LookupLabelDto[]> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAllAccountTypesForTableDropdown";
         url_ = url_.replace(/[?&]$/, "");
@@ -10498,6 +10614,64 @@ export class AppFeaturesServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = FileDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getFeatureStatusList(): Observable<SycEntityObjectStatusLookupTableDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppFeatures/GetFeatureStatusList";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFeatureStatusList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFeatureStatusList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SycEntityObjectStatusLookupTableDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SycEntityObjectStatusLookupTableDto[]>;
+        }));
+    }
+
+    protected processGetFeatureStatusList(response: HttpResponseBase): Observable<SycEntityObjectStatusLookupTableDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(SycEntityObjectStatusLookupTableDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -17872,12 +18046,13 @@ export class AppSubscriptionPlanDetailsServiceProxy {
      * @param trackactivityFilter (optional) 
      * @param appSubscriptionPlanHeaderFilter (optional) 
      * @param appFeatureDescriptionFilter (optional) 
+     * @param addFeaturesOnly (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, featureCodeFilter: string | null | undefined, featureNameFilter: string | null | undefined, availabilityFilter: string | null | undefined, maxFeatureLimitFilter: number | null | undefined, minFeatureLimitFilter: number | null | undefined, rollOverFilter: number | null | undefined, maxUnitPriceFilter: number | null | undefined, minUnitPriceFilter: number | null | undefined, featurePeriodLimitFilter: string | null | undefined, categoryFilter: string | null | undefined, featureDescriptionFilter: string | null | undefined, featureStatusFilter: string | null | undefined, unitOfMeasurementNameFilter: string | null | undefined, unitOfMeasurmentCodeFilter: string | null | undefined, isFeatureBillableFilter: number | null | undefined, featureBillingCodeFilter: string | null | undefined, featureCategoryFilter: string | null | undefined, trackactivityFilter: number | null | undefined, appSubscriptionPlanHeaderFilter: string | null | undefined, appFeatureDescriptionFilter: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto> {
+    getAll(filter: string | null | undefined, featureCodeFilter: string | null | undefined, featureNameFilter: string | null | undefined, availabilityFilter: string | null | undefined, maxFeatureLimitFilter: number | null | undefined, minFeatureLimitFilter: number | null | undefined, rollOverFilter: number | null | undefined, maxUnitPriceFilter: number | null | undefined, minUnitPriceFilter: number | null | undefined, featurePeriodLimitFilter: string | null | undefined, categoryFilter: string | null | undefined, featureDescriptionFilter: string | null | undefined, featureStatusFilter: string | null | undefined, unitOfMeasurementNameFilter: string | null | undefined, unitOfMeasurmentCodeFilter: string | null | undefined, isFeatureBillableFilter: number | null | undefined, featureBillingCodeFilter: string | null | undefined, featureCategoryFilter: string | null | undefined, trackactivityFilter: number | null | undefined, appSubscriptionPlanHeaderFilter: number | null | undefined, appFeatureDescriptionFilter: string | null | undefined, addFeaturesOnly: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppSubscriptionPlanDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanDetails/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -17921,6 +18096,10 @@ export class AppSubscriptionPlanDetailsServiceProxy {
             url_ += "AppSubscriptionPlanHeaderFilter=" + encodeURIComponent("" + appSubscriptionPlanHeaderFilter) + "&";
         if (appFeatureDescriptionFilter !== undefined && appFeatureDescriptionFilter !== null)
             url_ += "AppFeatureDescriptionFilter=" + encodeURIComponent("" + appFeatureDescriptionFilter) + "&";
+        if (addFeaturesOnly === null)
+            throw new Error("The parameter 'addFeaturesOnly' cannot be null.");
+        else if (addFeaturesOnly !== undefined)
+            url_ += "AddFeaturesOnly=" + encodeURIComponent("" + addFeaturesOnly) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -18546,6 +18725,64 @@ export class AppSubscriptionPlanHeadersServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = PagedResultDtoOfGetAppSubscriptionPlanHeaderForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getPlanStatusList(): Observable<SycEntityObjectStatusLookupTableDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppSubscriptionPlanHeaders/GetPlanStatusList";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPlanStatusList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPlanStatusList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SycEntityObjectStatusLookupTableDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SycEntityObjectStatusLookupTableDto[]>;
+        }));
+    }
+
+    protected processGetPlanStatusList(response: HttpResponseBase): Observable<SycEntityObjectStatusLookupTableDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(SycEntityObjectStatusLookupTableDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -19465,6 +19702,63 @@ export class AppTenantActivitiesLogServiceProxy {
     }
 
     /**
+     * @param body (optional) 
+     * @return Success
+     */
+    addCreditActivityLog(body: AddOnsInputDto[] | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTenantActivitiesLog/AddCreditActivityLog";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddCreditActivityLog(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddCreditActivityLog(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processAddCreditActivityLog(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param featureCode (optional) 
      * @param relatedEntityCode (optional) 
      * @param relatedEntityId (optional) 
@@ -19609,6 +19903,7 @@ export class AppTenantInvoicesServiceProxy {
     }
 
     /**
+     * @param tenantId (optional) 
      * @param filter (optional) 
      * @param invoiceNumberFilter (optional) 
      * @param maxInvoiceDateFilter (optional) 
@@ -19622,8 +19917,10 @@ export class AppTenantInvoicesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, invoiceNumberFilter: string | null | undefined, maxInvoiceDateFilter: moment.Moment | null | undefined, minInvoiceDateFilter: moment.Moment | null | undefined, maxDueDateFilter: moment.Moment | null | undefined, minDueDateFilter: moment.Moment | null | undefined, maxPayDateFilter: moment.Moment | null | undefined, minPayDateFilter: moment.Moment | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppTenantInvoiceForViewDto> {
+    getAll(tenantId: number | null | undefined, filter: string | null | undefined, invoiceNumberFilter: string | null | undefined, maxInvoiceDateFilter: moment.Moment | null | undefined, minInvoiceDateFilter: moment.Moment | null | undefined, maxDueDateFilter: moment.Moment | null | undefined, minDueDateFilter: moment.Moment | null | undefined, maxPayDateFilter: moment.Moment | null | undefined, minPayDateFilter: moment.Moment | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppTenantInvoiceForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTenantInvoices/GetAll?";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
         if (invoiceNumberFilter !== undefined && invoiceNumberFilter !== null)
@@ -21287,6 +21584,63 @@ export class AppTenantSubscriptionPlansServiceProxy {
     }
 
     /**
+     * @param tenantId (optional) 
+     * @return Success
+     */
+    getTenantSubscriptionPlanId(tenantId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppTenantSubscriptionPlans/GetTenantSubscriptionPlanId?";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantSubscriptionPlanId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantSubscriptionPlanId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetTenantSubscriptionPlanId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
@@ -21377,6 +21731,62 @@ export class AppTenantSubscriptionPlansServiceProxy {
     }
 
     protected processGetAppTenantSubscriptionPlanForEdit(response: HttpResponseBase): Observable<GetAppTenantSubscriptionPlanForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAppTenantSubscriptionPlanForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param input (optional) 
+     * @return Success
+     */
+    getAppTenantSubscriptionPlanByTenantIdForEdit(input: number | undefined): Observable<GetAppTenantSubscriptionPlanForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/AppTenantSubscriptionPlans/GetAppTenantSubscriptionPlanByTenantIdForEdit?";
+        if (input === null)
+            throw new Error("The parameter 'input' cannot be null.");
+        else if (input !== undefined)
+            url_ += "input=" + encodeURIComponent("" + input) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppTenantSubscriptionPlanByTenantIdForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppTenantSubscriptionPlanByTenantIdForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAppTenantSubscriptionPlanForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAppTenantSubscriptionPlanForEditOutput>;
+        }));
+    }
+
+    protected processGetAppTenantSubscriptionPlanByTenantIdForEdit(response: HttpResponseBase): Observable<GetAppTenantSubscriptionPlanForEditOutput> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -21576,6 +21986,64 @@ export class AppTenantSubscriptionPlansServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = FileDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getTenantsList(): Observable<TenantInformation[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTenantSubscriptionPlans/GetTenantsList";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantsList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantsList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TenantInformation[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TenantInformation[]>;
+        }));
+    }
+
+    protected processGetTenantsList(response: HttpResponseBase): Observable<TenantInformation[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(TenantInformation.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -23317,6 +23785,75 @@ export class AppTransactionServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param transactionId (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAppTransactionCategoriesFullNamesWithPaging(transactionId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppEntityCategoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAppTransactionCategoriesFullNamesWithPaging?";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "TransactionId=" + encodeURIComponent("" + transactionId) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppTransactionCategoriesFullNamesWithPaging(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppTransactionCategoriesFullNamesWithPaging(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfAppEntityCategoryDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfAppEntityCategoryDto>;
+        }));
+    }
+
+    protected processGetAppTransactionCategoriesFullNamesWithPaging(response: HttpResponseBase): Observable<PagedResultDtoOfAppEntityCategoryDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfAppEntityCategoryDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -47166,6 +47703,110 @@ export class SystemTablesServiceProxy {
     /**
      * @return Success
      */
+    getEntityObjectTypeUOMId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeUOMId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeUOMId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeUOMId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeUOMId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeFeatureCategoryId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeFeatureCategoryId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeFeatureCategoryId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeFeatureCategoryId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeFeatureCategoryId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getObjectLookupId(): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectLookupId";
         url_ = url_.replace(/[?&]$/, "");
@@ -66468,6 +67109,9 @@ export class AppFeatureDto implements IAppFeatureDto {
     unitPrice!: number | undefined;
     category!: string | undefined;
     trackActivity!: boolean;
+    isAddOn!: boolean;
+    featureStatus!: string | undefined;
+    notes!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -66498,6 +67142,9 @@ export class AppFeatureDto implements IAppFeatureDto {
             this.unitPrice = _data["unitPrice"];
             this.category = _data["category"];
             this.trackActivity = _data["trackActivity"];
+            this.isAddOn = _data["isAddOn"];
+            this.featureStatus = _data["featureStatus"];
+            this.notes = _data["notes"];
             this.id = _data["id"];
         }
     }
@@ -66526,6 +67173,9 @@ export class AppFeatureDto implements IAppFeatureDto {
         data["unitPrice"] = this.unitPrice;
         data["category"] = this.category;
         data["trackActivity"] = this.trackActivity;
+        data["isAddOn"] = this.isAddOn;
+        data["featureStatus"] = this.featureStatus;
+        data["notes"] = this.notes;
         data["id"] = this.id;
         return data;
     }
@@ -66543,6 +67193,9 @@ export interface IAppFeatureDto {
     unitPrice: number | undefined;
     category: string | undefined;
     trackActivity: boolean;
+    isAddOn: boolean;
+    featureStatus: string | undefined;
+    notes: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -66657,19 +67310,23 @@ export interface IPagedResultDtoOfGetAppFeatureForViewDto {
 }
 
 export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
+    isAddOn!: boolean;
     code!: string;
     name!: string;
     description!: string;
-    unitOfMeasurementCode!: string;
-    unitOfMeasurementName!: string;
+    unitOfMeasurementCode!: string | undefined;
+    unitOfMeasurementName!: string | undefined;
     featurePeriodLimit!: string;
     billable!: boolean;
     billingCode!: string | undefined;
     unitPrice!: number | undefined;
+    categoryId!: number;
     trackActivity!: boolean;
     entityStatusCode!: string | undefined;
     entityStatusId!: number | undefined;
     entityCategories!: AppEntityCategoryDto[] | undefined;
+    unitOfMeasurementId!: number;
+    notes!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -66689,6 +67346,7 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.isAddOn = _data["isAddOn"];
             this.code = _data["code"];
             this.name = _data["name"];
             this.description = _data["description"];
@@ -66698,6 +67356,7 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
             this.billable = _data["billable"];
             this.billingCode = _data["billingCode"];
             this.unitPrice = _data["unitPrice"];
+            this.categoryId = _data["categoryId"];
             this.trackActivity = _data["trackActivity"];
             this.entityStatusCode = _data["entityStatusCode"];
             this.entityStatusId = _data["entityStatusId"];
@@ -66706,6 +67365,8 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
                 for (let item of _data["entityCategories"])
                     this.entityCategories!.push(AppEntityCategoryDto.fromJS(item));
             }
+            this.unitOfMeasurementId = _data["unitOfMeasurementId"];
+            this.notes = _data["notes"];
             this.id = _data["id"];
         }
     }
@@ -66723,6 +67384,7 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["isAddOn"] = this.isAddOn;
         data["code"] = this.code;
         data["name"] = this.name;
         data["description"] = this.description;
@@ -66732,6 +67394,7 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
         data["billable"] = this.billable;
         data["billingCode"] = this.billingCode;
         data["unitPrice"] = this.unitPrice;
+        data["categoryId"] = this.categoryId;
         data["trackActivity"] = this.trackActivity;
         data["entityStatusCode"] = this.entityStatusCode;
         data["entityStatusId"] = this.entityStatusId;
@@ -66740,25 +67403,31 @@ export class CreateOrEditAppFeatureDto implements ICreateOrEditAppFeatureDto {
             for (let item of this.entityCategories)
                 data["entityCategories"].push(item.toJSON());
         }
+        data["unitOfMeasurementId"] = this.unitOfMeasurementId;
+        data["notes"] = this.notes;
         data["id"] = this.id;
         return data;
     }
 }
 
 export interface ICreateOrEditAppFeatureDto {
+    isAddOn: boolean;
     code: string;
     name: string;
     description: string;
-    unitOfMeasurementCode: string;
-    unitOfMeasurementName: string;
+    unitOfMeasurementCode: string | undefined;
+    unitOfMeasurementName: string | undefined;
     featurePeriodLimit: string;
     billable: boolean;
     billingCode: string | undefined;
     unitPrice: number | undefined;
+    categoryId: number;
     trackActivity: boolean;
     entityStatusCode: string | undefined;
     entityStatusId: number | undefined;
     entityCategories: AppEntityCategoryDto[] | undefined;
+    unitOfMeasurementId: number;
+    notes: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -66808,6 +67477,58 @@ export class GetAppFeatureForEditOutput implements IGetAppFeatureForEditOutput {
 
 export interface IGetAppFeatureForEditOutput {
     appFeature: CreateOrEditAppFeatureDto;
+
+    [key: string]: any;
+}
+
+export class SycEntityObjectStatusLookupTableDto implements ISycEntityObjectStatusLookupTableDto {
+    id!: number;
+    displayName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ISycEntityObjectStatusLookupTableDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.displayName = _data["displayName"];
+        }
+    }
+
+    static fromJS(data: any): SycEntityObjectStatusLookupTableDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SycEntityObjectStatusLookupTableDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["displayName"] = this.displayName;
+        return data;
+    }
+}
+
+export interface ISycEntityObjectStatusLookupTableDto {
+    id: number;
+    displayName: string | undefined;
 
     [key: string]: any;
 }
@@ -74261,6 +74982,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
     trackactivity!: boolean;
     appSubscriptionPlanHeaderId!: number;
     appFeatureId!: number | undefined;
+    appSubscriptionPlanHeaderCode!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -74299,6 +75021,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
             this.trackactivity = _data["trackactivity"];
             this.appSubscriptionPlanHeaderId = _data["appSubscriptionPlanHeaderId"];
             this.appFeatureId = _data["appFeatureId"];
+            this.appSubscriptionPlanHeaderCode = _data["appSubscriptionPlanHeaderCode"];
             this.id = _data["id"];
         }
     }
@@ -74335,6 +75058,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
         data["trackactivity"] = this.trackactivity;
         data["appSubscriptionPlanHeaderId"] = this.appSubscriptionPlanHeaderId;
         data["appFeatureId"] = this.appFeatureId;
+        data["appSubscriptionPlanHeaderCode"] = this.appSubscriptionPlanHeaderCode;
         data["id"] = this.id;
         return data;
     }
@@ -74360,6 +75084,7 @@ export interface IAppSubscriptionPlanDetailDto {
     trackactivity: boolean;
     appSubscriptionPlanHeaderId: number;
     appFeatureId: number | undefined;
+    appSubscriptionPlanHeaderCode: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -74369,6 +75094,8 @@ export class GetAppSubscriptionPlanDetailForViewDto implements IGetAppSubscripti
     appSubscriptionPlanDetail!: AppSubscriptionPlanDetailDto;
     appSubscriptionPlanHeader!: string | undefined;
     appFeatureDescription!: string | undefined;
+    featureUsedQty!: number;
+    featureCreditQty!: number;
 
     [key: string]: any;
 
@@ -74390,6 +75117,8 @@ export class GetAppSubscriptionPlanDetailForViewDto implements IGetAppSubscripti
             this.appSubscriptionPlanDetail = _data["appSubscriptionPlanDetail"] ? AppSubscriptionPlanDetailDto.fromJS(_data["appSubscriptionPlanDetail"]) : <any>undefined;
             this.appSubscriptionPlanHeader = _data["appSubscriptionPlanHeader"];
             this.appFeatureDescription = _data["appFeatureDescription"];
+            this.featureUsedQty = _data["featureUsedQty"];
+            this.featureCreditQty = _data["featureCreditQty"];
         }
     }
 
@@ -74409,6 +75138,8 @@ export class GetAppSubscriptionPlanDetailForViewDto implements IGetAppSubscripti
         data["appSubscriptionPlanDetail"] = this.appSubscriptionPlanDetail ? this.appSubscriptionPlanDetail.toJSON() : <any>undefined;
         data["appSubscriptionPlanHeader"] = this.appSubscriptionPlanHeader;
         data["appFeatureDescription"] = this.appFeatureDescription;
+        data["featureUsedQty"] = this.featureUsedQty;
+        data["featureCreditQty"] = this.featureCreditQty;
         return data;
     }
 }
@@ -74417,6 +75148,8 @@ export interface IGetAppSubscriptionPlanDetailForViewDto {
     appSubscriptionPlanDetail: AppSubscriptionPlanDetailDto;
     appSubscriptionPlanHeader: string | undefined;
     appFeatureDescription: string | undefined;
+    featureUsedQty: number;
+    featureCreditQty: number;
 
     [key: string]: any;
 }
@@ -74489,7 +75222,6 @@ export class CreateOrEditAppSubscriptionPlanDetailDto implements ICreateOrEditAp
     rollOver!: boolean;
     unitPrice!: number;
     featurePeriodLimit!: string;
-    category!: string;
     featureDescription!: string | undefined;
     featureStatus!: string | undefined;
     unitOfMeasurementName!: string;
@@ -74527,7 +75259,6 @@ export class CreateOrEditAppSubscriptionPlanDetailDto implements ICreateOrEditAp
             this.rollOver = _data["rollOver"];
             this.unitPrice = _data["unitPrice"];
             this.featurePeriodLimit = _data["featurePeriodLimit"];
-            this.category = _data["category"];
             this.featureDescription = _data["featureDescription"];
             this.featureStatus = _data["featureStatus"];
             this.unitOfMeasurementName = _data["unitOfMeasurementName"];
@@ -74563,7 +75294,6 @@ export class CreateOrEditAppSubscriptionPlanDetailDto implements ICreateOrEditAp
         data["rollOver"] = this.rollOver;
         data["unitPrice"] = this.unitPrice;
         data["featurePeriodLimit"] = this.featurePeriodLimit;
-        data["category"] = this.category;
         data["featureDescription"] = this.featureDescription;
         data["featureStatus"] = this.featureStatus;
         data["unitOfMeasurementName"] = this.unitOfMeasurementName;
@@ -74588,7 +75318,6 @@ export interface ICreateOrEditAppSubscriptionPlanDetailDto {
     rollOver: boolean;
     unitPrice: number;
     featurePeriodLimit: string;
-    category: string;
     featureDescription: string | undefined;
     featureStatus: string | undefined;
     unitOfMeasurementName: string;
@@ -74895,6 +75624,8 @@ export class AppSubscriptionPlanHeaderDto implements IAppSubscriptionPlanHeaderD
     yearlyPrice!: number;
     code!: string | undefined;
     name!: string | undefined;
+    appSubscriptionPlanDetails!: AppSubscriptionPlanDetailDto[] | undefined;
+    appTenantSubscriptionPlanId!: number | undefined;
     id!: number;
 
     [key: string]: any;
@@ -74923,6 +75654,12 @@ export class AppSubscriptionPlanHeaderDto implements IAppSubscriptionPlanHeaderD
             this.yearlyPrice = _data["yearlyPrice"];
             this.code = _data["code"];
             this.name = _data["name"];
+            if (Array.isArray(_data["appSubscriptionPlanDetails"])) {
+                this.appSubscriptionPlanDetails = [] as any;
+                for (let item of _data["appSubscriptionPlanDetails"])
+                    this.appSubscriptionPlanDetails!.push(AppSubscriptionPlanDetailDto.fromJS(item));
+            }
+            this.appTenantSubscriptionPlanId = _data["appTenantSubscriptionPlanId"];
             this.id = _data["id"];
         }
     }
@@ -74949,6 +75686,12 @@ export class AppSubscriptionPlanHeaderDto implements IAppSubscriptionPlanHeaderD
         data["yearlyPrice"] = this.yearlyPrice;
         data["code"] = this.code;
         data["name"] = this.name;
+        if (Array.isArray(this.appSubscriptionPlanDetails)) {
+            data["appSubscriptionPlanDetails"] = [];
+            for (let item of this.appSubscriptionPlanDetails)
+                data["appSubscriptionPlanDetails"].push(item.toJSON());
+        }
+        data["appTenantSubscriptionPlanId"] = this.appTenantSubscriptionPlanId;
         data["id"] = this.id;
         return data;
     }
@@ -74964,6 +75707,8 @@ export interface IAppSubscriptionPlanHeaderDto {
     yearlyPrice: number;
     code: string | undefined;
     name: string | undefined;
+    appSubscriptionPlanDetails: AppSubscriptionPlanDetailDto[] | undefined;
+    appTenantSubscriptionPlanId: number | undefined;
     id: number;
 
     [key: string]: any;
@@ -75573,12 +76318,75 @@ export interface IGetAppTenantActivityLogForEditOutput {
     [key: string]: any;
 }
 
+export class AddOnsInputDto implements IAddOnsInputDto {
+    featureCode!: string | undefined;
+    featureName!: string | undefined;
+    price!: number;
+    qty!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAddOnsInputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.featureCode = _data["featureCode"];
+            this.featureName = _data["featureName"];
+            this.price = _data["price"];
+            this.qty = _data["qty"];
+        }
+    }
+
+    static fromJS(data: any): AddOnsInputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddOnsInputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["featureCode"] = this.featureCode;
+        data["featureName"] = this.featureName;
+        data["price"] = this.price;
+        data["qty"] = this.qty;
+        return data;
+    }
+}
+
+export interface IAddOnsInputDto {
+    featureCode: string | undefined;
+    featureName: string | undefined;
+    price: number;
+    qty: number;
+
+    [key: string]: any;
+}
+
 export class AppTenantInvoiceDto implements IAppTenantInvoiceDto {
     invoiceNumber!: string | undefined;
     invoiceDate!: moment.Moment;
     amount!: number;
     dueDate!: moment.Moment;
     payDate!: moment.Moment;
+    attachment!: string | undefined;
+    displayName!: string | undefined;
+    tenantName!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -75603,6 +76411,9 @@ export class AppTenantInvoiceDto implements IAppTenantInvoiceDto {
             this.amount = _data["amount"];
             this.dueDate = _data["dueDate"] ? moment(_data["dueDate"].toString()) : <any>undefined;
             this.payDate = _data["payDate"] ? moment(_data["payDate"].toString()) : <any>undefined;
+            this.attachment = _data["attachment"];
+            this.displayName = _data["displayName"];
+            this.tenantName = _data["tenantName"];
             this.id = _data["id"];
         }
     }
@@ -75625,6 +76436,9 @@ export class AppTenantInvoiceDto implements IAppTenantInvoiceDto {
         data["amount"] = this.amount;
         data["dueDate"] = this.dueDate ? this.dueDate.toISOString() : <any>undefined;
         data["payDate"] = this.payDate ? this.payDate.toISOString() : <any>undefined;
+        data["attachment"] = this.attachment;
+        data["displayName"] = this.displayName;
+        data["tenantName"] = this.tenantName;
         data["id"] = this.id;
         return data;
     }
@@ -75636,6 +76450,9 @@ export interface IAppTenantInvoiceDto {
     amount: number;
     dueDate: moment.Moment;
     payDate: moment.Moment;
+    attachment: string | undefined;
+    displayName: string | undefined;
+    tenantName: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -75750,6 +76567,7 @@ export interface IPagedResultDtoOfGetAppTenantInvoiceForViewDto {
 }
 
 export class CreateOrEditAppTenantInvoiceDto implements ICreateOrEditAppTenantInvoiceDto {
+    tenantId!: number;
     invoiceNumber!: string;
     invoiceDate!: moment.Moment;
     amount!: number;
@@ -75775,6 +76593,7 @@ export class CreateOrEditAppTenantInvoiceDto implements ICreateOrEditAppTenantIn
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.tenantId = _data["tenantId"];
             this.invoiceNumber = _data["invoiceNumber"];
             this.invoiceDate = _data["invoiceDate"] ? moment(_data["invoiceDate"].toString()) : <any>undefined;
             this.amount = _data["amount"];
@@ -75802,6 +76621,7 @@ export class CreateOrEditAppTenantInvoiceDto implements ICreateOrEditAppTenantIn
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["tenantId"] = this.tenantId;
         data["invoiceNumber"] = this.invoiceNumber;
         data["invoiceDate"] = this.invoiceDate ? this.invoiceDate.toISOString() : <any>undefined;
         data["amount"] = this.amount;
@@ -75818,6 +76638,7 @@ export class CreateOrEditAppTenantInvoiceDto implements ICreateOrEditAppTenantIn
 }
 
 export interface ICreateOrEditAppTenantInvoiceDto {
+    tenantId: number;
     invoiceNumber: string;
     invoiceDate: moment.Moment;
     amount: number;
@@ -76895,7 +77716,7 @@ export interface IAppTenantsActivitiesLogTenantLookupTableDto {
 
 export class AppTenantSubscriptionPlanDto implements IAppTenantSubscriptionPlanDto {
     tenantName!: string | undefined;
-    appSubscriptionHeaderId!: number;
+    appSubscriptionPlanHeaderId!: number;
     subscriptionPlanCode!: string | undefined;
     currentPeriodStartDate!: moment.Moment;
     currentPeriodEndDate!: moment.Moment;
@@ -76921,7 +77742,7 @@ export class AppTenantSubscriptionPlanDto implements IAppTenantSubscriptionPlanD
                     this[property] = _data[property];
             }
             this.tenantName = _data["tenantName"];
-            this.appSubscriptionHeaderId = _data["appSubscriptionHeaderId"];
+            this.appSubscriptionPlanHeaderId = _data["appSubscriptionPlanHeaderId"];
             this.subscriptionPlanCode = _data["subscriptionPlanCode"];
             this.currentPeriodStartDate = _data["currentPeriodStartDate"] ? moment(_data["currentPeriodStartDate"].toString()) : <any>undefined;
             this.currentPeriodEndDate = _data["currentPeriodEndDate"] ? moment(_data["currentPeriodEndDate"].toString()) : <any>undefined;
@@ -76945,7 +77766,7 @@ export class AppTenantSubscriptionPlanDto implements IAppTenantSubscriptionPlanD
                 data[property] = this[property];
         }
         data["tenantName"] = this.tenantName;
-        data["appSubscriptionHeaderId"] = this.appSubscriptionHeaderId;
+        data["appSubscriptionPlanHeaderId"] = this.appSubscriptionPlanHeaderId;
         data["subscriptionPlanCode"] = this.subscriptionPlanCode;
         data["currentPeriodStartDate"] = this.currentPeriodStartDate ? this.currentPeriodStartDate.toISOString() : <any>undefined;
         data["currentPeriodEndDate"] = this.currentPeriodEndDate ? this.currentPeriodEndDate.toISOString() : <any>undefined;
@@ -76958,7 +77779,7 @@ export class AppTenantSubscriptionPlanDto implements IAppTenantSubscriptionPlanD
 
 export interface IAppTenantSubscriptionPlanDto {
     tenantName: string | undefined;
-    appSubscriptionHeaderId: number;
+    appSubscriptionPlanHeaderId: number;
     subscriptionPlanCode: string | undefined;
     currentPeriodStartDate: moment.Moment;
     currentPeriodEndDate: moment.Moment;
@@ -77080,7 +77901,7 @@ export interface IPagedResultDtoOfGetAppTenantSubscriptionPlanForViewDto {
 export class CreateOrEditAppTenantSubscriptionPlanDto implements ICreateOrEditAppTenantSubscriptionPlanDto {
     tenantId!: number;
     tenantName!: string;
-    appSubscriptionHeaderId!: number;
+    appSubscriptionPlanHeaderId!: number;
     subscriptionPlanCode!: string;
     currentPeriodStartDate!: moment.Moment;
     currentPeriodEndDate!: moment.Moment;
@@ -77107,7 +77928,7 @@ export class CreateOrEditAppTenantSubscriptionPlanDto implements ICreateOrEditAp
             }
             this.tenantId = _data["tenantId"];
             this.tenantName = _data["tenantName"];
-            this.appSubscriptionHeaderId = _data["appSubscriptionHeaderId"];
+            this.appSubscriptionPlanHeaderId = _data["appSubscriptionPlanHeaderId"];
             this.subscriptionPlanCode = _data["subscriptionPlanCode"];
             this.currentPeriodStartDate = _data["currentPeriodStartDate"] ? moment(_data["currentPeriodStartDate"].toString()) : <any>undefined;
             this.currentPeriodEndDate = _data["currentPeriodEndDate"] ? moment(_data["currentPeriodEndDate"].toString()) : <any>undefined;
@@ -77132,7 +77953,7 @@ export class CreateOrEditAppTenantSubscriptionPlanDto implements ICreateOrEditAp
         }
         data["tenantId"] = this.tenantId;
         data["tenantName"] = this.tenantName;
-        data["appSubscriptionHeaderId"] = this.appSubscriptionHeaderId;
+        data["appSubscriptionPlanHeaderId"] = this.appSubscriptionPlanHeaderId;
         data["subscriptionPlanCode"] = this.subscriptionPlanCode;
         data["currentPeriodStartDate"] = this.currentPeriodStartDate ? this.currentPeriodStartDate.toISOString() : <any>undefined;
         data["currentPeriodEndDate"] = this.currentPeriodEndDate ? this.currentPeriodEndDate.toISOString() : <any>undefined;
@@ -77146,7 +77967,7 @@ export class CreateOrEditAppTenantSubscriptionPlanDto implements ICreateOrEditAp
 export interface ICreateOrEditAppTenantSubscriptionPlanDto {
     tenantId: number;
     tenantName: string;
-    appSubscriptionHeaderId: number;
+    appSubscriptionPlanHeaderId: number;
     subscriptionPlanCode: string;
     currentPeriodStartDate: moment.Moment;
     currentPeriodEndDate: moment.Moment;
@@ -77201,6 +78022,58 @@ export class GetAppTenantSubscriptionPlanForEditOutput implements IGetAppTenantS
 
 export interface IGetAppTenantSubscriptionPlanForEditOutput {
     appTenantSubscriptionPlan: CreateOrEditAppTenantSubscriptionPlanDto;
+
+    [key: string]: any;
+}
+
+export class TenantInformation implements ITenantInformation {
+    name!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ITenantInformation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.name = _data["name"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): TenantInformation {
+        data = typeof data === 'object' ? data : {};
+        let result = new TenantInformation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["name"] = this.name;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ITenantInformation {
+    name: string | undefined;
+    id: number;
 
     [key: string]: any;
 }
@@ -77893,6 +78766,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     isSalesRepInformationValid!: boolean;
     isShippingInformationValid!: boolean;
     isBillingInformationValid!: boolean;
+    entityCategoriesNames!: PagedResultDtoOfString;
+    entityClassificationsNames!: PagedResultDtoOfString;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -77993,6 +78868,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.isSalesRepInformationValid = _data["isSalesRepInformationValid"];
             this.isShippingInformationValid = _data["isShippingInformationValid"];
             this.isBillingInformationValid = _data["isBillingInformationValid"];
+            this.entityCategoriesNames = _data["entityCategoriesNames"] ? PagedResultDtoOfString.fromJS(_data["entityCategoriesNames"]) : <any>undefined;
+            this.entityClassificationsNames = _data["entityClassificationsNames"] ? PagedResultDtoOfString.fromJS(_data["entityClassificationsNames"]) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -78127,6 +79004,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["isSalesRepInformationValid"] = this.isSalesRepInformationValid;
         data["isShippingInformationValid"] = this.isShippingInformationValid;
         data["isBillingInformationValid"] = this.isBillingInformationValid;
+        data["entityCategoriesNames"] = this.entityCategoriesNames ? this.entityCategoriesNames.toJSON() : <any>undefined;
+        data["entityClassificationsNames"] = this.entityClassificationsNames ? this.entityClassificationsNames.toJSON() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -78246,6 +79125,8 @@ export interface IGetAppTransactionsForViewDto {
     isSalesRepInformationValid: boolean;
     isShippingInformationValid: boolean;
     isBillingInformationValid: boolean;
+    entityCategoriesNames: PagedResultDtoOfString;
+    entityClassificationsNames: PagedResultDtoOfString;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -78894,6 +79775,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     isSalesRepInformationValid!: boolean;
     isShippingInformationValid!: boolean;
     isBillingInformationValid!: boolean;
+    entityCategoriesNames!: PagedResultDtoOfString;
+    entityClassificationsNames!: PagedResultDtoOfString;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -79003,6 +79886,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.isSalesRepInformationValid = _data["isSalesRepInformationValid"];
             this.isShippingInformationValid = _data["isShippingInformationValid"];
             this.isBillingInformationValid = _data["isBillingInformationValid"];
+            this.entityCategoriesNames = _data["entityCategoriesNames"] ? PagedResultDtoOfString.fromJS(_data["entityCategoriesNames"]) : <any>undefined;
+            this.entityClassificationsNames = _data["entityClassificationsNames"] ? PagedResultDtoOfString.fromJS(_data["entityClassificationsNames"]) : <any>undefined;
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -79146,6 +80031,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["isSalesRepInformationValid"] = this.isSalesRepInformationValid;
         data["isShippingInformationValid"] = this.isShippingInformationValid;
         data["isBillingInformationValid"] = this.isBillingInformationValid;
+        data["entityCategoriesNames"] = this.entityCategoriesNames ? this.entityCategoriesNames.toJSON() : <any>undefined;
+        data["entityClassificationsNames"] = this.entityClassificationsNames ? this.entityClassificationsNames.toJSON() : <any>undefined;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -79274,6 +80161,8 @@ export interface IGetAllAppTransactionsForViewDto {
     isSalesRepInformationValid: boolean;
     isShippingInformationValid: boolean;
     isBillingInformationValid: boolean;
+    entityCategoriesNames: PagedResultDtoOfString;
+    entityClassificationsNames: PagedResultDtoOfString;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -95868,58 +96757,6 @@ export class PagedResultDtoOfGetSycEntityObjectStatusForViewDto implements IPage
 export interface IPagedResultDtoOfGetSycEntityObjectStatusForViewDto {
     totalCount: number;
     items: GetSycEntityObjectStatusForViewDto[] | undefined;
-
-    [key: string]: any;
-}
-
-export class SycEntityObjectStatusLookupTableDto implements ISycEntityObjectStatusLookupTableDto {
-    id!: number;
-    displayName!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: ISycEntityObjectStatusLookupTableDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.id = _data["id"];
-            this.displayName = _data["displayName"];
-        }
-    }
-
-    static fromJS(data: any): SycEntityObjectStatusLookupTableDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new SycEntityObjectStatusLookupTableDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["id"] = this.id;
-        data["displayName"] = this.displayName;
-        return data;
-    }
-}
-
-export interface ISycEntityObjectStatusLookupTableDto {
-    id: number;
-    displayName: string | undefined;
 
     [key: string]: any;
 }

@@ -41,6 +41,6 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         public long AppSubscriptionPlanHeaderId { get; set; }
 
         public long? AppFeatureId { get; set; }
-
+        public string? AppSubscriptionPlanHeaderCode { get; set; }
     }
 }

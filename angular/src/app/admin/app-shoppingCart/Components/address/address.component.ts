@@ -79,9 +79,17 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
         }
     }
     }
-    filterAddressList(filterVal){
-        this.savedAddressesList=this.refSavedAddressesList.filter(item=>item.name.includes(filterVal));
-
+    filterAddressList(filterVal: string) {
+        this.savedAddressesList = this.refSavedAddressesList.filter(item => 
+            (
+                // item.name?.toLowerCase().includes(filterVal.toLowerCase()) || 
+                item.addressLine1?.toLowerCase().includes(filterVal.toLowerCase()) || 
+             item.addressLine2?.toLowerCase().includes(filterVal.toLowerCase()) ||
+             item.city?.toLowerCase().includes(filterVal.toLowerCase()) || 
+             item.state?.toLowerCase().includes(filterVal.toLowerCase()) || 
+             item.countryCode?.toLowerCase().includes(filterVal.toLowerCase()) || 
+             item.postalCode?.toLowerCase().includes(filterVal.toLowerCase()))
+        );
     }
 
     getAddressList(companySsin){

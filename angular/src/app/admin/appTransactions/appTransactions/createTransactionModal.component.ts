@@ -168,8 +168,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
     ngAfterViewInit() {
         // Set initial suggestions or interact with the component after it has been initialized
-        this.loadInitialContacts();
-        this.loadInitialSellerContacts()
+        // this.loadInitialContacts();
+        // this.loadInitialSellerContacts()
 
       }
     openCalendar(calendar: Calendar) {
@@ -178,7 +178,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
       
     ngOnChanges(){
-        this.loadInitialContacts();
+        // this.loadInitialContacts();
         this.orderForm = this.fb.group({
             enteredDate: [Date],
             startDate: [ Date, [Validators.required]],
@@ -204,8 +204,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.changeStartDate(this.orderForm.get('startDate'));
         this.getUserDefultRole();
-  console.log( this.orderForm.controls['enteredDate']?.value ,'init')
-    
 
     }
     // minDateValidator(minDate: Date) {
@@ -544,7 +542,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 contact.name.toLowerCase().includes(query)
             );
         } else {
-            console.log(this.selectedBuyerContact, 'selectedBuyerContact');
+ 
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(() => {
                 this._AppTransactionServiceProxy
@@ -605,7 +603,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         } else {
         clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(() => {
-            console.log(this.buyerComapnyId);
+           
             this._AppTransactionServiceProxy
                 .getAccountRelatedContacts(this.sellerCompanyId,this.selectedSellerContact)
                 .subscribe((res: any) => {
@@ -634,8 +632,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     
     handleBuyerNameChange(event: any) {
         
-        console.log(event,'vaaaal')
-
+    
         this.buyerContactId = event.id;
         this.buyerContactSSIN = event.ssin;
         if(event?.email != null){
@@ -655,7 +652,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
     }
     handleSellerNameChange(event: any) {
-        console.log(">>", event.value);
+    
         this.sellerContactId = event.id;
         this.sellerContactSSIN = event.ssin;
         if(event.email != null) {
@@ -863,7 +860,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         } else {
             this.areSame = true
         }
-  console.log( this.orderForm.controls['enteredDate']?.value ,'getstarted')
+
 
     }
 
@@ -930,7 +927,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
 
     changeEnteredDate(date){
-console.log(date,'daaate')
+
         const newDate = new Date();
 
         let month = date?.value?.getMonth();
@@ -953,7 +950,7 @@ console.log(date,'daaate')
 
         this.minSEnteredDate = this.orderForm.get('enteredDate')?.value;
        this.orderForm.controls['startDate'].setValue(this.orderForm.get('enteredDate')?.value);
-  console.log( this.orderForm.controls['enteredDate']?.value ,'changeentereddate')
+
     
     //    const selectedStartDate = new Date(startDateControl.value);
     //    if (selectedStartDate < this.today) {

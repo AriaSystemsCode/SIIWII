@@ -49,6 +49,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
+        
     }
 
     ngOnInit(): void {
@@ -95,12 +96,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
           this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = null;
         
         this.__selectedPhoneTypeValue = 0;
-        this.companyFilterValue = "";
-        this.companyNamePlaceholder = "Select Company Name";
-        this.contactNamePlaceholder = "Select Contact Name";
-        this.tempAccount = false;
-        this.tempContact = false;
-        this.contactFilterValue = "";
         }
     }
 
@@ -234,8 +229,15 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
          });
      } */
     onchangePhoneType($event) {
-        if ($event?.value)
+        if ($event?.value) {
+            console.log($event,'helllo')
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.value?.phoneTypeId);
+        if ($event?.value?.phoneNumber) {
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = $event?.value?.phoneNumber
+        }else {
+            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber =  null
+        }
+        }
         else
             var indx = this.allPhoneTypes?.findIndex(x => x.phoneTypeId == $event?.phoneTypeId);
         if (indx >= 0)
@@ -360,6 +362,12 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
     getAllCompaniesData() {
        
+        this.companyFilterValue = "";
+        this.companyNamePlaceholder = "Select Company Name";
+        this.contactNamePlaceholder = "Select Contact Name";
+        this.tempAccount = false;
+        this.tempContact = false;
+        this.contactFilterValue = "";
                 //////////////////////////////////////////////////// I36 -Temp Account scenario
                 if ((this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN == "0" || !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName) {
                     this.tempAccount = true;
@@ -431,8 +439,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
 
             (isValid) =
-                (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') &&
-                (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '' );
+               ( (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') &&
+                (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '' )
+                || this.tempAccount );
                 //(this.showDepartment ? (this.appTransactionsForViewDto?.buyerDepartment != undefined && this.appTransactionsForViewDto?.buyerDepartment != '') : true);
 
                 // (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail != '') &&
@@ -492,8 +501,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedPhoneType)
            {
             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType = null;
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber = ! this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber  ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber ;
-            this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail = ! this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail  ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail ;
+            event?.phone == null ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactPhoneNumber : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber ;
+            event?.email == null ?  this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail : this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail ;
         } 
            
 

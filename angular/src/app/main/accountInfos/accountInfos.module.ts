@@ -41,8 +41,14 @@ import { ViewOthersProfileComponent } from './components/view-others-profile.com
 import { ViewProfileComponent } from './components/view-profile.component';
 import { MembersListSharedModule } from '../members-list/members-list-shared.module';
 import { MyMembersModule } from '../teamMembers/my-members.module';
-
-
+import { AccountBillingComponent } from './components/accountBilling/AccountBilling/accountbilling.component';
+import { AddOnsComponent } from './components/accountBilling/components/add-ons/add-ons.component';
+import { ActivityLogComponent } from './components/accountBilling/components/activity-log/activity-log.component';
+import { TenantInvoicesComponent } from './components/accountBilling/components/tenant-invoices/tenant-invoices.component';
+import { PlansComponent } from './components/accountBilling/components/plans/plans.component';
+import { MainModule } from '../main.module';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 @NgModule({
     declarations: [
         AccountInfoComponent,
@@ -55,6 +61,11 @@ import { MyMembersModule } from '../teamMembers/my-members.module';
         BranchDetailsDynamicModalComponent,
         ViewOthersProfileComponent,
         ViewProfileComponent,
+        AccountBillingComponent,
+        AddOnsComponent,
+        ActivityLogComponent,
+        TenantInvoicesComponent,
+        PlansComponent
     ],
     imports: [
         CommonModule,
@@ -89,7 +100,9 @@ import { MyMembersModule } from '../teamMembers/my-members.module';
         SelectAddressModule,
         MembersListSharedModule,
         AccountModule,
-        MyMembersModule
+        MyMembersModule,MainModule,
+        ConfirmDialogModule,
+        DialogModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

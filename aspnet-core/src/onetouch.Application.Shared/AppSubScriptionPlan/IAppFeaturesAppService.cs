@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using onetouch.AppSubScriptionPlan.Dtos;
 using onetouch.Dto;
+using onetouch.SystemObjects.Dtos;
 
 namespace onetouch.AppSubScriptionPlan
 {
@@ -20,6 +22,6 @@ namespace onetouch.AppSubScriptionPlan
         Task Delete(EntityDto input);
 
         Task<FileDto> GetAppFeaturesToExcel(GetAllAppFeaturesForExcelInput input);
-
+        Task<List<SycEntityObjectStatusLookupTableDto>> GetFeatureStatusList();
     }
 }

@@ -153,13 +153,21 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     }
 
     onSelectionChange($event) {
+ 
         /* if($event.entityObjectStatusCode!="DRAFT")
              return ; */
         if ($event?.id)
             this.orderId = $event?.id;
+        
+        if (this.orderId) {
+            if($event.entityObjectStatusCode =="DRAFT") {
+                this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.createOrEdit);
 
-        if (this.orderId)
-            this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
+            } else {
+                this.shoppingCartModal.show(this.orderId, true, true, ShoppingCartMode.view);
+                
+            }
+        }
     }
 
     reloadPage(): void {

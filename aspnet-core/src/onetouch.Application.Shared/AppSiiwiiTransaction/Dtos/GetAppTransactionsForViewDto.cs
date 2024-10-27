@@ -35,6 +35,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual bool IsShippingInformationValid { set; get; }
         public virtual bool IsBillingInformationValid { set; get; }
         //MMT - Performance[End]
+        //start
+        public virtual PagedResultDto<string> EntityCategoriesNames { get; set; }
+        public virtual PagedResultDto<string> EntityClassificationsNames { get; set; }
+        //End
     }
 
     //xx
@@ -221,5 +225,13 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 
         public virtual string SharedUserTenantName { get; set; }
 
+    }
+    public class GetAppTransactionAttributesInput : PagedAndSortedResultRequestDto
+    {
+
+    }
+    public class GetAppTransactionAttributesWithPagingInput : GetAppTransactionAttributesInput
+    {
+        public long TransactionId { get; set; }
     }
 }

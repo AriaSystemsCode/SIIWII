@@ -102,6 +102,9 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IEmailSender _emailSender;
         private readonly IAppItemsAppService _appItemsAppService;
         private readonly ISycEntityObjectTypesAppService _SycEntityObjectTypesAppService;
+        private readonly IAppEntitiesAppService _appEntitiesAppService;
+        private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategory;
+        private readonly IRepository<SycEntityObjectClassification, long>  _sycEntityObjectClassificationRepository;
         //MMT37[End]
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -121,8 +124,13 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionDetails, long> appMarketplaceTransctionDetailsRepository,
              IRepository<AppMarketplaceTransactions.AppMarketplaceTransactionContacts, long> appMarketplaceTransctionContactsRepository,
              IRepository<AppEntitySharings, long> appEntitySharingsRepository, IMessageAppService messageAppService, IRepository<AppEntityAttachment, long> appEntityAttachment,
-             IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender, IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
+             IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender,IAppEntitiesAppService appEntitiesAppService, 
+             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository,
+             IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
         {
+            _sycEntityObjectClassificationRepository = sycEntityObjectClassificationRepository;
+            _sycEntityObjectCategory = sycEntityObjectCategory;
+            _appEntitiesAppService = appEntitiesAppService;
             _SycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
             _MessagesRepository = messagesRepository;
             _appAddressRepository = appAddressRepository;
@@ -1716,6 +1724,15 @@ namespace onetouch.AppSiiwiiTransaction
             var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
             if (input.fromExport)
             {
+                if (input.StatusId == 0)
+                {
+                    input.StatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                }
+                if (input.EntityTypeIdFilter == 0)
+                {
+                    input.EntityTypeIdFilter = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
+                }
+
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(x => x.AppTransactionContacts).ThenInclude(s => s.ContactAddressFk)
                     .Include(z => z.AppTransactionDetails)
                     .Include(z => z.PaymentTermsFk).ThenInclude(z => z.EntityExtraData)
@@ -1733,7 +1750,9 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrEmpty(input.SellerSSIN), e => e.SellerContactSSIN == input.SellerSSIN)
                             .WhereIf(!string.IsNullOrEmpty(input.SellerName), e => e.SellerCompanyName.Contains(input.SellerName))
                             .WhereIf(!string.IsNullOrEmpty(input.BuyerName), e => e.BuyerCompanyName.Contains(input.BuyerName))
-                            .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId) && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
+                            .WhereIf(input.Since_Id > 0 , e => e.Id > input.Since_Id)
+                            .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId)
+                                        && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
                             ;
 
 
@@ -1773,6 +1792,23 @@ namespace onetouch.AppSiiwiiTransaction
                 var items = await pagedAndFilteredAppTransactionsRes.ToListAsync();
                 var totalCount = items.DistinctBy(e => e.Trans).Count();
                 var objList = items.DistinctBy(e => e.Trans).ToList();
+
+                // remove parent items from export based on parameter [Begin]
+                if (input.hasParentItems==false)
+                {
+                    foreach (var transactions in objList)
+                    {
+                        var parentItems = transactions.Trans.AppTransactionDetails.Where(e => e.ParentId == null).ToList();
+                        foreach (var parentItem in parentItems)
+                        {
+                            transactions.Trans.AppTransactionDetails.Remove(parentItem);
+
+                        }
+                    }
+                }
+                
+                // remove parent items from export based on parameter [End]    
+
                 var appTrans = objList.Select(x =>
                 {
                     GetAllAppTransactionsForViewDto y = ObjectMapper.Map<GetAllAppTransactionsForViewDto>(x.Trans);
@@ -3559,6 +3595,80 @@ namespace onetouch.AppSiiwiiTransaction
             return returnList;
 
         }
+        //MMT-Show Sub Categories and classification[Start]
+        public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppTransactionCategoriesFullNamesWithPaging(GetAppTransactionAttributesWithPagingInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                if (input.TransactionId != 0)
+                {
+                    // List<string> returnName = new List<string>();
+                    var returnRes = await _appEntitiesAppService.GetAppEntityCategoriesWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.TransactionId });
+                    {
+                        foreach (var cat in returnRes.Items)
+                        {
+                            cat.EntityObjectCategoryName = GetDepartmentName(cat.EntityObjectCategoryId);
+                        }
+                    }
+                    return returnRes;
+                }
+                return new PagedResultDto<AppEntityCategoryDto>();
+            }
+        }
+        private string GetDepartmentName(long departmentId)
+        {
+            string returnName = "";
+            var categoriesFiltered = _sycEntityObjectCategory.GetAll().Include(a => a.ParentFk).FirstOrDefault(a => a.Id == departmentId);
+            if (categoriesFiltered != null)
+            {
+                if (categoriesFiltered.ParentId != null)
+                {
+                    returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + GetDepartmentName(long.Parse(categoriesFiltered.ParentId.ToString()));
+                }
+                //else
+                returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + categoriesFiltered.Name;
+            }
+            return returnName;
+
+        }
+        private async Task<PagedResultDto<AppEntityClassificationDto>> GetAppTransactionClassificationsFullNamesWithPaging(GetAppTransactionAttributesWithPagingInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                
+                if (input.TransactionId != 0)
+                {
+                    //return await _appEntitiesAppService.GetAppEntityClassificationsNamesWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.ItemEntityId });
+                    var returnRes = await _appEntitiesAppService.GetAppEntityClassificationsWithPaging(new GetAppEntityAttributesInput { MaxResultCount = input.MaxResultCount, SkipCount = input.SkipCount, Sorting = input.Sorting, EntityId = input.TransactionId });
+                    if (returnRes != null && returnRes.Items.Count > 0)
+                    {
+                        foreach (var clss in returnRes.Items)
+                        {
+                            clss.EntityObjectClassificationName = GetClassName(clss.EntityObjectClassificationId);
+                        }
+                    }
+                    return returnRes;
+                }
+                return new PagedResultDto<AppEntityClassificationDto>();
+            }
+        }
+        private string GetClassName(long classId)
+        {
+            string returnName = "";
+            var classFiltered = _sycEntityObjectClassificationRepository.GetAll().Include(a => a.ParentFk).FirstOrDefault(a => a.Id == classId);
+            if (classFiltered != null)
+            {
+                if (classFiltered.ParentId != null)
+                {
+                    returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + GetClassName(long.Parse(classFiltered.ParentId.ToString()));
+                }
+                //else
+                returnName += (string.IsNullOrEmpty(returnName) ? "" : "-") + classFiltered.Name;
+            }
+            return returnName;
+
+        }
+        //[End]
         public async Task<GetAppTransactionsForViewDto> GetAppTransactionsForView(long transactionId, GetAllAppTransactionsInputDto? input, TransactionPosition? position)
         {
 
@@ -3716,7 +3826,7 @@ namespace onetouch.AppSiiwiiTransaction
                         viewTrans.IsBuyerContactInformationValid = false;
                         var buyer = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Buyer).FirstOrDefault();
                         if (buyer!=null)
-                            viewTrans.IsBuyerContactInformationValid= (!string.IsNullOrEmpty(buyer.CompanyName) && !string.IsNullOrEmpty(buyer.BranchName));
+                            viewTrans.IsBuyerContactInformationValid= (!string.IsNullOrEmpty(buyer.CompanyName) );
 
                         viewTrans.IsSalesRepInformationValid = true;
                         var salesRep = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.SalesRep1).FirstOrDefault();
@@ -3732,7 +3842,7 @@ namespace onetouch.AppSiiwiiTransaction
                         var shipTo= viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipToContact).FirstOrDefault();
                         var shipFrom = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipFromContact).FirstOrDefault();
                         if (shipTo!=null && shipFrom!=null)
-                           viewTrans.IsShippingInformationValid = (!string.IsNullOrEmpty(shipTo.CompanyName) && !string.IsNullOrEmpty(shipTo.BranchName)) &&
+                           viewTrans.IsShippingInformationValid = (!string.IsNullOrEmpty(shipTo.CompanyName)) &&
                                 (!string.IsNullOrEmpty(shipFrom.CompanyName) && !string.IsNullOrEmpty(shipFrom.BranchName)) &&
                                 !string.IsNullOrEmpty(shipTo.ContactAddressCode) && !string.IsNullOrEmpty(shipTo.ContactAddressLine1) &&
                                 !string.IsNullOrEmpty(shipFrom.ContactAddressCode) && !string.IsNullOrEmpty(shipFrom.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.ShipViaCode);
@@ -3742,11 +3852,30 @@ namespace onetouch.AppSiiwiiTransaction
                         var apContact = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.APContact).FirstOrDefault();
                         var arContact = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ARContact).FirstOrDefault();
                         if (shipTo != null && shipFrom != null)
-                            viewTrans.IsBillingInformationValid = (!string.IsNullOrEmpty(apContact.CompanyName) && !string.IsNullOrEmpty(apContact.BranchName)) &&
+                            viewTrans.IsBillingInformationValid = (!string.IsNullOrEmpty(apContact.CompanyName)) &&
                                  (!string.IsNullOrEmpty(arContact.CompanyName) && !string.IsNullOrEmpty(arContact.BranchName)) &&
                                  !string.IsNullOrEmpty(arContact.ContactAddressCode) && !string.IsNullOrEmpty(arContact.ContactAddressLine1) &&
                                  !string.IsNullOrEmpty(apContact.ContactAddressCode) && !string.IsNullOrEmpty(apContact.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.PaymentTermsCode);
                         //MMT-Performance[End]
+                        //MMT-show
+                        viewTrans.EntityCategoriesNames = new PagedResultDto<string>
+                        {
+                            Items = (await GetAppTransactionCategoriesFullNamesWithPaging(new GetAppTransactionAttributesWithPagingInput
+                            {
+                                TransactionId = viewTrans.Id,
+                                Sorting = "Id"
+                            })).Items.Select(z => z.EntityObjectCategoryName).ToList()
+                        };
+                        viewTrans.EntityClassificationsNames = new PagedResultDto<string>
+                        {
+                            Items = (await GetAppTransactionClassificationsFullNamesWithPaging(new GetAppTransactionAttributesWithPagingInput
+                            {
+                                TransactionId = viewTrans.Id,
+                                Sorting = "Id"
+                            })).Items.Select(z => z.EntityObjectClassificationName).ToList()
+                        };
+
+                        //End
                         return viewTrans;
                     }
 

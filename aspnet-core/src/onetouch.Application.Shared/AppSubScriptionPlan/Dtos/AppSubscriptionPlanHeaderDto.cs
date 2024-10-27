@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Abp.Application.Services.Dto;
 
 namespace onetouch.AppSubScriptionPlan.Dtos
@@ -22,6 +23,8 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         public string Code { get; set; }
 
         public string Name { get; set; }
+        public System.Collections.Generic.List<AppSubscriptionPlanDetailDto> AppSubscriptionPlanDetails { get; set; }
+        public long? AppTenantSubscriptionPlanId { get; set; } = null;
 
     }
 }

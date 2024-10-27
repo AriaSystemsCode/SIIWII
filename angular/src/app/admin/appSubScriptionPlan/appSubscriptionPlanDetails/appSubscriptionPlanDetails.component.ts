@@ -56,7 +56,7 @@ export class AppSubscriptionPlanDetailsComponent extends AppComponentBase {
     featureBillingCodeFilter = '';
     featureCategoryFilter = '';
     trackactivityFilter = -1;
-        appSubscriptionPlanHeaderFilter = '';
+        appSubscriptionPlanHeaderFilter = null;
         appFeatureDescriptionFilter = '';
 
 
@@ -115,7 +115,7 @@ export class AppSubscriptionPlanDetailsComponent extends AppComponentBase {
             this.featureCategoryFilter,
             this.trackactivityFilter,
             this.appSubscriptionPlanHeaderFilter,
-            this.appFeatureDescriptionFilter,
+            this.appFeatureDescriptionFilter,false,
             this.primengTableHelper.getSorting(this.dataTable),
             this.primengTableHelper.getSkipCount(this.paginator, event),
             this.primengTableHelper.getMaxResultCount(this.paginator, event)
