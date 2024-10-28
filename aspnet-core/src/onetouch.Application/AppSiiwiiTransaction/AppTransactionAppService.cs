@@ -1816,6 +1816,15 @@ namespace onetouch.AppSiiwiiTransaction
             var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
             if (input.fromExport)
             {
+                if (input.StatusId == 0)
+                {
+                    input.StatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
+                }
+                if (input.EntityTypeIdFilter == 0)
+                {
+                    input.EntityTypeIdFilter = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
+                }
+
                 var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(x => x.AppTransactionContacts).ThenInclude(s => s.ContactAddressFk)
                     .Include(z => z.AppTransactionDetails)
                     .Include(z => z.PaymentTermsFk).ThenInclude(z => z.EntityExtraData)
@@ -1833,7 +1842,9 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrEmpty(input.SellerSSIN), e => e.SellerContactSSIN == input.SellerSSIN)
                             .WhereIf(!string.IsNullOrEmpty(input.SellerName), e => e.SellerCompanyName.Contains(input.SellerName))
                             .WhereIf(!string.IsNullOrEmpty(input.BuyerName), e => e.BuyerCompanyName.Contains(input.BuyerName))
-                            .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId) && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
+                            .WhereIf(input.Since_Id > 0 , e => e.Id > input.Since_Id)
+                            .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId)
+                                        && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
                             ;
 
 
@@ -1873,6 +1884,23 @@ namespace onetouch.AppSiiwiiTransaction
                 var items = await pagedAndFilteredAppTransactionsRes.ToListAsync();
                 var totalCount = items.DistinctBy(e => e.Trans).Count();
                 var objList = items.DistinctBy(e => e.Trans).ToList();
+
+                // remove parent items from export based on parameter [Begin]
+                if (input.hasParentItems==false)
+                {
+                    foreach (var transactions in objList)
+                    {
+                        var parentItems = transactions.Trans.AppTransactionDetails.Where(e => e.ParentId == null).ToList();
+                        foreach (var parentItem in parentItems)
+                        {
+                            transactions.Trans.AppTransactionDetails.Remove(parentItem);
+
+                        }
+                    }
+                }
+                
+                // remove parent items from export based on parameter [End]    
+
                 var appTrans = objList.Select(x =>
                 {
                     GetAllAppTransactionsForViewDto y = ObjectMapper.Map<GetAllAppTransactionsForViewDto>(x.Trans);
@@ -2561,6 +2589,7 @@ namespace onetouch.AppSiiwiiTransaction
                         || (colorId > 0 && x.AttributeValueId == colorId))).Count() > 0)
                             .ToList();
                         double oldQty = 0;
+                        long orgNoOfPrepacks = 0;
                         foreach (var e in itemsList)
                         {
                             if ((long)e.NoOfPrePacks > 0)
@@ -2568,9 +2597,10 @@ namespace onetouch.AppSiiwiiTransaction
                                // e.Quantity = qty / (e.Quantity / (long)e.NoOfPrePacks);
                                // e.NoOfPrePacks = qty;
                                 oldQty += e.Quantity;
+                                orgNoOfPrepacks = (long)e.NoOfPrePacks;
                             }
                         };
-                        long? NewNoOfPrePack = qty/(((long?)oldQty) / itemMajor.NoOfPrePacks);
+                        long? NewNoOfPrePack = qty/(((long?)oldQty) / orgNoOfPrepacks);
                         foreach (var e in itemsList)
                         {
                             if ((long)e.NoOfPrePacks > 0)
@@ -2580,7 +2610,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 e.Amount = e.NetPrice * decimal.Parse(e.Quantity.ToString());
                             }
                         };
-                        itemMajor.NoOfPrePacks = NewNoOfPrePack;
+                        itemMajor.NoOfPrePacks = itemMajor.NoOfPrePacks + NewNoOfPrePack - orgNoOfPrepacks;
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
                 }
