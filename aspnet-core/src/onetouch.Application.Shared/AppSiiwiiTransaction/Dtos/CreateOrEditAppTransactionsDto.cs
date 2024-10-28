@@ -132,4 +132,19 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public long? PhoneTypeId { get; set; }
         public string PhoneTypeName { set; get; }
     }
+    //Iteration#45
+    public class VariationInputDto {
+       //public string SellerNameFilter { set; get; }
+       //public string BuyerNameFilter { set; get; }
+       //public string CodeFilter { set; get; }
+       //public DateTime MinCreateDateFilter { set; get; }
+       //public DateTime MaxCreateDateFilter { set; get; }
+       //public DateTime MinCompleteDateFilter { set; get; }
+       //public DateTime MaxCompleteDateFilter { set; get; }
+       //public DateTime MinEnteredDateFilter { set; get; }
+       //public DateTime MaxEnteredDateFilter { set; get; }
+       //public string  StatusFilter { set; get; }
+      
+    }
+    //Iteration45
 }

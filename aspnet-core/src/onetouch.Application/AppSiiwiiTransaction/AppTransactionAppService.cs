@@ -62,6 +62,7 @@ using onetouch.SycSegmentIdentifierDefinitions.Dtos;
 using onetouch.Authorization.Accounts;
 using onetouch.Accounts;
 using onetouch.SycIdentifierDefinitions;
+using PayPalCheckoutSdk.Orders;
 
 
 //using NUglify.Helpers;
@@ -3956,9 +3957,27 @@ namespace onetouch.AppSiiwiiTransaction
                                 Sorting = "Id"
                             })).Items.Select(z => z.EntityObjectClassificationName).ToList()
                         };
+                        //iteration#45[Start]
+                        viewTrans.LastModifiedDate = (transOrg.LastModificationTime == null ? transOrg.CreationTime: DateTime.Parse(transOrg.LastModificationTime.ToString()));
+                        var marketplaceTransaction = await _appMarketplaceTransactionHeadersRepository.GetAll().AsNoTracking().Where(z => z.SSIN == transOrg.SSIN && z.TenantId == null).FirstOrDefaultAsync();
+                        if (marketplaceTransaction == null)
+                        {
+                            viewTrans.ShowSync = false;
+                        }
+                        else {
+                            if (transOrg.TimeStamp > marketplaceTransaction.TimeStamp )
+                            {
+                                viewTrans.ShowSync = true;
+                            }
+                            else
+                            {
+                                viewTrans.ShowSync = false;
+                            }
 
-                        //End
-                        return viewTrans;
+                        }
+                        //Iteration#45[End]
+                            //End
+                            return viewTrans;
                     }
 
                 }
@@ -5578,6 +5597,52 @@ namespace onetouch.AppSiiwiiTransaction
                     return false;
             }
             return true;
+        }
+        public async Task<bool> SyncTransaction(long transactionId)
+        {
+            var marketplaceTrans  = await ShareTransactionOnMarketplace(transactionId);
+            if (marketplaceTrans > 0)
+            {
+                var transaction = await _appTransactionsHeaderRepository.GetAll().Where(z => z.Id == transactionId).FirstOrDefaultAsync();
+                if (transaction != null)
+                {
+                    var sharedWithUsers = await   _appEntitySharingsRepository.GetAll().AsNoTracking().Where(z => z.EntityId == transaction.Id).ToListAsync();
+                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                    {
+                        var sharedWithTenantsTrans = await _appTransactionsHeaderRepository.GetAll().AsNoTracking().Where(z => z.SSIN == transaction.SSIN && z.TenantOwner!= z.TenantId).ToListAsync();
+                        if (sharedWithTenantsTrans != null && sharedWithTenantsTrans.Count > 0)
+                        {
+                            foreach (var transac in sharedWithTenantsTrans)
+                            {
+                                var tranCode = await ShareTransactionWithTenant(marketplaceTrans, int.Parse(transac.TenantId.ToString()),
+                                    (transac.EntityObjectTypeCode=="SALESORDER"?TransactionType.SalesOrder :TransactionType.PurchaseOrder));
+                                var user = sharedWithUsers.Where(z => z.SharedTenantId == int.Parse(transac.TenantId.ToString())).FirstOrDefault();
+                                if (user != null)
+                                {
+                                    await _messageAppService.CreateMessage(new CreateMessageInput
+                                    {
+                                        To = user.SharedUserId.ToString(),
+                                        Body = (transac.EntityObjectTypeCode == "SALESORDER" ? "Sales Order#":"Purchase Order#") + tranCode + " has been updated",
+                                        //MessageCategory = MessageCategory.UPDATEMESSAGE.ToString(),
+                                        MesasgeObjectType = MesasgeObjectType.Message,
+                                        RelatedEntityId = marketplaceTrans != null ? marketplaceTrans:null,
+                                        BodyFormat = (transac.EntityObjectTypeCode == "SALESORDER" ? "Sales Order#" : "Purchase Order#") + tranCode + " has been updated",
+                                        SendDate = DateTime.Now.Date,
+                                        ReceiveDate = DateTime.Now.Date,
+                                        Subject = (transac.EntityObjectTypeCode == "SALESORDER" ? "Sales Order#" : "Purchase Order#") + tranCode + " has been updated",
+                                        SenderId = AbpSession.UserId,
+                                        Code = null
+                                    });
+                                }
+
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+            else
+                return false;
         }
         //Iteration45[End]
     }

@@ -39,6 +39,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual PagedResultDto<string> EntityCategoriesNames { get; set; }
         public virtual PagedResultDto<string> EntityClassificationsNames { get; set; }
         //End
+        //Iteration45[Start]
+        public virtual bool ShowSync { set; get; } = false;
+        public virtual DateTime LastModifiedDate { set; get; }
+        //Iteration45[End]
     }
 
     //xx
