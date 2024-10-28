@@ -32,7 +32,6 @@ export class CatalogueReportProductsPrintInfoComponent extends AppComponentBase 
     }
 
     ngOnInit(): void {
-        // T-SII-20240605.0001
         this._AccountsServiceProxy.getAccountForView(this.appSession?.user?.accountId,undefined)
         .subscribe((res) => {
             this.userCountry=res.account.countryName;
@@ -44,7 +43,6 @@ export class CatalogueReportProductsPrintInfoComponent extends AppComponentBase 
     }
 
     printAndFinish(printInfoForm:NgForm) {
-        // T-SII-20240605.0001
         this.printInfoParam.userCountry=this.userCountry ; 
         this.continue.emit(true)
     }
