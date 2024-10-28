@@ -1,25 +1,25 @@
-<h3 class="register_label_margin titleLog">
+<h3 class="register_label_margin titleLog ml-5 pl-4">
     {{ "AccountSignUp" | localize }}
 </h3>
 
-<h4 *ngIf="model.edition" class="text-left edition_label register_label_margin">
+<h4 *ngIf="model.edition" class="text-left edition_label register_label_margin ml-5 pl-4 mb-4">
     {{ "Edition" | localize }}: {{ accountTypeLabel }} {{ "Edition" | localize }}
 </h4>
  
-<div class="Login_container kt-login__form" [@routerTransition]>
+<div class="Login_container kt-login__form p-4" [@routerTransition]>
     <form #registerForm="ngForm" role="form" novalidate (submit)="save()" class="kt-form mt-2">
         <h5 *ngIf="model.edition" class="Personal_Info text-left">
-          <label *ngIf="accountTypeLabel.includes('PERSONAL')"> {{ accountTypeLabel }}</label>
-          <label *ngIf="!accountTypeLabel.includes('PERSONAL')">{{ "Account" | localize }}</label>
+          <label *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')"> {{ accountTypeLabel }}</label>
+          <label *ngIf="!accountTypeLabel?.includes('PERSONAL')">{{ "Account" | localize }}</label>
           {{ "Information" | localize }} 
         </h5>
 
         <div class="form-group row">
             <div class="col-9 col-lg-12 pl-0 p-0 MB20">
-                <label class="sub_titleLog"> {{"WorkSpaceName"| localize}} <span class="StarInfo">*</span></label>
-                <div class="p_relative">
-                <img src="../../assets/img/input_icons/workSpaceIcon.png" class="User_icon icon-width">
-                <input #tenancyName="ngModel" class="MT0 form-control" autoFocus type="text"
+                <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"WorkSpaceName"| localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <div class="user_p_relative">
+                <img src="../../assets/img/input_icons/workSpaceIcon.png" class="user_icon icon-width">
+                <input #tenancyName="ngModel" class="mb-3 form-control" autoFocus type="text"
                     placeholder="{{ 'EnterYourWorkSpaceName' | localize }} " [(ngModel)]="model.tenancyName" name="tenancyName"
                     required maxlength="64" [pattern]="domainPattern" /></div>
             </div>
@@ -62,31 +62,32 @@
  -->
 
         <div *ngIf="model.edition" class="form-group col-9 col-lg-12 MB20">
-            <label class="sub_titleLog"> {{"AccountName"| localize}} <span class="StarInfo">*</span></label>
-            <div class="p_relative">
-            <img src="../../assets/img/input_icons/user.png" class="User_icon icon-width">
-            <input #nameInput="ngModel" class="MT0 form-control" type="text"
-                placeholder="{{ 'EnterAccountName' | localize }} *" [(ngModel)]="model.name" name="Name" required
+            <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"AccountName"| localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+            <div class="user_p_relative">
+            <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width">
+            <input #nameInput="ngModel" class="mb-3 form-control" type="text"
+                placeholder="{{ 'EnterAccountName' | localize }}" [(ngModel)]="model.name" name="Name" required
                 maxlength="128" /></div>
             <validation-messages [formCtrl]="nameInput"></validation-messages>
         </div>
 
-        <!-- <h5 class="mt-2" *ngIf="!accountTypeLabel.includes('PERSONAL')">
+        <!-- <h5 class="mt-2" *ngIf="!accountTypeLabel?.includes('PERSONAL')">
             {{ "AdminInformation" | localize }}
         </h5> -->
-        <!-- <h5 class="mt-2" *ngIf="accountTypeLabel.includes('PERSONAL')">
+        <!-- <h5 class="mt-2" *ngIf="accountTypeLabel?.includes('PERSONAL')">
             {{ "PersonalInformations" | localize }}
         </h5> -->
 
 
 
-        <div class="row MB20 PR2L10">
-            <label  *ngIf="!accountTypeLabel.includes('PERSONAL')" class="Personal_Info co-lg-12"> {{"AdminInformation" | localize}} </label>
+        <div class="row mt-5 ml-0 PR2L10">
+            <label  *ngIf="!accountTypeLabel?.includes('PERSONAL')" class="Personal_Info co-lg-12"> {{"AdminInformation" | localize}} </label>
             <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 pr-2">
-                <label class="sub_titleLog"> {{"FirstName" | localize}} <span class="StarInfo">*</span></label>
-                <div class="p_relative">
-                <img src="../../assets/img/input_icons/user.png" class="User_icon icon-width SmallUser_icon">
-                <input #firstNameInput="ngModel" class="MT0 form-control" type="text"
+                <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{"FirstName" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <div class="user_p_relative">
+                <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
+                <input #firstNameInput="ngModel" class="mb-3 form-control" type="text"
+                [disabled]="model.firstName"
                     [placeholder]="('EnterYourFirstName' | localize )" [(ngModel)]="model.firstName" name="adminFirstName"
                     required /></div>
                     <!-- firstName.length > 0 ? firstName : ('EnterYourFirstName' | localize ) -->
@@ -95,10 +96,11 @@
                 </span>
             </div>
             <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6">
-                <label class="sub_titleLog"> {{ "lastName" | localize }} <span class="StarInfo">*</span></label>
-                <div class="p_relative">
-                <img src="../../assets/img/input_icons/user.png" class="User_icon icon-width SmallUser_icon">
-                <input #lastNameInput="ngModel" class="MT0 form-control" type="text"
+                <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{ "lastName" | localize }} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <div class="user_p_relative">
+                <img src="../../assets/img/input_icons/user.png" class="user_icon icon-width SmallUser_icon">
+                <input #lastNameInput="ngModel" class="mb-3 form-control" type="text"
+                [disabled]="model.lastName"
                    [placeholder]="('EnterYourLastName' | localize )" [(ngModel)]="model.lastName" name="adminLastName"
                     required/></div>
                     <!-- lastName.length > 0  ? lastName : ( 'EnterYourLastName' | localize ) -->
@@ -110,12 +112,12 @@
 
 
         <div class="form-group MB20">
-            <label class="sub_titleLog" *ngIf="!accountTypeLabel.includes('PERSONAL')"> {{"AdminEmailAddressL" | localize}}<span class="StarInfo">*</span></label>
-            <label class="sub_titleLog" *ngIf="accountTypeLabel.includes('PERSONAL')"> {{"PersonalEmailAddressL" | localize}}<span class="StarInfo">*</span></label>
-            <div class="p_relative">
-            <img src="../../assets/img/input_icons/letter.png" class="User_icon icon-width">
-            <input #adminEmailAddressInput="ngModel" class="MT0 form-control" type="email"
-                [placeholder]="!accountTypeLabel.includes('PERSONAL') ? ('EnterTheAdminEmailAddress' | localize) : ( 'EnterYourPersonalEmailAdress '| localize)"
+            <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')"> {{"AdminEmailAddressL" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
+            <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')"> {{"PersonalEmailAddressL" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
+            <div class="user_p_relative">
+            <img src="../../assets/img/input_icons/letter.png" class="user_icon icon-width">
+            <input #adminEmailAddressInput="ngModel" class="mb-3 form-control" type="email"
+                [placeholder]="!accountTypeLabel?.includes('PERSONAL') ? ('EnterTheAdminEmailAddress' | localize) : ( 'EnterYourPersonalEmailAdress '| localize)"
                 [(ngModel)]="model.adminEmailAddress" name="adminEmailAddress" required maxlength="256" email /></div>
 
             <span class="form-text text-danger">
@@ -124,11 +126,11 @@
         </div>
         <div class="row MB20 PR2L10 ng-tns-c369-1">
             <div class="form-group MB20 col-lg-6 pr-2">
-                <label class="sub_titleLog" *ngIf="accountTypeLabel.includes('PERSONAL')">{{" Password" | localize}} <span class="StarInfo">*</span></label>
-                <label class="sub_titleLog" *ngIf="!accountTypeLabel.includes('PERSONAL')">{{" AdminPassword" | localize}} <span class="StarInfo">*</span></label>
-                <div class="p_relative">
-                <img src="../../assets/img/input_icons/lock.png" class="User_icon icon-width SmallUser_icon">
-                <input type="password" name="Password" class="MT0 form-control" [(ngModel)]="model.adminPassword"
+                <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')">{{"Password" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')">{{"AdminPassword" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <div class="user_p_relative">
+                <img src="../../assets/img/input_icons/lock.png" class="user_icon icon-width SmallUser_icon">
+                <input type="password" name="Password" class="mb-3 form-control" [(ngModel)]="model.adminPassword"
                     #Password="ngModel"
                     [placeholder]="'EnterYourPassword' | localize "
                     validateEqual="PasswordRepeat" reverse="true"
@@ -182,10 +184,10 @@
             </div>
 
             <div class="form-group MB20 col-lg-6">
-                <label class="sub_titleLog"> {{"PasswordRepeat" | localize}}<span class="StarInfo">*</span></label>
-                <div class="p_relative">
-                <img src="../../assets/img/input_icons/lock.png" class="User_icon icon-width SmallUser_icon">
-                <input type="password" name="PasswordRepeat" class="MT0 form-control" [ngModel]="model.passwordRepeat"
+                <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"PasswordRepeat" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <div class="user_p_relative">
+                <img src="../../assets/img/input_icons/lock.png" class="user_icon icon-width SmallUser_icon">
+                <input type="password" name="PasswordRepeat" class="mb-3 form-control" [ngModel]="model.passwordRepeat"
                     #PasswordRepeat="ngModel" placeholder="{{'EnterYourConfirmPassword' | localize}}" validateEqual="Password"
                     reverse="false" [requireDigit]="passwordComplexitySetting.requireDigit" [requireLowercase]="
                         passwordComplexitySetting.requireLowercase
@@ -240,10 +242,10 @@
         </div>
         <div class="kt-login__actions">
             <button [disabled]="saving" routerLink="/account/login" type="button"
-                class="backBtn btn shadowContainer btn-elevate kt-login__btn-secondary">
+                class="backBtn btn  btn-light btn-elevate kt-login__btn-secondary pl-5 pr-5">
                 {{"Back" | localize}}
             </button>
-            <button type="submit" class="submitBtn btn  kt-login__btn-primary" [disabled]="!registerForm.form.valid"
+            <button type="submit" class="submitBtn btn  btn-elevate kt-login__btn-primary pl-5 pr-5" [disabled]="!registerForm.form.valid"
                 [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
                 {{ "Submit" | localize }}
             </button>

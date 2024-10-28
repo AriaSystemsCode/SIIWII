@@ -69,8 +69,8 @@ a {
     font-weight: 500;
     box-shadow:0 4px 10px 0px rgba(0, 0, 0, 0.2), 0 0px 0px 0px rgba(0, 0, 0, 0.19);
     text-align: center;
-    padding: 7px 30px;
-    border-radius: 3px;
+    padding: 7px 50px;
+    border-radius: 8px;
 }
 #kt_login.kt-grid.kt-grid--hor.kt-grid--root {
     max-width: 95% !important;
@@ -105,4 +105,7 @@ a {
 }
 .form-control{
     border: 1px solid #e2e5ec !important;
+}
+input.form-control.m-input {
+    background-color: white !important;
 }
