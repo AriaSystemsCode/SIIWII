@@ -2,6 +2,10 @@
 @import '../../../assets/styles/base/mixins';
 @import '../../../assets/styles/base/placeholders';
 
+
+.form-control , .custom-dropdown {
+    background-color: #F8F8F8 !important;
+}
 :host {
     height: 100%;
 }
@@ -26,7 +30,7 @@
         filter: grayscale(1);
     }
     width: 200px;
-    height: 276px;
+  //  height: 276px;
     background-color: white;
     margin-right: 2rem;
     border-radius: 6px;
@@ -79,15 +83,15 @@
         z-index: 0;
         @extend %transition-all-3ms;
     }
-    &:hover {
+    &{
         cursor: pointer;
-        box-shadow: 0px 0px 6px #0000001A;
+      //  box-shadow: 0px 0px 6px #0000001A;
         @extend %transition-all-3ms;
-        filter: none;
+        filter: none !important;
         .upload-btn.btn {
             background-color: $blue!important;
             color: $white!important;
-            border-color: $blue!important;
+         //   border-color: $blue!important;
             font-weight: 500;
             @extend %transition-all-3ms;
         }

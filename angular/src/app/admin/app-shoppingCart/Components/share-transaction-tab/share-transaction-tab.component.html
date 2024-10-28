@@ -1,108 +1,110 @@
 <div class="tab-cont  position-relative">
     <div class="container-fluid orderInfoForm ">
         <div
-        class="header pt-4 p-2 my-2 d-flex align-items-center  ">
+        class=" pt-4 p-2 my-2 d-flex align-items-center  ">
         <h4><span class="mainheadertxt d-inline">{{'ShareTransaction' | localize}}</span></h4>
         <i class="fas fa-times closeShareMode" (click)="closeShareMode()"></i>
     </div>
     <div class="orderForm shareSectionCont  position-relative p-2">
-        <div class="container-fluid orderInfoForm thin-scroll">
-            <div class="header p-2 my-2 d-flex align-items-center  ">
+        <div class="container-fluid orderInfoForm thin-scroll p-0 custom-sec">
+            <div class="header  p-2 mb-2 d-flex align-items-center  ">
                 <h6><span class="headertxt">{{'MessageTransactionToSiiwiiUsers' | localize}}</span></h6>
             </div>
-            <hr class="my-2" />
-            </div>
-        <div class="row">
-            <div class="col-12 pt-3 pl-4 pr-4">
-                <label class="label">{{'SelectUsers' | localize}}</label>
-            </div>
-
-            <div class="col-11 pt-3 pb-3 pl-4 pr-0">
-                <p-autoComplete styleClass='w-100' [(ngModel)]="searchContact" 
-                [suggestions]="suggestionsContacts"  
-                (completeMethod)="filterContacts($event)" 
-                (onSelect)="selectContact($event)"
-                [multiple]="true">
-                <ng-template let-contact pTemplate="item">
-                    <div class="d-flex  flex-row gap-2 gap-2"  *ngIf="contact"  >
-                        <img  class="userImage"
-                         [src]="contact?.userImage?contact.userImage:'assets/common/images/default-profile-picture.png'"  
-                        />
-                        <span class="ml-2 font-medium" *ngIf="!contact.userName">{{contact.name}} @ {{contact.tenantName}}</span>
-                        <span class="ml-2 font-medium" *ngIf="contact.userName">{{contact.userName}}</span>
-                    </div>
-                </ng-template>
-                <ng-template let-contact pTemplate="selectedItem">
-                    <div class="d-flex  flex-row gap-2 gap-2">
-                        <img   class="userImage" 
-                        [src]="contact?.userImage?contact?.userImage:'assets/common/images/default-profile-picture.png'"  
-                        />
-                        <span class="ml-2 font-medium" *ngIf="!contact.userName" >{{contact.name}} @ {{contact.tenantName}}</span>
-                        <span class="ml-2 font-medium" *ngIf="contact.userName" >{{contact.userName}}</span>                    </div>
-                </ng-template>
-
-            </p-autoComplete> 
-
-            </div>
-<div class="col-1 pt-2">
-    <button  [disabled]="!searchContact||searchContact.length==0"  (click)="updateSelectedContacts()"            
-    class="addContBtn mt-1 text-center btn">
-    {{'Add2'| localize}}</button>
-</div>
-<div class="col-12 pt-3 pl-4 pr-4">
-    <label class="label">{{'SelectedUsersList' | localize}}</label>
-</div>
-<div class="col-12 p-3 pl-4 pr-4">
-
-    <div class="card flex align-items-center gap-2 p-3 flex-wrap selected-contact-list w-100">
-        <p-chip *ngFor="let item of sharingList" 
-        [styleClass]="item.removed ? 'pl-0 pr-2 mr-2 ml-2 removedContact':'pl-0 pr-2 mr-2 ml-2'" >
-            
-            <img *ngIf="item?.userImage" [src]="item?.userImage" />
-            <img *ngIf="!item?.userImage"  [src]="'assets/common/images/default-profile-picture.png'"  style="width: 18px;margin-right:10px;"/>            
-            <span class="ml-2 font-medium" *ngIf="!item.userName" [ngClass]="item.removed ? 'removedContact' : ''">{{item.name}} @ {{item.tenantName}}</span>
-            <span class="ml-2 font-medium" *ngIf="item.userName" [ngClass]="item.removed ? 'removedContact' : ''">{{item.userName}}</span>
-            <i *ngIf="!item.removed&&item.canBeRemoved" class="fas fa-times-circle ml-auto p-2 removeShare" (click)="removefromShareList(item.id)"></i>
-            <i *ngIf="item.removed" class="fas fa-redo-alt reloadContact" (click)="reloadContact(item.id)"></i>
-        </p-chip>
+            <!-- <hr class="my-2" /> -->
+            <div class="row">
+                <div class="col-12 pt-3 pl-4 pr-4">
+                    <label class="label">{{'SelectUsers' | localize}}</label>
+                </div>
+    
+                <div class="col-11 pt-3 pb-3 pl-4 pr-0">
+                    <p-autoComplete styleClass='w-100' [(ngModel)]="searchContact" 
+                    [suggestions]="suggestionsContacts"  
+                    (completeMethod)="filterContacts($event)" 
+                    (onSelect)="selectContact($event)"
+                    [multiple]="true">
+                    <ng-template let-contact pTemplate="item">
+                        <div class="d-flex  flex-row gap-2 gap-2"  *ngIf="contact"  >
+                            <img  class="userImage"
+                             [src]="contact?.userImage?contact.userImage:'assets/common/images/default-profile-picture.png'"  
+                            />
+                            <span class="ml-2 font-medium" *ngIf="!contact.userName">{{contact.name}} @ {{contact.tenantName}}</span>
+                            <span class="ml-2 font-medium" *ngIf="contact.userName">{{contact.userName}}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template let-contact pTemplate="selectedItem">
+                        <div class="d-flex  flex-row gap-2 gap-2">
+                            <img   class="userImage" 
+                            [src]="contact?.userImage?contact?.userImage:'assets/common/images/default-profile-picture.png'"  
+                            />
+                            <span class="ml-2 font-medium" *ngIf="!contact.userName" >{{contact.name}} @ {{contact.tenantName}}</span>
+                            <span class="ml-2 font-medium" *ngIf="contact.userName" >{{contact.userName}}</span>                    </div>
+                    </ng-template>
+    
+                </p-autoComplete> 
+    
+                </div>
+    <div class="col-1 pt-2 " style="padding-left: 7px;">
+        <button  [disabled]="!searchContact||searchContact.length==0"  (click)="updateSelectedContacts()"            
+        class="addContBtn mt-1 text-center btn">
+        {{'Add2'| localize}}</button>
     </div>
-</div>
+    <div class="col-12 pt-3 pl-4 pr-4">
+        <label class="label">{{'SelectedUsersList' | localize}}</label>
+    </div>
+    <div class="col-12 p-3 pl-4 pr-4">
+    
+        <div class="card flex align-items-center gap-2 p-3 flex-wrap selected-contact-list w-100">
+            <p-chip *ngFor="let item of sharingList" 
+            [styleClass]="item.removed ? 'pl-0 pr-2 mr-2 ml-2 removedContact':'pl-0 pr-2 mr-2 ml-2'" >
+                
+                <img *ngIf="item?.userImage" [src]="item?.userImage" />
+                <img *ngIf="!item?.userImage"  [src]="'assets/common/images/default-profile-picture.png'"  style="width: 18px;margin-right:10px;"/>            
+                <span class="ml-2 font-medium" *ngIf="!item.userName" [ngClass]="item.removed ? 'removedContact' : ''">{{item.name}} @ {{item.tenantName}}</span>
+                <span class="ml-2 font-medium" *ngIf="item.userName" [ngClass]="item.removed ? 'removedContact' : ''">{{item.userName}}</span>
+                <i *ngIf="!item.removed&&item.canBeRemoved" class="fas fa-times-circle ml-auto p-2 removeShare" (click)="removefromShareList(item.id)"></i>
+                <i *ngIf="item.removed" class="fas fa-redo-alt reloadContact" (click)="reloadContact(item.id)"></i>
+            </p-chip>
         </div>
-        <div class="container-fluid orderInfoForm thin-scroll">
-            <div class="header p-2 my-2 d-flex align-items-center  ">
+    </div>
+            </div>
+            </div>
+     
+        <div class="container-fluid orderInfoForm thin-scroll custom-sec mt-4 p-0">
+            <div class="header p-2 mb-2 d-flex align-items-center  ">
                 <h6><span class="headertxt">{{'EmailTransactionToNonSiiwiiUsers'| localize}}</span></h6>
             </div>
-            <hr class="my-2" />
-            </div>
-        <div class="row">
-            <div class="col-12 pt-3 pl-4 pr-4">
-                <label class="label">{{'TypeEmailAddress'| localize}}</label>
-            </div>
-
-            <div class="col-12 p-3 pl-4 pr-4">
-                <input type="email"   
-                (focusout)="validateEmailFormate()" 
-                (input)="checkSaveAvilabilty()"
-                class="form-control w-100"
-                [(ngModel)]="emailList"/>
-
-                <small 
-                class="text-danger"
-                *ngIf="!validEmailFormate">
-              {{'InvalidEmailFormate'| localize}}
-            </small>
-            </div>
-
-<div class="col-12 p-3 pl-4 pr-4">
-    <div class="col-12 pt-3 pl-0 pr-4">
-        <label class="label">{{'Addamessagehere'| localize}} <span style="color: red;">*</span></label>
-    </div>
-    <textarea class="form-control w-100 "
-    (input)="checkSaveAvilabilty()"
-     [(ngModel)]="messageBody" placeholder="{{'MessageBody'| localize}}....."></textarea>
-</div>
-
+            <!-- <hr class="my-2" /> -->
+            <div class="row p-2">
+                <div class="col-12 pt-3 pl-4 pr-4">
+                    <label class="label">{{'TypeEmailAddress'| localize}}</label>
+                </div>
+    
+                <div class="col-12 p-3 pl-4 pr-4">
+                    <input type="email"   
+                    (focusout)="validateEmailFormate()" 
+                    (input)="checkSaveAvilabilty()"
+                    class="form-control w-100"
+                    [(ngModel)]="emailList"/>
+    
+                    <small 
+                    class="text-danger"
+                    *ngIf="!validEmailFormate">
+                  {{'InvalidEmailFormate'| localize}}
+                </small>
+                </div>
+    
+    <div class="col-12 p-3 pl-4 pr-4">
+        <div class="col-12 pt-3 pl-0 pr-4">
+            <label class="label">{{'Addamessagehere'| localize}} <span style="color: #1B101B;">*</span></label>
         </div>
+        <textarea class="form-control w-100 "
+        (input)="checkSaveAvilabilty()"
+         [(ngModel)]="messageBody" placeholder="{{'MessageBody'| localize}}....."></textarea>
+    </div>
+    
+            </div>
+            </div>
+    
         <div class="row">
             <div class="col-12 p-3 pl-4 pr-4">
                 <button class="text-center btn btn-success float-right ml-2 mr-2"

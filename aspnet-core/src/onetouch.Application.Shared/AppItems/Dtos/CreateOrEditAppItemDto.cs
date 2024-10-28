@@ -77,6 +77,7 @@ namespace onetouch.AppItems.Dtos
         public List<AppItemSizesScaleInfo> AppItemSizesScaleInfo { get; set;}
         public string OriginalCode { get; set; }
         public long? SycIdentifierId { get; set; }
+        public string? SSIN { set; get; }
         //MMT
         //MMT-IT41[Start]
         public IList<LookupLabelDto> NonLookupValues { set; get; }
@@ -248,6 +249,9 @@ namespace onetouch.AppItems.Dtos
     //MMT
     public class ExtraDataSelectedValues 
     {
+        //Iteration#42,1 MMT 08/20/2024 Add new property for the code[Start]
+        public string Code { get; set; }
+        //Iteration#42,1 MMT 08/20/2024 Add new property for the code[End]
         public string value { get; set; }
         public int TotalCount { get; set; }
         public virtual List<AppEntityAttachmentDto> EntityAttachments { get; set; }

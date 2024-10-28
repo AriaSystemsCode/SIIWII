@@ -11,7 +11,7 @@ namespace onetouch.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "cc",
+                name: "RelatedEntityObjectTypeCode",
                 table: "AppTenantActivitiesLog",
                 type: "nvarchar(max)",
                 nullable: true);

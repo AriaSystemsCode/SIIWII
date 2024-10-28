@@ -1147,7 +1147,7 @@ let x=  this.appItem.nonLookupValues;
         // create app attachment entity
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
         att.index = index;
-        att.fileName = file.name;
+        att.fileName = file?.name;
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
         const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
@@ -1675,10 +1675,13 @@ let x=  this.appItem.nonLookupValues;
                         this.appItem.variationItems[i].code = this.appItem.code;
                     else this.appItem.variationItems[i].code = "";
                 }
+
+                if(this.appItem?.variationItems[i]?.entityExtraData[j]?.attributeValue ){
                 this.appItem.variationItems[i].code +=
                     "-" +
                     this.appItem?.variationItems[i]?.entityExtraData[j]
                         ?.attributeValue;
+                }
             }
         }
     }

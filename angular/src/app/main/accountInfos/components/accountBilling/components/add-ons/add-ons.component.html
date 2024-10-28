@@ -1,0 +1,199 @@
+<!-- 
+<div>
+    <div style=" display: flex;">
+        <span style="font-size: 3; left: 0;" #zerolabel> 0</span>
+         <span style="font-size: 3;" #progresslabel> 123</span>
+         <span style="font-size: 3; right: inherit;" #totallabel> 456</span>
+      </div>
+<div class="row align-items-center">
+
+    <div class="primeng-datatable-container col-12"
+         [busyIf]="primengTableHelper.isLoading">
+<p-table #table 
+(onLazyLoad)="getAppTenantAddOns($event)"
+[value]="primengTableHelper.records"
+rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+[paginator]="false"
+[lazy]="true"
+[scrollable]="true"
+ScrollWidth="100%"
+columnResizeMode="expand" 
+[responsive]="primengTableHelper.isResponsive">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 45px;height: 45px;"></th>
+            <th style="width: 400px;height: 45px;"></th>
+            <th style="height: 45px;" class="auto-width"></th> 
+            <th style="height: 45px;"></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData>
+        <tr><td style="width: 45px"><img src="assets/accounts/Feature-Icon.svg"/></td>
+            <td #rowreference>
+                
+                <div class="container">
+                <p [ngClass]="'AddOnsBoldText'" style="margin-top: 0px;">{{ rowData.appSubscriptionPlanDetail.featureName }}</p>
+               <div class="container-block">
+                <div class="progress-bar" style="margin-top: 12px;" #outerprogressbar>
+                    <div class="progress-bar-fill" #innerprogressbar
+                     [ngStyle]="getProgressBarWidth(rowData)"></div>
+                                   
+
+                
+                    </div>
+                    <div class="container" style="margin-top: 1px;height: 6px;left:0px;"  #progressvalues>
+                        <span style="font-size: 6; " #zerolabel> 0</span>
+                         <span style="font-size:6; " #progresslabel> {{ rowData.featureUsedQty }}</span>
+                         <span style="font-size: 6; " #totallabel> {{ rowData.featureCreditQty }}</span>
+                      </div>
+</div>
+                </div>
+           
+                 
+                
+                 
+                <p [ngClass]="'AddOnsRegularText'">{{ rowData.appSubscriptionPlanDetail.featureDescription }}
+                   
+                </p>
+                
+                    
+            </td>
+            <td class="auto-width"><span [ngClass]="'price-txt'">$ {{ rowData.appSubscriptionPlanDetail.unitPrice }}/</span>{{ rowData.appSubscriptionPlanDetail.featurePeriodLimit }}</td>
+            <td style="width: 30px">
+                <div  container="body">
+                    
+                     <button class="btn btn-add" #addbtn
+                     (click)="add(rowData)">
+                       {{l("Add2")}}
+                     </button>
+                     </div>
+                     </td> 
+        </tr>
+    </ng-template>
+</p-table>
+</div>
+</div>
+<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+    {{l('NoData')}}
+</div>
+<div class="primeng-paging-container">
+    <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                 #paginator
+                 (onPageChange)="getAppTenantAddOns($event)"
+                 [totalRecords]="primengTableHelper.totalRecordsCount"
+                 [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                 [showCurrentPageReport]="true"
+                 [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
+    >
+    </p-paginator>
+</div>
+</div>
+<div class="col p-2 m-5 m-md-0" style="padding: 0;border-left: 4px solid #e7e8ef;" *ngIf="showSideBar">
+    <app-app-side-bar [entityTypeName]="'add-ons'" [id]="" (hideSideBar)="onShowSideBar(false)"></app-app-side-bar> 
+</div> -->
+
+
+
+<div class="container mt-4" style="margin-top: 15px;">
+    <div class="row w-100">
+        
+        <div class="col-8 mt-1 pr-0" style="height: 75vh; overflow-y: scroll;">
+          <table *ngFor="let record of addons" class="table table-bordered p-datatable-gridlines">
+            <!-- Table Header -->
+            <thead>
+                <tr>
+                    <th colspan="2">{{ record?.appSubscriptionPlanDetail?.featureCategory }}</th>
+                </tr>
+            </thead>
+        
+            <!-- Table Body -->
+            <tbody>
+                <tr >
+                    <td>
+                        <div class="d-flex gap-2 first-col">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                                <path d="M16 8.5V5.5L19 2.5L20 4.5L22 5.5L19 8.5H16ZM16 8.5L12 12.4999M22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5C2 6.97715 6.47715 2.5 12 2.5M17 12.5C17 15.2614 14.7614 17.5 12 17.5C9.23858 17.5 7 15.2614 7 12.5C7 9.73858 9.23858 7.5 12 7.5" stroke="#4A0D4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <h5>{{ record?.appSubscriptionPlanDetail?.featureName }}</h5>
+                        </div>
+                    </td>
+        
+                    <td>
+                        <div class="d-flex flex-column gap-2 justify-content-center" style="align-items: end;">
+                            <p>${{ record?.appSubscriptionPlanDetail?.unitPrice }}/ <span class="measure">{{ record?.appSubscriptionPlanDetail?.unitOfMeasurementName }}</span></p>
+                            <button class="btn btn-add" (click)="addToCart(record)" [disabled]="isRecordInCart(record)">
+                                {{ isRecordInCart(record) ? 'Added' : 'Add' }}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        </div>
+
+        <div class="col-4 mt-1 pl-2" style="height: 60vh;">
+            <div class="summary border d-flex flex-column" style="height: 100%; overflow-x: hidden;">
+              
+            
+              <div class="header d-flex justify-content-between">
+                <h6 class="p-0 m-0 add-head">Add-on Cart</h6>
+                <button type="button" class="btn close border rounded-circle m-0 p-0" (click)="clearCart()">
+                  <i class="fas fa-times p-0 m-0"></i>
+                </button>
+              </div>
+              <hr />
+              
+            
+              <div class="totals d-flex justify-content-between">
+                <p class="p-0 m-0 qty">qty : {{ totalQuantity }}</p>
+                <p class="p-0 m-0 qty">Amount : {{ totalAmount | number: '1.2-2' }}</p>
+              </div>
+          
+       
+              <div class="orderedSummary flex-grow-1" style="overflow-y: auto;overflow-x: hidden;" *ngIf="cart.length != 0">
+                <div class="summaryTables">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr class="head-th">
+                        <th>Feature</th>
+                        <th>QTY</th>
+                        <th>Price</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let cartItem of cart">
+                        <td class="feature">{{ cartItem?.appSubscriptionPlanDetail?.featureName }}</td>
+                        <td>
+                          <p-inputNumber mode="decimal"
+                                         [showButtons]="true"
+                                         inputId="minmax-buttons"
+                                         [min]="0"
+                                         [(ngModel)]="cartItem.featureUsedQty"></p-inputNumber>
+                        </td>
+                        <td>{{ cartItem?.appSubscriptionPlanDetail?.unitPrice }}</td>
+                        <td>
+                          <div class="d-flex flex-column">
+                            <p>{{ (cartItem?.appSubscriptionPlanDetail?.unitPrice * cartItem?.featureUsedQty) | number: '1.2-2' }}</p>
+                            <a type="button" style="color: #F6851D; font-size: 10px;" class="btn p-0" (click)="removeRecord(cartItem)">
+                              Remove
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+          
+              <div class=" d-flex justify-content-center purchase-btn-wrapper" [ngClass]=" cart.length == 0 ? 'noCart' :'hasCart'" style=" background-color: white;">
+                <button class="btn m-0 add-p" (click)="purchaseAddons()" [disabled]="cart.length == 0">Purchase Add-Ons</button>
+              </div>
+          
+            </div>
+          </div>
+          
+    </div>
+</div>
+

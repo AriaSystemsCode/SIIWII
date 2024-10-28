@@ -41,8 +41,10 @@ namespace onetouch.AppSubScriptionPlan.Dtos
 
         public int? TrackactivityFilter { get; set; }
 
-        public string AppSubscriptionPlanHeaderFilter { get; set; }
+        public long? AppSubscriptionPlanHeaderFilter { get; set; }
 
-        public long? AppSubscriptionPlanHeaderIdFilter { get; set; }
+        public string AppFeatureDescriptionFilter { get; set; }
+        public bool AddFeaturesOnly { get; set; } = false;
+
     }
 }

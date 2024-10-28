@@ -1,13 +1,13 @@
 <div bsModal #bsModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
     aria-labelledby="selectListModal" aria-hidden="true">
     <div class="modal-dialog"  role="document">
-        <div class="modal-content">
+        <div class="modal-content" style="    border-radius: 12px;">
             <div class="modal-content-wrapper" >
                 <div class="modal-header flex-column">
-                    <h3 class="modal-title text-left">
+                    <h3 class="modal-title text-left font-weight-bold">
                         <span> {{ l("ProductAdvancedPricing") }}</span>
                     </h3>
-                    <button style="position: absolute; right: 0; top: 8px" type="button" class="close"
+                    <button style="position: absolute; right: 0; top: 8px" type="button" class="close mr-2 pt-4"
                         (click)="cancel()" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -34,12 +34,11 @@
                 </div>
                 <div class="modal-footer">
                     
-                    <button type="button" class="btn btn-outline-secondary pl-5 pr-5" (click)="cancel()"   style="border-radius: 5px;
-                    background-color:1px solid #EBEBEB!important;
-                    border: white !important;color: #4A0D4A !important;">
+                    <button type="button" class="btn btn-outline-secondary p-4 font-weight-bold" (click)="cancel()"   style="border-radius: 5px;
+                    background-color:1px solid #EBEBEB !important; color: #4A0D4A !important;">
                         {{ l("Cancel") }}
                     </button>
-                    <button type="submit" *ngIf="!readOnly" class="btn btn-primary pl-5 pr-5" (click)="submit()" [disabled]="!isValid"   style="border-radius: 5px;
+                    <button type="submit" *ngIf="!readOnly" class="btn btn-primar yp-4 font-weight-bold" (click)="submit()" [disabled]="!isValid"   style="border-radius: 5px;
                     background-color: #4A0D4A !important;
                     border: #4A0D4A !important;color: white;"
                         >

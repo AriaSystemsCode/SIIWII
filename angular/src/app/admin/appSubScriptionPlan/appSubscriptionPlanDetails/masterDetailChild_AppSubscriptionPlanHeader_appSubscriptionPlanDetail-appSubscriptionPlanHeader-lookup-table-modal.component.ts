@@ -45,6 +45,7 @@ export class MasterDetailChild_AppSubscriptionPlanHeader_AppSubscriptionPlanDeta
         }
 
         if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }

@@ -211,7 +211,7 @@ export class CreateEditAppItemVariationsComponent
             //     extraAttrSelectedValues =
             //         this.appSizeRatios?.appSizeScalesDetails?.length;
             // } else {
-                extraAttrSelectedValues = extraAttr.selectedValues?.length;
+               extraAttrSelectedValues =  extraAttr?.entityObjectTypeCode=='SIZE' ?  extraAttr.selectedValues?.length :  extraAttr.displayedSelectedValues?.length ;
             // }
             if (count == 0 && extraAttrSelectedValues > 0) count = 1;
             if (extraAttrSelectedValues) count *= extraAttrSelectedValues;
@@ -680,6 +680,9 @@ this.showMainSpinner();
             return this.setDefaultExtraAttributeForVariationAttachment(
                 this.selectedExtraAttributes[0]
             );
+            this.setDefaultExtraAttributeForVariationAttachment(
+                this.selectedExtraAttributes[0]
+            );
         const oldVariationsExtraAttrs = oldVariations[0]?.entityExtraData.map(
             (item) => item.attributeId
         );
@@ -902,6 +905,10 @@ this.showMainSpinner();
             
             var index =this.activeAttachmentOption.entityAttachments.findIndex(y=>y?.url ===this.activeAttachmentOption.attachmentSrcs[i] )
 
+            if(index<0)
+                 index =this.activeAttachmentOption.entityAttachments.findIndex(  (y) => `${this.attachmentBaseUrl}/${y?.url}` === this.activeAttachmentOption.attachmentSrcs[i]);
+                
+
             this.activeAttachmentOption.attachmentSrcs.splice(i, 1);
                 if(index>=0)
                 this.activeAttachmentOption.entityAttachments.splice(index, 1);
@@ -994,7 +1001,7 @@ this.showMainSpinner();
         // create app attachment entity
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
       //  att.index = index;
-        att.fileName = file.name;
+        att.fileName = file?.name;
         let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
        // let optionValue = this.activeAttachmentOption.lookupData.value;
        let optionValue;
@@ -1248,6 +1255,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             // const curentItem=oldAttributes.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')))[0];
             let curentItem;
             let repCode = newVariation;
+
              if(!this.appItem?.id) {
                 curentItem = this.variationMatrices.filter((record) => {
                 const repCodeNormalized = repCode.code.replace(/\s+/g, '').replace(/-0+/g, '');
@@ -1262,11 +1270,22 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                     return repCodeNormalized.includes(recordNormalized);
                 })[0];
             }
+           
 
              if(curentItem?.stockAvailability>0){
                 newVariation.stockAvailability=curentItem.stockAvailability;
             }
-
+ //P-SII-20240905.0006,1 MMT 09/12/2024 read stock availablity from existing variation[Start]
+ let existingVariation = oldAttributes.filter((record) => {
+    const repCodeNormalized = repCode.code.replace(/\s+/g, '').replace(/-0+/g, '');
+    const recordNormalized = record.code.replace(/\s+/g, '').replace(/-0+/g, '');
+    return repCodeNormalized.includes(recordNormalized);
+            })[0];
+    if (existingVariation != undefined && existingVariation?.stockAvailability>0)
+    {
+        newVariation.stockAvailability=existingVariation.stockAvailability;
+    }
+//P-SII-20240905.0006,1 MMT 09/12/2024 read stock availablity from existing variation[End]
             let item = this.variationMatrices?.filter((record)=>newVariation.code.includes(record.code.replace(/ /g,'')));
             if(!item || ! (item?.length>0) )
                 this.variationMatrices.push(newVariation);
@@ -1280,6 +1299,16 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             }
         };
             // if (currentExtraAttr.entityObjectTypeCode != this.sizeExtraAttrCode) {
+
+/////
+currentExtraAttr?.displayedSelectedValues?.forEach(item => {
+    if (!currentExtraAttr?.selectedValues?.includes(item?.value) && (item?.value!=0)) {
+        currentExtraAttr?.selectedValues?.push(item.value);
+    }
+});
+
+////
+
                 currentExtraAttr.selectedValues.forEach((attrId) => {
                     // if(attrId || attrId>=0){
                     let attrOptionData: any = currentExtraAttr?.lookupData?.filter(
@@ -1418,9 +1447,12 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         this.variationMatrices = this.variationMatrices.filter((variation) => {
             return !sectedRecordsPositions.includes(variation.position) || !variation.ssin ;   
         });
+
     }
         this.selectedVaritaions = [];
         this.primengTableHelper.records = this.variationMatrices;
+
+
         this.getExistingVariations();
         this.setSelectionVariations();
 
@@ -1487,7 +1519,27 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                 : this.variationMatrices,
             appItemSizesScaleInfo,
         };
-        this.applyVariations.emit(body);
+        for (let index = 0; index < this.appSizeScales?.appSizeScalesDetails.length; index++) {
+            const sizeScale = this.appSizeScales?.appSizeScalesDetails[index];
+
+            let notdeleteSize =  this.variationMatrices.some(matrix => {       return matrix.entityExtraData?.some((item) => {   return item.entityObjectTypeCode == 'SIZE'   && item.attributeCode  == sizeScale.sizeCode }) });
+
+            if(!notdeleteSize){
+                this.appSizeScales?.appSizeScalesDetails?.splice(index,1);
+                this.appSizeRatios?.appSizeScalesDetails?.splice(index,1);
+                index--;
+            }
+
+            }
+
+            this.appSizeScales?.appSizeScalesDetails?.forEach((item, index) => {
+                item.d1Position = index.toString(); 
+            }); 
+
+                this.appSizeRatios?.appSizeScalesDetails?.forEach((item, index) => {
+                    item.d1Position = index.toString(); 
+                   }); 
+                this.applyVariations.emit(body);
     }
 
     
@@ -1955,7 +2007,11 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             AppEntityListDynamicModalComponent,
             config
         );
+        let isProcessing = false; 
    const subs = this._BsModalService.onHidden.subscribe(() => {
+    if (isProcessing) return;  // Prevent multiple processing
+    isProcessing = true;
+
             const  subscription=  this._extraAttributeDataService.getExtraAttributeLookupData(
                 extraAttr.entityObjectTypeCode,
                 extraAttr.lookupData,
@@ -1971,8 +2027,10 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                 modalRef.content;
                 if (modalRefData.selectionDone)
                 this.onselectionDone(modalRefData,extraAttr);
+           
                 if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
            
+                isProcessing = false;
                 this.hideMainSpinner();
             });
 
@@ -2448,11 +2506,23 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
   
     }
     getExistingVariations(){
-        this.activeExisttingVariation=true;
-        this.activeNewVariation=false
-        this.primengTableHelper.records=this.variationMatrices.filter((variation) => {
+        this.primengTableHelper.records=this.variationMatrices?.filter((variation) => {
             return variation.ssin;
         });
+        if(this.primengTableHelper?.records  && this.primengTableHelper?.records?.length >0){
+            this.showExisttingVariation=true;
+        this.activeExisttingVariation=true;
+        this.activeNewVariation=false;
+        }
+
+        else{
+             this.showExisttingVariation=false;
+        this.activeExisttingVariation=false;
+        this.activeNewVariation=true;
+        this.primengTableHelper.records=this.variationMatrices?.filter((variation) => {
+            return !variation.ssin;
+        });
+        }
     }
     isExistingVariationsSelected():boolean{
         let sectedRecordsPositions: number[] = this.selectedVaritaions.reduce(
@@ -2477,13 +2547,25 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
 
     
     getNewVariations(){
-        this.activeExisttingVariation=false;
-        this.activeNewVariation=true
-        this.primengTableHelper.records=this.variationMatrices.filter((variation) => {
+        this.primengTableHelper.records=this.variationMatrices?.filter((variation) => {
             return !variation.ssin;
         });
+        if(this.primengTableHelper?.records  && this.primengTableHelper?.records?.length >0){
+        this.showNewVariation=true;
+        this.activeExisttingVariation=false;
+        this.activeNewVariation=true;
+        }
+    else{
+         this.showNewVariation=false;
+        this.activeExisttingVariation=true;
+        this.activeNewVariation=false;
+        this.primengTableHelper.records=this.variationMatrices?.filter((variation) => {
+            return variation.ssin;
+        });
+         }
+        
     }
-
+   
 }
 export interface ApplyVariationOutput {
     variation: VariationItemDto[];

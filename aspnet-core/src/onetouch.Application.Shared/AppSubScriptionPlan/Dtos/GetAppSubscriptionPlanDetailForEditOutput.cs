@@ -10,5 +10,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
 
         public string AppSubscriptionPlanHeader { get; set; }
 
+        public string AppFeatureDescription { get; set; }
+
     }
 }

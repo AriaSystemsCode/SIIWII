@@ -47,9 +47,9 @@
     &.upload {
         border: none;
         filter: grayscale(1);
-        border: 1px dashed #DADADA;
+        border: 1px dashed #DADADA !important;
     }
-    width: 200px;
+    width: 290px;
     height: 276px;
     background-color: white;
     margin-right: 2rem;
@@ -65,7 +65,7 @@
     .upload-image-icons {
         position: relative;
         width: 150px;
-        height: 90px;
+        height: 60px;
         @extend %transition-all-3ms;
     }
     i {
@@ -106,11 +106,22 @@
         z-index: 0;
         @extend %transition-all-3ms;
     }
+
+    .view-img-overlay  .kt-avatar__upload {
+            opacity: 1; /* Always visible */
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2; /* Ensure it's on top */
+            display: block; /* Ensure visibility */
+        
+    }
+
+    &{     filter: none !important;
+    }
     &:hover {
         cursor: pointer;
         box-shadow: 0px 0px 6px #0000001A;
         @extend %transition-all-3ms;
-        filter: none;
+        filter: none !important;
         .upload-btn.btn {
            // background-color: $blue!important;
             color: $white!important;
@@ -137,7 +148,7 @@
 .select-default-image {
     display: none;
     position: absolute;
-    bottom: -30px;
+    bottom: -45px;
 }
 
 .item-photos {
@@ -182,6 +193,12 @@ textarea.ng-pristine.ng-invalid.ng-touched {
 
 
 .bg-input{
-    background-color: #EEEEEE !important;
-    border: none !important;
+ background-color: #EEEEEE !important;
+ border-radius: 8px !important;
+  border: 1px solid #EEEEEE !important;
+}
+
+
+.text-purple{
+    color: #4A0D4A !important;
 }

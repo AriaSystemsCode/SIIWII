@@ -1,7 +1,7 @@
 ﻿import { Component, ViewChild, Injector, Output, EventEmitter, OnInit} from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
-import { AppSubscriptionPlanHeadersServiceProxy, CreateOrEditAppSubscriptionPlanHeaderDto } from '@shared/service-proxies/service-proxies';
+import { AppSubscriptionPlanHeadersServiceProxy, CreateOrEditAppSubscriptionPlanHeaderDto, SycEntityObjectStatusDto, SycEntityObjectStatusLookupTableDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import * as moment from 'moment';
 
@@ -20,11 +20,8 @@ export class CreateOrEditAppSubscriptionPlanHeaderModalComponent extends AppComp
 
     active = false;
     saving = false;
-
+    planStatusList: SycEntityObjectStatusLookupTableDto[];
     appSubscriptionPlanHeader: CreateOrEditAppSubscriptionPlanHeaderDto = new CreateOrEditAppSubscriptionPlanHeaderDto();
-
-
-
 
     constructor(
         injector: Injector,
@@ -65,7 +62,8 @@ export class CreateOrEditAppSubscriptionPlanHeaderModalComponent extends AppComp
             this._appSubscriptionPlanHeadersServiceProxy.createOrEdit(this.appSubscriptionPlanHeader)
              .pipe(finalize(() => { this.saving = false;}))
              .subscribe(() => {
-                this.notify.info(this.l('SavedSuccessfully'));
+               // this.notify.info(this.l('SavedSuccessfully'));
+               this.message.info(this.l("AppSubscriptionPlanHeader")+" "+this.appSubscriptionPlanHeader.code+" "+this.l('SavedSuccessfully'), this.l("AppSubscriptionPlanHeader"));
                 this.close();
                 this.modalSave.emit(null);
              });
@@ -89,6 +87,10 @@ export class CreateOrEditAppSubscriptionPlanHeaderModalComponent extends AppComp
     }
     
      ngOnInit(): void {
-        
+        this._appSubscriptionPlanHeadersServiceProxy.getPlanStatusList()
+        .subscribe((res: any) => {
+            this.planStatusList = res;
+        });
+
      }    
 }

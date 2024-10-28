@@ -82,7 +82,7 @@ namespace onetouch.SystemObjects
             try
             {
                 var objectId = _lookup_sydObjectRepository.GetAll().Where(e => e.Code == objectCode).FirstOrDefault();
-                return await _sycEntityObjectStatusRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId || x.TenantId == null && x.ObjectId == objectId.Id)
+                return await _sycEntityObjectStatusRepository.GetAll().Where(x => (x.TenantId == AbpSession.TenantId || x.TenantId == null) && x.ObjectId == objectId.Id)
                     .Select(sycEntityObjectType => new SycEntityObjectStatusLookupTableDto
                     {
                         Id = sycEntityObjectType.Id,

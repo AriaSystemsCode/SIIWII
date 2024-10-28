@@ -26,6 +26,9 @@ namespace onetouch.AppSubScriptionPlan.Dtos
         public string Category { get; set; }
 
         public bool TrackActivity { get; set; }
+        public bool IsAddOn { get; set; }
+        public string FeatureStatus { get; set; }
+        public string Notes { get; set; }
 
     }
 }

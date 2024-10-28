@@ -69,6 +69,7 @@ export class AppTenantInvoicesComponent extends AppComponentBase {
 
     getAppTenantInvoices(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
@@ -76,6 +77,7 @@ export class AppTenantInvoicesComponent extends AppComponentBase {
         this.primengTableHelper.showLoadingIndicator();
 
         this._appTenantInvoicesServiceProxy.getAll(
+            null,
             this.filterText,
             this.invoiceNumberFilter,
             this.maxInvoiceDateFilter === undefined ? this.maxInvoiceDateFilter : moment(this.maxInvoiceDateFilter).endOf('day'),

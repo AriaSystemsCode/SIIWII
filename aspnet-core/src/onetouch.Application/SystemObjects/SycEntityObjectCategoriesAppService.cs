@@ -242,6 +242,31 @@ namespace onetouch.SystemObjects
             return allParents;
 
         }
+        //Iteration#42,1 MMT 08/21/2024 Add API to get all categories with children[Start]
+        [AbpAllowAnonymous]
+        public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsForTransaction()
+        {
+            GetAllSycEntityObjectCategoriesInput tmpInput = new GetAllSycEntityObjectCategoriesInput
+            {
+                MaxResultCount = 9999,
+                SkipCount = 0,
+                ObjectId = await _helper.SystemTables.GetObjectTransactionId(),
+                DepartmentFlag = false
+            };
+
+            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> allParents = await GetAll(tmpInput);
+            foreach (var item in allParents.Items)
+            {
+                if (!item.Leaf)
+                {
+                    await LoadChilds(item);
+                }
+            }
+
+            return allParents;
+
+        }
+        //Iteration#42,1 MMT 08/21/2024 Add API to get all categories with children[End]
 
         [AbpAllowAnonymous]
         public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllWithChildsForProductWithPaging(GetAllSycEntityObjectCategoriesInput tmpInput)
@@ -497,7 +522,7 @@ namespace onetouch.SystemObjects
         //T-SII-20220919.0001,1 MMT 12/20/2022 Add an API to validate if the entered name is already entered before or not[Start]
         public async Task<bool> CategoryNameIsExisting(string categoryName)
         {
-            var objWithSameName = await _sycEntityObjectCategoryRepository.FirstOrDefaultAsync(x => x.Name.ToUpper() == categoryName.ToUpper());
+            var objWithSameName = await _sycEntityObjectCategoryRepository.FirstOrDefaultAsync(x => x.Name.ToUpper() == categoryName.ToUpper() && x.TenantId==AbpSession.TenantId);
             if (objWithSameName != null)
                 return true;
             return false;
@@ -545,7 +570,22 @@ namespace onetouch.SystemObjects
                 _sycEntityLocalizeAppService.CreateOrUpdateLocalization(cat.Id, sycEntityObjectCategory.Id, "ENG", "Name", input.Name);
             //xx
         }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[Start]
+        public async Task CreateOrEditForObjectTransaction(CreateOrEditSycEntityObjectCategoryDto input)
+        {
+            input.ObjectId = await _helper.SystemTables.GetObjectTransactionId();
 
+            if (input.Id == null)
+            {
+                await Create(input);
+            }
+            else
+            {
+                await Update(input);
+            }
+
+        }
+        //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[End]
         public async Task CreateOrEditForObjectProduct(CreateOrEditSycEntityObjectCategoryDto input)
         {
             input.ObjectId = await _helper.SystemTables.GetObjectItemId();

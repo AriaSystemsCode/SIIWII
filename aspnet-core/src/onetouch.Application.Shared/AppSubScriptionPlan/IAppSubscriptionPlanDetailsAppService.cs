@@ -23,5 +23,7 @@ namespace onetouch.AppSubScriptionPlan
 
         Task<PagedResultDto<AppSubscriptionPlanDetailAppSubscriptionPlanHeaderLookupTableDto>> GetAllAppSubscriptionPlanHeaderForLookupTable(GetAllForLookupTableInput input);
 
+        Task<PagedResultDto<AppSubscriptionPlanDetailAppFeatureLookupTableDto>> GetAllAppFeatureForLookupTable(GetAllForLookupTableInput input);
+
     }
 }

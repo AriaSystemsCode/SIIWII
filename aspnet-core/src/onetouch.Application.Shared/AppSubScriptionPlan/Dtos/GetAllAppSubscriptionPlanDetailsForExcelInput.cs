@@ -43,6 +43,7 @@ namespace onetouch.AppSubScriptionPlan.Dtos
 
         public string AppSubscriptionPlanHeaderFilter { get; set; }
 
-        public long? AppSubscriptionPlanHeaderIdFilter { get; set; }
+        public string AppFeatureDescriptionFilter { get; set; }
+
     }
 }
