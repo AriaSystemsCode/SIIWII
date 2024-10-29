@@ -1309,6 +1309,9 @@ namespace onetouch.AppItemsLists
                 {
                     foreach (var det in itmList.AppItemsListDetails)
                     {
+                        var itemExist = await _appItemRepository.GetAll().Where(z => z.SSIN == det.AppMarketplaceItemSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                        if (itemExist != null) continue;
+
                         AppMarketplaceItems.AppMarketplaceItems marketItem =await _appMarketplaceItem.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                             .Include(z=>z.EntityCategories)
                             .Include(z => z.EntityClassifications)
@@ -1414,8 +1417,9 @@ namespace onetouch.AppItemsLists
                                     prc.Id = 0;
                                 }
                             }
-                            
+                            itemC.NonLookupValues = new List<LookupLabelDto>();
                             var created = await _appItemsAppService.CreateOrEdit(itemC);
+                           
                         }
                     }
                 }
