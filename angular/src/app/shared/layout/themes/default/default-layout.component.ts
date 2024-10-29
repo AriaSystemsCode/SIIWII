@@ -56,7 +56,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
-   console.log(this.menu,'kkkkkkkkk')
+//    console.log(this.menu,'kkkkkkkkk')
    
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
 
@@ -78,7 +78,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
    
         this._accountsServiceProxy.getAccountSummary().subscribe(result =>{
             this.accountSummary = result;
-            console.log(this.accountSummary,'accountSummary')
+            // console.log(this.accountSummary,'accountSummary')
 
             if(result.logoUrl!=undefined)
                 this.tenantLogo=`${this.attachmentBaseUrl}/${this.accountSummary.logoUrl}`
