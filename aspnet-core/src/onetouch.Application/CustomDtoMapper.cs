@@ -952,6 +952,20 @@ namespace onetouch
              .ForPath(a => a.EntityFk.EntityObjectTypeCode, b => b.MapFrom(ent => ent.EntityObjectTypeCode))
              //.ForMember(a => a.EntityObjectTypeFk, b => b.MapFrom(ent => ent.EntityFk.EntityObjectTypeFk))
              .ForPath(a => a.EntityFk.EntityObjectTypeId, b => b.MapFrom(ent => ent.EntityObjectTypeId));
+            configuration.CreateMap<onetouch.AppMarketplaceItems.AppMarketplaceItems, AppItem>()
+                .ForPath(a => a.EntityFk.EntitiesRelationships, b => b.MapFrom(ent => ent.EntitiesRelationships))
+             .ForPath(a => a.EntityFk.EntityAttachments, b => b.MapFrom(ent => ent.EntityAttachments))
+             .ForPath(a => a.EntityFk.EntityCategories, b => b.MapFrom(ent => ent.EntityCategories))
+             .ForPath(a => a.EntityFk.EntityClassifications, b => b.MapFrom(ent => ent.EntityClassifications))
+             .ForPath(a => a.EntityFk.EntityExtraData, b => b.MapFrom(ent => ent.EntityExtraData))
+             .ForPath(a => a.EntityFk.EntityAddresses, b => b.MapFrom(ent => ent.EntityAddresses))
+             .ForPath(a => a.EntityFk.EntityObjectStatusCode, b => b.MapFrom(ent => ent.EntityObjectStatusCode))
+             // .ForMember(a => a.EntityObjectStatusFk, b => b.MapFrom(ent => ent.EntityFk.EntityObjectStatusFk))
+             .ForPath(a => a.EntityFk.EntityObjectStatusCode, b => b.MapFrom(ent => ent.EntityObjectStatusCode))
+             .ForPath(a => a.EntityFk.EntityObjectStatusId, b => b.MapFrom(ent => ent.EntityObjectStatusId))
+             .ForPath(a => a.EntityFk.EntityObjectTypeCode, b => b.MapFrom(ent => ent.EntityObjectTypeCode))
+             //.ForMember(a => a.EntityObjectTypeFk, b => b.MapFrom(ent => ent.EntityFk.EntityObjectTypeFk))
+             .ForPath(a => a.EntityFk.EntityObjectTypeId, b => b.MapFrom(ent => ent.EntityObjectTypeId));
             //I45
         }
     }

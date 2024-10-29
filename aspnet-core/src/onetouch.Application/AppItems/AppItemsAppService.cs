@@ -2331,6 +2331,7 @@ namespace onetouch.AppItems
                         ObjectMapper.Map(appItem, appItemChild);
                         ObjectMapper.Map(child, appItemChild);
                         //MMT30[Start]
+                        if (string.IsNullOrEmpty(appItemChild.SSIN))
                         appItemChild.SSIN = "";
                         //MMT30[End]
                         appItemChild.Id = 0;
