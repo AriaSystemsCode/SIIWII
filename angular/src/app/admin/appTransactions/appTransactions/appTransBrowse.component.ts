@@ -180,6 +180,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             filters.codeFilter, undefined,
             filters.mainFilterType?.id, filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
+            undefined,
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
             filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,

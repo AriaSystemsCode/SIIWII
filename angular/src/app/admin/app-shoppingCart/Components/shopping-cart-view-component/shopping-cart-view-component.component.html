@@ -41,14 +41,15 @@
                         (click)="hide()" />
                 </div>
             </div>
-            <div class="d-md-flex d-none justify-content-between  ml-1 mr-1 topsubheader border-bottom mobile">
+            <div class="d-md-flex d-none justify-content-between  ml-1 mr-1 topsubheader border-bottom mobile align-items-center">
                 <div class="ml-1 previousArrow">
                     <button *ngIf="showCarousel" (click)="goPrevious_Next_Transaction(transactionPosition.Previous)"
                         [disabled]="appTransactionsForViewDto?.firstRecord" class="previousBtn"
                         [ngClass]="{ disabled:appTransactionsForViewDto?.firstRecord}"> <i
                             class="fa fa-chevron-left"></i> </button>
                 </div>
-                <div class="py-4 px-0 d-flex ">
+                <div class="d-flex">
+                <div class="py-2 px-0 d-flex ">
                     <label class="pt-2 mr-1 font-weight-bold purpleColor"> {{l("Status")}} </label>
                     <div class="status   pt-2">
                         <p style="white-space: nowrap;"> {{appTransactionsForViewDto?.entityStatusCode}}</p>
@@ -56,15 +57,26 @@
                     </div>
 
                 </div>
-                <div class="p-4" style="line-height: 10px;">
+                <div class="px-4 py-2" style="line-height: 10px;">
                     <label class="pt-2 font-weight-bold purpleColor"> {{l("Created")}} </label>
                     <div class="purpleColor" style="white-space: nowrap;">
                         {{appTransactionsForViewDto?.enteredDate?.toString() | date: 'MMM d y, h:mm a'}}
                     </div>
                 </div>
-
-                <div class="py-4 px-3 text-right border-left row  d-lg-flex
+</div>
+<div>
+                <div class="py-2 px-3 text-right  row  d-lg-flex
                 d-none">
+                <button type="button" class="btn  syncBtn"
+                [disabled]="!appTransactionsForViewDto?.showSync"
+             
+                style="height: 37px; white-space: nowrap;" (click)="sync()">
+                <svg width="16" height="23" viewBox="0 0 16 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 3.5V0.5L4 4.5L8 8.5V5.5C11.31 5.5 14 8.19 14 11.5C14 12.51 13.75 13.47 13.3 14.3L14.76 15.76C15.5702 14.4869 16.0004 13.0091 16 11.5C16 7.08 12.42 3.5 8 3.5ZM8 17.5C4.69 17.5 2 14.81 2 11.5C2 10.49 2.25 9.53 2.7 8.7L1.24 7.24C0.429753 8.51309 -0.000419615 9.99094 3.07144e-07 11.5C3.07144e-07 15.92 3.58 19.5 8 19.5V22.5L12 18.5L8 14.5V17.5Z" fill="#F6851D"/>
+                    </svg>
+                    
+                {{l("Sync")}}
+            </button>
                     <button type="button" class="btn   border-0  shareBtn"
                         [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                         [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
@@ -162,11 +174,27 @@
                                 {{"Print" | localize}}</button>
                             </a>
                        
-                    
+                    <a class="dropdown-item d-flex" id="syncTransaction">
+                        <button type="button" class="btn  "
+                        [disabled]="!appTransactionsForViewDto?.showSync"
+                     
+                        style="height: 37px; white-space: nowrap;" (click)="sync()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.99967 3.33301V0.833008L6.66634 4.16634L9.99967 7.49967V4.99967C12.758 4.99967 14.9997 7.24134 14.9997 9.99967C14.9997 10.8413 14.7913 11.6413 14.4163 12.333L15.633 13.5497C16.3082 12.4888 16.6667 11.2572 16.6663 9.99967C16.6663 6.31634 13.683 3.33301 9.99967 3.33301ZM9.99967 14.9997C7.24134 14.9997 4.99967 12.758 4.99967 9.99967C4.99967 9.15801 5.20801 8.35801 5.58301 7.66634L4.36634 6.44967C3.69114 7.51058 3.33266 8.74213 3.33301 9.99967C3.33301 13.683 6.31634 16.6663 9.99967 16.6663V19.1663L13.333 15.833L9.99967 12.4997V14.9997Z" fill="#777777"/>
+                            </svg>
+                            
+                            
+                        {{l("Sync")}}
+                    </button>
+                    </a>
                         </div>
                     </div>
                 </div>
-                <div class="p-4 text-right border-left d-flex">
+                <p *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" style="color: #1B101B;" class="ml-2">Last Edit : {{appTransactionsForViewDto?.lastModifiedDate?.toString() | date: 'MMM d y, h:mm a'}}</p>
+
+            </div>
+            <div  *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"> 
+                <div   class="px-4  py-2 text-right border-left d-flex">
                     <button    *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'" type="button" class="btn  bgPurple border-0  "
                         style="height: 37px;white-space: nowrap;" (click)="onContinueShopping()"
                         [disabled]="!isOwnedByMe"
@@ -179,6 +207,10 @@
                         {{l("DiscardShopping")}}
                     </button>
                 </div>
+                <p  style="color: #1B101B;" class="ml-2">Last Edit : {{appTransactionsForViewDto?.lastModifiedDate?.toString() | date: 'MMM d y, h:mm a'}}</p>
+
+            </div>
+             
             </div>
             <div class="row h-100 m-3 web" *ngIf="!onshare">
                 <div class="col-8 p-0">
@@ -787,6 +819,19 @@ height: 48px;"
                     {{l("DiscardShopping")}}
                 </button>
                 
+        </a>
+        <a class="dropdown-item d-flex" id="syncTransaction">
+            <button type="button" class="btn  "
+            [disabled]="!appTransactionsForViewDto?.showSync"
+         
+            style="height: 37px; white-space: nowrap;" (click)="sync()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.99967 3.33301V0.833008L6.66634 4.16634L9.99967 7.49967V4.99967C12.758 4.99967 14.9997 7.24134 14.9997 9.99967C14.9997 10.8413 14.7913 11.6413 14.4163 12.333L15.633 13.5497C16.3082 12.4888 16.6667 11.2572 16.6663 9.99967C16.6663 6.31634 13.683 3.33301 9.99967 3.33301ZM9.99967 14.9997C7.24134 14.9997 4.99967 12.758 4.99967 9.99967C4.99967 9.15801 5.20801 8.35801 5.58301 7.66634L4.36634 6.44967C3.69114 7.51058 3.33266 8.74213 3.33301 9.99967C3.33301 13.683 6.31634 16.6663 9.99967 16.6663V19.1663L13.333 15.833L9.99967 12.4997V14.9997Z" fill="#777777"/>
+                </svg>
+                
+                
+            {{l("Sync")}}
+        </button>
         </a>
             </div>
         </div>
