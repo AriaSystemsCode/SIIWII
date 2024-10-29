@@ -57,16 +57,16 @@ SuccessMsg: boolean = false;
 
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.loadAddresComponentShipFrom = true;
-      this.contactIdShipFrom = this.shipFromData.compId;
+      this.contactIdShipFrom = this.shipFromData?.compId;
         if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData.compssin);
+      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
   
         
   
-      this.contactIdShipTo = this.shipToData.compId;
+      this.contactIdShipTo = this.shipToData?.compId;
       this.loadAddresComponentShipTo = true;
       if( this.AddressComponentChild)
-      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData.compssin);
+      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
     }  
       
   }
@@ -214,7 +214,8 @@ SuccessMsg: boolean = false;
     this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
     this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) ;
+      .pipe(finalize(() => { this.hideMainSpinner();
+        //  this.generatOrderReport.emit(true) ;
         this.SuccessMsg = true
       }))
       .subscribe((res) => {
@@ -321,19 +322,19 @@ SuccessMsg: boolean = false;
   reloadAddresscomponentShipFrom(data) {
     this.shipFromData=data;
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.contactIdShipFrom = this.shipFromData.compId;
+      this.contactIdShipFrom = this.shipFromData?.compId;
 
         if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData.compssin);
+      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
   }
 }
   reloadAddresscomponentShipTo(data) {
   this.shipToData=data;
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.contactIdShipTo = this.shipToData.compId;
+      this.contactIdShipTo = this.shipToData?.compId;
 
   if( this.AddressComponentChild)
-    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
+    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
 }
   }
 

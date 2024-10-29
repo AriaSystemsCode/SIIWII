@@ -32,3 +32,26 @@
             </a>
         </div>
 </div>
+
+
+
+
+
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '500px' }" [draggable]="false" >
+    <div class="d-flex justify-content-start  mb-3">
+        
+            
+            
+            <span  class=" ml-2 ">Regenrating order confirmation</span>
+    </div>
+        <div class=" con-body">
+    
+          <p class="mb-3 text-center">
+            <p-progressBar mode="indeterminate" [style]="{'height': '6px'}" />
+
+        </p>
+    
+        </div>
+      
+    
+      </p-dialog>

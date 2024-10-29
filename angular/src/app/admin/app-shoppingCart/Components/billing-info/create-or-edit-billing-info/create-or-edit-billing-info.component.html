@@ -4,9 +4,7 @@
     <div class="container-fluid pt-1 mb-3 "  *ngIf="createOrEditBillingInfo">
         <div class="header p-2 my-2 d-flex justify-content-between">
             <h6><span  class="headertxt">{{l("APContact")}} : </span></h6>
-            <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
-                 {{l("Continue")}}
-            </button>
+    
      
 
         </div>
@@ -128,7 +126,9 @@
 
 <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
     <div class="header p-2 my-2 d-flex  justify-content-end">
-
+        <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()" class="continuebtn text-center btn float-right"   *ngIf="!showSaveBtn">
+            {{l("Continue")}}
+       </button>
 <button
 *ngIf="showSaveBtn"
 (click)="visible = true;cancelBtn = true;saveBtn = false"

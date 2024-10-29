@@ -88,6 +88,7 @@ export class ShoppingCartViewComponentComponent
   openActions:boolean =false
   temp: TreeNode<any>[] = null;
   addLine:boolean=true;
+  visible:boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,

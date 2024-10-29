@@ -230,7 +230,9 @@ debugger
     this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) ;  this.SuccessMsg = true}))
+      .pipe(finalize(() => { this.hideMainSpinner();
+        //  this.generatOrderReport.emit(true) ; 
+          this.SuccessMsg = true}))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));

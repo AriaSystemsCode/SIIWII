@@ -32,7 +32,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   cancelBtn: boolean = false;
   saveBtn: boolean = false;
   SuccessMsg: boolean = false;
-  isTempAcc :boolean = false
+  TempComp :boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy
@@ -40,6 +40,8 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     super(injector);
   }
   ngOnInit(): void {
+    console.log(  this.TempComp,'  this.TempCompiniiiiit')
+
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -69,7 +71,9 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   createOrEditTransaction() {
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true);  this.SuccessMsg = true}))
+      .pipe(finalize(() =>  {this.hideMainSpinner();
+        // this.generatOrderReport.emit(true); 
+         this.SuccessMsg = true}))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
@@ -89,6 +93,14 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
 
   onUpdateAppTransactionsForViewDto($event) {
     this.appTransactionsForViewDto = $event;
+   
+  }
+
+  isTempComp($event) {
+    console.log($event,'eventeventevekkkkknt')
+    this.TempComp = $event;
+    console.log(  this.TempComp,'  this.TempComp')
+
    
   }
 

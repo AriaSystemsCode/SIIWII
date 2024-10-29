@@ -93,7 +93,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     }
 
     getAddressList(companySsin){
-        console.log(this.selectedAddress,'this.selectedAddressss meeeeee')
+       
         this.showMainSpinner()
         this._AppTransactionServiceProxy.getCompanyAddresses(companySsin,null).subscribe(result => {
             this.savedAddressesList=null;
@@ -101,7 +101,8 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
             this.refSavedAddressesList=result;
             // debugger
             if(this.savedAddressesList.length==0&&!this.selectedAddress){
-                this.openAddNewAddForm=true;
+                // this.openAddNewAddForm=true;
+                this.showAddBtn = true
                 this.showAddList=false;
                 this.selectedAddress=null;
 

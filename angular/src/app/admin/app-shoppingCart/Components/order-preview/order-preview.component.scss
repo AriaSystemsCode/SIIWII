@@ -28,3 +28,34 @@
     color: #fff;
     height: 35px;
 }
+
+
+::ng-deep {
+    .p-progressbar .p-progressbar-value {
+        border: 0 none;
+        margin: 0;
+        background: #4A0D4A !important;
+      }
+    .p-dialog {
+
+
+padding: 24px 24px 32px !important;
+min-width: 350px !important;
+height: 98 !important;
+
+background: #FFFFFF !important;
+border: 1px solid #EEEEEE !important;
+box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15) !important;
+border-radius: 10px !important;
+
+      }
+        .p-dialog .p-dialog-header {
+          border:  none !important;
+          background: white !important;
+          padding: 0 !important;
+        }
+
+
+ 
+
+}

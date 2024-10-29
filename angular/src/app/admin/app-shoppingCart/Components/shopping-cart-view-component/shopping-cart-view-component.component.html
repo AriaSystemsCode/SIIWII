@@ -284,13 +284,14 @@
 
                         <p-accordionTab class="shoppingCartAccordionTabBG" *ngIf="showTabs"  (click)="currentTab=4">
                             <ng-template pTemplate="header">
-                                <div class="d-inline-block custom-header d-flex">
+                                <div class="d-inline-block custom-header d-flex ">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
                                         *ngIf="shippingInfOValid" />
                                     <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!shippingInfOValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                     </h6>
+                                    <p *ngIf="!shippingInfOValid" class="mx-2">*Please select or add ( ship to) address</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==4">
@@ -312,6 +313,7 @@
                                     <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!BillingInfoValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
+                                    <p  *ngIf="!BillingInfoValid" class="mx-2">*Please select or add billing address</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==5">

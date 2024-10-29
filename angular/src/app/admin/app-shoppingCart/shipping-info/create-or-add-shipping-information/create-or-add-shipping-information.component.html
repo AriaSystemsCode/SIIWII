@@ -1,13 +1,9 @@
 <div class="position-relative tab-cont thin-scroll">
 <div >
-    <div class="container-fluid pt-1 mb-3 "[ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
+    <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
         <div class="header p-2 my-2 d-flex  justify-content-between">
             <h6><span  class="headertxt"> {{l("ShipFrom")}} : </span></h6>
-            <button 
-            [disabled]="!(shippingTabValid)" (click)="createOrEditTransaction()" 
-            class="continuebtn text-center btn float-right"  *ngIf="!showSaveBtn ">
-                 {{l("Continue")}}
-            </button>
+         
     
         </div>
         <hr class="my-2" />
@@ -83,7 +79,7 @@
    [showAddressType]="false"
    [canChange]="canChange"
    [currentTab]="currentTab"
-   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) "
+   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) ? false : true"
 
 
    ></app-address>
@@ -136,7 +132,7 @@
     (isContactsValid_2)="isContactFormValid($event,2)">
 </app-view-shipping-information>
 </div>
-<div class="d-flex justify-content-end">
+<div  *ngIf="showSaveBtn " class="d-flex justify-content-end">
     <button
 *ngIf="showSaveBtn"
 (click)="visible = true;cancelBtn = true;saveBtn = false"
@@ -154,7 +150,20 @@ Cancel
 
 </div>
 
+<div  *ngIf="!showSaveBtn " class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
+    <div class="header p-2 my-2 d-flex  justify-content-end">
+   
+        <button 
+        [disabled]="!(shippingTabValid)" (click)="createOrEditTransaction()" 
+        class="continuebtn text-center btn float-right"  *ngIf="!showSaveBtn ">
+             {{l("Continue")}}
+        </button>
 
+    </div>
+
+
+      
+</div>
 
 </div>
 
