@@ -284,6 +284,36 @@ namespace onetouch.AppSiiwiiTransaction
                         {
                             input.BuyerCompanySSIN = account.AccountInfo.SSIN;
                             buyerContact.CompanySSIN = account.AccountInfo.SSIN;
+                            // Add Address 
+                            var ShpToContact = input.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipToContact).FirstOrDefault();
+                            if (ShpToContact!=null && !string.IsNullOrEmpty(ShpToContact.ContactAddressCode) && !string.IsNullOrEmpty(ShpToContact.ContactAddressLine1))
+                            {
+                                AppAddressDto address = new AppAddressDto();
+                                address.AddressLine1 = ShpToContact.ContactAddressLine1;
+                                address.AddressLine2 = ShpToContact.ContactAddressLine2;
+                                address.AccountId = long.Parse(account.AccountInfo.Id.ToString());
+                                address.Code = ShpToContact.ContactAddressCode;
+                                address.City = ShpToContact.ContactAddressCity;
+                                address.CountryCode = ShpToContact.ContactAddressCountryCode;
+                                address.CountryId = ShpToContact.ContactAddressCountryId;
+                                address.State = ShpToContact.ContactAddressState;
+                                address.PostalCode = ShpToContact.ContactAddressPostalCode;
+                                address.Name = ShpToContact.ContactAddressName;
+                                AppAddressDto addReturn = await _accountAppService.CreateOrEditAddress(address);
+                                if (addReturn != null && addReturn.Id!=0)
+                                {
+                                    AppContactAddress  contactAdd = new AppContactAddress();
+                                    contactAdd.AddressId = addReturn.Id;
+                                    contactAdd.AddressCode = addReturn.Code;
+                                    contactAdd.ContactCode = account.AccountInfo.Code;
+                                    contactAdd.ContactId = long.Parse(account.AccountInfo.Id.ToString() );
+                                    contactAdd.AddressTypeCode = "DIRECT-SHIPPING";
+
+
+                                }
+
+                            }
+                             //
                         }
 
                     }
@@ -316,6 +346,7 @@ namespace onetouch.AppSiiwiiTransaction
                             buyerContact.ContactSSIN = savedContactDto.SSIN;
                         }
                     }
+                   
                 }
             }
             if (input.Id == 0)

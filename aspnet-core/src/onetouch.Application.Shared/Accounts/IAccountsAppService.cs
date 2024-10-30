@@ -6,6 +6,7 @@ using onetouch.Accounts.Dtos;
 using onetouch.Dto;
 using System.Collections.Generic;
 using onetouch.AccountInfos.Dtos;
+using onetouch.AppContacts;
 
 namespace onetouch.Accounts
 {
@@ -37,5 +38,7 @@ namespace onetouch.Accounts
 		Task<PagedResultDto<LookupAccountOrTenantDto>> GetTenantsWithManualAccounts(GetTenantsWithManualAccounts input);
 		Task<PagedResultDto<LookupAccountOrTenantDto>> GetAccountByType(GetAccountsForDropdownInputDto input);
 		Task<long> CreateOrUpdateAccountFromSourceAccount(CreateAccountsInputDto input);
-	}
+		Task<AppAddressDto> CreateOrEditAddress(AppAddressDto input);
+
+    }
 }
