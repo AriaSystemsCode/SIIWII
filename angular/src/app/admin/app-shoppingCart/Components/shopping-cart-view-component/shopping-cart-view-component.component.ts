@@ -645,7 +645,11 @@ this.hideMainSpinner();
     indx = this.minimizedOrders?.findIndex(x => x.orderId == orderId);
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
-    this.show(orderId, this.showCarousel, this.validateOrder, this.shoppingCartMode);
+    if(this.appTransactionsForViewDto?.entityStatusCode =="DRAFT") {
+      this.show(orderId, this.showCarousel, this.validateOrder, ShoppingCartMode.createOrEdit);
+    } else {
+        this.show(orderId, this.showCarousel, this.validateOrder, ShoppingCartMode.view);
+}
   }
 
   onProceedToCheckout() {
@@ -843,19 +847,19 @@ this.hideMainSpinner();
       this.printInfoParam.TransactionId = this.orderId.toString();
       //this.printInfoParam.orderType=this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder  ? "SO" : "PO";
       
-      if(this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder){
-      this.printInfoParam.orderConfirmationRole="Seller";
-     // this.printInfoParam.contactName= this.appTransactionsForViewDto.sellerContactName;
-      }
+    //   if(this.appTransactionsForViewDto.transactionType== TransactionType.SalesOrder){
+    //   this.printInfoParam.orderConfirmationRole="Seller";
+    //  // this.printInfoParam.contactName= this.appTransactionsForViewDto.sellerContactName;
+    //   }
 
 
 
-      if(this.appTransactionsForViewDto.transactionType== TransactionType.PurchaseOrder){
-      this.printInfoParam.orderConfirmationRole="Buyer";
-    //  this.printInfoParam.contactName=this.appTransactionsForViewDto.buyerContactName;
-      }
+    //   if(this.appTransactionsForViewDto.transactionType== TransactionType.PurchaseOrder){
+    //   this.printInfoParam.orderConfirmationRole="Buyer";
+    // //  this.printInfoParam.contactName=this.appTransactionsForViewDto.buyerContactName;
+    //   } 
 
-     // this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
+      this.printInfoParam.orderConfirmationRole = this.getTransactionRole(this.appTransactionsForViewDto.enteredByUserRole);
       this.printInfoParam.saveToPDF = true;
       this.printInfoParam.tenantId = this.appSession?.tenantId
       this.printInfoParam.userId = this.appSession?.userId

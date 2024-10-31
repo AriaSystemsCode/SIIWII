@@ -1,9 +1,61 @@
 ::ng-deep {
-
-    .entered {
-        color: #B375B3;
+    @media only screen and (min-width: 768px) {
+    .p-datepicker:not(.p-datepicker-inline) {
+        width: 305px !important;
     }
-    .p-dropdown .p-dropdown-label.p-placeholder {
+    .p-datepicker-calendar {
+        width: 286px !important;
+    }
+}
+    .focused-calendar .p-datepicker-trigger {
+        border-bottom-right-radius: 8px !important;
+    }
+   
+    
+.p-datepicker-calendar {
+    // width: 286px !important;
+    .p-datepicker table td {
+        padding: 5px !important;
+    }
+    // thead {
+    //     .ng-tns-c20-13{
+    //         width: 40px !important;
+    //     }
+    // }
+    .p-datepicker table td > span {
+        width: 30px !important;
+    }
+    .p-calendar-w-btn .p-inputtext {
+        color: #9E9E9E !important;
+font-size: 14px !important;
+font-weight: 600 !important;
+
+    }
+}
+.p-inputtext {
+    color: #9E9E9E !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+.spEnterd {
+    color: #1B101B;
+font-size: 16px;
+
+font-weight: 700;
+
+}
+.temm {
+    margin: 20px 0 ;
+}  
+.enteredBy {
+        color: #4A0D4A !important;
+  
+        font-size: 16px;
+
+        font-weight: 800;
+        line-height: normal;
+    }
+    .p-dropdown-label {
         color:#9E9E9E  !important;
         font-size: 14px !important;
 font-style: normal;
@@ -11,7 +63,7 @@ font-weight: 600 !important;
     }
     .p-calendar .p-inputtext {
         color: #9E9E9E !important;
-        font-size: 14px;
+        font-size: 14px !important;
 font-style: normal !important;
 font-weight: 600 !important;
     }
@@ -34,6 +86,7 @@ font-weight: 600 !important;
     }
     .p-dropdown{
         width: 100% !important;
+        height: 44px !important;
     }
     .p-dropdown-filter-icon{
         top: 16px !important;
@@ -59,6 +112,34 @@ color: #4a0d4a;
 
         border: 1px solid rgba(238, 238, 238, 0.93) !important;
 
+    }
+
+
+    .form-control {
+        height: 44px !important;
+        border-radius: 8px !important;
+border: 1px solid #D5D4DC !important;
+background: #FFF !important;
+color: #9E9E9E !important;
+font-size: 14px !important;
+font-style: normal !important;
+font-weight: 600 !important;
+    }
+    .form-control:focus {
+        border-radius: 8px !important;
+border: 2px solid #4A0D4A !important;
+background: #FFF !important;
+    }
+    // .form-control:active {
+    //     border-radius: 8px !important;
+    //     border: 1px solid #A07DA0 !important;
+    //     background: #FFF !important;
+    // }
+
+    .form-control:hover {
+        border-radius: 8px !important;
+        border: 1px solid #D5D4DC !important;
+        background: rgba(248, 248, 248, 0.97) !important;
     }
 }
 
@@ -105,15 +186,18 @@ color: #4a0d4a;
     }
 }
 .footer{
-    background-color: #E7E8EF;
+    border-radius: 12px;
+border: 1px solid #E0E0E0;
+background: #F8F8F8;
     padding: 10px;
     display: flex;
     align-items: center;
     justify-content: end;
     button{
         background-color: #4a0d4a;
-        color: #fff;
+        color: #fff ;
         border-radius: 8px !important;
+        border: none !important;
         padding: 10px 30px;
         font-size: 13px;
         margin: 10px 0px;
@@ -133,6 +217,7 @@ color: #4a0d4a;
     
 
 }
+
 .p-calendar-w-btn .p-datepicker-trigger {
     width: 48px !important;
     height: 44px !important;
@@ -167,7 +252,18 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
     // spinnericon {
     //     display: none !important;
 
+
     // }
+    .text-danger {
+        color: #C83532ed !important;
+    }
+    .was-validated .form-control:invalid, .form-control.is-invalid {
+        border: 1px solid#C83532ed !important;
+
+    }
+    // .is-invalid {
+    //     border: 1px solid red !important;
+    //   }
     p-autocomplete .p-autocomplete{
         width: 100% !important;
         .p-button:focus {
@@ -185,11 +281,14 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
             border-bottom-left-radius: 0px !important;
         }
         .p-inputtext {
+            height: 44px !important;
             border-top-left-radius: 8px !important;
             border-bottom-left-radius: 8px !important;
             border: 1px solid #e2e5ec !important;
     border-right: none !important;
-    // border-radius: 8px !important;
+    color: #9E9E9E !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
         }
         .p-inputtext:enabled:focus {
             border: 1px solid #e2e5ec !important;
@@ -202,12 +301,39 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 
         
     }
+    @media  (min-width: 567px) and  (max-width: 778px) {
+        .col-md-6 {
+            width: 50% !important;
+            max-width: 50%;
+        }
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 265px !important;
+        }
+  
+       
+        input.form-control.ng-dirty.ng-invalid.ng-touched {
+            border: 1px solid red !important;
+          } 
+    .p-datepicker-calendar {
+        width: 245px !important;
+        .p-datepicker table td {
+            padding: 5px !important;
+        }
+    
+       
+    }
+    }
+    @media  only screen and (max-width: 426px) { 
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 77% !important;
+        }
+    }
 }
 
 @media only screen and (max-width: 600px) {
     .mobile {
 
-        width: 80%;
+        width: 85%;
     }
 }
 label {

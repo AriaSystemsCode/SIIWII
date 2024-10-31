@@ -130,7 +130,7 @@ namespace onetouch.SystemObjects
         //T-SII-20220919.0001,1 MMT 12/20/2022 Add an API to validate if the entered name is already entered before or not[Start]
         public async Task<bool> ClassificationNameIsExisting(string classificationName)
         {
-            var objWithSameName = await _sycEntityObjectClassificationRepository.FirstOrDefaultAsync(x => x.Name.ToUpper() == classificationName.ToUpper());
+            var objWithSameName = await _sycEntityObjectClassificationRepository.FirstOrDefaultAsync(x => x.Name.ToUpper() == classificationName.ToUpper() && x.TenantId == AbpSession.TenantId);
             if (objWithSameName != null)
                 return true;
             return false;
