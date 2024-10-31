@@ -89,3 +89,12 @@ border-radius: 10px;
     border: 1px solid #e2e5ec !important;
     border-right: 1px solid #e2e5ec !important;
 }
+.tempAccount  {
+    .p-dropdown {
+        border: 1px solid #C83532 !important;
+    }
+    .p-dropdown:not(.p-disabled):hover {
+        border: 1px solid #C83532 !important;
+    }
+
+}

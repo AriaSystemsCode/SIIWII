@@ -396,7 +396,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
             ).subscribe((res: any) => {
                 this.allContacts = [...res];
                 this.filteredContacts = this.allContacts.filter(contact =>
-                    contact.name.toLowerCase().includes(event.query.toLowerCase())
+                    contact.name.toLowerCase().includes(event?.query?.toLowerCase())
                 );
         
                 // Set selected contact based on user input but don't overwrite existing selections
@@ -505,7 +505,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
 
             // if(this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany)
                
-            if(this.appTransactionsForViewDto?.buyerCompanySSIN != '' || this.activeTab!=this.shoppingCartoccordionTabs.BuyerContactInfo) {
+            if(this.appTransactionsForViewDto?.buyerCompanySSIN != '' ) {
                 (isValid) = (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') &&
                 (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != ''  ) 
             } else {
@@ -513,10 +513,10 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 // if(this.activeTab==this.shoppingCartoccordionTabs.BuyerContactInfo) {
 
               
-                (isValid) =    (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') &&  (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '' )  &&  (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name != '' ) &&  (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber != ''
-                     &&
+                (isValid) =    (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name != '') &&  (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.name != '' )  &&  (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name != '' ) &&  (
+                     
                      (this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany == this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) ?  this.comNew == false && this.conNew == false :
-                      this.comNew == true && this.conNew == true)) 
+                      this.comNew == true && this.conNew == true && (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber != '' &&this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContactEmail != undefined && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContactEmail != ''))) 
             // }
             // else {
 
@@ -641,7 +641,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         this.allBranches = result;
         console.log(this.allBranches,'braaaanchhh')
         this.filteredBranches = this.allBranches.filter(contact =>
-            contact.name.toLowerCase().includes(event.query.toLowerCase())
+            contact.name.toLowerCase().includes(event?.query?.toLowerCase())
         );
 
     
