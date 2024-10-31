@@ -892,6 +892,31 @@ namespace onetouch
             configuration.CreateMap<AppFeatureDto, AppFeature>().ReverseMap()
                 .ForMember(z=>z.FeatureStatus, z=>z.MapFrom(ss=>ss.EntityObjectStatusCode))
                 .ForMember(z=>z.Category, z=>z.MapFrom(s=>s.CategoryCode));
+            //MMT45
+            configuration.CreateMap<AppMarketplaceItemLists.AppMarketplaceItemLists, CreateOrEditAppItemsListDto>()
+                .ForMember(d => d.UsersCount, s => s.MapFrom(ss => ss.ItemSharingFkList.Count(x => x.SharedUserId != null)))
+                .ForMember(d => d.StatusCode, s => s.MapFrom(ss => ss.EntityObjectStatusCode))
+                .ForMember(d => d.StatusId, s => s.MapFrom(ss => ss.EntityObjectStatusId));
+              //  .ForMember(d => d.Users, s => s.MapFrom(ss => ss.ItemSharingFkList.Where(x => x.SharedUserId != null).Take(5)));
+
+            configuration.CreateMap<AppMarketplaceItemsListDetails, CreateOrEditAppItemsListItemDto>()
+                .ForMember(d => d.ItemCode, s => s.MapFrom(ss => ss.ItemFK.Code))
+                .ForMember(d => d.ItemName, s => s.MapFrom(ss => ss.ItemFK.Name))
+                .ForMember(d => d.ItemDescription, s => s.MapFrom(ss => ss.ItemFK.Notes))
+                .ForMember(d => d.ImageURL, s => s.MapFrom(ss => ss.ItemFK.TenantId.ToString()))
+                .ForMember(d => d.State, s => s.MapFrom(ss => string.IsNullOrEmpty(ss.State) == true ? StateEnum.ActiveOrEmpty : (StateEnum)Enum.Parse(typeof(StateEnum), ss.State.ToString().Trim())));
+            configuration.CreateMap<AppMarketplaceItemsListDetails, AppItemsListItemVariationDto>()
+             .ForMember(d => d.ItemCode, s => s.MapFrom(ss => ss.ItemFK.Code))
+             .ForMember(d => d.ItemName, s => s.MapFrom(ss => ss.ItemFK.Name))
+             .ForMember(d => d.ItemDescription, s => s.MapFrom(ss => ss.ItemFK.Notes))
+             .ForMember(d => d.ImageURL, s => s.MapFrom(ss => ss.ItemFK.TenantId.ToString()))
+             .ForMember(d => d.State, s => s.MapFrom(ss => string.IsNullOrEmpty(ss.State) == true ? StateEnum.ActiveOrEmpty : (StateEnum)Enum.Parse(typeof(StateEnum), ss.State.ToString().Trim())))
+             .ForMember(d => d.Variation, s => s.MapFrom(ss => ss.ItemFK.ParentFk));
+            configuration.CreateMap<AppMarketplaceItemsListDetails, AppItemVariationDto>()
+            .ForMember(d => d.State, s => s.MapFrom(ss => string.IsNullOrEmpty(ss.State) == true ? StateEnum.ActiveOrEmpty : (StateEnum)Enum.Parse(typeof(StateEnum), ss.State.ToString().Trim())));
+
+            //MMR45
+
         }
     }
 }
