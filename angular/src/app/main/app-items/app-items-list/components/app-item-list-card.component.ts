@@ -38,6 +38,7 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
 
     ngOnInit(){
         this.checkPermissions()
+        console.log(this.item?.appItemsList?.id)
     }
 
     deleteList(){
@@ -68,7 +69,20 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
         if (!this.canPublish) return
         this.unPublishMe.emit()
     }
-    sync() {
+    sync(id) {
+        this.visible = true
+   this._appItemsListsServiceProxy.copyItemsFromItemList(
+       id
+  
+    )
+    .pipe(
+        finalize(()=>
+            this.visible = false
+    )
+    )
+    .subscribe((result)=>{
+     
+    })
 
     }
 

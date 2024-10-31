@@ -67,8 +67,62 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
     this.showSaveBtn = false;
   }
+  synchronizeContactDetails() {
+    // Find the Buyer contact
+    const buyerContact = this.appTransactionsForViewDto.appTransactionContacts.find(
+        contact => contact.contactRole === 1
+    );
 
+    // Log the Buyer contact
+    console.log("Buyer Contact before sync:", buyerContact);
+
+    if (buyerContact) {
+        // List of roles to synchronize with Buyer contact
+        const rolesToUpdate = [6, 4]; // 6: ShipToContact, 4: ShipFromContact
+
+        rolesToUpdate.forEach(role => {
+            // Find the contact for the specified role
+            const roleContact = this.appTransactionsForViewDto.appTransactionContacts.find(
+                contact => contact.contactRole === role
+            );
+
+            // Log the role contact before updating
+            console.log(`Role Contact before sync (Role: ${role}):`, roleContact);
+
+            if (roleContact) {
+                // Synchronize relevant properties
+                roleContact.companyName = buyerContact.companyName;
+                roleContact.companySSIN = buyerContact.companySSIN;
+                roleContact.branchName = buyerContact.companyName;
+                roleContact.branchSSIN = buyerContact.branchSSIN
+                roleContact.contactSSIN = buyerContact.contactSSIN;                
+                roleContact.contactName = buyerContact.contactName;
+                roleContact.contactEmail = buyerContact.contactEmail;
+                roleContact.contactPhoneNumber = buyerContact.contactPhoneNumber;
+                roleContact.contactPhoneTypeId = buyerContact.contactPhoneTypeId;
+                roleContact.contactAddressCity = buyerContact.contactAddressCity;
+                roleContact.contactAddressCode = buyerContact.contactAddressCode;
+                roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
+                roleContact.contactAddressCountryId = buyerContact.contactAddressCountryId;
+                // roleContact.contactAddressDetail = { ...buyerContact.contactAddressDetail };
+                roleContact.contactAddressLine1 = buyerContact.contactAddressLine1;
+                roleContact.contactAddressLine2 = buyerContact.contactAddressLine2;
+                roleContact.contactAddressName = buyerContact.contactAddressName;
+                roleContact.contactAddressPostalCode = buyerContact.contactAddressPostalCode;
+                roleContact.contactAddressState = buyerContact.contactAddressState;
+
+                // Log the updated role contact after synchronization
+                console.log(`Role Contact after sync (Role: ${role}):`, roleContact);
+            } else {
+                console.warn(`No contact found for role: ${role}`);
+            }
+        });
+    } else {
+        console.warn("No Buyer contact found to sync with.");
+    }
+}
   createOrEditTransaction() {
+    this.synchronizeContactDetails();
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
@@ -77,11 +131,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-          /*  if (this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo)
-             this.buyer_seller_contactInfoValid.emit(ShoppingCartoccordionTabs.BuyerContactInfo);
- 
-           if (this.activeTab == this.shoppingCartoccordionTabs.SellerContactInfo)
-             this.buyer_seller_contactInfoValid.emit(ShoppingCartoccordionTabs.SellerContactInfo); */
+      
           if (!this.showSaveBtn)
             this.ontabChange.emit(this.activeTab);
           else
@@ -97,9 +147,9 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   }
 
   isTempComp($event) {
-    console.log($event,'eventeventevekkkkknt')
+
     this.TempComp = $event;
-    console.log(  this.TempComp,'  this.TempComp')
+   
 
    
   }
@@ -108,8 +158,10 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   isContactFormValid(value) {
     if(this.activeTab==this.shoppingCartoccordionTabs.BuyerContactInfo ||this.activeTab==this.shoppingCartoccordionTabs.SellerContactInfo)
     {
+
     this.isContactsValid = value;
     if (value) {
+
       this.isContactsValid = true;
       if (this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo)
         this.buyer_seller_contactInfoValid.emit(ShoppingCartoccordionTabs.BuyerContactInfo);

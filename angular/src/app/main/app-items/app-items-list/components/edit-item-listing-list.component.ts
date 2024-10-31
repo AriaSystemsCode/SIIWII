@@ -670,7 +670,20 @@ export class EditItemListingListComponent
     }
 
 
-    sync() {
+    sync(id) {
+        this.visible = true
+   this._appItemsListsServiceProxy.copyItemsFromItemList(
+       id
+  
+    )
+    .pipe(
+        finalize(()=>
+            this.visible = false
+    )
+    )
+    .subscribe((result)=>{
+     
+    })
 
     }
 }

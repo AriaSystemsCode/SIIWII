@@ -251,6 +251,7 @@
                                     <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!buyerContactInfoValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
+                                    <p *ngIf="!buyerContactInfoValid" class="mx-2">*Please select valid account or create a new one</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==1">

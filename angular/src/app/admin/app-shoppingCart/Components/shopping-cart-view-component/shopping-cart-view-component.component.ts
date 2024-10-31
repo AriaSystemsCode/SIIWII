@@ -817,12 +817,14 @@ this.hideMainSpinner();
   }
 
   ontabInfoValid(activetab) {
+    
     switch (activetab) {
       case ShoppingCartoccordionTabs.orderInfo:
         this.orderInfoValid = true;
         break;
 
       case ShoppingCartoccordionTabs.BuyerContactInfo:
+      
         this.buyerContactInfoValid = true;
         break;
 
