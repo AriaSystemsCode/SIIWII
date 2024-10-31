@@ -93,7 +93,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
                 // Synchronize relevant properties
                 roleContact.companyName = buyerContact.companyName;
                 roleContact.companySSIN = buyerContact.companySSIN;
-                roleContact.branchName = buyerContact.companyName;
+                roleContact.branchName = buyerContact.branchName;
                 roleContact.branchSSIN = buyerContact.branchSSIN
                 roleContact.contactSSIN = buyerContact.contactSSIN;                
                 roleContact.contactName = buyerContact.contactName;
