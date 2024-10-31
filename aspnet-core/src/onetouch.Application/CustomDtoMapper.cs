@@ -900,10 +900,11 @@ namespace onetouch
               //  .ForMember(d => d.Users, s => s.MapFrom(ss => ss.ItemSharingFkList.Where(x => x.SharedUserId != null).Take(5)));
 
             configuration.CreateMap<AppMarketplaceItemsListDetails, CreateOrEditAppItemsListItemDto>()
-                .ForMember(d => d.ItemCode, s => s.MapFrom(ss => ss.ItemFK.Code))
+                .ForMember(d => d.ItemCode, s => s.MapFrom(ss => ss.ItemFK.ManufacturerCode))
                 .ForMember(d => d.ItemName, s => s.MapFrom(ss => ss.ItemFK.Name))
                 .ForMember(d => d.ItemDescription, s => s.MapFrom(ss => ss.ItemFK.Notes))
                 .ForMember(d => d.ImageURL, s => s.MapFrom(ss => ss.ItemFK.TenantId.ToString()))
+                .ForMember(d => d.ItemId, s => s.MapFrom(ss => ss.AppMarketplaceItemId))
                 .ForMember(d => d.State, s => s.MapFrom(ss => string.IsNullOrEmpty(ss.State) == true ? StateEnum.ActiveOrEmpty : (StateEnum)Enum.Parse(typeof(StateEnum), ss.State.ToString().Trim())));
             configuration.CreateMap<AppMarketplaceItemsListDetails, AppItemsListItemVariationDto>()
              .ForMember(d => d.ItemCode, s => s.MapFrom(ss => ss.ItemFK.Code))

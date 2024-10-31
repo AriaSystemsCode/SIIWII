@@ -432,6 +432,9 @@ namespace onetouch.AppItemsLists
                     item.ImageURL = imageQuery.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0) != null
                                                 ? "attachments/" + item.ImageURL + "/" + imageQuery.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0).ItemFK.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
                                                     : "";
+                    //var maketItem = await _appMarketplaceItem.GetAll().Where(z => z.Id == item.ItemId).FirstOrDefaultAsync();
+                    //if (maketItem!=null)
+                    //    item.ItemCode = maketItem.ManufacturerCode;
                 }
 
                 var totalCount = await filteredAppItemsListItems.CountAsync();
