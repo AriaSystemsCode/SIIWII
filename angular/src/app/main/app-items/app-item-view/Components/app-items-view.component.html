@@ -193,7 +193,7 @@
                                                     <div
                                                         class="p-d-flex p-jc-center p-ai-center mr-2 ml-2"
                                                     >
-                                                        <img *ngIf="img?.colorImage"
+                                                        <img *ngIf="img?.colorImage && !img?.colorHexaCode"
                                                             [src]="
                                                                 attachmentBaseUrl +
                                                                 '/' +
@@ -221,7 +221,7 @@
                                                             "
                                                         />
                                                         <div
-                                                        *ngIf="!img?.colorImage && img?.colorHexaCode "
+                                                        *ngIf="(!img?.colorImage && img?.colorHexaCode ) || (img?.colorImage && img?.colorHexaCode)"
                                     class="colorBox"
                                     [ngStyle]="{'background-color':img?.colorHexaCode}"
                                     [ngClass]="{
@@ -323,7 +323,7 @@
 
 
                                                         <div
-                                    *ngIf="!img?.colorImage && img?.colorHexaCode "
+                                    *ngIf=" (!img?.colorImage && img?.colorHexaCode ) || (img?.colorImage && img?.colorHexaCode)"
                                     class="colorBox"
                                     [ngStyle]="{'background-color':img?.colorHexaCode}"
                                     [ngClass]="{
