@@ -61,7 +61,24 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.showSaveBtn = false;
   }
 
+
+  synchronizeContactDetails() {
+    // Find the Buyer contact
+    const buyerContact = this.appTransactionsForViewDto.appTransactionContacts.find(
+        contact => contact.contactRole === 1
+    );
+    this.appTransactionsForViewDto.buyerCompanyName= buyerContact.companyName 
+    this.appTransactionsForViewDto.buyerCompanySSIN = buyerContact.companySSIN
+    this.appTransactionsForViewDto.buyerContactName = buyerContact.contactName 
+    this.appTransactionsForViewDto.buyerBranchName =  buyerContact.branchName
+    this.appTransactionsForViewDto.buyerBranchSSIN = buyerContact.branchSSIN 
+    this.appTransactionsForViewDto.buyerContactEMailAddress = buyerContact.contactEmail 
+    this.appTransactionsForViewDto.buyerContactPhoneNumber = buyerContact.contactPhoneNumber 
+    this.appTransactionsForViewDto.buyerContactSSIN = buyerContact.contactSSIN 
+}
+
   createOrEditTransaction() {
+    this.synchronizeContactDetails()
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))

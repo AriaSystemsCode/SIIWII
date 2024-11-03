@@ -619,8 +619,9 @@ this.hideMainSpinner();
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
     this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-    if (this.shoppingCartMode == ShoppingCartMode.view)
+    // if (this.shoppingCartMode == ShoppingCartMode.view)
       this.hideShoppingCartModal.emit(true);
+    
   }
 
   minimizedOrders: any[] = [];
