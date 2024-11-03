@@ -27,7 +27,8 @@
     color: #FFFFFF;
     font-family: Poppins;font-size: 16px;font-weight: 600;line-height: 24px;text-align: left;
     text-align: center;
-  
+    display: flex;
+    justify-content: center;
   }
   .price-txt
   {
@@ -205,6 +206,8 @@ margin: auto;
 width: 90%;
 position: sticky;
 bottom: 0px;
+font-weight: 600;
+font-size: 16px;
   }
 .noCart {
 
@@ -241,9 +244,9 @@ line-height: normal;
   }
 
   .feature {
-    color: #777;
+    color: #1B101B;
 font-size: 12px;
-font-weight: 600;
+font-weight: 500;
 
   }
 
