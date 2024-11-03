@@ -146,5 +146,13 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
        //public string  StatusFilter { set; get; }
       
     }
+    public class SellerVariationInputDto : PagedAndSortedResultRequestDto
+    { 
+        public string SellerSSIN { set; get; }
+        public string Filter { set; get; }
+        public string ContactSSIN { set; get; }
+        public string CurrencyCode { set; get; }
+    }
+   
     //Iteration45
 }
