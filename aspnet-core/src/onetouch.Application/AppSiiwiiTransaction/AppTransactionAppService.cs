@@ -66,6 +66,7 @@ using PayPalCheckoutSdk.Orders;
 using Castle.MicroKernel.Registration;
 using onetouch.AppItemsLists;
 using System.Diagnostics;
+using Abp.AspNetZeroCore.Timing;
 
 
 //using NUglify.Helpers;
@@ -5627,43 +5628,94 @@ namespace onetouch.AppSiiwiiTransaction
             }
         }
         //Iteration45[Start]
-        public async Task<List<DataView>> GetAppTransactionVariationsDetail(long transactionId)
+        public async Task<PagedResultDto<TransactionDetailView>> GetllTransactionVariationsDetail(VariationInputDto input)
         {
+            long? transactionType = null;
+            long soType = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
+            long poType = await _helper.SystemTables.GetEntityObjectTypePurchaseOrder();
+            if (input.TransactionTypeFilter != null)
+            {
+                if (input.TransactionTypeFilter == TransactionType.SalesOrder)
+                {
+                    transactionType = soType;
+                }
+                else
+                {
+                    transactionType = poType;
+                }
+            }
             List<DataView> returnList = new List<DataView>();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var transDetail = await _appTransactionDetails.GetAll().Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
-                  .Where(a => a.TransactionId == transactionId && a.ParentId!= null).ToListAsync();
-                if (transDetail != null && transDetail.Count() > 0)
-                {
-                    foreach (var variation in transDetail)
-                    {
-                        DataView sizeColorDetailView = new DataView();
-                        sizeColorDetailView.LineId = variation.Id;
-                        sizeColorDetailView.code = variation.Code;
-                        sizeColorDetailView.ManufacturerCode = variation.ManufacturerCode;
-                        sizeColorDetailView.name = variation.Name;
-                        sizeColorDetailView.Qty = variation.Quantity;
-                        sizeColorDetailView.NoOfPrePacks = (variation.NoOfPrePacks == null ? 0 : (long)variation.NoOfPrePacks);
+                var transDetail = _appTransactionDetails.GetAll().Include(x => x.TransactionIdFk).Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
+                  .Where(a => a.ParentId != null && a.TenantId == AbpSession.TenantId)
+                  .WhereIf(input.TransactionTypeFilter != null, z => z.TransactionIdFk.EntityObjectTypeId == transactionType)
+                  .WhereIf(!string.IsNullOrEmpty(input.TransactionNumberFilter), z => z.TransactionCode == input.TransactionNumberFilter)
+                  .WhereIf(!string.IsNullOrEmpty(input.NameFilter!), z => z.Name.ToUpper().Contains(input.NameFilter.ToUpper()))
+                  .WhereIf(input.MinPrice!=null && input.MaxPrice!=null, z=>z.NetPrice >= input.MinPrice && z.NetPrice <= input.MaxPrice)
+                  .WhereIf(input.MinAmount != null && input.MaxAmount != null, z => z.Amount >= input.MinAmount && z.Amount <= input.MaxAmount)
+                  .WhereIf(!string.IsNullOrEmpty(input.VariationCodeFilter), z => z.ManufacturerCode.ToUpper().Contains(input.VariationCodeFilter.ToUpper()));
 
-                        sizeColorDetailView.Price = variation.NetPrice;
-                        sizeColorDetailView.Amount = variation.Amount;
-                        sizeColorDetailView.Image = "";
+                var tranDetail = from o in transDetail
+                                 select new TransactionDetailView
+                                 {
+                                     LineNo = o.LineNo,
+                                     code = o.Code,
+                                     ManufacturerCode = o.ManufacturerCode,
+                                     name = o.Name,
+                                     Qty = o.Quantity,
+                                     TransactionNumber= o.TransactionCode,
+                                     TransactionType = o.TransactionIdFk.EntityObjectTypeId == soType? TransactionType.SalesOrder: TransactionType.PurchaseOrder,
+                                     Price = o.NetPrice,
+                                     Amount = o.Amount,
+                                     Image = (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null) ?
+                                       ((o.EntityAttachments.FirstOrDefault(x => x.IsDefault != true) != null) ? ("attachments/" + o.TenantId + "/" + (o.EntityAttachments.FirstOrDefault(x => x.IsDefault != true).AttachmentFk.Attachment)) : "")
+                                        : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" +
+                                        (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)
+                                 };
 
-                        if (variation.EntityAttachments.Count() > 0)
-                        {
-                            var lineAttachmentDefault = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
-                            var lineAttachment = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
-                            sizeColorDetailView.Image = (lineAttachmentDefault == null ?
-                                       (lineAttachment != null ? "attachments/" + variation.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
-                                        : "attachments/" + (variation.TenantId.HasValue ? variation.TenantId : -1) + "/" +
-                                        lineAttachmentDefault.AttachmentFk.Attachment);
-                        }
-                        returnList.Add(sizeColorDetailView);
-                    }
-                }
+                //    if (transDetail != null && transDetail.Count() > 0)
+                //    {
+                //        foreach (var variation in transDetail)
+                //        {
+                //            DataView sizeColorDetailView = new DataView();
+                //            sizeColorDetailView.LineId = variation.Id;
+                //            sizeColorDetailView.code = variation.Code;
+                //            sizeColorDetailView.ManufacturerCode = variation.ManufacturerCode;
+                //            sizeColorDetailView.name = variation.Name;
+                //            sizeColorDetailView.Qty = variation.Quantity;
+                //            sizeColorDetailView.NoOfPrePacks = (variation.NoOfPrePacks == null ? 0 : (long)variation.NoOfPrePacks);
+
+                //            sizeColorDetailView.Price = variation.NetPrice;
+                //            sizeColorDetailView.Amount = variation.Amount;
+                //            sizeColorDetailView.Image = "";
+
+                //            if (variation.EntityAttachments.Count() > 0)
+                //            {
+                //                var lineAttachmentDefault = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
+                //                var lineAttachment = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
+                //                sizeColorDetailView.Image = (lineAttachmentDefault == null ?
+                //                           (lineAttachment != null ? "attachments/" + variation.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
+                //                            : "attachments/" + (variation.TenantId.HasValue ? variation.TenantId : -1) + "/" +
+                //                            lineAttachmentDefault.AttachmentFk.Attachment);
+                //            }
+                //            returnList.Add(sizeColorDetailView);
+                //        }
+                //    }
+                //}
+                var orderedItemsFilter = tranDetail.OrderBy(input.Sorting ?? "LineId asc");
+                var orderedItems = orderedItemsFilter.PageBy(input);
+
+                //var appItemsList = await appItems.ToListAs ync();
+                var appItemsList = await orderedItems.ToListAsync();
+
+                var totalCount = await orderedItemsFilter.CountAsync();
+
+                return new PagedResultDto<TransactionDetailView>(
+                    totalCount,
+                    appItemsList
+                );
             }
-            return returnList;
         }
         public async Task<string> CreateManualAccount(CreateOrEditAccountInfoDto manualAccountInfo)
         {

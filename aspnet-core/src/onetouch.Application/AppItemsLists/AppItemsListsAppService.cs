@@ -689,6 +689,7 @@ namespace onetouch.AppItemsLists
             //MMT33-2[Start]
             var timeStamp = DateTime.Now;
             appItemlist.TimeStamp = timeStamp;
+            entity.TimeStamp = timeStamp;
             if (string.IsNullOrEmpty(appItemlist.SSIN))
             {
                 appItemlist.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, entity);
@@ -1148,6 +1149,7 @@ namespace onetouch.AppItemsLists
                     var itemObjectId = await _helper.SystemTables.GetObjectItemId();
                     publishItemsList.SSIN = itemsList.SSIN; // await _helper.SystemTables.GenerateSSIN(itemObjectId, null);
                     publishItemsList.Code = itemsList.SSIN;
+                    publishItemsList.TimeStamp = itemsList.TimeStamp;
                     publishItemsList.TenantOwner = int.Parse(itemsList.TenantId.ToString());
                 }
                 else
@@ -1157,6 +1159,7 @@ namespace onetouch.AppItemsLists
                     publishItemsList.AppItemsListDetails = null;
                     publishItemsList.Id = publishEntityId;
                     publishItemsList.TenantId = null;
+                    publishItemsList.TimeStamp = itemsList.TimeStamp;
                     publishItemsList.TenantOwner = int.Parse(itemsList.TenantId.ToString());
                 }
                 publishItemsList.Code = itemsList.SSIN;

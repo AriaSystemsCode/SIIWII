@@ -27,6 +27,6 @@ namespace onetouch.AppMarketplaceItemLists
         public ICollection<AppMarketplaceItemsListDetails> AppItemsListDetails { get; set; }
 
         public ICollection<AppMarketplaceItemSharings> ItemSharingFkList { get; set; }
-        public virtual DateTime TimeStamp { get; set; }
+        //public virtual DateTime TimeStamp { get; set; }
     }
 }
