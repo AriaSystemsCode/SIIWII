@@ -111,7 +111,7 @@ namespace onetouch.AppSiiwiiTransaction
         //Iteration#42[End]
         //Iteration#45[Start]
         public virtual DateTime OrderConfirmationTimeStamp { get; set; }
-        public virtual DateTime TimeStamp { get; set; }
+       // public virtual DateTime TimeStamp { get; set; }
         //Iteration#45[End]
     }
 }
