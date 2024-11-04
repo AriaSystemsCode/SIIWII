@@ -47,6 +47,7 @@ namespace onetouch.AppEntities.Dtos
         //MMT30[Start]
         public virtual string SSIN { get; set; }
         public virtual long TenantOwner { get; set; }
+        public virtual DateTime TimeStamp { get; set; }
         //MMT30[End]
     }
 

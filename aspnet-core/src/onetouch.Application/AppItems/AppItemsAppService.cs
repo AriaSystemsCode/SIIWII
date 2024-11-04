@@ -930,7 +930,7 @@ namespace onetouch.AppItems
                     {
                         output.AppItem.SharingLevel = marketplaceItem.SharingLevel;
 
-                        if (marketplaceItem.TimeStamp < appItem.TimeStamp)
+                        if (marketplaceItem.TimeStamp < appItem.EntityFk.TimeStamp)
                             output.AppItem.ShowSync = true;
 
 
@@ -2216,6 +2216,7 @@ namespace onetouch.AppItems
             #endregion add and remove classifications/categories/department
             //MMT30[Start]
             appItem.TimeStamp = timeStamp;
+            entity.TimeStamp = timeStamp;
             appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
             if (string.IsNullOrEmpty(appItem.SSIN))
             {
@@ -2561,6 +2562,7 @@ namespace onetouch.AppItems
                     //childEntity.EntityExtraData = extrData;
 
                     appItemChild.TimeStamp = timeStamp;
+                    childEntity.TimeStamp = timeStamp;
                     appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appItemChild.SSIN))
                     {
@@ -3357,7 +3359,7 @@ namespace onetouch.AppItems
         {
             long returnCount = 0;
             var apptemSelector = from o in _appItemSelectorRepository.GetAll().Where(e => e.Key == key)
-                                 join i in _appItemRepository.GetAll() on o.SelectedId equals i.Id into j
+                                 join i in _appItemRepository.GetAll().Include(z=>z.EntityFk) on o.SelectedId equals i.Id into j
                                  from j1 in j
                                  select new { item = j1 };
 
@@ -3372,7 +3374,7 @@ namespace onetouch.AppItems
                         if (itm.item.SSIN == null)
                             continue;
                         var sharedItem = _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefault();
-                        if (sharedItem != null && sharedItem.TimeStamp < itm.item.TimeStamp)
+                        if (sharedItem != null && sharedItem.TimeStamp < itm.item.EntityFk.TimeStamp)
                         {
                             returnCount++;
                             await SyncProduct(itm.item.Id);
@@ -3683,7 +3685,9 @@ namespace onetouch.AppItems
                         marketplaceItem.ItemPricesFkList.ForEach(a => a.Id = 0);
                         marketplaceItem.ItemPricesFkList.ForEach(a => a.AppMarketplaceItemId = marketplaceItem.Id);
                         marketplaceItem.ItemPricesFkList.ForEach(a => a.AppItemFk = null);
-
+                        //i45
+                        marketplaceItem.TimeStamp = appItem.EntityFk.TimeStamp;
+                        //i45
                     }
 
                     if (!input.SyncProduct)
@@ -4151,6 +4155,9 @@ namespace onetouch.AppItems
                         publishChild.Name = child.Name;
                         publishChild.Name = marketplaceItem.Name;
                         publishChild.Notes = marketplaceItem.Notes;
+                        //i45
+                        publishChild.TimeStamp = child.EntityFk.TimeStamp;
+                        //i45
                         //publishChild.ParentEntityId = publishItem.EntityId;
                         if (!input.SyncProduct)
                             publishChild.SharingLevel = input.SharingLevel;
@@ -6015,6 +6022,7 @@ namespace onetouch.AppItems
                 //MMT30[Start]
                 DateTime timeStamp = DateTime.Now;
                 appItem.TimeStamp = timeStamp;
+                appItem.EntityFk.TimeStamp = timeStamp;
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 if (string.IsNullOrEmpty(appItem.SSIN))
                 {
@@ -6727,6 +6735,7 @@ namespace onetouch.AppItems
                     //XX
                     //MMT30[End]
                     appChildItem.TimeStamp = timeStamp;
+                    appChildItem.EntityFk.TimeStamp = timeStamp;
                     appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appChildItem.SSIN))
                     {

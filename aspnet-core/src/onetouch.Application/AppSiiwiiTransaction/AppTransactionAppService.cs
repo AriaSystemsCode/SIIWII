@@ -5048,6 +5048,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EnteredDate = transaction.EnteredDate;
+                    marketplaceTransaction.TimeStamp = transaction.TimeStamp;
                     //marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     //marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;
@@ -5254,6 +5255,7 @@ namespace onetouch.AppSiiwiiTransaction
                     marketplaceTransaction.TenantOwner = int.Parse(transaction.TenantId.ToString());
                     marketplaceTransaction.TenantId = null;
                     marketplaceTransaction.Id = id;
+                    marketplaceTransaction.TimeStamp = transaction.TimeStamp;
                     marketplaceTransaction.AppMarketplaceTransactionDetails = null;
                     marketplaceTransaction.AppMarketplaceTransactionContacts = null;
                     marketplaceTransaction.EntityCategories = null;

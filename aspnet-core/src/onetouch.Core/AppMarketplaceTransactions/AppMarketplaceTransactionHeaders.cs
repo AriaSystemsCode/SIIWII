@@ -97,7 +97,7 @@ namespace onetouch.AppMarketplaceTransactions
         public virtual DateTime EnteredDate { set; get; }
         //Iteration#42[End]
         //Iteration45[start]
-        public virtual DateTime TimeStamp { get; set; }
+       // public virtual DateTime TimeStamp { get; set; }
         //Iteration45[End]
 
     }
