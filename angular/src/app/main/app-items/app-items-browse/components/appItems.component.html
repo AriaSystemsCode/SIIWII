@@ -50,7 +50,8 @@
 
 <div class="row w-100" style="height: 60px;position: absolute;
 top: 50%;
-left: 3%;">
+left: 3%;
+transform: translateY(-50%);">
                             <div class="col-md-2 ">
                                 <div class="dev-logo">
                                     <app-image-display
@@ -61,8 +62,8 @@ left: 3%;">
                                     >
                                     </app-image-display>
                                 </div>
-                                <p class="pl-5 ml-3" style="font-size: 24px;font-weight: 700;color: white;position: absolute;
-    bottom: -40px;"><a>{{appSession?.tenancyName}}</a></p>
+                                <p class="ml-3 pl-5" style="font-size: 24px;font-weight: 700;color: white;position: absolute;
+    bottom: -40px;"><a>{{appSession?.tenant?.name}}</a></p>
                                 <!-- <img [src]="logoPhoto"  onerror="this.src='../../../assets/placeholders/_logo-placeholder.png';" class="logo-profile ml-4"> -->
                             </div>
                         </div>
@@ -77,7 +78,7 @@ left: 3%;">
                          <div class="row ">
                         <div class="col-12 list-toolbar  pb-4">
                             <div class="row mb-3 justify-content-between pt-2" >
-                                <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0 d-flex justify-content-center align-items-center mb-4 mb-md-0">
+                                <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0 d-flex justify-content-center align-items-center mb-4 mb-md-0 mr-5 pr-5">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
                                         <button class="dropdown-toggle btn btn-sm font-weight-normal p-0" style="border: 1px solid #D9D9D9 !important;
                                         color: #D9D9D9 !important;
