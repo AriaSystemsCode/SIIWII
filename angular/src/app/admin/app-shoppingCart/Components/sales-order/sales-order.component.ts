@@ -642,7 +642,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
         .pipe(finalize(() =>  {
      this.SuccessMsg = true
-            this.generatOrderReport.emit(true)      
+            // this.generatOrderReport.emit(true)      
         }))
            
         .subscribe((res) => {

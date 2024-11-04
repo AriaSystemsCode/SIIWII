@@ -463,13 +463,15 @@
                     </div>
                     <!-- buyer email -->
                     <!-- buyer company branch -->
-                <div class="col-md-6"  *ngIf="!isBuyerTempAccount">
+
+                <div class="col-md-6" >
                     <div class="mb-3">
                         <label for="" class="form-label"
                             >Branch*</label
                         >
                             <div>
                                 <p-dropdown
+                                *ngIf="!isBuyerTempAccount" 
                                 [virtualScroll]="true" [itemSize]="30"
                                     [options]="buyerBranches"
                                     formControlName="buyerCompanyBranch"
@@ -479,13 +481,22 @@
                                     [required]="!isBuyerTempAccount"
                                 ></p-dropdown>
                             </div>
+                            <input
+                            type="text"
+                            name=""
+                            id=""
+                            required
+                            class="form-control"
+                            placeholder="Enter Branch Name"
+                            formControlName="buyerBranchName"
+                            *ngIf="isBuyerTempAccount"    />
             
                                         <small
                                             class="text-danger"
                                             *ngIf="
                                                 submitted &&
                                                 orderForm
-                                                    .get('buyerCompanyBranch')
+                                                    .get('buyerBranchName')
                                                     ?.hasError('required')
                                             "
                                         >
@@ -494,6 +505,73 @@
                                     </div>
                                 </div>
                   <!-- buyer company branch -->
+
+                  <!--price level and currency  -->
+
+                  <div class="col-md-6 d-flex price-sec"      *ngIf="isBuyerTempAccount" >
+                    <div class="mb-3 w-100">
+                        <label for="" class="form-label"
+                            >{{l("PriceLevel")}}</label
+                        >
+                            <div>
+                                <p-dropdown
+                           
+                           
+                                [options]="allPriceLevel" 
+                              [(ngModel)]="accountInfoTemp.priceLevel"
+                                    formControlName="priceLevel"
+                                    (change)="changePrice($event)"
+                                    placeholder="MSRP"
+                                 
+                                ></p-dropdown>
+                            </div>
+                           
+                                        <small
+                                            class="text-danger"
+                                            *ngIf="
+                                                submitted &&
+                                                orderForm
+                                                    .get('priceLevel')
+                                                    ?.hasError('required')
+                                            "
+                                        >
+                                        Price Level is required
+                                        </small>
+                     </div>
+                       
+
+
+
+                                <div class="mb-3 w-100">
+                                    <label for="" class="form-label"
+                                        >  {{l("Currency")}}</label
+                                    >
+                                        <div>
+                                            <p-dropdown [options]="allCurrencies"  
+                                            (onChange)="changeTouchState($event)"
+                                        [(ngModel)]="accountInfoTemp.currencyId" 
+                                            placeholder="USD"             ></p-dropdown>
+                                        
+                                        </div>
+                                       
+                                                    <!-- <small
+                                                        class="text-danger"
+                                                        *ngIf="
+                                                            submitted &&
+                                                            orderForm
+                                                                .get('Currency')
+                                                                ?.hasError('required')
+                                                        "
+                                                    >
+                                                    Currency is required
+                                                    </small> -->
+                                                </div>
+                                       
+
+                  <!-- price level and currency -->
+                </div>
+
+                  <!-- price level and currency -->
                 </div>
             </form>
         </div>
@@ -605,7 +683,7 @@
                         formControlName="sellerContactName"
                         [(ngModel)]="selectedSellerContact"
                         (completeMethod)="handleSellerNameSearch($event)"
-                        (change)="handleSellerNameChange($event)"
+                        (ngModelChange)="handleSellerNameChange($event)"
                          (click)="loadInitialSellerContacts()"
                        
                         [placeholder]=" 'Please Select Seller Contact Name'"

@@ -211,13 +211,13 @@ color: #9E9E9E !important;
     }
     .p-icon-wrapper {
         position: absolute !important;
-        right: 5px !important;
+        right: 2px !important;
     }
 }
 
 .imgIcon {
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
     border-radius: 12px;
     cursor: pointer;
 }
@@ -646,3 +646,40 @@ input.ng-invalid.ng-touched {
     color: white;
 
 }
+.addNbtn {
+    /* Group 1552 */
+
+width: 158px;
+height: 38px;
+
+filter: drop-shadow(2px 2px 4px rgba(22, 22, 22, 0.05));
+
+display: flex;
+justify-content: center;
+align-items: center;
+background-color: #FFFFFF;
+gap: 5px;
+border: 1px solid #eee;
+border-radius: 4px;
+svg {
+    color: #777777;
+}
+span {
+
+font-weight: 700;
+font-size: 14px;
+line-height: 21px;
+color: #4A0D4A;
+
+
+}
+
+}
+
+.syncBtn{
+
+    border: 1.5px solid #F88011 !important;
+    border-radius: 6px;
+    padding: 5px 10px;
+    color:#F88011 ;
+        }

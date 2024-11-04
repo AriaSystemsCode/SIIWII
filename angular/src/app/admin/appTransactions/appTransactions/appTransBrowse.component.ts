@@ -1,4 +1,4 @@
-﻿import { Component, Injector, OnInit, ViewChild } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { AppTransactionServiceProxy, SycEntityObjectStatusesServiceProxy, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Paginator } from 'primeng/paginator';
@@ -47,8 +47,12 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     maxCompleteDateFilter: moment.Moment;
     minCompleteDateFilter: moment.Moment;
     orderId: number = 0;
+    showHeader: boolean = true;
+    showDetails: boolean = false;
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: ShoppingCartViewComponentComponent;
-
+    products:any
+    selectedProduct: any;
+    variationDetails: any[];
 
     constructor(
         injector: Injector,
@@ -58,10 +62,50 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy
     ) {
         super(injector);
+        this.products = [
+            {
+                id: '1000',
+                code: 'f230fh0g3',
+                name: 'Bamboo Watch',
+                description: 'Product Description',
+                image: 'bamboo-watch.jpg',
+                price: 65,
+                category: 'Accessories',
+                quantity: 24,
+                inventoryStatus: 'INSTOCK',
+                rating: 5
+            },
+
+            {
+                id: '1000',
+                code: 'f230fh0g3',
+                name: 'Bamboo Watch',
+                description: 'Product Description',
+                image: 'bamboo-watch.jpg',
+                price: 65,
+                category: 'Accessories',
+                quantity: 24,
+                inventoryStatus: 'INSTOCK',
+                rating: 5
+            },
+            {
+                id: '1000',
+                code: 'f230fh0g3',
+                name: 'Bamboo Watch',
+                description: 'Product Description',
+                image: 'bamboo-watch.jpg',
+                price: 65,
+                category: 'Accessories',
+                quantity: 24,
+                inventoryStatus: 'INSTOCK',
+                rating: 5
+            },
+        ]
     }
     ngOnInit(): void {
         this.setPageMainFilters();
         this.initFilterForm();
+        this.getVariationDetail()
         // this.getAppTransactions();
     }
     initFilterForm() {
@@ -138,7 +182,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             , filters.maxCreateDateFilter,
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
+            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,undefined,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
@@ -224,6 +268,21 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 this.fullName =
                     this.appSession.user.name + this.appSession.user.surname;
                 this.display = true;
+            });
+    }
+
+
+    getVariationDetail(id?: number) {
+        // this.showMainSpinner();
+        this._appTransactionServiceProxy
+            .getAppTransactionVariationsDetail(419479)
+            .pipe(finalize(() => {
+                // this.hideMainSpinner()
+            }))
+            .subscribe((res: any) => {
+                this.variationDetails = res
+                console.log(res,'detaiiils')
+             
             });
     }
 

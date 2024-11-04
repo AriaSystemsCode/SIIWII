@@ -1789,7 +1789,7 @@ namespace onetouch.AppItems
                             output.NonLookupValues.Add(new LookupLabelDto
                             {
                                 Code = firstattributeCodes[cod].AttributeCode,
-                                Label = firstattributeValues[cod],
+                                Label = firstattributeCodes[cod].AttributeValue,
                                 HexaCode = (hexa != null && hexa.AttributeValue != null) ? hexa.AttributeValue : "",
                                 Image = (img != null && img.AttributeValue != null) ? (imagesUrl + (itm.TenantId.HasValue ? itm.TenantId.ToString() : "-1") + @"/" + img.AttributeValue) : ""
                             });

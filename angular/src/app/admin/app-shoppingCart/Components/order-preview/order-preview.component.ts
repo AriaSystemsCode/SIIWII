@@ -15,7 +15,7 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     @Input("orderId") orderId;
     loadingError: boolean = false;
     showReport: boolean = false;
-
+    visible: boolean = false;
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -25,19 +25,28 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     ngOnInit(): void {
     }
     ngOnChanges(changes: SimpleChanges) {
-        this.loadPdf();
+        // this.loadPdf();
+    this.isOrderConfirmationNeedsReprint()
+
     }
     ngAfterViewInit() {
         // this.loadPdf();
     }
     async loadPdf() {
         this.showReport = false;
-        this.showMainSpinner()
+        if(this.visible){
+            this.visible = true
+
+        } else {
+this.showMainSpinner()
+        }
+        
         try {
             await this.delay(10000);
             this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
                 .pipe(finalize(() => {
                     this.showReport = true;
+                    this.visible = false
                     this.hideMainSpinner()
                 }))
                 .subscribe(async (res) => {
@@ -72,7 +81,24 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
             this.hideMainSpinner();
         }
     }
+    isOrderConfirmationNeedsReprint(){
+        this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+        .subscribe((res) => {
+          console.log(res,'rep')
+          if (res) {
+            this.visible = res
+           this.loadPdf()
+       
 
+          }
+          else {
+            this.loadPdf()
+          }
+       
+        });
+      
+        
+      }
     //     var base64String =res;
     //     var pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
 

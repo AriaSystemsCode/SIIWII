@@ -28,6 +28,7 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
     canEdit : boolean
     canPrint : boolean
     canDelete : boolean
+    visible:boolean = false
     constructor(
         injector:Injector,
         private _appItemsListsServiceProxy: AppItemsListsServiceProxy,
@@ -37,6 +38,7 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
 
     ngOnInit(){
         this.checkPermissions()
+        console.log(this.item?.appItemsList?.id)
     }
 
     deleteList(){
@@ -66,6 +68,22 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
     unPublish(){
         if (!this.canPublish) return
         this.unPublishMe.emit()
+    }
+    sync(id) {
+        this.visible = true
+   this._appItemsListsServiceProxy.copyItemsFromItemList(
+       id
+  
+    )
+    .pipe(
+        finalize(()=>
+            this.visible = false
+    )
+    )
+    .subscribe((result)=>{
+     
+    })
+
     }
 
 }

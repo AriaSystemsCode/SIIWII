@@ -21,7 +21,8 @@ import { PaginatorModule } from 'primeng/paginator';
 import { AppItemsBrowseModule } from '../app-items-browse/app-items-browse.module';
 import { AppItemSharedModule } from '../app-item-shared/app-item-shared.module';
 import { ButtonModule } from 'primeng/button';
-
+import { DialogModule } from 'primeng/dialog';
+import { ProgressBarModule } from 'primeng/progressbar';
 @NgModule({
   declarations:
     [
@@ -45,7 +46,9 @@ import { ButtonModule } from 'primeng/button';
     ModalModule,
     AppItemSharedModule,
     AppItemsBrowseModule,
-    ButtonModule
+    ButtonModule,
+    DialogModule,
+    ProgressBarModule
   ],
   providers:[
       ExtraAttributeDataService,

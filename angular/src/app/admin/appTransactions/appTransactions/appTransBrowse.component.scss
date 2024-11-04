@@ -83,3 +83,67 @@ font-weight: 700;
    padding: 16px 20px;
 }
 
+.period-btn {
+    width: Hug (150px)px;
+height: Hug (37px)px;
+padding: 11px 20px 11px 20px;
+gap: 10px;
+border-radius: 8px;
+background-color: #EEE;
+color: #4A0D4A;
+opacity: 0px;
+border: none;
+font-size: 16px;
+font-weight: 700;
+// background: var(--Primary-Color, btnBackColor);
+  }
+  .selected-month-btn{
+    background: var(--Primary-Color, #4A0D4A);
+    width: Hug (152px)px;
+height: Hug (37px)px;
+padding: 11px 20px 11px 20px;
+gap: 10px;
+border-radius: 8px;
+opacity: 0px;
+font-size: 16px;
+font-weight: 700;
+
+color: #FFFFFF;
+
+  }
+
+  .selected-year-btn{
+    background: var(--Primary-Color, #4A0D4A);
+    width: Hug (152px)px;
+height: Hug (37px)px;
+padding: 11px 20px 11px 20px;
+gap: 10px;
+border-radius: 8px;
+opacity: 0px;
+font-size: 16px;
+font-weight: 700;
+color: #FFFFFF;
+
+  }
+::ng-deep .detailTab {
+    .p-datatable .p-datatable-thead > tr > th {
+        border: 1px solid #E5E5E5 !important;
+        font-weight: 700 !important;
+        color: #1B101B !important;
+        text-align: center;
+
+    }
+    .p-datatable .p-datatable-tbody > tr > td {
+        border: 1px solid #E5E5E5 !important;
+        font-weight: 400 !important;
+        text-align: center;
+    }
+}
+
+.itemImg {
+
+width: 50px;
+height: 50px;
+border-radius: 12px;
+
+}

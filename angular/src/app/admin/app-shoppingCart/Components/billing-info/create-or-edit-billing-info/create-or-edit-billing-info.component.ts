@@ -108,6 +108,13 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressCode = addObj.code;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressId = addObj.id;
       this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressTypyId = addObj.typeId;
+      
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressLine1=addObj?.selectedAddressObj?.addressLine1;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressLine2=addObj?.selectedAddressObj?.addressLine2;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressName=addObj?.selectedAddressObj?.name;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressPostalCode=addObj?.selectedAddressObj?.postalCode;
+      this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressState=addObj?.selectedAddressObj?.state;
+   this.appTransactionsForViewDto.appTransactionContacts[contactIndex].contactAddressDetail= addObj?.selectedAddressObj;
 
 
     }
@@ -223,7 +230,9 @@ debugger
     this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) ;  this.SuccessMsg = true}))
+      .pipe(finalize(() => { this.hideMainSpinner();
+        //  this.generatOrderReport.emit(true) ; 
+          this.SuccessMsg = true}))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));

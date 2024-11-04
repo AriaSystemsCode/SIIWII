@@ -1,9 +1,10 @@
 import {
   Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild
   , AfterViewInit, ViewChildren, QueryList, ViewContainerRef, Renderer2, ElementRef, ComponentFactoryResolver,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -86,20 +87,30 @@ export class ShoppingCartViewComponentComponent
   shareDone:boolean=false;
   openActions:boolean =false
   temp: TreeNode<any>[] = null;
+  addLine:boolean=true;
+  visible:boolean = false
+  allVariations: GetAppMarketItemForViewDto[] = [];
+  displayedVariations: any[] = [];
+  incrementCount: number = 10;
+totalVariationsCount: number = 0;
+
+  selectedVariation: any;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     private userClickService: UserClickService,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     super(injector);
 
   }
   ngOnInit(): void {
     // this.onGeneratOrderReport(true,undefined,true,true);
-   console.log(this.openActions, "openActions")
+    this.getSellerVariations()
+ 
   }
   ngOnChanges() {
     // this.onGeneratOrderReport(true,undefined,true,true);
@@ -236,7 +247,7 @@ export class ShoppingCartViewComponentComponent
 this.temp=temp;
     this.showMainSpinner();
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
     .pipe(finalize(() => {
 this.hideMainSpinner();
     }))
@@ -645,12 +656,16 @@ this.hideMainSpinner();
     indx = this.minimizedOrders?.findIndex(x => x.orderId == orderId);
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
-    this.show(orderId, this.showCarousel, this.validateOrder, this.shoppingCartMode);
+    if(this.appTransactionsForViewDto?.entityStatusCode =="DRAFT") {
+      this.show(orderId, this.showCarousel, this.validateOrder, ShoppingCartMode.createOrEdit);
+    } else {
+        this.show(orderId, this.showCarousel, this.validateOrder, ShoppingCartMode.view);
+}
   }
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
@@ -769,10 +784,39 @@ this.hideMainSpinner();
       }
     });
   }
-
+  sync(){
+    this.showMainSpinner();
+    this._AppTransactionServiceProxy.syncTransaction(this.orderId)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe((res) => {
+        // if (res) {
+        //   Swal.fire({
+        //     title: "",
+        //     text:  "Transaction has been sync successfully",
+        //     icon: "success",
+        //     showCancelButton: false,
+        //     confirmButtonText: "OK",
+        //     allowOutsideClick: false,
+        //     allowEscapeKey: false,
+        //     backdrop: true,
+        //     customClass: {
+        //       popup: 'popup-class',
+        //       icon: 'icon-class',
+        //       content: 'content-class',
+        //       actions: 'actions-class',
+        //       confirmButton: 'confirm-button-class2',
+        //     },
+        //   }).then((result) => {
+        //     if (result.isConfirmed) {
+        //     }
+        //   });
+        // }
+      });
+    
+  }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
         this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);
@@ -780,12 +824,14 @@ this.hideMainSpinner();
   }
 
   ontabInfoValid(activetab) {
+    
     switch (activetab) {
       case ShoppingCartoccordionTabs.orderInfo:
         this.orderInfoValid = true;
         break;
 
       case ShoppingCartoccordionTabs.BuyerContactInfo:
+      
         this.buyerContactInfoValid = true;
         break;
 
@@ -916,6 +962,44 @@ this.hideMainSpinner();
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
+addNewLine() {
+  this.shoppingCartTreeNodes.push({
+    data: {
+        manufacturerCode: '',
+        name: '',
+        qty: '',
+        price: '',
+        amount: '',
+        image: ''
+    },
+    children: [], // No children, since this is a parent node,
+    leaf: true  // Indicates it’s a parent and currently has no children
+});
+this.cdr.detectChanges();
+}
+getSellerVariations(skipCount: number = 0, maxResultCount: number = this.incrementCount) {
+  this._AppTransactionServiceProxy.getAllSellerVariations(
+      this.appTransactionsForViewDto?.sellerCompanySSIN,
+      undefined,
+      this.appTransactionsForViewDto?.buyerContactSSIN,
+      this.appTransactionsForViewDto?.currencyCode,
+      undefined,
+      skipCount,
+      maxResultCount
+  ).pipe(finalize(() => this.hideMainSpinner()))
+   .subscribe((res) => {
+       this.totalVariationsCount = res.totalCount;
+       this.allVariations = this.allVariations.concat(res.items);
+       this.displayedVariations = [...this.allVariations];
+       console.log(this.displayedVariations, 'displayedVariations');
+   });
+}
 
+loadMore() {
+  if (this.displayedVariations.length < this.totalVariationsCount) {
+      const nextSkipCount = this.displayedVariations.length;
+      this.getSellerVariations(nextSkipCount);
+  }
+}
 
 }

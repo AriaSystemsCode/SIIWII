@@ -14,16 +14,24 @@
                         [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
                         (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                         (formValidityChanged)="isContactFormValid($event)"
-                        [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo"></app-contact>
+                        [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo" (isTempComp)="isTempComp($event)"></app-contact>
                 </div>
             </div>
             <hr class="my-2" />
         </div>
-        <div class="d-flex justify-content-end mr-4">
+        <div  *ngIf="!showSaveBtn" class="d-flex justify-content-between mx-4 align-items-center">
+            <div>
+                <p *ngIf="TempComp && activeTab==shoppingCartoccordionTabs.BuyerContactInfo"  class="p-0 mb-0">*Creating new accounts / contacts will take place upon placing the order</p>
+
+            </div>
+
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
-                *ngIf="!showSaveBtn " class="continuebtn text-center">
-                Continue
-            </button>
+            *ngIf="!showSaveBtn " class="continuebtn text-center">
+            Continue
+        </button>
+        </div>
+        <div             *ngIf="showSaveBtn"  class="d-flex justify-content-end mr-4">
+      
           
             <button
             *ngIf="showSaveBtn"
