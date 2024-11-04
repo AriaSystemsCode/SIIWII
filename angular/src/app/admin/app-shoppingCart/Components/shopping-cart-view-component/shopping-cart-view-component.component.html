@@ -543,14 +543,29 @@
                                                 >
                                                     <div>
                                                         <p-dropdown
-                                                     
-                                                        [virtualScroll]="true" [itemSize]="30"
-                                                        
-                                                            [filter]="true"
-                                                            optionLabel="name"
-                                                            placeholder="Please Select "
-                                                         
-                                                        ></p-dropdown>
+                                                        [options]="displayedVariations"
+                                                        [filter]="true"
+                                                        optionLabel="appItem.code"
+                                                        placeholder="Please Select"
+                                                        [(ngModel)]="selectedVariation"
+                                                    >
+                                                        <!-- Custom item template -->
+                                                        <ng-template let-option pTemplate="item">
+                                                            <div>
+                                                                {{ option.appItem.code }} - {{ option.appItem.name }}
+                                                            </div>
+                                                        </ng-template>
+                                                    
+                                                        <!-- Custom footer template for "Show More" button -->
+                                                        <ng-template pTemplate="footer">
+                                                            <button *ngIf="displayedVariations.length < totalVariationsCount"
+                                                                    (click)="loadMore()" class="p-button p-component">
+                                                                Show More
+                                                            </button>
+                                                        </ng-template>
+                                                    </p-dropdown>
+                                                    
+                                                    
                                                     </div>
                                               
                                     

@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -89,6 +89,12 @@ export class ShoppingCartViewComponentComponent
   temp: TreeNode<any>[] = null;
   addLine:boolean=true;
   visible:boolean = false
+  allVariations: GetAppMarketItemForViewDto[] = [];
+  displayedVariations: any[] = [];
+  incrementCount: number = 10;
+totalVariationsCount: number = 0;
+
+  selectedVariation: any;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -103,7 +109,8 @@ export class ShoppingCartViewComponentComponent
   }
   ngOnInit(): void {
     // this.onGeneratOrderReport(true,undefined,true,true);
-   console.log(this.openActions, "openActions")
+    this.getSellerVariations()
+ 
   }
   ngOnChanges() {
     // this.onGeneratOrderReport(true,undefined,true,true);
@@ -969,6 +976,30 @@ addNewLine() {
     leaf: true  // Indicates it’s a parent and currently has no children
 });
 this.cdr.detectChanges();
+}
+getSellerVariations(skipCount: number = 0, maxResultCount: number = this.incrementCount) {
+  this._AppTransactionServiceProxy.getAllSellerVariations(
+      this.appTransactionsForViewDto?.sellerCompanySSIN,
+      undefined,
+      this.appTransactionsForViewDto?.buyerContactSSIN,
+      this.appTransactionsForViewDto?.currencyCode,
+      undefined,
+      skipCount,
+      maxResultCount
+  ).pipe(finalize(() => this.hideMainSpinner()))
+   .subscribe((res) => {
+       this.totalVariationsCount = res.totalCount;
+       this.allVariations = this.allVariations.concat(res.items);
+       this.displayedVariations = [...this.allVariations];
+       console.log(this.displayedVariations, 'displayedVariations');
+   });
+}
+
+loadMore() {
+  if (this.displayedVariations.length < this.totalVariationsCount) {
+      const nextSkipCount = this.displayedVariations.length;
+      this.getSellerVariations(nextSkipCount);
+  }
 }
 
 }

@@ -24837,6 +24837,82 @@ export class AppTransactionServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param sellerSSIN (optional) 
+     * @param filter (optional) 
+     * @param contactSSIN (optional) 
+     * @param currencyCode (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllSellerVariations(sellerSSIN: string | null | undefined, filter: string | null | undefined, contactSSIN: string | null | undefined, currencyCode: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAllSellerVariations?";
+        if (sellerSSIN !== undefined && sellerSSIN !== null)
+            url_ += "SellerSSIN=" + encodeURIComponent("" + sellerSSIN) + "&";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (contactSSIN !== undefined && contactSSIN !== null)
+            url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
+        if (currencyCode !== undefined && currencyCode !== null)
+            url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSellerVariations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSellerVariations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAppMarketItemForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAppMarketItemForViewDto>;
+        }));
+    }
+
+    protected processGetAllSellerVariations(response: HttpResponseBase): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetAppMarketItemForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -62585,6 +62661,7 @@ export class AppEntity implements IAppEntity {
     appEntityReactionsCount!: AppEntityReactionsCount;
     tenantOwner!: number;
     ssin!: string | undefined;
+    timeStamp!: moment.Moment;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -62662,6 +62739,7 @@ export class AppEntity implements IAppEntity {
             this.appEntityReactionsCount = _data["appEntityReactionsCount"] ? AppEntityReactionsCount.fromJS(_data["appEntityReactionsCount"]) : <any>undefined;
             this.tenantOwner = _data["tenantOwner"];
             this.ssin = _data["ssin"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -62737,6 +62815,7 @@ export class AppEntity implements IAppEntity {
         data["appEntityReactionsCount"] = this.appEntityReactionsCount ? this.appEntityReactionsCount.toJSON() : <any>undefined;
         data["tenantOwner"] = this.tenantOwner;
         data["ssin"] = this.ssin;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -62773,6 +62852,7 @@ export interface IAppEntity {
     appEntityReactionsCount: AppEntityReactionsCount;
     tenantOwner: number;
     ssin: string | undefined;
+    timeStamp: moment.Moment;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -64368,6 +64448,7 @@ export class AppEntityDto implements IAppEntityDto {
     appEntityTypes!: AppEntityTypes;
     ssin!: string | undefined;
     tenantOwner!: number;
+    timeStamp!: moment.Moment;
     id!: number;
 
     [key: string]: any;
@@ -64437,6 +64518,7 @@ export class AppEntityDto implements IAppEntityDto {
             this.appEntityTypes = _data["appEntityTypes"];
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.id = _data["id"];
         }
     }
@@ -64504,6 +64586,7 @@ export class AppEntityDto implements IAppEntityDto {
         data["appEntityTypes"] = this.appEntityTypes;
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["id"] = this.id;
         return data;
     }
@@ -64532,6 +64615,7 @@ export interface IAppEntityDto {
     appEntityTypes: AppEntityTypes;
     ssin: string | undefined;
     tenantOwner: number;
+    timeStamp: moment.Moment;
     id: number;
 
     [key: string]: any;
@@ -79140,6 +79224,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     appEntityTypes!: AppEntityTypes;
     ssin!: string | undefined;
     tenantOwner!: number;
+    timeStamp!: moment.Moment;
     id!: number;
 
     [key: string]: any;
@@ -79282,6 +79367,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.appEntityTypes = _data["appEntityTypes"];
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.id = _data["id"];
         }
     }
@@ -79422,6 +79508,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["appEntityTypes"] = this.appEntityTypes;
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["id"] = this.id;
         return data;
     }
@@ -79511,6 +79598,7 @@ export interface IGetAppTransactionsForViewDto {
     appEntityTypes: AppEntityTypes;
     ssin: string | undefined;
     tenantOwner: number;
+    timeStamp: moment.Moment;
     id: number;
 
     [key: string]: any;
@@ -79583,6 +79671,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     appEntityTypes!: AppEntityTypes;
     ssin!: string | undefined;
     tenantOwner!: number;
+    timeStamp!: moment.Moment;
     id!: number;
 
     [key: string]: any;
@@ -79704,6 +79793,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             this.appEntityTypes = _data["appEntityTypes"];
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.id = _data["id"];
         }
     }
@@ -79823,6 +79913,7 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
         data["appEntityTypes"] = this.appEntityTypes;
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["id"] = this.id;
         return data;
     }
@@ -79895,6 +79986,7 @@ export interface ICreateOrEditAppTransactionsDto {
     appEntityTypes: AppEntityTypes;
     ssin: string | undefined;
     tenantOwner: number;
+    timeStamp: moment.Moment;
     id: number;
 
     [key: string]: any;
@@ -80177,6 +80269,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     appEntityTypes!: AppEntityTypes;
     ssin!: string | undefined;
     tenantOwner!: number;
+    timeStamp!: moment.Moment;
     id!: number;
 
     [key: string]: any;
@@ -80328,6 +80421,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.appEntityTypes = _data["appEntityTypes"];
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.id = _data["id"];
         }
     }
@@ -80477,6 +80571,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["appEntityTypes"] = this.appEntityTypes;
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["id"] = this.id;
         return data;
     }
@@ -80575,6 +80670,7 @@ export interface IGetAllAppTransactionsForViewDto {
     appEntityTypes: AppEntityTypes;
     ssin: string | undefined;
     tenantOwner: number;
+    timeStamp: moment.Moment;
     id: number;
 
     [key: string]: any;
@@ -80982,6 +81078,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     appEntityTypes!: AppEntityTypes;
     ssin!: string | undefined;
     tenantOwner!: number;
+    timeStamp!: moment.Moment;
     id!: number;
 
     [key: string]: any;
@@ -81122,6 +81219,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             this.appEntityTypes = _data["appEntityTypes"];
             this.ssin = _data["ssin"];
             this.tenantOwner = _data["tenantOwner"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.id = _data["id"];
         }
     }
@@ -81260,6 +81358,7 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
         data["appEntityTypes"] = this.appEntityTypes;
         data["ssin"] = this.ssin;
         data["tenantOwner"] = this.tenantOwner;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["id"] = this.id;
         return data;
     }
@@ -81339,6 +81438,7 @@ export interface IGetOrderDetailsForViewDto {
     appEntityTypes: AppEntityTypes;
     ssin: string | undefined;
     tenantOwner: number;
+    timeStamp: moment.Moment;
     id: number;
 
     [key: string]: any;

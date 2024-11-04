@@ -95,11 +95,12 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
                 roleContact.companySSIN = buyerContact.companySSIN;
                 roleContact.branchName = buyerContact.branchName;
                 roleContact.branchSSIN = buyerContact.branchSSIN
-                roleContact.contactSSIN = buyerContact.contactSSIN;                
+                // roleContact.contactSSIN = buyerContact.contactSSIN;                
                 roleContact.contactName = buyerContact.contactName;
                 roleContact.contactEmail = buyerContact.contactEmail;
                 roleContact.contactPhoneNumber = buyerContact.contactPhoneNumber;
                 roleContact.contactPhoneTypeId = buyerContact.contactPhoneTypeId;
+                roleContact.contactPhoneTypeName = buyerContact.contactPhoneTypeName;
                 roleContact.contactAddressCity = buyerContact.contactAddressCity;
                 roleContact.contactAddressCode = buyerContact.contactAddressCode;
                 roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
@@ -122,7 +123,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     }
 }
   createOrEditTransaction() {
-    this.synchronizeContactDetails();
+    // this.synchronizeContactDetails();
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
