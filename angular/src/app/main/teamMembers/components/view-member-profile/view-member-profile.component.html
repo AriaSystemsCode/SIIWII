@@ -96,7 +96,7 @@
                         <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                             <h6 class="text-right font-weight-bold mr-3 "> <img src="../../assets/img/input_icons/outline-work.png" class=""> {{ ( "JobTitle" | localize ) + " :" }}</h6>
                             <p class="text-left old_editjobTitle" style="color: #595959;" [ngClass]="{'hide':NoteditInfo}">{{memberData?.contact?.jobTitle}}</p>
-                            <input type="text" class="editjobTitle form-control form-control-sm aria-input-text"name="JobTitle" #JobTitleInput="ngModel" required name="JobTitle" minlength="2" maxlength="100" [(ngModel)]="editjobTitleValue" [placeholder]="'PleaseEnterJobTitle' | localize " [class.hide]="editInfo">
+                            <input  style="color: #595959 !important;" type="text" class="editjobTitle form-control form-control-sm aria-input-text"name="JobTitle" #JobTitleInput="ngModel" required name="JobTitle" minlength="2" maxlength="100" [(ngModel)]="editjobTitleValue" [placeholder]="'PleaseEnterJobTitle' | localize " [class.hide]="editInfo">
                             <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
                         </div>
                         <hr class="header"  *ngIf="memberData?.contact?.joinDateIsPublic">
@@ -140,7 +140,7 @@
                                     {{ memberData?.countryName  }}
                                 </span>
                             </p>
-                            <input type="text" class="editBranch form-control form-control-sm aria-input-text" [(ngModel)]="editBranchValue"  [placeholder]="'PleaseSelectBranch' | localize "  [class.hide]="editInfo">
+                            <input type="text" style="color: #595959 !important;" class="editBranch form-control form-control-sm aria-input-text" [(ngModel)]="editBranchValue"  [placeholder]="'PleaseSelectBranch' | localize "  [class.hide]="editInfo">
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.phone1IsPublic">
                         <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"  *ngIf="memberData?.contact?.phone1IsPublic">
