@@ -27,7 +27,7 @@
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
                                             <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 "
                                                 dropdownToggle>
-                                                <span class="list-toolbar-dropdown-filter-selectedItem">
+                                                <span class="list-toolbar-dropdown-filter-selectedItem font-weight-bold">
                                                     {{mainFilterCtrl?.value?.label | localize}}
                                                 </span>
                                             </button>
@@ -50,7 +50,7 @@
                                         <div class="kt-input-icon kt-input-icon--left">
                                             <input type="text"  (input)="handleSearchInput($event)" class="form-control" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch">
                                             <span class="kt-input-icon__icon kt-input-icon__icon--left">
-                                                <span><i class="flaticon2-search-1 icon-md text-primary"></i></span>
+                                                <span><i class="flaticon2-search-1 icon-md"></i></span>
                                             </span>
                                         </div>
                                     </div>
@@ -64,16 +64,17 @@
                                     <div class="text-center" >
                                         <a style="padding: 5px 3px;padding-right: 0px;" [title]="'ResetData' | localize" class=" shadowContainer btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
                                             <img src="../../assets/img/input_icons/repeat.png"
-                                            class="alarmInfo">
+                                            class="alarmInfo p-2 mr-2" style="border: 1px solid #EEEEEE;border-radius: 6px;">
                                         </a>
-                                        <a style="padding-left: 10px;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="toggleView btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
+                                        <a style="padding-left: 10px;border-radius: 6px;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="toggleView btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
                                             <i  class="d-inline-block w-100 " [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'"></i>
                                         </a>
                                     </div>
                                 </div>
                                 <div class="row justify-content-between">
                                     <div class="font-weight-normal list-toolbar-data-summary" *ngIf="active">
-                                        {{ (paginator.getPage()) * primengTableHelper.defaultRecordsCountPerPage  }}-{{ (paginator.getPage() ) * primengTableHelper.defaultRecordsCountPerPage + members.length  }}
+                                        {{ (paginator?.getPage() ?? 0) * (primengTableHelper?.defaultRecordsCountPerPage ?? 0) + 1 }} - 
+                                        {{ (paginator?.getPage() ?? 0) * (primengTableHelper?.defaultRecordsCountPerPage ?? 0) + (members?.length ?? 0) }}
                                         {{ "over" | localize}}
                                         {{ primengTableHelper.totalRecordsCount }} {{"ResultsOf" | localize }} "{{mainFilterCtrl?.value?.label | localize}}"
                                     </div>
@@ -130,12 +131,12 @@
                     <div class="row">
                         <div class="col d-flex flex-column justify-content-between">
                             <div class="primeng-paging-container custom-paginator">
-                                <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
-                                            #paginator
-                                            (onPageChange)="getMembers($event)"
-                                            [totalRecords]="primengTableHelper.totalRecordsCount"
-                                            [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
-                                </p-paginator>
+ <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+             #paginator
+             (onPageChange)="getMembers($event)"
+             [totalRecords]="primengTableHelper.totalRecordsCount"
+             [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
+</p-paginator>
 
                                 <div class="total-records-count text-right mr-3">
                                     {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}

@@ -62,6 +62,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         if (this.memberData?.contact.userName.includes("admin")) {
             this.editInfo = false;
             this.NoteditInfo = true;
+            this.editjobTitleValue=this.memberData?.contact?.jobTitle;
+            this.editBranchValue=this.memberData?.branchName;
         } else {
             const memberId: number = this.memberData?.contact?.id;
             if (isNaN(memberId)) return
@@ -138,7 +140,14 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         if (this.newEditMemberInfo.jobTitle != '' && this.newEditMemberInfo.branchName != '') {
             this.editInfo = true;
             this.NoteditInfo = false;
-            this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
+         //  this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
+
+           this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
+           .pipe(finalize(()=>this.hideMainSpinner()))
+           .subscribe(result => {
+            this.notify.success(this.l('SuccessfullySaved'));
+               });
+
         }
     }
 }

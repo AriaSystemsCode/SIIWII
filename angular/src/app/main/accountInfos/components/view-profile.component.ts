@@ -331,18 +331,14 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         // this._publishAccountService._accountId = this.accountData.id;
         // this._publishAccountService.screen = 1
         debugger
-        this._AccountsServiceProxy.publishProfile(false).subscribe(
-            (response) => {
-                console.log("share called")
-                this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
+        this._AccountsServiceProxy.publishProfile(false).subscribe((response) => {
+            this.notify.info(this.l('ProfilePublishedSuccessfully'));
+            this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
                 this.hidUshare = true;
                 this.hideshowShare=true;
                 this.showShare=true;
-            },
-            (error) => {
-                console.log('API call error:', error); // Error handling
-            });;
-       
+            }
+        );
     }
     showIsSync = false;
     syncAccount() {
@@ -351,10 +347,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         //this.btnLoader = true;
         this._AccountsServiceProxy.publishProfile(true).subscribe(
             (response) => {
-                console.log("sync called")
-            },
-            (error) => {
-                console.log('API call error:', error); // Error handling
+                this.notify.success(this.l("Account sync Successfully"));
             });
         this.showIsSync = false;
 
@@ -365,16 +358,13 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         debugger
         this._AccountsServiceProxy.unPublishProfile().subscribe(
             (response) => {
+                this.notify.info(this.l('ProfileUnPublishedSuccessfully'));
                 this.showShare = false;
                 this.hidUshare = true;
                 this.hideshowShare=true;
                 this.showHide=true;
                 this.showPrivate=true;
-                console.log('API call successful:', response); // Success handling
-            },
-            (error) => {
-                console.log('API call error:', error); // Error handling
-            })
+            });
     }
 
 }

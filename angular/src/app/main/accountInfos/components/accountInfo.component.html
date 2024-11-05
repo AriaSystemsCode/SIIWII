@@ -44,7 +44,7 @@
       </div>
       <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
         <div class="row align-items-start accountinfo-container justify-content-center">
-          <div class="col-lg-3 col-md-3 col-sm-12 sidebar-grid">
+          <div class="col-lg-2 col-md-2 col-sm-12 sidebar-grid">
             <div >
               <div class="row">
                 <div class="col-md-12">
@@ -59,10 +59,10 @@
                     </div>
                   </div>
                   <div class="title-sidebar-logo">
-                    <p class="title-company">
+                    <p class="title-company pt-3">
                       {{accountDataForView?.name}}
                     </p>
-                    <p class="desc-company" *ngIf="false">
+                    <p class="desc-company pt-3" *ngIf="false">
                         {{accountDataForView?.description}}
                     </p>
                   </div>
@@ -108,7 +108,7 @@
                 <li class="nav-item">
                   <a class="nav-link d-flex w-100 justify-content-between" (click)="changeTab( !accountInfoTemp?.id && !accountId ? accountInfoPageTabsEnum.ProfileCreateOrEdit : accountInfoPageTabsEnum.ProfileView  )"  [ngClass]="{'active' :currentTab ==  accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit }">
                     <span>
-                        <img class="sidebar-menu-item-img" *ngIf="currentTab === accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit" src="/assets/img/input_icons/bage-prof.png">
+                        <img class="sidebar-menu-item-img" *ngIf="currentTab === accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit" src="/assets/accounts/briefcase 1.png">
                         <img class="sidebar-menu-item-img" *ngIf="currentTab !== accountInfoPageTabsEnum.ProfileView && currentTab !== accountInfoPageTabsEnum.ProfileCreateOrEdit" src="assets/profile/My-Account-Information-Default.svg">
                         <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                           {{l("MyProfile")}}
@@ -126,8 +126,8 @@
                   </li>
                 <li class="nav-item" >
                   <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)" [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
-                    <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.Branches" src="assets/profile/My-Addresses-Activated.svg">
                     <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.Branches" src="assets/profile/My-Addresses-Default.svg">
+                    <i class=" fa fa-map-marker-alt sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.Branches" style="color: #4A0D4A;"></i>
                     <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                       {{l("MyBranches/Addresses")}}
                     </span>
@@ -145,8 +145,8 @@
                 </li>
                 <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile && !viewMode">
                   <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Payments)" [ngClass]="currentTab == accountInfoPageTabsEnum.Payments?'active':''">
-                    <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.Payments" src="assets/payment/payment-icon-active.svg">
-                    <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.Payments" src="assets/payment/payment-icon.svg">
+                    <!-- <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.Payments" src="assets/payment/payment-icon-active.svg"> -->
+                    <img class="sidebar-menu-item-img"  src="assets/payment/payment-method1.png"> 
                     <span> {{l("MyPaymentMethods")}}</span>
                   </a>
                 </li>
@@ -155,8 +155,8 @@
                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.MembersList)" [ngClass]="currentTab == accountInfoPageTabsEnum.MembersList?'active':''">
                       <!-- <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.MembersList" src="assets/payment/payment-icon-active.svg">
                       <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.MembersList" src="assets/payment/payment-icon.svg">-->
-                      <i *ngIf="currentTab == accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3"> </i>   
-                      <i *ngIf="currentTab != accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3" style="color: #595d6e;width: 22px;"> </i>   
+                      <i *ngIf="currentTab != accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3"> </i>   
+                      <i *ngIf="currentTab == accountInfoPageTabsEnum.MembersList" class="fa fa-users mr-3" style="color: #4A0D4A;width: 22px;"> </i>   
                       <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                         {{l("MyTeamMembers")}}
                       </span>
@@ -166,11 +166,15 @@
                       
                     </a>
                   </li>
-                  <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile">
-                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)">
-                      <img class="sidebar-menu-item-img"  src="assets/accounts/billingoptions.svg">
-                      <span>{{l("AccountBilling")}}</span>
-                    </a>
+                  <li class="nav-item ml-2" *ngIf="accountLevel == accountLevelEnum.Profile">
+                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)" [ngClass]="currentTab == accountInfoPageTabsEnum.AccountBilling?'active':''">
+                        <!-- <img class="sidebar-menu-item-img" *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling" src="assets/accounts/billingoptions.svg">
+                        <img class="sidebar-menu-item-img" *ngIf="currentTab != accountInfoPageTabsEnum.AccountBilling" src="assets/accounts/billingoptions.svg"> -->
+                        <i *ngIf="currentTab != accountInfoPageTabsEnum.AccountBilling" class="fa fa-file-invoice" style="color: #84818A"> </i>   
+                        <i *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling" class="fa fa-file-invoice" style="color: #4A0D4A"> </i>   
+                        <span class="ml-2"> {{l("AccountBilling")}}</span>
+                      </a>
+
                   </li>
                 <!-- Sara Start -->
 

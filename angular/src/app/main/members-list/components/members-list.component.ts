@@ -134,10 +134,13 @@ export class MembersListComponent extends AppComponentBase {
     getMembers(event?: LazyLoadEvent) {
         if ( isNaN(this.defaultMainFilter) ) return
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
+           this.paginator.totalRecords = 10;
             this.paginator.changePage(0);
             return;
         }
+
+        
+
         const filters = this.filterForm.value
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner()
@@ -148,7 +151,7 @@ export class MembersListComponent extends AppComponentBase {
             filters?.mainFilterType?.value ,
             filters?.sorting?.value || undefined,
             this.primengTableHelper.getSkipCount(this.paginator, event) || 0,
-            this.primengTableHelper.getMaxResultCount(this.paginator, event)
+            this.primengTableHelper.getMaxResultCount(this.paginator, event) || this.primengTableHelper.defaultRecordsCountPerPage
         )
         .pipe(finalize(() => {
             if (!this.active) this.active = true
