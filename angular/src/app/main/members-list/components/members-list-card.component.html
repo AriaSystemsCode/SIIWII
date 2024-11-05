@@ -9,10 +9,10 @@
     >
         <i *ngIf="!member.imageUrl" class="fa-image fas text-black-50"></i>
     </div>
-    <div class="single-item-body col " [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
+    <div class="single-item-body col pt-3" [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
         <div class="row justify-content-between row">
             <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" >
-                <h3 (click)="clickCardHandler()" class="text-capitalize card-name" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
+                <h3 (click)="clickCardHandler()" class="text-capitalize card-name mb-2" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
                     <div *ngIf="member.firstName || member.surName ">
                         {{member.firstName}}  {{member.surName}}
                     </div>
@@ -21,8 +21,8 @@
                 <div class="mb-1" >
                     <div class="d-flex flex-column" >
 
-                        <div class="d-flex justify-content-between" [ngClass]=" singleItemPerRowMode ? 'flex-row' : 'flex-column' ">
-                            <div class="jobDetails">
+                        <div class="d-flex justify-content-between mb-2" [ngClass]=" singleItemPerRowMode ? 'flex-row' : 'flex-column' ">
+                            <div class="jobDetails mb-2">
                                 {{ member?.jobTitle + ( member?.accountName && member?.jobTitle ? ' ' + l('at') + ' ' : ''   ) + member?.accountName }}
                              </div>
                             <div  *ngIf="member.eMailAddress && singleItemPerRowMode"> | </div>
@@ -34,8 +34,8 @@
                     <div *ngIf="!singleItemPerRowMode" class="align-items-baseline d-flex" >
 
                         <div  *ngIf="showActiveStatus && member?.userId" class="activeStatus">
-                            <span class="connected" *ngIf="member.isActive == true">
-                                <img src="../../assets/img/input_icons/true_.png" class="">
+                            <span class="connected pt-4" *ngIf="member.isActive == true">
+                                <img src="../../assets/img/input_icons/true_.png" class="mr-1">
                                 {{'Active' | localize }}
                             </span>
                             <span class="text-muted" *ngIf="member.isActive == false">

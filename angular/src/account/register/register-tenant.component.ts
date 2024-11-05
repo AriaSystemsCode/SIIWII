@@ -129,7 +129,8 @@ firstName:string=";"
         let recaptchaCallback = (token: string) => {
             this.saving = true;
             this.model.captchaResponse = token;
-       this.model.editionId =Number(this.accountType);
+       //this.model.editionId =Number(this.accountType);
+      this.model.editionId= Number(this.accountType) ? Number(this.accountType) :  this.model.editionId;
        this.model.accountTypeId=this.accountType;
        this.model.accountType = this.accountTypeLabel;
 //this.model.firstName=this.firstName;

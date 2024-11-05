@@ -539,22 +539,22 @@ export class TopBarComponent
         let type = accout_type;
         let accountname = account_name;
         let email = this.appSession.user.emailAddress;
-        let url = "https://app.testing.siiwii.net";
+        let url =  this.appUrlService.appRootUrl;
         let tenantName =this.appSession.tenant.name;
         //let tenantName =this.appSession.tenancyName;
         let firstName=btoa(this.appSession.user.name);
         let lastName=btoa(this.appSession.user.surname);
         let relatedTenantId=this.appSession.tenantId;
-        const htmlContent: string = `<div><img src="../../assets/img/input_icons/alarm.png" class="alarmInfo"><p class="text-left alarmInfo_title">A registration mail has been Sent to ` + email + ` </p> </div><p class="pleaseClick">*Please Click on the register link in the email in order to create the new <label>` + accountname + ` </label>  account .</p> `;
+        const htmlTitle: string = `<div class="font-weight-bold"><p class="text-left alarmInfo_title"> <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"/> A registration mail has been Sent to ` + email  + ` </p> </div> `;
+        const htmlContent: string = `<p class="pleaseClick" style="color: #9E9E9E;">*Please Click on the register link in the email in order to create the new  Business | group account. </p> `;
         var tenantId;
         if (this.appSession?.tenantId)
             tenantId = this.appSession?.tenantId?.toString();
         else tenantId = null;
         let link = url + "/account/select-edition?editionId=1&subscriptionStartType=1&accountTypeLabel="+type+"&accountType="+type+"&firstName="+firstName+"&lastName="+lastName+"&relatedTenantId="+relatedTenantId;
         Swal.fire({
-            title: "",
+            title: htmlTitle,
             html: htmlContent,
-            icon: "info",
             showCancelButton: false,
             //cancelButtonText: this.l("No"),
             confirmButtonText: "okay",
@@ -562,7 +562,7 @@ export class TopBarComponent
             allowEscapeKey: false,
             backdrop: true,
             customClass: {
-                popup: 'popup_container',
+                popup: 'popup_container popup_container_CreateBusiness_GroupAccount',
                 content: 'popup_content',
                 actions: 'popup_actions',
                 confirmButton: 'popp_confirm-button',

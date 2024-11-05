@@ -633,7 +633,7 @@
 		<text name="TenantName">Tenant name</text>
 		<text name="TenantDeleteWarningMessage">Tenant {0} will be deleted.</text>
 		<text name="AdminEmailAddress">admin email</text>
-		<text name="AdminPassword">admin password</text>
+		<text name="AdminPassword">Admin password</text>
 		<text name="AdminPasswordRepeat">Confirm admin password</text>
 		<text name="EditTenant">Edit tenant</text>
 		<text name="ChangingPermissions">Changing permissions</text>
@@ -2323,7 +2323,7 @@
 		<text name="DeletedSuccessfully">Deleted Successfully</text>
 		<text name="FromDate">From Date</text>
 		<text name="ToDate">To Date</text>
-	    <text name="UserName@DomainName">User Name@Domain Name</text>
+	    <text name="UserName@DomainName">Example :  Username@Workspacename</text>
 		<text name="DomainTooltip">Use your organization's company name or business domain. (The company name should only have one word in capital letters, without special characters)</text>
 		<text name="InviteNewUser">Invite New User</text>
 		<text name="AccountName">Account name</text>
