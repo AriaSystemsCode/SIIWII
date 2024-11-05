@@ -66,6 +66,8 @@ using PayPalCheckoutSdk.Orders;
 using Castle.MicroKernel.Registration;
 using onetouch.AppItemsLists;
 using System.Diagnostics;
+using Abp.AspNetZeroCore.Timing;
+using System.Drawing.Imaging;
 
 
 //using NUglify.Helpers;
@@ -952,7 +954,7 @@ namespace onetouch.AppSiiwiiTransaction
                         if (buyerTenantId != null)
                         {
                             foreach (var det in header.AppTransactionDetails.Where(z => z.ParentId == null))
-                                await GetProductFromMarketplace(det.SSIN, int.Parse(buyerTenantId.ToString()));
+                                await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
                         }
                     }
                     //Iteration45[Start]
@@ -1405,7 +1407,7 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         appTrans.AppTransactionDetails = _appTransactionDetails.GetAll().AsNoTracking().Where(z => z.TransactionId == appTrans.Id && z.ParentId == null).ToList();
                         foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
-                            await GetProductFromMarketplace(det.SSIN, int.Parse(buyerTenantId.ToString()));
+                            await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
                     }
                 }
                 foreach (var con in appTrans.AppTransactionContacts)
@@ -4665,6 +4667,9 @@ namespace onetouch.AppSiiwiiTransaction
                             {
                                 if (det.ParentId != null)
                                     continue;
+                                //I45
+                                await GetProductFromMarketplace(det.SSIN, int.Parse(tenantId.ToString()));
+                                //I45
                                 AppTransactionDetails detail = new AppTransactionDetails();
                                 detail = ObjectMapper.Map<AppTransactionDetails>(det);
                                 detail.Id = 0;
@@ -4905,6 +4910,9 @@ namespace onetouch.AppSiiwiiTransaction
                             {
                                 if (det.ParentId != null)
                                     continue;
+                                //I45
+                                await GetProductFromMarketplace(det.SSIN, int.Parse(tenantId.ToString()));
+                                //I45
                                 AppTransactionDetails detail = new AppTransactionDetails();
                                 detail = ObjectMapper.Map<AppTransactionDetails>(det);
                                 detail.Id = 0;
@@ -5657,43 +5665,94 @@ namespace onetouch.AppSiiwiiTransaction
             }
         }
         //Iteration45[Start]
-        public async Task<List<DataView>> GetAppTransactionVariationsDetail(long transactionId)
+        public async Task<PagedResultDto<TransactionDetailView>> GetllTransactionVariationsDetail(VariationInputDto input)
         {
+            long? transactionType = null;
+            long soType = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
+            long poType = await _helper.SystemTables.GetEntityObjectTypePurchaseOrder();
+            if (input.TransactionTypeFilter != null)
+            {
+                if (input.TransactionTypeFilter == TransactionType.SalesOrder)
+                {
+                    transactionType = soType;
+                }
+                else
+                {
+                    transactionType = poType;
+                }
+            }
             List<DataView> returnList = new List<DataView>();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var transDetail = await _appTransactionDetails.GetAll().Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
-                  .Where(a => a.TransactionId == transactionId && a.ParentId!= null).ToListAsync();
-                if (transDetail != null && transDetail.Count() > 0)
-                {
-                    foreach (var variation in transDetail)
-                    {
-                        DataView sizeColorDetailView = new DataView();
-                        sizeColorDetailView.LineId = variation.Id;
-                        sizeColorDetailView.code = variation.Code;
-                        sizeColorDetailView.ManufacturerCode = variation.ManufacturerCode;
-                        sizeColorDetailView.name = variation.Name;
-                        sizeColorDetailView.Qty = variation.Quantity;
-                        sizeColorDetailView.NoOfPrePacks = (variation.NoOfPrePacks == null ? 0 : (long)variation.NoOfPrePacks);
+                var transDetail = _appTransactionDetails.GetAll().Include(x => x.TransactionIdFk).Include(e => e.EntityAttachments).ThenInclude(e => e.AttachmentFk)
+                  .Where(a => a.ParentId != null && a.TenantId == AbpSession.TenantId)
+                  .WhereIf(input.TransactionTypeFilter != null, z => z.TransactionIdFk.EntityObjectTypeId == transactionType)
+                  .WhereIf(!string.IsNullOrEmpty(input.TransactionNumberFilter), z => z.TransactionCode == input.TransactionNumberFilter)
+                  .WhereIf(!string.IsNullOrEmpty(input.NameFilter!), z => z.Name.ToUpper().Contains(input.NameFilter.ToUpper()))
+                  .WhereIf(input.MinPrice!=null && input.MaxPrice!=null, z=>z.NetPrice >= input.MinPrice && z.NetPrice <= input.MaxPrice)
+                  .WhereIf(input.MinAmount != null && input.MaxAmount != null, z => z.Amount >= input.MinAmount && z.Amount <= input.MaxAmount)
+                  .WhereIf(!string.IsNullOrEmpty(input.VariationCodeFilter), z => z.ManufacturerCode.ToUpper().Contains(input.VariationCodeFilter.ToUpper()));
 
-                        sizeColorDetailView.Price = variation.NetPrice;
-                        sizeColorDetailView.Amount = variation.Amount;
-                        sizeColorDetailView.Image = "";
+                var tranDetail = from o in transDetail
+                                 select new TransactionDetailView
+                                 {
+                                     LineNo = o.LineNo,
+                                     code = o.Code,
+                                     ManufacturerCode = o.ManufacturerCode,
+                                     name = o.Name,
+                                     Qty = o.Quantity,
+                                     TransactionNumber= o.TransactionCode,
+                                     TransactionType = o.TransactionIdFk.EntityObjectTypeId == soType? TransactionType.SalesOrder: TransactionType.PurchaseOrder,
+                                     Price = o.NetPrice,
+                                     Amount = o.Amount,
+                                     Image = (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null) ?
+                                       ((o.EntityAttachments.FirstOrDefault(x => x.IsDefault != true) != null) ? ("attachments/" + o.TenantId + "/" + (o.EntityAttachments.FirstOrDefault(x => x.IsDefault != true).AttachmentFk.Attachment)) : "")
+                                        : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" +
+                                        (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)
+                                 };
 
-                        if (variation.EntityAttachments.Count() > 0)
-                        {
-                            var lineAttachmentDefault = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
-                            var lineAttachment = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
-                            sizeColorDetailView.Image = (lineAttachmentDefault == null ?
-                                       (lineAttachment != null ? "attachments/" + variation.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
-                                        : "attachments/" + (variation.TenantId.HasValue ? variation.TenantId : -1) + "/" +
-                                        lineAttachmentDefault.AttachmentFk.Attachment);
-                        }
-                        returnList.Add(sizeColorDetailView);
-                    }
-                }
+                //    if (transDetail != null && transDetail.Count() > 0)
+                //    {
+                //        foreach (var variation in transDetail)
+                //        {
+                //            DataView sizeColorDetailView = new DataView();
+                //            sizeColorDetailView.LineId = variation.Id;
+                //            sizeColorDetailView.code = variation.Code;
+                //            sizeColorDetailView.ManufacturerCode = variation.ManufacturerCode;
+                //            sizeColorDetailView.name = variation.Name;
+                //            sizeColorDetailView.Qty = variation.Quantity;
+                //            sizeColorDetailView.NoOfPrePacks = (variation.NoOfPrePacks == null ? 0 : (long)variation.NoOfPrePacks);
+
+                //            sizeColorDetailView.Price = variation.NetPrice;
+                //            sizeColorDetailView.Amount = variation.Amount;
+                //            sizeColorDetailView.Image = "";
+
+                //            if (variation.EntityAttachments.Count() > 0)
+                //            {
+                //                var lineAttachmentDefault = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
+                //                var lineAttachment = variation.EntityAttachments.FirstOrDefault(x => x.IsDefault == true);
+                //                sizeColorDetailView.Image = (lineAttachmentDefault == null ?
+                //                           (lineAttachment != null ? "attachments/" + variation.TenantId + "/" + lineAttachment.AttachmentFk.Attachment : "")
+                //                            : "attachments/" + (variation.TenantId.HasValue ? variation.TenantId : -1) + "/" +
+                //                            lineAttachmentDefault.AttachmentFk.Attachment);
+                //            }
+                //            returnList.Add(sizeColorDetailView);
+                //        }
+                //    }
+                //}
+                var orderedItemsFilter = tranDetail.OrderBy(input.Sorting ?? "LineId asc");
+                var orderedItems = orderedItemsFilter.PageBy(input);
+
+                //var appItemsList = await appItems.ToListAs ync();
+                var appItemsList = await orderedItems.ToListAsync();
+
+                var totalCount = await orderedItemsFilter.CountAsync();
+
+                return new PagedResultDto<TransactionDetailView>(
+                    totalCount,
+                    appItemsList
+                );
             }
-            return returnList;
         }
         public async Task<string> CreateManualAccount(CreateOrEditAccountInfoDto manualAccountInfo)
         {
@@ -5882,6 +5941,228 @@ namespace onetouch.AppSiiwiiTransaction
                 );
             }
         }
+        public async Task<bool> AddVariationToTransaction(AddVariationToInputDto input)
+        {
+            long? tranTypeId = null;
+            if (input.TransactionType == TransactionType.SalesOrder)
+            {
+                tranTypeId = await _helper.SystemTables.GetEntityObjectTypeSalesOrder();
+            }
+            else
+            {
+                tranTypeId = await _helper.SystemTables.GetEntityObjectTypePurchaseOrder();
+            }
+            if (input.TransactionId != null && input.VariationSSIN != null)
+            {
+                var header = await _appTransactionsHeaderRepository.GetAll()
+                    .FirstOrDefaultAsync(a => a.Id == input.TransactionId && a.TenantId == AbpSession.TenantId && a.EntityObjectTypeId == tranTypeId);
+                if (header == null)
+                    return false;
+                
+                var lastLine = 0;
+                try
+                {
+                    lastLine = await _appTransactionDetails.GetAll().AsNoTracking().Where(s => s.TransactionId == header.Id).DefaultIfEmpty().Select(a => a.LineNo).DefaultIfEmpty().MaxAsync();
+                }
+                catch { lastLine = 0; }
+
+                var marketplaceVariation =await _appMarketplaceItem.GetAll().AsNoTracking().Include(x => x.EntityCategories)
+                                        .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk).Include(a => a.EntityClassifications)
+                                        .Include(a => a.EntityExtraData).Where(z => z.SSIN == input.VariationSSIN).FirstOrDefaultAsync();
+                if (marketplaceVariation != null)
+                {
+                    var marketplaceVariationParent =await _appMarketplaceItem.GetAll().AsNoTracking().Include(x => x.EntityCategories)
+                                        .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk).Include(a => a.EntityClassifications)
+                                        .Include(a => a.EntityExtraData).Where(z => z.Id == marketplaceVariation.ParentId).FirstOrDefaultAsync();
+                    if (marketplaceVariationParent != null)
+                    {
+                        long parentItemId = 0;
+                        var detParent = await _appTransactionDetails.GetAll().Include(z=>z.ParentFkList).Where(z =>z.TransactionId== input.TransactionId &&
+                        z.TransactionIdFk.EntityObjectTypeId == header.EntityObjectTypeId &&
+                        z.ItemSSIN == marketplaceVariationParent.SSIN).FirstOrDefaultAsync();
+                        if (detParent == null)
+                        {
+                            detParent = new AppTransactionDetails();
+                            detParent = ObjectMapper.Map<AppTransactionDetails>(marketplaceVariationParent);
+                            detParent.Amount = decimal.Parse((input.Price * input.Qty).ToString());
+                            detParent.Quantity = double.Parse(input.Qty.ToString());
+                            detParent.NetPrice = decimal.Parse(input.Price.ToString());
+                            detParent.GrossPrice = decimal.Parse(input.Price.ToString());
+                            detParent.Discount = 0;
+                            detParent.NoOfPrePacks = 0;
+                            detParent.SSIN = marketplaceVariationParent.SSIN;
+                            detParent.ItemSSIN = marketplaceVariationParent.SSIN;
+                            detParent.ItemDescription = marketplaceVariationParent.Description;
+                            detParent.Name = marketplaceVariationParent.Name;
+                            detParent.Id = 0;
+                            detParent.TransactionId = header.Id;
+                            lastLine++;
+                            detParent.LineNo = lastLine;
+                            detParent.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                            detParent.TenantId = int.Parse(AbpSession.TenantId.ToString());
+                            detParent.TransactionCode = header.Code;
+                            detParent.EntityObjectTypeId = header.EntityObjectTypeId;
+                            detParent.EntityObjectTypeCode = header.EntityObjectTypeCode;
+                            detParent.Note = "";
+                            detParent.ItemCode = marketplaceVariationParent.Code;
+                            detParent.Code = header.TenantId.ToString().TrimEnd() + "-" + header.Code.TrimEnd() + "-" + detParent.LineNo.ToString() + "-" + marketplaceVariationParent.Code.TrimEnd();
+                            detParent.Notes = string.IsNullOrEmpty(marketplaceVariationParent.Notes) ? "" : marketplaceVariationParent.Notes;
+                            detParent.ParentId = null;
+                            if (detParent.EntityExtraData != null)
+                            {
+                                detParent.EntityExtraData.ForEach(d => d.Id = 0);
+                                detParent.EntityExtraData.ForEach(d => d.EntityFk = null);
+                                detParent.EntityExtraData.ForEach(d => d.EntityCode = detParent.Code);
+                                detParent.EntityExtraData.ForEach(d => d.EntityId = 0);
+                            }
+                            if (detParent.EntityAttachments != null)
+                            {
+                                detParent.EntityAttachments.ForEach(d => d.Id = 0);
+                                detParent.EntityAttachments.ForEach(d => d.EntityId = 0);
+                                detParent.EntityAttachments.ForEach(d => d.EntityCode = detParent.Code);
+                                detParent.EntityAttachments.ForEach(d => d.EntityFk = null);
+                            }
+                            if (detParent.EntityCategories != null)
+                            {
+                                detParent.EntityCategories.ForEach(d => d.Id = 0);
+                                detParent.EntityCategories.ForEach(d => d.EntityFk = null);
+                                detParent.EntityCategories.ForEach(d => d.EntityCode = detParent.Code);
+                                detParent.EntityCategories.ForEach(d => d.EntityId = 0);
+                            }
+                            if (detParent.EntityClassifications != null)
+                            {
+                                detParent.EntityClassifications.ForEach(d => d.EntityId = 0);
+                                detParent.EntityClassifications.ForEach(d => d.EntityFk = null);
+                                detParent.EntityClassifications.ForEach(d => d.EntityCode = detParent.Code);
+                                detParent.EntityClassifications.ForEach(d => d.Id = 0);
+                            }
+                            if (detParent.EntityAttachments != null)
+                            {
+                                foreach (var parentAttach in detParent.EntityAttachments)
+                                {
+                                    parentAttach.Id = 0;
+
+                                    parentAttach.EntityId = 0;
+                                    parentAttach.EntityFk = null;
+                                    parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
+                                    MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                    parentAttach.AttachmentId = 0;
+                                    parentAttach.AttachmentFk.Id = 0;
+                                }
+                            }
+                            detParent = await _appTransactionDetails.InsertAsync(detParent);
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                            if (detParent == null)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                parentItemId = detParent.Id;
+                                detParent.ParentFkList = new List<AppTransactionDetails>();
+                            }
+                           
+
+                        }
+                        else
+                        {
+
+                            detParent.Quantity += input.Qty;
+                            detParent.Amount += decimal.Parse((input.Qty * input.Price).ToString());
+                            detParent.NetPrice = (detParent.Amount / decimal.Parse(detParent.Quantity.ToString()));
+                            detParent.GrossPrice = detParent.NetPrice;
+                            parentItemId = detParent.Id;
+
+                        }
+                        AppTransactionDetails det = new AppTransactionDetails();
+                        det = ObjectMapper.Map<AppTransactionDetails>(marketplaceVariation);
+                        det.Quantity = input.Qty;
+                        det.NetPrice = input.Price; //input.AppItem.MaxSpecialPrice != 0 ? input.AppItem.MaxSpecialPrice : input.AppItem.MaxMSRP;
+                        det.GrossPrice = input.Price; //input.AppItem.MaxSpecialPrice != 0 ? input.AppItem.MaxSpecialPrice : input.AppItem.MaxMSRP;
+                        det.Discount = 0;
+                        det.Amount = decimal.Parse((decimal.Parse(det.Quantity.ToString()) * det.NetPrice).ToString());
+                        det.Id = 0;
+                        det.TransactionId = header.Id;
+                        lastLine++;
+                        det.LineNo = lastLine;
+                        det.NoOfPrePacks =0;
+                        det.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                        det.TenantId = int.Parse(AbpSession.TenantId.ToString());
+                        det.TransactionCode = header.Code;
+                        det.ItemCode = marketplaceVariation.Code;
+                        det.ItemDescription = marketplaceVariation.Description;
+                        det.ItemSSIN = marketplaceVariation.SSIN;
+                        det.EntityObjectTypeId = header.EntityObjectTypeId;
+                        det.EntityObjectTypeCode = header.EntityObjectTypeCode;
+                        det.Note = "";
+                        det.Code = header.TenantId.ToString().TrimEnd() + "-" + header.Code.TrimEnd() + "-" + det.LineNo.ToString() + "-" + det.Code.TrimEnd();
+                        det.Notes = string.IsNullOrEmpty(marketplaceVariation.Notes) ? "" : marketplaceVariation.Notes;
+                        if (det.EntityExtraData != null)
+                        {
+                            det.EntityExtraData.ForEach(d => d.EntityCode = marketplaceVariation.Code);
+                            det.EntityExtraData.ForEach(d => d.Id = 0);
+                            det.EntityExtraData.ForEach(d => d.EntityFk = null);
+                            det.EntityExtraData.ForEach(d => d.EntityCode = det.Code);
+                            det.EntityExtraData.ForEach(d => d.EntityId = 0);
+                         }
+                        if (det.EntityAttachments != null)
+                        {
+                            det.EntityAttachments.ForEach(d => d.Id = 0);
+                            det.EntityAttachments.ForEach(d => d.EntityId = 0);
+                            det.EntityAttachments.ForEach(d => d.EntityCode = det.Code);
+                            det.EntityAttachments.ForEach(d => d.EntityFk = null);
+                        }
+                        if (det.EntityCategories != null)
+                        {
+                            det.EntityCategories.ForEach(d => d.Id = 0);
+                            det.EntityCategories.ForEach(d => d.EntityFk = null);
+                            det.EntityCategories.ForEach(d => d.EntityCode = marketplaceVariation.Code);
+                            det.EntityCategories.ForEach(d => d.EntityId = 0);
+                        }
+                        if (det.EntityClassifications != null)
+                        {
+                            det.EntityClassifications.ForEach(d => d.EntityId = 0);
+                            det.EntityClassifications.ForEach(d => d.EntityFk = null);
+                            det.EntityClassifications.ForEach(d => d.EntityCode = marketplaceVariation.Code);
+                            det.EntityClassifications.ForEach(d => d.Id = 0);
+                        }
+                        if (det.EntityAttachments != null)
+                        {
+                            foreach (var parentAttach in det.EntityAttachments)
+                            {
+                                parentAttach.Id = 0;
+
+                                parentAttach.EntityId = 0;
+                                parentAttach.EntityFk = null;
+                                parentAttach.AttachmentFk.TenantId = AbpSession.TenantId;
+                                MoveFile(parentAttach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                                parentAttach.AttachmentId = 0;
+                                parentAttach.AttachmentFk.Id = 0;
+                            }
+                        }
+                        det.Id =0;
+                        det.ParentId = parentItemId;
+                        detParent.ParentFkList.Add(det);
+                        await _appTransactionDetails.UpdateAsync(detParent);
+                        header.TimeStamp = DateTime.Now;
+                        header.TotalQuantity += long.Parse(input.Qty.ToString());
+                        header.TotalAmount += double.Parse((input.Qty*input.Price).ToString());
+                        await _appTransactionsHeaderRepository.UpdateAsync(header);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                        //Add Variation Line
+                        //det = await _appTransactionDetailsRepository.InsertAsync(det);
+
+                    }
+
+                }
+            }
+            return true;
+        }
+      
+            
+
+
+       
         //Iteration45[End]
     }
 

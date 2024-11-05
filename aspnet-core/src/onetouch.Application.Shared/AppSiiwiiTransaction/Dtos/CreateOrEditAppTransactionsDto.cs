@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Abp.Application.Services.Dto;
 using onetouch.AppEntities.Dtos;
 using onetouch.Sessions.Dto;
+using System.Net;
 
 namespace onetouch.AppSiiwiiTransaction.Dtos
 {
@@ -133,18 +134,18 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string PhoneTypeName { set; get; }
     }
     //Iteration#45
-    public class VariationInputDto {
-       //public string SellerNameFilter { set; get; }
-       //public string BuyerNameFilter { set; get; }
-       //public string CodeFilter { set; get; }
-       //public DateTime MinCreateDateFilter { set; get; }
-       //public DateTime MaxCreateDateFilter { set; get; }
-       //public DateTime MinCompleteDateFilter { set; get; }
-       //public DateTime MaxCompleteDateFilter { set; get; }
-       //public DateTime MinEnteredDateFilter { set; get; }
-       //public DateTime MaxEnteredDateFilter { set; get; }
-       //public string  StatusFilter { set; get; }
-      
+    public class VariationInputDto : PagedAndSortedResultRequestDto
+    {
+       public string? VariationCodeFilter { set; get; }
+       public TransactionType? TransactionTypeFilter { set; get; }
+       public string? NameFilter{ set; get; }
+       
+       public string? TransactionNumberFilter { set; get; }
+       public decimal? MinPrice { set; get; }
+       public decimal? MaxPrice { set; get; }
+       public decimal? MinAmount{ set; get; }
+       public decimal? MaxAmount{ set; get; }
+
     }
     public class SellerVariationInputDto : PagedAndSortedResultRequestDto
     { 
@@ -153,6 +154,13 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string ContactSSIN { set; get; }
         public string CurrencyCode { set; get; }
     }
-   
+    public class AddVariationToInputDto
+    { 
+        public string VariationSSIN { set; get; }
+        public int Qty { set; get; }
+        public decimal Price { set; get; }
+        public long TransactionId { set; get; }
+        public TransactionType TransactionType { set; get; }
+    }
     //Iteration45
 }

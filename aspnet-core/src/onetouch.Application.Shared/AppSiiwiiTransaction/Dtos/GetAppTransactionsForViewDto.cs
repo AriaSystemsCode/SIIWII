@@ -238,4 +238,21 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public long TransactionId { get; set; }
     }
+    //I45[start]
+    public class TransactionDetailView
+    {
+        public TransactionType TransactionType { set; get; }
+        public string TransactionNumber { get; set; }
+        public string code { get; set; }
+        public string ManufacturerCode { set; get; }
+        public string name { get; set; }
+        public double Qty { get; set; }
+        public decimal Price { get; set; }
+        public decimal Amount { get; set; }
+        public string Image { get; set; }
+        public long ParentId { get; set; }
+        public int LineNo { get; set; }
+
+    }
+    //I45[end]
 }
