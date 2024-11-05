@@ -95,6 +95,11 @@ export class ShoppingCartViewComponentComponent
 totalVariationsCount: number = 0;
 
   selectedVariation: any;
+  selectedPrice: number | string = ''; // Holds the selected price
+selectedQuantity: number = 0; // Holds the entered quantity
+amount: number = 0; // Holds the calculated amount
+showAddLine : boolean = false
+newData:any
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -306,7 +311,7 @@ this.hideMainSpinner();
      )
      .subscribe((res) => {
        this.shoppingCartDetails = res;
-
+        console.log(this.shoppingCartTreeNodes,'llll')
        this?.shoppingCartDetails?.totalAmount % 1 == 0 ? this.shoppingCartDetails.totalAmount = parseFloat(Math.round(this.shoppingCartDetails.totalAmount * 100 / 100).toFixed(2)) : null;
 
        this.userClickService.userClicked("refreshShoppingInfoInTopbar");
@@ -963,19 +968,26 @@ this.hideMainSpinner();
     }
 }
 addNewLine() {
-  this.shoppingCartTreeNodes.push({
-    data: {
-        manufacturerCode: '',
-        name: '',
-        qty: '',
-        price: '',
-        amount: '',
-        image: ''
-    },
-    children: [], // No children, since this is a parent node,
-    leaf: true  // Indicates it’s a parent and currently has no children
-});
-this.cdr.detectChanges();
+  console.log(this.newData,'newData')
+  
+    this.shoppingCartTreeNodes.push({
+      key: 'new-' + new Date().getTime(), // Unique key for the new node
+      data: {
+          manufacturerCode: this.newData?.value?.appItem?.manufacturerCode,
+          name: this.newData?.value?.appItem?.name,
+          qty: this.selectedQuantity,
+          price: this.newData?.value?.appItem?.price,
+          amount: this.amount,
+          image: this.newData?.value?.appItem?.imageUrl,
+      },
+      children: [], // No children, since this is a parent node,
+      leaf: true,  // Indicates it’s a parent and currently has no children
+      expanded: true // Ensure the new node is expanded
+  });
+  
+  this.cdr.detectChanges();
+  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  
 }
 getSellerVariations(skipCount: number = 0, maxResultCount: number = this.incrementCount) {
   this._AppTransactionServiceProxy.getAllSellerVariations(
@@ -995,11 +1007,36 @@ getSellerVariations(skipCount: number = 0, maxResultCount: number = this.increme
    });
 }
 
-loadMore() {
+loadMore(event: MouseEvent, dropdown: any) {
+  // Prevent the dropdown from closing
+  event.stopPropagation();
+
   if (this.displayedVariations.length < this.totalVariationsCount) {
       const nextSkipCount = this.displayedVariations.length;
       this.getSellerVariations(nextSkipCount);
+      
+      // Ensure the dropdown remains open after loading more items
+      setTimeout(() => {
+          dropdown.overlayVisible = true;
+      }, 0);
   }
+}
+onVariationSelect(event: any) {
+  // Update the selected price when a variation is selected
+  this.selectedQuantity = 0
+  this.selectedPrice = 0
+  if (event && event.value && event.value.appItem) {
+  this.newData = event
+
+      this.selectedPrice = event.value.appItem.price;
+      this.updateAmount(); // Recalculate the amount when a new price is selected
+  }
+}
+
+updateAmount() {
+  // Calculate the amount based on the quantity and selected price
+  const price = typeof this.selectedPrice === 'number' ? this.selectedPrice : parseFloat(this.selectedPrice);
+  this.amount = this.selectedQuantity * (price || 0);
 }
 
 }
