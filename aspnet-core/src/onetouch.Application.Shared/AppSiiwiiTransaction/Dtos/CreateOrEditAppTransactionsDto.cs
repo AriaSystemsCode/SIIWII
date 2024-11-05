@@ -154,6 +154,13 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string ContactSSIN { set; get; }
         public string CurrencyCode { set; get; }
     }
-   
+    public class AddVariationToInputDto
+    { 
+        public string VariationSSIN { set; get; }
+        public int Qty { set; get; }
+        public decimal Price { set; get; }
+        public long TransactionId { set; get; }
+        public TransactionType TransactionType { set; get; }
+    }
     //Iteration45
 }
