@@ -95,7 +95,7 @@
                         <hr class="header">
                         <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                             <h6 class="text-right font-weight-bold mr-3 "> <img src="../../assets/img/input_icons/outline-work.png" class=""> {{ ( "JobTitle" | localize ) + " :" }}</h6>
-                            <p class="text-left old_editjobTitle" [ngClass]="{'hide':NoteditInfo}">{{memberData?.contact?.jobTitle}}</p>
+                            <p class="text-left old_editjobTitle" style="color: #595959;" [ngClass]="{'hide':NoteditInfo}">{{memberData?.contact?.jobTitle}}</p>
                             <input type="text" class="editjobTitle form-control form-control-sm aria-input-text"name="JobTitle" #JobTitleInput="ngModel" required name="JobTitle" minlength="2" maxlength="100" [(ngModel)]="editjobTitleValue" [placeholder]="'PleaseEnterJobTitle' | localize " [class.hide]="editInfo">
                             <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
                         </div>
@@ -117,7 +117,7 @@
                         <hr class="header">
                         <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                             <h6 class="text-right font-weight-bold mr-3 " >  <img src="../../assets/img/input_icons/location.png" class=""> {{ ( "Branch" | localize ) + " :" }}</h6>
-                            <p class="text-left old_editBranch" [class.hide]="NoteditInfo" *ngIf="memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName">
+                            <p class="text-left old_editBranch"  style="color: #595959;" [class.hide]="NoteditInfo" *ngIf="memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName">
                                 <span *ngIf="memberData?.branchName">
                                     {{ memberData?.branchName + ' '}}
                                 </span>
