@@ -219,17 +219,31 @@ namespace onetouch.AppItemsLists
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                 var appItemsPage = appItemsLists.PageBy(input);
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
-                var imageQuery = _appItemsListDetailRepository.GetAll().Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk);
+                
+                    
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                 //var appItemsListsWithImages = await appItemsLists.ToListAsync();
                 var appItemsListsWithImages = await appItemsPage.ToListAsync();
                 //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
                 foreach (var item in appItemsListsWithImages)
                 {
+                    if (input.FilterType == ItemsListFilterTypesEnum.MyItemsList)
+                    {
+                        var imageQuery = _appItemsListDetailRepository.GetAll().Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                            .Where(z=>z.ItemsListId== item.AppItemsList.Id);
+                        item.AppItemsList.ImgURL = imageQuery.FirstOrDefault(x => x.ItemsListId == item.AppItemsList.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0) != null
+                                                     ? "attachments/" + item.AppItemsList.TenantId + "/" + imageQuery.FirstOrDefault(x => x.ItemsListId == item.AppItemsList.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0).ItemFK.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
+                                                      : "";
+                    }
+                    else
+                    {
+                        var imageQuery = _appMarketplaceItemsListDetailRepository.GetAll().Include(x => x.ItemFK).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                                  .Where(z => z.AppMarketplaceItemsListId == item.AppItemsList.Id);
+                        item.AppItemsList.ImgURL = imageQuery.FirstOrDefault(x => x.ItemFK.EntityAttachments != null && x.ItemFK.EntityAttachments.Count > 0) != null
+                                                     ? "attachments/" +  "-1" + "/" + imageQuery.FirstOrDefault(x => x.ItemFK.EntityAttachments !=null && x.ItemFK.EntityAttachments.Count > 0).ItemFK.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
+                                                      : "";
+                    }
 
-                    item.AppItemsList.ImgURL = imageQuery.FirstOrDefault(x => x.ItemsListId == item.AppItemsList.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0) != null
-                                                 ? "attachments/" + item.AppItemsList.TenantId + "/" + imageQuery.FirstOrDefault(x => x.ItemsListId == item.AppItemsList.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0).ItemFK.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
-                                                  : "";
                 }
 
                 return new PagedResultDto<GetAppItemsListForViewDto>(
@@ -425,12 +439,13 @@ namespace onetouch.AppItemsLists
 
                 var appItemsLists = ObjectMapper.Map<IReadOnlyList<CreateOrEditAppItemsListItemDto>>(pagedAndFilteredAppItemsListItems);
 
-                var imageQuery = _appItemsListDetailRepository.GetAll().Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk);
+                var imageQuery = _appMarketplaceItemsListDetailRepository.GetAll().Include(x => x.ItemFK).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    .Where(z=>z.AppMarketplaceItemsListId == input.ItemListId);
                 foreach (var item in appItemsLists)
                 {
-                    item.AppItemsListItemVariations = await GetMarketplaceItemsListVariations(item.ItemId, item.ItemsListId);
-                    item.ImageURL = imageQuery.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0) != null
-                                                ? "attachments/" + item.ImageURL + "/" + imageQuery.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0).ItemFK.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
+                    item.AppItemsListItemVariations = await GetMarketplaceItemsListVariations(item.ItemId, input.ItemListId);
+                    item.ImageURL = imageQuery.FirstOrDefault(x =>  x.ItemFK.EntityAttachments.Count > 0) != null
+                                                ? "attachments/" + "-1"+ "/" + imageQuery.FirstOrDefault(x => x.ItemFK.EntityAttachments.Count > 0).ItemFK.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
                                                     : "";
                     //var maketItem = await _appMarketplaceItem.GetAll().Where(z => z.Id == item.ItemId).FirstOrDefaultAsync();
                     //if (maketItem!=null)
