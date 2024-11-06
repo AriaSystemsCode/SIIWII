@@ -1,6 +1,6 @@
-<div [@routerTransition] class="wrapper">
+<div [@routerTransition]>
     <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-            <div class="view-profile-wrapper" [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" *ngIf="active">
+            <div class="view-profile-wrapper" *ngIf="active">
                 <div>
                     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
 
@@ -237,9 +237,12 @@
                     </div>
                 </div>
             </div>
+
             <createOrEditUserModal #createOrEditUserModal></createOrEditUserModal>
+
     </div>
 </div>
+
 
 
 <selectBranchModal #selectBranchModal (branchSelected)="branchSelected($event)"

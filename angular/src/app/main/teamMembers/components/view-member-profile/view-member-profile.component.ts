@@ -1,4 +1,4 @@
-import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input } from '@angular/core';
+import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
@@ -15,6 +15,7 @@ import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-
 
 @Component({
     selector: 'app-view-member-profile',
+    encapsulation: ViewEncapsulation.None,
     templateUrl: './view-member-profile.component.html',
     styleUrls: ['./view-member-profile.component.scss'],
     animations: [appModuleAnimation()]
