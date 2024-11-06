@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AddVariationToInputDto, AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAppMarketItemForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, PagedResultDtoOfGetAccountInformationOutputDto, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -95,11 +95,17 @@ export class ShoppingCartViewComponentComponent
 totalVariationsCount: number = 0;
 
   selectedVariation: any;
-  selectedPrice: number | string = ''; // Holds the selected price
+  selectedPrice: number = 0; // Holds the selected price
 selectedQuantity: number = 0; // Holds the entered quantity
 amount: number = 0; // Holds the calculated amount
 showAddLine : boolean = false
 newData:any
+showSaveCancel : boolean = false
+// visibleD: boolean = false;
+cancelBtn: boolean = false;
+saveBtn: boolean = false;
+SuccessMsg: boolean = false;
+addNewLinebtn : boolean = true;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -114,8 +120,7 @@ newData:any
   }
   ngOnInit(): void {
     // this.onGeneratOrderReport(true,undefined,true,true);
-    this.getSellerVariations()
- 
+ this.getSellerVariations()
   }
   ngOnChanges() {
     // this.onGeneratOrderReport(true,undefined,true,true);
@@ -482,6 +487,43 @@ this.hideMainSpinner();
     });
   }
   onDelete(rowNode) {
+    console.log(rowNode,'rowNode')
+    if(rowNode?.node?.data?.added) {
+      Swal.fire({
+        title: "Remove",
+        text: "Are you sure you want to permanently remove this ?",
+        showCancelButton: true,
+        cancelButtonText: "No",
+        imageUrl: "../../../assets/posts/deletePost.svg",
+        imageWidth: 70,
+        imageHeight: 70,
+        confirmButtonText: "Yes",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        backdrop: true,
+        customClass: {
+          confirmButton: "swal-btn swal-confirm bgPurple",
+          cancelButton: "swal-btn",
+          title: "swal-title purpleColor",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+      this.addLine = true
+      this.showAddLine = false;
+      this.showSaveCancel = false;
+     
+     
+        this.selectedVariation = '';
+      this.selectedQuantity = 0;
+      this.selectedPrice = 0
+      this.amount = 0;
+      this.shoppingCartTreeNodes.pop(); // Removes the last item
+      this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  this.addNewLinebtn = true
+
+    }
+  });
+    } else {
     Swal.fire({
       title: "Remove",
       text: "Are you sure you want to permanently remove this ?",
@@ -512,7 +554,7 @@ this.hideMainSpinner();
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
                   this.hideMainSpinner();
@@ -530,7 +572,7 @@ this.hideMainSpinner();
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
                   this.hideMainSpinner();
@@ -546,7 +588,7 @@ this.hideMainSpinner();
               .subscribe((res) => {
                 if (res)
                   this.notify.info("Successfully deleted.");
-                  this.onGeneratOrderReport(true,undefined,false,true);
+                  // this.onGeneratOrderReport(true,undefined,false,true);
                   this.getShoppingCartData();
                   rowNode.node.data.showEditQty = false;
                   this.hideMainSpinner();
@@ -559,7 +601,27 @@ this.hideMainSpinner();
       }
     });
   }
+}
   onEditQty(rowNode) {
+    console.log(rowNode,'rowNode')
+
+    if(rowNode.node.data.added) { 
+
+
+      this.selectedQuantity =     rowNode.node.data.updatedQty
+      this.updateAmount()
+    console.log(  rowNode.node.data.updatedQty,'  rowNode.node.data.updatedQt')
+    console.log(this.selectedQuantity,'this.selectedQuantity')
+    console.log( this.amount,' this.amount')
+    console.log(  rowNode.node.data.amount,'  rowNode.node.data.amount')
+
+      rowNode.node.data.amount =  this.amount
+      rowNode.node.data.qty =  this.selectedQuantity 
+      rowNode.node.data.showEditQty = false;
+
+    }else {
+
+    
     rowNode.node.data.invalidUpdatedQty = "";
     this.showMainSpinner();
 
@@ -574,7 +636,7 @@ this.hideMainSpinner();
           )
           .subscribe((res) => {
             if (res) this.notify.info("Successfully Updated.");
-            this.onGeneratOrderReport(true,undefined,false,true);
+            // this.onGeneratOrderReport(true,undefined,false,true);
             rowNode.node.data.showEditQty = false;
             this.getShoppingCartData();
             this.hideMainSpinner();
@@ -605,7 +667,7 @@ this.hideMainSpinner();
             )
             .subscribe((res) => {
               if (res) this.notify.info("Successfully Updated.");
-              this.onGeneratOrderReport(true,undefined,false,true);
+              // this.onGeneratOrderReport(true,undefined,false,true);
               this.getShoppingCartData();
               // rowNode.node.data.showEditQty = false;
               this.hideMainSpinner();
@@ -627,6 +689,7 @@ this.hideMainSpinner();
 
     }
   }
+}
   hide() {
     this.resetData();
     this.modal.hide();
@@ -674,7 +737,7 @@ this.hideMainSpinner();
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
-        this.onGeneratOrderReport(true,undefined,false,true);
+        // this.onGeneratOrderReport(true,undefined,false,true);
         this.hideMainSpinner();
         this.showTabs = true;
       });
@@ -756,7 +819,7 @@ this.hideMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
-            this.onGeneratOrderReport(true,undefined,true,true);
+            // this.onGeneratOrderReport(true,undefined,true,true);
             this.hideMainSpinner();
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
@@ -792,7 +855,11 @@ this.hideMainSpinner();
   sync(){
     this.showMainSpinner();
     this._AppTransactionServiceProxy.syncTransaction(this.orderId)
-      .pipe(finalize(() => this.hideMainSpinner()))
+      .pipe(finalize(() => {
+        this.hideMainSpinner()
+        this.getShoppingCartData();
+
+      } ))
       .subscribe((res) => {
         // if (res) {
         //   Swal.fire({
@@ -938,7 +1005,7 @@ this.hideMainSpinner();
     for (let i = 0; i < $event.tenantTransactionInfo?.length; i++) {
       printInfoParam.TransactionId = $event.tenantTransactionInfo[i].transactionId.toString();
       printInfoParam.tenantId =$event.tenantTransactionInfo[i].tenantId;
-      this.onGeneratOrderReport(true,printInfoParam,false,false);
+      // this.onGeneratOrderReport(true,printInfoParam,false,false);
     }
   }
   createReportViewer() {
@@ -968,27 +1035,86 @@ this.hideMainSpinner();
     }
 }
 addNewLine() {
-  console.log(this.newData,'newData')
-  
-    this.shoppingCartTreeNodes.push({
-      key: 'new-' + new Date().getTime(), // Unique key for the new node
-      data: {
-          manufacturerCode: this.newData?.value?.appItem?.manufacturerCode,
-          name: this.newData?.value?.appItem?.name,
-          qty: this.selectedQuantity,
-          price: this.newData?.value?.appItem?.price,
-          amount: this.amount,
-          image: this.newData?.value?.appItem?.imageUrl,
-      },
-      children: [], // No children, since this is a parent node,
-      leaf: true,  // Indicates it’s a parent and currently has no children
-      expanded: true // Ensure the new node is expanded
-  });
-  
+  console.log(this.newData, 'newData'); // Log new data for debugging
+
+  // Get the item data from the selected line (newData)
+  const appItem = this.newData?.value?.appItem;
+
+  // Initialize the new parent node without using itself within the definition
+  const newParentNode: any = {
+   
+    data: {}, // We’ll fill this data field after initializing the node
+    children: [], // Children will be added afterward
+    expanded: true // Expand the new node by default
+  };
+
+  // Fill the parent node's data to match the required structure
+  newParentNode.data = {
+    code: appItem?.code,
+    manufacturerCode: appItem?.manufacturerCode,
+    name: appItem?.name,
+    qty: this.selectedQuantity,
+    price: appItem?.price,
+    amount: this.selectedQuantity * appItem?.price,
+    image: appItem?.imageUrl,
+    parentId: 0, // Top-level node
+    // lineId: new Date().getTime(), // Unique identifier for lineId
+    colorId: 0,
+    colorCode: "", // Empty if not applicable
+    sizeId: 0,
+    sizeCode: "", // Empty if not applicable
+    editQty: true,
+    noOfPrePacks: 0,
+    prePackQty: 0,
+    added:true
+  };
+
+  // Define a child node that references the parent node's lineId
+  // const childNode = {
+  //   // key: 'new-child-' + new Date().getTime(), // Unique key for child
+  //   data: {
+  //     code: appItem?.code + '-child', // Custom code for the child
+  //     manufacturerCode: appItem?.manufacturerCode,
+  //     name: appItem?.name,
+  //     qty: this.selectedQuantity,
+  //     price: appItem?.price,
+  //     amount: this.selectedQuantity * appItem?.price,
+  //     image: appItem?.imageUrl,
+  //     parentId: newParentNode.data.lineId, // Link to parent
+  //     // lineId: new Date().getTime() + 1, // Unique lineId for child
+  //     colorId: 0,
+  //     colorCode: "", // Empty if not applicable
+  //     sizeId: 0,
+  //     sizeCode: "", // Empty if not applicable
+  //     editQty: true,
+  //     noOfPrePacks: 0,
+  //     prePackQty: 0
+  //   },
+  //   children: null // No further children for this level
+  // };
+
+  // Add the child node to the parent's children array
+  // newParentNode.children.push(childNode);
+
+  // Add the new parent node to the shopping cart tree
+  this.shoppingCartTreeNodes.push(newParentNode);
+
+  // Update the tree structure in the UI
   this.cdr.detectChanges();
   this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
-  
+  console.log(this.shoppingCartTreeNodes, 'Updated shopping cart tree nodes');
+
+  // Reset variables
+  this.showSaveCancel = false;
+  this.addLine = true
+  // this.selectedVariation = '';
+  // this.selectedQuantity = 0;
+  // this.selectedPrice = 0
+  // this.amount = 0;
+  // this.getSellerVariations()
+  this.addLine = false
 }
+
 getSellerVariations(skipCount: number = 0, maxResultCount: number = this.incrementCount) {
   this._AppTransactionServiceProxy.getAllSellerVariations(
       this.appTransactionsForViewDto?.sellerCompanySSIN,
@@ -1022,21 +1148,65 @@ loadMore(event: MouseEvent, dropdown: any) {
   }
 }
 onVariationSelect(event: any) {
-  // Update the selected price when a variation is selected
-  this.selectedQuantity = 0
-  this.selectedPrice = 0
-  if (event && event.value && event.value.appItem) {
-  this.newData = event
+  // Reset quantity and price when a new variation is selected  
+  console.log(event,'mmmmmmevv')
+  this.selectedQuantity = 0;
+  this.selectedPrice = 0;
+  this.newData = event;
 
-      this.selectedPrice = event.value.appItem.price;
-      this.updateAmount(); // Recalculate the amount when a new price is selected
+  if ( event.value.appItem.price) {
+    this.selectedPrice = event.value.appItem.price; // Ensure selectedPrice is a number
+    this.updateAmount(); // Recalculate the amount when a new price is selected
   }
 }
 
 updateAmount() {
   // Calculate the amount based on the quantity and selected price
-  const price = typeof this.selectedPrice === 'number' ? this.selectedPrice : parseFloat(this.selectedPrice);
-  this.amount = this.selectedQuantity * (price || 0);
+  this.amount = this.selectedQuantity * this.selectedPrice;
+}
+
+saveVariations() {
+  const body = new AddVariationToInputDto();
+
+  // Assign each property to the DTO object
+  body.variationSSIN = this.newData?.value?.appItem?.ssin;
+  body.qty = this.selectedQuantity;
+  body.price = this.selectedPrice;
+  body.transactionId = this.orderId;
+  body.transactionType = this.appTransactionsForViewDto?.transactionType;
+
+  this._AppTransactionServiceProxy.addVariationToTransaction(body)
+    .pipe(finalize(() =>  {
+        this.selectedVariation = '';
+  this.selectedQuantity = 0;
+  this.selectedPrice = 0
+  this.amount = 0;
+  this.hideMainSpinner()
+  this.getShoppingCartData();
+  this.showSaveCancel = false
+
+    }))
+    .subscribe((res) => {
+      console.log(this.displayedVariations, 'displayedVariations');
+      // Handle post-save logic here
+    });
+    this.addNewLinebtn = true
+}
+
+cancelAddLine() {
+  this.addLine = true
+  this.showAddLine = false;
+  this.showSaveCancel = false;
+ 
+  this.addNewLinebtn = true
+ 
+    this.selectedVariation = '';
+  this.selectedQuantity = 0;
+  this.selectedPrice = 0
+  this.amount = 0;
+  this.shoppingCartTreeNodes.pop(); // Removes the last item
+  this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
+  // Reset selections as needed
 }
 
 }

@@ -2,7 +2,7 @@ import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { AppTransactionServiceProxy, SycEntityObjectStatusesServiceProxy, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Paginator } from 'primeng/paginator';
-import { LazyLoadEvent, SelectItem } from 'primeng/api';
+import { LazyLoadEvent, SelectItem, SortEvent } from 'primeng/api';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { finalize } from 'rxjs';
@@ -53,6 +53,22 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     products:any
     selectedProduct: any;
     variationDetails: any[];
+    transactionTypeFilter = ''
+    transactionNameFilter = ''
+    variationCodeFilter = ''
+    minPriceFilter = ''
+    maxPriceFilter = ''
+    minAmountFilter = ''
+    maxAmountFilter = ''
+    totalRecords: number = 0;
+    page: number = 0; // current page number
+    rowsPerPage: number = 10; // rows per page, can be changed by user
+    // totalRecords: number = 0;
+    // loading: boolean = false;
+    // page: number = 0;
+    // rowsPerPage: number = 10;
+
+    filters: any;
 
     constructor(
         injector: Injector,
@@ -62,66 +78,57 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy
     ) {
         super(injector);
-        this.products = [
-            {
-                id: '1000',
-                code: 'f230fh0g3',
-                name: 'Bamboo Watch',
-                description: 'Product Description',
-                image: 'bamboo-watch.jpg',
-                price: 65,
-                category: 'Accessories',
-                quantity: 24,
-                inventoryStatus: 'INSTOCK',
-                rating: 5
-            },
-
-            {
-                id: '1000',
-                code: 'f230fh0g3',
-                name: 'Bamboo Watch',
-                description: 'Product Description',
-                image: 'bamboo-watch.jpg',
-                price: 65,
-                category: 'Accessories',
-                quantity: 24,
-                inventoryStatus: 'INSTOCK',
-                rating: 5
-            },
-            {
-                id: '1000',
-                code: 'f230fh0g3',
-                name: 'Bamboo Watch',
-                description: 'Product Description',
-                image: 'bamboo-watch.jpg',
-                price: 65,
-                category: 'Accessories',
-                quantity: 24,
-                inventoryStatus: 'INSTOCK',
-                rating: 5
-            },
-        ]
+  
     }
     ngOnInit(): void {
+        this.filters = {
+            variationCode: '',
+            transactionType: 1,
+            nameFilter: '',
+            transactionNumberFilter: '',
+            minPrice: null,
+            maxPrice: null,
+            minAmount: null,
+            maxAmount: null
+        };
         this.setPageMainFilters();
         this.initFilterForm();
         this.getVariationDetail()
         // this.getAppTransactions();
     }
-    initFilterForm() {
-        this.filterForm = this._formBuilder.group({
-            search: undefined,
-            sellerNameFilter: undefined,
-            buyerNameFilter: undefined,
-            codeFilter: undefined,
-            statusFilter: 0,
-            maxCreateDateFilter: undefined,
-            minCreateDateFilter: undefined,
-            maxCompleteDateFilter: undefined,
-            minCompleteDateFilter: undefined,
-            mainFilterType: this.defaultMainFilter,
+    initFilterForm() {  
 
-        });
+
+        if (this.showHeader) {
+            this.filterForm = this._formBuilder.group({
+                search: undefined,
+                sellerNameFilter: undefined,
+                buyerNameFilter: undefined,
+                codeFilter: undefined,
+                statusFilter: 0,
+                maxCreateDateFilter: undefined,
+                minCreateDateFilter: undefined,
+                maxCompleteDateFilter: undefined,
+                minCompleteDateFilter: undefined,
+                mainFilterType: this.defaultMainFilter,
+               
+    
+            });
+        } 
+         else {
+            this.filterForm = this._formBuilder.group({
+                search: undefined,
+                mainFilterType: this.defaultMainFilter,
+                transactionTypeFilter: undefined,
+                transactionNameFilter: undefined,
+                variationCodeFilter: undefined,
+                minPriceFilter: undefined,
+                maxPriceFilter : undefined,
+                minAmountFilter: undefined,
+                maxAmountFilter: undefined,
+    
+            });
+         }
 
         const selectedfilter = this.pageMainFilters.filter(
             (item) => this.defaultMainFilter.id == item.id
@@ -180,9 +187,10 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             filters.codeFilter, undefined,
             filters.mainFilterType?.id, filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
+            undefined,
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,undefined,
+            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
@@ -271,20 +279,49 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             });
     }
 
+    getVariationDetail(event?: { page?: number; rows?: number }) {
+        this.loading = true;
 
-    getVariationDetail(id?: number) {
-        // this.showMainSpinner();
+        // Update pagination if pagination event passed
+        if (event) {
+            this.page = event.page ?? this.page;
+            this.rowsPerPage = event.rows ?? this.rowsPerPage;
+        }
+
+        const skipCount = this.page * this.rowsPerPage;
+
         this._appTransactionServiceProxy
-            .getAppTransactionVariationsDetail(419479)
-            .pipe(finalize(() => {
-                // this.hideMainSpinner()
-            }))
-            .subscribe((res: any) => {
-                this.variationDetails = res
-                console.log(res,'detaiiils')
-             
-            });
+        .getllTransactionVariationsDetail(
+          this.filters.variationCode, 
+          0, 
+          this.filters.nameFilter, 
+          this.filters.transactionNumberFilter, 
+          this.filters.minPrice, 
+          this.filters.maxPrice, 
+          this.filters.minAmount, 
+          this.filters.maxAmount, 
+          null,  // Sorting
+          skipCount,
+          this.rowsPerPage
+        )
+        .pipe(finalize(() => {
+          this.loading = false;
+        }))
+        .subscribe(
+          (result: any) => {
+            this.variationDetails = result.items;
+            this.totalRecords = result.totalCount;
+          },
+          (error) => {
+            console.error('API Request Failed:', error);
+            this.loading = false;
+          }
+        );
     }
+// Bind to sorting event
+onDetailTableSort(event: SortEvent) {
+    this.getVariationDetail(); // Call variation detail with sorting
+}
 
 
     closeModal($event) {

@@ -24605,15 +24605,49 @@ export class AppTransactionServiceProxy {
     }
 
     /**
-     * @param transactionId (optional) 
+     * @param variationCodeFilter (optional) 
+     * @param transactionTypeFilter (optional) 
+     * @param nameFilter (optional) 
+     * @param transactionNumberFilter (optional) 
+     * @param minPrice (optional) 
+     * @param maxPrice (optional) 
+     * @param minAmount (optional) 
+     * @param maxAmount (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppTransactionVariationsDetail(transactionId: number | undefined): Observable<DataView[]> {
-        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAppTransactionVariationsDetail?";
-        if (transactionId === null)
-            throw new Error("The parameter 'transactionId' cannot be null.");
-        else if (transactionId !== undefined)
-            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+    getllTransactionVariationsDetail(variationCodeFilter: string | null | undefined, transactionTypeFilter: TransactionType | undefined, nameFilter: string | null | undefined, transactionNumberFilter: string | null | undefined, minPrice: number | null | undefined, maxPrice: number | null | undefined, minAmount: number | null | undefined, maxAmount: number | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTransactionDetailView> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetllTransactionVariationsDetail?";
+        if (variationCodeFilter !== undefined && variationCodeFilter !== null)
+            url_ += "VariationCodeFilter=" + encodeURIComponent("" + variationCodeFilter) + "&";
+        if (transactionTypeFilter === null)
+            throw new Error("The parameter 'transactionTypeFilter' cannot be null.");
+        else if (transactionTypeFilter !== undefined)
+            url_ += "TransactionTypeFilter=" + encodeURIComponent("" + transactionTypeFilter) + "&";
+        if (nameFilter !== undefined && nameFilter !== null)
+            url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
+        if (transactionNumberFilter !== undefined && transactionNumberFilter !== null)
+            url_ += "TransactionNumberFilter=" + encodeURIComponent("" + transactionNumberFilter) + "&";
+        if (minPrice !== undefined && minPrice !== null)
+            url_ += "MinPrice=" + encodeURIComponent("" + minPrice) + "&";
+        if (maxPrice !== undefined && maxPrice !== null)
+            url_ += "MaxPrice=" + encodeURIComponent("" + maxPrice) + "&";
+        if (minAmount !== undefined && minAmount !== null)
+            url_ += "MinAmount=" + encodeURIComponent("" + minAmount) + "&";
+        if (maxAmount !== undefined && maxAmount !== null)
+            url_ += "MaxAmount=" + encodeURIComponent("" + maxAmount) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -24625,20 +24659,20 @@ export class AppTransactionServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAppTransactionVariationsDetail(response_);
+            return this.processGetllTransactionVariationsDetail(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetAppTransactionVariationsDetail(response_ as any);
+                    return this.processGetllTransactionVariationsDetail(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<DataView[]>;
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfTransactionDetailView>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<DataView[]>;
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfTransactionDetailView>;
         }));
     }
 
-    protected processGetAppTransactionVariationsDetail(response: HttpResponseBase): Observable<DataView[]> {
+    protected processGetllTransactionVariationsDetail(response: HttpResponseBase): Observable<PagedResultDtoOfTransactionDetailView> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -24649,14 +24683,7 @@ export class AppTransactionServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(DataView.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
+            result200 = PagedResultDtoOfTransactionDetailView.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -24904,6 +24931,63 @@ export class AppTransactionServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = PagedResultDtoOfGetAppMarketItemForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    addVariationToTransaction(body: AddVariationToInputDto | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/AddVariationToTransaction";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddVariationToTransaction(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddVariationToTransaction(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processAddVariationToTransaction(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -81882,6 +81966,218 @@ export class ShareTransactionByMessageResultDto implements IShareTransactionByMe
 export interface IShareTransactionByMessageResultDto {
     result: boolean;
     tenantTransactionInfos: TenantTransactionInfo[] | undefined;
+
+    [key: string]: any;
+}
+
+export class TransactionDetailView implements ITransactionDetailView {
+    transactionType!: TransactionType;
+    transactionNumber!: string | undefined;
+    code!: string | undefined;
+    manufacturerCode!: string | undefined;
+    name!: string | undefined;
+    qty!: number;
+    price!: number;
+    amount!: number;
+    image!: string | undefined;
+    parentId!: number;
+    lineNo!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ITransactionDetailView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.transactionType = _data["transactionType"];
+            this.transactionNumber = _data["transactionNumber"];
+            this.code = _data["code"];
+            this.manufacturerCode = _data["manufacturerCode"];
+            this.name = _data["name"];
+            this.qty = _data["qty"];
+            this.price = _data["price"];
+            this.amount = _data["amount"];
+            this.image = _data["image"];
+            this.parentId = _data["parentId"];
+            this.lineNo = _data["lineNo"];
+        }
+    }
+
+    static fromJS(data: any): TransactionDetailView {
+        data = typeof data === 'object' ? data : {};
+        let result = new TransactionDetailView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["transactionType"] = this.transactionType;
+        data["transactionNumber"] = this.transactionNumber;
+        data["code"] = this.code;
+        data["manufacturerCode"] = this.manufacturerCode;
+        data["name"] = this.name;
+        data["qty"] = this.qty;
+        data["price"] = this.price;
+        data["amount"] = this.amount;
+        data["image"] = this.image;
+        data["parentId"] = this.parentId;
+        data["lineNo"] = this.lineNo;
+        return data;
+    }
+}
+
+export interface ITransactionDetailView {
+    transactionType: TransactionType;
+    transactionNumber: string | undefined;
+    code: string | undefined;
+    manufacturerCode: string | undefined;
+    name: string | undefined;
+    qty: number;
+    price: number;
+    amount: number;
+    image: string | undefined;
+    parentId: number;
+    lineNo: number;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfTransactionDetailView implements IPagedResultDtoOfTransactionDetailView {
+    totalCount!: number;
+    items!: TransactionDetailView[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfTransactionDetailView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(TransactionDetailView.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfTransactionDetailView {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfTransactionDetailView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfTransactionDetailView {
+    totalCount: number;
+    items: TransactionDetailView[] | undefined;
+
+    [key: string]: any;
+}
+
+export class AddVariationToInputDto implements IAddVariationToInputDto {
+    variationSSIN!: string | undefined;
+    qty!: number;
+    price!: number;
+    transactionId!: number;
+    transactionType!: TransactionType;
+
+    [key: string]: any;
+
+    constructor(data?: IAddVariationToInputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.variationSSIN = _data["variationSSIN"];
+            this.qty = _data["qty"];
+            this.price = _data["price"];
+            this.transactionId = _data["transactionId"];
+            this.transactionType = _data["transactionType"];
+        }
+    }
+
+    static fromJS(data: any): AddVariationToInputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddVariationToInputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["variationSSIN"] = this.variationSSIN;
+        data["qty"] = this.qty;
+        data["price"] = this.price;
+        data["transactionId"] = this.transactionId;
+        data["transactionType"] = this.transactionType;
+        return data;
+    }
+}
+
+export interface IAddVariationToInputDto {
+    variationSSIN: string | undefined;
+    qty: number;
+    price: number;
+    transactionId: number;
+    transactionType: TransactionType;
 
     [key: string]: any;
 }

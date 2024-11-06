@@ -76,9 +76,7 @@
                                     </div>
                                 </div>
                                 <div class="col-4"></div>
-                                <!-- <div class="list-toolbar-divider" *ngIf="showAddButton"></div> -->
-                          
-                                <!-- <div class="list-toolbar-divider"></div> -->
+                           
 <div class="col-md-4 col-12 d-flex justify-content-md-end justify-content-start">
                                 <div class="text-center mr-2">
                                     <a style="
@@ -117,11 +115,14 @@
                                 </div>
                             </div>
                         </div>
-                            <div class="row " [hidden]="!advancedFiltersAreShown">
+                            <div class="row " [hidden]="!advancedFiltersAreShown"    >
                                 <div class="col-md-12">
                                     <div class="kt-separator kt-separator--border-dashed"></div>
                                 </div>
+                                 <div [ngClass]="showHeader ? 'd-block' : 'd-none' ">
 
+
+                              
                                 <div class="row w-100 pl-3 pt-3">
                                     <div class="col-md-3 mr-5">
                                         <div class="form-group">
@@ -150,8 +151,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
 
                                 <div class="row w-100 pl-3 pt-3">
                                     <div class="col-md-3 mr-5">
@@ -199,7 +198,80 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
+
+
+                            <div [ngClass]="showDetails ? 'd-block' : 'd-none' ">
+
+
+                              
+                                <div class="row w-100 pl-3 pt-3">
+                                    <div class="col-md-3 mr-5">
+                                        <div class="form-group">
+                                            <label for="transactionTypeFilter">{{l("TransactionType")}}</label>
+                                            <input type="text" class="form-control" id="transactionTypeFilter"
+                                                formControlName="transactionTypeFilter" [(ngModel)]="transactionTypeFilter"
+                                                (keyup)="getVariationDetail()">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mr-5">
+                                        <div class="form-group">
+                                            <label for="transactionNameFilter">{{l("TransactionNumber")}}</label>
+                                            <input type="text" class="form-control" id="transactionNameFilter"
+                                                formControlName="transactionNameFilter" [(ngModel)]="transactionNameFilter"
+                                                (keyup)="getVariationDetail()">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="variationCodeFilter">{{l("Variation Code")}}</label>
+                                            <input type="text" class="form-control" id="variationCodeFilter"
+                                                formControlName="variationCodeFilter" [(ngModel)]="variationCodeFilter"
+                                                (keyup)="getVariationDetail()">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row w-100 pl-3 pt-3">
+                                    <div class="col-md-3 mr-5">
+                                        <div class="form-group">
+                                            <label for="MinPriceFilter">{{l("PriceRange")}}</label>
+                                            <div class="input-group">
+                                                <input class="form-control m-input" id="minPriceFilter"
+                                                    formControlName="minPriceFilter" type="number" 
+                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minPriceFilter"
+                                                    (focusout)="getVariationDetail()">
+                                                <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
+                                                <input class="form-control m-input" id="maxPriceFilter" type="text" 
+                                                    formControlName="maxPriceFilter" 
+                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxPriceFilter"
+                                                    (focusout)="getVariationDetail()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="MinAmountFilter">{{l("AmountRange")}}</label>
+                                            <div class="input-group">
+                                                <input class="form-control m-input" id="minAmountFilter"
+                                                    formControlName="minAmountFilter" type="text" 
+                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minAmountFilter"
+                                                    (focusout)="getVariationDetail()">
+                                                <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
+                                                <input class="form-control m-input" id="maxAmountFilter"
+                                                    formControlName="maxAmountFilter" type="text" 
+                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxAmountFilter"
+                                                    (focusout)="getVariationDetail()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                       
+                            </div>
                             </div>
 
                             <div class="row mb-2 ">
@@ -231,19 +303,7 @@
                     </form>
 
                     <div  class="row align-items-center pt-5  mt-4" [ngClass]="showHeader ? 'd-block' : 'd-none' ">
-                        <!--<Primeng-Datatable-Start>-->
-
-
-                        <!--  [lazy]="true" 
-                            (onLazyLoad)="getAppTransactions($event)" 
-                        [globalFilterFields]="['sellerName',
-                            'buyerName',
-                            'entityObjectTypeCode',
-                            'code',
-                            'entityObjectStatusCode',
-                            'creationTime',
-                            'completeDate']"
-                        -->
+                      
                         <div class="primeng-datatable-container col-12" [busyIf]="primengTableHelper.isLoading">
                             <p-table #dataTable [value]="primengTableHelper.records" [lazy]="true"
                                 (onLazyLoad)="getAppTransactions($event)" [loading]="loading"
@@ -446,12 +506,22 @@
                         <!--<Primeng-Datatable-End>-->
                     </div>   
 
-                    <div class="row align-items-center pt-5  mt-4 detailTab" [ngClass]="showDetails ? 'd-block' : 'd-none' " >
-                        <p-table [value]="variationDetails"  dataKey="code" [tableStyle]="{'min-width': '50rem'}">
+                    <div class="row align-items-center pt-5 mt-4 detailTab" [ngClass]="showDetails ? 'd-block' : 'd-none'">
+                        <p-table
+                          
+                            [value]="variationDetails"
+                            [paginator]="true"
+                            [scrollable]="true"
+                            responsiveLayout="stack"
+                            [breakpoint]="'960px'"
+                            [tableStyle]="{'min-width': '50rem'}"
+                            selectionMode="single"
+                            [lazy]="true"
+                            [loading]="loading">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th>     {{l('TransactionType')}}</th>
-                                    <th>  {{l('Transaction #')}}</th>
+                                    <th>{{l('TransactionType')}}</th>
+                                    <th>{{l('Transaction #')}}</th>
                                     <th>Image</th>
                                     <th>Variation Code</th>
                                     <th>Name</th>
@@ -462,18 +532,36 @@
                             </ng-template>
                             <ng-template pTemplate="body" let-product>
                                 <tr [pSelectableRow]="product">
-                                    <td>{{product.code}}</td>
-                                    <td>{{product.name}}</td>
-                                    <td> <img [src]=" product.image" alt="" srcset="" class="itemImg"      onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
-                                    <td>{{product.code}}</td>
-                                    <td>{{product.name}}</td>
-                                    <td>{{product.qty}}</td>
-                                    <td>{{product.price}}</td>
-                                    <td>{{product.amount}}</td>
+                                    <td>{{ product?.appItem?.transactionType }}</td>
+                                    <td>{{ product.id }}</td>
+                                    <td><img [src]="product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
+                                    <td>{{ product?.appItem?.code }}</td>
+                                    <td>{{ product.name }}</td>
+                                    <td>{{ product.qty }}</td>
+                                    <td>{{ product.price }}</td>
+                                    <td>{{ product.amount }}</td>
                                 </tr>
                             </ng-template>
                         </p-table>
+                    
+                        <!-- No Data Message -->
+                        <div class="primeng-no-data" *ngIf="!loading && totalRecords === 0">
+                            {{ l('NoData') }}
+                        </div>
+                    
+                        <!-- Paginator -->
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="rowsPerPage"
+                                         [totalRecords]="totalRecords"
+                                         (onPageChange)="getVariationDetail($event)"
+                                         [rowsPerPageOptions]="[10, 20, 50]">
+                            </p-paginator>
+                            <span class="total-records-count">
+                                {{ l('TotalRecordsCount', totalRecords) }}
+                            </span>
+                        </div>
                     </div>
+                    
                     <div>
                         
 
