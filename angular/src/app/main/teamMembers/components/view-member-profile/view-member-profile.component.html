@@ -115,7 +115,7 @@
                             <p class="text-left " style="color: #595959;">{{memberData?.contact?.languageName}}</p>
                         </div>
                         <hr class="header">
-                        <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
+                        <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3 d-flex flex-row">
                             <h6 class="text-right font-weight-bold mr-3 " >  <img src="../../assets/img/input_icons/location.png" class=""> {{ ( "Branch" | localize ) + " :" }}</h6>
                             <p class="text-left old_editBranch"  style="color: #595959;" [class.hide]="NoteditInfo" *ngIf="memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName">
                                 <span *ngIf="memberData?.branchName">
@@ -140,7 +140,13 @@
                                     {{ memberData?.countryName  }}
                                 </span>
                             </p>
-                            <input type="text" style="color: #595959 !important;" class="editBranch form-control form-control-sm aria-input-text" [(ngModel)]="editBranchValue"  [placeholder]="'PleaseSelectBranch' | localize "  [class.hide]="editInfo">
+                            <div [class.hide]="editInfo">
+                            <input type="text" style="color: #595959 !important;  width: 500px;" class="editBranch form-control form-control-sm aria-input-text" [(ngModel)]="editBranchValue"  disabled [placeholder]="'PleaseSelectBranch' | localize ">
+                                <a (click)="selectBranch()">
+                                    {{ ( editBranchValue ? 'Change' : 'Choose' ) | localize }}
+                                </a>
+                            </div>
+                            
                         </div>
                         <hr class="header" *ngIf="memberData?.contact?.phone1IsPublic">
                         <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"  *ngIf="memberData?.contact?.phone1IsPublic">
@@ -182,6 +188,13 @@
                 </div>
             </div>
         </div>
-
     </div>
+    <createOrEditUserModal #createOrEditUserModal></createOrEditUserModal>
 </div>
+
+
+<selectBranchModal
+    #selectBranchModal
+    (branchSelected)="branchSelected($event)"
+    (branchSelectionCanceled)="branchSelectionCanceled()"
+></selectBranchModal>

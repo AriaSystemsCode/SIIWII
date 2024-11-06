@@ -98,7 +98,8 @@ export class MembersListComponent extends AppComponentBase {
             )
             .subscribe((status) => {
                 if (status) {
-                    this.getMembers({ rows: this.primengTableHelper.defaultRecordsCountPerPage })
+                   // this.getMembers({ rows: this.primengTableHelper.defaultRecordsCountPerPage })
+                   this.getMembers();
                 }
             })
         this.subscriptions.push(subs)
@@ -139,8 +140,12 @@ export class MembersListComponent extends AppComponentBase {
             return;
         }
 
+        event.first = event.first ?? 0;
+        event.rows = event.rows ?? this.primengTableHelper.defaultRecordsCountPerPage;
+        if (!this.primengTableHelper.predefinedRecordsCountPerPage.length) {
+            this.primengTableHelper.predefinedRecordsCountPerPage = [10, 20, 50, 100];
+        }
         
-
         const filters = this.filterForm.value
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner()
@@ -150,8 +155,8 @@ export class MembersListComponent extends AppComponentBase {
             this.accountId,
             filters?.mainFilterType?.value ,
             filters?.sorting?.value || undefined,
-            this.primengTableHelper.getSkipCount(this.paginator, event) || 0,
-            this.primengTableHelper.getMaxResultCount(this.paginator, event) || this.primengTableHelper.defaultRecordsCountPerPage
+        this.primengTableHelper.getSkipCount(this.paginator, event),
+        this.primengTableHelper.getMaxResultCount(this.paginator, event)
         )
         .pipe(finalize(() => {
             if (!this.active) this.active = true
@@ -163,6 +168,7 @@ export class MembersListComponent extends AppComponentBase {
             this.members = result.items
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
+            this.paginator.totalRecords = result.totalCount || 0;
         });
         this.subscriptions.push(subs)
     }

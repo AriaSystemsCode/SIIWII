@@ -14,6 +14,7 @@ import { ViewMemberProfileComponent } from './components/view-member-profile/vie
 import { SelectBranchModule } from '@app/select-branch/select-branch.module';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { CalendarModule } from 'primeng/calendar';
+import { AdminModule } from '@app/admin/admin.module';
 
 @NgModule({
     declarations: [
@@ -32,7 +33,7 @@ import { CalendarModule } from 'primeng/calendar';
         FormsModule,
         BsDatepickerModule.forRoot(),
         SelectBranchModule,
-        CalendarModule
+        CalendarModule,AdminModule 
     ],
     exports: [
         CreateOrEditMemberComponent,

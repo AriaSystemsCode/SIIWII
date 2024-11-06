@@ -331,8 +331,13 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         // this._publishAccountService._accountId = this.accountData.id;
         // this._publishAccountService.screen = 1
         debugger
-        this._AccountsServiceProxy.publishProfile(false).subscribe((response) => {
-            this.notify.info(this.l('ProfilePublishedSuccessfully'));
+        this.showMainSpinner();
+        this._AccountsServiceProxy.publishProfile(false)
+        .pipe(
+            finalize(() => this.hideMainSpinner()
+            ))
+        .subscribe((response) => {
+            this.notify.info(this.l('Profile Published Successfully'));
             this.connectionCount == 0 ? this.showPrivate = false : this.showHide = false
                 this.hidUshare = true;
                 this.hideshowShare=true;
@@ -345,20 +350,27 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         //I40-syncAccount
         debugger
         //this.btnLoader = true;
-        this._AccountsServiceProxy.publishProfile(true).subscribe(
+        this.showMainSpinner();
+        this._AccountsServiceProxy.publishProfile(true).pipe(
+            finalize(() => this.hideMainSpinner()
+            )).subscribe(
             (response) => {
                 this.notify.success(this.l("Account sync Successfully"));
             });
         this.showIsSync = false;
+        this.isSync=false;
 
     }
     showShare = true;
     hideshowShare=false;
     UnShareAccount() {
         debugger
-        this._AccountsServiceProxy.unPublishProfile().subscribe(
+        this.showMainSpinner();
+        this._AccountsServiceProxy.unPublishProfile().pipe(
+            finalize(() => this.hideMainSpinner()
+            )).subscribe(
             (response) => {
-                this.notify.info(this.l('ProfileUnPublishedSuccessfully'));
+                this.notify.info(this.l('Profile UnPublished Successfully'));
                 this.showShare = false;
                 this.hidUshare = true;
                 this.hideshowShare=true;
