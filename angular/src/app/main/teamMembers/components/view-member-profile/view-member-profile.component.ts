@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input } from '@angular/core';
-import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -137,7 +137,12 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     }
     CreateUserName() {
-       // this.createOrEditUserModal.show(this.memberData)
+       this.createOrEditUserModal.user = new UserEditDto();
+       this.createOrEditUserModal.user.name= this.memberData?.contact?.firstName;
+       this.createOrEditUserModal.user.surname=this.memberData?.contact?.lastName;
+       this.createOrEditUserModal.user.emailAddress= this.memberData?.contact?.eMailAddress;
+       this.createOrEditUserModal.user.phoneNumber=this.memberData?.contact?.phone1Number;
+       this.createOrEditUserModal.fromTeamMember=true;
        this.createOrEditUserModal.show()
     }
     editjobTitleValue: string = '';
