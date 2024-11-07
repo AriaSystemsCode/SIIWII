@@ -787,12 +787,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
                         sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
-                        completeDate: moment.utc(new Date(this.orderForm.controls['completeDate']?.value).toISOString()),
-                        enteredDate: moment.utc(new Date(this.orderForm.controls['enteredDate']?.value).toISOString()) ,
-                    
-                      startDate: moment.utc(new Date(this.orderForm.controls['startDate']?.value).toISOString()) ,
-                    
-                      availableDate: moment.utc(new Date(this.orderForm.controls['availableDate']?.value).toISOString()) ,
+                        completeDate: moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
+enteredDate: moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
+startDate: moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
+availableDate: moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
+
                     
 
                         reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : ""
@@ -899,96 +898,49 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
 
-    changeEnteredDate(date){
-
-        const newDate = new Date();
-
+    changeEnteredDate(date) {
+        let day = date?.value?.getDate();
         let month = date?.value?.getMonth();
         let year = date?.value?.getFullYear();
-        let day = date?.value?.getDate();
-
-        let monthVal = (month === 11) ? 0 : month + 1;
-        let yearVal = (monthVal === 0) ? year + 1 : year;
-        this.minDate = newDate;
-        this.minDate.setDate(day);
-        this.minDate.setMonth(monthVal);
-        this.minDate.setFullYear(yearVal);
-
-        
     
-
-
-
-
-
+        // Use local time
+        this.minDate = new Date(year, month, day);
         this.minSEnteredDate = this.orderForm.get('enteredDate')?.value;
-       this.orderForm.controls['startDate'].setValue(this.orderForm.get('enteredDate')?.value);
-
-    
-    //    const selectedStartDate = new Date(startDateControl.value);
-    //    if (selectedStartDate < this.today) {
-    //      this.startDateMsg = true
-    //      startDateControl.setErrors({ minDate: true });
-    //    } else {
-
-    //     this.startDateMsg = false
-    //      startDateControl.setErrors(null); 
-    //    }
-
-
-
-
-    //    const selectedavailableDate = new Date(availableDateControl.value);
-    //    if (selectedavailableDate < selectedCompliteDate) {
-    //      this.avalabletDateMsg = true
-    //      availableDateControl.setErrors({ minDate: true });
-    //    } else {
-
-    //     this.avalabletDateMsg = false
-    //     availableDateControl.setErrors(null); 
-    //    }
-
-       
+        this.orderForm.controls['startDate'].setValue(this.orderForm.get('enteredDate')?.value);
     }
-
+    
     changeCompleteDate(event) {
-        const newDate = event.value;
+        const newDate = new Date(event.value);
     
         this.orderForm.controls['availableDate'].setValue(newDate);
-        this.minCompleteDate = newDate;
+        this.minCompleteDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
         this.minStartDate = this.orderForm.get('startDate')?.value;
-
-        // Check if the new date is different from the current value to prevent infinite loops
-        if (newDate?.getTime() !== this.orderForm.controls['completeDate']?.value?.getTime()) 
+    
+        if (newDate?.getTime() !== this.orderForm.controls['completeDate']?.value?.getTime()) {
             this.orderForm.controls['completeDate'].setValue(newDate);
-
-        const selectedCompliteDate = new Date(this.orderForm.controls['completeDate']?.value);
-        if (selectedCompliteDate < this.orderForm.get('startDate')?.value) {
-          this.comtDateMsg = true
-          this.orderForm.controls['completeDate']?.setErrors({ minDate: true });
-        } else {
- 
-         this.comtDateMsg = false
-         this.orderForm.controls['completeDate']?.setErrors(null); 
         }
-        
+    
+        const selectedCompleteDate = new Date(this.orderForm.controls['completeDate']?.value);
+        if (selectedCompleteDate < this.orderForm.get('startDate')?.value) {
+            this.comtDateMsg = true;
+            this.orderForm.controls['completeDate']?.setErrors({ minDate: true });
+        } else {
+            this.comtDateMsg = false;
+            this.orderForm.controls['completeDate']?.setErrors(null);
+        }
     }
-
-
+    
     changeAvailbeDate(event) {
-        const selectedavailableDate = new Date(this.orderForm.controls['availableDate']?.value);
-        if (selectedavailableDate < this.orderForm.get('completeDate')?.value) {
-            this.avalabletDateMsg = true
-          this.orderForm.controls['availableDate']?.setErrors({ minDate: true });
+        const selectedAvailableDate = new Date(this.orderForm.controls['availableDate']?.value);
+        if (selectedAvailableDate < this.orderForm.get('completeDate')?.value) {
+            this.avalabletDateMsg = true;
+            this.orderForm.controls['availableDate']?.setErrors({ minDate: true });
         } else {
- 
-         this.avalabletDateMsg = false
-         this.orderForm.controls['availableDate']?.setErrors(null); 
+            this.avalabletDateMsg = false;
+            this.orderForm.controls['availableDate']?.setErrors(null);
         }
-
-     
     }
-
+    
 
    
 
