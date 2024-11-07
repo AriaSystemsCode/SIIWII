@@ -14,11 +14,6 @@ RUN npm install -g @angular/cli
 {
   "name": "SIIWII-DEV",
   "dockerFile": "Dockerfile",
-  "forwardPorts": [5000, 5001]
-}
-{
-  "name": "Your Codespace Name",
-  "dockerFile": "Dockerfile",
   "forwardPorts": [5000, 5001],
   "extensions": ["ms-dotnettools.csharp", "angular.ng-template"]
 }
