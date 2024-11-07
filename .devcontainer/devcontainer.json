@@ -1,1 +1,25 @@
+{
+  "name": "Your Codespace Name",
+  "image": "mcr.microsoft.com/vscode/devcontainers/dotnetcore:0-3.1",
+  "forwardPorts": [5000, 5001]
+}
+# Start from the dotnetcore image
+FROM mcr.microsoft.com/vscode/devcontainers/dotnetcore:0-3.1
+
+# Install Node.js
+RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && nvm install lts/* 2>&1"
+
+# Install Angular CLI
+RUN npm install -g @angular/cli
+{
+  "name": "SIIWII-DEV",
+  "dockerFile": "Dockerfile",
+  "forwardPorts": [5000, 5001]
+}
+{
+  "name": "Your Codespace Name",
+  "dockerFile": "Dockerfile",
+  "forwardPorts": [5000, 5001],
+  "extensions": ["ms-dotnettools.csharp", "angular.ng-template"]
+}
 
