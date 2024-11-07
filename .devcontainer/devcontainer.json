@@ -1,5 +1,5 @@
 {
-    "name": ".NET in Codespaces",
+    "name": "SIIWII-DEV-POC-v2",
     "image": "mcr.microsoft.com/dotnet/sdk:8.0",
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {},
@@ -54,4 +54,16 @@
             "onAutoForward": "notify"
         }
     }
+}
+{
+  "name": "SIIWII-DEV-POC-v2",
+  "extensions": [
+    "ms-dotnettools.vscode-dotnet-runtime",
+    "nrwl.angular-console",
+    "ms-vscode.node-debug2"
+  ],
+  "settings": {
+    "editor.tabSize": 2,
+    "terminal.integrated.shell.linux": "/bin/bash"
+  }
 }
