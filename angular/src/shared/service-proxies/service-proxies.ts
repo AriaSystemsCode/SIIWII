@@ -22555,12 +22555,13 @@ export class AppTransactionServiceProxy {
      * @param buyerSSIN (optional) 
      * @param statusId (optional) 
      * @param fromExport (optional) 
+     * @param hasParentItems (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllAppTransactionsForViewDto> {
+    getAll(withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAllAppTransactionsForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAll?";
         if (withDetails === null)
             throw new Error("The parameter 'withDetails' cannot be null.");
@@ -22602,6 +22603,10 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'fromExport' cannot be null.");
         else if (fromExport !== undefined)
             url_ += "fromExport=" + encodeURIComponent("" + fromExport) + "&";
+        if (hasParentItems === null)
+            throw new Error("The parameter 'hasParentItems' cannot be null.");
+        else if (hasParentItems !== undefined)
+            url_ += "hasParentItems=" + encodeURIComponent("" + hasParentItems) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -23882,13 +23887,14 @@ export class AppTransactionServiceProxy {
      * @param buyerSSIN (optional) 
      * @param statusId (optional) 
      * @param fromExport (optional) 
+     * @param hasParentItems (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @param position (optional) 
      * @return Success
      */
-    getAppTransactionsForView(transactionId: number | undefined, withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, position: TransactionPosition | undefined): Observable<GetAppTransactionsForViewDto> {
+    getAppTransactionsForView(transactionId: number | undefined, withDetails: boolean | undefined, since_Id: number | undefined, filter: string | null | undefined, codeFilter: string | null | undefined, descriptionFilter: string | null | undefined, entityTypeIdFilter: number | null | undefined, fromCreationDateFilter: moment.Moment | null | undefined, toCreationDateFilter: moment.Moment | null | undefined, fromCompleteDateFilter: moment.Moment | null | undefined, toCompleteDateFilter: moment.Moment | null | undefined, sellerName: string | null | undefined, sellerSSIN: string | null | undefined, buyerName: string | null | undefined, buyerSSIN: string | null | undefined, statusId: number | undefined, fromExport: boolean | undefined, hasParentItems: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, position: TransactionPosition | undefined): Observable<GetAppTransactionsForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAppTransactionsForView?";
         if (transactionId === null)
             throw new Error("The parameter 'transactionId' cannot be null.");
@@ -23934,6 +23940,10 @@ export class AppTransactionServiceProxy {
             throw new Error("The parameter 'fromExport' cannot be null.");
         else if (fromExport !== undefined)
             url_ += "fromExport=" + encodeURIComponent("" + fromExport) + "&";
+        if (hasParentItems === null)
+            throw new Error("The parameter 'hasParentItems' cannot be null.");
+        else if (hasParentItems !== undefined)
+            url_ += "hasParentItems=" + encodeURIComponent("" + hasParentItems) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -79588,6 +79598,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
     buyerSSIN!: string | undefined;
     statusId!: number;
     fromExport!: boolean;
+    hasParentItems!: boolean;
     sorting!: string | undefined;
     skipCount!: number;
     maxResultCount!: number;
@@ -79625,6 +79636,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
             this.buyerSSIN = _data["buyerSSIN"];
             this.statusId = _data["statusId"];
             this.fromExport = _data["fromExport"];
+            this.hasParentItems = _data["hasParentItems"];
             this.sorting = _data["sorting"];
             this.skipCount = _data["skipCount"];
             this.maxResultCount = _data["maxResultCount"];
@@ -79660,6 +79672,7 @@ export class GetAllAppTransactionsInputDto implements IGetAllAppTransactionsInpu
         data["buyerSSIN"] = this.buyerSSIN;
         data["statusId"] = this.statusId;
         data["fromExport"] = this.fromExport;
+        data["hasParentItems"] = this.hasParentItems;
         data["sorting"] = this.sorting;
         data["skipCount"] = this.skipCount;
         data["maxResultCount"] = this.maxResultCount;
@@ -79684,6 +79697,7 @@ export interface IGetAllAppTransactionsInputDto {
     buyerSSIN: string | undefined;
     statusId: number;
     fromExport: boolean;
+    hasParentItems: boolean;
     sorting: string | undefined;
     skipCount: number;
     maxResultCount: number;
