@@ -55,15 +55,6 @@
         }
     }
 }
-{
-  "name": "SIIWII-DEV-POC-v2",
-  "extensions": [
-    "ms-dotnettools.vscode-dotnet-runtime",
-    "nrwl.angular-console",
-    "ms-vscode.node-debug2"
-  ],
-  "settings": {
-    "editor.tabSize": 2,
-    "terminal.integrated.shell.linux": "/bin/bash"
-  }
-}
+nvm install 16.13
+npm install -g @angular/cli
+ng serve
