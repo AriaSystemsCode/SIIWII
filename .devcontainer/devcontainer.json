@@ -1,9 +1,0 @@
-{
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {
-  }
-}
-#Node.js 
-nvm install 18.1
-#Angular
-npm install -g @angular/cli
