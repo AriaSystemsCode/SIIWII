@@ -16,6 +16,8 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     loadingError: boolean = false;
     showReport: boolean = false;
     visible: boolean = false;
+    SuccessMsg: boolean = false;
+    showbar: boolean = true;
     constructor(
         injector: Injector,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -45,9 +47,17 @@ this.showMainSpinner()
             await this.delay(10000);
             this._AppTransactionServiceProxy.getTransactionOrderConfirmation(this.orderId)
                 .pipe(finalize(() => {
-                    this.showReport = true;
-                    this.visible = false
+                    // this.visible = false
+                    this.SuccessMsg = true
+                    if( this.SuccessMsg) {
+                    this.showbar = false;
+                      
+                    //    this.loadPdf()
+       
+                    }
                     this.hideMainSpinner()
+                    this.showReport = true
+                     
                 }))
                 .subscribe(async (res) => {
                     try {
@@ -82,11 +92,13 @@ this.showMainSpinner()
         }
     }
     isOrderConfirmationNeedsReprint(){
+        
         this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
         .subscribe((res) => {
           console.log(res,'rep')
           if (res) {
             this.visible = res
+
            this.loadPdf()
        
 

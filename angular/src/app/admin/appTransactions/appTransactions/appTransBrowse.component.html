@@ -23,13 +23,13 @@
                                         </button>
                                         <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
                                             <li *ngFor="
-                                                let filter of pageMainFilters
+                                                let filter of pageMainFilters ; let i = index
                                             ">
                                                 <a href="javascript:;" (click)="
                                                     mainFilterCtrl.setValue(
                                                         filter
                                                     );getAppTransactions();getVariationDetail()
-                                                ">
+                                                " [ngClass]="{ 'd-block': i < 3 || showHeader, 'd-none': i >= 3 && !showHeader }">
                                                     <span>
                                                         <i [ngClass]="{
                                                             'visibility-hidden':
@@ -207,17 +207,10 @@
 
                               
                                 <div class="row w-100 pl-3 pt-3">
+                                   
                                     <div class="col-md-3 mr-5">
                                         <div class="form-group">
-                                            <label for="transactionTypeFilter">{{l("TransactionType")}}</label>
-                                            <input type="number" class="form-control" id="transactionTypeFilter"
-                                                formControlName="transactionTypeFilter" [(ngModel)]="transactionTypeFilter"
-                                                (keyup)="getVariationDetail()">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mr-5">
-                                        <div class="form-group">
-                                            <label for="transactionNumberFilter">{{l("TransactionNumber")}}</label>
+                                            <label for="transactionNumberFilter">{{l("Transaction Number")}}</label>
                                             <input type="text" class="form-control" id="transactionNumberFilter"
                                                 formControlName="transactionNumberFilter" [(ngModel)]="transactionNumberFilter"
                                                 (keyup)="getVariationDetail()">
@@ -238,7 +231,7 @@
                                 <div class="row w-100 pl-3 pt-3">
                                     <div class="col-md-3 mr-5">
                                         <div class="form-group">
-                                            <label for="MinPriceFilter">{{l("PriceRange")}}</label>
+                                            <label for="MinPriceFilter">{{l("Price Range")}}</label>
                                             <div class="input-group">
                                                 <input class="form-control m-input" id="minPrice"
                                                     formControlName="minPrice" type="number" 
@@ -254,7 +247,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="MinAmountFilter">{{l("AmountRange")}}</label>
+                                            <label for="MinAmountFilter">{{l("Amount Range")}}</label>
                                             <div class="input-group">
                                                 <input class="form-control m-input" id="minAmount"
                                                     formControlName="minAmount" type="text" 
@@ -278,11 +271,11 @@
                                 <div class="col-sm-12 d-flex justify-content-between">
                                     <div>
                                         <button id="monthlybtn" class="mr-2" [ngClass]="{'period-btn': !showHeader, 'selected-month-btn': showHeader}"
-                                        (click)="showDetails = false;showHeader = true">
+                                        (click)="showDetails = false;showHeader = true;filterText = '';advancedFiltersAreShown = false;initFilterForm();  getAppTransactions() ">
                                             Header
                                         </button>
                                         <button id="yearlybtn" [ngClass]="{'period-btn': showHeader, 'selected-year-btn': !showHeader}"
-                                        (click)="showHeader = false;showDetails = true;">
+                                        (click)="showHeader = false;showDetails = true;filterText = '';advancedFiltersAreShown = false;initFilterForm();  getVariationDetail() ">
                                             Details
                                         </button>
                                
@@ -514,6 +507,7 @@
                         [paginator]="false"
                         [lazy]="true"
                         (onLazyLoad)="getVariationDetail($event)"
+                        (onSort)="onSort($event)"
                         [rows]="rowsPerPage"
                         [totalRecords]="totalRecords">
                             <ng-template pTemplate="header">
@@ -524,8 +518,8 @@
                                     <th>Variation Code</th>
                                     <th>Name</th>
                                     <th>Qty.</th>
-                                    <th>Price</th>
-                                    <th>Amount</th>
+                                    <th pSortableColumn="price" >Price</th>
+                                    <th pSortableColumn="amount">Amount</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-product>
@@ -533,7 +527,7 @@
                                     <td>{{ product?.transactionType == 0 ?   'Sales Order'  : 'Purchase Order' }}</td>
                                     <td>{{ product.transactionNumber }}</td>
                                     <td><img [src]="product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
-                                    <td>{{ product?.code }}</td>
+                                    <td>{{ product?.manufacturerCode }}</td>
                                     <td>{{ product.name }}</td>
                                     <td>{{ product.qty }}</td>
                                     <td>{{ product.price }}</td>
@@ -543,7 +537,7 @@
                         </p-table>
                     
                         <!-- No Data Message -->
-                        <div class="primeng-no-data" *ngIf="!loading && totalRecords === 0">
+                        <div class="primeng-no-data p-3 text-center" *ngIf="!loading && totalRecords === 0">
                             {{ l('NoData') }}
                         </div>
                     
@@ -552,7 +546,7 @@
                             <p-paginator [rows]="rowsPerPage"
                                          [totalRecords]="totalRecords"
                                          (onPageChange)="getVariationDetail($event)"
-                                         [rowsPerPageOptions]="[10, 20, 50]">
+                                         [rowsPerPageOptions]="[10, 20,25, 50,100,250,500]">
                             </p-paginator>
                             <span class="total-records-count">
                                 {{ l('TotalRecordsCount', totalRecords) }}

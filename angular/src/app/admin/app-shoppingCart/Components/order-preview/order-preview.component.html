@@ -47,10 +47,14 @@
         <div class=" con-body">
     
           <p class="mb-3 text-center">
-            <p-progressBar mode="indeterminate" [style]="{'height': '6px'}" />
+            <p-progressBar *ngIf="showbar" mode="indeterminate" [style]="{'height': '6px'}" />
 
         </p>
-    
+        <div *ngIf="SuccessMsg" class="d-flex justify-content-center btns" >
+        
+     
+            <button  (click)="visible = false;showReport = true" label="Ok" class="p-button-text" >Ok</button>
+          </div>
         </div>
       
     

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Injector, OnInit, ViewChild } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { AppTransactionServiceProxy, SycEntityObjectStatusesServiceProxy, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Paginator } from 'primeng/paginator';
@@ -69,7 +69,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     // rowsPerPage: number = 10;
 
     // filters: any;
-
+    sortField: string | undefined;
+    sortOrder: number | undefined;
     constructor(
         injector: Injector,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
@@ -85,7 +86,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
       
         this.setPageMainFilters();
         this.initFilterForm();
-        this.getVariationDetail()
+        // this.getVariationDetail()
         // this.getAppTransactions();
     }
 
@@ -233,10 +234,12 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.paginator.changePage(this.paginator.getPage());
     }
     resetList() {
-        this.filterForm.reset();
+        // this.filterForm.reset();
+        this.initFilterForm()
         this.dataTable.reset();
         this.setMainPageFilter(this.defaultMainFilter);
         this.getAppTransactions();
+        this.getVariationDetail()
     }
 
     setMainPageFilter(filter) {
@@ -285,55 +288,53 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 this.display = true;
             });
     }
-
+    onSort(event: { field: string; order: number }) {
+        this.sortField = event.field;
+        this.sortOrder = event.order;
+        this.getVariationDetail();  // Trigger data load with new sorting
+    }
     getVariationDetail(event?: { page?: number; rows?: number }) {
-        // this.loading = true;
         this.showMainSpinner();
-
+    
         // Update pagination if pagination event passed
         if (event) {
             this.page = event.page ?? this.page;
             this.rowsPerPage = event.rows ?? this.rowsPerPage;
         }
-
+    
         const skipCount = this.page * this.rowsPerPage;
         const filters = this.filterForm.value;
-             console.log(filters,'filtersfiltersfilters')
+    
         this._appTransactionServiceProxy
-        .getllTransactionVariationsDetail(
-          filters.variationCodeFilter, 
-          filters.mainFilterType?.id == undefined ? undefined : filters.mainFilterType.id == 723 ? 0 : 1, 
-          filters.search, 
-          filters.transactionNumberFilter, 
-          filters.minPrice, 
-          filters.maxPrice, 
-          filters.minAmount, 
-          filters.maxAmount, 
-          null,  // Sorting
-          skipCount,
-          this.rowsPerPage
-        )
-        .pipe(finalize(() => {
-            this.hideMainSpinner();
-
-        }))
-        .subscribe(
-          (result: any) => {
-
-            this.variationDetails = result.items;
-            this.totalRecords = result.totalCount;
-         
-          },
-          (error) => {
-            console.error('API Request Failed:', error);
-            this.loading = false;
-          }
-        );
+            .getllTransactionVariationsDetail(
+                filters.variationCodeFilter,
+                filters.mainFilterType?.id == undefined ? undefined : filters.mainFilterType.id == 723 ? 0 : 1,
+                filters.search,
+                filters.transactionNumberFilter,
+                filters.minPrice,
+                filters.maxPrice,
+                filters.minAmount,
+                filters.maxAmount,
+                this.sortField ? `${this.sortField} ${this.sortOrder === 1 ? 'asc' : 'desc'}` : null,  // Sorting
+                skipCount,
+                this.rowsPerPage
+            )
+            .pipe(finalize(() => {
+                this.hideMainSpinner();
+            }))
+            .subscribe(
+                (result: any) => {
+                    this.variationDetails = result.items;
+                    this.totalRecords = result.totalCount;
+                },
+                (error) => {
+                    console.error('API Request Failed:', error);
+                    this.loading = false;
+                }
+            );
     }
-// Bind to sorting event
-onDetailTableSort(event: SortEvent) {
-    this.getVariationDetail(); // Call variation detail with sorting
-}
+    
+
 
 
     closeModal($event) {
@@ -351,13 +352,5 @@ onDetailTableSort(event: SortEvent) {
           this.getAppTransactions();
     }
 
-    ngDoCheck() {
-        // this.initFilterForm()
-//        if(this.showHeader && !this.showDetails) {
-//         this.initFilterForm()
-//        } else if(!this.showHeader && this.showDetails) {
-// this.iniDetailtFilterForm()
-//        }
-    }
 
 }
