@@ -2807,6 +2807,7 @@ namespace onetouch.Accounts
         }
         private async Task<bool> PublishMember(long contactId)
         {
+            return true;
             var contact = await _appContactRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.Id == contactId && x.IsProfileData == true);
             var entity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
