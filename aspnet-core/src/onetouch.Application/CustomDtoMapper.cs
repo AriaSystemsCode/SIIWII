@@ -910,12 +910,23 @@ namespace onetouch
              .ForMember(d => d.ItemCode, s => s.MapFrom(ss => ss.ItemFK.Code))
              .ForMember(d => d.ItemName, s => s.MapFrom(ss => ss.ItemFK.Name))
              .ForMember(d => d.ItemDescription, s => s.MapFrom(ss => ss.ItemFK.Notes))
-             .ForMember(d => d.ImageURL, s => s.MapFrom(ss => ss.ItemFK.TenantId.ToString()))
+             .ForMember(d => d.ImageURL, s => s.MapFrom(ss =>"-1"))
              .ForMember(d => d.State, s => s.MapFrom(ss => string.IsNullOrEmpty(ss.State) == true ? StateEnum.ActiveOrEmpty : (StateEnum)Enum.Parse(typeof(StateEnum), ss.State.ToString().Trim())))
              .ForMember(d => d.Variation, s => s.MapFrom(ss => ss.ItemFK.ParentFk));
+
             configuration.CreateMap<AppMarketplaceItemsListDetails, AppItemVariationDto>()
             .ForMember(d => d.State, s => s.MapFrom(ss => string.IsNullOrEmpty(ss.State) == true ? StateEnum.ActiveOrEmpty : (StateEnum)Enum.Parse(typeof(StateEnum), ss.State.ToString().Trim())));
-
+           
+            configuration.CreateMap<AppMarketplaceItems.AppMarketplaceItems, AppItemVariationDto>()
+                               .ForMember(d => d.ItemCode, s => s.MapFrom(ss => ss.ManufacturerCode))
+               .ForMember(d => d.ItemName, s => s.MapFrom(ss => ss.Name))
+               .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityExtraData))
+               .ForMember(d => d.State, s => s.MapFrom(ss => StateEnum.ActiveOrEmpty))
+               .ForMember(d => d.ImgURL, s => s.MapFrom(ss =>
+                   (ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                   (ss.EntityAttachments.FirstOrDefault() == null ? ss.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                   : ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)
+               ));
             //MMR45
 
         }
