@@ -1,5 +1,5 @@
 {
-  "name": "Your Codespace Name",
+  "name": "SIIWII-DEV",
   "image": "mcr.microsoft.com/vscode/devcontainers/dotnetcore:0-3.1",
   "forwardPorts": [5000, 5001]
 }
