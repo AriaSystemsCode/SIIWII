@@ -28,7 +28,7 @@
                                                 <a href="javascript:;" (click)="
                                                     mainFilterCtrl.setValue(
                                                         filter
-                                                    );getAppTransactions()
+                                                    );getAppTransactions();getVariationDetail()
                                                 ">
                                                     <span>
                                                         <i [ngClass]="{
@@ -63,7 +63,7 @@
                                     <div class="form-group m-form__group align-items-center">
                                         <div class="input-group">
                                             <span class="input-group-btn">
-                                                <button (click)="getAppTransactions()" class="searchBtn" type="submit">
+                                                <button (click)="getAppTransactions();getVariationDetail()" class="searchBtn" type="submit">
                                                     <img 
                                                         src="../../../assets/landingPage/Search.png" />
                                                     </button>
@@ -198,7 +198,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> 
 
 
 
@@ -210,16 +210,16 @@
                                     <div class="col-md-3 mr-5">
                                         <div class="form-group">
                                             <label for="transactionTypeFilter">{{l("TransactionType")}}</label>
-                                            <input type="text" class="form-control" id="transactionTypeFilter"
+                                            <input type="number" class="form-control" id="transactionTypeFilter"
                                                 formControlName="transactionTypeFilter" [(ngModel)]="transactionTypeFilter"
                                                 (keyup)="getVariationDetail()">
                                         </div>
                                     </div>
                                     <div class="col-md-3 mr-5">
                                         <div class="form-group">
-                                            <label for="transactionNameFilter">{{l("TransactionNumber")}}</label>
-                                            <input type="text" class="form-control" id="transactionNameFilter"
-                                                formControlName="transactionNameFilter" [(ngModel)]="transactionNameFilter"
+                                            <label for="transactionNumberFilter">{{l("TransactionNumber")}}</label>
+                                            <input type="text" class="form-control" id="transactionNumberFilter"
+                                                formControlName="transactionNumberFilter" [(ngModel)]="transactionNumberFilter"
                                                 (keyup)="getVariationDetail()">
                                         </div>
                                     </div>
@@ -240,14 +240,14 @@
                                         <div class="form-group">
                                             <label for="MinPriceFilter">{{l("PriceRange")}}</label>
                                             <div class="input-group">
-                                                <input class="form-control m-input" id="minPriceFilter"
-                                                    formControlName="minPriceFilter" type="number" 
-                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minPriceFilter"
+                                                <input class="form-control m-input" id="minPrice"
+                                                    formControlName="minPrice" type="number" 
+                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minPrice"
                                                     (focusout)="getVariationDetail()">
                                                 <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
-                                                <input class="form-control m-input" id="maxPriceFilter" type="text" 
-                                                    formControlName="maxPriceFilter" 
-                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxPriceFilter"
+                                                <input class="form-control m-input" id="maxPrice" type="text" 
+                                                    formControlName="maxPrice" 
+                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxPrice"
                                                     (focusout)="getVariationDetail()">
                                             </div>
                                         </div>
@@ -256,14 +256,14 @@
                                         <div class="form-group">
                                             <label for="MinAmountFilter">{{l("AmountRange")}}</label>
                                             <div class="input-group">
-                                                <input class="form-control m-input" id="minAmountFilter"
-                                                    formControlName="minAmountFilter" type="text" 
-                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minAmountFilter"
+                                                <input class="form-control m-input" id="minAmount"
+                                                    formControlName="minAmount" type="text" 
+                                                    placeholder="{{l('MinValue')}}" [(ngModel)]="minAmount"
                                                     (focusout)="getVariationDetail()">
                                                 <span style="line-height: 40px;padding: 0 15px 0 15px;"> &mdash; </span>
-                                                <input class="form-control m-input" id="maxAmountFilter"
-                                                    formControlName="maxAmountFilter" type="text" 
-                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxAmountFilter"
+                                                <input class="form-control m-input" id="maxAmount"
+                                                    formControlName="maxAmount" type="text" 
+                                                    placeholder="{{l('MaxValue')}}" [(ngModel)]="maxAmount"
                                                     (focusout)="getVariationDetail()">
                                             </div>
                                         </div>
@@ -282,7 +282,7 @@
                                             Header
                                         </button>
                                         <button id="yearlybtn" [ngClass]="{'period-btn': showHeader, 'selected-year-btn': !showHeader}"
-                                        (click)="showHeader = false;showDetails = true">
+                                        (click)="showHeader = false;showDetails = true;">
                                             Details
                                         </button>
                                
@@ -301,6 +301,7 @@
                         </div>
                         </div>
                     </form>
+                    
 
                     <div  class="row align-items-center pt-5  mt-4" [ngClass]="showHeader ? 'd-block' : 'd-none' ">
                       
@@ -489,10 +490,10 @@
 
                                 </ng-template>
                             </p-table>
-                            <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0"  >
                                 {{l('NoData')}}
                             </div>
-                            <div class="primeng-paging-container">
+                            <div class="primeng-paging-container" >
                                 <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage" #paginator
                                     (onPageChange)="getAppTransactions($event)"
                                     [totalRecords]="primengTableHelper.totalRecordsCount"
@@ -509,15 +510,12 @@
                     <div class="row align-items-center pt-5 mt-4 detailTab" [ngClass]="showDetails ? 'd-block' : 'd-none'">
                         <p-table
                           
-                            [value]="variationDetails"
-                            [paginator]="true"
-                            [scrollable]="true"
-                            responsiveLayout="stack"
-                            [breakpoint]="'960px'"
-                            [tableStyle]="{'min-width': '50rem'}"
-                            selectionMode="single"
-                            [lazy]="true"
-                            [loading]="loading">
+                        [value]="variationDetails"
+                        [paginator]="false"
+                        [lazy]="true"
+                        (onLazyLoad)="getVariationDetail($event)"
+                        [rows]="rowsPerPage"
+                        [totalRecords]="totalRecords">
                             <ng-template pTemplate="header">
                                 <tr>
                                     <th>{{l('TransactionType')}}</th>
@@ -531,11 +529,11 @@
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-product>
-                                <tr [pSelectableRow]="product">
-                                    <td>{{ product?.appItem?.transactionType }}</td>
-                                    <td>{{ product.id }}</td>
+                                <tr >
+                                    <td>{{ product?.transactionType == 0 ?   'Sales Order'  : 'Purchase Order' }}</td>
+                                    <td>{{ product.transactionNumber }}</td>
                                     <td><img [src]="product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
-                                    <td>{{ product?.appItem?.code }}</td>
+                                    <td>{{ product?.code }}</td>
                                     <td>{{ product.name }}</td>
                                     <td>{{ product.qty }}</td>
                                     <td>{{ product.price }}</td>

@@ -5740,7 +5740,7 @@ namespace onetouch.AppSiiwiiTransaction
                 //        }
                 //    }
                 //}
-                var orderedItemsFilter = tranDetail.OrderBy(input.Sorting ?? "LineId asc");
+                var orderedItemsFilter = tranDetail.OrderBy(input.Sorting ?? "LineNo asc");
                 var orderedItems = orderedItemsFilter.PageBy(input);
 
                 //var appItemsList = await appItems.ToListAs ync();

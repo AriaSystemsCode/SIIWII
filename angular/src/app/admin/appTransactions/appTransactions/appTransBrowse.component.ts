@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { AppTransactionServiceProxy, SycEntityObjectStatusesServiceProxy, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { Paginator } from 'primeng/paginator';
@@ -53,13 +53,13 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     products:any
     selectedProduct: any;
     variationDetails: any[];
-    transactionTypeFilter = ''
-    transactionNameFilter = ''
+    transactionTypeFilter :number 
+    transactionNumberFilter = ''
     variationCodeFilter = ''
-    minPriceFilter = ''
-    maxPriceFilter = ''
-    minAmountFilter = ''
-    maxAmountFilter = ''
+    minPrice :number 
+    maxPrice :number 
+    minAmount :number 
+    maxAmount :number 
     totalRecords: number = 0;
     page: number = 0; // current page number
     rowsPerPage: number = 10; // rows per page, can be changed by user
@@ -68,38 +68,36 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     // page: number = 0;
     // rowsPerPage: number = 10;
 
-    filters: any;
+    // filters: any;
 
     constructor(
         injector: Injector,
         private _appTransactionServiceProxy: AppTransactionServiceProxy,
         private _formBuilder: FormBuilder,
         private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
-        private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy
+        private _sycEntityObjectStatusesAppService: SycEntityObjectStatusesServiceProxy,
+        private cdr: ChangeDetectorRef
     ) {
         super(injector);
   
     }
     ngOnInit(): void {
-        this.filters = {
-            variationCode: '',
-            transactionType: 1,
-            nameFilter: '',
-            transactionNumberFilter: '',
-            minPrice: null,
-            maxPrice: null,
-            minAmount: null,
-            maxAmount: null
-        };
+      
         this.setPageMainFilters();
         this.initFilterForm();
         this.getVariationDetail()
         // this.getAppTransactions();
     }
+
+    ngOnChanges(): void {
+  
+        this.initFilterForm();
+
+    }
     initFilterForm() {  
 
 
-        if (this.showHeader) {
+        // if (this.showHeader) {
             this.filterForm = this._formBuilder.group({
                 search: undefined,
                 sellerNameFilter: undefined,
@@ -111,24 +109,32 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 maxCompleteDateFilter: undefined,
                 minCompleteDateFilter: undefined,
                 mainFilterType: this.defaultMainFilter,
-               
-    
-            });
-        } 
-         else {
-            this.filterForm = this._formBuilder.group({
-                search: undefined,
-                mainFilterType: this.defaultMainFilter,
                 transactionTypeFilter: undefined,
-                transactionNameFilter: undefined,
+                transactionNumberFilter: undefined,
+                nameFilter: undefined,
                 variationCodeFilter: undefined,
-                minPriceFilter: undefined,
-                maxPriceFilter : undefined,
-                minAmountFilter: undefined,
-                maxAmountFilter: undefined,
+                minPrice: undefined,
+                maxPrice : undefined,
+                minAmount: undefined,
+                maxAmount: undefined,
     
             });
-         }
+        // } 
+        //  else if (this.showDetails) {
+        //     this.filterForm = this._formBuilder.group({
+        //         search: undefined,
+        //         mainFilterType: this.defaultMainFilter,
+        //         transactionTypeFilter: undefined,
+        //         transactionNumberFilter: undefined,
+        //         nameFilter: undefined,
+        //         variationCodeFilter: undefined,
+        //         minPrice: undefined,
+        //         maxPrice : undefined,
+        //         minAmount: undefined,
+        //         maxAmount: undefined,
+    
+        //     });
+        //  }
 
         const selectedfilter = this.pageMainFilters.filter(
             (item) => this.defaultMainFilter.id == item.id
@@ -136,6 +142,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         if (!selectedfilter) return;
         this.mainFilterCtrl.setValue(selectedfilter);
     }
+
+
 
     setPageMainFilters() {
         this.pageMainFilters = [];
@@ -187,10 +195,10 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             filters.codeFilter, undefined,
             filters.mainFilterType?.id, filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
-            undefined,
+            
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
+            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter,undefined, false,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
@@ -199,7 +207,6 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             this.loading = false;
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
-            console.log(result.items,'dataaaaaaaaaaaaaaaaaaa')
             this.primengTableHelper.hideLoadingIndicator();
         });
     }
@@ -280,7 +287,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     }
 
     getVariationDetail(event?: { page?: number; rows?: number }) {
-        this.loading = true;
+        // this.loading = true;
+        this.showMainSpinner();
 
         // Update pagination if pagination event passed
         if (event) {
@@ -289,28 +297,32 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         }
 
         const skipCount = this.page * this.rowsPerPage;
-
+        const filters = this.filterForm.value;
+             console.log(filters,'filtersfiltersfilters')
         this._appTransactionServiceProxy
         .getllTransactionVariationsDetail(
-          this.filters.variationCode, 
-          0, 
-          this.filters.nameFilter, 
-          this.filters.transactionNumberFilter, 
-          this.filters.minPrice, 
-          this.filters.maxPrice, 
-          this.filters.minAmount, 
-          this.filters.maxAmount, 
+          filters.variationCodeFilter, 
+          filters.mainFilterType?.id == undefined ? undefined : filters.mainFilterType.id == 723 ? 0 : 1, 
+          filters.search, 
+          filters.transactionNumberFilter, 
+          filters.minPrice, 
+          filters.maxPrice, 
+          filters.minAmount, 
+          filters.maxAmount, 
           null,  // Sorting
           skipCount,
           this.rowsPerPage
         )
         .pipe(finalize(() => {
-          this.loading = false;
+            this.hideMainSpinner();
+
         }))
         .subscribe(
           (result: any) => {
+
             this.variationDetails = result.items;
             this.totalRecords = result.totalCount;
+         
           },
           (error) => {
             console.error('API Request Failed:', error);
@@ -338,4 +350,14 @@ onDetailTableSort(event: SortEvent) {
         if($event)
           this.getAppTransactions();
     }
+
+    ngDoCheck() {
+        // this.initFilterForm()
+//        if(this.showHeader && !this.showDetails) {
+//         this.initFilterForm()
+//        } else if(!this.showHeader && this.showDetails) {
+// this.iniDetailtFilterForm()
+//        }
+    }
+
 }
