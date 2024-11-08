@@ -1,6 +1,6 @@
 {
   "name": "Node.js & Angular",
-  "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:18",
+  "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:20",
   "extensions": [
     "formulahendry.dotnet",
     "github.codespaces",
