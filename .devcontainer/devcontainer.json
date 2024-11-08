@@ -1,0 +1,14 @@
+{
+  "name": "Node.js & Angular",
+  "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:18",
+  "extensions": [
+    "formulahendry.dotnet",
+    "github.codespaces",
+    "github.github-vscode-theme",
+    "github.vscode-pull-request-github",
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.vscode-dotnet-runtime",
+    "ms-vsliveshare.vsliveshare"
+  ],
+  "postCreateCommand": "npm install -g @angular/cli"
+}
