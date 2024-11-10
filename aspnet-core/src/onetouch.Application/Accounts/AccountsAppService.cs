@@ -3890,7 +3890,7 @@ namespace onetouch.Accounts
         protected virtual async Task<ContactDto> CreateContact(ContactDto input)
         {
             var contactObjectId = await _helper.SystemTables.GetObjectContactId();
-            SetAccountSync((long)input.ParentId);
+            SetAccountSync((long)input.AccountId);
 
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             if(!string.IsNullOrEmpty(input.EntityObjectType) )
@@ -4146,7 +4146,7 @@ namespace onetouch.Accounts
         {
             var sydObject = await _appContactRepository.GetAll().Include(x => x.AppContactAddresses).Where(x => x.Id == input.Id).FirstOrDefaultAsync();
             ObjectMapper.Map(input, sydObject);
-            SetAccountSync((long)input.ParentId);
+            SetAccountSync((long)input.AccountId);
             //deleted removed addreses
             foreach (var item in sydObject.AppContactAddresses)
             {
@@ -4541,7 +4541,7 @@ namespace onetouch.Accounts
 
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
             var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);
-            SetAccountSync((long)input.ParentId);
+            SetAccountSync((long)input.AccountId);
             var entity = new AppEntity();
             entity.ObjectId = entityParent.ObjectId;
             entity.EntityObjectTypeId = entityParent.EntityObjectTypeId;
@@ -4635,7 +4635,7 @@ namespace onetouch.Accounts
         {
             var sydObject = await _appContactRepository.GetAll().Include(x => x.AppContactAddresses).Where(x => x.Id == input.Id).FirstOrDefaultAsync();
             ObjectMapper.Map(input, sydObject);
-            SetAccountSync((long)input.ParentId);
+            SetAccountSync((long)input.AccountId);
             //deleted removed addreses
             foreach (var item in sydObject.AppContactAddresses)
             {
