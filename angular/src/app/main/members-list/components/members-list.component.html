@@ -66,7 +66,11 @@
                                             <img src="../../assets/img/input_icons/repeat.png"
                                             class="alarmInfo p-2 mr-2" style="border: 1px solid #EEEEEE;border-radius: 6px;">
                                         </a>
-                                        <a style="padding-left: 10px;border-radius: 6px;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="toggleView btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
+                                        <a style="padding-left: 10px;
+                                        background-color: #4A0D4A !important;
+                                        border-radius: 6px;
+                                        border: 1px solid #4A0D4A !important;
+                                        color: white !important;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="toggleView btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
                                             <i  class="d-inline-block w-100 " [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'"></i>
                                         </a>
                                     </div>
