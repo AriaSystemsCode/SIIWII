@@ -312,6 +312,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 address.State = ShpToContact.ContactAddressState;
                                 address.PostalCode = ShpToContact.ContactAddressPostalCode;
                                 address.Name = ShpToContact.ContactAddressName;
+                                address.TenantId = AbpSession.TenantId;
                                 AppAddressDto addReturn = await _accountAppService.CreateOrEditAddress(address);
                                 if (addReturn != null && addReturn.Id!=0)
                                 {
@@ -320,7 +321,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     contactAdd.AddressCode = addReturn.Code;
                                     contactAdd.ContactCode = account.AccountInfo.Code;
                                     contactAdd.ContactId = long.Parse(account.AccountInfo.Id.ToString() );
-                                    contactAdd.AddressTypeCode = "DIRECT-SHIPPING"; ;
+                                    contactAdd.AddressTypeCode = "DIRECT-SHIPPING"; 
                                     var addressType = await _appEntity.GetAll().Where(z => z.Code == "DIRECT-SHIPPING").FirstOrDefaultAsync();
                                     if (addressType != null)
                                     {                                     
@@ -348,6 +349,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 address.State = billToContact.ContactAddressState;
                                 address.PostalCode = billToContact.ContactAddressPostalCode;
                                 address.Name = billToContact.ContactAddressName;
+                                address.TenantId = AbpSession.TenantId;
                                 AppAddressDto addReturn = await _accountAppService.CreateOrEditAddress(address);
                                 if (addReturn != null && addReturn.Id != 0)
                                 {
@@ -6193,8 +6195,58 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return true;
         }
-      
-            
+        public async Task<List<AccountDefaultAddressDto>> GetCompanyDefaultAddresses(string companySSIN,string? branchSSIN)
+        {
+            List<AccountDefaultAddressDto> returnList = new List<AccountDefaultAddressDto>();
+            if (string.IsNullOrEmpty(branchSSIN))
+            {
+                var account = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressTypeFk)
+                    .Where(z => z.SSIN == companySSIN)
+                    .FirstOrDefaultAsync();
+
+                if (account != null)
+                {
+                    if (account.AppContactAddresses != null && account.AppContactAddresses.Count > 0)
+                    {
+                        var shipAdd = account.AppContactAddresses.Where(z => z.AddressTypeFk!=null && z.AddressTypeFk.Code == "DIRECT-SHIPPING" || z.AddressTypeFk.Code == "DISTRIBUTION-CENTER").FirstOrDefault();
+                        if (shipAdd != null)
+                        {
+                            returnList.Add(new AccountDefaultAddressDto { AddressId=shipAdd.AddressId,AddressType="Shipping"});
+                        }
+                        var billAdd = account.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk != null && x.AddressTypeFk.Code == "BILLING");
+                        if (billAdd != null)
+                        {
+                            returnList.Add(new AccountDefaultAddressDto { AddressId = billAdd.AddressId, AddressType = "Billing" });
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var branch = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressTypeFk)
+                .Where(z => z.SSIN == branchSSIN && z.ParentId!=null)
+                .FirstOrDefaultAsync();
+
+                if (branch != null)
+                {
+                    if (branch.AppContactAddresses != null && branch.AppContactAddresses.Count > 0)
+                    {
+                        var shipAdd = branch.AppContactAddresses.Where(z => z.AddressTypeFk != null && z.AddressTypeFk.Code == "DIRECT-SHIPPING" || z.AddressTypeFk.Code == "DISTRIBUTION-CENTER").FirstOrDefault();
+                        if (shipAdd != null)
+                        {
+                            returnList.Add(new AccountDefaultAddressDto { AddressId = shipAdd.AddressId, AddressType = "Shipping" });
+                        }
+                        var billAdd = branch.AppContactAddresses.FirstOrDefault(x => x.AddressTypeFk != null && x.AddressTypeFk.Code == "BILLING");
+                        if (billAdd != null)
+                        {
+                            returnList.Add(new AccountDefaultAddressDto { AddressId = billAdd.AddressId, AddressType = "Billing" });
+                        }
+                    }
+                }
+            }
+
+            return returnList;
+        }
 
 
        
