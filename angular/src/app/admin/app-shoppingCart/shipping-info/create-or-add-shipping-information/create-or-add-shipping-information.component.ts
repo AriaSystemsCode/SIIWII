@@ -16,6 +16,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("shippingInfOValid") shippingInfOValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
+
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   isshipFromContactsValid: boolean = false;
   isShipToContactsValid: boolean = false;
@@ -216,6 +218,8 @@ SuccessMsg: boolean = false;
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
         //  this.generatOrderReport.emit(true) ;
+       this.refreshShoppingCart.emit(true)
+
         this.SuccessMsg = true
       }))
       .subscribe((res) => {

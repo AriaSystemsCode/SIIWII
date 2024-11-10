@@ -78,8 +78,8 @@
    [selectedAddressDetails]="shipToSelectedAdd"
    [showAddressType]="false"
    [canChange]="canChange"
-   [currentTab]="currentTab"
-   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) ? false : true"
+   [currentTab]="currentTab"  
+   [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) ? true : false"
 
 
    ></app-address>

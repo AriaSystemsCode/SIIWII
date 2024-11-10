@@ -182,7 +182,38 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
           })
 
     }
-    saveAddress(addressForm: NgForm) {
+
+    saveAddress(addressForm:NgForm) {
+        this.saving = true;
+        this.address.code=addressForm.value.addressCode;
+        this.address.name=addressForm.value.addressName;
+        this.address.addressLine1=addressForm.value.address1;
+        this.address.addressLine2=addressForm.value.address2;
+        this.address.city=addressForm.value.cityAddress;
+        this.address.state=addressForm.value.State;
+        this.address.postalCode=addressForm.value.postalCode;
+        this.address.countryId=addressForm.value.AddressCountry;
+        this.address.accountId=this.contactId;
+        this.addressIdForEdit?this.address.id=this.addressIdForEdit:null;
+        let addNew = this.addressIdForEdit == null || this.addressIdForEdit == undefined || this.addressIdForEdit == 0
+        this._accountsServiceProxy.createOrEditAddress(this.address)
+        .pipe(finalize(() => { this.saving = false;}))
+        .subscribe((value) => {
+            this.notify.info(this.l('SavedSuccessfully'));
+            addressForm.resetForm();
+            this.discardAddressForm();
+            if(addNew){
+                this.savedAddressesList.push(value);
+                this.showAddList=true;
+            }
+            else{
+                const index = this.savedAddressesList.findIndex(item=>item.id === value.id);
+                this.savedAddressesList[index]=value;
+                this.addressIdForEdit=null;
+            }
+        });
+    }
+    savetempAddress(addressForm: NgForm) {
         this.saving = true;
     
         // Assign address fields from the form

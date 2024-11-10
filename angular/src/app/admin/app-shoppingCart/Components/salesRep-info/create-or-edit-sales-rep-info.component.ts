@@ -16,6 +16,8 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("SalesRepInfoValid") SalesRepInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
+
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   salesRepIndex = 1;
   salesReps: any[];
@@ -84,6 +86,8 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto=JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+       this.refreshShoppingCart.emit(true)
+
           if (!this.showSaveBtn)
             this.ontabChange.emit(ShoppingCartoccordionTabs.SalesRepInfo);
 

@@ -21,6 +21,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
     @ViewChild('dataTable', { static: true }) dataTable;
     @ViewChild('paginator', { static: true }) paginator: Paginator;
+    @ViewChild('dataDetailTable', { static: true }) dataDetailTable;
     filterForm: FormGroup;
     pageMainFilters;
     showMainFiltersOptions = true;
@@ -235,11 +236,19 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     }
     resetList() {
         // this.filterForm.reset();
+       this.sortField = undefined
+       this.sortOrder = undefined
         this.initFilterForm()
         this.dataTable.reset();
-        this.setMainPageFilter(this.defaultMainFilter);
-        this.getAppTransactions();
-        this.getVariationDetail()
+        this.dataDetailTable.reset();
+        this.setMainPageFilter(this.defaultMainFilter); 
+        if(this.showHeader) {
+            this.getAppTransactions();
+
+        } else if (this.showDetails) {
+            this.getVariationDetail()
+
+        }
     }
 
     setMainPageFilter(filter) {
@@ -315,7 +324,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
                 filters.maxPrice,
                 filters.minAmount,
                 filters.maxAmount,
-                this.sortField ? `${this.sortField} ${this.sortOrder === 1 ? 'asc' : 'desc'}` : null,  // Sorting
+                this.sortField ? `${this.sortField} ${this.sortOrder === 1 ? 'ASC' : 'DESC'}` : null,  // Sorting
                 skipCount,
                 this.rowsPerPage
             )

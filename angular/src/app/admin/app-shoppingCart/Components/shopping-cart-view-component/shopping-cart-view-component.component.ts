@@ -19,6 +19,7 @@ import { CommentParentComponent } from '@app/main/interactions/components/commen
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
 import { AppConsts } from '@shared/AppConsts';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -97,6 +98,7 @@ totalVariationsCount: number = 0;
   selectedVariation: any;
   selectedPrice: number = 0; // Holds the selected price
 selectedQuantity: number = 0; // Holds the entered quantity
+selectedImg: number = 0; // Holds the entered quantity
 amount: number = 0; // Holds the calculated amount
 showAddLine : boolean = false
 newData:any
@@ -106,6 +108,8 @@ cancelBtn: boolean = false;
 saveBtn: boolean = false;
 SuccessMsg: boolean = false;
 addNewLinebtn : boolean = true;
+filterForm: FormGroup;
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -113,12 +117,14 @@ addNewLinebtn : boolean = true;
     private userClickService: UserClickService,
     private componentFactoryResolver: ComponentFactoryResolver,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private _formBuilder: FormBuilder,
   ) {
     super(injector);
 
   }
   ngOnInit(): void {
+    this.initFilterForm()
     // this.onGeneratOrderReport(true,undefined,true,true);
  this.getSellerVariations()
   }
@@ -603,17 +609,13 @@ this.hideMainSpinner();
   }
 }
   onEditQty(rowNode) {
-    console.log(rowNode,'rowNode')
+
 
     if(rowNode.node.data.added) { 
 
 
       this.selectedQuantity =     rowNode.node.data.updatedQty
       this.updateAmount()
-    console.log(  rowNode.node.data.updatedQty,'  rowNode.node.data.updatedQt')
-    console.log(this.selectedQuantity,'this.selectedQuantity')
-    console.log( this.amount,' this.amount')
-    console.log(  rowNode.node.data.amount,'  rowNode.node.data.amount')
 
       rowNode.node.data.amount =  this.amount
       rowNode.node.data.qty =  this.selectedQuantity 
@@ -934,6 +936,12 @@ this.hideMainSpinner();
     this.currentTab= this.activeIndex ;
   }
 
+  refreshShoppingCart(event) {
+    if (event) {
+      this.getShoppingCartData()
+    }
+  }
+  
   onChangeAppTransactionsForViewDto($event) {
     $event.companeyNames=this.companeyNames;
     this.appTransactionsForViewDto = $event;
@@ -1034,8 +1042,25 @@ this.hideMainSpinner();
         console.error("Native element of reportViewerContainer is not available.");
     }
 }
+
+
+initFilterForm() {  
+
+
+  // if (this.showHeader) {
+      this.filterForm = this._formBuilder.group({
+          selectedVariation: undefined,
+          selectedPrice: undefined,
+          selectedQuantity: undefined,
+
+      });
+ 
+
+}
+
 addNewLine() {
   console.log(this.newData, 'newData'); // Log new data for debugging
+  const filters = this.filterForm.value;
 
   // Get the item data from the selected line (newData)
   const appItem = this.newData?.value?.appItem;
@@ -1054,8 +1079,8 @@ addNewLine() {
     manufacturerCode: appItem?.manufacturerCode,
     name: appItem?.name,
     qty: this.selectedQuantity,
-    price: appItem?.price,
-    amount: this.selectedQuantity * appItem?.price,
+    price: filters.selectedPrice,
+    amount: filters.selectedQuantity * filters.selectedPrice,
     image: appItem?.imageUrl,
     parentId: 0, // Top-level node
     // lineId: new Date().getTime(), // Unique identifier for lineId
@@ -1129,7 +1154,7 @@ getSellerVariations(skipCount: number = 0, maxResultCount: number = this.increme
        this.totalVariationsCount = res.totalCount;
        this.allVariations = this.allVariations.concat(res.items);
        this.displayedVariations = [...this.allVariations];
-       console.log(this.displayedVariations, 'displayedVariations');
+      //  console.log(this.displayedVariations, 'displayedVariations');
    });
 }
 
@@ -1150,19 +1175,34 @@ loadMore(event: MouseEvent, dropdown: any) {
 onVariationSelect(event: any) {
   // Reset quantity and price when a new variation is selected  
   console.log(event,'mmmmmmevv')
+  const filters = this.filterForm.value;
+
   this.selectedQuantity = 0;
   this.selectedPrice = 0;
   this.newData = event;
 
   if ( event.value.appItem.price) {
-    this.selectedPrice = event.value.appItem.price; // Ensure selectedPrice is a number
+    this.selectedImg = event.value.appItem.image
+   
+     this.filterForm.controls['selectedPrice']?.setValue(event.value.appItem.price); // Ensure selectedPrice is a number
+    //  this.selectedPrice = filters.selectedPrice
     this.updateAmount(); // Recalculate the amount when a new price is selected
   }
 }
 
 updateAmount() {
+  const filters = this.filterForm.value;
+ this.selectedPrice = filters.selectedPrice
   // Calculate the amount based on the quantity and selected price
   this.amount = this.selectedQuantity * this.selectedPrice;
+}
+
+updatePrice() {
+  const filters = this.filterForm.value;
+
+
+  // Calculate the amount based on the quantity and selected price
+  this.amount = filters.selectedQuantity * filters.selectedPrice;
 }
 
 saveVariations() {

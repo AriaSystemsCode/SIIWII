@@ -29,9 +29,23 @@
     border: none;
     background-color: transparent;
 }
+::ng-deep  .arrows {
+    .p-icon-wrapper {
+        position: initial !important;
+        // color: #1B101B !important;
+    }
+    .p-datatable .p-sortable-column .p-sortable-column-icon {
+        // color: #1B101B !important;
 
+    }
+}
 
 ::ng-deep  {
+    // .p-icon-wrapper {
+    //     position: initial !important;
+    //     color: #1B101B !important;
+    // }
+   
     .transBrow {
         padding-top: 0px !important;
     }

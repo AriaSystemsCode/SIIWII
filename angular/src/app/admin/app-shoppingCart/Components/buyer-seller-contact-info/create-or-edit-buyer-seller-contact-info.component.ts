@@ -26,6 +26,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   @Input("showSaveBtn") showSaveBtn: boolean = false;
   oldappTransactionsForViewDto;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   @Input("canChange")  canChange:boolean=true;
   visible: boolean = false;
@@ -132,7 +133,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-      
+       this.refreshShoppingCart.emit(true)
           if (!this.showSaveBtn)
             this.ontabChange.emit(this.activeTab);
           else

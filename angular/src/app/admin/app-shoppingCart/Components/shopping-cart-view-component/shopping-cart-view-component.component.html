@@ -237,7 +237,8 @@
                                     [createOrEditorderInfo]="createOrEditorderInfo"
                                     [oldCreateOrEditorderInfo]="createOrEditorderInfo"
                                     (ontabChange)="ontabChange($event)"
-                                    (generatOrderReport)="onGeneratOrderReport($event)"
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
+                                    
                                     [canChange]="canChange"></app-sales-order>
                                 </div>
                         </p-accordionTab>
@@ -262,7 +263,8 @@
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
                                         [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        (refreshShoppingCart)="refreshShoppingCart($event)"
+                                        
                                         [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
                         </p-accordionTab>
@@ -285,7 +287,8 @@
                                         (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                         (ontabChange)="ontabChange($event)" [showSaveBtn]="showSaveBtn"
                                         [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        (refreshShoppingCart)="refreshShoppingCart($event)"
+                                        
                                         [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
                                 </div>
                         </p-accordionTab>
@@ -310,7 +313,8 @@
                                         (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [showSaveBtn]="showSaveBtn"
                                         [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
+                                        
                                         [canChange]="canChange"></app-create-or-edit-sales-rep-info>
                                 </div>
                         </p-accordionTab>
@@ -324,7 +328,7 @@
                                         *ngIf="!shippingInfOValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                     </h6>
-                                    <p *ngIf="!shippingInfOValid" class="mx-2">*Please select or add ( ship to) address</p>
+                                    <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')" class="mx-2">*Please select or add ( ship to) address</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==4">
@@ -333,7 +337,9 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [createOrEditshippingInfO]="createOrEditshippingInfO"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
+
                                         [canChange]="canChange">
                                     </app-create-or-add-shipping-information>
                                 </div>
@@ -346,7 +352,7 @@
                                     <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                         *ngIf="!BillingInfoValid"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
-                                    <p  *ngIf="!BillingInfoValid" class="mx-2">*Please select or add billing address</p>
+                                    <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')"  class="mx-2">*Please select or add billing address</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==5">
@@ -355,7 +361,9 @@
                                         [appTransactionsForViewDto]="appTransactionsForViewDto"
                                         (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                         [createOrEditBillingInfo]="createOrEditBillingInfo"
-                                        (generatOrderReport)="onGeneratOrderReport($event)"
+                                        
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
+
                                         [canChange]="canChange">
                                     </app-create-or-edit-billing-info>
                                 </div>
@@ -447,7 +455,10 @@
                                                             {{ rowData[col.field] }}</label>
 
                                                         <label *ngIf="col.field=='image'">
-                                                            <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                            <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                                class="imgIcon" />
+
+                                                                  <img *ngIf="rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  selectedImg"
                                                                 class="imgIcon" />
                                                         </label>
 
@@ -536,7 +547,7 @@
                                         </button>
 
 
-                                        <div *ngIf="!addLine" style="display: flex; justify-content: space-evenly; gap: 30px;">
+                                        <form [formGroup]="filterForm" *ngIf="!addLine" style="display: flex; justify-content: space-evenly; gap: 30px;">
                                             <div class="mb-3 w-100">
                                               <label class="form-label">Product Variation Code</label>
                                               <p-dropdown
@@ -545,6 +556,7 @@
                                                 optionLabel="appItem.code"
                                                 placeholder="Please Select"
                                                 [(ngModel)]="selectedVariation"
+                                                formControlName="selectedVariation"
                                                 (onChange)="onVariationSelect($event)"
                                                 #dropdown
                                               >
@@ -567,9 +579,11 @@
                                               <input
                                                 type="number"
                                                 [(ngModel)]="selectedQuantity"
+                                                formControlName="selectedQuantity"
                                                 (ngModelChange)="updateAmount()"
                                                 class="form-control"
                                                 placeholder="Enter Qty"
+                                              
                                               />
                                             </div>
                                           
@@ -578,6 +592,9 @@
                                               <input
                                                 type="text"
                                                 [(ngModel)]="selectedPrice"
+                                                formControlName="selectedPrice"
+                                                (ngModelChange)="updatePrice()"
+
                                                 class="form-control"
                                                 placeholder="Price"
                                               
@@ -588,10 +605,10 @@
                                               <label>Amount</label>
                                               <p>{{ amount | currency }}</p>
                                             </div>
-                                          </div>
+                                        </form>
                                           
                                           <div class="d-flex justify-content-end">
-                                            <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false" [disabled]="selectedQuantity == 0 || !selectedVariation">
+                                            <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false" [disabled]="selectedQuantity == 0 && !selectedVariation && selectedPrice">
                                               <span>Add line</span>
                                             </button>
                                           </div>
@@ -966,7 +983,8 @@ height: 48px;"
                                 [createOrEditorderInfo]="createOrEditorderInfo"
                                 [oldCreateOrEditorderInfo]="createOrEditorderInfo"
                                 (ontabChange)="ontabChange($event)"
-                                (generatOrderReport)="onGeneratOrderReport($event)"
+                                
+                                (refreshShoppingCart)="refreshShoppingCart($event)"
                                 [canChange]="canChange"></app-sales-order>
                                 </div>
                     </p-accordionTab>
@@ -990,7 +1008,8 @@ height: 48px;"
                                     (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                     (ontabChange)="ontabChange($event)"  [showSaveBtn]="showSaveBtn"
                                     [createOrEditbuyerContactInfo]="createOrEditbuyerContactInfo"
-                                    (generatOrderReport)="onGeneratOrderReport($event)"
+                                    
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
                                     [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
                             </div>
                     </p-accordionTab>
@@ -1013,7 +1032,8 @@ height: 48px;"
                                     (buyer_seller_contactInfoValid)="ontabInfoValid($event)"
                                     (ontabChange)="ontabChange($event)" [showSaveBtn]="showSaveBtn"
                                     [createOrEditSellerContactInfo]="createOrEditSellerContactInfo"
-                                    (generatOrderReport)="onGeneratOrderReport($event)"
+                                    
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
                                     [canChange]="canChange"></app-create-or-edit-buyer-seller-contact-info>
                             </div>
                     </p-accordionTab>
@@ -1038,7 +1058,8 @@ height: 48px;"
                                     (SalesRepInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                     [showSaveBtn]="showSaveBtn"
                                     [createOrEditSalesRepInfo]="createOrEditSalesRepInfo"
-                                    (generatOrderReport)="onGeneratOrderReport($event)"
+                                    
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
                                     [canChange]="canChange"></app-create-or-edit-sales-rep-info>
                             </div>
                     </p-accordionTab>
@@ -1060,7 +1081,8 @@ height: 48px;"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     (shippingInfOValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                     [createOrEditshippingInfO]="createOrEditshippingInfO"
-                                    (generatOrderReport)="onGeneratOrderReport($event)"
+                                    
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
                                     [canChange]="canChange">
                                 </app-create-or-add-shipping-information>
                             </div>
@@ -1081,7 +1103,8 @@ height: 48px;"
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     (BillingInfoValid)="ontabInfoValid($event)" (ontabChange)="ontabChange($event)"
                                     [createOrEditBillingInfo]="createOrEditBillingInfo"
-                                    (generatOrderReport)="onGeneratOrderReport($event)"
+                                    
+                                    (refreshShoppingCart)="refreshShoppingCart($event)"
                                     [canChange]="canChange">
                                 </app-create-or-edit-billing-info>
                             </div>
@@ -1198,7 +1221,7 @@ height: 48px;"
                                                                     (click)="rowNode.node.data.showEditQty=false"></a>
                                                                 <button
                                                                     class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
-                                                                    (click)="onEditQty(rowNode);onGeneratOrderReport(true,undefined,false,true);"
+                                                                    (click)="onEditQty(rowNode);"
                                                                     [ngClass]="{ disabled:!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0 || rowNode.node.data.updatedQty==rowNode.node.data.qty}"
                                                                     [disabled]="!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0  || rowNode.node.data.updatedQty==rowNode.node.data.qty"></button>
                                                             </div>
@@ -1261,12 +1284,78 @@ height: 48px;"
                                         </ng-template>
 
                                     </p-treeTable>
-                                    <button class="addNbtn">
+                                    <button (click)="addLine = false;addNewLinebtn = false ;showAddLine = true" class="addNbtn" *ngIf="addLine && addNewLinebtn">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M2.5 2.5V5M2.5 5V8.33333C2.5 8.77536 2.67559 9.19928 2.98816 9.51184C3.30072 9.8244 3.72464 10 4.16667 10H7.5M2.5 5H7.5M17.5 2.5V5M17.5 5V8.33333C17.5 8.77536 17.3244 9.19928 17.0118 9.51184C16.6993 9.8244 16.2754 10 15.8333 10H7.5M17.5 5H7.5M7.5 10V5M7.5 5V2.5M12.5 2.5V10M10 12.5V15M10 15V17.5M10 15H12.5M10 15H7.5" stroke="#777777" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
                                             <span> Add new line</span>
                                     </button>
+
+
+                                    <div *ngIf="!addLine" style="display: flex; justify-content: space-evenly; gap: 30px;">
+                                        <div class="mb-3 w-100">
+                                          <label class="form-label">Product Variation Code</label>
+                                          <p-dropdown
+                                            [options]="displayedVariations"
+                                            [filter]="true"
+                                            optionLabel="appItem.code"
+                                            placeholder="Please Select"
+                                            [(ngModel)]="selectedVariation"
+                                            (onChange)="onVariationSelect($event)"
+                                            #dropdown
+                                          >
+                                            <!-- Custom item template -->
+                                            <ng-template let-option pTemplate="item">
+                                              <div>{{ option.appItem.code }} - {{ option.appItem.name }}</div>
+                                            </ng-template>
+                                      
+                                            <!-- Custom footer template for "Show More" button -->
+                                            <ng-template pTemplate="footer">
+                                              <div *ngIf="displayedVariations.length < totalVariationsCount" class="d-flex justify-content-center">
+                                                <a (click)="loadMore($event, dropdown)" class="pb-4">Show More ...</a>
+                                              </div>
+                                            </ng-template>
+                                          </p-dropdown>
+                                        </div>
+                                      
+                                        <div class="mb-3 w-100">
+                                          <label class="form-label">Quantity</label>
+                                          <input
+                                            type="number"
+                                            [(ngModel)]="selectedQuantity"
+                                            (ngModelChange)="updateAmount()"
+                                            class="form-control"
+                                            placeholder="Enter Qty"
+                                          />
+                                        </div>
+                                      
+                                        <div class="mb-3 w-100">
+                                          <label class="form-label">Price</label>
+                                          <input
+                                            type="text"
+                                            [(ngModel)]="selectedPrice"
+                                            class="form-control"
+                                            placeholder="Price"
+                                          
+                                          />
+                                        </div>
+                                      
+                                        <div class="mb-3 w-100">
+                                          <label>Amount</label>
+                                          <p>{{ amount | currency }}</p>
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="d-flex justify-content-end">
+                                        <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false" [disabled]="selectedQuantity == 0 || !selectedVariation">
+                                          <span>Add line</span>
+                                        </button>
+                                      </div>
+                                      
+                                      <div *ngIf="showSaveCancel" class="d-flex justify-content-end mt-3">
+                                        <button (click)="visible = true;cancelBtn = true;saveBtn = false" class="cancelbtn text-center btn float-right">Cancel</button>
+                                        <button (click)="visible = true;saveBtn = true;cancelBtn = false" class="previewbtn text-center btn ml-2">Save</button>
+                                      </div>
                                 </div>
                             </div>
                         </div>

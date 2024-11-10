@@ -17,6 +17,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("BillingInfoValid") BillingInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   isContactsValid: boolean = true;
   @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
@@ -232,6 +233,8 @@ debugger
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();
         //  this.generatOrderReport.emit(true) ; 
+       this.refreshShoppingCart.emit(true)
+
           this.SuccessMsg = true}))
       .subscribe((res) => {
         if (res) {

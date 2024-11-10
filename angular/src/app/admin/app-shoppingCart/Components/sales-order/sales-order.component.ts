@@ -77,6 +77,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     oldappTransactionsForViewDto;
     @ViewChild(TreeSelect) treeSelect!: TreeSelect;
     @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input("canChange") canChange: boolean = true;
     sycEntityObjectCategory: CreateOrEditSycEntityObjectCategoryDto = new CreateOrEditSycEntityObjectCategoryDto();
     entityObjectType:string ="CATEGORY"
@@ -641,6 +642,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 
         .pipe(finalize(() =>  {
+
      this.SuccessMsg = true
             // this.generatOrderReport.emit(true)      
         }))
@@ -648,6 +650,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         .subscribe((res) => {
                 if (res) {
                     this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
+       this.refreshShoppingCart.emit(true)
                    
                     // this.orderInfoValid.emit(ShoppingCartoccordionTabs.orderInfo);
 
