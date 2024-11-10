@@ -48,9 +48,10 @@
                             </span>
                         </div>
                         <div *ngIf="!member?.userId">
-                            <span class="connected text-success">
+                            <span class="connected  activeStatus">
                                 <span class="mr-1">
                                     <i
+                                    style="background-color: #4A0D4A !important;"
                                         class="success-icon bg-success flaticon2-information d-inline-flex rounded-circle text-white"
                                     ></i>
                                 </span>
@@ -67,9 +68,10 @@
                         {{ "JoinedAt" | localize }} {{ member.joinDate?.toString() | date : 'M-d-yyyy' }}
                     </div>
                     <div *ngIf="showActiveStatus && member?.userId">
-                        <span class="connected text-success" *ngIf="member.isActive == true">
+                        <span class="connected  activeStatus" *ngIf="member.isActive == true">
                             <span class="mr-1">
                                 <i
+                                style="background-color: #4A0D4A !important;"
                                     class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
                                 ></i>
                             </span>
@@ -85,9 +87,10 @@
                         </span>
                     </div>
                     <div *ngIf="!member?.userId">
-                        <span class="connected text-success">
+                        <span class="connected  activeStatus">
                             <span class="mr-1">
                                 <i
+                                style="background-color: #4A0D4A !important;"
                                     class="success-icon bg-success flaticon2-information d-inline-flex rounded-circle text-white"
                                 ></i>
                             </span>

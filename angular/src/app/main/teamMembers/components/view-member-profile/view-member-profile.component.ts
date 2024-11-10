@@ -50,7 +50,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
     @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
     @ViewChild("createOrEditUserModal", { static: true })  createOrEditUserModal: CreateOrEditUserModalComponent;
-
+    Editting:boolean =false;
     constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy) {
         super(injector);
         this.accountInfoTemp = new CreateOrEditAccountInfoDto();
@@ -63,6 +63,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     editInfo = true;
     NoteditInfo = false;
     editMember() {
+        this.Editting=true;
         debugger
         //this.memberData?.contact.eMailAddress
         if (this.memberData?.contact.userName.includes("admin")) {
@@ -101,6 +102,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.canDelete = input.canDelete
         this.canEdit = input.canEdit
         this.title = input.title
+        this.editInfo = true;
+        this.NoteditInfo = false;
+        this.Editting=false;
         this.showMainSpinner()
 
         this._AccountsServiceProxy.getContactForView(input.id)
@@ -162,7 +166,10 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             //  this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
 
             this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
-                .pipe(finalize(() => this.hideMainSpinner()))
+                .pipe(finalize(() => {
+                    this.hideMainSpinner(); 
+                    this.Editting=false;
+        }))
                 .subscribe(result => {
                     this.notify.success(this.l('SuccessfullySaved'));
                 });
