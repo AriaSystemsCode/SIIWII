@@ -38,11 +38,11 @@
                                                         (click)="CreateUserName()">
                                                         <img src="../../assets/img/input_icons/plus.png"
                                                             class="mr-2 pb-1">
-                                                        {{ "CreateUserName" | localize }}
+                                                        {{ "Create User" | localize }}
                                                     </button>
                                                     <button *ngIf="canEdit" class="btn mb-3 mt-4 editAccount_butn"
-                                                        style="border-radius: 6px;" (click)="editMember()">
-                                                        <img src="../../assets/img/input_icons/edit.png" class="">
+                                                        style="border-radius: 6px;    color: white !important;" (click)="editMember()" [disabled]="Editting">
+                                                        <img src="../../assets/img/input_icons/edit.png" class="" >
                                                         {{ "Edit" | localize }}
                                                     </button>
                                                     <button *ngIf="canDelete" class="btn mb-3 mt-4 w-100 btn-danger"
@@ -218,12 +218,13 @@
                                 </div>
                                 <div class="row ml-5">
                                     <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
+                                    style="color: white !important;"
                                         [class.hide]="editInfo" (click)="Save_editMember()">
                                         {{ "SaveChanges" | localize }}
                                     </button>
 
                                     <button class="btn mb-3 mt-4 editAccount_butn Save_editMember" style="background-color: white;
-    color: #4A0D4A;
+    color: #4A0D4A !important;
     border: 1px solid #EEEEEEEE;
     height: 38px;
     width: 118px;

@@ -47,10 +47,13 @@
                                 {{'NotActive'| localize }}
                             </span>
                         </div>
-                        <div *ngIf="!member?.userId">
-                            <span class="connected text-success">
+                        <div *ngIf="!member?.userId"  style="position: absolute;
+                        bottom: 0px;
+                        right: 0px;">
+                            <span class="connected  activeStatus">
                                 <span class="mr-1">
                                     <i
+                                    style="background-color: #4A0D4A !important;"
                                         class="success-icon bg-success flaticon2-information d-inline-flex rounded-circle text-white"
                                     ></i>
                                 </span>
@@ -66,10 +69,13 @@
                     <div *ngIf="member.joinDate !== null">
                         {{ "JoinedAt" | localize }} {{ member.joinDate?.toString() | date : 'M-d-yyyy' }}
                     </div>
-                    <div *ngIf="showActiveStatus && member?.userId">
-                        <span class="connected text-success" *ngIf="member.isActive == true">
+                    <div *ngIf="showActiveStatus && member?.userId"  style="position: absolute;
+                    bottom: 0px;
+                    right: 0px;">
+                        <span class="connected  activeStatus" *ngIf="member.isActive == true">
                             <span class="mr-1">
                                 <i
+                                style="background-color: #4A0D4A !important;"
                                     class="success-icon bg-success flaticon2-check-mark d-inline-flex rounded-circle text-white"
                                 ></i>
                             </span>
@@ -84,10 +90,13 @@
                             {{'NotActive'| localize }}
                         </span>
                     </div>
-                    <div *ngIf="!member?.userId">
-                        <span class="connected text-success">
+                    <div *ngIf="!member?.userId" style="position: absolute;
+                    bottom: 0px;
+                    right: 0px;">
+                        <span class="connected  activeStatus">
                             <span class="mr-1">
                                 <i
+                                style="background-color: #4A0D4A !important;"
                                     class="success-icon bg-success flaticon2-information d-inline-flex rounded-circle text-white"
                                 ></i>
                             </span>

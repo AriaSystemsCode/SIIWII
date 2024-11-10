@@ -48,7 +48,7 @@
                                     </div>
                                     <div class="mb-4 mb-md-0 list-toolbar-search">
                                         <div class="kt-input-icon kt-input-icon--left">
-                                            <input type="text"  (input)="handleSearchInput($event)" class="form-control" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch">
+                                            <input type="text"  (input)="handleSearchInput($event)" class="form-control" (keydown.enter)="$event.preventDefault()" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch">
                                             <span class="kt-input-icon__icon kt-input-icon__icon--left">
                                                 <span><i class="flaticon2-search-1 icon-md"></i></span>
                                             </span>
@@ -62,11 +62,16 @@
                                     </div>
                                     <!-- <div class="list-toolbar-divider"></div> -->
                                     <div class="text-center" >
-                                        <a style="padding: 5px 3px;padding-right: 0px;" [title]="'ResetData' | localize" class=" shadowContainer btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
+                                        <a style="padding: 5px 3px;padding-right: 0px; background-color: white !important;
+    border: 1px solid white !important;" [title]="'ResetData' | localize" class=" shadowContainer btn btn-hover-primary font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
                                             <img src="../../assets/img/input_icons/repeat.png"
-                                            class="alarmInfo p-2 mr-2" style="border: 1px solid #EEEEEE;border-radius: 6px;">
+                                            class="alarmInfo p-2 mr-2" style="border: 1px solid #EEEEEE;border-radius: 6px;     background-color: white !important;">
                                         </a>
-                                        <a style="padding-left: 10px;border-radius: 6px;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="toggleView btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
+                                        <a style="padding-left: 10px;
+                                        background-color: #4A0D4A !important;
+                                        border-radius: 6px;
+                                        border: 1px solid #4A0D4A !important;
+                                        color: white !important;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="toggleView btn btn-hover-primary font-weight-normal pr-1 text-center text-primary toolbar-btn">
                                             <i  class="d-inline-block w-100 " [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'"></i>
                                         </a>
                                     </div>
