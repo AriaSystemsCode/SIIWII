@@ -356,8 +356,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             )).subscribe(
             (response:boolean) => {
                 this.notify.success(this.l("Account sync Successfully"));
-                this.showIsSync = response;
-                this.isSync=response;
+                this.showIsSync = !response;
+                this.isSync=!response;
             });
 
     }
