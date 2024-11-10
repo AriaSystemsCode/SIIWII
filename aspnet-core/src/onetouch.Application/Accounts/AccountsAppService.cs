@@ -4541,7 +4541,7 @@ namespace onetouch.Accounts
 
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
             var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);
-            SetAccountSync((long)input.AccountId);
+            SetAccountSync((long)contactParent.Id);
             var entity = new AppEntity();
             entity.ObjectId = entityParent.ObjectId;
             entity.EntityObjectTypeId = entityParent.EntityObjectTypeId;
@@ -4635,7 +4635,7 @@ namespace onetouch.Accounts
         {
             var sydObject = await _appContactRepository.GetAll().Include(x => x.AppContactAddresses).Where(x => x.Id == input.Id).FirstOrDefaultAsync();
             ObjectMapper.Map(input, sydObject);
-            SetAccountSync((long)input.AccountId);
+            SetAccountSync((long)sydObject.Id);
             //deleted removed addreses
             foreach (var item in sydObject.AppContactAddresses)
             {
