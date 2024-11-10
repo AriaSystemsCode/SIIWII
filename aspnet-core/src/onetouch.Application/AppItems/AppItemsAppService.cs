@@ -1843,7 +1843,9 @@ namespace onetouch.AppItems
                 //}
                 // else
                 // {
-                var appItemExisting = await _appItemRepository.GetAll().Where(r => r.Code == input.Code && r.ItemType == input.ItemType).FirstOrDefaultAsync();
+                if (input.TenantId == null)
+                    input.TenantId = AbpSession.TenantId;
+                var appItemExisting = await _appItemRepository.GetAll().Where(r =>r.TenantId == input.TenantId  && r.Code == input.Code && r.ItemType == input.ItemType).FirstOrDefaultAsync();
                 if (appItemExisting != null)
                 {
                     //throw new Exception("This product code already existing. Please use different code.");
@@ -2233,7 +2235,8 @@ namespace onetouch.AppItems
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
             await CurrentUnitOfWork.SaveChangesAsync();
             //MMT
-            appItem.TenantId = AbpSession.TenantId;
+            if (appItem.TenantId == null)
+                appItem.TenantId = AbpSession.TenantId;
             //MMT
 
             appItem.EntityId = savedEntity;
@@ -2354,7 +2357,8 @@ namespace onetouch.AppItems
                     childEntity.Code = child.Code;
                     childEntity.ObjectId = itemObjectId;
                     childEntity.EntityObjectTypeId = entity.EntityObjectTypeId;
-                    childEntity.TenantId = AbpSession.TenantId;
+                    if(childEntity.TenantId==null)
+                        childEntity.TenantId = AbpSession.TenantId;
                     childEntity.EntityObjectStatusId = itemStatusId;
                     childEntity.Id = appItemChild.EntityId;
                     childEntity.Name = appItem.Name;
@@ -2609,6 +2613,7 @@ namespace onetouch.AppItems
                             var itemPriceObj = ObjectMapper.Map<AppItemPrices>(itemPrice);
                             itemPriceObj.AppItemCode = appItemChild.Code;
                             itemPriceObj.AppItemId = appItemChild.Id;
+                            if(itemPriceObj.TenantId==null)
                             itemPriceObj.TenantId = AbpSession.TenantId;
                             //MMT33-3
                             if (itemPriceObj.CurrencyCode == currency)//itemPriceObj.Code == "MSRP" &&
@@ -2852,7 +2857,8 @@ namespace onetouch.AppItems
                     {
 
                         var scaleHeader = ObjectMapper.Map<AppItemSizeScalesHeader>(sizeHead);
-                        scaleHeader.TenantId = AbpSession.TenantId;
+                        if (scaleHeader.TenantId == null)
+                            scaleHeader.TenantId = AbpSession.TenantId;
                         scaleHeader.AppItemId = appItem.Id;
                         if (string.IsNullOrEmpty(scaleHeader.SizeScaleCode))
                         {
@@ -2863,7 +2869,8 @@ namespace onetouch.AppItems
                         scaleHeader.ParentId = scaleHeader.ParentId == null ? null : sizeScaleSavedId;
                         foreach (var size in scaleHeader.AppItemSizeScalesDetails)
                         {
-                            size.TenantId = AbpSession.TenantId;
+                            if (size.TenantId == null)
+                                size.TenantId = AbpSession.TenantId;
                             size.Id = 0;
                         }
                         scaleHeader = await _appItemSizeScalesHeaderRepository.InsertAsync(scaleHeader);
@@ -2877,6 +2884,7 @@ namespace onetouch.AppItems
                     {
                         var sizescaleObj = sizeScales.FirstOrDefault(a => a.Id == sizeHead.Id);
                         var scaleHeader = ObjectMapper.Map<AppItemSizeScalesHeader>(sizeHead);
+                        if(scaleHeader.TenantId==null)
                         scaleHeader.TenantId = AbpSession.TenantId;
                         scaleHeader.AppItemId = appItem.Id;
                         scaleHeader.SizeScaleCode = sizescaleObj.SizeScaleCode;
@@ -2904,7 +2912,8 @@ namespace onetouch.AppItems
                                 var sz = ObjectMapper.Map<AppSizeScalesDetailDto>(size);
                                 var sizeObject = ObjectMapper.Map<AppItemSizeScalesDetails>(sz);
                                 sizeObject.IsDeleted = true;
-                                sizeObject.TenantId = AbpSession.TenantId;
+                                if (sizeObject.TenantId == null)
+                                    sizeObject.TenantId = AbpSession.TenantId;
                                 sizeObject.SizeScaleId = sizeScaleObj.Id;
                                 await _appItemSizeScalesDetailRepository.UpdateAsync(sizeObject);
                             }
@@ -2920,7 +2929,8 @@ namespace onetouch.AppItems
                         foreach (var sizObj in sizeHead.AppSizeScalesDetails)
                         {
                             var sizeObject = ObjectMapper.Map<AppItemSizeScalesDetails>(sizObj);
-                            sizeObject.TenantId = AbpSession.TenantId;
+                            if (sizeObject.TenantId == null)
+                                sizeObject.TenantId = AbpSession.TenantId;
                             sizeObject.SizeScaleId = sizeScaleObj.Id;
                             var sizeObjectDet = await _appItemSizeScalesDetailRepository.GetAll()
                                 .Where(a => a.SizeScaleId == sizeObject.SizeScaleId & a.SizeCode == sizObj.SizeCode & a.DimensionName == sizObj.DimensionName).AsNoTracking().FirstOrDefaultAsync();
@@ -3319,6 +3329,7 @@ namespace onetouch.AppItems
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+               
                 var appItem = await _appItemRepository.GetAll().Include(a => a.ParentFkList).AsNoTracking().FirstOrDefaultAsync(x => x.Id == appItemId);
                 if (appItem != null)
                 {

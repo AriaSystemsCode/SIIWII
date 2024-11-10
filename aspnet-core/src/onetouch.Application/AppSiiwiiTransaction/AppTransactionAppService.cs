@@ -3396,11 +3396,10 @@ namespace onetouch.AppSiiwiiTransaction
                         price.Price = itemPrice.Price;
                         item.ItemPricesFkList.Add(price);
                     }
+                    
 
-
-
-                    await _appItems.InsertAsync(item);
-                    await CurrentUnitOfWork.SaveChangesAsync();
+                   //I45 await _appItems.InsertAsync(item);
+                   //I45 await CurrentUnitOfWork.SaveChangesAsync();
                     // return;
                     //item.ItemSizeScaleHeadersFkList = new List<AppItemSizeScalesHeader>();
                     //    //ObjectMapper.Map<List<AppItemSizeScalesHeader>>(marketplaceItem.ItemSizeScaleHeadersFkList);
@@ -3470,7 +3469,11 @@ namespace onetouch.AppSiiwiiTransaction
                             appAtt.IsDefault = attch.IsDefault;
                             entityMain.EntityAttachments.Add(appAtt);
                         }
+                        //I45[start]
+                        //saveItemDto.EntityAttachments = entityMain.EntityAttachments;
+                        //I45[End]
                     }
+
                     if (marketplaceItem.EntityExtraData != null && marketplaceItem.EntityExtraData.Count() > 0)
                     {
                         item.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
@@ -3493,7 +3496,11 @@ namespace onetouch.AppSiiwiiTransaction
                             item.EntityFk.EntityExtraData.Add(extr);
 
                         }
+                        //I45[start]
+                        //saveItemDto.EntityExtraData = entityMain.EntityExtraData;
+                        //I45[End]
                     }
+
                     {
                         if (marketplaceItem.EntityCategories != null)
                         {
@@ -3508,7 +3515,11 @@ namespace onetouch.AppSiiwiiTransaction
                                 entCategory.EntityObjectCategoryFk = null;
                                 item.EntityFk.EntityCategories.Add(entCategory);
                             }
+                            //I45[start]
+                            //saveItemDto.EntityCategories = item.EntityFk.EntityCategories;
+                            //I45[End]
                         }
+
                         if (marketplaceItem.EntityClassifications != null)
                         {
                             item.EntityFk.EntityClassifications = new List<AppEntityClassification>();
@@ -3522,8 +3533,11 @@ namespace onetouch.AppSiiwiiTransaction
                                 entClass.EntityObjectClassificationFk = null;
                                 item.EntityFk.EntityClassifications.Add(entClass);
                             }
+                            //I45[start]
+                            //saveItemDto.EntityClassifications = ObjectMapper.Map<List<AppEntityClassificationDto>>(item.EntityFk.EntityClassifications);
+                            //I45[End]
                         }
-                        _appEntity.UpdateAsync(item.EntityFk);
+                        //I45 _appEntity.UpdateAsync(item.EntityFk);
 
                         //item.ItemSizeScaleHeadersFkList = new List<AppItemSizeScalesHeader>();
                         ////ObjectMapper.Map<List<AppItemSizeScalesHeader>>(marketplaceItem.ItemSizeScaleHeadersFkList);
@@ -3640,7 +3654,7 @@ namespace onetouch.AppSiiwiiTransaction
                                         tenantVariation.EntityFk.EntityAttachments.Add(appAtt);
                                     }
                                 }
-                                _appEntity.UpdateAsync(tenantVariation.EntityFk);
+                                 //I45   _appEntity.UpdateAsync(tenantVariation.EntityFk);
                                 // tenantVariation.ItemPricesFkList = null;// new List<AppItemPrices>();
                                 //foreach (var itemPrice in variation.ItemPricesFkList)
                                 //{
@@ -3685,8 +3699,9 @@ namespace onetouch.AppSiiwiiTransaction
                                 det.SizeScaleId = 0;
                                 det.SizeScaleFK = null;
                             }
-                            await _appItemSizeScaleHeadersRepository.InsertAsync(itemSizeScaleHeader);
-                            await CurrentUnitOfWork.SaveChangesAsync();
+                            item.ItemSizeScaleHeadersFkList.Add(itemSizeScaleHeader);
+                            //I45 await _appItemSizeScaleHeadersRepository.InsertAsync(itemSizeScaleHeader);
+                            //I45 await CurrentUnitOfWork.SaveChangesAsync();
                             var sizeScaleRatio = marketplaceItem.ItemSizeScaleHeadersFkList.FirstOrDefault(z => z.ParentId != null);
                             if (sizeScaleRatio != null)
                             {
@@ -3704,12 +3719,14 @@ namespace onetouch.AppSiiwiiTransaction
                                     det.SizeScaleFK = null;
                                 }
                                 sizeRatio.ItemSizeScaleFK = itemSizeScaleHeader;
-                                await _appItemSizeScaleHeadersRepository.InsertAsync(sizeRatio);
-                                await CurrentUnitOfWork.SaveChangesAsync();
+                                item.ItemSizeScaleHeadersFkList.Add(sizeRatio);
+                                //I45 await _appItemSizeScaleHeadersRepository.InsertAsync(sizeRatio);
+                                //I45 await CurrentUnitOfWork.SaveChangesAsync();
                             }
-
+                            
 
                         }
+
                         //item.ItemSizeScaleHeadersFkList.Add(itemSizeScaleHeader);
                         // await _appItems.UpdateAsync(item);
 
@@ -3770,7 +3787,25 @@ namespace onetouch.AppSiiwiiTransaction
                         //item.ItemSizeScaleHeadersFkList.Add(itemSizeScaleHeader);
                         //await _appItems.UpdateAsync(item);
                         //  await CurrentUnitOfWork.SaveChangesAsync();
-
+                        //I45[Start]
+                        CreateOrEditAppItemDto saveItemDto = new CreateOrEditAppItemDto();
+                        saveItemDto = ObjectMapper.Map<CreateOrEditAppItemDto>(item);
+                        saveItemDto.ManufacturerCode = marketplaceItem.ManufacturerCode;
+                        saveItemDto.Price = marketplaceItem.Price;
+                        if (saveItemDto.VariationItems != null && saveItemDto.VariationItems.Count > 0)
+                        {
+                            foreach (var variation in saveItemDto.VariationItems)
+                            {
+                                var varItem = marketplaceItem.ParentFkList.Where(z => z.SSIN == variation.SSIN).FirstOrDefault();
+                                if (varItem != null)
+                                {
+                                    variation.ManufacturerCode = varItem.ManufacturerCode;
+                                    variation.Price = varItem.Price;
+                                }
+;                            } 
+                        }
+                        await _appItemsAppService.CreateOrEdit(saveItemDto);
+                        //145[End]
                     }
                 }
             }
