@@ -664,10 +664,11 @@ namespace onetouch.AppMarketplaceAccounts
                 var foundEntity = _appEntityRepository.GetAll().FirstOrDefault(e => e.Id == input.EntityId);
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
 
+                var foundContactInfo = _appContactRepository.GetAll().FirstOrDefault(e => e.Id == input.Id);
 
                 ObjectMapper.Map(input, appMarketplaceContact);
                 appMarketplaceContact.Id = 0;
-                appMarketplaceContact.LastModificationTime = foundEntity.LastModificationTime;
+                appMarketplaceContact.LastModificationTime = foundContactInfo.LastModificationTime;
                 appMarketplaceContact.AccountId = mainAccountID;
                 appMarketplaceContact.IsProfileData = true;
                 appMarketplaceContact.ObjectId = foundEntity.ObjectId;
