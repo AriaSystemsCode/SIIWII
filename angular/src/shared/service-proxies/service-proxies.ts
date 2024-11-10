@@ -68679,6 +68679,7 @@ export class VariationItemDto implements IVariationItemDto {
     stockAvailability!: number;
     appItemPriceInfos!: AppItemPriceInfo[] | undefined;
     ssin!: string | undefined;
+    manufacturerCode!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -68720,6 +68721,7 @@ export class VariationItemDto implements IVariationItemDto {
                     this.appItemPriceInfos!.push(AppItemPriceInfo.fromJS(item));
             }
             this.ssin = _data["ssin"];
+            this.manufacturerCode = _data["manufacturerCode"];
             this.id = _data["id"];
         }
     }
@@ -68759,6 +68761,7 @@ export class VariationItemDto implements IVariationItemDto {
                 data["appItemPriceInfos"].push(item.toJSON());
         }
         data["ssin"] = this.ssin;
+        data["manufacturerCode"] = this.manufacturerCode;
         data["id"] = this.id;
         return data;
     }
@@ -68775,6 +68778,7 @@ export interface IVariationItemDto {
     stockAvailability: number;
     appItemPriceInfos: AppItemPriceInfo[] | undefined;
     ssin: string | undefined;
+    manufacturerCode: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -70444,6 +70448,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     ssin!: string | undefined;
     nonLookupValues!: LookupLabelDto[] | undefined;
     manufacturerCode!: string | undefined;
+    tenantId!: number | undefined;
     id!: number;
 
     [key: string]: any;
@@ -70585,6 +70590,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
                     this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
             }
             this.manufacturerCode = _data["manufacturerCode"];
+            this.tenantId = _data["tenantId"];
             this.id = _data["id"];
         }
     }
@@ -70724,6 +70730,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
                 data["nonLookupValues"].push(item.toJSON());
         }
         data["manufacturerCode"] = this.manufacturerCode;
+        data["tenantId"] = this.tenantId;
         data["id"] = this.id;
         return data;
     }
@@ -70772,6 +70779,7 @@ export interface ICreateOrEditAppItemDto {
     ssin: string | undefined;
     nonLookupValues: LookupLabelDto[] | undefined;
     manufacturerCode: string | undefined;
+    tenantId: number | undefined;
     id: number;
 
     [key: string]: any;

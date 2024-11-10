@@ -10,6 +10,7 @@ using Abp.Application.Services.Dto;
 using onetouch.AppEntities.Dtos;
 using onetouch.Sessions.Dto;
 using System.Net;
+using System.Security.Policy;
 
 namespace onetouch.AppSiiwiiTransaction.Dtos
 {
@@ -161,6 +162,12 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public decimal Price { set; get; }
         public long TransactionId { set; get; }
         public TransactionType TransactionType { set; get; }
+    }
+    public class AccountDefaultAddressDto
+    {
+        public string AddressType { set; get; }
+        public long AddressId { set; get; }
+
     }
     //Iteration45
 }
