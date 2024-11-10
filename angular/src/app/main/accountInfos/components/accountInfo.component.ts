@@ -825,7 +825,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         }
     }
     showPublishProfileMsg(): void {
-        var isConfirmed: Observable<boolean>;
+     /*    var isConfirmed: Observable<boolean>;
         isConfirmed   = this.askToConfirm("DoYouWantToPublishYourProfileNow","");
 
         isConfirmed.subscribe((res)=>{
@@ -833,7 +833,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
                     this.publishProfile();
                 }
             }
-        );
+        ); */
     }
     changeStyleActionButton($event) {
         this.dropdownActionmenuhover = $event.type == 'mouseover' ? 'dropdownActionmenuhover' : '';

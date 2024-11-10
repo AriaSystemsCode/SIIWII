@@ -354,11 +354,11 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this._AccountsServiceProxy.publishProfile(true).pipe(
             finalize(() => this.hideMainSpinner()
             )).subscribe(
-            (response) => {
+            (response:boolean) => {
                 this.notify.success(this.l("Account sync Successfully"));
+                this.showIsSync = response;
+                this.isSync=response;
             });
-        this.showIsSync = false;
-        this.isSync=false;
 
     }
     showShare = true;

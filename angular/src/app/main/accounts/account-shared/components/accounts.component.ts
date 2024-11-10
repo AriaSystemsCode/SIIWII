@@ -210,8 +210,10 @@ export class AccountsComponent
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner();
         this.loading = true;
-        this._accountsServiceProxy
-            .getAll(
+        let apiCall;
+
+        if (!this.fromMarketplace) {
+            apiCall = this._accountsServiceProxy.getAll(
                 filters.search || undefined,
                 filters?.mainFilterType?.value || undefined,
                 undefined,
@@ -232,20 +234,44 @@ export class AccountsComponent
                 filters?.sorting?.value || undefined,
                 this.primengTableHelper.getSkipCount(this.paginator, event),
                 this.primengTableHelper.getMaxResultCount(this.paginator, event)
-            )
-            .pipe(
-                finalize(() => {
-                    this.primengTableHelper.hideLoadingIndicator();
-                    if (!this.active) this.active = true;
-                    this.loading = false;
-                    this.hideMainSpinner();
-                })
-            )
-            .subscribe((result) => {
-                this.accounts = result.items;
-                this.primengTableHelper.totalRecordsCount = result.totalCount;
-                this.primengTableHelper.records = result.items;
-            });
+            );
+        } else {
+            apiCall = this._marketplaceAccountsServiceProxy.getAll(
+                filters.search || undefined,
+                undefined,
+                undefined,
+                undefined,
+                filters.city || undefined,
+                filters.state || undefined,
+                filters.postalCode || undefined,
+                filters?.ssin || undefined,
+                filters?.accountTypeId || undefined,
+                filters?.accountType || undefined,
+                filters.accountTypes || undefined,
+                filters.statuses || undefined,
+                filters.languages || undefined,
+                filters.countries || undefined,
+                filters.classifications || undefined,
+                filters.categories || undefined,
+                filters.currencies || undefined,
+                filters?.sorting?.value || undefined,
+                this.primengTableHelper.getSkipCount(this.paginator, event),
+                this.primengTableHelper.getMaxResultCount(this.paginator, event)
+            );
+        }
+        
+        apiCall.pipe(
+            finalize(() => {
+                this.primengTableHelper.hideLoadingIndicator();
+                if (!this.active) this.active = true;
+                this.loading = false;
+                this.hideMainSpinner();
+            })
+        ).subscribe((result) => {
+            this.accounts = result.items;
+            this.primengTableHelper.totalRecordsCount = result.totalCount;
+            this.primengTableHelper.records = result.items;
+        });
     }
 
     reloadPage(): void {
