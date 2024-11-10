@@ -38,6 +38,7 @@
         [showAddressType]="false"
         [canChange]="canChange"
         [currentTab]="currentTab"
+        [shipInfoIndex]="1"
         [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) ? false : true"
         ></app-address>
     </div>
@@ -71,6 +72,7 @@
    <div   [ngClass]="createOrEditshippingInfO  ?  'd-block' : 'd-none'">
     <hr class="my-2" />
    <app-address 
+   [shipInfoIndex]="2"
    [appTransactionsForViewDto]="appTransactionsForViewDto"
    [isCreateOredit]="createOrEditshippingInfO"
    [contactId]="contactIdShipTo"

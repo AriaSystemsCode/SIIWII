@@ -78,6 +78,14 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     console.log("Buyer Contact before sync:", buyerContact);
 
     if (buyerContact) {
+      buyerContact.companyName = this.appTransactionsForViewDto.buyerCompanyName
+  buyerContact.companySSIN = this.appTransactionsForViewDto.buyerCompanySSIN
+  buyerContact.contactName = this.appTransactionsForViewDto.buyerContactName
+  buyerContact.branchName = this.appTransactionsForViewDto.buyerBranchName
+  buyerContact.branchSSIN = this.appTransactionsForViewDto.buyerBranchSSIN
+  buyerContact.contactEmail = this.appTransactionsForViewDto.buyerContactEMailAddress
+  buyerContact.contactPhoneNumber = this.appTransactionsForViewDto.buyerContactPhoneNumber
+  buyerContact.contactSSIN = this.appTransactionsForViewDto.buyerContactSSIN
         // List of roles to synchronize with Buyer contact
         const rolesToUpdate = [6, 4]; // 6: ShipToContact, 4: ShipFromContact
 

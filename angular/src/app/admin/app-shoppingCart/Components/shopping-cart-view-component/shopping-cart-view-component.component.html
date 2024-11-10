@@ -590,7 +590,7 @@
                                             <div class="mb-3 w-100">
                                               <label class="form-label">Price</label>
                                               <input
-                                                type="text"
+                                                type="number"
                                                 [(ngModel)]="selectedPrice"
                                                 formControlName="selectedPrice"
                                                 (ngModelChange)="updatePrice()"
@@ -608,7 +608,7 @@
                                         </form>
                                           
                                           <div class="d-flex justify-content-end">
-                                            <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false" [disabled]="selectedQuantity == 0 && !selectedVariation && selectedPrice">
+                                            <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false"    [disabled]="filterForm.invalid">
                                               <span>Add line</span>
                                             </button>
                                           </div>
@@ -641,7 +641,7 @@
                                             <div *ngIf="saveBtn" class="d-flex justify-content-center btns" >
                                             
                                                 <button  (click)="visible = false ;"  label="No" Class="p-button-no">No</button>
-                                                <button  (click)="saveVariations();visible = false" label="Yes" class="p-button-text" >Yes</button>
+                                                <button  (click)="saveVariations();visible = false;SuccessMsg = true" label="Yes" class="p-button-text" >Yes</button>
                                               </div>
                                           </p-dialog>
                                         
@@ -665,7 +665,7 @@
                                             <div class="d-flex justify-content-center btns" >
                                             
                                          
-                                              <button  (click)="SuccessMsg = false;" label="Ok" class="p-button-text" >Ok</button>
+                                              <button  (click)="SuccessMsg = false;showSaveCancel = false;cancelAddLine()" label="Ok" class="p-button-text" >Ok</button>
                                             </div>
                                           </p-dialog> 
                                     </div>
@@ -998,6 +998,8 @@ height: 48px;"
                                 <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                     *ngIf="!buyerContactInfoValid"></i>
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
+                                <p *ngIf="!buyerContactInfoValid" class="mx-2">*Please select valid account or create a new one</p>
+
                             </div>
                         </ng-template>
                         <div *ngIf="currentTab==1">
@@ -1073,6 +1075,8 @@ height: 48px;"
                                     *ngIf="!shippingInfOValid"></i>
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor"> {{l("Shippinginformation")}}
                                 </h6>
+                                <p *ngIf="!shippingInfOValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')" class="mx-2">*Please select or add ( ship to) address</p>
+
                             </div>
                         </ng-template>
                         <div *ngIf="currentTab==4">
@@ -1095,6 +1099,8 @@ height: 48px;"
                                 <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
                                     *ngIf="!BillingInfoValid"></i>
                                 <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("BillingInformation")}}</h6>
+                                <p  *ngIf="!BillingInfoValid && (appTransactionsForViewDto.buyerCompanySSIN == null || appTransactionsForViewDto.buyerCompanySSIN == '')"  class="mx-2">*Please select or add billing address</p>
+
                             </div>
                         </ng-template>
                         <div *ngIf="currentTab==5">
@@ -1347,7 +1353,7 @@ height: 48px;"
                                       </div>
                                       
                                       <div class="d-flex justify-content-end">
-                                        <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false" [disabled]="selectedQuantity == 0 || !selectedVariation">
+                                        <button class="addNbtn" *ngIf="showAddLine" (click)="addNewLine(); showSaveCancel = true; addLine= true; showAddLine = false"  [disabled]="filterForm.invalid">
                                           <span>Add line</span>
                                         </button>
                                       </div>

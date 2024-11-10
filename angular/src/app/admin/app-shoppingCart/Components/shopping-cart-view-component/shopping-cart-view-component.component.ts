@@ -19,7 +19,7 @@ import { CommentParentComponent } from '@app/main/interactions/components/commen
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
 import { AppConsts } from '@shared/AppConsts';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-shopping-cart-view-component',
@@ -95,7 +95,7 @@ export class ShoppingCartViewComponentComponent
   incrementCount: number = 10;
 totalVariationsCount: number = 0;
 
-  selectedVariation: any;
+  selectedVariation: string = '';
   selectedPrice: number = 0; // Holds the selected price
 selectedQuantity: number = 0; // Holds the entered quantity
 selectedImg: number = 0; // Holds the entered quantity
@@ -1049,9 +1049,9 @@ initFilterForm() {
 
   // if (this.showHeader) {
       this.filterForm = this._formBuilder.group({
-          selectedVariation: undefined,
-          selectedPrice: undefined,
-          selectedQuantity: undefined,
+        selectedVariation: ['', Validators.required],
+        selectedQuantity: [null, [Validators.required, Validators.min(1)]],
+        selectedPrice: [null, [Validators.required, Validators.min(1)]]
 
       });
  
@@ -1078,7 +1078,7 @@ addNewLine() {
     code: appItem?.code,
     manufacturerCode: appItem?.manufacturerCode,
     name: appItem?.name,
-    qty: this.selectedQuantity,
+    qty: filters.selectedQuantity,
     price: filters.selectedPrice,
     amount: filters.selectedQuantity * filters.selectedPrice,
     image: appItem?.imageUrl,
@@ -1175,10 +1175,11 @@ loadMore(event: MouseEvent, dropdown: any) {
 onVariationSelect(event: any) {
   // Reset quantity and price when a new variation is selected  
   console.log(event,'mmmmmmevv')
-  const filters = this.filterForm.value;
-
+// this.filterForm.reset();
+  // filters.reset()
+  this.filterForm.controls['selectedQuantity']?.setValue(0);
   this.selectedQuantity = 0;
-  this.selectedPrice = 0;
+  // this.selectedPrice = 0;
   this.newData = event;
 
   if ( event.value.appItem.price) {
@@ -1192,22 +1193,27 @@ onVariationSelect(event: any) {
 
 updateAmount() {
   const filters = this.filterForm.value;
+  
  this.selectedPrice = filters.selectedPrice
+ this.selectedQuantity = filters.selectedQuantity
   // Calculate the amount based on the quantity and selected price
   this.amount = this.selectedQuantity * this.selectedPrice;
 }
 
 updatePrice() {
   const filters = this.filterForm.value;
-
+  this.selectedQuantity = filters.selectedQuantity
 
   // Calculate the amount based on the quantity and selected price
-  this.amount = filters.selectedQuantity * filters.selectedPrice;
+  this.amount = filters.selectedQuantity * this.selectedPrice;
 }
 
 saveVariations() {
   const body = new AddVariationToInputDto();
-
+  const filters = this.filterForm.value;
+  
+ this.selectedPrice = filters.selectedPrice
+ this.selectedQuantity = filters.selectedQuantity
   // Assign each property to the DTO object
   body.variationSSIN = this.newData?.value?.appItem?.ssin;
   body.qty = this.selectedQuantity;
@@ -1221,7 +1227,8 @@ saveVariations() {
   this.selectedQuantity = 0;
   this.selectedPrice = 0
   this.amount = 0;
-  this.hideMainSpinner()
+  // this.filterForm.value.reset()
+  // this.hideMainSpinner()
   this.getShoppingCartData();
   this.showSaveCancel = false
 
@@ -1241,7 +1248,11 @@ cancelAddLine() {
   this.addNewLinebtn = true
  
     this.selectedVariation = '';
-  this.selectedQuantity = 0;
+    this.filterForm.controls['selectedQuantity']?.setValue(0);
+    this.filterForm.controls['selectedPrice']?.setValue(0);
+
+    this.selectedQuantity = 0;
+
   this.selectedPrice = 0
   this.amount = 0;
   this.shoppingCartTreeNodes.pop(); // Removes the last item

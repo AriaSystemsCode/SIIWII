@@ -40,7 +40,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     AddressTypesList:any=[];
     addType:any;
     @Output("updateSelectedAddress") updateSelectedAddress = new EventEmitter<any>();
-
+    @Input("shipInfoIndex") shipInfoIndex: number;
     @ViewChild("addressForm") addressForm: NgForm;
     @Input("canChange")  canChange:boolean=true;
 
@@ -196,9 +196,11 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
         this.address.accountId=this.contactId;
         this.addressIdForEdit?this.address.id=this.addressIdForEdit:null;
         let addNew = this.addressIdForEdit == null || this.addressIdForEdit == undefined || this.addressIdForEdit == 0
+
         this._accountsServiceProxy.createOrEditAddress(this.address)
         .pipe(finalize(() => { this.saving = false;}))
         .subscribe((value) => {
+
             this.notify.info(this.l('SavedSuccessfully'));
             addressForm.resetForm();
             this.discardAddressForm();
@@ -213,79 +215,99 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
             }
         });
     }
-    savetempAddress(addressForm: NgForm) {
-        this.saving = true;
-    
-        // Assign address fields from the form
-        this.address.code = addressForm.value.addressCode;
-        this.address.name = addressForm.value.addressName;
-        this.address.addressLine1 = addressForm.value.address1;
-        this.address.addressLine2 = addressForm.value.address2;
-        this.address.city = addressForm.value.cityAddress;
-        this.address.state = addressForm.value.State;
-        this.address.postalCode = addressForm.value.postalCode;
-        this.address.countryId = addressForm.value.AddressCountry;
-        this.address.accountId = this.contactId;
-    
-        // Handle the address ID for editing
-        if (this.addressIdForEdit) {
-            this.address.id = this.addressIdForEdit;
-        }
-    
-        // Determine if this is a new address
-        const addNew = !this.addressIdForEdit;
-    
-        // Call the service to create or edit the address
-        this._accountsServiceProxy.createOrEditAddress(this.address)
-            .pipe(finalize(() => { this.saving = false; }))
-            .subscribe((value) => {
-                this.notify.info(this.l('SavedSuccessfully'));
-                addressForm.resetForm();
-                this.discardAddressForm();
-    
-                // If adding a new address
-                if (addNew) {
-                    this.savedAddressesList.push(value); // Add new address to the list
-                    this.showAddList = true;
-    
-                    // Find the relevant role contact and update its address details
-                    const roleContact = this.appTransactionsForViewDto.appTransactionContacts.find(contact => contact.contactRole === 6);
-                    if (roleContact) {
-                        // Update the contact's address details
-                        roleContact.contactAddressDetail = {
-                            ...roleContact.contactAddressDetail, // Preserve existing properties
-                            code: value.code, // Use the saved value
-                            name: value.name, // Use the saved value
-                            addressLine1: value.addressLine1, // Use the saved value
-                            addressLine2: value.addressLine2, // Use the saved value
-                            city: value.city, // Use the saved value
-                            state: value.state, // Use the saved value
-                            postalCode: value.postalCode, // Use the saved value
-                            countryId: value.countryId, // Use the saved value
-                            accountId: this.contactId,
-                            contactEmail: addressForm.value.contactEmail || '', // Optional: Provide fallback if needed
-                            contactPhone: addressForm.value.contactPhone || '', // Optional: Provide fallback if needed
-                            // tenantId: this.tenantId || 0, // Ensure you set your tenantId if needed
-                            countryCode: addressForm.value.countryCode || 'N/A', // Optional: Set a default or from form
-                            countryIdName: addressForm.value.countryIdName || '', // Optional fallback
-                            useDTOTenant: false, // Default or derived value
-                            id: value.id, // Use the ID of the newly saved address
-                            init: () => { /* Define init function or method */ }, // Placeholder or actual function
-                            toJSON: () => JSON.stringify(this) // Basic implementation or modify as needed
-                        };
-                        console.log(this.appTransactionsForViewDto.appTransactionContacts[2],'klll')
-                    }
-    
-                } else {
-                    // Update existing address in the savedAddressesList
-                    const index = this.savedAddressesList.findIndex(item => item.id === value.id);
-                    if (index !== -1) {
-                        this.savedAddressesList[index] = value; // Update existing address
-                    }
-                    this.addressIdForEdit = null; // Clear edit mode
-                }
-            });
+    generateNewId(): number {
+        return Date.now(); // Generates a unique ID based on the current timestamp
     }
+savetempAddress(addressForm: NgForm) {
+    this.saving = true;
+
+    // Assign address fields from the form
+    this.address.id = this.generateNewId();
+    this.address.code = addressForm.value.addressCode;
+    this.address.name = addressForm.value.addressName;
+    this.address.addressLine1 = addressForm.value.address1;
+    this.address.addressLine2 = addressForm.value.address2;
+    this.address.city = addressForm.value.cityAddress;
+    this.address.state = addressForm.value.State;
+    this.address.postalCode = addressForm.value.postalCode;
+    this.address.countryId = addressForm.value.AddressCountry;
+    this.address.countryCode = addressForm.value.countryCode;
+    this.address.countryName = addressForm.value.AddressCountry;
+    this.addressIdForEdit?this.address.id=this.addressIdForEdit:null;
+        let addNew = this.addressIdForEdit == null || this.addressIdForEdit == undefined || this.addressIdForEdit == 0
+    // Handle the address ID for editing
+    if (this.addressIdForEdit) {
+        this.address.id = this.addressIdForEdit;
+    }
+
+    // If editing, find and update the existing address in the list; else, add a new address
+    if (this.addressIdForEdit) {
+        const index = this.savedAddressesList.findIndex(addr => addr.id === this.addressIdForEdit);
+        if (index !== -1) {
+            this.savedAddressesList[index] = { ...this.address }; // Update the existing address
+        }
+    } else {
+        this.savedAddressesList.push({ ...this.address }); // Add new address to the list
+    }
+
+    this.saving = false;
+    this.openAddNewAddForm = false;
+    addressForm.resetForm();
+    this.discardAddressForm();
+    this.addressIdForEdit = null; // Reset edit mode
+
+
+    // console.log('Address saved:', this.address);
+    // console.log('Updated savedAddressesList:', this.savedAddressesList);
+}
+addAddressDataToDto(index:number) {
+    // const buyerContact = this.appTransactionsForViewDto.appTransactionContacts.find(
+    //     contact => contact.contactRole === 1
+    // );
+    // Update the contact address details if roleContact exists with contactRole 6
+    let Role 
+    if (index  ==2 ) {
+        Role = 6
+    } else if (Role == 1) {
+        Role = 4
+    }
+    const roleContact = this.appTransactionsForViewDto.appTransactionContacts.find(contact => contact.contactRole === Role);
+    if (roleContact) {
+        roleContact.contactAddressCity = this.selectedAddress.city;
+        roleContact.contactAddressCountryCode = this.selectedAddress.countryCode;
+        roleContact.contactAddressCountryId = this.selectedAddress.countryId;
+        // roleContact.branchName = buyerContact.branchName;
+        // roleContact.branchSSIN = buyerContact.branchSSIN
+        // roleContact.contactSSIN = buyerContact.contactSSIN;
+        // roleContact.contactName = buyerContact.contactName;
+        // roleContact.contactEmail = buyerContact.contactEmail;
+        // roleContact.contactPhoneNumber = buyerContact.contactPhoneNumber;
+        // roleContact.contactPhoneTypeId = buyerContact.contactPhoneTypeId;
+        // roleContact.contactAddressCity = buyerContact.contactAddressCity;
+        // roleContact.contactAddressCode = buyerContact.contactAddressCode;
+        // roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
+        // roleContact.contactAddressCountryId = buyerContact.contactAddressCountryId;
+        roleContact.contactAddressDetail = {
+            ...roleContact.contactAddressDetail,
+            code: this.selectedAddress.code,
+            name: this.selectedAddress.addressName,
+            countryName: this.selectedAddress.countryName,
+            addressLine1: this.selectedAddress.addressLine1,
+            addressLine2: this.selectedAddress.addressLine2,
+            city: this.selectedAddress.city,
+            state: this.selectedAddress.state,
+            postalCode: this.selectedAddress.postalCode,
+            countryId: this.selectedAddress.countryId,
+            countryCode: this.selectedAddress.countryCode ,
+            countryIdName: this.selectedAddress.countryIdName || '', 
+            init: () => { /* Define init function or method */ }, // Placeholder or actual function
+            toJSON: () => JSON.stringify(this) // Basic implementation or modify as needed
+        };
+    }
+    console.log(this.appTransactionsForViewDto?.appTransactionContacts[2],'llkkkoo')
+    console.log(this.appTransactionsForViewDto?.appTransactionContacts[3],'llkkkvvoo')
+    
+}
     
     editAddress(addressId){
         this.openAddAddressForm();
@@ -313,8 +335,52 @@ this.selectedAddress.city=  this.selectedAddress?.city ? this.selectedAddress?.c
 this.selectedAddress.state=  this.selectedAddress?.state ? this.selectedAddress?.state : '' ;
 this.selectedAddress.countryName=  this.selectedAddress?.countryName ? this.selectedAddress?.countryName : '' ;
 this.selectedAddress.postalCode=  this.selectedAddress?.postalCode ? this.selectedAddress?.postalCode : '' ;
+this.selectedAddress.countryId=  this.selectedAddress?.countryId ? this.selectedAddress?.countryId : '' ;
+this.selectedAddress.code=  this.selectedAddress?.code ? this.selectedAddress?.code : '' ;
+this.selectedAddress.state=  this.selectedAddress?.state ? this.selectedAddress?.state : '' ;
 
+ if(this.appTransactionsForViewDto?.buyerCompanySSIN == '' || this.appTransactionsForViewDto?.buyerCompanySSIN == null) {
+    if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo && this.shipInfoIndex == 2) {
+        this.addAddressDataToDto (2)
+
+    } else if (this.currentTab == ShoppingCartoccordionTabs.BillingInfo && this.shipInfoIndex == 1) {
+        this.addAddressDataToDto (1)
+
+    }
+ }
 this.updateSelectedAddress.emit({id:addId,code:currentAddress[0].code,selectedAddressObj:this.selectedAddress});
+}
+deleteTempAddress(addressId) {
+    Swal.fire({
+        title: "",
+        text: "Are you sure that you want to delete this address?",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        backdrop: true,
+        customClass: {
+          popup: 'popup-class',
+          icon: 'icon-class',
+          content: 'content-class',
+          actions: 'actions-class',
+          confirmButton: 'confirm-button-class2',
+  
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+            const index = this.savedAddressesList.findIndex(item=>item.id === addressId)
+            this.savedAddressesList.splice(index,1)
+            this.notify.success(this.l("DeletedSuccessfully"));
+            if(this.savedAddressesList.length==0){
+                this.openAddAddressForm();
+                this.showAddList=false;
+                this.selectedAddress=null;
+            }
+        }
+      })
 }
 showAddressList(){
     this.showAddList=true;
