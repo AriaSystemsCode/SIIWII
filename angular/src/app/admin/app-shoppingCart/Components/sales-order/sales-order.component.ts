@@ -607,16 +607,16 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             this.availableDate=this.startDate;
         }
 
-        let enteredDate = this.enteredDate.toLocaleString();
-        let startDate = this.startDate.toLocaleString();
-        let availableDate = this.availableDate.toLocaleString();
-        let completeDate = this.completeDate.toLocaleString();
+        let enteredDate = this.enteredDate;
+        let startDate = this.startDate;
+        let availableDate = this.availableDate;
+        let completeDate = this.completeDate;
             console.log(enteredDate,'enteredDate')
 
-        this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-        this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-        this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-        this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+        this.appTransactionsForViewDto.enteredDate =   moment(enteredDate);
+        this.appTransactionsForViewDto.startDate = moment(startDate);
+        this.appTransactionsForViewDto.availableDate = moment(availableDate);
+        this.appTransactionsForViewDto.completeDate = moment(completeDate);
         console.log(this.appTransactionsForViewDto.enteredDate,'this.appTransactionsForViewDto.enteredDate')
 
     }
