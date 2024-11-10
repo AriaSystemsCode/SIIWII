@@ -109,17 +109,17 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(!string.IsNullOrEmpty(input.Filter),
                                 x => x.Name.Contains(input.Filter) || x.TradeName.Contains(input.Filter))
 
-                            .WhereIf(input.FilterType <= 1 && input.FilterType != 6,
-                                x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null && x.EntityObjectStatusId != cancelledStatusId))
-                            .WhereIf(input.FilterType == 2 && input.FilterType != 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
-                                && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
-                            .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null))
-                             .WhereIf(input.FilterType == 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null)
-                                || (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
-                                && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
+                            //.WhereIf(input.FilterType <= 1 && input.FilterType != 6,
+                            //    x => (x.TenantId == null && !x.IsProfileData && x.ParentId == null && x.EntityObjectStatusId != cancelledStatusId))
+                            //.WhereIf(input.FilterType == 2 && input.FilterType != 6,
+                            //    x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
+                            //    && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
+                            //.WhereIf(input.FilterType >= 3 && input.FilterType != 6,
+                            //    x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null))
+                            // .WhereIf(input.FilterType == 6,
+                            //    x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN == null)
+                            //    || (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.SSIN == null && x.SSIN != null)
+                            //    && (_appMarketplaceContactRepository.GetAll().Count(c => c.TenantId == null && c.SSIN == x.SSIN) > 0))
 
                             .WhereIf(!string.IsNullOrEmpty(input.Name),
                                 x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))

@@ -3523,7 +3523,7 @@ namespace onetouch.Accounts
                 .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk)
                 .Include(x => x.AppContactPaymentMethods)
                 .FirstOrDefaultAsync(x => x.IsProfileData);
-
+            
 
             if (contactOriginal == null)
                 throw new UserFriendlyException("Ooppps! Please Save My Profile First!");
@@ -3539,6 +3539,7 @@ namespace onetouch.Accounts
 
             contactPaymentMethod.ContactId = contactOriginal.Id;
             contactPaymentMethod.TenantId = (int)AbpSession.TenantId;
+            SetAccountSync((long)contactOriginal.Id);
 
             //add the card in authorize.net first, and throw new exception if not succeed so it will be loged by the aspnetzero
             var billingAddress = contactOriginal.AppContactAddresses.FirstOrDefault(e => e.AddressTypeFk.Code == "BILLING");
@@ -3873,10 +3874,24 @@ namespace onetouch.Accounts
         }
         //MAriam[End]
 
+        public  void SetAccountSync (long AccountId)
+        {
+            var account =  _appContactRepository.GetAll()
+                .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
+                .FirstOrDefaultAsync(x => x.Id == AccountId).Result;
+
+            if (account != null)
+            { account.LastModificationTime = DateTime.Now;  
+            }
+             
+        }
+
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         protected virtual async Task<ContactDto> CreateContact(ContactDto input)
         {
             var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+            SetAccountSync((long)input.ParentId);
+
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             if(!string.IsNullOrEmpty(input.EntityObjectType) )
             { presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeName(input.EntityObjectType); }
@@ -4131,7 +4146,7 @@ namespace onetouch.Accounts
         {
             var sydObject = await _appContactRepository.GetAll().Include(x => x.AppContactAddresses).Where(x => x.Id == input.Id).FirstOrDefaultAsync();
             ObjectMapper.Map(input, sydObject);
-
+            SetAccountSync((long)input.ParentId);
             //deleted removed addreses
             foreach (var item in sydObject.AppContactAddresses)
             {
@@ -4526,7 +4541,7 @@ namespace onetouch.Accounts
 
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
             var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);
-
+            SetAccountSync((long)input.ParentId);
             var entity = new AppEntity();
             entity.ObjectId = entityParent.ObjectId;
             entity.EntityObjectTypeId = entityParent.EntityObjectTypeId;
@@ -4620,6 +4635,7 @@ namespace onetouch.Accounts
         {
             var sydObject = await _appContactRepository.GetAll().Include(x => x.AppContactAddresses).Where(x => x.Id == input.Id).FirstOrDefaultAsync();
             ObjectMapper.Map(input, sydObject);
+            SetAccountSync((long)input.ParentId);
             //deleted removed addreses
             foreach (var item in sydObject.AppContactAddresses)
             {
@@ -4687,6 +4703,7 @@ namespace onetouch.Accounts
                         //MMT
                         //.Where(x => x.IsProfileData)
                         .Where(e => e.ParentId != null && e.ParentId == parentId && e.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId);
+
             var branches = from o in filteredBranches
                            join o2 in _appContactRepository.GetAll() on o.ParentId equals o2.Id into j2
                            from s2 in j2.DefaultIfEmpty()
@@ -4770,7 +4787,7 @@ namespace onetouch.Accounts
                 input.TenantId = AbpSession.TenantId;
             }
 
-
+            SetAccountSync((long)input.AccountId);
             var address = ObjectMapper.Map<AppAddress>(input);
 
             var value = await _appAddressRepository.InsertAsync(address);
@@ -4805,7 +4822,7 @@ namespace onetouch.Accounts
         {
             var address = await _appAddressRepository.FirstOrDefaultAsync((int)input.Id);
             ObjectMapper.Map(input, address);
-
+            SetAccountSync((long)input.AccountId);
             return input;
         }
 

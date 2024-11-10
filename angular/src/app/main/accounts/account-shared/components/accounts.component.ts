@@ -57,7 +57,7 @@ export class AccountsComponent
     entityHistoryEnabled = false;
 
    // accounts: GetAccountForViewDto[] = [];
-    accounts:GetMarketplaceAccountForViewDto[]=[];
+    accounts:GetAccountForViewDto[]=[];
     sortingOptions: SelectItem[];
 
     active: boolean = false;
@@ -210,7 +210,7 @@ export class AccountsComponent
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner();
         this.loading = true;
-        this._marketplaceAccountsServiceProxy
+        this._accountsServiceProxy
             .getAll(
                 filters.search || undefined,
                 filters?.mainFilterType?.value || undefined,
