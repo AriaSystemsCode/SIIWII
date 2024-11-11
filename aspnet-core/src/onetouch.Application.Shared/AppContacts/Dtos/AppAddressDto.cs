@@ -17,7 +17,7 @@ namespace onetouch.AppContacts
 		public virtual string Code { get; set; }
 		public int? TenantId { get; set; }
 		//Mariam
-		public long AccountId { get; set; }
+		public long? AccountId { get; set; }
 		//Mariam
 		public virtual string Name { get; set; }
 

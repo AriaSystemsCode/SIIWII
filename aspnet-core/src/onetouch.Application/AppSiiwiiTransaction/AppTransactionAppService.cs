@@ -5726,8 +5726,10 @@ namespace onetouch.AppSiiwiiTransaction
                   .WhereIf(input.TransactionTypeFilter != null, z => z.TransactionIdFk.EntityObjectTypeId == transactionType)
                   .WhereIf(!string.IsNullOrEmpty(input.TransactionNumberFilter), z => z.TransactionCode == input.TransactionNumberFilter)
                   .WhereIf(!string.IsNullOrEmpty(input.NameFilter!), z => z.Name.ToUpper().Contains(input.NameFilter.ToUpper()))
-                  .WhereIf(input.MinPrice!=null && input.MaxPrice!=null, z=>z.NetPrice >= input.MinPrice && z.NetPrice <= input.MaxPrice)
-                  .WhereIf(input.MinAmount != null && input.MaxAmount != null, z => z.Amount >= input.MinAmount && z.Amount <= input.MaxAmount)
+                  .WhereIf(input.MinPrice!=null, z => z.NetPrice >= input.MinPrice)
+                  .WhereIf(input.MaxPrice!=null,z=> z.NetPrice <= input.MaxPrice)
+                  .WhereIf(input.MinAmount != null, z => z.Amount >= input.MinAmount)
+                  .WhereIf(input.MaxAmount != null,z=> z.Amount <= input.MaxAmount)
                   .WhereIf(!string.IsNullOrEmpty(input.VariationCodeFilter), z => z.ManufacturerCode.ToUpper().Contains(input.VariationCodeFilter.ToUpper()));
 
                 var tranDetail = from o in transDetail
