@@ -147,9 +147,24 @@ a.btn {
         color: white;
         border-radius: 6px;
     }
+    .relation_Status_button{
+        background-color: #FBFBFBFB;
+        color: #4A0D4A;
+        border-radius: 6px;
+        border: 1px solid #EEEEEEEE;
+    }
 }
 
 .shadow,
 .shadowContainer {
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
+
+.no-padding-bottom {
+    padding-bottom: 0px !important;
+  }
+  
+  .extra-padding-bottom {
+    padding-bottom: 50px !important;
+  }
+  
