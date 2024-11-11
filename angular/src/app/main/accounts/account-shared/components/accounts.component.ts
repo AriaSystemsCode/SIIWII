@@ -411,4 +411,21 @@ export class AccountsComponent
         if ($event)
             this.reloadPage();
     }
+
+
+    createRelation($event) {
+        // this.showMainSpinner();
+        // this._accountsServiceProxy
+        //     .()
+        //     .pipe(
+        //         finalize(() => {
+        //             this.getAccounts();
+        //             this.hideMainSpinner();
+        //         })
+        //     )
+        //     .subscribe(() => {
+
+        //     });
+    }
+
 }

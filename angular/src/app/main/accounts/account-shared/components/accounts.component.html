@@ -238,7 +238,8 @@
                                                     connect(account.account)
                                                 " (disconnectMe)="
                                                     disconnect(account.account)
-                                                " [isHost]="isHost"></app-account-card>
+                                                " [isHost]="isHost"
+                                                (_createRelation)="createRelation($event)"></app-account-card>
                                         </div>
                                         <div class="font-weight-normal mt-5 p-5 text-center w-100"
                                             *ngIf="accounts.length == 0 && !loading">
