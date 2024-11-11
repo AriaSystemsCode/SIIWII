@@ -109,33 +109,33 @@ a.btn {
 }
 
 .memberCard_container {
-    border: 1px solid rgba(238, 238, 238, 0.9333333333);
+    border: 1px solid #EEEEEE;
     border-radius: 10px;
     padding: 10px;
 
     .card-name {
         color: #1b101b;
-        font-size: 16px;
+        font-size: 12px;
         font-weight: 700 !important;
     }
 
     .accountType_label {
-        color: #9e9e9e;
-        font-weight: 500;
-        vertical-align: sub;
+        font-weight: 600;
         font-size: 14px;
+        color: black;
     }
 
     .accountType_value,
     .connectionName {
-        float: right;
+        //float: right;
         border: 1px solid #eeeeee;
         border-radius: 4px;
-        padding: 3px 5px;
+        padding: 4px 12px;
         padding-top: 5px;
         background: #fbfbfb;
         color: #1b101b;
-        font-size: 12px;
+        font-size: 10px;
+        font-weight: 600 !important;
     }
 
     .connectionName {

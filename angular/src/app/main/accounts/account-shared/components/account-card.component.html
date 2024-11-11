@@ -1,10 +1,12 @@
-<div class="single-item mr-1 row w-80 p-4 memberCard_container shadowContainer">
+<div class="single-item mr-1 row w-80  memberCard_container shadowContainer"
+[ngClass]="singleItemPerRowMode?'p-0' : 'p-4'">
     <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
         'background-image':
         account.account.logoUrl ?
         'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl+ ')'  :
-        ''
-    }"
+        '' , 
+    'height': singleItemPerRowMode ? 'auto' : '100px'
+}"
     (click)="clickCardHandler()"
     >
         <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
@@ -12,43 +14,65 @@
     <div class="single-item-body col " [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}" >
         <div class="row">
             <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-11'" >
-                <h3 (click)="clickCardHandler()" class="card-name" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">{{account?.account?.name}}</h3>
+                <h3 (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">{{account?.account?.name}}</h3>
                 <p  class="text-primary m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
                     {{ account?.account.description  | textSubstring : 60 }}
                 </p>
-                <p *ngIf="singleItemPerRowMode && account.account.classfications" class="text-dark m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
+                <p *ngIf="singleItemPerRowMode && account.account.categories" class="text-dark m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'" style="font-weight: 600;
+                font-size: 14px;">
+                                <b>{{"Categories" | localize}}</b> :
+                                <span class="ml-5" >
+                                <span *ngFor="let category of account.account.categories;let last = last" class="ml-3" style="background-color: #F8F8F8F8 !important;
+                                padding: 5px;
+                                border: 1px solid #E6E6E6;
+                                border-radius: 4px;
+                                margin-right: 5px;">
+                                    {{ category }}
+                                    <!-- {{ last ? '' : ', ' }} -->
+                                </span>
+                                
+                                <span *ngIf="account.account.categories.length === 0"  class="ml-3">
+                                    {{ "NotSpecified" | localize }}
+                                </span>
+                            </span>
+                            </p>
+                <p *ngIf="singleItemPerRowMode && account.account.classfications" class="text-dark m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'" style="font-weight: 600;
+    font-size: 14px;">
                     <b>{{ "Classifications" | localize }}</b> :
-                    <span *ngFor="let class of account.account.classfications;let last = last">
-                        {{ class }}{{ last ? '' : ', ' }}
+                    <span class="ml-3" >
+                    <span *ngFor="let class of account.account.classfications;let last = last"  class="ml-3" style="background-color: #F8F8F8F8 !important;
+                    padding: 5px;
+                    border: 1px solid #E6E6E6;
+                    border-radius: 4px;
+                    margin-right: 5px;">
+                        {{ class }}
+                        <!-- {{ last ? '' : ', ' }} -->
                     </span>
-                    <span *ngIf="account.account.classfications.length === 0">
+                    <span *ngIf="account.account.classfications.length === 0"  class="ml-3">
                         {{ "NotSpecified" | localize }}
                     </span>
+                </span>
                 </p>
-                <p *ngIf="singleItemPerRowMode && account.account.categories" class="text-dark m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
-                    <b>{{"Categories" | localize}}</b> :
-                    <span *ngFor="let category of account.account.categories;let last = last">
-                        {{ category }}{{ last ? '' : ', ' }}
-                    </span>
-                    <span *ngIf="account.account.categories.length === 0">
-                        {{ "NotSpecified" | localize }}
-                    </span>
-                </p>
+              
 
-                <div style="margin-top: 10px;" >
-                    <b class="accountType_label">{{"AccountType" | localize}}: </b>
+                <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'">
+                    <b class="accountType_label"
+                    [ngStyle]="{
+                        'color': singleItemPerRowMode ? 'black' : '#595959'
+                }"
+                    >{{"AccountType" | localize}}: </b>
                     <!-- <span *ngFor="let accountType of account.account.accountType;let last = last">
                         {{ accountType }}{{ last ? '' : ', ' }}
                     </span> -->
-                    <span class="accountType_value">
+                    <span class="accountType_value ml-3">
                         {{ account.account.accountType }}
                     </span>
                     
                     <span *ngIf="account.account.accountType.length === 0">
                         {{ "NotSpecified" | localize }}
                     </span>
-                    <span *ngIf="singleItemPerRowMode" >
-                        <span *ngIf="account.account.status !== null && account.account.accountType !== null">|</span>
+                    <span *ngIf="singleItemPerRowMode d-block" >
+                        <!-- <span *ngIf="account.account.status !== null && account.account.accountType !== null">|</span>
                         <b class="ml-1 mr-1" *ngIf="account.account.addressLine1 || account.account.city || account.account.countryName  || account.account.state">
                             <i class="flaticon-placeholder-2"></i>
                         </b>
@@ -63,9 +87,11 @@
                         </span>
                         <span *ngIf="account.account.state">
                             , {{account.account.state}} ,
-                        </span>
-                        <b class="ml-1">{{ "Zipcode" | localize }}: </b>
-                        <span >
+                        </span> -->
+                        <b  style="font-weight: 600;
+                        font-size: 14px;
+                        color: black;">{{ "Zipcode" | localize }}: </b>
+                        <span  class="ml-2">
                              {{ account.account.zipCode ? account.account.zipCode  : "NotSpecified" | localize }}
                         </span>
                     </span>
