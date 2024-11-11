@@ -112,7 +112,7 @@
                                         class="editjobTitle form-control form-control-sm aria-input-text"
                                         name="JobTitle" #JobTitleInput="ngModel" required name="JobTitle" minlength="2"
                                         maxlength="100" [(ngModel)]="editjobTitleValue"
-                                        [placeholder]="'PleaseEnterJobTitle' | localize " [class.hide]="editInfo">
+                                        [placeholder]="'PleaseEnterJobTitle' | localize " required [class.hide]="editInfo">
                                     <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
                                 </div>
                                 <hr class="header" *ngIf="memberData?.contact?.joinDateIsPublic">
@@ -219,7 +219,7 @@
                                 <div class="row ml-5">
                                     <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
                                     style="color: white !important;"
-                                        [class.hide]="editInfo" (click)="Save_editMember()">
+                                        [class.hide]="editInfo" (click)="Save_editMember()" [disabled]="!editjobTitleValue">
                                         {{ "SaveChanges" | localize }}
                                     </button>
 
