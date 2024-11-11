@@ -58892,7 +58892,7 @@ export interface IContactForEditDto {
 export class AppAddressDto implements IAppAddressDto {
     code!: string | undefined;
     tenantId!: number | undefined;
-    accountId!: number;
+    accountId!: number | undefined;
     name!: string | undefined;
     addressLine1!: string | undefined;
     addressLine2!: string | undefined;
@@ -58973,7 +58973,7 @@ export class AppAddressDto implements IAppAddressDto {
 export interface IAppAddressDto {
     code: string | undefined;
     tenantId: number | undefined;
-    accountId: number;
+    accountId: number | undefined;
     name: string | undefined;
     addressLine1: string | undefined;
     addressLine2: string | undefined;
@@ -78745,7 +78745,7 @@ export class ContactAppAddressDto implements IContactAppAddressDto {
     contactPhone!: string | undefined;
     code!: string | undefined;
     tenantId!: number | undefined;
-    accountId!: number;
+    accountId!: number | undefined;
     name!: string | undefined;
     addressLine1!: string | undefined;
     addressLine2!: string | undefined;
@@ -78832,7 +78832,7 @@ export interface IContactAppAddressDto {
     contactPhone: string | undefined;
     code: string | undefined;
     tenantId: number | undefined;
-    accountId: number;
+    accountId: number | undefined;
     name: string | undefined;
     addressLine1: string | undefined;
     addressLine2: string | undefined;
@@ -81610,7 +81610,7 @@ export class ContactAddressDto implements IContactAddressDto {
     isSelected!: boolean;
     code!: string | undefined;
     tenantId!: number | undefined;
-    accountId!: number;
+    accountId!: number | undefined;
     name!: string | undefined;
     addressLine1!: string | undefined;
     addressLine2!: string | undefined;
@@ -81694,7 +81694,7 @@ export interface IContactAddressDto {
     isSelected: boolean;
     code: string | undefined;
     tenantId: number | undefined;
-    accountId: number;
+    accountId: number | undefined;
     name: string | undefined;
     addressLine1: string | undefined;
     addressLine2: string | undefined;

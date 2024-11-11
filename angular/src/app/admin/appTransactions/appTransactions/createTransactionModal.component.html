@@ -485,13 +485,15 @@
                             type="text"
                             name=""
                             id=""
-                            required
+                            
+                            [value]="'Main'"
+                            readonly
                             class="form-control"
-                            placeholder="Enter Branch Name"
+                            placeholder="Main"
                             formControlName="buyerBranchName"
                             *ngIf="isBuyerTempAccount"    />
             
-                                        <small
+                                        <!-- <small
                                             class="text-danger"
                                             *ngIf="
                                                 submitted &&
@@ -501,7 +503,7 @@
                                             "
                                         >
                                              Branch is required
-                                        </small>
+                                        </small> -->
                                     </div>
                                 </div>
                   <!-- buyer company branch -->

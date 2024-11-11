@@ -380,13 +380,13 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         handleContactSearch(event) {
             if (!this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact?.name) {
                 this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact = new GetContactInformationDto();
-                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = event.query;
+                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.name = event?.query;
             }
             if (this.allContacts && this.allContacts.length > 0) {
                 // Filtering logic
-                const query = event.query.toLowerCase();
+                const query = event?.query?.toLowerCase();
                 this.filteredContacts = this.allContacts.filter(contact =>
-                    contact.name.toLowerCase().includes(query)
+                    contact?.name?.toLowerCase().includes(query)
                 );
             } else {
             // Fetch contacts only if required and ensure selections are maintained

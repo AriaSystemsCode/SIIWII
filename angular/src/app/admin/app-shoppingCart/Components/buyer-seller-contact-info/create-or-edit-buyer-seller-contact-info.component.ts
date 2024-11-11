@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
-import { AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountBranchDto, AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { ShoppingCartoccordionTabs } from '../shopping-cart-view-component/ShoppingCartoccordionTabs';
@@ -100,6 +100,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
 
             if (roleContact) {
                 // Synchronize relevant properties
+                roleContact.selectedBranch = new AccountBranchDto
                 roleContact.companyName = buyerContact.companyName;
                 roleContact.companySSIN = buyerContact.companySSIN;
                 roleContact.branchName = buyerContact.branchName;
@@ -132,7 +133,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     }
 }
   createOrEditTransaction() {
-    this.synchronizeContactDetails();
+    // this.synchronizeContactDetails();
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
