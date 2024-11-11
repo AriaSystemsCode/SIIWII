@@ -355,7 +355,7 @@
     </Item6>
     <Item7 Ref="184" ControlType="DetailReportBand" Name="DetailReport" Level="0" DataMember="AppTransactionHeaders.AppTransactionHeadersAppTransactionDetails" DataSource="#Ref-0" Dpi="254">
       <Bands>
-        <Item1 Ref="185" ControlType="GroupHeaderBand" Name="GroupHeader1" HeightF="262.728149" Dpi="254">
+        <Item1 Ref="185" ControlType="GroupHeaderBand" Name="GroupHeader1" HeightF="262.728149" KeepTogether="true" Dpi="254">
           <GroupFields>
             <Item1 Ref="186" FieldName="ParentId" />
             <Item2 Ref="187" FieldName="AttributeCode" />
@@ -443,7 +443,7 @@
             </Item5>
           </Controls>
         </Item1>
-        <Item2 Ref="229" ControlType="DetailBand" Name="Detail" HeightF="131.014862" KeepTogether="true" Dpi="254" BackColor="LightGray">
+        <Item2 Ref="229" ControlType="DetailBand" Name="Detail" HeightF="138.30188" KeepTogether="true" Dpi="254" BackColor="LightGray">
           <HierarchyPrintOptions Ref="230" Indent="50.8" />
           <MultiColumn Ref="231" ColumnCount="12" Layout="AcrossThenDown" Mode="UseColumnCount" />
           <SortFields>
@@ -451,13 +451,13 @@
           </SortFields>
           <Scripts Ref="233" OnAfterPrint="Detail_AfterPrint" OnBeforePrint="Detail_BeforePrint" />
           <Controls>
-            <Item1 Ref="234" ControlType="XRLabel" Name="label33" KeepTogether="true" Multiline="true" CanGrow="false" Text="label33" TextAlignment="MiddleCenter" SizeF="111.124992,49.42" LocationFloat="11.3750324,54.43746" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="White" Padding="5,5,0,0,254">
+            <Item1 Ref="234" ControlType="XRLabel" Name="label33" KeepTogether="true" Multiline="true" CanGrow="false" Text="label33" TextAlignment="MiddleCenter" SizeF="111.124992,49.42" LocationFloat="11.3750324,62.43746" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="White" Padding="5,5,0,0,254">
               <ExpressionBindings>
                 <Item1 Ref="235" EventName="BeforePrint" PropertyName="Text" Expression="[Quantity]" />
               </ExpressionBindings>
               <StylePriority Ref="236" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
             </Item1>
-            <Item2 Ref="237" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.420002" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
+            <Item2 Ref="237" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.420002" LocationFloat="11.3750324,8" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
               <ExpressionBindings>
                 <Item1 Ref="238" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeSizeCode]" />
               </ExpressionBindings>
