@@ -845,7 +845,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         buyerCompanySSIN: this.buyerCompanySSIN,
                         buyerBranchSSIN: this.orderForm.controls['buyerCompanyBranch']?.value?.ssin,
                         // buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
-                        buyerBranchName: this.isBuyerTempAccount ?   this.orderForm.controls['buyerBranchName']?.value : this.orderForm.controls['buyerCompanyBranch']?.value?.name ,
+                        buyerBranchName: this.isBuyerTempAccount ?   this.orderForm.controls['buyerBranchName']?.setValue('Main') : this.orderForm.controls['buyerCompanyBranch']?.value?.name ,
                         sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
                         completeDate: moment.utc(this.orderForm.controls['completeDate']?.value?.toLocaleString()),

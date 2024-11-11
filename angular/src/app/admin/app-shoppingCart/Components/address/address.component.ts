@@ -103,26 +103,30 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
             this.savedAddressesList=result;
             this.refSavedAddressesList=result;
             console.log( this.savedAddressesList,' this.savedAddressesList')
-            this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
-                console.log(result,'defauulllt')
-                if (result){
-                    const matchedAddress = this.savedAddressesList.find(address =>
-                        (result => result.addressId == address.id)
-                    );
+            // this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
+            //     console.log(result,'defauulllt')
+            //     if (result){
+            //         const addressIds = result.map(address => address.addressId);
+            //         console.log(addressIds,'addressIds')
+                       
+            //         const matchedAddress = this.savedAddressesList.find(address =>
+            //             (result => result.addressId == address.id)
+            //         );
+            //         console.log(matchedAddress,'matchedAddress')
                
-                    if (matchedAddress) {
-                        this.selectedAddress = matchedAddress
+            //         if (matchedAddress) {
+            //             this.selectedAddress = matchedAddress
         
-                        }
+            //             }
          
     
-                    //  else {
-                    //     this.selectedAddress = null;
-                    // }
-                }
+            //         //  else {
+            //         //     this.selectedAddress = null;
+            //         // }
+            //     }
                
             
-             }) 
+            //  }) 
              
             // debugger
             if(this.savedAddressesList.length==0&&!this.selectedAddress){
@@ -333,7 +337,7 @@ addAddressDataToDto(index: number) {
         roleContact.contactAddressLine1 = this.selectedAddress.addressLine1 || roleContact.contactAddressLine1;
         roleContact.contactAddressLine2 = this.selectedAddress.addressLine2 || roleContact.contactAddressLine2;
         roleContact.contactAddressName = this.selectedAddress.addressName || roleContact.contactAddressName;
-        roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
+        // roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
         roleContact.contactAddressState = this.selectedAddress.state || roleContact.contactAddressState;
     }
 

@@ -96,6 +96,9 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         }
 
     }
+    preventTyping(event: KeyboardEvent): void {
+        event.preventDefault();
+    }
     resetSelectedData() {
         if(this.appTransactionContactsIndex>=0){
        if(!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany)
@@ -420,8 +423,8 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
                 }
                 this.hideMainSpinner();
 
-               /* if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch)
-                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch = null;*/
+                if (!this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch)
+                    this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.name = 'Main'
             });
         }
     }
@@ -547,7 +550,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     }
 
     onChangeContact(event:any) {
-        console.log(event,'eventeventevent')
+        // console.log(event,'eventeventevent')
         if (this.tempContact && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact) {
             this.tempContact = false
             this.contactFilterValue = "";
