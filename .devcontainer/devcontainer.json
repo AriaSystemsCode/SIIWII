@@ -12,8 +12,3 @@
   ],
   "postCreateCommand": "npm install -g @angular/cli"
 }
-{
-  "extensions": [
-    "ms-mssql.mssql"
-  ]
-}
