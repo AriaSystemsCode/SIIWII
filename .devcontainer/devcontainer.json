@@ -9,7 +9,6 @@
     "ms-dotnettools.csharp",
     "ms-dotnettools.vscode-dotnet-runtime",
     "ms-vsliveshare.vsliveshare"
-    "ms-mssql.mssql"
   ],
   "postCreateCommand": "npm install -g @angular/cli"
 }
