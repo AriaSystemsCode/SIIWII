@@ -12,3 +12,15 @@
   ],
   "postCreateCommand": "npm install -g @angular/cli"
 }
+{
+  "extensions": [
+    "ms-mssql.mssql"
+  ]
+}
+"remoteEnv": {
+    "SQL_HOST": "your-local-sql-host",
+    "SQL_USER": "your-sql-username",
+    "SQL_PASSWORD": "your-sql-password",
+    "SQL_DATABASE": "your-database-name"
+  }
+}
