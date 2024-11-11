@@ -41,6 +41,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     addType:any;
     @Output("updateSelectedAddress") updateSelectedAddress = new EventEmitter<any>();
     @Input("shipInfoIndex") shipInfoIndex: number;
+    @Input("billingIndexInfo") billingIndexInfo: number;
     @ViewChild("addressForm") addressForm: NgForm;
     @Input("canChange")  canChange:boolean=true;
 
@@ -92,13 +93,32 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
         );
     }
 
-    getAddressList(companySsin){
+    getAddressList(companySsin,branchSsin){
        
         this.showMainSpinner()
+    
         this._AppTransactionServiceProxy.getCompanyAddresses(companySsin,null).subscribe(result => {
+            
             this.savedAddressesList=null;
             this.savedAddressesList=result;
             this.refSavedAddressesList=result;
+            // this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
+            //     console.log(result,'defauulllt')
+               
+            //     const matchedAddress = this.savedAddressesList.find(address =>
+            //         (defaultAddress => defaultAddress.addressId === address.id)
+            //     );
+            //     if (matchedAddress) {
+            //         this.selectedAddress = matchedAddress;
+            //         this.selectedAddress.countryName = this.countries.find(
+            //             item => item.value === matchedAddress['countryId']
+            //         )?.label || '';
+            //     }
+            //     //  else {
+            //     //     this.selectedAddress = null;
+            //     // }
+            //  }) 
+             
             // debugger
             if(this.savedAddressesList.length==0&&!this.selectedAddress){
                 // this.openAddNewAddForm=true;
@@ -108,8 +128,10 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
 
             }else{
                 this.openAddNewAddForm=false;
+                this.showAddList=false;
+
                 this.selectedAddress?this.selectedAddress.countryName=this.countries.filter(item=>item.value === this.selectedAddress['countryId'])[0].label:'';
-                this.selectedAddress?this.showAddList=false:this.showAddList=true;
+                // this.selectedAddress?this.showAddList=false:this.showAddList=true;
             }
             this.hideMainSpinner()
 
@@ -223,17 +245,17 @@ savetempAddress(addressForm: NgForm) {
 
     // Assign address fields from the form
     this.address.id = this.generateNewId();
-    this.address.code = addressForm.value.addressCode;
-    this.address.name = addressForm.value.addressName;
-    this.address.addressLine1 = addressForm.value.address1;
-    this.address.addressLine2 = addressForm.value.address2;
-    this.address.city = addressForm.value.cityAddress;
-    this.address.state = addressForm.value.State;
-    this.address.postalCode = addressForm.value.postalCode;
-    this.address.countryId = addressForm.value.AddressCountry;
-    this.address.countryCode = addressForm.value.countryCode;
-    this.address.countryName = addressForm.value.AddressCountry;
-    this.addressIdForEdit?this.address.id=this.addressIdForEdit:null;
+    this.address.code = addressForm.value.addressCode || null;
+    this.address.name = addressForm.value.addressName || null;
+    this.address.addressLine1 = addressForm.value.address1 || null;
+    this.address.addressLine2 = addressForm.value.address2 || null;
+    this.address.city = addressForm.value.cityAddress || null;
+    this.address.state = addressForm.value.State || null;
+    this.address.postalCode = addressForm.value.postalCode || null;
+    this.address.countryId = addressForm.value.AddressCountry || null;
+    this.address.countryCode = addressForm.value.countryCode || null;
+    this.address.countryName = addressForm.value.AddressCountry || null;
+    this.addressIdForEdit?this.address.id=this.addressIdForEdit:null || null;
         let addNew = this.addressIdForEdit == null || this.addressIdForEdit == undefined || this.addressIdForEdit == 0
     // Handle the address ID for editing
     if (this.addressIdForEdit) {
@@ -271,11 +293,11 @@ addAddressDataToDto(index:number) {
     } else if (Role == 1) {
         Role = 4
     }
-    const roleContact = this.appTransactionsForViewDto.appTransactionContacts.find(contact => contact.contactRole === Role);
+    const roleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(contact => contact?.contactRole === Role);
     if (roleContact) {
-        roleContact.contactAddressCity = this.selectedAddress.city;
-        roleContact.contactAddressCountryCode = this.selectedAddress.countryCode;
-        roleContact.contactAddressCountryId = this.selectedAddress.countryId;
+        roleContact.contactAddressCity = this.selectedAddress.city || null;
+        roleContact.contactAddressCountryCode = this.selectedAddress.countryCode || null;
+        roleContact.contactAddressCountryId = this.selectedAddress.countryId || null;
         // roleContact.branchName = buyerContact.branchName;
         // roleContact.branchSSIN = buyerContact.branchSSIN
         // roleContact.contactSSIN = buyerContact.contactSSIN;
@@ -287,22 +309,33 @@ addAddressDataToDto(index:number) {
         // roleContact.contactAddressCode = buyerContact.contactAddressCode;
         // roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
         // roleContact.contactAddressCountryId = buyerContact.contactAddressCountryId;
-        roleContact.contactAddressDetail = {
-            ...roleContact.contactAddressDetail,
-            code: this.selectedAddress.code,
-            name: this.selectedAddress.addressName,
-            countryName: this.selectedAddress.countryName,
-            addressLine1: this.selectedAddress.addressLine1,
-            addressLine2: this.selectedAddress.addressLine2,
-            city: this.selectedAddress.city,
-            state: this.selectedAddress.state,
-            postalCode: this.selectedAddress.postalCode,
-            countryId: this.selectedAddress.countryId,
-            countryCode: this.selectedAddress.countryCode ,
-            countryIdName: this.selectedAddress.countryIdName || '', 
-            init: () => { /* Define init function or method */ }, // Placeholder or actual function
-            toJSON: () => JSON.stringify(this) // Basic implementation or modify as needed
-        };
+        // roleContact.contactAddressDetail  = {
+        //     ...roleContact.contactAddressDetail,
+        //     code: this.selectedAddress?.code ,
+        //     name: this.selectedAddress?.addressName  ,
+        //     countryName: this.selectedAddress?.countryName  ,
+        //     addressLine1: this.selectedAddress?.addressLine1  ,
+        //     addressLine2: this.selectedAddress?.addressLine2  ,
+        //     city: this.selectedAddress?.city  ,
+        //     state: this.selectedAddress?.state  ,
+        //     postalCode: this.selectedAddress?.postalCode  ,
+        //     countryId: this.selectedAddress?.countryId ,
+        //     countryCode: this.selectedAddress?.countryCode   ,
+        //     countryIdName: this.selectedAddress?.countryIdName , 
+        //     init: () => { /* No initialization logic needed */ },
+        //     toJSON: () => ({ /* Return object representation */ ...roleContact.contactAddressDetail } )
+        // };
+
+        // roleContact.contactAddressCity = sel.contactAddressCity;
+        roleContact.contactAddressCode = this.selectedAddress.contactAddressCode;
+        roleContact.contactAddressCountryCode =this.selectedAddress.contactAddressCountryCode;
+        roleContact.contactAddressCountryId = this.selectedAddress.contactAddressCountryId;
+        // roleContact.contactAddressDetail = { ...buyerContact.contactAddressDetail };
+        roleContact.contactAddressLine1 = this.selectedAddress.contactAddressLine1;
+        roleContact.contactAddressLine2 = this.selectedAddress.contactAddressLine2;
+        roleContact.contactAddressName =this.selectedAddress.contactAddressName;
+        roleContact.contactAddressPostalCode = this.selectedAddress.contactAddressPostalCode;
+        roleContact.contactAddressState = this.selectedAddress.contactAddressState;
     }
     console.log(this.appTransactionsForViewDto?.appTransactionContacts[2],'llkkkoo')
     console.log(this.appTransactionsForViewDto?.appTransactionContacts[3],'llkkkvvoo')

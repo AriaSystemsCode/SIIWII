@@ -89,7 +89,7 @@
                         <p >{{l("Edit")}}</p>
                         <!-- <i class="fas fa-edit ml-1 mr-1"></i> -->
                     </button>
-                    <button (click)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && ((currentTab == 4 && shipInfoIndex == 2) ||  (currentTab == 5 && shipInfoIndex == 1))  ? deleteTempAddress(address.id):  deleteAddress(address.id)" class="acBtn">
+                    <button (click)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && ((currentTab == 4 && shipInfoIndex == 2) ||  (currentTab == 5 && billingIndexInfo == 1))  ? deleteTempAddress(address.id):  deleteAddress(address.id)" class="acBtn">
                         <img class="mx-1" src="../../../../../assets/icons/fluent_delete.png">
 
                             
@@ -113,7 +113,7 @@
             <p class="mb-0">{{l("PleaseEnterThenewAddressInformation")}}</p>
         </div>
         <hr>
-        <form class="form" #addressForm="ngForm"  method="post" novalidate (ngSubmit)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && (currentTab == 4 && (shipInfoIndex == 2) ||  (currentTab == 5 && shipInfoIndex == 1)) ? savetempAddress(addressForm) :  saveAddress(addressForm)">
+        <form class="form" #addressForm="ngForm"  method="post" novalidate (ngSubmit)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && (currentTab == 4 && (shipInfoIndex == 2) ||  (currentTab == 5 && billingIndexInfo == 1)) ? savetempAddress(addressForm) :  saveAddress(addressForm)">
 
             <div class="row">
                 <div class="col-12">

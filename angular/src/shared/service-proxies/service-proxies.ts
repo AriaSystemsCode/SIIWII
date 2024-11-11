@@ -24997,6 +24997,70 @@ export class AppTransactionServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param companySSIN (optional) 
+     * @param branchSSIN (optional) 
+     * @return Success
+     */
+    getCompanyDefaultAddresses(companySSIN: string | null | undefined, branchSSIN: string | null | undefined): Observable<AccountDefaultAddressDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetCompanyDefaultAddresses?";
+        if (companySSIN !== undefined && companySSIN !== null)
+            url_ += "companySSIN=" + encodeURIComponent("" + companySSIN) + "&";
+        if (branchSSIN !== undefined && branchSSIN !== null)
+            url_ += "branchSSIN=" + encodeURIComponent("" + branchSSIN) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCompanyDefaultAddresses(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCompanyDefaultAddresses(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AccountDefaultAddressDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AccountDefaultAddressDto[]>;
+        }));
+    }
+
+    protected processGetCompanyDefaultAddresses(response: HttpResponseBase): Observable<AccountDefaultAddressDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(AccountDefaultAddressDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -82186,6 +82250,58 @@ export interface IAddVariationToInputDto {
     price: number;
     transactionId: number;
     transactionType: TransactionType;
+
+    [key: string]: any;
+}
+
+export class AccountDefaultAddressDto implements IAccountDefaultAddressDto {
+    addressType!: string | undefined;
+    addressId!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAccountDefaultAddressDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.addressType = _data["addressType"];
+            this.addressId = _data["addressId"];
+        }
+    }
+
+    static fromJS(data: any): AccountDefaultAddressDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AccountDefaultAddressDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["addressType"] = this.addressType;
+        data["addressId"] = this.addressId;
+        return data;
+    }
+}
+
+export interface IAccountDefaultAddressDto {
+    addressType: string | undefined;
+    addressId: number;
 
     [key: string]: any;
 }

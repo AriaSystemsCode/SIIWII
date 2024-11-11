@@ -328,6 +328,7 @@ SuccessMsg: boolean = false;
   shipToData;
   reloadAddresscomponentShipFrom(data) {
     this.shipFromData=data;
+    console.log(this.shipFromData,'this.shipFromData')
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.contactIdShipFrom = this.shipFromData?.compId;
 

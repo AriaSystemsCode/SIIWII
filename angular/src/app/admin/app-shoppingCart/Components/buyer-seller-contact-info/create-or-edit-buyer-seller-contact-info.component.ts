@@ -77,15 +77,15 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     // Log the Buyer contact
     console.log("Buyer Contact before sync:", buyerContact);
 
-    if (buyerContact) {
-      buyerContact.companyName = this.appTransactionsForViewDto.buyerCompanyName
-  buyerContact.companySSIN = this.appTransactionsForViewDto.buyerCompanySSIN
-  buyerContact.contactName = this.appTransactionsForViewDto.buyerContactName
-  buyerContact.branchName = this.appTransactionsForViewDto.buyerBranchName
-  buyerContact.branchSSIN = this.appTransactionsForViewDto.buyerBranchSSIN
-  buyerContact.contactEmail = this.appTransactionsForViewDto.buyerContactEMailAddress
-  buyerContact.contactPhoneNumber = this.appTransactionsForViewDto.buyerContactPhoneNumber
-  buyerContact.contactSSIN = this.appTransactionsForViewDto.buyerContactSSIN
+    if (buyerContact &&  this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo ) {
+  //     buyerContact.companyName = this.appTransactionsForViewDto.buyerCompanyName
+  // buyerContact.companySSIN = this.appTransactionsForViewDto.buyerCompanySSIN
+  // buyerContact.contactName = this.appTransactionsForViewDto.buyerContactName
+  // buyerContact.branchName = this.appTransactionsForViewDto.buyerBranchName
+  // buyerContact.branchSSIN = this.appTransactionsForViewDto.buyerBranchSSIN
+  // buyerContact.contactEmail = this.appTransactionsForViewDto.buyerContactEMailAddress
+  // buyerContact.contactPhoneNumber = this.appTransactionsForViewDto.buyerContactPhoneNumber
+  // buyerContact.contactSSIN = this.appTransactionsForViewDto.buyerContactSSIN
         // List of roles to synchronize with Buyer contact
         const rolesToUpdate = [6, 4]; // 6: ShipToContact, 4: ShipFromContact
 
@@ -111,15 +111,15 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
                 roleContact.contactPhoneTypeId = buyerContact.contactPhoneTypeId;
                 roleContact.contactPhoneTypeName = buyerContact.contactPhoneTypeName;
                 roleContact.contactAddressCity = buyerContact.contactAddressCity;
-                roleContact.contactAddressCode = buyerContact.contactAddressCode;
-                roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
-                roleContact.contactAddressCountryId = buyerContact.contactAddressCountryId;
+                // roleContact.contactAddressCode = buyerContact.contactAddressCode;
+                // roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
+                // roleContact.contactAddressCountryId = buyerContact.contactAddressCountryId;
                 // roleContact.contactAddressDetail = { ...buyerContact.contactAddressDetail };
-                roleContact.contactAddressLine1 = buyerContact.contactAddressLine1;
-                roleContact.contactAddressLine2 = buyerContact.contactAddressLine2;
-                roleContact.contactAddressName = buyerContact.contactAddressName;
-                roleContact.contactAddressPostalCode = buyerContact.contactAddressPostalCode;
-                roleContact.contactAddressState = buyerContact.contactAddressState;
+                // roleContact.contactAddressLine1 = buyerContact.contactAddressLine1;
+                // roleContact.contactAddressLine2 = buyerContact.contactAddressLine2;
+                // roleContact.contactAddressName = buyerContact.contactAddressName;
+                // roleContact.contactAddressPostalCode = buyerContact.contactAddressPostalCode;
+                // roleContact.contactAddressState = buyerContact.contactAddressState;
 
                 // Log the updated role contact after synchronization
                 console.log(`Role Contact after sync (Role: ${role}):`, roleContact);
@@ -132,7 +132,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     }
 }
   createOrEditTransaction() {
-    // this.synchronizeContactDetails();
+    this.synchronizeContactDetails();
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
