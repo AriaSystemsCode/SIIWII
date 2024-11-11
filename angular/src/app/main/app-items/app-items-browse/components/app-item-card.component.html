@@ -34,7 +34,7 @@
                         <div class="price pt-2" 
                          style="float: right;
                         clear: both;">
-                            {{ "MSRP" | localize }}:
+                      {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:
                             {{ tenantDefaultCurrency.symbol
                             }}{{item?.appItem?.price }}
                         </div>

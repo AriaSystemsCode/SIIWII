@@ -22,7 +22,11 @@
             {{ product?.name }}
         </p>
 
-     
+        <div class="d-flex name-price">
+            <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
+             <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
+            <h5 class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</h5>
+        </div>
     </div>
 </div>
 

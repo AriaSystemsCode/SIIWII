@@ -38,6 +38,7 @@ export class AppItemCardComponent extends AppComponentBase {
     AppItemBrowseEvents = AppItemBrowseEvents
     selectedList: AppItemsListDto;
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
+    languageSettingName: string =AppConsts.languageSettingName;
     BrowseModeEnum = BrowseMode
     get mainFilterCtrl() { return this.filterForm.get('filterType') }
 

@@ -13,6 +13,7 @@ export class AppConsts {
     static recaptchaSiteKey: string;
     static subscriptionExpireNootifyDayCount: number;
     static siiwiiName: string;
+    static languageSettingName:string;
 
     static localeMappings: any = [];
 
