@@ -251,7 +251,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     }
 savetempAddress(addressForm: NgForm) {
     this.saving = true;
-
+     console.log(addressForm.value,'addressForm')
     // Assign address fields from the form
     this.address.id = this.generateNewId();
     this.address.code = addressForm.value.addressCode ;
@@ -262,7 +262,7 @@ savetempAddress(addressForm: NgForm) {
     this.address.state = addressForm.value.State ;
     this.address.postalCode = addressForm.value.postalCode ;
     this.address.countryId = addressForm.value.AddressCountry ;
-    // this.address.countryCode = addressForm.value.countryCode ;
+    this.address.addressCode = addressForm.value.addressCode ;
     // this.address.countryName = addressForm.value.AddressCountry ;
     this.addressIdForEdit?this.address.id=this.addressIdForEdit:null || null;
         let addNew = this.addressIdForEdit == null || this.addressIdForEdit == undefined || this.addressIdForEdit == 0
@@ -391,7 +391,9 @@ addAddressDataToDto(index: number) {
         this.selectedAddress = currentAddress[0] as ContactAppAddressDto;
     
         // Set the country name based on the countryId
+      
         this.selectedAddress.countryName = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0].label;
+        this.selectedAddress.countryCode = this.countries.filter(item => item.value === currentAddress[0]['countryId'])[0].code;
         this.showAddList = false;
     
         // Ensure no undefined or null values, default them to empty strings or null
@@ -401,9 +403,10 @@ addAddressDataToDto(index: number) {
         this.selectedAddress.state = this.selectedAddress?.state || '';
         this.selectedAddress.countryName = this.selectedAddress?.countryName || '';
         this.selectedAddress.postalCode = this.selectedAddress?.postalCode || '';
-        this.selectedAddress.countryId = this.selectedAddress?.countryId || null;
-        this.selectedAddress.code = this.selectedAddress?.code || '';
+        this.selectedAddress.countryId = this.selectedAddress?.countryId ;
+        this.selectedAddress.code = this.selectedAddress?.code ;
         this.selectedAddress.state = this.selectedAddress?.state || '';
+        this.selectedAddress.name = this.selectedAddress?.addressName || '';
     
         // Check if Buyer SSN is empty or null before adding address data
         if (this.appTransactionsForViewDto?.buyerCompanySSIN == '' || this.appTransactionsForViewDto?.buyerCompanySSIN == null) {
@@ -435,7 +438,8 @@ addAddressDataToDto(index: number) {
             useDTOTenant: this.selectedAddress?.useDTOTenant,
             id: this.selectedAddress?.id
         });
-    
+       
+        
         // Emit the updated selectedAddressObj as an instance of ContactAppAddressDto
         this.updateSelectedAddress.emit({
             id: addId,
