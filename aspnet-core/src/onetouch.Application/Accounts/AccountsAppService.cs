@@ -318,8 +318,8 @@ namespace onetouch.Accounts
 
                     foreach (var account in accountsList)
                     {
-                        account.AvaliableConnectionName = GetAction(account.Account.AccountType);
-                        account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
+                        account.AvaliableConnectionName = GetAction(account.Account.AccountType, false);
+                        account.ConnectionName = GetAction(account.Account.AccountType, true);
                     }
                     // List<LookupLabelDto> tmpAccountType = await _appEntitiesAppService.GetAllAccountTypeForTableDropdown();
 
@@ -345,7 +345,7 @@ namespace onetouch.Accounts
         }
 
 
-        public string GetAction(string accountTypeCode)
+        public string GetAction(string accountTypeCode, bool neeedAction)
         {
 
             int currentTenant = AbpSession.TenantId == null ? -1 : ((int)AbpSession.TenantId);
@@ -355,16 +355,16 @@ namespace onetouch.Accounts
             string action = "";
             if (!string.IsNullOrEmpty(accountTypeCode))
             {
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = "MPActionCONNECTED"; }
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionFOLLOWED"; }
-                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = "MPActionJOINED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionFOLLOW" : "MPActionFOLLOWED"; }
+                if (currentTenantEdition.ToUpper() == "PERSONAL" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
 
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = " MPActionEMPLOYED"; }
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionCONNECTED"; }
-                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = "MPActionJOINED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionEMPLOY" : " MPActionEMPLOYED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionCONNECT" : "MPActionCONNECTED"; }
+                if (currentTenantEdition.ToUpper() == "BUSINESS" && accountTypeCode.ToUpper() == "GROUP") { action = neeedAction ? "MPActionJOIN" : "MPActionJOINED"; }
 
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = "MPActionINVITED"; }
-                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = "MPActionINVITED"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "PERSONAL") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
+                if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "BUSINESS") { action = neeedAction ? "MPActionINVIT" : "MPActionINVITED"; }
                 if (currentTenantEdition.ToUpper() == "GROUP" && accountTypeCode.ToUpper() == "GROUP") { action = ""; }
 
 
@@ -2008,7 +2008,7 @@ namespace onetouch.Accounts
             if (AbpSession.TenantId != null)
             {
                 var tenantObj = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
-
+                //var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 if (tenantObj != null)
                 {
 
@@ -2033,7 +2033,7 @@ namespace onetouch.Accounts
                                     contactDto.UserName = adminUser.UserName;
                                     contactDto.TradeName = "";
                                     contactDto.ParentId = account.Id;
-                                    contactDto.EntityObjectType = tenantObj.Edition.Name;
+                                    contactDto.EntityObjectType = (tenantObj.Edition != null)?tenantObj.Edition.Name: "PERSONAL";
                                     //temp solution to test 
                                     //T-SII-20240329.0005 as per Sam and Abdo
                                     contactDto.Code = System.Guid.NewGuid().ToString();
