@@ -187,7 +187,10 @@
             <label for="branch_Address1">{{l("BillingAddress")}}</label>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(1)">
             </button>
-            <p  class="form-control  aria-input-text address-name">
+            <p  class="form-control  aria-input-text address-name"    style="overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            height: auto !important;min-height: 40px;" >
                 {{ address1.name?  address1.name : '' }}
                 {{ address1.addressLine1?  ' - ' + address1.addressLine1 : '' }}
                 {{ address1.addressLine2?  ' - ' + address1.addressLine2 : '' }}
@@ -201,7 +204,10 @@
             <label for="branch_Address2">{{l("ShippingAddress")}}</label>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(2)">
             </button>
-            <p  class="form-control  aria-input-text address-name">
+            <p  class="form-control  aria-input-text address-name"    style="overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            height: auto !important;min-height: 40px;" >
                 {{ address2.name?  address2.name : '' }}
                 {{ address2.addressLine1?  ' - ' + address2.addressLine1 : '' }}
                 {{ address2.addressLine2?  ' - ' + address2.addressLine2 : '' }}
@@ -215,7 +221,10 @@
             <label for="branch_Address3">{{l("DistributionAddress")}}</label>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(3)">
             </button>
-            <p  class="form-control  aria-input-text address-name">
+            <p  class="form-control  aria-input-text address-name"    style="overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            height: auto !important;min-height: 40px;" >
                 {{ address3.name?  address3.name : '' }}
                 {{ address3.addressLine1?  ' - ' + address3.addressLine1 : '' }}
                 {{ address3.addressLine2?  ' - ' + address3.addressLine2 : '' }}
@@ -229,7 +238,10 @@
             <label for="branch_Address4">{{l("MailingAddress")}}</label>
             <button type="button" class="btn btn-plus" (click)="selectAddressClick(4)">
             </button>
-            <p  class="form-control  aria-input-text address-name">
+            <p  class="form-control  aria-input-text address-name"    style="overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            height: auto !important;min-height: 40px;" >
                 {{ address4.name?  address4.name : '' }}
                 {{ address4.addressLine1?  ' - ' + address4.addressLine1 : '' }}
                 {{ address4.addressLine2?  ' - ' + address4.addressLine2 : '' }}

@@ -138,11 +138,11 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             , filters.maxCreateDateFilter,
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
+            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,undefined,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
-            // this.dataTable.filters
+            // this.dataTable.filters 
         ).subscribe(result => {
             this.loading = false;
             this.primengTableHelper.totalRecordsCount = result.totalCount;
