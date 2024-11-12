@@ -388,4 +388,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         });
 
     }
+
+    isNotManualLevel(): boolean {
+        return this.accountLevel !== AccountLevelEnum.Manual;
+      }
 }
