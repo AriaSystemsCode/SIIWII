@@ -29,7 +29,7 @@
     }
     @media only screen and (min-width: 1024px) {
         .rout-c {
-            padding-left: 40px !important;
+            padding-left: 15px !important;
             padding-right: 10px !important;
             overflow-x: hidden;
             padding-top: 120px !important;
@@ -48,7 +48,7 @@
     }
     @media only screen and (min-width: 575px) and (max-width: 1024px) {
  .rout-c {
-    padding-left: 115px !important;
+    padding-left: 85px !important;
     padding-right: 0px !important;
     overflow-x: hidden;
 // margin-top: 80px !important;
@@ -59,7 +59,9 @@
 }
 
 .sidebar {
-   
+    svg {
+      padding-bottom: 5px;
+    }
     width: 250px;
     transition: width 0.3s;
     // border-radius: 0px 20px 20px 0px;
@@ -68,10 +70,11 @@
     position: fixed;
     box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.10);
     ul li {
-        padding: 10px 16px;
+        padding: 10px 12px;
         // width: 60px;
         margin-left: 10px !important;
-        margin-right: 10px;
+        // margin-right: 10px;
+        white-space: nowrap;
         // text-align: center;
         // margin-bottom: 10px;
         cursor: pointer;
@@ -81,9 +84,11 @@
         color: #777777 !important;
       }
   }
-  
+  .mlIcon {
+    margin-left: 3.5rem;
+  }
   .sidebar.minimized {
-    width: 100px;
+    width: 76px;
     border-top-left-radius: 20px;
         background: #FFF;
     z-index: 9999 !important;
@@ -99,8 +104,10 @@ display: none;
   }
   .min {
     ul li {
-        padding: 10px 16px;
-        width: 60px;
+        padding: 10px 5px;
+        width: 45px;
+        height: 45px;
+        margin-bottom: 8px;
         margin-left: auto !important;
         margin-right: auto;
         text-align: center;
@@ -128,6 +135,9 @@ box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.05);
     pointer-events: none;
     color: #ccc; /* Disabled text color */
 }
+.ulMargin {
+  margin-top: 50px;
+}
   .sidebar ul {
     list-style-type: none;
     // padding: 5px 25px;
@@ -137,14 +147,16 @@ box-shadow: 2px 2px 10px 0px rgba(22, 22, 22, 0.05);
     padding: 0;
     // padding-left: 10px;
   }
-  li svg {
-    fill :#777777
+  .svgIcon {
+    fill :#777777;
+    padding-bottom: 3px;
   }
   .active-link {
     background: #4A0D4A;
     border-radius: 6px;
     svg {
         fill: white !important;
+        padding-bottom: 3px;
     }
     .item-name {
         color: white !important;
@@ -158,22 +170,22 @@ margin-bottom: 30px;
   }
   .arr {
     position: absolute;
-    left: 75px;
-    top: 87px;
+    left: 60px;
+    top: 70px;
 
   }
   .arr-left {
     position: absolute;
     left: 225px;
-    top: 87px;
+    top: 70px;
 
   }
 
   
   .sidebar ul li i {
-    margin-right: 10px;
-    font-size: 18px;
-    margin-left: 8px;
+    // margin-right: 10px;
+    font-size: 14px;
+    // margin-left: 8px;
   }
   
   .sidebar ul li.has-children ul {
