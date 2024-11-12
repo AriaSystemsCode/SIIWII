@@ -103,30 +103,30 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
             this.savedAddressesList=result;
             this.refSavedAddressesList=result;
             console.log( this.savedAddressesList,' this.savedAddressesList')
-            // this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
-            //     console.log(result,'defauulllt')
-            //     if (result){
-            //         const addressIds = result.map(address => address.addressId);
-            //         console.log(addressIds,'addressIds')
+            this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
+                console.log(result,'defauulllt')
+                if (result){
+                    const addressIds = result.map(address => address.addressId);
+                    console.log(addressIds,'addressIds')
                        
-            //         const matchedAddress = this.savedAddressesList.find(address =>
-            //             (result => result.addressId == address.id)
-            //         );
-            //         console.log(matchedAddress,'matchedAddress')
+                    const matchedAddress = this.savedAddressesList.find(savedAddress => 
+                        addressIds.includes(savedAddress.id)
+                    );
+                    console.log(matchedAddress,'matchedAddress')
                
-            //         if (matchedAddress) {
-            //             this.selectedAddress = matchedAddress
+                    if (matchedAddress) {
+                        this.selectedAddress = matchedAddress
         
-            //             }
+                        }
          
     
-            //         //  else {
-            //         //     this.selectedAddress = null;
-            //         // }
-            //     }
+                    //  else {
+                    //     this.selectedAddress = null;
+                    // }
+                }
                
             
-            //  }) 
+             }) 
              
             // debugger
             if(this.savedAddressesList.length==0&&!this.selectedAddress){

@@ -240,7 +240,7 @@
                   [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch" 
                   (keydown)="preventTyping($event)"  
                   (completeMethod)="handleBranchSearch($event)"
-                  [placeholder]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch ? appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch : ' Main'"
+                  [placeholder]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch || ' Main'"
                   field="name" 
                   [forceSelection]="false" 
                   class="w-100" 
