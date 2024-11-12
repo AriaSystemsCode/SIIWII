@@ -202,7 +202,7 @@
                                       <path d="M16.5 19.9998C18.7091 19.9998 20.5 18.209 20.5 15.9998C20.5 13.7907 18.7091 11.9998 16.5 11.9998C14.2909 11.9998 12.5 13.7907 12.5 15.9998C12.5 18.209 14.2909 19.9998 16.5 19.9998Z" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                       </svg>
                                       
-                        <a *ngIf="!isMinimized" [queryParams]="child.parameters" class="child-name mx-1 item-name"  [routerLink]="child.route "  routerLinkActive="child-active-link" (click)="isMinimized = true">{{ child.name }}</a>
+                        <a *ngIf="!isMinimized" [queryParams]="child.parameters" class="child-name mx-1 item-name"  [routerLink]="child.route "  routerLinkActive="child-active-link" (click)="isMinimized = true">{{ child.name | localize }}</a>
                       </li>
                     </div>
                   </li>
