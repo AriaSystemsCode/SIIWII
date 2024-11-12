@@ -18,6 +18,10 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Output() connectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input() fromMarketplace;
+    @Output() _createRelation : EventEmitter<string> = new EventEmitter<string>()
+
+
+    
     constructor(
         injector:Injector,
         private router:Router
@@ -62,8 +66,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     }
 
     createRelation(avaliableConnectionName){
-
-        //I40 -after finish , get account again to update data 
+this._createRelation.emit(avaliableConnectionName);
 
     }
 

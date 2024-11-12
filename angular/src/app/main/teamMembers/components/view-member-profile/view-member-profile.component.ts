@@ -160,7 +160,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.newEditMemberInfo.parentId = this.selectedBranchid;
 
         //accountInfoTemp
-        if (this.newEditMemberInfo.jobTitle != '' && this.newEditMemberInfo.branchName != '') {
+        
             this.editInfo = true;
             this.NoteditInfo = false;
             //  this._AccountsServiceProxy.createOrEditContact(this.newEditMemberInfo)
@@ -174,7 +174,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
                     this.notify.success(this.l('SuccessfullySaved'));
                 });
 
-        }
+       
     }
 
     selectBranch() {

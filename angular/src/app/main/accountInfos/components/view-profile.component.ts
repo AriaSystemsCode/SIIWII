@@ -89,6 +89,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.handleAccountData()
             this.initDepartmentVariables(true);
             this.initClassificationVariables(true);
+            this.getContactSync();
         }
     }
     ngOnInit() {
@@ -379,4 +380,16 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             });
     }
 
+
+    getContactSync(){
+        this._AccountsServiceProxy.getContactSync(this.accountData.id)
+        .subscribe((res:boolean) => {
+            this.isSync=res;
+        });
+
+    }
+
+    isNotManualLevel(): boolean {
+        return this.accountLevel !== AccountLevelEnum.Manual;
+      }
 }

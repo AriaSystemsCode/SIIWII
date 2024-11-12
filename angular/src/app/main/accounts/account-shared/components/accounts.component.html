@@ -6,13 +6,13 @@
                     <div class="kt-portlet__body">
                         <div class="row">
                             <div class="col-12 list-toolbar pb-4">
-                                <div class="row mb-3 justify-content-between">
+                                <div class="row mb-3 justify-content-between mt-3">
                                     <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                             *ngIf="showMainFiltersOptions">
-                                            <button class="dropdown-toggle btn btn-sm font-weight-normal p-0"
+                                            <button class="dropdown-toggle btn btn-sm  p-0"
                                                 dropdownToggle>
-                                                <span class="list-toolbar-dropdown-filter-selectedItem">
+                                                <span class="list-toolbar-dropdown-filter-selectedItem" style="font-weight: 700 !important;">
                                                     {{
                                                     mainFilterCtrl?.value
                                                     ?.label | localize
@@ -62,15 +62,18 @@
                                                 " id="generalSearch" />
                                             <span class="kt-input-icon__icon kt-input-icon__icon--left">
                                                 <span><i class="flaticon2-search-1 icon-md text-primary"
-                                                        style="color: #6259CE !important;"></i></span>
+                                                        style="color: #777777 !important"></i></span>
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="list-toolbar-divider" *ngIf="showAddButton"></div>
+                                    <div class="" *ngIf="showAddButton"></div>
                                     <div class="mb-4 mb-md-0 text-center">
                                         <a class="btn font-weight-normal toolbar-btn btn_Primary"
+                                        style="background-color: #4A0D4A !important;
+                                        border-radius: 6px;
+                                        color: white !important;"
                                             (click)="showSendMail()">
-                                            <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo">
+                                            <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo mr-2" style="width: 16px;">
                                             {{ "InvitePartner" | localize }}
                                             <!-- <i class="fas fa-share-alt" style="color: white !important;"></i> -->
                                         </a>
@@ -80,6 +83,12 @@
                                                         | localize
                                                 "
                                                 class="btn font-weight-normal text-center toolbar-btn transparent-button"
+                                                style="background-color: #FFFFFF !important;
+                                                border: 1px solid #EEEEEEEE !important;
+                                                color: #4A0D4A !important;
+                                                padding: 10px;
+                                                border-radius: 6px;
+                                                margin-left: 10px;"
                                                 [routerLink]="[
                                                     '/app/main/account/create-manual'
                                                 ]">
@@ -89,6 +98,12 @@
                                                     'AddExternalAccount'
                                                         | localize
                                                 "
+                                                style="background-color: #FFFFFF !important;
+                                                border: 1px solid #EEEEEEEE !important;
+                                                color: #4A0D4A !important;
+                                                padding: 10px;
+                                                border-radius: 6px;
+                                                margin-left: 10px;"
                                                 class="btn font-weight-normal text-center toolbar-btn transparent-button"
                                                 [routerLink]="[
                                                     '/app/main/account/create-external'
@@ -109,18 +124,26 @@
                                             <!-- Iteration-8 -->
                                         </ng-container>
                                     </div>
-                                    <div class="list-toolbar-divider"></div>
+                                    <div class=""></div>
 
                                     <div class="text-center">
                                         <a [title]="'ResetData' | localize"
                                             class="btn font-weight-normal text-center text-primary toolbar-btn ResetData_btn transparent-button"
+                                            style="background-color: #FFFFFF !important;
+                                            border: 1px solid #EEEEEEEE !important;
+                                            color: #4A0D4A !important;
+                                            padding: 10px;
+                                            border-radius: 6px;
+                                            margin-left: 10px;"
                                             (click)="resetList()"> <img src="../../assets/img/input_icons/repeat.png"
                                                 class="alarmInfo">
                                             <!-- <i
                                                 class="d-inline-block w-100 flaticon2-reload icon-center"
                                             ></i> -->
                                         </a>
-                                        <a style="padding-left: 10px" [title]="'ToggleView' | localize"
+                                        <a style="padding-left: 10px;background-color: #4A0D4A !important;
+                                        color: white !important;
+                                        border-radius: 6px;" [title]="'ToggleView' | localize"
                                             (click)="triggerListView()"
                                             class="btn font-weight-normal pr-1 text-center text-primary toolbar-btn btn_Primary">
 
@@ -139,7 +162,7 @@
                             </div> 
                             <div class="col">
                                 <div class="d-flex justify-content-between">
-                                    <div class="font-weight-normal list-toolbar-data-summary" *ngIf="active">
+                                    <div class="font-weight-normal list-toolbar-data-summary pl-5" *ngIf="active">
                                         {{
                                         paginator.getPage() *
                                         primengTableHelper.defaultRecordsCountPerPage
@@ -208,7 +231,7 @@
                                 </div>
                                 <div class="col d-flex flex-column justify-content-between">
                              
-                                    <div class="row pt-5 pl-5 pr-2">
+                                    <div class="row  pl-5 pr-2">
                                         <div *ngFor="
                                                 let account of accounts;
                                                 index as i;
@@ -233,7 +256,8 @@
                                                     connect(account.account)
                                                 " (disconnectMe)="
                                                     disconnect(account.account)
-                                                " [isHost]="isHost"></app-account-card>
+                                                " [isHost]="isHost"
+                                                (_createRelation)="createRelation($event)"></app-account-card>
                                         </div>
                                         <div class="font-weight-normal mt-5 p-5 text-center w-100"
                                             *ngIf="accounts.length == 0 && !loading">
