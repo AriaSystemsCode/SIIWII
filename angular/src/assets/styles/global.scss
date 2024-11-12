@@ -1029,3 +1029,8 @@ input{
 searchicon.p-element.p-icon-wrapper {
     padding: 15px !important;
 }
+
+
+.p-link:focus {
+   box-shadow: none !important;
+}
