@@ -56992,6 +56992,7 @@ export class BranchDto implements IBranchDto {
     attachmentSourceTenantId!: number | undefined;
     contactAddresses!: AppContactAddressDto[] | undefined;
     accountId!: number | undefined;
+    ssin!: string | undefined;
     tenantId!: number | undefined;
     useDTOTenant!: boolean;
     id!: number;
@@ -57045,6 +57046,7 @@ export class BranchDto implements IBranchDto {
                     this.contactAddresses!.push(AppContactAddressDto.fromJS(item));
             }
             this.accountId = _data["accountId"];
+            this.ssin = _data["ssin"];
             this.tenantId = _data["tenantId"];
             this.useDTOTenant = _data["useDTOTenant"];
             this.id = _data["id"];
@@ -57096,6 +57098,7 @@ export class BranchDto implements IBranchDto {
                 data["contactAddresses"].push(item.toJSON());
         }
         data["accountId"] = this.accountId;
+        data["ssin"] = this.ssin;
         data["tenantId"] = this.tenantId;
         data["useDTOTenant"] = this.useDTOTenant;
         data["id"] = this.id;
@@ -57132,6 +57135,7 @@ export interface IBranchDto {
     attachmentSourceTenantId: number | undefined;
     contactAddresses: AppContactAddressDto[] | undefined;
     accountId: number | undefined;
+    ssin: string | undefined;
     tenantId: number | undefined;
     useDTOTenant: boolean;
     id: number;

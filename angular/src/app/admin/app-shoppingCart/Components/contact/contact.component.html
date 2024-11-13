@@ -9,12 +9,12 @@
                     <label class="label">Company Name</label>
 
                     <div class="d-flex align-items-center gap-1 " *ngIf="appTransactionsForViewDto?.buyerCompanySSIN == '' && activeTab==shoppingCartoccordionTabs.BuyerContactInfo">
-         
+                         {{appTransactionsForViewDto.createManualAccount}}
                         <input
                         type="checkbox"
                         name="company"
                         class="m-2"
-                       [(ngModel)]="comNew"
+                        [(ngModel)]=" appTransactionsForViewDto.createManualAccount"
                         (change)="createManualCompany($event,'company')"
                      
                     />
@@ -141,13 +141,14 @@
                     <label class="label">Contact Name</label>
 
                     <div class="d-flex align-items-center gap-1 " *ngIf="appTransactionsForViewDto?.buyerCompanySSIN == '' && activeTab==shoppingCartoccordionTabs.BuyerContactInfo">
+                        {{appTransactionsForViewDto.createManualContact}}
          
                         <input
                         type="checkbox"
                         name="contact"
                         class="m-2"
-                        [(ngModel)]="conNew"
-                   
+                        [(ngModel)]=" appTransactionsForViewDto.createManualContact"
+                        
                         (change)="createManualCompany($event,'contact')"
                      
                     />
