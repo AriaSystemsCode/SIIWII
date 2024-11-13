@@ -376,7 +376,7 @@
               </ExpressionBindings>
               <StylePriority Ref="195" UseBackColor="false" />
             </Item3>
-            <Item4 Ref="196" ControlType="XRLabel" Name="label40" Multiline="true" CanGrow="false" CanShrink="true" ProcessDuplicatesMode="Suppress" Text="Sizes:" SizeF="156.104156,39.8991852" LocationFloat="12.5625172,201.689209" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
+            <Item4 Ref="196" ControlType="XRLabel" Name="label40" Multiline="true" CanGrow="false" CanShrink="true" Text="Sizes:" SizeF="156.104156,39.8991852" LocationFloat="12.5625172,201.689209" Dpi="254" Font="Arial, 8pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
               <StylePriority Ref="197" UseFont="false" UseBackColor="false" />
             </Item4>
             <Item5 Ref="198" ControlType="XRTable" Name="xrTable2" SizeF="1380.06653,137.583328" LocationFloat="13.229167,6.81250429" Dpi="254" Padding="5,5,0,0,254">
