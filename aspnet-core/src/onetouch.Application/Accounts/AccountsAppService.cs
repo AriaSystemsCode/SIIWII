@@ -4061,6 +4061,12 @@ namespace onetouch.Accounts
             entity.ObjectId = entityParent.ObjectId;
             entity.EntityObjectTypeId = entityParent.EntityObjectTypeId;
             entity.Name = input.Name;
+            //I45
+            if (!string.IsNullOrEmpty(input.SSIN))
+            {
+                entity.SSIN = input.SSIN;
+            }
+            //I45
             //entity.TenantId = AbpSession.TenantId;
             if (input.UseDTOTenant)
             { entity.TenantId = input.TenantId; }
