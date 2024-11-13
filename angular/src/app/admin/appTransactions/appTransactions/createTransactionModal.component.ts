@@ -352,7 +352,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.isCompantIdExist = false;
                     this.handleSellerNameSearch("");
                     // add seller values
-                    this.orderForm.get("sellerContactName").setValue(res.name);
+                    // this.orderForm.get("sellerContactName").setValue(res.name);
                     this.orderForm.get("sellerCompanyName").setValue(res.name);
                     this.orderForm.get('sellerContactPhoneNumber').setValue(res.phone)
                     this.orderForm.get('sellerContactEMailAddress').setValue(res.email)
@@ -380,7 +380,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                     this.buyerComapnyId = res.id;
                     this.buyerCompanySSIN = res.accountSSIN;
                     this.handleBuyerNameSearch("");
-                    this.orderForm.get("buyerContactName").setValue(res.name);
+                    // this.orderForm.get("buyerContactName").setValue(res.name);
                     this.orderForm.get("buyerCompanyName").setValue(res.name);
                     this.orderForm.get('buyerContactPhoneNumber').setValue(res.phone)
                     this.orderForm.get('buyerContactEMailAddress').setValue(res.email)
