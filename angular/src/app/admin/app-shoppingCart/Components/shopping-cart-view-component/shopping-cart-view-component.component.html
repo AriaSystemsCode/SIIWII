@@ -383,7 +383,7 @@
                                             [tableStyle]="{'min-width':'45rem'}">
                                             <ng-template pTemplate="header">
                                                 <tr>
-                                                    <th style="width: 5rem;" *ngFor="let col of cols" class="purpleColor"
+                                                    <th style="width: 7rem;" *ngFor="let col of cols" class="purpleColor"
                                                         [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                         {{ col.header }}
                                                     </th>
@@ -408,7 +408,7 @@
                                             <td>{{ rowData.amount }}</td>
                                             <td>{{ rowData.image }}</td> -->
                                                     <!-- style="white-space: nowrap;  overflow: hidden;" -->
-                                                    <td  style="width: 5rem;" *ngFor="let col of cols; let i = index" class="p-treeTable"
+                                                    <td  style="width: 7rem;" *ngFor="let col of cols; let i = index" class="p-treeTable"
                                                         [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                         <p-treeTableToggler [rowNode]="rowNode"
                                                             *ngIf="i === 0"></p-treeTableToggler>
@@ -975,15 +975,15 @@ height: 48px;"
                                     <p-treeTable [value]="shoppingCartTreeNodes" [scrollable]="true"
                                         [tableStyle]="{'min-width':'375px'}">
                                         <ng-template pTemplate="header">
-                                            <tr>
-                                                <th *ngFor="let col of cols" class="purpleColor"
+                                            <tr >
+                                                <th style="width: 5rem;"  *ngFor="let col of cols" class="purpleColor"
                                                     [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                     {{ col.header }}
                                                 </th>
                                                 <!--  <th> <img
                                                 src="../../../../../assets/shoppingCart/Order-Details-Table-Action_Btn.svg" />
                                         </th> -->
-                                                <th class="purpleColor" *ngIf="canChange">
+                                                <th style="width: 4rem;"  class="purpleColor" *ngIf="canChange">
                                                     {{l("Action")}}
                                                 </th>
                                             </tr>
@@ -1001,7 +1001,7 @@ height: 48px;"
                                         <td>{{ rowData.amount }}</td>
                                         <td>{{ rowData.image }}</td> -->
                                                 <!-- style="white-space: nowrap;  overflow: hidden;" -->
-                                                <td *ngFor="let col of cols; let i = index" class="p-treeTable"
+                                                <td style="width: 5rem;"  *ngFor="let col of cols; let i = index" class="p-treeTable"
                                                     [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                     <p-treeTableToggler [rowNode]="rowNode"
                                                         *ngIf="i === 0"></p-treeTableToggler>
@@ -1044,7 +1044,7 @@ height: 48px;"
                                                     </label>
                                                 </td>
 
-                                                <td class="p-treeTable" *ngIf="canChange">
+                                                <td style="width: 4rem;"  class="p-treeTable" *ngIf="canChange">
                                                     <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
                                                 class="imgIcon" (click)="onDelete(rowNode)" />
                                             <img *ngIf="rowNode?.node?.data?.editQty" src=""
