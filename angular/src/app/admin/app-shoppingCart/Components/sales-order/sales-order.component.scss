@@ -196,6 +196,7 @@ font-weight: 600;
 .categoriesClassificationsContainer{
     
     max-height: 200px;
+    padding: 0 10px;
     // till new design
     // overflow: hidden scroll;
 }
@@ -240,6 +241,12 @@ font-weight: 600;
     padding: 12px;
 }
 ::ng-deep .treeSel {
+    .p-treeselect-filter-icon {
+        right: 0 !important;
+    }
+    .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
+        order: 0 !important;
+    }
     .p-treeselect.p-treeselect-chip .p-treeselect-token{
         display: none !important;
     }
@@ -254,7 +261,7 @@ font-weight: 600;
         padding: 0 5px;
     }
     .p-icon-wrapper {
-        right: 3px !important;
+        // right: 3px !important;
     }
     .pointer {
         padding: 12px;
@@ -326,3 +333,28 @@ img {
 //     right: 3px !important;
 
 // }
+
+
+ ::ng-deep  {
+    .p-datepicker table {
+        width: 100% !important;
+
+    }
+    @media only screen and (min-width: 768px) {
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 27% !important;
+        }
+    }
+    @media  (min-width: 567px) and  (max-width: 778px) {
+        @media only screen and (min-width: 768px) {
+            .p-datepicker:not(.p-datepicker-inline) {
+                width: 34% !important;
+            }
+        }
+    }
+    @media  only screen and (max-width: 426px) { 
+        .p-datepicker:not(.p-datepicker-inline) {
+            width: 84% !important;
+        }
+    }
+}

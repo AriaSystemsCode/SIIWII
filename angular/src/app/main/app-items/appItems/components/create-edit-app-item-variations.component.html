@@ -204,7 +204,7 @@
                                                     <th>
                                                         {{ "Photos" | localize }}
                                                     </th>
-                                                    <th class="row mr-5" style="display: ruby;">
+                                                    <th class="row mr-5" style="display: ruby;border: 0px !important;">
                                                         <div>
                                                             <div class="text-center">
                                                                 {{ "Price" | localize }}
@@ -404,24 +404,9 @@
                                        {{ variationPossibilities > 0 ? variationPossibilities : ' '  }}
                                        {{ "Variations" | localize }}
                                    </button>
-                            <div class="align-items-baseline d-flex flex-row justify-content-start">
-                                <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg">
-                                    <!-- attributes -->
-                                    <a  class="aria-tag  border mb-3 mr-3 pr-4 pl-4 position-relative pt-2 pb-2 rounded-lg"
-                                        *ngFor="let selectedExtraAttribute of selectedExtraAttributes;index  as i"
-                                        [ngClass]="{'active':i == activeExtraAttributeIndex  , 
-                                             'text-white' : i == activeExtraAttributeIndex  , 
-                                            'text-purple' :i != activeExtraAttributeIndex }"
-
-                                        (click)="setActiveExtraAttribute(i)"
-                                        [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE' &&  selectedExtraAttribute?.entityObjectTypeCode!=='CLOSURE'"   >
-                                        {{selectedExtraAttribute.name | localize}}
-                                        <!-- <span (click)="removeExtraAttribute(selectedExtraAttribute,i)" class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle">
-                                            <i class="flaticon2-delete"></i>
-                                        </span> -->
-                                    </a>
-                                </div>
-                                <div class="dropdown" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
+                            <div class="align-items-baselineflex-row justify-content-start">
+                                <div class="dropdown d-flex flex-row col-2" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
+                                    <span class="pl-3 pr-3 font-weight-bold">{{ "Attributes" | localize }}</span> 
                                     <!-- <button class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2"
                                         dropdownToggle>
                                         <span class="mr-1">+</span> {{ "AddAttribute" | localize }}
@@ -474,6 +459,23 @@
                                     </div> -->
                                     <!-- attribute DropDown -->
                                 </div>
+                                <div class="align-items-center aria-tag-wrapper d-flex flex-wrap pb-0 pl-2 pt-1 rounded-lg ml-3 mt-2">
+                                    <!-- attributes -->
+                                    <a  class="aria-tag  border mb-3 mr-3 pr-4 pl-4 position-relative pt-2 pb-2 rounded-lg"
+                                        *ngFor="let selectedExtraAttribute of selectedExtraAttributes;index  as i"
+                                        [ngClass]="{'active':i == activeExtraAttributeIndex  , 
+                                             'text-white' : i == activeExtraAttributeIndex  , 
+                                            'text-purple' :i != activeExtraAttributeIndex }"
+
+                                        (click)="setActiveExtraAttribute(i)"
+                                        [hidden]="selectedExtraAttribute?.entityObjectTypeCode !=='COLOR' && selectedExtraAttribute?.entityObjectTypeCode!=='SIZE' &&  selectedExtraAttribute?.entityObjectTypeCode!=='CLOSURE'"   >
+                                        {{selectedExtraAttribute.name | localize}}
+                                        <!-- <span (click)="removeExtraAttribute(selectedExtraAttribute,i)" class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle">
+                                            <i class="flaticon2-delete"></i>
+                                        </span> -->
+                                    </a>
+                                </div>
+                               
                             </div>
                         </div>
                         <div *ngIf="activeExtraAttributeIndex > -1 && selectedExtraAttributes" class="extra-attribute-options-wrapper m-2 pb-4 pl-4 pr-4 pt-4" style="    background-color: white;

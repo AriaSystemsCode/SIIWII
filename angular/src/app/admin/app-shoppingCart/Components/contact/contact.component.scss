@@ -11,6 +11,16 @@ img {
     .aria-select-primeng.p-dropdown {
         min-width: 5.5em !important;
     }
+    .tempAccount  {
+        .p-dropdown {
+            border: 1px solid #C83532 !important;
+        }
+        .p-dropdown:not(.p-disabled):hover {
+            border: 1px solid #C83532 !important;
+        }
+    
+    }
+}
 
 
     // .tempCon {
@@ -19,7 +29,7 @@ img {
     //     }
       
     // }
-}
+
 :host ::ng-deep .tempCon .p-inputtext {
     border-top-right-radius: 8px !important;
     border-bottom-right-radius: 8px !important;

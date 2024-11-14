@@ -11,7 +11,7 @@
         >
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
-                    <h3 class="kt-subheader__title">
+                    <h3 class="kt-subheader__title pl-5">
                         <div class="header">
                             {{ appItemViewInput?.header }}
                         </div>
@@ -193,7 +193,7 @@
                                                     <div
                                                         class="p-d-flex p-jc-center p-ai-center mr-2 ml-2"
                                                     >
-                                                        <img *ngIf="img?.colorImage"
+                                                        <img *ngIf="img?.colorImage && !img?.colorHexaCode"
                                                             [src]="
                                                                 attachmentBaseUrl +
                                                                 '/' +
@@ -221,7 +221,7 @@
                                                             "
                                                         />
                                                         <div
-                                    *ngIf="!img?.colorImage"
+                                                        *ngIf="(!img?.colorImage && img?.colorHexaCode ) || (img?.colorImage && img?.colorHexaCode)"
                                     class="colorBox"
                                     [ngStyle]="{'background-color':img?.colorHexaCode}"
                                     [ngClass]="{
@@ -239,6 +239,27 @@
                                     imageSelectedIndex = 0
                                 "
                                 ></div>
+
+                                <img
+                                *ngIf="!img?.colorImage && !img?.colorHexaCode "
+                                [src]="defaultLogo"
+            class="colorBox"
+            [ngClass]="{
+                leftImageBorder:
+                    appItemForViewDto
+                        .variations[0]
+                        .selectedValues[
+                        varitaionSelectedIndex
+                    ] == img
+            }"
+            (click)="
+            showImagesOfVaritaionSelectedValues(
+                img
+            );
+            imageSelectedIndex = 0
+        "
+       />
+
                                                     </div>
                                                 </ng-template>
                                             </p-carousel>
@@ -302,7 +323,7 @@
 
 
                                                         <div
-                                    *ngIf="!img?.colorImage"
+                                    *ngIf=" (!img?.colorImage && img?.colorHexaCode ) || (img?.colorImage && img?.colorHexaCode)"
                                     class="colorBox"
                                     [ngStyle]="{'background-color':img?.colorHexaCode}"
                                     [ngClass]="{
@@ -320,6 +341,25 @@
                                     imageSelectedIndex = 0
                                 "
                                 ></div>
+                                <img
+                                *ngIf="!img?.colorImage && !img?.colorHexaCode "
+                                [src]="defaultLogo"
+            class="colorBox"
+            [ngClass]="{
+                leftImageBorder:
+                    appItemForViewDto
+                        .variations[0]
+                        .selectedValues[
+                        varitaionSelectedIndex
+                    ] == img
+            }"
+            (click)="
+            showImagesOfVaritaionSelectedValues(
+                img
+            );
+            imageSelectedIndex = 0
+        "
+       />
                                                     </div>
                                                 </div>
                                             </div>
@@ -437,7 +477,7 @@
                                 [ngStyle]="{
                                     'overflow-y': scrollDesc
                                         ? 'scroll'
-                                        : 'hidden',
+                                        : 'auto',
                                     height: scrollDesc ? '200px' : 'auto'
                                 }"
                             >
