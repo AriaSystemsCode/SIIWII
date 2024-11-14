@@ -1037,12 +1037,17 @@ export class AccountsServiceProxy {
 
     /**
      * @param accountTypeCode (optional) 
+     * @param neeedAction (optional) 
      * @return Success
      */
-    getAction(accountTypeCode: string | null | undefined): Observable<string> {
+    getAction(accountTypeCode: string | null | undefined, neeedAction: boolean | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAction?";
         if (accountTypeCode !== undefined && accountTypeCode !== null)
             url_ += "accountTypeCode=" + encodeURIComponent("" + accountTypeCode) + "&";
+        if (neeedAction === null)
+            throw new Error("The parameter 'neeedAction' cannot be null.");
+        else if (neeedAction !== undefined)
+            url_ += "neeedAction=" + encodeURIComponent("" + neeedAction) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
