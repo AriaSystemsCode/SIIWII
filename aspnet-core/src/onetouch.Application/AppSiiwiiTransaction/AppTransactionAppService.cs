@@ -472,21 +472,26 @@ namespace onetouch.AppSiiwiiTransaction
                     isBuyerManual = true;
                     buyerPrclvl = "MSRP";
                     buyerCurrency = "";
-                    input.CurrencyId = null;
-                    input.CurrencyCode = null;
-                }
-                if (isBuyerManual)
-                    input.PriceLevel = buyerPrclvl;
-                else
-                {
-                    var priceLevel = await _appMarketplaceAccountsPriceLevelsRepository.GetAll().FirstOrDefaultAsync(a => a.AccountSSIN == input.SellerCompanySSIN && a.ConnectedAccountSSIN == input.BuyerCompanySSIN);
-                    if (priceLevel != null)
+                    if (input.CurrencyId==0)
                     {
-                        input.PriceLevel = priceLevel.PriceLevel;
+                        input.CurrencyId = null;
+                        input.CurrencyCode = null;
                     }
-                    else { input.PriceLevel = "MSRP"; }
                 }
-
+                if (string.IsNullOrEmpty(input.PriceLevel))
+                {
+                    if (isBuyerManual)
+                        input.PriceLevel = buyerPrclvl;
+                    else
+                    {
+                        var priceLevel = await _appMarketplaceAccountsPriceLevelsRepository.GetAll().FirstOrDefaultAsync(a => a.AccountSSIN == input.SellerCompanySSIN && a.ConnectedAccountSSIN == input.BuyerCompanySSIN);
+                        if (priceLevel != null)
+                        {
+                            input.PriceLevel = priceLevel.PriceLevel;
+                        }
+                        else { input.PriceLevel = "MSRP"; }
+                    }
+                }
                 var account = await _appContactRepository.GetAll().FirstOrDefaultAsync(a => a.SSIN == input.SellerCompanySSIN);
                 if (account != null)
                 {
@@ -502,7 +507,7 @@ namespace onetouch.AppSiiwiiTransaction
                     }
                 }
 
-                if (string.IsNullOrEmpty(input.CurrencyCode))
+                if (input.CurrencyId==0)
                 {
                     var currencyObject = await TenantManager.GetTenantCurrency();
                     if (currencyObject != null)
@@ -511,7 +516,7 @@ namespace onetouch.AppSiiwiiTransaction
                         input.CurrencyCode = currencyObject.Code;
                     }
                 }
-                if (string.IsNullOrEmpty(input.CurrencyCode))
+                if (input.CurrencyId == 0)
                 {
                     input.CurrencyCode = "USD";
                     //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[Start]
@@ -520,6 +525,7 @@ namespace onetouch.AppSiiwiiTransaction
                         input.CurrencyId = currencyObj.Id;
                     //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[End]
                 }
+
                 if (input.EnteredDate == new DateTime(1, 1, 1))
                     input.EnteredDate = DateTime.Now.Date;
 
@@ -3810,6 +3816,7 @@ namespace onetouch.AppSiiwiiTransaction
                         //I45[Start]
                         CreateOrEditAppItemDto saveItemDto = new CreateOrEditAppItemDto();
                         saveItemDto = ObjectMapper.Map<CreateOrEditAppItemDto>(item);
+                        saveItemDto.NonLookupValues = new List<LookupLabelDto>();
                         saveItemDto.ManufacturerCode = marketplaceItem.ManufacturerCode;
                         saveItemDto.Price = marketplaceItem.Price;
                         if (saveItemDto.VariationItems != null && saveItemDto.VariationItems.Count > 0)
@@ -3824,6 +3831,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 }
 ;                            } 
                         }
+                        saveItemDto.OriginalCode = saveItemDto.Code;
                         await _appItemsAppService.CreateOrEdit(saveItemDto);
                         //145[End]
                     }
@@ -4082,7 +4090,8 @@ namespace onetouch.AppSiiwiiTransaction
                         viewTrans.IsBuyerContactInformationValid = false;
                         var buyer = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Buyer).FirstOrDefault();
                         if (buyer != null)
-                            viewTrans.IsBuyerContactInformationValid = (!string.IsNullOrEmpty(buyer.CompanyName) && !string.IsNullOrEmpty(buyer.CompanySSIN));
+                            viewTrans.IsBuyerContactInformationValid = (!string.IsNullOrEmpty(buyer.CompanyName));
+                        // && !string.IsNullOrEmpty(buyer.CompanySSIN));
 
                         viewTrans.IsSalesRepInformationValid = true;
                         var salesRep = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.SalesRep1).FirstOrDefault();
@@ -4630,7 +4639,7 @@ namespace onetouch.AppSiiwiiTransaction
 
                         if (transactionType == TransactionType.SalesOrder)
                         {
-                            await ShareManualAccount(marketplaceTransaction.BuyerCompanySSIN,tenantId);
+                         //   await ShareManualAccount(marketplaceTransaction.BuyerCompanySSIN,tenantId);
                             tenantTransaction.Code = await GetTenantNextOrderNumber("SO", tenantId);
                             tenantTransaction.Name = "Sales Order#" + tenantTransaction.Code.TrimEnd();
                             tenantTransaction.EntityObjectTypeId = soType;
@@ -6284,11 +6293,16 @@ namespace onetouch.AppSiiwiiTransaction
                         accountInput.TenantId = int.Parse(tenantId.ToString());
                         accountInput.ReturnId = true;
                         accountInput.Id = 0;
+                        accountInput.UseDTOTenant = true;
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                         if (tenantObj != null)
                         {
                             string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("TENANTCONTACT");
                             accountInput.Code = tenantObj.TenancyName.Trim() + "-M" + sequance;
+                        }
+                        if (accountOrg.PartnerId == null)
+                        {
+                            accountInput.SSIN = "";
                         }
                         accountInput.UseDTOTenant = true;
                         var account = await _accountAppService.CreateOrEditAccount(accountInput);
@@ -6308,10 +6322,15 @@ namespace onetouch.AppSiiwiiTransaction
                                     contactDto.AccountId = long.Parse(account.AccountInfo.Id.ToString());
                                     contactDto.TenantId = int.Parse(tenantId.ToString());
                                     contactDto.Id = 0;
+                                    contactDto.UseDTOTenant = true;
                                     if (tenantObj != null)
                                     {
                                         string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("TENANTBRANCH");
                                         contactDto.Code = tenantObj.TenancyName.Trim() + "-" + sequance;
+                                    }
+                                    if (accountOrg.PartnerId == null)
+                                    {
+                                        contactDto.SSIN = "";
                                     }
                                     BranchDto savedContactDto = await _accountAppService.CreateOrEditBranch(contactDto);
                                 }
@@ -6330,6 +6349,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     contactDto.TenantId = int.Parse(tenantId.ToString());
                                     contactDto.ParentId = accountObj.Id;
                                     contactDto.Id = 0;
+                                    contactDto.UseDTOTenant = true;
                                     if (contactDto.EntityAttachments != null)
                                     {
                                         foreach (var attach in contactDto.EntityAttachments)
@@ -6342,6 +6362,10 @@ namespace onetouch.AppSiiwiiTransaction
                                     {
                                         string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("MANUALACCOUNTCONTACT");
                                         contactDto.Code = tenantObj.TenancyName.Trim() + "-C" + sequance;
+                                    }
+                                    if (accountOrg.PartnerId == null)
+                                    {
+                                        contactDto.SSIN = "";
                                     }
                                     ContactDto savedContactDto = await _accountAppService.CreateOrEditContact(contactDto);
 
@@ -6357,6 +6381,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     AppAddressDto address = ObjectMapper.Map<AppAddressDto>(conAdd);
                                     address.AccountId = long.Parse(account.AccountInfo.Id.ToString());
                                     address.TenantId = int.Parse(tenantId.ToString());
+                                    address.UseDTOTenant = true;
                                     address.Id= 0;
                                     AppAddressDto addReturn = await _accountAppService.CreateOrEditAddress(address);
                                 }
@@ -6407,7 +6432,36 @@ namespace onetouch.AppSiiwiiTransaction
                         }
 
                     }
+                    if (accountOrg.PartnerId != null)
+                    {
+                        long? otherTenantId = null;
+                        //accountOrg.EntityFk.TenantOwner 
+                        var publishedAcc = await _appContactRepository.GetAll().Where(z => z.Id == accountOrg.PartnerId && z.TenantId == null)
+                            .FirstOrDefaultAsync();
+                        if(publishedAcc!=null)
+                        {
+                            var otherAccount = await _appContactRepository.GetAll().Where(z => z.Id == publishedAcc.PartnerId && z.TenantId != null)
+                            .FirstOrDefaultAsync();
+                            if (otherAccount!=null)
+                            {
+                                otherTenantId = long.Parse(otherAccount.TenantId.ToString());
+                            }
+                        }
+                        string? otherTenantSSN = null;
+                        var tenantOrg = await _appContactRepository.GetAll().Where(z => z.TenantId == tenantId && z.IsProfileData == true
+                        && z.ParentId == null).FirstOrDefaultAsync();
+                        if (tenantOrg!=null)
+                        {
+                            otherTenantSSN = tenantOrg.SSIN;
+                        }
+                        if (!string.IsNullOrEmpty(otherTenantSSN) && otherTenantId!=null)
+                        await ShareManualAccount(otherTenantSSN, long.Parse(otherTenantId.ToString()));
+                       
+                    }
                 }
+                
+
+
             }
             return true;
         }
