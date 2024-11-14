@@ -1,6 +1,6 @@
-<div class="tab-cont thin-scroll">
-<div class="container-fluid pt-1 mb-3 ">
-    <div class="header p-2 my-2 d-flex  justify-content-between">
+<div class="">
+<div class="container-fluid pt-1 mb-3  thin-scroll">
+    <div class="header p-2 my-2 d-flex  justify-content-between align-items-center">
         <h6><span  class="headertxt"> {{l("APContact")}} : </span></h6>   
         <div >
             <button
@@ -76,7 +76,7 @@
         <h6><span  class="headertxt">{{l("PaymentInformation")}} : </span></h6>
     </div>
     <div class="row view-mode mt-2 mb-2">
-        <div class="col-6" *ngIf="appTransactionsForViewDto?.paymentTermsCode">
+        <div class="col-md-6 col-12" *ngIf="appTransactionsForViewDto?.paymentTermsCode">
             <label class="label mt-1 mb-1  w-50">{{l("PaymentTerms")}}</label>
             <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto?.paymentTermsCode}}</label>
     

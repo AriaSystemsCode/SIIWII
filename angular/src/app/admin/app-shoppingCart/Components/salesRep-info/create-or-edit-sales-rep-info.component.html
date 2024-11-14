@@ -28,15 +28,16 @@
                     class="continuebtn text-center btn">
                     Continue
                 </button>
-                <button *ngIf="showSaveBtn" (click)="save()" [disabled]="!isContactsValid"
-                    class="previewbtn text-center btn ml-2">
-                    Save
-                    <i class="pi pi-check"></i>
-                </button>
+               
                 <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn ml-2">
                     Cancel
-                    <i class="pi pi-times"></i>
+                    <!-- <i class="pi pi-times"></i> -->
                 </button>
+                <button *ngIf="showSaveBtn" (click)="save()" [disabled]="!isContactsValid"
+                class="previewbtn text-center btn ml-2">
+                Save
+                <!-- <i class="pi pi-check"></i> -->
+            </button>
             </div>
         </div>
 

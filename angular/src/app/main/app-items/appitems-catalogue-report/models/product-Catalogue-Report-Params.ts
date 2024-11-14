@@ -26,6 +26,7 @@ export class ProductCatalogueReportParamsI {
     subject: string = "";
     body: string = "";
     orderBy: string="";
+    userCountry:string="";
 }
 
 export class ProductCatalogueReportParams implements ProductCatalogueReportParamsI {
@@ -64,6 +65,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     saveToPDF:boolean= false;
     onlyInStockColors:boolean=false;
     mimimumInStockQty:number=0;
+    userCountry:string="";
 
 
     private attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
@@ -136,6 +138,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&saveToPDF=" + this.saveToPDF
        url += "&onlyInStockColors=" + this.onlyInStockColors
        url += "&mimimumInStockQty=" + this.mimimumInStockQty
+        url += "&muserCountry="+this.userCountry
               return url
     }
 }

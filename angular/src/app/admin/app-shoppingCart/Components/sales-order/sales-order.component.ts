@@ -132,6 +132,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             }
     }
     ngOnInit(): void {
+        
         if(this.currentTab == ShoppingCartoccordionTabs.orderInfo){
             this.getAppTransactionList();
             this.getAppTransactionClassList()
@@ -191,7 +192,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
                 this.selectedClassificationsShow= [...this.appTransactionsForViewDto.entityClassificationsNames?.items];
             }
         }
-        console.log(this.appTransactionsForViewDto,'appTransactionsForViewDto')
+      
 
         
     }
@@ -211,10 +212,10 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
     onNodeToggle(event: any, isExpanded: boolean) {
     const node = event.node;
     if (isExpanded) {
-        console.log('Node expanded:', node);
+
         // Custom logic when a node is expanded
     } else {
-        console.log('Node collapsed:', node);
+
         // Custom logic when a node is collapsed
     }
 }
@@ -303,7 +304,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
     // get childs related to parents
     classificationNodeExpand(value: any) {
-        console.log(">>", value);
+    
 
         if (value.node) {
             this.loading = true;
@@ -606,16 +607,16 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
             this.availableDate=this.startDate;
         }
 
-        let enteredDate = this.enteredDate.toLocaleString();
-        let startDate = this.startDate.toLocaleString();
-        let availableDate = this.availableDate.toLocaleString();
-        let completeDate = this.completeDate.toLocaleString();
+        let enteredDate = this.enteredDate;
+        let startDate = this.startDate;
+        let availableDate = this.availableDate;
+        let completeDate = this.completeDate;
             console.log(enteredDate,'enteredDate')
 
-        this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
-        this.appTransactionsForViewDto.startDate = moment.utc(startDate);
-        this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
-        this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+        this.appTransactionsForViewDto.enteredDate =   moment(enteredDate);
+        this.appTransactionsForViewDto.startDate = moment(startDate);
+        this.appTransactionsForViewDto.availableDate = moment(availableDate);
+        this.appTransactionsForViewDto.completeDate = moment(completeDate);
         console.log(this.appTransactionsForViewDto.enteredDate,'this.appTransactionsForViewDto.enteredDate')
 
     }
@@ -652,7 +653,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
                 }
             });
-        console.log(this.appTransactionsForViewDto.enteredDate,'save')
+    
 
     }
 
@@ -949,7 +950,7 @@ onNodeSelectCat(event: any) {
     }
 // Handles when a node is selected
 onNodeSelect(event: any) {
-    console.log(">>evvvvvvvvvvvvvvvvvvvv", event.node);
+    // console.log(">>evvvvvvvvvvvvvvvvvvvv", event.node);
 
     this.processNodeSelection(event.node, true);
   }
@@ -1177,7 +1178,7 @@ saveClass(classification:any,type?:''){
 
 
 deleteCat(cat:any){
-    console.log(cat,'id') 
+   
 
     this._sycEntityObjectCategoriesServiceProxy.delete(cat.data.sycEntityObjectCategory.id)
     .pipe(finalize(() => { 
@@ -1192,12 +1193,12 @@ deleteCat(cat:any){
     // this.showCatBtn = false
         // this.selectedCategories[0] = {...cat};
     //    this.category.name = ''
-        console.log(this.selectedCategories,'selectedCategories')
+       
     
 }
 
 deleteClass(classi:any){
-    console.log(classi,'id') 
+   
 
     this._sycEntityObjectClassificationsServiceProxy.delete(classi.data.sycEntityObjectClassification.id)
     .pipe(finalize(() => { 
@@ -1212,7 +1213,7 @@ deleteClass(classi:any){
     // this.showCatBtn = false
         // this.selectedCategories[0] = {...cat};
     //    this.category.name = ''
-        console.log(this.selectedCategories,'selectedCategories')
+      
     
 }
 cancelCat(){
@@ -1282,7 +1283,7 @@ cancelClass(){
     // loadedChildrenRecords: TreeNodeOfGetSycEntityObjectTypeForViewDto[] = [];
     // lastSelectedRecord: TreeNodeOfGetSycEntityObjectTypeForViewDto;
     getAppTransactionList(searchQuery?: string) {
-        console.log(">>", searchQuery)
+       
         // this.loading = true;
         const subs = this._sycEntityObjectCategoriesServiceProxy
             .getAllWithChildsForTransaction(
@@ -1304,7 +1305,7 @@ cancelClass(){
             .pipe(finalize(() => (this.loading = false)))
             .subscribe((result) => {
                 // this.selectedCategories = this.appTransactionsForViewDto?.entityCategories;
-                console.log(result.items,'result.items')
+          
 
                 // if (searchQuery !== undefined) this.allRecords = [];
                 // result.items.map((record) => {
@@ -1364,7 +1365,7 @@ cancelClass(){
 
 
     getAppTransactionClassList(searchQuery?: string) {
-        console.log(">>", searchQuery)
+       
         // this.loading = true;
         const subs = this._sycEntityObjectClassificationsServiceProxy
             .getAllWithChildsForTransaction(
@@ -1375,7 +1376,7 @@ cancelClass(){
            
                 this.allClassRecords = [];
                 this.allClassRecords.push(...result.items);
-                console.log(this.allClassRecords,'this.allRecordsclass')
+             
   
 
                 this.allClassFilteredRecords = this.allClassRecords.filter(record =>
