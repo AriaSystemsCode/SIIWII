@@ -135,7 +135,7 @@
        </button>
 <button
 *ngIf="showSaveBtn"
-(click)="visible = true;cancelBtn = true;saveBtn = false"
+(click)="cancel();"
 class="cancelbtn text-center btn "
 >
 Cancel
@@ -144,7 +144,7 @@ Cancel
 <button
 *ngIf="showSaveBtn"
 [disabled]="!(isContactsValid)"
-(click)="visible = true;saveBtn = true;cancelBtn = false"
+(click)="save();"
 class="previewbtn text-center btn "
 >
 Save
@@ -156,7 +156,7 @@ Save
 
 
 
-
+<!-- 
 <p-dialog [(visible)]="visible " [modal]="true" [style]="{ width: '474px' }" [draggable]="false" >
 
     <div class=" con-body">
@@ -175,7 +175,7 @@ Save
     <div *ngIf="cancelBtn" class="d-flex justify-content-center btns" >
     
       <button  (click)="visible = false;cancel()" label="Ok" Class="p-button-text">Ok</button>
-      <!-- <button  (click)="visible = false;SuccessMsg = true ;cancel()" label="Yes" class="p-button-text" >Yes</button> -->
+      <button  (click)="visible = false;SuccessMsg = true ;cancel()" label="Yes" class="p-button-text" >Yes</button>
     </div>
 
     <div *ngIf="saveBtn" class="d-flex justify-content-center btns" >
@@ -207,4 +207,4 @@ Save
  
       <button  (click)="SuccessMsg = false" label="Ok" class="p-button-text" >Ok</button>
     </div>
-  </p-dialog>
+  </p-dialog> -->

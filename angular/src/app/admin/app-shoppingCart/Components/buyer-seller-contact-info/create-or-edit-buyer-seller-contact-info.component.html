@@ -14,7 +14,8 @@
                         [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"
                         (updateAppTransactionsForViewDto)="onUpdateAppTransactionsForViewDto($event)"
                         (formValidityChanged)="isContactFormValid($event)"
-                        [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo" (isTempComp)="isTempComp($event)"></app-contact>
+                        (validateTempBuyer)="validateTempBuyer($event)"
+                        [showDepartment]="activeTab ==shoppingCartoccordionTabs.BuyerContactInfo" ></app-contact>
                 </div>
             </div>
             <hr class="my-2" />
@@ -32,20 +33,30 @@
         </div>
         <div             *ngIf="showSaveBtn"  class="d-flex justify-content-end mr-4">
       
-          
-            <button
+   
+            <!-- <button
             *ngIf="showSaveBtn"
             (click)="visible = true;cancelBtn = true;saveBtn = false"
             class="cancelbtn text-center btn "
         >
             Cancel
-            <!-- <i class="pi pi-times"></i> -->
+        </button> -->
+            <button
+            *ngIf="showSaveBtn"
+            (click)="cancel()"
+            class="cancelbtn text-center btn "
+        >
+            Cancel
         </button>
-        <button *ngIf="showSaveBtn"  [disabled]="!(isContactsValid)" (click)="visible = true;saveBtn = true;cancelBtn = false"
+        <button
+         *ngIf="showSaveBtn"  [disabled]="!(isContactsValid)" (click)="save()"
         class="previewbtn text-center ">
         Save
-        <!-- <i class="pi pi-check"></i> -->
     </button>
+    <!-- <button *ngIf="showSaveBtn"  [disabled]="!(isContactsValid)" (click)="visible = true;saveBtn = true;cancelBtn = false"
+    class="previewbtn text-center ">
+    Save
+</button> -->
         </div>
     </div>
     
@@ -64,7 +75,7 @@
     </div>
     
 
-    <p-dialog [(visible)]="visible " [modal]="true" [style]="{ width: '474px' }" [draggable]="false" >
+    <!-- <p-dialog [(visible)]="visible " [modal]="true" [style]="{ width: '474px' }" [draggable]="false" >
 
         <div class=" con-body">
           <p class="mb-3">
@@ -82,7 +93,7 @@
         <div *ngIf="cancelBtn" class="d-flex justify-content-center btns" >
         
           <button  (click)="visible = false;cancel()" label="Ok" Class="p-button-text">Ok</button>
-          <!-- <button  (click)="visible = false;SuccessMsg = true ;cancel()" label="Yes" class="p-button-text" >Yes</button> -->
+          <button  (click)="visible = false;SuccessMsg = true ;cancel()" label="Yes" class="p-button-text" >Yes</button>
         </div>
     
         <div *ngIf="saveBtn" class="d-flex justify-content-center btns" >
@@ -114,4 +125,4 @@
      
           <button  (click)="SuccessMsg = false" label="Ok" class="p-button-text" >Ok</button>
         </div>
-      </p-dialog>
+      </p-dialog> -->

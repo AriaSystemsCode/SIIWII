@@ -109,7 +109,10 @@ saveBtn: boolean = false;
 SuccessMsg: boolean = false;
 addNewLinebtn : boolean = true;
 filterForm: FormGroup;
-
+comNew : boolean
+conNew : boolean
+TempComp : boolean = false
+currentFilter: string = '';
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -127,6 +130,23 @@ filterForm: FormGroup;
     this.initFilterForm()
     // this.onGeneratOrderReport(true,undefined,true,true);
  this.getSellerVariations()
+ let value = localStorage.getItem("comNew"); 
+
+ if (value) {
+  this.comNew = Boolean((value));
+ }else {
+  this.comNew = false
+ }
+ let value2 = localStorage.getItem("conNew");
+ if (value2) {
+  this.conNew = Boolean((value2));
+}  else {
+  this.conNew = false;
+
+}
+ this.TempComp = false
+ console.log(this.comNew,'this.comNew')
+ console.log(this.conNew,'this.conNew')
   }
   ngOnChanges() {
     // this.onGeneratOrderReport(true,undefined,true,true);
@@ -770,8 +790,11 @@ this.hideMainSpinner();
         this._AppTransactionServiceProxy.discardTransaction(this.orderId)
           .subscribe(() => {
             this.hideMainSpinner();
+            localStorage.removeItem("comNew");
+            localStorage.removeItem("conNew");
             this.userClickService.userClicked("refreshShoppingInfoInTopbar");
             this.hide();
+
           });
       }
     });
@@ -781,6 +804,8 @@ this.hideMainSpinner();
     this.showMainSpinner();
     this._AppTransactionServiceProxy.cancelTransaction(this.orderId)
       .subscribe(() => {
+        localStorage.removeItem("comNew");
+        localStorage.removeItem("conNew");
         this.hideMainSpinner();
         this.getShoppingCartData();
       });
@@ -797,62 +822,70 @@ this.hideMainSpinner();
   }
 
   PlaceOrder() {
-    Swal.fire({
-      title: "",
-      text: "Are you sure that you want to place the order?",
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      backdrop: true,
-      customClass: {
-        popup: 'popup-class',
-        icon: 'icon-class',
-        content: 'content-class',
-        actions: 'actions-class',
-        confirmButton: 'confirm-button-class2',
+    // Swal.fire({
+    //   title: "",
+    //   text: "Are you sure that you want to place the order?",
+    //   icon: "info",
+    //   showCancelButton: true,
+    //   confirmButtonText: "Yes",
+    //   cancelButtonText: "No",
+    //   allowOutsideClick: false,
+    //   allowEscapeKey: false,
+    //   backdrop: true,
+    //   customClass: {
+    //     popup: 'popup-class',
+    //     icon: 'icon-class',
+    //     content: 'content-class',
+    //     actions: 'actions-class',
+    //     confirmButton: 'confirm-button-class2',
 
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
+    //   },
+    // }).then((result) => {
+    //   if (result.isConfirmed) {
         this.showMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
             // this.onGeneratOrderReport(true,undefined,true,true);
-            this.hideMainSpinner();
+         
+            localStorage.removeItem("comNew");
+            localStorage.removeItem("conNew");
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
         }
           ))
           .subscribe((res) => {
+
             if (res) {
-              Swal.fire({
-                title: "",
-                text: "Order #" + this.transactionCode + " has been placed successfully",
-                icon: "success",
-                showCancelButton: false,
-                confirmButtonText: "OK",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                backdrop: true,
-                customClass: {
-                  popup: 'popup-class',
-                  icon: 'icon-class',
-                  content: 'content-class',
-                  actions: 'actions-class',
-                  confirmButton: 'confirm-button-class2',
-                },
-              }).then((result) => {
-                if (result.isConfirmed) {
-                }
-              });
+            this.hideMainSpinner();
+              this.visible = false
+              this.SuccessMsg = true
+            this.getShoppingCartData()
+
+            //   Swal.fire({
+            //     title: "",
+            //     text: "Order #" + this.transactionCode + " has been placed successfully",
+            //     icon: "success",
+            //     showCancelButton: false,
+            //     confirmButtonText: "OK",
+            //     allowOutsideClick: false,
+            //     allowEscapeKey: false,
+            //     backdrop: true,
+            //     customClass: {
+            //       popup: 'popup-class',
+            //       icon: 'icon-class',
+            //       content: 'content-class',
+            //       actions: 'actions-class',
+            //       confirmButton: 'confirm-button-class2',
+            //     },
+            //   }).then((result) => {
+            //     if (result.isConfirmed) {
+            //     }
+            //   });
             }
           });
-      }
-    });
+    //   }
+    // });
   }
   sync(){
     this.showMainSpinner();
@@ -937,14 +970,23 @@ this.hideMainSpinner();
   }
 
   refreshShoppingCart(event) {
+    if (this.appTransactionsForViewDto?.entityStatusCode?.toUpperCase() == 'OPEN') {
+
     if (event) {
-      this.getShoppingCartData()
+    this.getShoppingCartData()
+      }
+  
     }
   }
   
   onChangeAppTransactionsForViewDto($event) {
     $event.companeyNames=this.companeyNames;
     this.appTransactionsForViewDto = $event;
+  }
+
+  TempCompValid($event) {
+ 
+    this.TempComp = $event;
   }
 
   printTransaction() {
@@ -1139,39 +1181,64 @@ addNewLine() {
   // this.getSellerVariations()
   this.addLine = false
 }
+handleVarSearch(event: any, dropdown: any) {
+  this.currentFilter = event.filter; // Store the current filter
+  this.allVariations = [];
+  this.displayedVariations = [];
+  this.loadMore(new MouseEvent('click'), dropdown, this.currentFilter);
+}
 
-getSellerVariations(skipCount: number = 0, maxResultCount: number = this.incrementCount) {
-  this._AppTransactionServiceProxy.getAllSellerVariations(
+getSellerVariations(
+  skipCount: number = 0,
+  maxResultCount: number = this.incrementCount,
+  filter: string = ''
+) {
+  this._AppTransactionServiceProxy
+    .getAllSellerVariations(
       this.appTransactionsForViewDto?.sellerCompanySSIN,
-      undefined,
+      filter, // Pass the filter to the API
       this.appTransactionsForViewDto?.buyerContactSSIN,
       this.appTransactionsForViewDto?.currencyCode,
       undefined,
       skipCount,
       maxResultCount
-  ).pipe(finalize(() => this.hideMainSpinner()))
-   .subscribe((res) => {
-       this.totalVariationsCount = res.totalCount;
-       this.allVariations = this.allVariations.concat(res.items);
-       this.displayedVariations = [...this.allVariations];
-      //  console.log(this.displayedVariations, 'displayedVariations');
-   });
+    )
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((res) => {
+      this.totalVariationsCount = res.totalCount;
+
+      if (filter && skipCount === 0) {
+        // If a new filter is applied, replace `allVariations` and `displayedVariations`
+        this.allVariations = res.items;
+      } else {
+        // Otherwise, append the new items
+        this.allVariations = this.allVariations.concat(res.items);
+      }
+
+      // Update the displayed variations
+      this.displayedVariations = [...this.allVariations];
+    });
 }
 
-loadMore(event: MouseEvent, dropdown: any) {
+
+loadMore(event: MouseEvent, dropdown: any, filter: string = '') {
   // Prevent the dropdown from closing
   event.stopPropagation();
 
-  if (this.displayedVariations.length < this.totalVariationsCount) {
-      const nextSkipCount = this.displayedVariations.length;
-      this.getSellerVariations(nextSkipCount);
-      
-      // Ensure the dropdown remains open after loading more items
-      setTimeout(() => {
-          dropdown.overlayVisible = true;
-      }, 0);
+  // Calculate the `skipCount` based on whether a filter is applied
+  const nextSkipCount = filter ? this.displayedVariations.length : this.allVariations.length;
+
+  // Check if more variations can be loaded
+  if (this.displayedVariations.length < this.totalVariationsCount || filter) {
+    this.getSellerVariations(nextSkipCount, this.incrementCount, filter);
+
+    // Ensure the dropdown remains open after loading more items
+    setTimeout(() => {
+      dropdown.overlayVisible = true;
+    }, 0);
   }
 }
+
 onVariationSelect(event: any) {
   // Reset quantity and price when a new variation is selected  
   console.log(event,'mmmmmmevv')
@@ -1258,6 +1325,25 @@ cancelAddLine() {
   this.shoppingCartTreeNodes.pop(); // Removes the last item
   this.shoppingCartTreeNodes = [...this.shoppingCartTreeNodes];
   // Reset selections as needed
+}
+
+ngDoCheck() {
+        
+  let value = localStorage.getItem("comNew"); 
+
+  if (value) {
+   this.comNew = Boolean((value));
+  }else {
+   this.comNew = false
+  }
+  let value2 = localStorage.getItem("conNew");
+  if (value2) {
+   this.conNew = Boolean((value2));
+ }  else {
+   this.conNew = false;
+ 
+ }
+  
 }
 
 }

@@ -662,27 +662,25 @@ Cancel
  
 <button
 *ngIf="showSaveBtn"
-(click)="visible = true;cancelBtn = true;saveBtn = false"
+(click)="cancel()"
 class="cancelbtn text-center btn float-right"
 >
 Cancel
-<!-- <i class="pi pi-times"></i> -->
 </button>
 <button
 *ngIf="showSaveBtn"
 [disabled]="!(isContactsValid && isSalesOrderValidForm())"
-(click)="visible = true;saveBtn = true;cancelBtn = false"
+(click)="save()"
 class="previewbtn text-center btn float-right"
 >
 Save
-<!-- <i class="pi pi-check"></i> -->
 </button>
 </div>
     </div>
 </div>
 
 
-<p-dialog [(visible)]="visible " [modal]="true" [style]="{ width: '474px' }" [draggable]="false" >
+<!-- <p-dialog [(visible)]="visible " [modal]="true" [style]="{ width: '474px' }" [draggable]="false" >
 
     <div class=" con-body">
       <p class="mb-3">
@@ -700,7 +698,7 @@ Save
     <div *ngIf="cancelBtn" class="d-flex justify-content-center btns" >
     
       <button  (click)="visible = false;cancel()" label="Ok" Class="p-button-text">Ok</button>
-      <!-- <button  (click)="visible = false;SuccessMsg = true ;cancel()" label="Yes" class="p-button-text" >Yes</button> -->
+      <button  (click)="visible = false;SuccessMsg = true ;cancel()" label="Yes" class="p-button-text" >Yes</button>
     </div>
 
     <div *ngIf="saveBtn" class="d-flex justify-content-center btns" >
@@ -732,4 +730,4 @@ Save
  
       <button  (click)="SuccessMsg = false" label="Ok" class="p-button-text" >Ok</button>
     </div>
-  </p-dialog>
+  </p-dialog> -->

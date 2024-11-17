@@ -1145,7 +1145,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             this.btnLoader = true;
             this._AppTransactionServiceProxy
                 .createOrEdit(this.body)
-                .pipe(finalize(() => (this.btnLoader = false)))
+                .pipe(finalize(() =>  {
+                    this.btnLoader = false
+                    localStorage.removeItem("comNew");
+                    localStorage.removeItem("conNew");
+                } ))
                 .subscribe((response: any) => {
                     if (this.setCurrentUserActiveTransaction) {
                         this._AppTransactionServiceProxy

@@ -511,35 +511,7 @@
                   <!--price level and currency  -->
 
                   <div class="col-md-6 d-flex price-sec"      *ngIf="isBuyerTempAccount" >
-                    <div class="mb-3 w-100">
-                        <label for="" class="form-label"
-                            >{{l("PriceLevel")}}</label
-                        >
-                            <div>
-                                <p-dropdown
-                           
-                           
-                                [options]="allPriceLevel" 
-                              [(ngModel)]="accountInfoTemp.priceLevel"
-                                    formControlName="priceLevel"
-                                    (change)="changePrice($event)"
-                                    placeholder="MSRP"
-                                 
-                                ></p-dropdown>
-                            </div>
-                           
-                                        <small
-                                            class="text-danger"
-                                            *ngIf="
-                                                submitted &&
-                                                orderForm
-                                                    .get('priceLevel')
-                                                    ?.hasError('required')
-                                            "
-                                        >
-                                        Price Level is required
-                                        </small>
-                     </div>
+              
                        
 
 
@@ -570,6 +542,35 @@
                                                 </div>
                                        
 
+                                                <div class="mb-3 w-100">
+                                                    <label for="" class="form-label"
+                                                        >{{l("PriceLevel")}}</label
+                                                    >
+                                                        <div>
+                                                            <p-dropdown
+                                                       
+                                                       
+                                                            [options]="allPriceLevel" 
+                                                          [(ngModel)]="accountInfoTemp.priceLevel"
+                                                                formControlName="priceLevel"
+                                                                (change)="changePrice($event)"
+                                                                placeholder="MSRP"
+                                                             
+                                                            ></p-dropdown>
+                                                        </div>
+                                                       
+                                                                    <small
+                                                                        class="text-danger"
+                                                                        *ngIf="
+                                                                            submitted &&
+                                                                            orderForm
+                                                                                .get('priceLevel')
+                                                                                ?.hasError('required')
+                                                                        "
+                                                                    >
+                                                                    Price Level is required
+                                                                    </small>
+                                                 </div>
                   <!-- price level and currency -->
                 </div>
 

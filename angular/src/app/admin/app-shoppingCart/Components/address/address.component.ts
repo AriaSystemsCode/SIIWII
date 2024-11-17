@@ -20,7 +20,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
 
     showAddList:boolean=false;
     addressCode: string;
-    addressName: string;
+    name: string;
     address1: string;
     address2: string;
     city: string;
@@ -77,6 +77,76 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
         if(!this.selectedAddress && this.selectedAddressDetails)
         this.selectedAddress=this.selectedAddressDetails;
   
+        }      else {
+            // this.selectedAddress = null;
+            let role;
+        
+            if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo && this.shipInfoIndex === 2) {
+                role = 6;
+            } else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo && this.billingIndexInfo === 1) {
+                role = 4;
+            }
+        
+            const shIPtOroleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
+                contact => contact?.contactRole === 6
+            );
+            const apRoleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
+                contact => contact?.contactRole === 4
+            );
+        
+        
+        
+            if (  role == 6) {
+                // Set data for role 6 (Shipping)
+                // const generatedId = this.generateNewId();
+                this.selectedAddressDetails = {
+                    ...shIPtOroleContact.contactAddressDetail,
+                    // code: shIPtOroleContact.contactAddressCode,
+                    // name: shIPtOroleContact.contactAddressName,
+                    // id: generatedId
+                };
+                // this.refSavedAddressesList[0] = {
+                //     ...shIPtOroleContact.contactAddressDetail,
+                //     code: shIPtOroleContact.contactAddressCode,
+                //     name: shIPtOroleContact.contactAddressName,
+                //     // id: generatedId
+                // };
+                // this.selectedAddress = this.savedAddressesList[0];
+            } else if ( role == 4) {
+                this.selectedAddressDetails = {
+                    ...apRoleContact.contactAddressDetail,
+                    // code: shIPtOroleContact.contactAddressCode,
+                    // name: shIPtOroleContact.contactAddressName,
+                    // id: generatedId
+                };
+                // Set data for role 4 (Billing) and handle both Shipping and AP
+                // const generatedId = this.generateNewId();
+                
+              
+        
+                // // Address for role 4 (Billing)
+                // if (apRoleContact?.contactAddressDetail?.countryCode) {
+                //     const apGeneratedId = this.generateNewId();
+                //     this.savedAddressesList[1] = {
+                //         ...apRoleContact.contactAddressDetail,
+                //         code: apRoleContact.contactAddressCode,
+                //         name: apRoleContact.contactAddressName,
+                //         id: apGeneratedId
+                //     };
+                //     this.refSavedAddressesList[1] = {
+                //         ...apRoleContact.contactAddressDetail,
+                //         code: apRoleContact.contactAddressCode,
+                //         name: apRoleContact.contactAddressName,
+                //         id: apGeneratedId
+                //     };
+                //     this.selectedAddress = this.savedAddressesList[1];
+                // } else {
+                //     this.selectedAddress = null;
+                // }
+            } 
+          
+        
+            console.log(this.savedAddressesList, 'this.savedAddressesList');
         }
     }
     }
@@ -104,7 +174,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                         this.refSavedAddressesList=result;
                         console.log( this.savedAddressesList,' this.savedAddressesList')
                         this._AppTransactionServiceProxy.getCompanyDefaultAddresses(companySsin,branchSsin).subscribe(result => {
-                            console.log(result,'defauulllt')
+                            // console.log(result,'defauulllt')
                             if (result){
                                 const addressIds = result.map(address => address.addressId);
                                 // console.log(addressIds,'addressIds')
@@ -114,7 +184,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
                                 );
                                 // console.log(matchedAddress,'matchedAddress')
                            
-                                if (matchedAddress) {
+                                if (matchedAddress ) {
                                     this.selectedAddress = matchedAddress
                     
                                     }
@@ -142,73 +212,105 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
             
                     });
                  }
-                     else {
-                        this.selectedAddress = null
-
-                        let role;
-
-                        if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo && this.shipInfoIndex === 2) {
-                            role = 6;
-                        } else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo && this.billingIndexInfo === 1) {
-                            role = 4;
-                        }
+                 else {
+                    // this.selectedAddress = null;
+                    let role;
+                
+                    if (this.currentTab === ShoppingCartoccordionTabs.ShippingInfo && this.shipInfoIndex === 2) {
+                        role = 6;
+                    } else if (this.currentTab === ShoppingCartoccordionTabs.BillingInfo && this.billingIndexInfo === 1) {
+                        role = 4;
+                    }
+                
+                    const shIPtOroleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
+                        contact => contact?.contactRole === 6
+                    );
+                    const apRoleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
+                        contact => contact?.contactRole === 4
+                    );
+                
+                    console.log(shIPtOroleContact?.contactAddressDetail.countryCode, 'shIPtOroleContact');
+                    console.log(apRoleContact?.contactAddressDetail.countryCode, 'apRoleContact');
+                
+                    if (role === 6 && shIPtOroleContact?.contactAddressDetail?.countryCode) {
+                        // Set data for role 6 (Shipping)
+                        const generatedId = this.generateNewId();
+                        this.savedAddressesList[0] = {
+                            ...shIPtOroleContact.contactAddressDetail,
+                            code: shIPtOroleContact.contactAddressCode,
+                            name: shIPtOroleContact.contactAddressName,
+                            id: generatedId
+                        };
+                        this.refSavedAddressesList[0] = {
+                            ...shIPtOroleContact.contactAddressDetail,
+                            code: shIPtOroleContact.contactAddressCode,
+                            name: shIPtOroleContact.contactAddressName,
+                            id: generatedId
+                        };
+                        // this.selectedAddress = this.savedAddressesList[0];
+                    } else if (role === 4 && shIPtOroleContact?.contactAddressDetail?.countryCode) {
+                        // Set data for role 4 (Billing) and handle both Shipping and AP
+                        const generatedId = this.generateNewId();
                         
-                        const shIPtOroleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
-                            contact => contact?.contactRole === 6
-                        );
-                        const apRoleContact = this.appTransactionsForViewDto?.appTransactionContacts.find(
-                            contact => contact?.contactRole === 4
-                        );
-                        console.log(shIPtOroleContact.contactAddressDetail.countryCode,'shIPtOroleContact')
-                        console.log(apRoleContact.contactAddressDetail.countryCode,'apRoleContact')
-                            if (role === 6) {
-                             
-                                if(shIPtOroleContact.contactAddressDetail.countryCode) {
-                                    // Push role 6's contact address detail to savedAddressesList and refSavedAddressesList
-                                    this.savedAddressesList[0] = { ...shIPtOroleContact.contactAddressDetail };
-                                    this.refSavedAddressesList[0] = { ...shIPtOroleContact.contactAddressDetail };
-                                    this.selectedAddress = this.savedAddressesList[0]; // Default selection to role 6's detail initially
-                                } else {
-                                    this.selectedAddress = null
-                                }
-                            
-                         
-                            } 
-                            
-                            if (role === 4) {
-                            
-                                if (shIPtOroleContact.contactAddressDetail.countryCode ) {
-                                this.savedAddressesList[0] = { ...shIPtOroleContact.contactAddressDetail };
-                                this.refSavedAddressesList[0] = { ...shIPtOroleContact.contactAddressDetail };
-                                        if (apRoleContact.contactAddressDetail.countryCode) {
-                                                // Push role 4's contact address detail to savedAddressesList and refSavedAddressesList
-                                                this.savedAddressesList[1] = { ...apRoleContact.contactAddressDetail };
-                                                this.refSavedAddressesList[1] = { ...apRoleContact.contactAddressDetail };
-                                                this.selectedAddress = this.savedAddressesList[1];
-                                        } else {
-                                            this.selectedAddress = null
+                        // Address for role 6 (Shipping)
+                        this.savedAddressesList[0] = {
+                            ...shIPtOroleContact.contactAddressDetail,
+                            code: shIPtOroleContact.contactAddressCode,
+                            name: shIPtOroleContact.contactAddressName,
 
-                                        }
-                                        this.selectedAddress = null
+                            id: generatedId
+                        };
+                        this.refSavedAddressesList[0] = {
+                            ...shIPtOroleContact.contactAddressDetail,
+                            code: shIPtOroleContact.contactAddressCode,
+                            name: shIPtOroleContact.contactAddressName,
 
-                           
-
-                                }
-                                    else {
-                                        if (apRoleContact.contactAddressDetail.countryCode) {
-                                        this.savedAddressesList[0] = { ...apRoleContact.contactAddressDetail };
-                                        this.refSavedAddressesList[0] = { ...apRoleContact.contactAddressDetail };
-                                this.selectedAddress = this.savedAddressesList[0];
-                                        } else {
-                                            this.selectedAddress = null
-                                        }
-                                    }
-                              
-                                // this.selectedAddress = this.savedAddressesList[1];
-                            }
-                        
-                            console.log(this.savedAddressesList, 'this.savedAddressesList');
+                            id: generatedId
+                        };
+                
+                        // Address for role 4 (Billing)
+                        if (apRoleContact?.contactAddressDetail?.countryCode) {
+                            const apGeneratedId = this.generateNewId();
+                            this.savedAddressesList[1] = {
+                                ...apRoleContact.contactAddressDetail,
+                                code: apRoleContact.contactAddressCode,
+                                name: apRoleContact.contactAddressName,
+                                id: apGeneratedId
+                            };
+                            this.refSavedAddressesList[1] = {
+                                ...apRoleContact.contactAddressDetail,
+                                code: apRoleContact.contactAddressCode,
+                                name: apRoleContact.contactAddressName,
+                                id: apGeneratedId
+                            };
+                            // this.selectedAddress = this.savedAddressesList[1];
+                        } else {
+                            this.selectedAddress = null;
                         }
+                    } else if (apRoleContact?.contactAddressDetail?.countryCode) {
+                        // Fallback to AP role address if role 6 (Shipping) is not found
+                        const apGeneratedId = this.generateNewId();
+                        this.savedAddressesList[0] = {
+                            ...apRoleContact.contactAddressDetail,
+                            code: apRoleContact.contactAddressCode,
+                            name: apRoleContact.contactAddressName,
+
+                            id: apGeneratedId
+                        };
+                        this.refSavedAddressesList[0] = {
+                            ...apRoleContact.contactAddressDetail,
+                            code: apRoleContact.contactAddressCode,
+                            name: apRoleContact.contactAddressName,
+                            id: apGeneratedId
+                        };
+                        // this.selectedAddress = this.savedAddressesList[0];
+                    } else {
+                        this.selectedAddress = null;
+                    }
+                
+                    console.log(this.savedAddressesList, 'this.savedAddressesList');
+                }
+                
                         
                     //  }
     }
@@ -229,7 +331,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
         this.openAddNewAddForm=false;
         this.addressIdForEdit=null;
         this.addressCode='';
-        this.addressName='';
+        this.name='';
         this.address1='';
         this.address2='';
         this.city='';
@@ -283,7 +385,7 @@ export class AddressComponent extends AppComponentBase implements OnInit,OnChang
     saveAddress(addressForm:NgForm) {
         this.saving = true;
         this.address.code=addressForm.value.addressCode;
-        this.address.name=addressForm.value.addressName;
+        this.address.name=addressForm.value.name;
         this.address.addressLine1=addressForm.value.address1;
         this.address.addressLine2=addressForm.value.address2;
         this.address.city=addressForm.value.cityAddress;
@@ -321,7 +423,7 @@ savetempAddress(addressForm: NgForm) {
     // Assign address fields from the form
     this.address.id = this.generateNewId();
     this.address.code = addressForm.value.addressCode ;
-    this.address.name = addressForm.value.addressName ;
+    this.address.name = addressForm.value.name ;
     this.address.addressLine1 = addressForm.value.address1 ;
     this.address.addressLine2 = addressForm.value.address2 ;
     this.address.city = addressForm.value.cityAddress ;
@@ -330,7 +432,7 @@ savetempAddress(addressForm: NgForm) {
     this.address.countryId = addressForm.value.AddressCountry ;
     this.address.addressCode = addressForm.value.addressCode ;
     this.address.countryName = addressForm.value.AddressCountry ;
-    this.addressIdForEdit?this.address.id=this.addressIdForEdit:null || null;
+    this.addressIdForEdit?this.address.id=this.addressIdForEdit:null;
         let addNew = this.addressIdForEdit == null || this.addressIdForEdit == undefined || this.addressIdForEdit == 0
     // Handle the address ID for editing
     if (this.addressIdForEdit) {
@@ -376,12 +478,13 @@ addAddressDataToDto(index: number) {
         roleContact.contactAddressCity = this.selectedAddress.city || roleContact.contactAddressCity;
         roleContact.contactAddressCountryCode = this.selectedAddress.countryCode || roleContact.contactAddressCountryCode;
         roleContact.contactAddressCountryId = this.selectedAddress.countryId || roleContact.contactAddressCountryId;
-        roleContact.contactAddressName = this.selectedAddress.addressName || roleContact.contactAddressName;
+        roleContact.contactAddressName = this.selectedAddress.name || roleContact.contactAddressName;
+
         
         // Ensure contactAddressDetail is updated with address-related values but leave others unchanged
         roleContact.contactAddressDetail = new ContactAppAddressDto({
             code: this.selectedAddress?.code || roleContact.contactAddressDetail.code,
-            name: this.selectedAddress?.addressName || roleContact.contactAddressDetail.name,
+            name: roleContact.contactAddressName,
             countryName: this.selectedAddress?.countryName || roleContact.contactAddressDetail.countryName,
             addressLine1: this.selectedAddress?.addressLine1 || roleContact.contactAddressDetail.addressLine1,
             addressLine2: this.selectedAddress?.addressLine2 || roleContact.contactAddressDetail.addressLine2,
@@ -397,13 +500,12 @@ addAddressDataToDto(index: number) {
             accountId: roleContact.accountId || roleContact.contactAddressDetail.accountId,
             contactAddressId: roleContact.contactAddressId || roleContact.contactAddressDetail.contactAddressId,
             useDTOTenant: roleContact.useDTOTenant || roleContact.contactAddressDetail.useDTOTenant,
-            id: roleContact.id || roleContact.contactAddressDetail.id
+            id: roleContact.id || roleContact.contactAddressDetail.id || this.generateNewId()
         });
 
         // Set additional address properties if they exist
         roleContact.contactAddressLine1 = this.selectedAddress.addressLine1 || roleContact.contactAddressLine1;
         roleContact.contactAddressLine2 = this.selectedAddress.addressLine2 || roleContact.contactAddressLine2;
-        roleContact.contactAddressName = this.selectedAddress.addressName || roleContact.contactAddressName;
         // roleContact.contactAddressPostalCode = this.selectedAddress.postalCode || roleContact.contactAddressDetail.postalCode;
         roleContact.contactAddressState = this.selectedAddress.state || roleContact.contactAddressState;
     }
@@ -420,10 +522,8 @@ addAddressDataToDto(index: number) {
         this.openAddAddressForm();
         this.addressIdForEdit=addressId;
         const currentAddress = this.savedAddressesList.filter(item=>item.id === this.addressIdForEdit);
-        console.log(addressId,'addressId')
-        console.log(currentAddress[0],'currentAddress')
         this.addressCode=currentAddress[0].code;
-        this.addressName=currentAddress[0].name;
+        this.name=currentAddress[0].name;
         this.address1=currentAddress[0].addressLine1;
         this.address2=currentAddress[0].addressLine2;
         this.city=currentAddress[0].city;
@@ -436,7 +536,7 @@ addAddressDataToDto(index: number) {
         // Create a new instance of ContactAppAddressDto using selectedAddress properties
         const contactAddressDto = new ContactAppAddressDto({
             code: this.selectedAddress?.code,
-            name: this.selectedAddress?.addressName,
+            name: this.selectedAddress?.name,
             countryName: this.selectedAddress?.countryName,
             addressLine1: this.selectedAddress?.addressLine1,
             addressLine2: this.selectedAddress?.addressLine2,
@@ -466,6 +566,7 @@ addAddressDataToDto(index: number) {
         this.showAddList = false;
     
         // Ensure no undefined or null values, default them to empty strings or null
+       this.selectedAddress.id = this.selectedAddress.id
         this.selectedAddress.addressLine1 = this.selectedAddress?.addressLine1 ;
         this.selectedAddress.addressLine2 = this.selectedAddress?.addressLine2 ;
         this.selectedAddress.city = this.selectedAddress?.city ;
@@ -476,7 +577,7 @@ addAddressDataToDto(index: number) {
         this.selectedAddress.countryId = this.selectedAddress?.countryId ;
         this.selectedAddress.code = this.selectedAddress?.code ;
         this.selectedAddress.state = this.selectedAddress?.state;
-        this.selectedAddress.name = this.selectedAddress?.addressName ;
+        this.selectedAddress.name = this.selectedAddress?.name ;
     
         // Check if Buyer SSN is empty or null before adding address data
         if (this.appTransactionsForViewDto?.buyerCompanySSIN == '' || this.appTransactionsForViewDto?.buyerCompanySSIN == null) {
@@ -490,7 +591,7 @@ addAddressDataToDto(index: number) {
         // Ensure selectedAddress is an instance of ContactAppAddressDto before emitting
         const updatedContactAddressDto = new ContactAppAddressDto({
             code: this.selectedAddress?.code,
-            name: this.selectedAddress?.addressName,
+            name: this.selectedAddress?.name,
             countryName: this.selectedAddress?.countryName,
             addressLine1: this.selectedAddress?.addressLine1,
             addressLine2: this.selectedAddress?.addressLine2,
@@ -506,7 +607,7 @@ addAddressDataToDto(index: number) {
             accountId: this.selectedAddress?.accountId,
             contactAddressId: this.selectedAddress?.contactAddressId,
             useDTOTenant: this.selectedAddress?.useDTOTenant,
-            id: this.selectedAddress?.id
+            id: this.selectedAddress?.id ||  this.generateNewId(),
         });
        
         
