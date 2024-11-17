@@ -307,22 +307,31 @@ namespace onetouch.AppSiiwiiTransaction
                                 ShpToContact.CompanySSIN = account.AccountInfo.SSIN;
                                 ShpToContact.BranchSSIN = account.AccountInfo.SSIN; 
                             }
-                            if (ShpToContact!=null && !string.IsNullOrEmpty(ShpToContact.ContactAddressCode) && !string.IsNullOrEmpty(ShpToContact.ContactAddressLine1))
+                            if (ShpToContact != null && !string.IsNullOrEmpty(ShpToContact.ContactAddressCode) && !string.IsNullOrEmpty(ShpToContact.ContactAddressLine1))
                             {
-                              
-                                AppAddressDto address = new AppAddressDto();
-                                address.AddressLine1 = ShpToContact.ContactAddressLine1;
-                                address.AddressLine2 = ShpToContact.ContactAddressLine2;
-                                address.AccountId = long.Parse(account.AccountInfo.Id.ToString());
-                                address.Code = ShpToContact.ContactAddressCode;
-                                address.City = ShpToContact.ContactAddressCity;
-                                address.CountryCode = ShpToContact.ContactAddressCountryCode;
-                                address.CountryId = ShpToContact.ContactAddressCountryId;
-                                address.State = ShpToContact.ContactAddressState;
-                                address.PostalCode = ShpToContact.ContactAddressPostalCode;
-                                address.Name = ShpToContact.ContactAddressName;
-                                address.TenantId = AbpSession.TenantId;
-                                AppAddressDto addReturn = await _accountAppService.CreateOrEditAddress(address);
+                                var existimngAdd = await _appAddressRepository.GetAll().Where(z => z.Code == ShpToContact.ContactAddressCode && z.AccountId== account.AccountInfo.Id
+                                && z.TenantId == AbpSession.TenantId)
+                                    .FirstOrDefaultAsync();
+                                AppAddressDto addReturn = new AppAddressDto();
+                                if (existimngAdd == null)
+                                {
+                                    AppAddressDto address = new AppAddressDto();
+                                    address.AddressLine1 = ShpToContact.ContactAddressLine1;
+                                    address.AddressLine2 = ShpToContact.ContactAddressLine2;
+                                    address.AccountId = long.Parse(account.AccountInfo.Id.ToString());
+                                    address.Code = ShpToContact.ContactAddressCode;
+                                    address.City = ShpToContact.ContactAddressCity;
+                                    address.CountryCode = ShpToContact.ContactAddressCountryCode;
+                                    address.CountryId = ShpToContact.ContactAddressCountryId;
+                                    address.State = ShpToContact.ContactAddressState;
+                                    address.PostalCode = ShpToContact.ContactAddressPostalCode;
+                                    address.Name = ShpToContact.ContactAddressName;
+                                    address.TenantId = AbpSession.TenantId;
+                                    addReturn = await _accountAppService.CreateOrEditAddress(address);
+                                }
+                                else {
+                                    addReturn = ObjectMapper.Map<AppAddressDto>(existimngAdd);
+                                }
                                 if (addReturn != null && addReturn.Id!=0)
                                 {
                                     AppContactAddress  contactAdd = new AppContactAddress();
@@ -354,20 +363,29 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                             if (billToContact != null && !string.IsNullOrEmpty(billToContact.ContactAddressCode) && !string.IsNullOrEmpty(billToContact.ContactAddressLine1))
                             {
-                                
-                                AppAddressDto address = new AppAddressDto();
-                                address.AddressLine1 = billToContact.ContactAddressLine1;
-                                address.AddressLine2 = billToContact.ContactAddressLine2;
-                                address.AccountId = long.Parse(account.AccountInfo.Id.ToString());
-                                address.Code = billToContact.ContactAddressCode;
-                                address.City = billToContact.ContactAddressCity;
-                                address.CountryCode = billToContact.ContactAddressCountryCode;
-                                address.CountryId = billToContact.ContactAddressCountryId;
-                                address.State = billToContact.ContactAddressState;
-                                address.PostalCode = billToContact.ContactAddressPostalCode;
-                                address.Name = billToContact.ContactAddressName;
-                                address.TenantId = AbpSession.TenantId;
-                                AppAddressDto addReturn = await _accountAppService.CreateOrEditAddress(address);
+                                var existimngAdd = await _appAddressRepository.GetAll().Where(z => z.Code == billToContact.ContactAddressCode && z.AccountId == account.AccountInfo.Id 
+                                && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
+                                AppAddressDto addReturn = new AppAddressDto();
+                                if (existimngAdd == null)
+                                {
+                                    AppAddressDto address = new AppAddressDto();
+                                    address.AddressLine1 = billToContact.ContactAddressLine1;
+                                    address.AddressLine2 = billToContact.ContactAddressLine2;
+                                    address.AccountId = long.Parse(account.AccountInfo.Id.ToString());
+                                    address.Code = billToContact.ContactAddressCode;
+                                    address.City = billToContact.ContactAddressCity;
+                                    address.CountryCode = billToContact.ContactAddressCountryCode;
+                                    address.CountryId = billToContact.ContactAddressCountryId;
+                                    address.State = billToContact.ContactAddressState;
+                                    address.PostalCode = billToContact.ContactAddressPostalCode;
+                                    address.Name = billToContact.ContactAddressName;
+                                    address.TenantId = AbpSession.TenantId;
+                                    addReturn = await _accountAppService.CreateOrEditAddress(address);
+                                }
+                                else
+                                {
+                                    addReturn=ObjectMapper.Map<AppAddressDto>(existimngAdd);
+                                }
                                 if (addReturn != null && addReturn.Id != 0)
                                 {
                                     AppContactAddress contactAdd = new AppContactAddress();
@@ -4648,7 +4666,7 @@ namespace onetouch.AppSiiwiiTransaction
 
                         if (transactionType == TransactionType.SalesOrder)
                         {
-                         //   await ShareManualAccount(marketplaceTransaction.BuyerCompanySSIN,tenantId);
+                           // await ShareManualAccount(marketplaceTransaction.BuyerCompanySSIN,tenantId);
                             tenantTransaction.Code = await GetTenantNextOrderNumber("SO", tenantId);
                             tenantTransaction.Name = "Sales Order#" + tenantTransaction.Code.TrimEnd();
                             tenantTransaction.EntityObjectTypeId = soType;
@@ -6441,7 +6459,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
 
                     }
-                    if (accountOrg.PartnerId != null)
+                    if (accountOrg != null && accountOrg.PartnerId != null)
                     {
                         long? otherTenantId = null;
                         //accountOrg.EntityFk.TenantOwner 
