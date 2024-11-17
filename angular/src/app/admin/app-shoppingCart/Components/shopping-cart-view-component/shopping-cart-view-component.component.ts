@@ -145,7 +145,13 @@ regenrate : boolean = false
   this.conNew = false;
 
 }
- this.TempComp = false
+// if(this.appTransactionsForViewDto?.buyerCompanySSIN == ''){
+//  this.TempComp = false
+
+// } else {
+//  this.TempComp = true
+
+// }
  console.log(this.comNew,'this.comNew')
  console.log(this.conNew,'this.conNew')
   }
@@ -871,6 +877,7 @@ this.hideMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
+
             this.onGeneratOrderReport(true,undefined,true,true);
          
             localStorage.removeItem("comNew");
@@ -879,15 +886,18 @@ this.hideMainSpinner();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
          this.getShoppingCartData()
 
+
         }
           ))
           .subscribe((res) => {
 
             if (res) {
+            this.getShoppingCartData()
+
             this.hideMainSpinner();
+
               this.visible = false
               this.SuccessMsg = true
-            this.getShoppingCartData()
 
             //   Swal.fire({
             //     title: "",
@@ -1025,8 +1035,10 @@ this.hideMainSpinner();
   }
 
   TempCompValid($event) {
- 
+   if($event && this.appTransactionsForViewDto?.buyerCompanySSIN == '') {
     this.TempComp = $event;
+    
+   }
   }
 
   printTransaction() {
