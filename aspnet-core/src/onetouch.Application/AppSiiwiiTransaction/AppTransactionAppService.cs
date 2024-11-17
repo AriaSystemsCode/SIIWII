@@ -472,10 +472,19 @@ namespace onetouch.AppSiiwiiTransaction
                     isBuyerManual = true;
                     buyerPrclvl = "MSRP";
                     buyerCurrency = "";
-                    if (input.CurrencyId==0)
+                    if (input.CurrencyId == 0)
                     {
                         input.CurrencyId = null;
                         input.CurrencyCode = null;
+                    }
+                    else
+                    {
+                        var currencyEnt = await _appEntity.GetAll().Where(z => z.Id == input.CurrencyId).FirstOrDefaultAsync();
+                        if (currencyEnt != null)
+                        {
+                            buyerCurrency = currencyEnt.Code;
+                            input.CurrencyCode = currencyEnt.Code;
+                        }
                     }
                 }
                 if (string.IsNullOrEmpty(input.PriceLevel))
@@ -498,7 +507,7 @@ namespace onetouch.AppSiiwiiTransaction
                     sellerCurrency = account.CurrencyCode;
                     input.LanguageId = account.LanguageId;
                     input.LanguageCode = account.LanguageCode;
-                    if (string.IsNullOrEmpty(input.CurrencyCode))
+                    if (input.CurrencyId == 0)//(string.IsNullOrEmpty(input.CurrencyCode))
                     {
                         input.CurrencyCode = sellerCurrency;
                         //T-SII-20231221.0002,1 MMT 01/01/2024 Transactions-Temp Account issues[Start]
