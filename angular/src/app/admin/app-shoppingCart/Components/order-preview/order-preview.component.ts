@@ -13,6 +13,8 @@ export class OrderPreviewComponent extends AppComponentBase implements OnInit, O
     // @Input("orderConfirmationFile") orderConfirmationFile;
     @Input("transactionFormPath") transactionFormPath;
     @Input("orderId") orderId;
+    @Input("regenrate") regenrate;
+
     loadingError: boolean = false;
     showReport: boolean = false;
     visible: boolean = false;

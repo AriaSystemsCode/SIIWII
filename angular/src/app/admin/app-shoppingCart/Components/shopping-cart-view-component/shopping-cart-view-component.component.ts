@@ -113,6 +113,7 @@ comNew : boolean
 conNew : boolean
 TempComp : boolean = false
 currentFilter: string = '';
+regenrate : boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -820,7 +821,31 @@ this.hideMainSpinner();
         this.getShoppingCartData();
       });
   }
+  isOrderConfirmationNeedsReprint(){
+        
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    .subscribe((res) => {
+      console.log(res,'rep')
+      if (res) {
+        // this.visible = res
 
+      //  this.regenrate = res
+       if(  res){
+        this.toGenerate()
+
+       }
+       this.getOrderConfirmation()
+
+      }
+      // else {
+      //   this.regenrate = true
+
+      // }
+   
+    });
+  
+    
+  }
   PlaceOrder() {
     // Swal.fire({
     //   title: "",
@@ -846,13 +871,14 @@ this.hideMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
-            // this.onGeneratOrderReport(true,undefined,true,true);
-            this.getShoppingCartData()
+            this.onGeneratOrderReport(true,undefined,true,true);
          
             localStorage.removeItem("comNew");
             localStorage.removeItem("conNew");
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+         this.getShoppingCartData()
+
         }
           ))
           .subscribe((res) => {
@@ -861,7 +887,7 @@ this.hideMainSpinner();
             this.hideMainSpinner();
               this.visible = false
               this.SuccessMsg = true
-            // this.getShoppingCartData()
+            this.getShoppingCartData()
 
             //   Swal.fire({
             //     title: "",
@@ -887,6 +913,19 @@ this.hideMainSpinner();
           });
     //   }
     // });
+  }
+  toGenerate(){
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    .pipe(finalize(() => {
+      this.onGeneratOrderReport(true,undefined,true,false)
+      // this.getOrderConfirmation()
+  }
+    ))
+    .subscribe((res) => {
+
+      if (res) {
+      }
+    });
   }
   sync(){
     this.showMainSpinner();
