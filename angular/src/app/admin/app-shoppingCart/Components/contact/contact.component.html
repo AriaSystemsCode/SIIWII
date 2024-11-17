@@ -43,6 +43,7 @@
                     [dropdown]="true"
                     [suggestions]="companeyNames"  
                     [ngModelOptions]="{standalone: true}"
+                    (keydown)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) ? '': preventTyping($event)"  
                      
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     (completeMethod)="handleCompanySearch($event)"

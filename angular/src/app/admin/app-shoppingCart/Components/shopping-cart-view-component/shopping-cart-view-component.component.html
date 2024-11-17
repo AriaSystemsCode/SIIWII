@@ -1365,7 +1365,7 @@ height: 48px;"
                     </p-accordionTab>
                    <!-- order Preview tab -->
                    <p-accordionTab class="shoppingCartAccordionTabBG" 
-                   *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
+                   *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="onGeneratOrderReport(true,undefined,false,true);getOrderConfirmation()">
                    <ng-template pTemplate="header">
                        <div class="d-inline-block custom-header d-flex">
                            <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>

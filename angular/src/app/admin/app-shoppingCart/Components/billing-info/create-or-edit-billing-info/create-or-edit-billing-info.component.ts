@@ -235,7 +235,8 @@ debugger
         //  this.generatOrderReport.emit(true) ; 
        this.refreshShoppingCart.emit(true)
 
-          this.SuccessMsg = true}))
+          // this.SuccessMsg = true
+        }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));

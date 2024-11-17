@@ -847,6 +847,7 @@ this.hideMainSpinner();
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
             // this.onGeneratOrderReport(true,undefined,true,true);
+            this.getShoppingCartData()
          
             localStorage.removeItem("comNew");
             localStorage.removeItem("conNew");
@@ -860,7 +861,7 @@ this.hideMainSpinner();
             this.hideMainSpinner();
               this.visible = false
               this.SuccessMsg = true
-            this.getShoppingCartData()
+            // this.getShoppingCartData()
 
             //   Swal.fire({
             //     title: "",
