@@ -108,7 +108,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
                 );
             }, 2000); // 2 seconds delay
         };
-    
+     
         if (this.useCaptcha) {
             this._reCaptchaV3Service.execute(
                 this.recaptchaSiteKey,
