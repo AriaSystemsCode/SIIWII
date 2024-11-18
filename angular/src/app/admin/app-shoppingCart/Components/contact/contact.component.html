@@ -38,11 +38,13 @@
 
 
                     <p-autoComplete
+                    [ngClass]=" tempAccount ? 'tempAccount' : ''" 
                       *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo && activeTab!=shoppingCartoccordionTabs.SellerContactInfo"
                     #autoComplete
                     [dropdown]="true"
                     [suggestions]="companeyNames"  
                     [ngModelOptions]="{standalone: true}"
+                    (keydown)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) ? '': preventTyping($event)"  
                      
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     (completeMethod)="handleCompanySearch($event)"

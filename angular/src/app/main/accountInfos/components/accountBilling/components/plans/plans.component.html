@@ -85,7 +85,7 @@
                 <ng-container *ngFor="let detail of plan.appSubscriptionPlanHeader?.appSubscriptionPlanDetails" >
                   <!-- Display the feature limit if the feature matches -->
                   <span *ngIf="detail?.featureName === feature?.featureName">
-                    {{ detail.featureLimit ? detail?.featureLimit : '-' }} {{ detail.featureLimit ? detail?.unitOfMeasurementName : ''  }}
+                    {{ detail.featureLimit ? detail?.featureLimit : '-' }} {{ detail.featureLimit ? detail?.unitOfMeasurementName : ''  }}  {{ detail?.featureLimit && detail?.featurePeriodLimit != 'Absolute' ? '/ '+ detail?.featurePeriodLimit : ''   }}
                   </span>
                 </ng-container>
               </ng-container>

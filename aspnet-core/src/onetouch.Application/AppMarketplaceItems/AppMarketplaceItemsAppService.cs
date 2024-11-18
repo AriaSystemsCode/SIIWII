@@ -362,7 +362,7 @@ namespace onetouch.AppMarketplaceItems
 
                     var filteredAppEntities = _appEntityRepository.GetAll()
                         .Where(x => x.EntityObjectTypeCode == input.SycEntityObjectTypeNameFilter)
-                        .WhereIf(tenantId != null, x => x.TenantId == tenantId)
+                        .WhereIf(tenantId != null, x => x.TenantId == tenantId || x.TenantId ==null)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), x => false || x.Name.Contains(input.NameFilter));// *Abdo : is added to filter by name "Red" as  example
 
                     var pagedAndFilteredAppEntities = filteredAppEntities

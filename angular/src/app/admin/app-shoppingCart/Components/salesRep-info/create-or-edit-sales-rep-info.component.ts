@@ -82,7 +82,8 @@ export class CreateOrEditSalesRepInfoComponent extends AppComponentBase {
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
         // this.generatOrderReport.emit(true) ; 
-        this.SuccessMsg = true}))
+        // this.SuccessMsg = true
+      }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto=JSON.parse(JSON.stringify(this.appTransactionsForViewDto));

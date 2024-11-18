@@ -248,11 +248,11 @@
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <img src="../../../../../assets/shoppingCart/checked.svg"
-                                        *ngIf="buyerContactInfoValid  && (appTransactionsForViewDto?.buyerCompanySSIN == ''?  TempComp : !TempComp)" />
+                                        *ngIf=" appTransactionsForViewDto?.buyerCompanySSIN != '' ? buyerContactInfoValid  : TempComp   " />
                                     <i class="fa   fa-times-circle times-icon pointer" title=" Missing info"
-                                        *ngIf="!buyerContactInfoValid || (appTransactionsForViewDto?.buyerCompanySSIN == ''? !TempComp : TempComp)"></i>
+                                        *ngIf=" (appTransactionsForViewDto?.buyerCompanySSIN == ''? !TempComp : !buyerContactInfoValid  )"></i>
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor">{{l("Buyercontactinfo")}}</h6>
-                                    <p *ngIf="!buyerContactInfoValid || (appTransactionsForViewDto?.buyerCompanySSIN == ''? !TempComp : TempComp)" class="mx-2">*Please select valid account or create a new one</p>
+                                    <p *ngIf=" (appTransactionsForViewDto?.buyerCompanySSIN == ''?  !TempComp :!buyerContactInfoValid )" class="mx-2">*Please select valid account or create a new one</p>
                                 </div>
                             </ng-template>
                             <div *ngIf="currentTab==1">
@@ -628,7 +628,7 @@
                         </p-accordionTab>
                         <!-- order Preview tab -->
                         <p-accordionTab class="shoppingCartAccordionTabBG" 
-                            *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
+                            *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="isOrderConfirmationNeedsReprint();getOrderConfirmation()">
                             <ng-template pTemplate="header">
                                 <div class="d-inline-block custom-header d-flex">
                                     <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>
@@ -638,6 +638,8 @@
                                 <app-order-preview 
                                     [appTransactionsForViewDto]="appTransactionsForViewDto"
                                     [transactionFormPath]="transactionFormPath"
+                               
+                                  
                                     [orderId]="orderId"></app-order-preview>
                             </ng-template>
                         </p-accordionTab>
@@ -727,7 +729,7 @@
                                             <div class="d-flex justify-content-center btns" >
                                             
                                          
-                                              <button  (click)="SuccessMsg = false" label="Ok" class="p-button-text" >Ok</button>
+                                              <button  (click)="SuccessMsg = false;" label="Ok" class="p-button-text" >Ok</button>
                                             </div>
                                           </p-dialog>  
                     <ng-container *ngIf="loadNotesComp;">
@@ -1365,7 +1367,7 @@ height: 48px;"
                     </p-accordionTab>
                    <!-- order Preview tab -->
                    <p-accordionTab class="shoppingCartAccordionTabBG" 
-                   *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="getOrderConfirmation()">
+                   *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN'" (click)="isOrderConfirmationNeedsReprint();getOrderConfirmation()">
                    <ng-template pTemplate="header">
                        <div class="d-inline-block custom-header d-flex">
                            <h6 class="mb-1 ml-2 mt-1 purpleColor"> Order Preview</h6>

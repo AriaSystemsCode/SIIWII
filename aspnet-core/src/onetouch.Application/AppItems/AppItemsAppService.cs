@@ -1180,7 +1180,7 @@ namespace onetouch.AppItems
                                 //41
                                 //T-SII-20230818.0003,1 MMT 08/23/2023 Display the Product Solid color or image in the Marketplace product detail page[Start]
                                 var codeItemVar = varAppItems.Where(x => x.EntityFk.EntityExtraData
-                                                                                 .Where(a => a.AttributeValue == varItem.ToString() &&
+                                                                                 .Where(a => a.AttributeValue == varItem.AttributeValue.ToString() &&
                                                                                  a.AttributeId == firstAttributeIdLong
                                                                                  ).Any()).FirstOrDefault();
                                 if (codeItemVar != null)
@@ -1327,11 +1327,15 @@ namespace onetouch.AppItems
                                                                                     a.AttributeId == long.Parse(secondAttId)
                                                                                     ).Any()).ToList().Where(x => x.EntityFk.EntityExtraData
                                                                                     .Where(a => a.AttributeId == firstAttributeIdLong & a.AttributeValue == varItem).Any()).ToList();*/
-                                            var codeItems = varAppItems.Where(x => x.EntityFk.EntityExtraData
+                                            var codeItemsFirst = varAppItems.Where(x => x.EntityFk.EntityExtraData
                                                                                     .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                     a.AttributeId == long.Parse(secondAttId)
                                                                                     ).Any()).ToList();
-
+                                            var codeItems = codeItemsFirst.Where(x => x.EntityFk.EntityExtraData
+                                                                                    .Where(a => (a.AttributeValue == extraDataSelectedValues.value.ToString() || 
+                                                                                    a.AttributeCode == extraDataSelectedValues.Code.ToString()) &&
+                                                                                    a.AttributeId == firstAttributeIdLong
+                                                                                    ).Any()).ToList();
                                             if (codeItems.Count != 0)
                                             {
                                                 /*  var itemVarSum = codeItems.Where(x =>

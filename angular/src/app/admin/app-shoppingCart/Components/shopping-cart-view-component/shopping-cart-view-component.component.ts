@@ -113,6 +113,7 @@ comNew : boolean
 conNew : boolean
 TempComp : boolean = false
 currentFilter: string = '';
+regenrate : boolean = false
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -144,7 +145,13 @@ currentFilter: string = '';
   this.conNew = false;
 
 }
- this.TempComp = false
+// if(this.appTransactionsForViewDto?.buyerCompanySSIN == ''){
+//  this.TempComp = false
+
+// } else {
+//  this.TempComp = true
+
+// }
  console.log(this.comNew,'this.comNew')
  console.log(this.conNew,'this.conNew')
   }
@@ -283,7 +290,7 @@ currentFilter: string = '';
 this.temp=temp;
     this.showMainSpinner();
     //header
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined, 0, 10, this.transactionPosition.Current)
     .pipe(finalize(() => {
 this.hideMainSpinner();
     }))
@@ -720,8 +727,9 @@ this.hideMainSpinner();
     if (indx >= 0)
       this.minimizedOrders.splice(indx, 1);
     this.userClickService.userClicked("refreshShoppingInfoInTopbar");
-    if (this.shoppingCartMode == ShoppingCartMode.view)
+    // if (this.shoppingCartMode == ShoppingCartMode.view)
       this.hideShoppingCartModal.emit(true);
+    
   }
 
   minimizedOrders: any[] = [];
@@ -755,7 +763,7 @@ this.hideMainSpinner();
 
   onProceedToCheckout() {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 10, this.transactionPosition.Current)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined, 0, 10, this.transactionPosition.Current)
       .subscribe((res: GetAppTransactionsForViewDto) => {
         res.companeyNames=this.companeyNames;
         this.appTransactionsForViewDto = res;
@@ -820,7 +828,31 @@ this.hideMainSpinner();
         this.getShoppingCartData();
       });
   }
+  isOrderConfirmationNeedsReprint(){
+        
+    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
+    .subscribe((res) => {
+      console.log(res,'rep')
+      if (res) {
+        // this.visible = res
 
+      //  this.regenrate = res
+       if(  res){
+        this.toGenerate()
+
+       }
+       this.getOrderConfirmation()
+
+      }
+      // else {
+      //   this.regenrate = true
+
+      // }
+   
+    });
+  
+    
+  }
   PlaceOrder() {
     // Swal.fire({
     //   title: "",
@@ -846,21 +878,27 @@ this.hideMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
-            // this.onGeneratOrderReport(true,undefined,true,true);
+
+            this.onGeneratOrderReport(true,undefined,true,true);
          
             localStorage.removeItem("comNew");
             localStorage.removeItem("conNew");
          //   this.hide();
          this.show(this.orderId, this.showCarousel, this.validateOrder, this._shoppingCartMode.view);
+         this.getShoppingCartData()
+
+
         }
           ))
           .subscribe((res) => {
 
             if (res) {
+            this.getShoppingCartData()
+
             this.hideMainSpinner();
+
               this.visible = false
               this.SuccessMsg = true
-            this.getShoppingCartData()
 
             //   Swal.fire({
             //     title: "",
@@ -886,6 +924,19 @@ this.hideMainSpinner();
           });
     //   }
     // });
+  }
+  toGenerate(){
+    this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
+    .pipe(finalize(() => {
+      this.onGeneratOrderReport(true,undefined,true,false)
+      // this.getOrderConfirmation()
+  }
+    ))
+    .subscribe((res) => {
+
+      if (res) {
+      }
+    });
   }
   sync(){
     this.showMainSpinner();
@@ -923,7 +974,7 @@ this.hideMainSpinner();
   }
   goPrevious_Next_Transaction(transactionPosition: TransactionPosition) {
     this.showMainSpinner();
-    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false, undefined, 0, 1, transactionPosition)
+    this._AppTransactionServiceProxy.getAppTransactionsForView(this.orderId, false, 0, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, false,undefined, undefined, 0, 1, transactionPosition)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res1: GetAppTransactionsForViewDto) => {
         this.show(res1.id, this.showCarousel, this.validateOrder, this.shoppingCartMode);
@@ -985,8 +1036,10 @@ this.hideMainSpinner();
   }
 
   TempCompValid($event) {
- 
+   if($event && this.appTransactionsForViewDto?.buyerCompanySSIN == '') {
     this.TempComp = $event;
+    
+   }
   }
 
   printTransaction() {

@@ -74,19 +74,19 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     const buyerContact = this.appTransactionsForViewDto.appTransactionContacts.find(
         contact => contact.contactRole === 1
     );
-
+    this.appTransactionsForViewDto.buyerCompanyName= buyerContact.companyName 
+    this.appTransactionsForViewDto.buyerCompanySSIN = buyerContact.companySSIN
+    this.appTransactionsForViewDto.buyerContactName = buyerContact.contactName 
+    this.appTransactionsForViewDto.buyerBranchName =  buyerContact.branchName
+    this.appTransactionsForViewDto.buyerBranchSSIN = buyerContact.branchSSIN 
+    this.appTransactionsForViewDto.buyerContactEMailAddress = buyerContact.contactEmail 
+    this.appTransactionsForViewDto.buyerContactPhoneNumber = buyerContact.contactPhoneNumber 
+    // this.appTransactionsForViewDto.buyerContactSSIN = buyerContact.contactSSIN 
     // Log the Buyer contact
     console.log("Buyer Contact before sync:", buyerContact);
 
     if (buyerContact &&  this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo ) {
-  //     buyerContact.companyName = this.appTransactionsForViewDto.buyerCompanyName
-  // buyerContact.companySSIN = this.appTransactionsForViewDto.buyerCompanySSIN
-  // buyerContact.contactName = this.appTransactionsForViewDto.buyerContactName
-  // buyerContact.branchName = this.appTransactionsForViewDto.buyerBranchName
-  // buyerContact.branchSSIN = this.appTransactionsForViewDto.buyerBranchSSIN
-  // buyerContact.contactEmail = this.appTransactionsForViewDto.buyerContactEMailAddress
-  // buyerContact.contactPhoneNumber = this.appTransactionsForViewDto.buyerContactPhoneNumber
-  // buyerContact.contactSSIN = this.appTransactionsForViewDto.buyerContactSSIN
+
         // List of roles to synchronize with Buyer contact
         const rolesToUpdate = [6, 4]; // 6: ShipToContact, 4: ShipFromContact
 
@@ -96,23 +96,21 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
                 contact => contact.contactRole === role
             );
 
-            // Log the role contact before updating
-            console.log(`Role Contact before sync (Role: ${role}):`, roleContact);
+            // Log the role contact before updatin
 
             if (roleContact) {
                 // Synchronize relevant properties
-                roleContact.selectedBranch = new AccountBranchDto
+                // roleContact.selectedBranch = new AccountBranchDto
                 roleContact.companyName = buyerContact.companyName;
                 roleContact.companySSIN = buyerContact.companySSIN;
                 roleContact.branchName = buyerContact.branchName;
-                roleContact.branchSSIN = buyerContact.branchSSIN
-                // roleContact.contactSSIN = buyerContact.contactSSIN;                
+                roleContact.branchSSIN = buyerContact.branchSSIN               
                 roleContact.contactName = buyerContact.contactName;
                 roleContact.contactEmail = buyerContact.contactEmail;
                 roleContact.contactPhoneNumber = buyerContact.contactPhoneNumber;
                 roleContact.contactPhoneTypeId = buyerContact.contactPhoneTypeId;
                 roleContact.contactPhoneTypeName = buyerContact.contactPhoneTypeName;
-                roleContact.contactAddressCity = buyerContact.contactAddressCity;
+                // roleContact.contactAddressCity = buyerContact.contactAddressCity;
                 // roleContact.contactAddressCode = buyerContact.contactAddressCode;
                 // roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
                 // roleContact.contactAddressCountryId = buyerContact.contactAddressCountryId;
@@ -125,21 +123,26 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
 
                 // Log the updated role contact after synchronization
                 console.log(`Role Contact after sync (Role: ${role}):`, roleContact);
-            } else {
-                console.warn(`No contact found for role: ${role}`);
-            }
+            } 
         });
-    } else {
-        console.warn("No Buyer contact found to sync with.");
-    }
+
+  //             buyerContact.companyName = this.appTransactionsForViewDto.buyerCompanyName
+  // buyerContact.companySSIN = this.appTransactionsForViewDto.buyerCompanySSIN
+  // buyerContact.contactName = this.appTransactionsForViewDto.buyerContactName
+  // buyerContact.branchName = this.appTransactionsForViewDto.buyerBranchName
+  // buyerContact.branchSSIN = this.appTransactionsForViewDto.buyerBranchSSIN
+  // buyerContact.contactEmail = this.appTransactionsForViewDto.buyerContactEMailAddress
+  // buyerContact.contactPhoneNumber = this.appTransactionsForViewDto.buyerContactPhoneNumber
+  // buyerContact.contactSSIN = this.appTransactionsForViewDto.buyerContactSSIN
+    } 
 }
   createOrEditTransaction() {
-    // this.synchronizeContactDetails();
+    this.synchronizeContactDetails();
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
         // this.generatOrderReport.emit(true); 
-        //  this.SuccessMsg = true
+      //  this.SuccessMsg = true
         }))
       .subscribe((res) => {
         if (res) {
