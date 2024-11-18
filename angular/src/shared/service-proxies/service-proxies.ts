@@ -1538,14 +1538,17 @@ export class AccountsServiceProxy {
 
     /**
      * @param id (optional) 
+     * @param tenantId (optional) 
      * @return Success
      */
-    connect(id: number | undefined): Observable<void> {
+    connect(id: number | undefined, tenantId: number | null | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/Connect?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -42581,12 +42584,15 @@ export class SycIdentifierDefinitionsServiceProxy {
 
     /**
      * @param code (optional) 
+     * @param tenantId (optional) 
      * @return Success
      */
-    getNextEntityCode(code: string | null | undefined): Observable<string> {
+    getNextEntityCode(code: string | null | undefined, tenantId: number | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/SycIdentifierDefinitions/GetNextEntityCode?";
         if (code !== undefined && code !== null)
             url_ += "code=" + encodeURIComponent("" + code) + "&";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

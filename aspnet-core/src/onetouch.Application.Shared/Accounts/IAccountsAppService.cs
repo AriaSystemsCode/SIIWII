@@ -40,7 +40,8 @@ namespace onetouch.Accounts
 		Task<long> CreateOrUpdateAccountFromSourceAccount(CreateAccountsInputDto input);
 		Task<AppAddressDto> CreateOrEditAddress(AppAddressDto input);
 		//I45
-		Task<BranchDto> CreateOrEditBranch(BranchDto input);
+		Task Connect(long id, int? tenantId = null);
+        Task<BranchDto> CreateOrEditBranch(BranchDto input);
         //I45
     }
 }

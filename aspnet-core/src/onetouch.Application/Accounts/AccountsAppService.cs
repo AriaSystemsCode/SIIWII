@@ -816,15 +816,18 @@ namespace onetouch.Accounts
             return output;
         }
 
-        public async Task Connect(long id)
+        public async Task Connect(long id,int? tenantId=null)
         {
-
+            //I45
+            if (tenantId == null)
+                tenantId = AbpSession.TenantId;
+            //I45
             var cancelledStatus=  await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
             AppContact originalContact;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 AppContact originalPublishContactFortCurrTenant = null;
-                var originalContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
+                var originalContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == tenantId && x.IsProfileData == true && x.ParentId == null);
 
                 if (originalContactFortCurrTenant != null)
                     originalPublishContactFortCurrTenant = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses)
@@ -844,7 +847,7 @@ namespace onetouch.Accounts
                     id = originalContact.Id;
                 }
                 var existed = await _appContactRepository.GetAll()
-                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.PartnerId == id);
+                    .FirstOrDefaultAsync(x => x.TenantId == tenantId && x.PartnerId == id);
 
                 if (existed == null)
                 {
@@ -1007,14 +1010,14 @@ namespace onetouch.Accounts
                     ObjectMapper.Map(entity2, entityDto2);
                     entityDto2.Id = 0;
                     //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[Start]
-                    entityDto2.TenantId = AbpSession.TenantId;
+                    entityDto2.TenantId = tenantId;
                     //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
                     AppContactDto contactDto2 = new AppContactDto();
                     ObjectMapper.Map(originalContact, contactDto2);
                     contactDto2.PriceLevel = "MSRP";
                     contactDto2.PartnerId = originalContact.Id;
                     contactDto2.IsProfileData = false;
-                    contactDto2.TenantId = AbpSession.TenantId;
+                    contactDto2.TenantId = tenantId;
                     contactDto2.ContactAddresses = null;
                     contactDto2.Id = 0;
 
@@ -1034,8 +1037,8 @@ namespace onetouch.Accounts
                             attach.AttachmentFk.Id = 0;
                             attach.EntityId = savedEntity2;
                             attach.EntityFk = null;
-                            attach.AttachmentFk.TenantId = AbpSession.TenantId;
-                            MoveFile(attach.AttachmentFk.Attachment, -1, AbpSession.TenantId);
+                            attach.AttachmentFk.TenantId = tenantId;
+                            MoveFile(attach.AttachmentFk.Attachment, -1, tenantId);
                             //entityEntityAttachments.Add(attach);
                             var attachIns = await _appAttachmentRepository.InsertAsync(attach.AttachmentFk);
                             attach.AttachmentId = attachIns.Id;
@@ -1174,7 +1177,7 @@ namespace onetouch.Accounts
                             var adminUser = await _userManager.FindByNameAsync("admin@" + tenancyName);
                             if (adminUser != null)
                             {
-                                var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                                 //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
                                 string accProfileUrl = _appConfiguration["App:ClientRootAddress"] + "app/main/account/view/" + originalPublishContactFortCurrTenant.Id.ToString() + "?tab=ProfileView";
                                 await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(profileContactofOtherTenant.TenantId, adminUser.Id),
@@ -1202,7 +1205,7 @@ namespace onetouch.Accounts
                         ObjectMapper.Map(contactEntity, contactEntityDto);
                         contactEntityDto.Id = 0;
                         //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[Start]
-                        contactEntityDto.TenantId = AbpSession.TenantId;
+                        contactEntityDto.TenantId = tenantId;
                         //T-SII-20220920.0002, MMT 09/27/2022 - I see multiple occurrences (20 copies) of Brisco on the Marketplace / account[End]
                         AppContactDto branchContactDto = new AppContactDto();
                         ObjectMapper.Map(contactObj, branchContactDto);
@@ -1210,7 +1213,7 @@ namespace onetouch.Accounts
                         branchContactDto.PartnerId = contactObj.Id;
                         branchContactDto.IsProfileData = false;
                         branchContactDto.ParentId = contactDto2.Id;
-                        branchContactDto.TenantId = AbpSession.TenantId;
+                        branchContactDto.TenantId = tenantId;
                         branchContactDto.ContactAddresses = null;
                         branchContactDto.Id = 0;
                         branchContactDto.AccountId = contactDto2.Id;
