@@ -60,9 +60,9 @@ transform: translateY(-50%);">
                                     >
                                     </app-image-display>
                                 </div>
-                                <p class="pl-5" style="font-size: 24px;font-weight: 700;color: white;position: absolute;
+                                <h3  class="mt-3" style="font-size: 24px;color: white;position: absolute;
    top: 90%;
-   white-space: nowrap;">{{appSession?.tenant?.name}}</p>
+   white-space: nowrap;">{{appSession?.tenant?.name}}</h3>
                                 <!-- <img [src]="logoPhoto"  onerror="this.src='../../../assets/placeholders/_logo-placeholder.png';" class="logo-profile ml-4"> -->
                             </div>
                         </div>
@@ -231,6 +231,7 @@ transform: translateY(-50%);">
                                         [browseMode]="browseMode"
                                         [singleItemPerRowMode]="singleItemPerRowMode"
                                         (eventTriggered)="eventHandler($event,i)"
+                                        [sycAttachmentCategoryImage]="sycAttachmentCategoryImage"
                                     ></app-item-card>
                                 </div>
                                 <div
