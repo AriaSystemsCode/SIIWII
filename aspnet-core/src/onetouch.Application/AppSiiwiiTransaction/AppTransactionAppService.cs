@@ -4116,9 +4116,14 @@ namespace onetouch.AppSiiwiiTransaction
                         
                         viewTrans.IsBuyerContactInformationValid = false;
                         var buyer = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.Buyer).FirstOrDefault();
+<<<<<<< HEAD
                         if (buyer != null)
                             viewTrans.IsBuyerContactInformationValid = (!string.IsNullOrEmpty(buyer.CompanyName));
                         // && !string.IsNullOrEmpty(buyer.CompanySSIN));
+=======
+                        if (buyer!=null)
+                            viewTrans.IsBuyerContactInformationValid= (!string.IsNullOrEmpty(buyer.CompanyName) && !string.IsNullOrEmpty(buyer.CompanySSIN));
+>>>>>>> origin/Nov_2024_W3_Testing
 
                         viewTrans.IsSalesRepInformationValid = true;
                         var salesRep = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.SalesRep1).FirstOrDefault();
@@ -4134,7 +4139,11 @@ namespace onetouch.AppSiiwiiTransaction
                         var shipTo= viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipToContact).FirstOrDefault();
                         var shipFrom = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ShipFromContact).FirstOrDefault();
                         if (shipTo!=null && shipFrom!=null)
+<<<<<<< HEAD
                            viewTrans.IsShippingInformationValid = (!string.IsNullOrEmpty(shipTo.CompanyName)) && //!string.IsNullOrEmpty(shipTo.CompanySSIN)) &&
+=======
+                           viewTrans.IsShippingInformationValid = (!string.IsNullOrEmpty(shipTo.CompanyName) && !string.IsNullOrEmpty(shipTo.CompanySSIN)) &&
+>>>>>>> origin/Nov_2024_W3_Testing
                                 (!string.IsNullOrEmpty(shipFrom.CompanyName) && !string.IsNullOrEmpty(shipFrom.BranchName)) &&
                                 !string.IsNullOrEmpty(shipTo.ContactAddressCode) && !string.IsNullOrEmpty(shipTo.ContactAddressLine1) &&
                                 !string.IsNullOrEmpty(shipFrom.ContactAddressCode) && !string.IsNullOrEmpty(shipFrom.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.ShipViaCode);
@@ -4144,7 +4153,11 @@ namespace onetouch.AppSiiwiiTransaction
                         var apContact = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.APContact).FirstOrDefault();
                         var arContact = viewTrans.AppTransactionContacts.Where(z => z.ContactRole == ContactRoleEnum.ARContact).FirstOrDefault();
                         if (shipTo != null && shipFrom != null)
+<<<<<<< HEAD
                             viewTrans.IsBillingInformationValid = (!string.IsNullOrEmpty(apContact.CompanyName)) && // !string.IsNullOrEmpty(apContact.CompanySSIN)) &&
+=======
+                            viewTrans.IsBillingInformationValid = (!string.IsNullOrEmpty(apContact.CompanyName) && !string.IsNullOrEmpty(apContact.CompanySSIN)) &&
+>>>>>>> origin/Nov_2024_W3_Testing
                                  (!string.IsNullOrEmpty(arContact.CompanyName) && !string.IsNullOrEmpty(arContact.BranchName)) &&
                                  !string.IsNullOrEmpty(arContact.ContactAddressCode) && !string.IsNullOrEmpty(arContact.ContactAddressLine1) &&
                                  !string.IsNullOrEmpty(apContact.ContactAddressCode) && !string.IsNullOrEmpty(apContact.ContactAddressLine1) && !string.IsNullOrEmpty(viewTrans.PaymentTermsCode);
