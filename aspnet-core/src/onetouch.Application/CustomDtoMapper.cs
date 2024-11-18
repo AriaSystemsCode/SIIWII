@@ -895,7 +895,7 @@ namespace onetouch
             configuration.CreateMap<AppFeatureDto, AppFeature>().ReverseMap()
                 .ForMember(z=>z.FeatureStatus, z=>z.MapFrom(ss=>ss.EntityObjectStatusCode))
                 .ForMember(z=>z.Category, z=>z.MapFrom(s=>s.CategoryCode));
-<<<<<<< HEAD
+
             //I45
             configuration.CreateMap<onetouch.AppMarketplaceItems.AppMarketplaceItems, AppItem>()
                .ForMember(a => a.SSIN, b => b.MapFrom(ent => ent.Code))
@@ -968,7 +968,7 @@ namespace onetouch
              //.ForMember(a => a.EntityObjectTypeFk, b => b.MapFrom(ent => ent.EntityFk.EntityObjectTypeFk))
              .ForPath(a => a.EntityFk.EntityObjectTypeId, b => b.MapFrom(ent => ent.EntityObjectTypeId));
             //I45
-=======
+
             //MMT45
             configuration.CreateMap<AppMarketplaceItemLists.AppMarketplaceItemLists, CreateOrEditAppItemsListDto>()
                 .ForMember(d => d.UsersCount, s => s.MapFrom(ss => ss.ItemSharingFkList.Count(x => x.SharedUserId != null)))
@@ -1006,7 +1006,7 @@ namespace onetouch
                ));
             //MMR45
 
->>>>>>> origin/Nov_2024_W3_Testing
+
         }
     }
 }

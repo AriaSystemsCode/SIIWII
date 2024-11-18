@@ -580,7 +580,7 @@ namespace onetouch.AppItemsLists
             {
                 //var appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == input.Id && x.TenantId==AbpSession.TenantId).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
                 var appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == input.Id).Include(e => e.EntityFk).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
-<<<<<<< HEAD
+
                 //Iteration45[Start]
                 if (appItemsList==null)
                 {
@@ -592,14 +592,14 @@ namespace onetouch.AppItemsLists
                     }
                 }
                 //Iteration45[End]
-=======
+
                 //MMT45
                 if (appItemsList==null)
                 {
                     return await GetAppItemsListFromMarketplace(input);
                 }
                 //MMT45
->>>>>>> origin/Nov_2024_W3_Testing
+
                 var output = new GetAppItemsListForEditOutput { AppItemsList = ObjectMapper.Map<CreateOrEditAppItemsListDto>(appItemsList), TenantId = appItemsList.TenantId };
                 output.AppItemsList.AppItemsListItems = await GetDetails(new GetDetailsInput { ItemListId = input.Id, SkipCount = 0, MaxResultCount = 10 });
 
