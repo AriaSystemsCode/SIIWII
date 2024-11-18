@@ -1,4 +1,4 @@
-<div class="single-item  mb-0 position-relative" [ngClass]=" { 'row': singleItemPerRowMode }" style="    border-radius: 11px;
+<div class="single-item  mb-0 position-relative" #singleItem [ngClass]=" { 'row': singleItemPerRowMode }" style="    border-radius: 11px;
     border: 2px solid #EDEDED !important;">
     <div class="purple-selection position-absolute p-2" style="width: 45px;top: 3px;"
         *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections  ) && !singleItemPerRowMode  ">
@@ -17,11 +17,15 @@
             [sycAttachmentCategory]="sycAttachmentCategoryImage"
             [staticHeight]="singleItemPerRowMode ? bodyDiv.clientHeight : 200"
             >
-        </app-image-display> -->
-        <img  class="img-thumbnail p-0" [ngStyle]="{'width.px':(singleItemPerRowMode ? bodyDiv.clientHeight : 200) * acceptedAspectRatio ,'height.px':singleItemPerRowMode ? bodyDiv.clientHeight : 200 }" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl"   onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"/>
+        </app-image-display> 
+         [ngStyle]="{'width.px':(singleItemPerRowMode ? bodyDiv.clientHeight : 200) * acceptedAspectRatio ,'height.px':singleItemPerRowMode ? bodyDiv.clientHeight : 200 }" -->
+        <img  class="img-thumbnail p-0" 
+         [ngStyle]="{'width.px': !singleItemPerRowMode ? singleItem.clientWidth : ( bodyDiv.clientHeight * acceptedAspectRatio)  ,'height.px': !singleItemPerRowMode ? (singleItem.clientWidth / acceptedAspectRatio ) : bodyDiv.clientHeight }"
+        [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl"   onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"/>
     </div>
+    <!-- [ngStyle]="{'height': singleItemPerRowMode ? 'fit-content' : 'auto'}" -->
     <div class="single-item-body col d-flex position-static p-0 pl-2" #bodyDiv
-         [ngStyle]="{'height': singleItemPerRowMode ? 'fit-content' : 'auto'}"
+    [ngStyle]="{'height': singleItemPerRowMode ? '230px' : 'auto'}"
     >
         <div class="row w-100">
 
@@ -102,7 +106,8 @@
                         ></i>
                     </span>
                 </p> -->
-                <div class="share-level">
+                <div class="share-level" 
+                [ngClass]=" { 'share-level-div': singleItemPerRowMode }">
                     <span *ngIf="item?.appItem?.sharingLevel === '1' || item?.appItem?.sharingLevel === '2' ">
                         <div class="fa fa-check-circle" style="color: #2DC74F;"></div> Shared
                     </span>
