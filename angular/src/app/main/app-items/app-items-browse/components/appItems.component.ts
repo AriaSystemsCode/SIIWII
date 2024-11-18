@@ -110,6 +110,7 @@ export class AppItemsComponent extends AppComponentBase {
 sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
+    acceptedAspectRatio:number=0;
     constructor(
         injector: Injector,
         private _importService: MainImportService,
@@ -191,8 +192,12 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
             result.forEach(item=>{
                 if(item.code == "LOGO") this.sycAttachmentCategoryLogo = item
                 else if(item.code == "BANNER") this.sycAttachmentCategoryBanner = item
-                else if(item.code == "IMAGE") this.sycAttachmentCategoryImage = item
-            })
+                else if(item.code == "IMAGE") {
+                    this.sycAttachmentCategoryImage = item
+                let [width,height,border] = this.sycAttachmentCategoryImage.aspectRatio.split(':')
+              this.acceptedAspectRatio = Number(width) / Number(height)  ;    
+                }
+                  })
         })
 
         this.showMainSpinner()

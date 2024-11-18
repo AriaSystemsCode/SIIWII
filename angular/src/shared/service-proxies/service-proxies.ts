@@ -14930,6 +14930,148 @@ export class AppItemsListsServiceProxy {
     }
 
     /**
+     * @param itemId (optional) 
+     * @param itemsListId (optional) 
+     * @return Success
+     */
+    getMarketplaceItemsListVariations(itemId: number | undefined, itemsListId: number | undefined): Observable<AppItemsListItemVariationDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppItemsLists/GetMarketplaceItemsListVariations?";
+        if (itemId === null)
+            throw new Error("The parameter 'itemId' cannot be null.");
+        else if (itemId !== undefined)
+            url_ += "ItemId=" + encodeURIComponent("" + itemId) + "&";
+        if (itemsListId === null)
+            throw new Error("The parameter 'itemsListId' cannot be null.");
+        else if (itemsListId !== undefined)
+            url_ += "ItemsListId=" + encodeURIComponent("" + itemsListId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMarketplaceItemsListVariations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMarketplaceItemsListVariations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppItemsListItemVariationDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppItemsListItemVariationDto[]>;
+        }));
+    }
+
+    protected processGetMarketplaceItemsListVariations(response: HttpResponseBase): Observable<AppItemsListItemVariationDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(AppItemsListItemVariationDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param itemListId (optional) 
+     * @param itemId (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getMarketplaceItemListDetails(itemListId: number | undefined, itemId: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfCreateOrEditAppItemsListItemDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItemsLists/GetMarketplaceItemListDetails?";
+        if (itemListId === null)
+            throw new Error("The parameter 'itemListId' cannot be null.");
+        else if (itemListId !== undefined)
+            url_ += "ItemListId=" + encodeURIComponent("" + itemListId) + "&";
+        if (itemId === null)
+            throw new Error("The parameter 'itemId' cannot be null.");
+        else if (itemId !== undefined)
+            url_ += "ItemId=" + encodeURIComponent("" + itemId) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMarketplaceItemListDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMarketplaceItemListDetails(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfCreateOrEditAppItemsListItemDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfCreateOrEditAppItemsListItemDto>;
+        }));
+    }
+
+    protected processGetMarketplaceItemListDetails(response: HttpResponseBase): Observable<PagedResultDtoOfCreateOrEditAppItemsListItemDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfCreateOrEditAppItemsListItemDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
