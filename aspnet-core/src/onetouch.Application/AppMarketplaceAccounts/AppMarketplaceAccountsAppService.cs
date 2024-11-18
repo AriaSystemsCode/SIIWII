@@ -165,9 +165,9 @@ namespace onetouch.AppMarketplaceAccounts
                     var logoCategory = await _helper.SystemTables.GetAttachmentCategoryLogoId();
 
                     var _accounts = from o in pagedAndFilteredAccounts
-                                    join o1 in _appContactRepository.GetAll() on o.SSIN equals o1.SSIN into j1
-                                    from s1 in j1.DefaultIfEmpty()
-                                    where s1.TenantId == AbpSession.TenantId
+                                    //join o1 in _appContactRepository.GetAll() on o.SSIN equals o1.SSIN into j1
+                                    //from s1 in j1.DefaultIfEmpty()
+                                    //where s1.TenantId == AbpSession.TenantId
                                     //join o1 in _appEntityRepository.GetAll() on o.AppContactAddresses.FirstOrDefault().AddressFk.CountryId equals o1.Id into j1
                                     //from s1 in j1.DefaultIfEmpty()
 
