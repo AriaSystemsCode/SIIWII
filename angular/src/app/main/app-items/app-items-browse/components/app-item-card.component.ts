@@ -45,7 +45,7 @@ export class AppItemCardComponent extends AppComponentBase {
 
 
     @Input()   sycAttachmentCategoryImage :SycAttachmentCategoryDto
-
+    @Input()   acceptedAspectRatio
     constructor(
         injector: Injector,
     ) {

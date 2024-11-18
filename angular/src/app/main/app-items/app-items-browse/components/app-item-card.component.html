@@ -1,4 +1,4 @@
-<div class="single-item position-relative" [ngClass]=" { 'row': singleItemPerRowMode }" style="    border-radius: 11px;
+<div class="single-item  mb-0 position-relative" [ngClass]=" { 'row': singleItemPerRowMode }" style="    border-radius: 11px;
     border: 2px solid #EDEDED !important;">
     <div class="purple-selection position-absolute p-2" style="width: 45px;top: 3px;"
         *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections  ) && !singleItemPerRowMode  ">
@@ -12,13 +12,13 @@
         <!--  <img class="w-100" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl" alt=""
             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"  
             [ngStyle]="{'height.px': singleItemPerRowMode ? bodyDiv.clientHeight : 200 }" />  -->
-            <app-image-display
+          <!--   <app-image-display
             [image]="attachmentBaseUrl + '/' + item.appItem.imageUrl"
             [sycAttachmentCategory]="sycAttachmentCategoryImage"
             [staticHeight]="singleItemPerRowMode ? bodyDiv.clientHeight : 200"
             >
-        </app-image-display>
-
+        </app-image-display> -->
+        <img  class="img-thumbnail p-0" [ngStyle]="{'width.px':(singleItemPerRowMode ? bodyDiv.clientHeight : 200) * acceptedAspectRatio ,'height.px':singleItemPerRowMode ? bodyDiv.clientHeight : 200 }" [src]="attachmentBaseUrl + '/' + item.appItem.imageUrl"   onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"/>
     </div>
     <div class="single-item-body col d-flex position-static p-0 pl-2" #bodyDiv
          [ngStyle]="{'height': singleItemPerRowMode ? 'fit-content' : 'auto'}"
