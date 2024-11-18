@@ -557,7 +557,6 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
         return isValid;
     }
     
-    
     onChangeEmail($event){
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].contactEmail = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail;
 

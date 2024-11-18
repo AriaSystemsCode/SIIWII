@@ -193,14 +193,15 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.loading = true;
         // filters.transTypeFilter = filters.transTypeFilter.toUpperCase().toString().replace(/ /g, "")
         this._appTransactionServiceProxy.getAll(
-            false, 0, filters.search,
+            false,0,filters.search,
             filters.codeFilter, undefined,
-            filters.mainFilterType?.id, filters.minCreateDateFilter
+            filters.mainFilterType?.id,filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
             
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter,undefined, false,
+            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
+            undefined,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
@@ -209,6 +210,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             this.loading = false;
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
+            // console.log(result.items,'dataaaaaaaaaaaaaaaaaaa')
             this.primengTableHelper.hideLoadingIndicator();
         });
     }

@@ -224,7 +224,7 @@
 
                             <div *ngIf="!isCompantIdExist">
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
+                           
                                     *ngIf="!isBuyerTempAccount"
                                     [options]="buyerCompanies"
                                     formControlName="buyerCompanyName"
@@ -299,7 +299,7 @@
     (completeMethod)="handleBuyerNameSearch($event)"
     (ngModelChange)="handleBuyerNameChange($event)"
      (click)="loadInitialContacts()"
-    [disabled]="buyerComapnyId === 0"
+   
     [placeholder]=" 'Please Select Buyer Name'"
     field="name"
     [forceSelection]="false">
@@ -472,7 +472,6 @@
                             <div>
                                 <p-dropdown
                                 *ngIf="!isBuyerTempAccount" 
-                                [virtualScroll]="true" [itemSize]="30"
                                     [options]="buyerBranches"
                                     formControlName="buyerCompanyBranch"
                                     [filter]="true"
@@ -608,7 +607,7 @@
                             </div>
                             <div *ngIf="!isSellerCompanyIdExist">
                                 <p-dropdown
-                                [virtualScroll]="true" [itemSize]="30"
+                           
                                     [options]="sellerCompanies"
                                     formControlName="sellerCompanyName"
                                     [filter]="true"
@@ -813,7 +812,7 @@
                             >
                                 <div >
                                     <p-dropdown
-                                    [virtualScroll]="true" [itemSize]="30"
+                                
                                         [options]="sellerBranches"
                                         formControlName="sellerCompanyBranch"
                                         [filter]="true"

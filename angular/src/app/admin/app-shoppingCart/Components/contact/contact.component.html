@@ -38,6 +38,7 @@
 
 
                     <p-autoComplete
+                    [ngClass]=" tempAccount ? 'tempAccount' : ''" 
                       *ngIf="activeTab!=shoppingCartoccordionTabs.orderInfo && activeTab!=shoppingCartoccordionTabs.SellerContactInfo"
                     #autoComplete
                     [dropdown]="true"

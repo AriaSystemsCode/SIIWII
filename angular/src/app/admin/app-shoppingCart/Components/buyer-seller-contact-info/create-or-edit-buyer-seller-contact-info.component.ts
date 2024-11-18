@@ -74,7 +74,14 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     const buyerContact = this.appTransactionsForViewDto.appTransactionContacts.find(
         contact => contact.contactRole === 1
     );
-
+    this.appTransactionsForViewDto.buyerCompanyName= buyerContact.companyName 
+    this.appTransactionsForViewDto.buyerCompanySSIN = buyerContact.companySSIN
+    this.appTransactionsForViewDto.buyerContactName = buyerContact.contactName 
+    this.appTransactionsForViewDto.buyerBranchName =  buyerContact.branchName
+    this.appTransactionsForViewDto.buyerBranchSSIN = buyerContact.branchSSIN 
+    this.appTransactionsForViewDto.buyerContactEMailAddress = buyerContact.contactEmail 
+    this.appTransactionsForViewDto.buyerContactPhoneNumber = buyerContact.contactPhoneNumber 
+    // this.appTransactionsForViewDto.buyerContactSSIN = buyerContact.contactSSIN 
     // Log the Buyer contact
     console.log("Buyer Contact before sync:", buyerContact);
 
