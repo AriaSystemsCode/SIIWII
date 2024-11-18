@@ -17,6 +17,7 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("BillingInfoValid") BillingInfoValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   isContactsValid: boolean = true;
   @ViewChildren(AddressComponent) AddressComponentChild: AddressComponent;
@@ -37,7 +38,10 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase  implemen
   @Input("createOrEditBillingInfo") createOrEditBillingInfo: boolean = true;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
-
+  visible: boolean = false;
+  cancelBtn: boolean = false;
+  saveBtn: boolean = false;
+  SuccessMsg: boolean = false;
 
   constructor(
     injector: Injector,
@@ -227,7 +231,12 @@ debugger
     this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
+      .pipe(finalize(() => { this.hideMainSpinner();
+        //  this.generatOrderReport.emit(true) ; 
+       this.refreshShoppingCart.emit(true)
+
+          // this.SuccessMsg = true
+        }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));

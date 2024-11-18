@@ -82,6 +82,10 @@ namespace onetouch.AppItems.Dtos
         //MMT-IT41[Start]
         public IList<LookupLabelDto> NonLookupValues { set; get; }
         //MMT-IT41[End]
+        //I45[Start]
+        public string ManufacturerCode { set; get; }
+        public long? TenantId { set; get; }
+        //I45[End]
     }
     //MMT
     public class AppItemPriceInfo : EntityDto<long>
@@ -334,6 +338,9 @@ namespace onetouch.AppItems.Dtos
         //MMT30
         public string SSIN { set; get; }
         //MMT30
+        //I45
+        public string? ManufacturerCode { set; get; } 
+        //I45
     }
 
     //public class AttributeInfo

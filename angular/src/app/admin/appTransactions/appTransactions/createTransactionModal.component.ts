@@ -9,7 +9,7 @@ import {
     Input,
     ViewChild,
 } from "@angular/core";
-import { MenuItem } from "primeng/api";
+import { MenuItem, SelectItem } from "primeng/api";
 import {
     FormBuilder,
     FormGroup,
@@ -31,6 +31,10 @@ import {
     TransactionType,
     ValidateTransaction,
     AppMarketplaceItemsServiceProxy,
+    LookupLabelDto,
+    CurrencyInfoDto,
+    AppEntitiesServiceProxy,
+    CreateOrEditAccountInfoDto,
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
@@ -128,6 +132,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     @ViewChild('calendar3') calendar3: Calendar;
     @ViewChild('calendar4') calendar4: Calendar;
     @ViewChild('autoComplete') autoComplete: any; 
+    allCurrencies: LookupLabelDto[];
+    allCurrenciesDto: CurrencyInfoDto[];
+    allPriceLevel: SelectItem[] = [];
+    accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -135,7 +143,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppMarketplaceItemsServiceProxy:AppMarketplaceItemsServiceProxy,
         private userClickService: UserClickService,
-        private router: Router
+        private router: Router,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     ) {
         super(injector);
         this.orderForm = this.fb.group({
@@ -154,7 +163,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            buyerBranchName:[""],
             reference:[""],
+            priceLevel:[""],
+            currencyId:[""],
+ 
 
         });
         this.orderForm.reset();
@@ -188,6 +201,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
       }
       
     ngOnChanges(){
+        this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
+                this.getCurrencies();
+        this.getCurrenciesDto();
+        this.allPriceLevel= this.getPriceLevel();
+        // this.loadInitialContacts();
        this.updateControlState()
         this.orderForm = this.fb.group({
             enteredDate: [Date],
@@ -205,7 +223,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            buyerBranchName:[""],
             reference:[""],
+            priceLevel:[""],
+            currencyId:[""],
+   
 
             
         });
@@ -648,6 +670,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                 buyerContactName: this.orderForm.controls['buyerContactName']?.value,
                 buyerCompanyName: this.orderForm.controls['buyerCompanyName']?.value,
             });
+
+          
     }
 
 
@@ -784,7 +808,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
                         sellerCompanySSIN: this.sellerCompanySSIN,
                         buyerCompanySSIN: this.buyerCompanySSIN,
                         buyerBranchSSIN: this.orderForm.controls['buyerCompanyBranch']?.value?.ssin,
-                        buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
+                        // buyerBranchName: this.orderForm.controls['buyerCompanyBranch']?.value?.name,
+                        buyerBranchName: this.isBuyerTempAccount ?   this.orderForm.controls['buyerBranchName']?.setValue('Main') : this.orderForm.controls['buyerCompanyBranch']?.value?.name ,
                         sellerBranchSSIN:  this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
                         completeDate: moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
@@ -1037,7 +1062,11 @@ availableDate: moment(this.orderForm.controls['availableDate']?.value).format('Y
             this.btnLoader = true;
             this._AppTransactionServiceProxy
                 .createOrEdit(this.body)
-                .pipe(finalize(() => (this.btnLoader = false)))
+                .pipe(finalize(() =>  {
+                    this.btnLoader = false
+                    localStorage.removeItem("comNew");
+                    localStorage.removeItem("conNew");
+                } ))
                 .subscribe((response: any) => {
                     if (this.setCurrentUserActiveTransaction) {
                         this._AppTransactionServiceProxy
@@ -1208,7 +1237,32 @@ availableDate: moment(this.orderForm.controls['availableDate']?.value).format('Y
 
     }
 
+    changeTouchState(event){
+        this.orderForm.controls['currencyId'].setValue(event.value)
+        
+        console.log(event.value,'cuuuuur')
+    
+    }
+
+    changePrice(event){
+        this.orderForm.controls['priceLevel'].setValue(event.value)
+        
+        console.log(event,'cuuuuur')
+    }
+    getCurrencies(){
+        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
+            this.allCurrencies = result;
+        });
+    }
+
+    getCurrenciesDto(){
+        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
+            this.allCurrenciesDto = result;
+        });
+    }
+
     ngOnInit(): void {
+
         this.today = new Date()
         this.updateControlState()
         this.orderForm = this.fb.group({
@@ -1227,7 +1281,11 @@ availableDate: moment(this.orderForm.controls['availableDate']?.value).format('Y
             buyerCompanyBranch:["", [Validators.required]],
             sellerCompanyBranch:["", [Validators.required]],
             istemp: [false],
+            buyerBranchName:[""],
             reference:[""],
+            priceLevel:[""],
+            currencyId:[""],
+     
 
             
         });

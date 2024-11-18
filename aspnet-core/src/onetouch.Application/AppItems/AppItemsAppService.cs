@@ -930,7 +930,7 @@ namespace onetouch.AppItems
                     {
                         output.AppItem.SharingLevel = marketplaceItem.SharingLevel;
 
-                        if (marketplaceItem.TimeStamp < appItem.TimeStamp)
+                        if (marketplaceItem.TimeStamp < appItem.EntityFk.TimeStamp)
                             output.AppItem.ShowSync = true;
 
 
@@ -1847,7 +1847,9 @@ namespace onetouch.AppItems
                 //}
                 // else
                 // {
-                var appItemExisting = await _appItemRepository.GetAll().Where(r => r.Code == input.Code && r.ItemType == input.ItemType).FirstOrDefaultAsync();
+                if (input.TenantId == null)
+                    input.TenantId = AbpSession.TenantId;
+                var appItemExisting = await _appItemRepository.GetAll().Where(r =>r.TenantId == input.TenantId  && r.Code == input.Code && r.ItemType == input.ItemType).FirstOrDefaultAsync();
                 if (appItemExisting != null)
                 {
                     //throw new Exception("This product code already existing. Please use different code.");
@@ -2220,6 +2222,7 @@ namespace onetouch.AppItems
             #endregion add and remove classifications/categories/department
             //MMT30[Start]
             appItem.TimeStamp = timeStamp;
+            entity.TimeStamp = timeStamp;
             appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
             if (string.IsNullOrEmpty(appItem.SSIN))
             {
@@ -2236,7 +2239,8 @@ namespace onetouch.AppItems
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
             await CurrentUnitOfWork.SaveChangesAsync();
             //MMT
-            appItem.TenantId = AbpSession.TenantId;
+            if (appItem.TenantId == null)
+                appItem.TenantId = AbpSession.TenantId;
             //MMT
 
             appItem.EntityId = savedEntity;
@@ -2335,6 +2339,7 @@ namespace onetouch.AppItems
                         ObjectMapper.Map(appItem, appItemChild);
                         ObjectMapper.Map(child, appItemChild);
                         //MMT30[Start]
+                        if (string.IsNullOrEmpty(appItemChild.SSIN))
                         appItemChild.SSIN = "";
                         //MMT30[End]
                         appItemChild.Id = 0;
@@ -2356,7 +2361,8 @@ namespace onetouch.AppItems
                     childEntity.Code = child.Code;
                     childEntity.ObjectId = itemObjectId;
                     childEntity.EntityObjectTypeId = entity.EntityObjectTypeId;
-                    childEntity.TenantId = AbpSession.TenantId;
+                    if(childEntity.TenantId==null)
+                        childEntity.TenantId = AbpSession.TenantId;
                     childEntity.EntityObjectStatusId = itemStatusId;
                     childEntity.Id = appItemChild.EntityId;
                     childEntity.Name = appItem.Name;
@@ -2564,6 +2570,7 @@ namespace onetouch.AppItems
                     //childEntity.EntityExtraData = extrData;
 
                     appItemChild.TimeStamp = timeStamp;
+                    childEntity.TimeStamp = timeStamp;
                     appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appItemChild.SSIN))
                     {
@@ -2610,6 +2617,7 @@ namespace onetouch.AppItems
                             var itemPriceObj = ObjectMapper.Map<AppItemPrices>(itemPrice);
                             itemPriceObj.AppItemCode = appItemChild.Code;
                             itemPriceObj.AppItemId = appItemChild.Id;
+                            if(itemPriceObj.TenantId==null)
                             itemPriceObj.TenantId = AbpSession.TenantId;
                             //MMT33-3
                             if (itemPriceObj.CurrencyCode == currency)//itemPriceObj.Code == "MSRP" &&
@@ -2853,7 +2861,8 @@ namespace onetouch.AppItems
                     {
 
                         var scaleHeader = ObjectMapper.Map<AppItemSizeScalesHeader>(sizeHead);
-                        scaleHeader.TenantId = AbpSession.TenantId;
+                        if (scaleHeader.TenantId == null)
+                            scaleHeader.TenantId = AbpSession.TenantId;
                         scaleHeader.AppItemId = appItem.Id;
                         if (string.IsNullOrEmpty(scaleHeader.SizeScaleCode))
                         {
@@ -2864,7 +2873,8 @@ namespace onetouch.AppItems
                         scaleHeader.ParentId = scaleHeader.ParentId == null ? null : sizeScaleSavedId;
                         foreach (var size in scaleHeader.AppItemSizeScalesDetails)
                         {
-                            size.TenantId = AbpSession.TenantId;
+                            if (size.TenantId == null)
+                                size.TenantId = AbpSession.TenantId;
                             size.Id = 0;
                         }
                         scaleHeader = await _appItemSizeScalesHeaderRepository.InsertAsync(scaleHeader);
@@ -2878,6 +2888,7 @@ namespace onetouch.AppItems
                     {
                         var sizescaleObj = sizeScales.FirstOrDefault(a => a.Id == sizeHead.Id);
                         var scaleHeader = ObjectMapper.Map<AppItemSizeScalesHeader>(sizeHead);
+                        if(scaleHeader.TenantId==null)
                         scaleHeader.TenantId = AbpSession.TenantId;
                         scaleHeader.AppItemId = appItem.Id;
                         scaleHeader.SizeScaleCode = sizescaleObj.SizeScaleCode;
@@ -2905,7 +2916,8 @@ namespace onetouch.AppItems
                                 var sz = ObjectMapper.Map<AppSizeScalesDetailDto>(size);
                                 var sizeObject = ObjectMapper.Map<AppItemSizeScalesDetails>(sz);
                                 sizeObject.IsDeleted = true;
-                                sizeObject.TenantId = AbpSession.TenantId;
+                                if (sizeObject.TenantId == null)
+                                    sizeObject.TenantId = AbpSession.TenantId;
                                 sizeObject.SizeScaleId = sizeScaleObj.Id;
                                 await _appItemSizeScalesDetailRepository.UpdateAsync(sizeObject);
                             }
@@ -2921,7 +2933,8 @@ namespace onetouch.AppItems
                         foreach (var sizObj in sizeHead.AppSizeScalesDetails)
                         {
                             var sizeObject = ObjectMapper.Map<AppItemSizeScalesDetails>(sizObj);
-                            sizeObject.TenantId = AbpSession.TenantId;
+                            if (sizeObject.TenantId == null)
+                                sizeObject.TenantId = AbpSession.TenantId;
                             sizeObject.SizeScaleId = sizeScaleObj.Id;
                             var sizeObjectDet = await _appItemSizeScalesDetailRepository.GetAll()
                                 .Where(a => a.SizeScaleId == sizeObject.SizeScaleId & a.SizeCode == sizObj.SizeCode & a.DimensionName == sizObj.DimensionName).AsNoTracking().FirstOrDefaultAsync();
@@ -3320,6 +3333,7 @@ namespace onetouch.AppItems
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+               
                 var appItem = await _appItemRepository.GetAll().Include(a => a.ParentFkList).AsNoTracking().FirstOrDefaultAsync(x => x.Id == appItemId);
                 if (appItem != null)
                 {
@@ -3360,7 +3374,7 @@ namespace onetouch.AppItems
         {
             long returnCount = 0;
             var apptemSelector = from o in _appItemSelectorRepository.GetAll().Where(e => e.Key == key)
-                                 join i in _appItemRepository.GetAll() on o.SelectedId equals i.Id into j
+                                 join i in _appItemRepository.GetAll().Include(z=>z.EntityFk) on o.SelectedId equals i.Id into j
                                  from j1 in j
                                  select new { item = j1 };
 
@@ -3375,7 +3389,7 @@ namespace onetouch.AppItems
                         if (itm.item.SSIN == null)
                             continue;
                         var sharedItem = _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefault();
-                        if (sharedItem != null && sharedItem.TimeStamp < itm.item.TimeStamp)
+                        if (sharedItem != null && sharedItem.TimeStamp < itm.item.EntityFk.TimeStamp)
                         {
                             returnCount++;
                             await SyncProduct(itm.item.Id);
@@ -3686,7 +3700,9 @@ namespace onetouch.AppItems
                         marketplaceItem.ItemPricesFkList.ForEach(a => a.Id = 0);
                         marketplaceItem.ItemPricesFkList.ForEach(a => a.AppMarketplaceItemId = marketplaceItem.Id);
                         marketplaceItem.ItemPricesFkList.ForEach(a => a.AppItemFk = null);
-
+                        //i45
+                        marketplaceItem.TimeStamp = appItem.EntityFk.TimeStamp;
+                        //i45
                     }
 
                     if (!input.SyncProduct)
@@ -4154,6 +4170,9 @@ namespace onetouch.AppItems
                         publishChild.Name = child.Name;
                         publishChild.Name = marketplaceItem.Name;
                         publishChild.Notes = marketplaceItem.Notes;
+                        //i45
+                        publishChild.TimeStamp = child.EntityFk.TimeStamp;
+                        //i45
                         //publishChild.ParentEntityId = publishItem.EntityId;
                         if (!input.SyncProduct)
                             publishChild.SharingLevel = input.SharingLevel;
@@ -6018,6 +6037,7 @@ namespace onetouch.AppItems
                 //MMT30[Start]
                 DateTime timeStamp = DateTime.Now;
                 appItem.TimeStamp = timeStamp;
+                appItem.EntityFk.TimeStamp = timeStamp;
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 if (string.IsNullOrEmpty(appItem.SSIN))
                 {
@@ -6730,6 +6750,7 @@ namespace onetouch.AppItems
                     //XX
                     //MMT30[End]
                     appChildItem.TimeStamp = timeStamp;
+                    appChildItem.EntityFk.TimeStamp = timeStamp;
                     appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appChildItem.SSIN))
                     {

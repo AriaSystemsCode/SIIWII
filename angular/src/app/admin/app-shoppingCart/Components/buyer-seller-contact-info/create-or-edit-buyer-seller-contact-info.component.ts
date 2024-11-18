@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
-import { AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountBranchDto, AppTransactionServiceProxy, GetAppTransactionsForViewDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { ShoppingCartoccordionTabs } from '../shopping-cart-view-component/ShoppingCartoccordionTabs';
@@ -26,8 +26,16 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   @Input("showSaveBtn") showSaveBtn: boolean = false;
   oldappTransactionsForViewDto;
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   @Input("canChange")  canChange:boolean=true;
+  visible: boolean = false;
+  cancelBtn: boolean = false;
+  saveBtn: boolean = false;
+  SuccessMsg: boolean = false;
+  @Output("TempComp") TempComp: EventEmitter<boolean> = new EventEmitter<boolean>()
+
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy
@@ -35,6 +43,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     super(injector);
   }
   ngOnInit(): void {
+
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -60,8 +69,6 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo ? this.createOrEditbuyerContactInfo = false : this.createOrEditSellerContactInfo = false;
     this.showSaveBtn = false;
   }
-
-
   synchronizeContactDetails() {
     // Find the Buyer contact
     const buyerContact = this.appTransactionsForViewDto.appTransactionContacts.find(
@@ -74,22 +81,73 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
     this.appTransactionsForViewDto.buyerBranchSSIN = buyerContact.branchSSIN 
     this.appTransactionsForViewDto.buyerContactEMailAddress = buyerContact.contactEmail 
     this.appTransactionsForViewDto.buyerContactPhoneNumber = buyerContact.contactPhoneNumber 
-    this.appTransactionsForViewDto.buyerContactSSIN = buyerContact.contactSSIN 
-}
+    // this.appTransactionsForViewDto.buyerContactSSIN = buyerContact.contactSSIN 
+    // Log the Buyer contact
+    console.log("Buyer Contact before sync:", buyerContact);
 
+    if (buyerContact &&  this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo ) {
+
+        // List of roles to synchronize with Buyer contact
+        const rolesToUpdate = [6, 4]; // 6: ShipToContact, 4: ShipFromContact
+
+        rolesToUpdate.forEach(role => {
+            // Find the contact for the specified role
+            const roleContact = this.appTransactionsForViewDto.appTransactionContacts.find(
+                contact => contact.contactRole === role
+            );
+
+            // Log the role contact before updatin
+
+            if (roleContact) {
+                // Synchronize relevant properties
+                // roleContact.selectedBranch = new AccountBranchDto
+                roleContact.companyName = buyerContact.companyName;
+                roleContact.companySSIN = buyerContact.companySSIN;
+                roleContact.branchName = buyerContact.branchName;
+                roleContact.branchSSIN = buyerContact.branchSSIN               
+                roleContact.contactName = buyerContact.contactName;
+                roleContact.contactEmail = buyerContact.contactEmail;
+                roleContact.contactPhoneNumber = buyerContact.contactPhoneNumber;
+                roleContact.contactPhoneTypeId = buyerContact.contactPhoneTypeId;
+                roleContact.contactPhoneTypeName = buyerContact.contactPhoneTypeName;
+                // roleContact.contactAddressCity = buyerContact.contactAddressCity;
+                // roleContact.contactAddressCode = buyerContact.contactAddressCode;
+                // roleContact.contactAddressCountryCode = buyerContact.contactAddressCountryCode;
+                // roleContact.contactAddressCountryId = buyerContact.contactAddressCountryId;
+                // roleContact.contactAddressDetail = { ...buyerContact.contactAddressDetail };
+                // roleContact.contactAddressLine1 = buyerContact.contactAddressLine1;
+                // roleContact.contactAddressLine2 = buyerContact.contactAddressLine2;
+                // roleContact.contactAddressName = buyerContact.contactAddressName;
+                // roleContact.contactAddressPostalCode = buyerContact.contactAddressPostalCode;
+                // roleContact.contactAddressState = buyerContact.contactAddressState;
+
+                // Log the updated role contact after synchronization
+                console.log(`Role Contact after sync (Role: ${role}):`, roleContact);
+            } 
+        });
+
+  //             buyerContact.companyName = this.appTransactionsForViewDto.buyerCompanyName
+  // buyerContact.companySSIN = this.appTransactionsForViewDto.buyerCompanySSIN
+  // buyerContact.contactName = this.appTransactionsForViewDto.buyerContactName
+  // buyerContact.branchName = this.appTransactionsForViewDto.buyerBranchName
+  // buyerContact.branchSSIN = this.appTransactionsForViewDto.buyerBranchSSIN
+  // buyerContact.contactEmail = this.appTransactionsForViewDto.buyerContactEMailAddress
+  // buyerContact.contactPhoneNumber = this.appTransactionsForViewDto.buyerContactPhoneNumber
+  // buyerContact.contactSSIN = this.appTransactionsForViewDto.buyerContactSSIN
+    } 
+}
   createOrEditTransaction() {
-    this.synchronizeContactDetails()
+    this.synchronizeContactDetails();
     this.showMainSpinner()
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() =>  {this.hideMainSpinner();this.generatOrderReport.emit(true)}))
+      .pipe(finalize(() =>  {this.hideMainSpinner();
+        // this.generatOrderReport.emit(true); 
+      //  this.SuccessMsg = true
+        }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
-          /*  if (this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo)
-             this.buyer_seller_contactInfoValid.emit(ShoppingCartoccordionTabs.BuyerContactInfo);
- 
-           if (this.activeTab == this.shoppingCartoccordionTabs.SellerContactInfo)
-             this.buyer_seller_contactInfoValid.emit(ShoppingCartoccordionTabs.SellerContactInfo); */
+       this.refreshShoppingCart.emit(true)
           if (!this.showSaveBtn)
             this.ontabChange.emit(this.activeTab);
           else
@@ -104,12 +162,22 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
    
   }
 
+  validateTempBuyer($event) {
+
+    this.TempComp.emit($event);
+   
+
+   
+  }
+
   isContactsValid: boolean = false;
   isContactFormValid(value) {
     if(this.activeTab==this.shoppingCartoccordionTabs.BuyerContactInfo ||this.activeTab==this.shoppingCartoccordionTabs.SellerContactInfo)
     {
+
     this.isContactsValid = value;
     if (value) {
+
       this.isContactsValid = true;
       if (this.activeTab == this.shoppingCartoccordionTabs.BuyerContactInfo)
         this.buyer_seller_contactInfoValid.emit(ShoppingCartoccordionTabs.BuyerContactInfo);

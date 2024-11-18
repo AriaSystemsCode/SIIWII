@@ -3,10 +3,10 @@
         <div
             class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
         >
-            <div class="kt-subheader kt-grid__item">
+            <div class="kt-subheader kt-grid__item" style="margin-left: 15px;">
                 <div [class]="containerClass">
-                    <div class="kt-subheader__main">
-                        <h3 class="kt-subheader__title">
+                    <div class="kt-subheader__main" style="height: 95px;">
+                        <h3 class="kt-subheader__title pl-4">
                             <a
                                 class="text-capitalize text-dark"
                                 type="button"
@@ -96,16 +96,21 @@
                                 (click)="openShareProductListingModal()"
                             ></button>
                             <button
-                                pButton
+                              
                                 pRipple
-                                label="Sync"
+                            
                                 class="sync"
                                 type="button"
-                                icon="pi pi-sync"
-                                [loading]="btnLoader"
+                          
+                              
                                 [disabled]="!list.showSync"
                                 (click)="syncProduct()"
-                            ></button>
+                            >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4V1L8 5L12 9V6C15.31 6 18 8.69 18 12C18 13.01 17.75 13.97 17.3 14.8L18.76 16.26C19.5702 14.9869 20.0004 13.5091 20 12C20 7.58 16.42 4 12 4ZM12 18C8.69 18 6 15.31 6 12C6 10.99 6.25 10.03 6.7 9.2L5.24 7.74C4.42975 9.01309 3.99958 10.4909 4 12C4 16.42 7.58 20 12 20V23L16 19L12 15V18Z" fill="#F6851D"/>
+                                </svg>
+                                <span>Sync</span>
+                        </button>
                         </div>
                         <div
                             class="last-updated my-3 d-flex align-items-center gap-3 justify-content-end w-100"
@@ -152,9 +157,9 @@
                 [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
                 *ngIf="viewMode"
             >
-                <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body">
-                        <div class="row">
+                <div class="kt-portlet kt-portlet--mobile ">
+                    <div class="kt-portlet__body ">
+                        <div class="row align-items-center">
                             <div
                                 class="col-10 d-flex flex-column justify-content-between"
                             >
@@ -308,6 +313,11 @@
                                                 }}</a
                                             >
                                         </li>
+                                        <li >
+                                            <a href="javascript:;" (click)="sync(list?.appItemsList?.id)">{{
+                                                "Sync to my products" | localize
+                                            }}</a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -319,7 +329,7 @@
                 [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
             >
                 <div
-                    class="kt-portlet kt-portlet--mobile"
+                    class="kt-portlet kt-portlet--mobile body-cont"
                     [ngClass]="{ veiwMode: viewMode }"
                 >
                     <div class="kt-portlet__body">
@@ -577,3 +587,31 @@
     (cancel)="cancelHandler()"
 >
 </app-items-browse-modal>
+
+
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '500px' }" [draggable]="false" >
+    <div class="d-flex justify-content-start  mb-3">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.75" y="0.75" width="42.5" height="42.5" rx="5.25" stroke="#4A0D4A" stroke-width="1.5"/>
+            <path d="M22 14V11L18 15L22 19V16C25.31 16 28 18.69 28 22C28 23.01 27.75 23.97 27.3 24.8L28.76 26.26C29.5702 24.9869 30.0004 23.5091 30 22C30 17.58 26.42 14 22 14ZM22 28C18.69 28 16 25.31 16 22C16 20.99 16.25 20.03 16.7 19.2L15.24 17.74C14.4298 19.0131 13.9996 20.4909 14 22C14 26.42 17.58 30 22 30V33L26 29L22 25V28Z" fill="#4A0D4A"/>
+            </svg>
+            
+            
+            <span  class="msg-text ml-2 ">Sync Products</span>
+    </div>
+        <div class=" con-body">
+    
+          <p class="mb-3 text-center">
+            <p-progressBar mode="indeterminate" [style]="{'height': '6px'}" />
+
+        </p>
+    
+        </div>
+      
+      
+        <div class="d-flex justify-content-end btns" >
+        
+     
+          <button  (click)="visible = false" label="Ok" class="p-button-no" >Cancel</button>
+        </div>
+      </p-dialog>

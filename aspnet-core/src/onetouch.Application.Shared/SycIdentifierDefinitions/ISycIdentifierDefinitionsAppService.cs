@@ -15,7 +15,7 @@ namespace onetouch.SycIdentifierDefinitions
         Task<GetSycIdentifierDefinitionForViewDto> GetSycIdentifierDefinitionForView(long id);
         Task<GetSycIdentifierDefinitionForViewDto> GetSycIdentifierDefinitionByTypeForView(string code);
         Task<GetSycIdentifierDefinitionForEditOutput> GetSycIdentifierDefinitionForEdit(EntityDto<long> input);
-        Task<string> GetNextEntityCode(string code);
+        Task<string> GetNextEntityCode(string code, long? tenantId = null);
         Task CreateOrEdit(CreateOrEditSycIdentifierDefinitionDto input);
 
         Task Delete(EntityDto<long> input);

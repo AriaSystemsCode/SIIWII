@@ -723,7 +723,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         let  sequance="";
         let tenancyName = this.appSession.tenancyName;
 
-        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType).toPromise()
+        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType,this.appSession.tenantId).toPromise()
         if(getNextEntityCodeRes)
             sequance=getNextEntityCodeRes;
 
@@ -1061,7 +1061,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
     connect(): void {
-        this._AccountsServiceProxy.connect(this.accountDataForView.partnerId)
+        this._AccountsServiceProxy.connect(this.accountDataForView.partnerId,null)
         .subscribe(() => {
             this.notify.success(this.l('SuccessfullyConnected'));
             this.accountDataForView.status = true

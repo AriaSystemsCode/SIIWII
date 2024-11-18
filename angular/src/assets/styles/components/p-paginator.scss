@@ -22,17 +22,24 @@ body  p-paginator {
         .p-paginator-first,
         .p-paginator-next,
         .p-paginator-prev,
-        .p-paginator-last	 {
-            background-color: $pagiantor-paginate-btns-bg!important;
+        .p-paginator-last ,body p-paginator .p-paginator .p-paginator-page	 {
+            width: 32px !important;
+            height: 32px !important;
+            
+            background: #FFFFFF !important;
+            border: 1px solid #DFE3E8 !important;
+            border-radius: 4px !important;
             &.p-disabled {
                 background-color: $pagiantor-paginate-btns-bg-disabled!important;
             }
         }
         //every page number
         .p-paginator-page	 {
-            background-color: $pagiantor-page-bg!important;
-            border: 1px solid $pagiantor-page-border-color!important;
-            color: $pagiantor-page-color!important;
+            height: 32px !important;
+            
+            background: #FFFFFF !important;
+            border: 1px solid #DFE3E8 !important;
+            border-radius: 4px !important;
             // &.p-state-active {
             //     background-color: $pagiantor-page-bg-active!important;
             //     border: 1px solid $pagiantor-page-border-color-active!important;

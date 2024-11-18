@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using onetouch.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    partial class onetouchDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241024110258_AddTransactionTimeStampField")]
+    partial class AddTransactionTimeStampField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2290,9 +2293,6 @@ namespace onetouch.Migrations
 
                     b.Property<int>("TenantOwner")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -7032,6 +7032,9 @@ namespace onetouch.Migrations
                     b.Property<byte>("SharingLevel")
                         .HasColumnType("tinyint");
 
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
                     b.ToTable("AppMarketplaceItemLists", t =>
                         {
                             t.HasTrigger("AppMarketplaceItemLists_Trigger");
@@ -7060,6 +7063,9 @@ namespace onetouch.Migrations
 
                     b.Property<long>("StockAvailability")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Variations")
                         .HasColumnType("nvarchar(max)");
@@ -7235,6 +7241,9 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime2");
 
                     b.Property<double>("TotalAmount")
@@ -7430,6 +7439,9 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime2");
 
                     b.Property<double>("TotalAmount")

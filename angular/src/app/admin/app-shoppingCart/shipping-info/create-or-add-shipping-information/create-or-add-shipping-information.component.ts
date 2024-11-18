@@ -16,6 +16,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   @Input("appTransactionsForViewDto") appTransactionsForViewDto: GetAppTransactionsForViewDto;
   @Output("shippingInfOValid") shippingInfOValid: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>();
   shoppingCartoccordionTabs = ShoppingCartoccordionTabs;
+  @Output("refreshShoppingCart") refreshShoppingCart: EventEmitter<boolean> = new EventEmitter<boolean>()
+
   @Output("ontabChange") ontabChange: EventEmitter<ShoppingCartoccordionTabs> = new EventEmitter<ShoppingCartoccordionTabs>()
   isshipFromContactsValid: boolean = false;
   isShipToContactsValid: boolean = false;
@@ -40,6 +42,10 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase  i
   @Output("generatOrderReport") generatOrderReport: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Input("canChange")  canChange:boolean=true;
 isAccManual :boolean = false
+visible: boolean = false;
+cancelBtn: boolean = false;
+saveBtn: boolean = false;
+SuccessMsg: boolean = false;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -53,16 +59,16 @@ isAccManual :boolean = false
 
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
       this.loadAddresComponentShipFrom = true;
-      this.contactIdShipFrom = this.shipFromData.compId;
+      this.contactIdShipFrom = this.shipFromData?.compId;
         if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData.compssin);
+      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
   
         
   
-      this.contactIdShipTo = this.shipToData.compId;
+      this.contactIdShipTo = this.shipToData?.compId;
       this.loadAddresComponentShipTo = true;
       if( this.AddressComponentChild)
-      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData.compssin);
+      this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
     }  
       
   }
@@ -210,7 +216,12 @@ isAccManual :boolean = false
     this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
     this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
-      .pipe(finalize(() => { this.hideMainSpinner(); this.generatOrderReport.emit(true) }))
+      .pipe(finalize(() => { this.hideMainSpinner();
+        //  this.generatOrderReport.emit(true) ;
+       this.refreshShoppingCart.emit(true)
+
+        // this.SuccessMsg = true
+      }))
       .subscribe((res) => {
         if (res) {
           this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto));
@@ -241,9 +252,12 @@ isAccManual :boolean = false
       if (this.shippingTabValid) {
 
         if (sectionIndex == 1) {
+          
           (!shipFromObj[0]?.companySSIN) || (shipFromObj[0]?.contactAddressDetail && shipFromObj[0]?.contactAddressDetail?.addressLine1) ? this.enableSAveShipFrom = true : shipFromObj[0]?.contactAddressId ? this.enableSAveShipFrom = true : this.enableSAveShipFrom = false;
+
+
         } else {
-          (!shipToObj[0]?.companySSIN) || (shipToObj[0]?.contactAddressDetail && shipToObj[0]?.contactAddressDetail?.addressLine1) ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
+        (shipToObj[0]?.contactAddressDetail && shipToObj[0]?.contactAddressDetail?.addressLine1) ? this.enableSAveShipTo = true : shipToObj[0]?.contactAddressId ? this.enableSAveShipTo = true : this.enableSAveShipTo = false;
         }
         this.enableSAveShipFrom && this.enableSAveShipTo && this.appTransactionsForViewDto.shipViaId ? this.shippingTabValid = true : this.shippingTabValid = false;  
 
@@ -314,20 +328,21 @@ isAccManual :boolean = false
   shipToData;
   reloadAddresscomponentShipFrom(data) {
     this.shipFromData=data;
+    console.log(this.shipFromData,'this.shipFromData')
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.contactIdShipFrom = this.shipFromData.compId;
+      this.contactIdShipFrom = this.shipFromData?.compId;
 
         if( this.AddressComponentChild)
-      this.AddressComponentChild['first']?.getAddressList(this.shipFromData.compssin);
+      this.AddressComponentChild['first']?.getAddressList(this.shipFromData?.compssin);
   }
 }
   reloadAddresscomponentShipTo(data) {
   this.shipToData=data;
     if(this.currentTab == ShoppingCartoccordionTabs.ShippingInfo){
-      this.contactIdShipTo = this.shipToData.compId;
+      this.contactIdShipTo = this.shipToData?.compId;
 
   if( this.AddressComponentChild)
-    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(data.compssin) : this.AddressComponentChild['last'].getAddressList(data.compssin);
+    this.AddressComponentChild['second'] ? this.AddressComponentChild['second'].getAddressList(this.shipToData?.compssin) : this.AddressComponentChild['last'].getAddressList(this.shipToData?.compssin);
 }
   }
 

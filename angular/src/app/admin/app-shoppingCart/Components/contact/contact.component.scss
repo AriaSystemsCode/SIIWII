@@ -52,3 +52,59 @@ font-weight: 600;
     font-weight: 600;
 }
 
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip {
+    visibility: hidden;
+padding: 24px 20px;
+
+
+width: 177px;
+height: 120px;
+
+
+background: #FFFAF5;
+border: 1px solid #EEEEEE;
+box-shadow: 1px 1px 4px rgba(22, 22, 22, 0.1);
+border-radius: 10px;
+
+    position: absolute;
+    z-index: 1;
+    bottom: 85%; /* Position above the element */
+    left: 50%;
+    margin-left: -60px; /* Center the tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: #1B101B;
+    font-weight: 500;
+}
+
+.tooltip-container:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+:host ::ng-deep .tempCon .p-inputtext {
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-right: 1px solid #e2e5ec !important;
+    width: 100% !important;
+}
+:host ::ng-deep .tempCon .p-inputtext:enabled:focus {
+    border: 1px solid #e2e5ec !important;
+    border-right: 1px solid #e2e5ec !important;
+}
+.tempAccount  {
+    .p-dropdown {
+        border: 1px solid #C83532 !important;
+    }
+    .p-dropdown:not(.p-disabled):hover {
+        border: 1px solid #C83532 !important;
+    }
+
+}
