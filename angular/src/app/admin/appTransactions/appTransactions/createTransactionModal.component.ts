@@ -819,7 +819,9 @@ availableDate: moment(this.orderForm.controls['availableDate']?.value).format('Y
 
                     
 
-                        reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : ""
+                        reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
+                        priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "",
+                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : ""
                     }; 
 
          
