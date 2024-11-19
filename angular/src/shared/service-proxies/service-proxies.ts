@@ -16204,7 +16204,7 @@ export class AppItemsListsServiceProxy {
      * @param appItemListId (optional) 
      * @return Success
      */
-    copyItemsFromItemList(appItemListId: number | undefined): Observable<boolean> {
+    copyItemsFromItemList(appItemListId: number | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/AppItemsLists/CopyItemsFromItemList?";
         if (appItemListId === null)
             throw new Error("The parameter 'appItemListId' cannot be null.");
@@ -16227,14 +16227,14 @@ export class AppItemsListsServiceProxy {
                 try {
                     return this.processCopyItemsFromItemList(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<boolean>;
+                    return _observableThrow(e) as any as Observable<number>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<boolean>;
+                return _observableThrow(response_) as any as Observable<number>;
         }));
     }
 
-    protected processCopyItemsFromItemList(response: HttpResponseBase): Observable<boolean> {
+    protected processCopyItemsFromItemList(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :

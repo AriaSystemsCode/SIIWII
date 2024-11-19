@@ -29,6 +29,12 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
     canPrint : boolean
     canDelete : boolean
     visible:boolean = false
+    currentSyncCount: number = 0;
+totalProductsToSync: number = 0;
+syncCompleted: boolean = false;
+alreadyCopied : boolean = false;
+beforeMsg: boolean = false;
+successMsg: boolean = false;
     constructor(
         injector:Injector,
         private _appItemsListsServiceProxy: AppItemsListsServiceProxy,
@@ -69,22 +75,39 @@ export class AppItemListCardComponent extends AppComponentBase implements OnInit
         if (!this.canPublish) return
         this.unPublishMe.emit()
     }
-    sync(id) {
-        this.visible = true
-   this._appItemsListsServiceProxy.copyItemsFromItemList(
-       id
-  
-    )
-    .pipe(
-        finalize(()=>
-            this.visible = false
-    )
-    )
-    .subscribe((result)=>{
-     
-    })
-
-    }
+    sync(id: number) {
+        this.visible = true; // Open the dialog immediately
+        this.currentSyncCount = 0; // Reset the sync counter
+        this.totalProductsToSync = 0; // Reset the total count
+      
+        this._appItemsListsServiceProxy
+          .copyItemsFromItemList(id)
+          .pipe(finalize(() => {
+            this.visible = false; // Mark the sync as complete when finished
+            // this.alreadyCopied = true
+            // this.successMsg = true
+          }))
+          .subscribe((result: number) => {
+            if(result > 0){
+                this.totalProductsToSync = result; // Set the total products to sync
+      
+                // Simulate progress
+                const syncInterval = setInterval(() => {
+                  if (this.currentSyncCount < this.totalProductsToSync) {
+                    this.currentSyncCount++; // Increment the synced count
+                  } else {
+                    clearInterval(syncInterval); // Stop the interval when complete
+                  }
+                }, 500); // Adjust this interval to match your API's progress
+            
+            }  else {
+                this.alreadyCopied = true
+                this.beforeMsg = true
+              } 
+         
+          });
+      } 
+      
 
 }
 
