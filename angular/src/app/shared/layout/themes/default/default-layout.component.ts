@@ -40,6 +40,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
 
     currentRouteUrl = '';
     openSub = false
+    openAdSub= false
     tenantLogo:any;
     constructor(
         injector: Injector,
