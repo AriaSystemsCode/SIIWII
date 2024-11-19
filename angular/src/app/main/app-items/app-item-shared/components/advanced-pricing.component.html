@@ -34,8 +34,8 @@
                 </div>
                 <div class="modal-footer">
                     
-                    <button type="button" class="btn btn-outline-secondary  font-weight-bold" (click)="cancel()"   style="border-radius: 5px;
-                    background-color:1px solid #EBEBEB !important; color: #4A0D4A !important;">
+                    <button type="button" class="btn  font-weight-bold" (click)="cancel()"   style="border-radius: 5px;
+                    border:1px solid #EBEBEB !important; color: #4A0D4A !important;">
                         {{ l("Cancel") }}
                     </button>
                     <button type="submit" *ngIf="!readOnly" class="btn btn-primar  font-weight-bold" (click)="submit()" [disabled]="!isValid"   style="border-radius: 5px;
