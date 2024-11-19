@@ -48,7 +48,8 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                        <div class="list-toolbar-dropdown-filter-selectedItem font-weight-normal text-dark"
+                                        <div class="list-toolbar-dropdown-filter-selectedItem   text-dark"
+                                        style="font-weight: 700 !important;"
                                             *ngIf="!showMainFiltersOptions">
                                             {{ mainFilterCtrl?.value?.label | localize }}
                                         </div>
@@ -68,10 +69,10 @@
                                     </div>
                                     <div class="" *ngIf="showAddButton"></div>
                                     <div class="mb-4 mb-md-0 text-center">
-                                        <a class="btn font-weight-normal toolbar-btn btn_Primary"
+                                        <a class="btn   toolbar-btn btn_Primary"
                                         style="background-color: #4A0D4A !important;
                                         border-radius: 6px;
-                                        color: white !important;"
+                                        color: white !important;font-size: 16px;"
                                             (click)="showSendMail()">
                                             <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo mr-2" style="width: 16px;">
                                             {{ "InvitePartner" | localize }}
@@ -82,7 +83,7 @@
                                                     'AddManualAccount'
                                                         | localize
                                                 "
-                                                class="btn font-weight-normal text-center toolbar-btn transparent-button"
+                                                class="btn   text-center toolbar-btn transparent-button"
                                                 style="background-color: #FFFFFF !important;
                                                 border: 1px solid #EEEEEEEE !important;
                                                 color: #4A0D4A !important;
@@ -104,7 +105,7 @@
                                                 padding: 10px;
                                                 border-radius: 6px;
                                                 margin-left: 10px;"
-                                                class="btn font-weight-normal text-center toolbar-btn transparent-button"
+                                                class="btn   text-center toolbar-btn transparent-button"
                                                 [routerLink]="[
                                                     '/app/main/account/create-external'
                                                 ]">
@@ -117,7 +118,7 @@
                                                     
                                                 " [title]="
                                                     'Import Accounts' | localize
-                                                " class="btn font-weight-normal toolbar-btn pr-0 transparent-button">
+                                                " class="btn   toolbar-btn pr-0 transparent-button">
                                                 <i class="d-inline-block w-100 fa-file-import fas icon-center"
                                                     style="color: #4a0d4a !important;"></i>
                                             </a>
@@ -128,7 +129,7 @@
 
                                     <div class="text-center">
                                         <a [title]="'ResetData' | localize"
-                                            class="btn font-weight-normal text-center text-primary toolbar-btn ResetData_btn transparent-button"
+                                            class="btn   text-center text-primary toolbar-btn ResetData_btn transparent-button"
                                             style="background-color: #FFFFFF !important;
                                             border: 1px solid #EEEEEEEE !important;
                                             color: #4A0D4A !important;
@@ -145,7 +146,7 @@
                                         color: white !important;
                                         border-radius: 6px;" [title]="'ToggleView' | localize"
                                             (click)="triggerListView()"
-                                            class="btn font-weight-normal pr-1 text-center text-primary toolbar-btn btn_Primary">
+                                            class="btn   pr-1 text-center text-primary toolbar-btn btn_Primary">
 
                                             <i class="d-inline-block w-100" [ngClass]="
                                                     singleItemPerRowMode
@@ -162,7 +163,7 @@
                             </div> 
                             <div class="col">
                                 <div class="d-flex justify-content-between">
-                                    <div class="font-weight-normal list-toolbar-data-summary pl-5" *ngIf="active">
+                                    <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
                                         {{
                                         paginator.getPage() *
                                         primengTableHelper.defaultRecordsCountPerPage
@@ -176,12 +177,12 @@
                                         primengTableHelper.totalRecordsCount
                                         }}
                                         {{ "ResultsOf" | localize }} "{{
-                                        mainFilterCtrl?.value?.label
+                                        mainFilterCtrl?.value?.label | localize
                                         }}"
                                     </div>
                                     <div>
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown>
-                                            <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 sortByDd"
+                                            <button class="dropdown-toggle btn btn-sm   p-0 sortByDd"
                                                 dropdownToggle>
                                                 <span class="list-toolbar-dropdown-sort-label">
                                                     {{ "SortBy" | localize }}
@@ -259,7 +260,7 @@
                                                 " [isHost]="isHost"
                                                 (_createRelation)="createRelation($event)"></app-account-card>
                                         </div>
-                                        <div class="font-weight-normal mt-5 p-5 text-center w-100"
+                                        <div class="  mt-5 p-5 text-center w-100"
                                             *ngIf="accounts.length == 0 && !loading">
                                             {{ "NoDataFound" | localize }}
                                         </div>
