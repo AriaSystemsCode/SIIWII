@@ -29,7 +29,8 @@
                         <div class="col-md-12 cursor-pointer" style="margin-bottom: 0;display: flex;" (click)="selectedAddressId = address.id">
                             <input type="radio" name="address" [value]="address.id" class="radio-select" [(ngModel)]="selectedAddressId"  >
 
-                            <p type="text" [ngClass]="(selectedAddressId == address.id)?'checkedAddress':''"  class="form-control bg-white address-name code-name m-2" name="Address1" style="overflow: hidden;
+                            <p type="text"  
+                            [ngClass]="(selectedAddressId == address.id)?'checkedAddress':''"  class="form-control bg-white address-name code-name m-2" name="Address1" style="overflow: hidden;
                             text-overflow: ellipsis;
                             width: 100%;
                             height: auto !important;">
