@@ -1434,12 +1434,14 @@ namespace onetouch.AppItemsLists
         //}
         //I45
         [AbpAuthorize(AppPermissions.Pages_AppItemsLists_Create)]
-        public async Task<bool> CopyItemsFromItemList(long appItemListId)
+        public async Task<int> CopyItemsFromItemList(long appItemListId)
         {
+            int retutnval = 0;
             var itmList = await _appMarketplaceItemListRepository.GetAll().Where(z => z.Id == appItemListId).Include(z => z.AppItemsListDetails).FirstOrDefaultAsync();
             if (itmList == null)
-                return false;
+                return retutnval;
             else {
+               
                 if (itmList.AppItemsListDetails != null && itmList.AppItemsListDetails.Count > 0)
                 {
                     foreach (var det in itmList.AppItemsListDetails)
@@ -1552,6 +1554,7 @@ namespace onetouch.AppItemsLists
                                     prc.Id = 0;
                                 }
                             }
+                            retutnval++;
                             itemC.NonLookupValues = new List<LookupLabelDto>();
                             var created = await _appItemsAppService.CreateOrEdit(itemC);
                            
@@ -1559,7 +1562,7 @@ namespace onetouch.AppItemsLists
                     }
                 }
             }
-                return true;
+            return retutnval;
 
         }
         private async Task<long?> GetProductTypeIdentifier(int productTypeId, long? tenantId)
