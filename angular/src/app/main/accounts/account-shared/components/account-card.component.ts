@@ -18,7 +18,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Output() connectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input() fromMarketplace;
-    @Output() _createRelation : EventEmitter<string> = new EventEmitter<string>()
+    @Output() _createRelation : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
 
 
     
@@ -65,9 +65,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
         }
     }
 
-    createRelation(avaliableConnectionName){
-this._createRelation.emit(avaliableConnectionName);
-
+    createRelation(){
+      this._createRelation.emit(this.account);
     }
 
 }

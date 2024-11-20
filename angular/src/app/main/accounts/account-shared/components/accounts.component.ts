@@ -413,19 +413,22 @@ export class AccountsComponent
     }
 
 
-    createRelation($event) {
-        // this.showMainSpinner();
-        // this._accountsServiceProxy
-        //     .()
-        //     .pipe(
-        //         finalize(() => {
-        //             this.getAccounts();
-        //             this.hideMainSpinner();
-        //         })
-        //     )
-        //     .subscribe(() => {
-
-        //     });
+    createRelation(account) {
+        this._accountsServiceProxy
+                .applyRelationOnProfile(account.account.id)
+                .pipe(
+                    finalize(() => {;
+                        this.hideMainSpinner();
+                    })
+                )
+                .subscribe((/*result:string*/) => {
+                    let accountIndx = this.accounts.findIndex(x=>x.account.id == account.account.id);
+                    if(accountIndx >=0){
+                        this.accounts[accountIndx]=account;
+                        this.accounts[accountIndx].avaliableConnectionName="";
+                        this.accounts[accountIndx].connectionName=this.l(result);
+                    }
+                });
     }
 
 }
