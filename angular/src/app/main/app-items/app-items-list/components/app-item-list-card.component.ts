@@ -35,6 +35,7 @@ syncCompleted: boolean = false;
 alreadyCopied : boolean = false;
 beforeMsg: boolean = false;
 successMsg: boolean = false;
+showSync: boolean = false;
     constructor(
         injector:Injector,
         private _appItemsListsServiceProxy: AppItemsListsServiceProxy,
@@ -75,38 +76,50 @@ successMsg: boolean = false;
         if (!this.canPublish) return
         this.unPublishMe.emit()
     }
-    sync(id: number) {
+    sync(id: number,count:number) {
         this.visible = true; // Open the dialog immediately
         this.currentSyncCount = 0; // Reset the sync counter
         this.totalProductsToSync = 0; // Reset the total count
-      
+    
         this._appItemsListsServiceProxy
-          .copyItemsFromItemList(id)
-          .pipe(finalize(() => {
-            this.visible = false; // Mark the sync as complete when finished
-            // this.alreadyCopied = true
-            // this.successMsg = true
-          }))
-          .subscribe((result: number) => {
-            if(result > 0){
-                this.totalProductsToSync = result; // Set the total products to sync
-      
-                // Simulate progress
-                const syncInterval = setInterval(() => {
-                  if (this.currentSyncCount < this.totalProductsToSync) {
-                    this.currentSyncCount++; // Increment the synced count
-                  } else {
-                    clearInterval(syncInterval); // Stop the interval when complete
-                  }
-                }, 500); // Adjust this interval to match your API's progress
-            
-            }  else {
-                this.alreadyCopied = true
-                this.beforeMsg = true
-              } 
-         
-          });
-      } 
+            .copyItemsFromItemList(id)
+            .pipe(
+                finalize(() => {
+                    // this.visible = false; // Hide dialog after sync completion
+                    console.log("Sync finalized.");
+                })
+            )
+            .subscribe((result: number) => {
+                console.log("Result from service:", result);
+                if (result > 0) {
+                    this.showSync = true
+                    this.totalProductsToSync = result; // Set the total products to sync
+                    console.log("Total products to sync:", this.totalProductsToSync);
+    
+                    // Simulate progress
+                    const syncInterval = setInterval(() => {
+                        if (this.currentSyncCount < count) {
+                            this.currentSyncCount++;
+                            console.log("Sync progress:", this.currentSyncCount);
+                        } else {
+                            clearInterval(syncInterval); // Stop the interval when complete
+                            console.log("Sync complete.");
+                        }
+                    }, 500); // Adjust this interval to match your API's progress
+                } else {
+                    console.log("No items to sync or already copied.");
+                    this.alreadyCopied = true;
+                    this.beforeMsg = true;
+        this.visible = false; // Open the dialog immediately
+
+                }
+            }, (error) => {
+                console.error("Error during sync:", error);
+        this.visible = false; // Open the dialog immediately
+
+            });
+    }
+    
       
 
 }
