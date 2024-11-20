@@ -177,7 +177,7 @@
                   </li>
                   </ul>
 
-            <div class="position-relative pt-3 d-flex flex-column ml-4" style="">
+            <div class="position-relative pt-3 d-flex flex-column ml-4 mr-1"   (click)="getShoppingCartInfo(true)" style="cursor: pointer;">
                 <span
                     class="kt-header__topbar-icon kt-header__topbar-icon--primary"
                 >
@@ -185,7 +185,7 @@
                         src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
                         style="width: 20px; height: 20px; cursor: pointer;"
                         class="m-auto"
-                        (click)="getShoppingCartInfo(true)"
+                      
                         *ngIf="shoppingCartSummary?.shoppingCartId >0"
                     />
                     <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
@@ -202,7 +202,7 @@
                 </span>
                 <p *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="text-white mb-0" style="white-space: nowrap;font-size: 10px;">My cart</p>
             </div>
-            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
+            <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty"  class="ml-3 mt-2 pt-3 d-lg-block d-none"> 
                 <h5 class="text-white"> {{currencySymbol }} {{shoppingCartSummary?.amount | currency:' ' }}</h5>  
             </div>
 
@@ -589,7 +589,7 @@
                     </a>
                 </li>
 <li        *ngIf="shoppingCartSummary?.shoppingCartId >0" class="nav-item pt-1">
-    <div class="position-relative pt-3" >
+    <div class="position-relative pt-3"   (click)="getShoppingCartInfo(true)">
         <span
             class="kt-header__topbar-icon kt-header__topbar-icon--primary"
         >
@@ -597,7 +597,7 @@
                 src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
                 style="width: 20px; height: 20px; cursor: pointer;"
                 class="m-auto"
-                (click)="getShoppingCartInfo(true)"
+              
          
             />
             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
