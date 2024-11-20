@@ -254,14 +254,14 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
             transactionType = TransactionType.PurchaseOrder;*/
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result=>{
             if (this.formType?.toUpperCase() == "SO"){
-                if(result.toLowerCase().includes('seller')){
+                if(result?.toLowerCase().includes('seller')){
                   this.roleDdval=this.roles.filter(role=>role.code==1)[0];
 
                 }else{
                     this.roleDdval=this.roles.filter(role=>role.code!==1)[0];
                 }
             }else if (this.formType?.toUpperCase() == "PO"){
-                if(result.toLowerCase().includes('buyer')){
+                if(result?.toLowerCase().includes('buyer')){
                     this.roleDdval=this.roles.filter(role=>role.code==2)[0];
 
                 }else{
@@ -503,6 +503,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     }
 
     handleBuyerCompanyChange(event: any) {
+        console.log(event,'nooowwwee')
         this.searchTerm = ''
         this.selectedBuyerContact = ''
         this.buyerComapnyId = event.value.id;
@@ -514,7 +515,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
         this.handleBuyerNameSearch("");
         this.buyerBranches=[];
-        this.getBranches(event.value.accountSSIN,'buyer')
+         this.getBranches(this.buyerCompanySSIN ,'buyer')
     }
 
     handleSellerCompanyChange(event: any) {
@@ -528,7 +529,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
         this.orderForm.get('sellerContactEMailAddress').setValue(event.value.email)
         this.handleSellerNameSearch("");
         this.sellerBranches=[];
-        this.getBranches(event.value.accountSSIN,'seller')
+        this.getBranches(this.sellerCompanySSIN ,'seller')
     }
     loadInitialContacts() {
         this._AppTransactionServiceProxy
@@ -552,7 +553,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
     handleBuyerNameSearch(event: any) {
         if (this.buyerContacts && this.buyerContacts.length > 0) {
             // Filtering logic
-            const query = event.query.toLowerCase();
+            const query = event?.query?.toLowerCase();
             this.filteredBuyerContacts = this.buyerContacts.filter(contact =>
                 contact?.name?.toLowerCase().includes(query)
             );
@@ -640,6 +641,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
         this.invalidBuyerPhoneNumber = "";
         this.buyerPhoneLabel = event?.phoneTypeName ?   event?.phoneTypeName + " Number" : this.buyerPhoneLabel;
+ 
+
 
     }
     handleSellerNameChange(event: any) {
