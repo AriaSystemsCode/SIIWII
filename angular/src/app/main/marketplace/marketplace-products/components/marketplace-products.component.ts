@@ -113,7 +113,7 @@ export class MarketplaceProductsComponent
         }
         this.sortingData = [
             { label: "Product Name", value: "name" },
-            { label: "Product code", value: "code" },
+            { label: "Product code", value: "manufacturercode" },
             { label: "Price low to high", value: "price" },
             { label: "Price high to low", value: "price desc" },
         ];
