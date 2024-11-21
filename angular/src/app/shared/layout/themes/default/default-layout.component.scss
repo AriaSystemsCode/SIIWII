@@ -21,6 +21,9 @@
 
 
 ::ng-deep {
+  .flaticon-app:before {
+    // content: "" !important;
+}
     .kt-header--fixed.kt-subheader--fixed.kt-subheader--enabled .kt-wrapper {
         padding-top: 0 !important;
     }
@@ -57,7 +60,9 @@
     //     padding-top: 60px;
  }
 }
-
+.spLeng {
+  height: 70vh !important;
+}
 .sidebar {
     svg {
       padding-bottom: 5px;

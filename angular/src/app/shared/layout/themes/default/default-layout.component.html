@@ -38,7 +38,11 @@
                       </svg>
                 </button>
                 <ul [ngClass]="isMinimized ? 'ulMargin':''">
-                  <li *ngFor="let item of menu.items" [ngClass]="{'d-none': !showMenuItem(item) }"  [queryParams]="item.parameters"   [routerLink]="item.name != 'Administration' ? item.route : null" [routerLinkActive]="item.name != 'Administration' ? 'active-link' :''" (click)=" item.name != 'Administration' ? isMinimized = true : ''; item.items.length == 0 ? openSub = false : ''">
+                  <li *ngFor="let item of menu.items ; let i = index" [ngClass]="{
+                    'd-none': !showMenuItem(item) || item.name === 'BillingLog',
+                    'spLeng': item.name == 'System Objects' && openSub && isMinimized ,
+                  
+                  }"  [queryParams]="item.parameters"   [routerLink]="item.name != 'Administration' && item.name != 'System Objects'  ? item.route : null" [routerLinkActive]="item.name != 'Administration' && item.name != 'System Objects' ? 'active-link' :''" (click)=" item.name != 'Administration' ? isMinimized = true : ''; item.items.length == 0 ? openSub = false : ''">
                     <svg *ngIf="item.name == 'My Transactions'" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none"  class="svgIcon">
                         <g clip-path="url(#clip0_272_39693)">
                           <path d="M22.7116 10.3223H2.06641V20.6448H22.7116V10.3223ZM11.3567 19.6126H3.09866V17.5481H11.3567V19.6126ZM11.3567 16.5158H3.09866V14.4513H11.3567V16.5158ZM11.3567 13.419H3.09866V11.3545H11.3567V13.419ZM16.518 19.6126H12.389V17.5481H16.518V19.6126ZM16.518 16.5158H12.389V14.4513H16.518V16.5158ZM16.518 13.419H12.389V11.3545H16.518V13.419ZM21.6793 19.6126H17.5503V17.5481H21.6793V19.6126ZM21.6793 16.5158H17.5503V14.4513H21.6793V16.5158ZM21.6793 13.419H17.5503V11.3545H21.6793V13.419Z" />
@@ -99,8 +103,8 @@
                           </clipPath>
                         </defs>
                       </svg>
-                    <i *ngIf="item.name != 'My Transactions' && item.name != 'MyAccounts' && item.name != 'MyProducts' && item.name != 'ProductsList' && item.name != 'Linesheet' && item.name != 'Administration'"  [class]="item.icon"></i>
-                    <a *ngIf="!isMinimized" (click)="item.items.length ? openSub = !openSub : ''" [queryParams]="item.parameters"   [routerLink]="item.name != 'Administration' ? item.route : null" class="ml-2 item-name">{{ item.name  | localize }}  <svg *ngIf="item.name == 'Administration' && !openSub"  width="15" height="8" viewBox="0 0 15 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="mlIcon">
+                    <i *ngIf="item.name != 'My Transactions' && item.name != 'MyAccounts' && item.name != 'MyProducts' && item.name != 'ProductsList' && item.name != 'Linesheet' && item.name != 'Administration'"  [class]="item.icon" (click)="item.items.length ? openSub = !openSub : ''"></i>
+                    <a *ngIf="!isMinimized" (click)="item.items.length ? openSub = !openSub : ''" [queryParams]="item.parameters"   [routerLink]="item.name != 'Administration'  && item.name != 'System Objects'  ? item.route : null" class="ml-2 item-name">{{ item.name  | localize }}  <svg *ngIf="item.name == 'Administration' && !openSub"  width="15" height="8" viewBox="0 0 15 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="mlIcon">
                       <path d="M13.5 1L7.5 7L1.5 1" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
                       <svg *ngIf="item.name == 'Administration' && openSub" width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg"  class="mlIcon">
@@ -109,7 +113,7 @@
                         
                       </a>
                     <div *ngIf="item.items.length && openSub" class="sub-menu">
-                      <li *ngFor="let child of item.items" [ngClass]=" showMenuItem(child) ? '' : 'd-none'" [routerLink]="child.route " [routerLinkActive]="'active-link'" (click)="isMinimized = true" >
+                      <li *ngFor="let child of item.items" [ngClass]=" !showMenuItem(child) || child?.name =='BillingLog' ? 'd-none' : ''" [routerLink]="child.route " [routerLinkActive]="'active-link'" (click)="isMinimized = true" >
                         <i    *ngIf="child.name != 'AccountProfile' && child.name != 'Lookups' && child.name != 'Organization Units' && child.name != 'Roles'  && child.name != 'Users' && child.name != 'Subscription' && child.name != 'Settings' && child.name != 'OrganizationUnits' " [class]="child.icon" ></i>
                         <svg *ngIf="child.name == 'AccountProfile'" width="32" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg"   class="svgIcon">
                           <path d="M27.1667 28C27.1667 26.1392 27.1667 25.2089 26.937 24.4518C26.4199 22.7473 25.0861 21.4134 23.3815 20.8963C22.6245 20.6667 21.6941 20.6667 19.8333 20.6667H13.1667C11.3059 20.6667 10.3755 20.6667 9.61847 20.8963C7.91393 21.4134 6.58005 22.7473 6.06298 24.4518C5.83333 25.2089 5.83333 26.1392 5.83333 28M22.5 10C22.5 13.3137 19.8137 16 16.5 16C13.1863 16 10.5 13.3137 10.5 10C10.5 6.68629 13.1863 4 16.5 4C19.8137 4 22.5 6.68629 22.5 10Z" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -202,7 +206,7 @@
                                       <path d="M16.5 19.9998C18.7091 19.9998 20.5 18.209 20.5 15.9998C20.5 13.7907 18.7091 11.9998 16.5 11.9998C14.2909 11.9998 12.5 13.7907 12.5 15.9998C12.5 18.209 14.2909 19.9998 16.5 19.9998Z" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                       </svg>
                                       
-                        <a *ngIf="!isMinimized" [queryParams]="child.parameters" class="child-name mx-1 item-name"  [routerLink]="child.route "  routerLinkActive="child-active-link" (click)="isMinimized = true">{{ child.name | localize }}</a>
+                        <a *ngIf="!isMinimized" [queryParams]="child.parameters" class="child-name mx-1 item-name"  [routerLink]="child.route "  routerLinkActive="child-active-link" (click)="isMinimized = true">{{ child.name | localize }} </a>
                       </li>
                     </div>
                   </li>
