@@ -39,6 +39,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual PagedResultDto<string> EntityCategoriesNames { get; set; }
         public virtual PagedResultDto<string> EntityClassificationsNames { get; set; }
         //End
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { set; get; }
     }
 
     //xx

@@ -360,10 +360,20 @@ namespace onetouch.AppSiiwiiTransaction
 
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
                 //Iteration#37 -MMT [Start]
-                if (appTrans.ShipViaFk != null)
-                    appTrans.ShipViaName = appTrans.ShipViaFk.Name;
-                if (appTrans.PaymentTermsFk != null)
-                    appTrans.PaymentTermsName = appTrans.PaymentTermsFk.Name;
+                if (appTrans.ShipViaId != null)
+                {
+                    var shipViaEntity = await _appEntity.GetAll().Where(z => z.Id == appTrans.ShipViaId).FirstOrDefaultAsync();
+                    if(shipViaEntity!=null)
+                        appTrans.ShipViaName = shipViaEntity.Name;
+                }
+
+                if (appTrans.PaymentTermsId != null)
+                {
+                    //   appTrans.PaymentTermsName = appTrans.PaymentTermsFk.Name;
+                    var paymntEntity = await _appEntity.GetAll().Where(z => z.Id == appTrans.PaymentTermsId).FirstOrDefaultAsync();
+                    if (paymntEntity != null)
+                        appTrans.PaymentTermsName = paymntEntity.Name;
+                }
                 //Iteration#37 -MMT [End]
                 if (input.lFromPlaceOrder)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
@@ -1233,6 +1243,24 @@ namespace onetouch.AppSiiwiiTransaction
                             await GetProductFromMarketplace(det.SSIN, int.Parse(buyerTenantId.ToString()));
                     }
                 }
+                //MMT
+                //Iteration#37 -MMT [Start]
+                if (appTrans.ShipViaId != null)
+                {
+                    var shipViaEntity = await _appEntity.GetAll().Where(z => z.Id == appTrans.ShipViaId).FirstOrDefaultAsync();
+                    if (shipViaEntity != null)
+                        appTrans.ShipViaName = shipViaEntity.Name;
+                }
+
+                if (appTrans.PaymentTermsId != null)
+                {
+                    //   appTrans.PaymentTermsName = appTrans.PaymentTermsFk.Name;
+                    var paymntEntity = await _appEntity.GetAll().Where(z => z.Id == appTrans.PaymentTermsId).FirstOrDefaultAsync();
+                    if (paymntEntity != null)
+                        appTrans.PaymentTermsName = paymntEntity.Name;
+                }
+                //Iteration#37 -MMT [End]
+                //MMT
                 foreach (var con in appTrans.AppTransactionContacts)
                 {
                     if (con.ContactAddressId == null) con.ContactAddressCountryId = null;
