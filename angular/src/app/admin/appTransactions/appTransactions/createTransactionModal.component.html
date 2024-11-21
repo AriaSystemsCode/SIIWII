@@ -529,21 +529,23 @@
                                             <p-dropdown [options]="allCurrencies"  
                                             (onChange)="changeTouchState($event)"
                                         [(ngModel)]="accountInfoTemp.currencyId" 
+                                        formControlName="currencyId"
+
                                             placeholder="USD"             ></p-dropdown>
                                         
                                         </div>
                                        
-                                                    <!-- <small
+                                                    <small
                                                         class="text-danger"
                                                         *ngIf="
                                                             submitted &&
                                                             orderForm
-                                                                .get('Currency')
+                                                                .get('currencyId')
                                                                 ?.hasError('required')
                                                         "
                                                     >
                                                     Currency is required
-                                                    </small> -->
+                                                    </small>
                                                 </div>
                                        
 

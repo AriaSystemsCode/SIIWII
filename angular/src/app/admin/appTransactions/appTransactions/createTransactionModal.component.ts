@@ -201,7 +201,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
       }
       
     ngOnChanges(){
-        this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
+        // this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
                 this.getCurrencies();
         this.getCurrenciesDto();
         this.allPriceLevel= this.getPriceLevel();
@@ -829,7 +829,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
 
                     
 
-                        reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : ""
+                        reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
+                        priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "",
+                        currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : ""
                     }; 
 
          
