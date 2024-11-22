@@ -12,3 +12,12 @@
   ],
   "postCreateCommand": "npm install -g @angular/cli && npm install devextreme@24.1.7 && wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && chmod +x dotnet-install.sh && ./dotnet-install.sh"
 }
+{
+  "name": "SQL Server Codespace",
+  "dockerFile": "Dockerfile",
+  "extensions": [
+    "ms-azuretools.vscode-docker",
+    "ms-mssql.mssql"
+  ],
+  "postCreateCommand": "echo 'SQL Server setup complete'"
+}
