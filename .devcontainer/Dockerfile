@@ -8,5 +8,5 @@ ENV SA_PASSWORD=YourStrong!Passw0rd
 # Expose the SQL Server port
 EXPOSE 1433
 
-# Run SQL Server
+# Start SQL Server
 CMD /opt/mssql/bin/sqlservr
