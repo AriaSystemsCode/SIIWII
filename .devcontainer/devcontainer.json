@@ -10,5 +10,5 @@
     "ms-dotnettools.vscode-dotnet-runtime",
     "ms-vsliveshare.vsliveshare"
   ],
-  "postCreateCommand": "npm install -g @angular/cli"
+  "postCreateCommand": "npm install -g @angular/cli && npm install devextreme@24.1.7"
 }
