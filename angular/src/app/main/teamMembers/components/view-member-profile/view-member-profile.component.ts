@@ -78,6 +78,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
                 (this.memberData?.state ? (this.memberData?.state + ', ') : '') +
                 (this.memberData?.zipCode ? (this.memberData?.zipCode + ', ') : '') +
                 (this.memberData?.countryName ? (this.memberData?.countryName) : '');
+
+                this.oldEditBranchValue =this.editBranchValue;
         } else {
             const memberId: number = this.memberData?.contact?.id;
             if (isNaN(memberId)) return
@@ -152,6 +154,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     }
     editjobTitleValue: string = '';
     editBranchValue: string = '';
+    oldEditBranchValue:string="";
     Save_editMember() {
         debugger
         this.newEditMemberInfo = this.memberData.contact;
@@ -205,7 +208,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
 
     branchSelected(Branch) {
-        this.editBranchValue = Branch?.contactAddresses[0]?.name ? Branch?.contactAddresses[0]?.name : '';
+        this.editBranchValue = Branch?.name ? Branch?.name : '';
         this.editBranchValue += Branch?.contactAddresses[0]?.addressLine1 ? (this.editBranchValue != '' ? ' - ' + Branch?.contactAddresses[0]?.addressLine1 : Branch?.contactAddresses[0]?.addressLine1) : '';
         this.editBranchValue += Branch?.contactAddresses[0]?.addressLine2 ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.addressLine2 : Branch?.contactAddresses[0]?.addressLine2) : '';
         this.editBranchValue += Branch?.contactAddresses[0]?.city ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.city : Branch?.contactAddresses[0]?.city) : '';

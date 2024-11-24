@@ -246,8 +246,8 @@
                 {{"Back" | localize}}
             </button>
             <button type="submit" class="submitBtn btn  btn-elevate kt-login__btn-primary pl-5 pr-5" [disabled]="!registerForm.form.valid"
-                [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
-                {{ "Submit" | localize }}
+                [disabled]="saving" >
+                {{ saving ? l('SavingWithThreeDot') : ("Submit" | localize) }}
             </button>
         </div>
     </form>

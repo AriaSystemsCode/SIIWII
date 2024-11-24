@@ -106,14 +106,16 @@
                                     <h6 class="text-right font-weight-bold mr-3 "> <img
                                             src="../../assets/img/input_icons/outline-work.png" class=""> {{ (
                                         "JobTitle" | localize ) + " :" }}</h6>
-                                    <p class="text-left old_editjobTitle" style="color: #595959;"
+                                    <p  *ngIf="!editjobTitleValue" class="text-left old_editjobTitle" style="color: #595959;"
                                         [ngClass]="{'hide':NoteditInfo}">{{memberData?.contact?.jobTitle}}</p>
+                                        <p  *ngIf="editjobTitleValue" class="text-left old_editjobTitle" style="color: #595959;"
+                                        [ngClass]="{'hide':NoteditInfo}">{{editjobTitleValue}}</p>
                                     <input style="color: #595959 !important;" type="text"
                                         class="editjobTitle form-control form-control-sm aria-input-text"
                                         name="JobTitle" #JobTitleInput="ngModel" required name="JobTitle" minlength="2"
                                         maxlength="100" [(ngModel)]="editjobTitleValue"
                                         [placeholder]="'PleaseEnterJobTitle' | localize " required [class.hide]="editInfo">
-                                    <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
+                                    <validation-messages  *ngIf="NoteditInfo" [formCtrl]="JobTitleInput"></validation-messages>
                                 </div>
                                 <hr class="header" *ngIf="memberData?.contact?.joinDateIsPublic">
                                 <div class="col-md-12 align-items-baseline pt-2 pb-2  pl-3"
@@ -147,9 +149,11 @@
                                     <h6 class="text-right font-weight-bold mr-3 "> <img
                                             src="../../assets/img/input_icons/location.png" class=""> {{ ( "Branch" |
                                         localize ) + " :" }}</h6>
-                                    <p class="text-left old_editBranch" style="color: #595959;"
+                                        <p *ngIf="editBranchValue" class="text-left old_editBranch" style="color: #595959;"
+                                        [class.hide]="NoteditInfo"> {{editBranchValue}}</p>
+                                    <p   class="text-left old_editBranch" style="color: #595959;"
                                         [class.hide]="NoteditInfo"
-                                        *ngIf="memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName">
+                                        *ngIf=" !editBranchValue &&( memberData?.branchName || memberData?.addressLine1 || memberData?.addressLine2 || memberData?.city || memberData?.state || memberData?.zipCode || memberData?.countryName)">
                                         <span *ngIf="memberData?.branchName">
                                             {{ memberData?.branchName + ' '}}
                                         </span>
@@ -177,7 +181,7 @@
                                             class="editBranch form-control form-control-sm aria-input-text"
                                             [(ngModel)]="editBranchValue" disabled
                                             [placeholder]="'PleaseSelectBranch' | localize ">
-                                        <a (click)="selectBranch()">
+                                        <a (click)="selectBranch()" style="color: #4A0D4A !important;">
                                             {{ ( editBranchValue ? 'Change' : 'Choose' ) | localize }}
                                         </a>
                                     </div>
@@ -219,7 +223,7 @@
                                 <div class="row ml-5">
                                     <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
                                     style="color: white !important;"
-                                        [class.hide]="editInfo" (click)="Save_editMember()" [disabled]="!editjobTitleValue">
+                                        [class.hide]="editInfo" (click)="Save_editMember()" [disabled]="!editjobTitleValue || (editjobTitleValue== memberData?.contact?.jobTitle && editBranchValue== oldEditBranchValue) ">
                                         {{ "SaveChanges" | localize }}
                                     </button>
 
@@ -228,7 +232,7 @@
     border: 1px solid #EEEEEEEE;
     height: 38px;
     width: 118px;
-    border-radius: 6px;" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;">
+    border-radius: 6px;" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false">
                                         {{ "Cancel" | localize }}
                                     </button>
                                 </div>
