@@ -5144,7 +5144,7 @@ namespace onetouch.AppSiiwiiTransaction
                         await CurrentUnitOfWork.SaveChangesAsync();
 
                         await _appTransactionDetails.DeleteAsync(z => z.TransactionId == id && z.ParentId == null);
-                        await _appTransactionContactsRepository.DeleteAsync(z => z.TransactionId == id);
+                        //await _appTransactionContactsRepository.DeleteAsync(z => z.TransactionId == id);
                         await CurrentUnitOfWork.SaveChangesAsync();
 
                         if (marketplaceTransaction.AppMarketplaceTransactionDetails != null && marketplaceTransaction.AppMarketplaceTransactionDetails.Count > 0)
