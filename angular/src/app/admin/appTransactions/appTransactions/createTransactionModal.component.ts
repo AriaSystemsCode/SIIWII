@@ -201,7 +201,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit,O
       }
       
     ngOnChanges(){
-        this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
+        // this.accountInfoTemp.currencyId=this.tenantDefaultCurrency.value;
                 this.getCurrencies();
         this.getCurrenciesDto();
         this.allPriceLevel= this.getPriceLevel();
