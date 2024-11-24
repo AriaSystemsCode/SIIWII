@@ -57,15 +57,22 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
         this.relatedTenantId=this._activatedRoute.snapshot.queryParams['relatedTenantId'];
         this.lastName=this._activatedRoute.snapshot.queryParams['lastName'];
         this.firstName=this._activatedRoute.snapshot.queryParams['firstName'];
-        this.accountTypeLabel=this._activatedRoute.snapshot.queryParams['accountTypeLabel'];
-        this.accountType=this._activatedRoute.snapshot.queryParams['accountType'];
+        this.accountTypeLabel=this._activatedRoute.snapshot.queryParams['accountTypeLabel'] ? this._activatedRoute.snapshot.queryParams['accountTypeLabel'] : "personal" ;
+        this.accountType=this._activatedRoute.snapshot.queryParams['accountType'] ?this._activatedRoute.snapshot.queryParams['accountType'] : "personal" ;
         this.isUserLoggedIn = abp.session.userId > 0;
 
         this._tenantRegistrationService.getEditionsForSelect()
             .subscribe((result) => {
                 this.editionsSelectOutput = result;
-                 this.editionWithFeatures= this.editionsSelectOutput.editionsWithFeatures[0];
+                var indx= this.editionsSelectOutput?.editionsWithFeatures?.findIndex(x=>  x.edition?.displayName.toLowerCase()?.includes(this.accountType?.toLowerCase()));
 
+                if(indx>=0)
+                this.editionWithFeatures= this.editionsSelectOutput.editionsWithFeatures[indx];
+
+                else
+                this.editionWithFeatures= this.editionsSelectOutput.editionsWithFeatures[0];
+
+                 
                  if (!this.editionsSelectOutput.editionsWithFeatures || this.editionsSelectOutput.editionsWithFeatures.length <= 0) {
                     this._router.navigate(['/account/register-tenant']);
                  }
