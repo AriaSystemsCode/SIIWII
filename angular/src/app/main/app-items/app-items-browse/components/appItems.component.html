@@ -60,9 +60,16 @@ transform: translateY(-50%);">
                                     >
                                     </app-image-display>
                                 </div>
-                                <h3  class="mt-3" style="font-size: 24px;color: white;position: absolute;
+                                <h3  class="mt-3" 
+                                [ngClass]="{'ml-5':appSession?.tenant?.name?.length <=10 }"
+                                style="font-size: 24px;color: white;position: absolute;
    top: 90%;
-   white-space: nowrap;">{{appSession?.tenant?.name}}</h3>
+   white-space: nowrap;
+   background-color: #D4D4D4 !important;
+    border-radius: 10px;
+    border: 1px solid #D4D4D4 !important;
+    padding: 0px 5px;
+    margin-left: 43px !important;">{{appSession?.tenant?.name}}</h3>
                                 <!-- <img [src]="logoPhoto"  onerror="this.src='../../../assets/placeholders/_logo-placeholder.png';" class="logo-profile ml-4"> -->
                             </div>
                         </div>
