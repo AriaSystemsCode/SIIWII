@@ -434,6 +434,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.accountInfoForm.form.patchValue(this.accountInfoTemp.toJSON())
         this.companyLogo = this.accountDataForView.logoUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}` : undefined;
         this.coverPhoto = this.accountDataForView.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}` : undefined;
+        this.changeTab( !this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView  )
     }
     async getAccountDataForView() {
         this.showMainSpinner()
@@ -703,7 +704,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
 
     saveMyAccount(){
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
-        .pipe(finalize(() => { this.saving = false;}))
+        .pipe(finalize(() => { this.saving = false;
+            this.changeTab( !this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView  )
+        }))
             .subscribe(result => {
                
                 this.touched = false
