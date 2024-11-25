@@ -113,7 +113,8 @@ namespace onetouch.AppSubScriptionPlan
                                                      Id = o.Id,
                                                      s1.IsAddOn,
                                                      AppFeatureId = o.AppFeatureId,
-                                                     o.AppSubscriptionPlanHeaderId
+                                                     o.AppSubscriptionPlanHeaderId,
+                                                     o.AppSubscriptionPlanHeaderFk
                                                      //AppFeatureDescription = s2 == null || s2.Description == null ? "" : s2.Description.ToString()
                                                  };
 
@@ -147,7 +148,9 @@ namespace onetouch.AppSubScriptionPlan
                             Trackactivity = o.Trackactivity,
                             Id = o.Id,
                             IsAddOn = o.IsAddOn,
-                            AppFeatureId = o.AppFeatureId
+                            AppFeatureId = o.AppFeatureId,
+                            AppSubscriptionPlanHeaderCode = o.AppSubscriptionPlanHeaderFk.Code,
+                            AppSubscriptionPlanHeaderName = o.AppSubscriptionPlanHeaderFk.Name
                         },
                         
                         // AppSubscriptionPlanHeader = o.AppSubscriptionPlanHeader,
