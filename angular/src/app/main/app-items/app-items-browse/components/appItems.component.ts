@@ -302,7 +302,8 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     @Output() itemEmited :EventEmitter<any> = new EventEmitter<any>()
     getAppItems(event?: LazyLoadEvent) {
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
+            this.paginator.rows=4;
+            this.paginator.totalRecords = 4;
             this.paginator.changePage(0);
             return;
         }
@@ -333,6 +334,19 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
                 }
             })
         }
+
+      
+
+        const predefinedValues = [4, 12, 20, 40, 100, 300, 500];
+        if (this.primengTableHelper.predefinedRecordsCountPerPage.length <= predefinedValues.length) {
+            this.primengTableHelper.predefinedRecordsCountPerPage = predefinedValues.slice(0, this.primengTableHelper.predefinedRecordsCountPerPage.length);
+        }
+        else {
+            const extraValues = this.primengTableHelper.predefinedRecordsCountPerPage.slice(predefinedValues.length);
+            this.primengTableHelper.predefinedRecordsCountPerPage = [...predefinedValues, ...extraValues];
+        }
+
+        this.paginator.rowsPerPageOptions=this.primengTableHelper.predefinedRecordsCountPerPage;
         filterBody.listingStatus = filters.listingStatus || undefined
         filterBody.publishStatus = filters.publishStatus || undefined
         filterBody.visibilityStatus = filters.visibilityStatus || undefined
