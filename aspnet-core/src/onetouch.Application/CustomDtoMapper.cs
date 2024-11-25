@@ -928,6 +928,7 @@ namespace onetouch
                    : ss.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)
                ));
             //MMR45
+            configuration.CreateMap <GetAllAppTenantActivitiesLogForExcelInput, GetAllAppTenantActivitiesLogInput>();
 
         }
     }
