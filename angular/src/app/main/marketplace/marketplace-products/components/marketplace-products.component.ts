@@ -62,7 +62,7 @@ export class MarketplaceProductsComponent
     sortBy: number;
     appSession: AppSessionService;
     skipCount: number = 0;
-    maxResultCount: number = 10;
+    maxResultCount: number = 12;
     pagesNumber: number;
     displayFitlers: boolean = false;
     filterType: string;
