@@ -455,10 +455,10 @@
                                                             {{ rowData[col.field] }}</label>
 
                                                         <label *ngIf="col.field=='image'">
-                                                            <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                            <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                                 class="imgIcon" />
 
-                                                                  <img *ngIf="rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  selectedImg"
+                                                                  <img *ngIf="rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  selectedImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                                 class="imgIcon" />
                                                         </label>
 
@@ -1207,8 +1207,11 @@ height: 48px;"
                                                         {{ rowData[col.field] }}</label>
 
                                                     <label *ngIf="col.field=='image'">
-                                                        <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
-                                                            class="imgIcon" />
+                                                        <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                                class="imgIcon" />
+
+                                                                  <img *ngIf="rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  selectedImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                                class="imgIcon" />
                                                     </label>
 
                                                     <label
