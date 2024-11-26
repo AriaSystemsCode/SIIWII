@@ -1,5 +1,5 @@
 ﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, AfterViewInit, } from '@angular/core';
-import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ActivatedRoute } from '@angular/router';
@@ -32,7 +32,8 @@ import { Console, log } from 'console';
     templateUrl:'./AccountInfo.component.html',
     styleUrls: ['./AccountInfo.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()],
+    providers:[MarketplaceAccountsServiceProxy]
 })
 export class AccountInfoComponent extends AppComponentBase implements OnInit, AfterViewInit {
     @Input('viewMode') viewMode :boolean = false
@@ -124,6 +125,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     entityObjectType:string ="TENANTCONTACT";
     accountInfoOldCurrencyId=0;
     changeCurrency:boolean=false;
+    
+    @Input('fromMarketplace') fromMarketplace :boolean = false;
 
     constructor(
         injector: Injector,
@@ -137,7 +140,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         private _abpSessionService : AbpSessionService,
         private updateLogoService:UpdateLogoService,
         private _activatedRoute  : ActivatedRoute,
-        private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy
+        private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
+        private  _marketplaceAccountsServiceProxy : MarketplaceAccountsServiceProxy
     ) {
         super(injector);
 
@@ -437,14 +441,29 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.changeTab( !this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView  )
     }
     async getAccountDataForView() {
-        this.showMainSpinner()
-        const result = await this._AccountsServiceProxy.getAccountForView(this.accountId,5)
+
+        this.showMainSpinner();
+        let result;
+        if (!this.fromMarketplace) {
+   result = await this._AccountsServiceProxy.getAccountForView(this.accountId,5)
         .toPromise()
         .finally(
             ()=> {
                 this.hideMainSpinner()
             }
         )
+    }
+
+    else{
+        result = await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId,5)
+        .toPromise()
+        .finally(
+            ()=> {
+                this.hideMainSpinner()
+            }
+        )
+    }
+
         this.isPublished= result ? result.isPublished : false;
         this.isSync= result ? result.isSync : false;
         this.connectionCount=result ? result.connectionCount : 0;

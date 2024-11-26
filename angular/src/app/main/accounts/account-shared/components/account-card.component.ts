@@ -52,7 +52,9 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     }
     viewProfile(): void {
         if(!this.id) return
-        this.router.navigate([`/app/main/account/view/${this.id}`])
+        this.router.navigate([`/app/main/account/view/${this.id}`], {
+            queryParams: { fromMarketplace: this.fromMarketplace }
+          });
     }
     clickCardHandler(){
         // view profile

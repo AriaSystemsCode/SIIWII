@@ -8,6 +8,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 })
 export class ViewOthersProfileComponent extends AppComponentBase implements OnInit  {
     accountId : number
+    fromMarketplace:boolean
     constructor(
         injector:Injector,
         private activatedRoute:ActivatedRoute
@@ -17,7 +18,11 @@ export class ViewOthersProfileComponent extends AppComponentBase implements OnIn
 
     ngOnInit() {
         this.activatedRoute.params.subscribe(params => {
-            this.accountId = params['id']
+            this.accountId = params['id'];
+        });
+
+        this.activatedRoute.queryParams.subscribe(params => {
+            this.fromMarketplace = params['fromMarketplace'];
         });
     }
 }
