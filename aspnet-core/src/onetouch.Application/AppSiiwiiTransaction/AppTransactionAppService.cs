@@ -70,6 +70,7 @@ using Abp.AspNetZeroCore.Timing;
 using System.Drawing.Imaging;
 using Abp.AutoMapper;
 using Namotion.Reflection;
+using onetouch.Globals;
 
 
 //using NUglify.Helpers;
@@ -122,6 +123,7 @@ namespace onetouch.AppSiiwiiTransaction
         //MMT45
         private readonly IRepository<AppContactAddress, long> _appContactAddressRepository;
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRateRepository;
+        private readonly TimeZoneInfoAppService _timeZoneInfoAppService;
         //MMT45
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -144,7 +146,8 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender, IAppEntitiesAppService appEntitiesAppService,
              IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
-             IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository
+             IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
+             TimeZoneInfoAppService timeZoneInfoAppService
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
@@ -189,6 +192,7 @@ namespace onetouch.AppSiiwiiTransaction
             //MMT37[End]
             _appContactAddressRepository = appContactAddressRepository;
             _sycCurrencyExchangeRateRepository = sycCurrencyExchangeRateRepository;
+            _timeZoneInfoAppService = timeZoneInfoAppService;
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -4233,6 +4237,14 @@ namespace onetouch.AppSiiwiiTransaction
                         };
                         //iteration#45[Start]
                         viewTrans.LastModifiedDate = (transOrg.LastModificationTime == null ? transOrg.CreationTime : DateTime.Parse(transOrg.LastModificationTime.ToString()));
+                        //
+                        if (viewTrans.LastModifiedDate != null && input != null && !string.IsNullOrEmpty(input.TimeZoneValue))
+                        {
+                            var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                            var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(viewTrans.LastModifiedDate, currentTimeZone);
+                            viewTrans.LastModifiedDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+                        }
+                        //
                         var marketplaceTransaction = await _appMarketplaceTransactionHeadersRepository.GetAll().AsNoTracking().Where(z => z.SSIN == transOrg.SSIN && z.TenantId == null).FirstOrDefaultAsync();
                         if (marketplaceTransaction == null)
                         {
