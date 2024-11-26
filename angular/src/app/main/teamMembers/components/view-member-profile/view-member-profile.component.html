@@ -32,10 +32,10 @@
                                                     [classList]="'img-cover'">
                                                 </app-image-display>
                                                 <div class="view-profile-action-buttons">
-                                                    <button *ngIf="canEdit"
+                                                    <button *ngIf="canEdit && adminContact"
                                                         class="btn mb-3 mt-4  transparent-button shadow mr-3"
                                                         style="color: #4A0D4A;    border-radius: 6px;"
-                                                        (click)="CreateUserName()">
+                                                        (click)="CreateUserName()" [disabled]="Editting">
                                                         <img src="../../assets/img/input_icons/plus.png"
                                                             class="mr-2 pb-1">
                                                         {{ "Create User" | localize }}

@@ -51,6 +51,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
     @ViewChild("createOrEditUserModal", { static: true })  createOrEditUserModal: CreateOrEditUserModalComponent;
     Editting:boolean =false;
+    adminContact:boolean =false;
     constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy) {
         super(injector);
         this.accountInfoTemp = new CreateOrEditAccountInfoDto();
@@ -59,6 +60,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     }
     ngOnInit() {
         this.getAllAttachmentCategories()
+
     }
     editInfo = true;
     NoteditInfo = false;
@@ -66,7 +68,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.Editting=true;
         debugger
         //this.memberData?.contact.eMailAddress
-        if (this.memberData?.contact.userName.includes("admin")) {
+        if (this.adminContact) {
             this.editInfo = false;
             this.NoteditInfo = true;
             this.editjobTitleValue = this.memberData?.contact?.jobTitle;
@@ -117,6 +119,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
             }))
             .subscribe((result) => {
                 this.memberData = result;
+                this.adminContact =   this.memberData?.contact.userName.includes("admin");
                 const firstName = this.memberData.contact.firstName
                 const lastName = this.memberData.contact.lastName
                 this.contactDisplayName = firstName ? firstName : ""
@@ -147,8 +150,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
        this.createOrEditUserModal.user = new UserEditDto();
        this.createOrEditUserModal.user.name= this.memberData?.contact?.firstName;
        this.createOrEditUserModal.user.surname=this.memberData?.contact?.lastName;
-       this.createOrEditUserModal.user.emailAddress= this.memberData?.contact?.eMailAddress;
-       this.createOrEditUserModal.user.phoneNumber=this.memberData?.contact?.phone1Number;
+    //    this.createOrEditUserModal.user.emailAddress= this.memberData?.contact?.eMailAddress;
+    //    this.createOrEditUserModal.user.phoneNumber=this.memberData?.contact?.phone1Number;
        this.createOrEditUserModal.fromTeamMember=true;
        this.createOrEditUserModal.show()
     }
