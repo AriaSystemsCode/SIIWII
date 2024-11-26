@@ -96,8 +96,8 @@ namespace onetouch.AppSubscriptionPlans
                             InvoiceNumber = o.InvoiceNumber,
                             InvoiceDate = o.InvoiceDate,
                             Amount = o.Amount,
-                            DueDate = o.DueDate,
-                            PayDate = o.PayDate,
+                            DueDate = (o.DueDate == new DateTime(1, 1, 1) ? null : o.DueDate),
+                            PayDate = (o.PayDate == new DateTime(1,1,1) ? null:o.PayDate),
                             Id = o.Id,
                             Attachment = !string.IsNullOrEmpty(o.Attachment) ? (pathSource + o.Attachment) : null,
                             DisplayName = !string.IsNullOrEmpty(o.DisplayName) ?(o.DisplayName.TrimEnd() + Path.GetExtension(o.Attachment)):"",
@@ -120,7 +120,8 @@ namespace onetouch.AppSubscriptionPlans
             var appTenantInvoice = await _appTenantInvoiceRepository.GetAsync(id);
 
             var output = new GetAppTenantInvoiceForViewDto { AppTenantInvoice = ObjectMapper.Map<AppTenantInvoiceDto>(appTenantInvoice) };
-
+            output.AppTenantInvoice.DueDate = (output.AppTenantInvoice.DueDate == new DateTime(1, 1, 1) ? null : output.AppTenantInvoice.DueDate);
+            output.AppTenantInvoice.PayDate = (output.AppTenantInvoice.PayDate == new DateTime(1, 1, 1) ? null : output.AppTenantInvoice.PayDate);
             return output;
         }
 
@@ -131,6 +132,8 @@ namespace onetouch.AppSubscriptionPlans
 
             var output = new GetAppTenantInvoiceForEditOutput { AppTenantInvoice = ObjectMapper.Map<CreateOrEditAppTenantInvoiceDto>(appTenantInvoice) };
 
+            output.AppTenantInvoice.DueDate = (output.AppTenantInvoice.DueDate == new DateTime(1, 1, 1) ? null : output.AppTenantInvoice.DueDate);
+            output.AppTenantInvoice.PayDate= (output.AppTenantInvoice.PayDate == new DateTime(1, 1, 1) ? null : output.AppTenantInvoice.PayDate);
             return output;
         }
 
@@ -194,8 +197,8 @@ namespace onetouch.AppSubscriptionPlans
                                  InvoiceNumber = o.InvoiceNumber,
                                  InvoiceDate = o.InvoiceDate,
                                  Amount = o.Amount,
-                                 DueDate = o.DueDate,
-                                 PayDate = o.PayDate,
+                                 DueDate = (o.DueDate == new DateTime(1,1,1) ? null:o.DueDate),
+                                 PayDate = (o.PayDate == new DateTime(1, 1, 1) ? null : o.PayDate),
                                  Id = o.Id
                              }
                          });
