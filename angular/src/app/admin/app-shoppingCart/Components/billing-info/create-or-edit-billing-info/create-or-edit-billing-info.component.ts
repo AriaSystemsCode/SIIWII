@@ -229,6 +229,7 @@ debugger
     this.appTransactionsForViewDto.startDate = moment.utc(startDate);
     this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
     this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() => { this.hideMainSpinner();

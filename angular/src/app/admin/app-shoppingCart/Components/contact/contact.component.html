@@ -44,7 +44,7 @@
                     [dropdown]="true"
                     [suggestions]="companeyNames"  
                     [ngModelOptions]="{standalone: true}"
-                    (keydown)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) ? '': preventTyping($event)"  
+ 
                      
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     (completeMethod)="handleCompanySearch($event)"
@@ -179,7 +179,7 @@
             [ngModelOptions]="{standalone: true}"
             *ngIf="activeTab != shoppingCartoccordionTabs.orderInfo"
             [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact"
-            (completeMethod)="handleContactSearch($event)"
+            (completeMethod)="handleContactSearch($event);"
             (onSelect)="onChangeContact($event)"
            
             [placeholder]=" defaultcontactNamePlaceholder"
