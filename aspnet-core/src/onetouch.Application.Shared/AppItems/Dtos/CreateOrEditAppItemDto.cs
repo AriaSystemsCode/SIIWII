@@ -85,6 +85,7 @@ namespace onetouch.AppItems.Dtos
         //I45[Start]
         public string ManufacturerCode { set; get; }
         public long? TenantId { set; get; }
+        public long? TenantOwner { set; get; }
         //I45[End]
     }
     //MMT
