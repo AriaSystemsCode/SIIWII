@@ -70671,6 +70671,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     nonLookupValues!: LookupLabelDto[] | undefined;
     manufacturerCode!: string | undefined;
     tenantId!: number | undefined;
+    tenantOwner!: number | undefined;
     id!: number;
 
     [key: string]: any;
@@ -70813,6 +70814,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             }
             this.manufacturerCode = _data["manufacturerCode"];
             this.tenantId = _data["tenantId"];
+            this.tenantOwner = _data["tenantOwner"];
             this.id = _data["id"];
         }
     }
@@ -70953,6 +70955,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         }
         data["manufacturerCode"] = this.manufacturerCode;
         data["tenantId"] = this.tenantId;
+        data["tenantOwner"] = this.tenantOwner;
         data["id"] = this.id;
         return data;
     }
@@ -71002,6 +71005,7 @@ export interface ICreateOrEditAppItemDto {
     nonLookupValues: LookupLabelDto[] | undefined;
     manufacturerCode: string | undefined;
     tenantId: number | undefined;
+    tenantOwner: number | undefined;
     id: number;
 
     [key: string]: any;

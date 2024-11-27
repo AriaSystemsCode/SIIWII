@@ -129,8 +129,11 @@ regenrate : boolean = false
   }
   ngOnInit(): void {
     this.initFilterForm()
-    // this.onGeneratOrderReport(true,undefined,true,true);
- this.getSellerVariations()
+    // this.onGeneratOrderReport(true,undefined,true,true); 
+    // if (      this.appTransactionsForViewDto?.sellerCompanySSIN){
+    //   this.getSellerVariations()
+
+    // }
  let value = localStorage.getItem("comNew"); 
 
  if (value) {
