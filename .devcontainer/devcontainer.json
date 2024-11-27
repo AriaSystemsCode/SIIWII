@@ -12,4 +12,16 @@
   ],
   "postCreateCommand": "npm install -g @angular/cli && npm install devextreme@22.2.3 && wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && chmod +x dotnet-install.sh && ./dotnet-install.sh"
 }
+{
+  "name": "C# (.NET) and MS SQL",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "extensions": [
+    "ms-dotnettools.csharp",
+    "ms-mssql.mssql"
+  ],
+  "forwardPorts": [1433],
+  "postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh"
+}
 
