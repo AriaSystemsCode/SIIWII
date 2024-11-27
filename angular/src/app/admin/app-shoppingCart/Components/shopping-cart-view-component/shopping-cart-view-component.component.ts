@@ -371,26 +371,46 @@ this.hideMainSpinner();
   }
 }
 
-  expandCollapseRecursive(node: TreeNode, isExpand: boolean) {
-    node.expanded = isExpand;
-    if (node.children) {
-      for (let i = 0; i < node.children.length; i++) {
-        this.expandCollapseRecursive(node.children[i], isExpand);
-      }
-    }
+   // Recursive function to extract only third-level nodes (variations)
+getThirdLevelVariations(node: any, level: number = 1): any[] {
+  let variations: any[] = [];
+
+  // If the current node is a third-level node and has no children, add it to the variations
+  if (level === 3 && node.children === null) {
+    variations.push(node);
   }
 
-  onShowVariations($event) {
-    const temp = cloneDeep(this.shoppingCartTreeNodes);
-    temp.forEach((node) => {
-      this.expandCollapseRecursive(node, this.showVariations);
+  // If the node has children, process them recursively
+  if (node.children && node.children.length > 0) {
+    node.children.forEach((child) => {
+      variations = variations.concat(this.getThirdLevelVariations(child, level + 1));
     });
-
-    if (this.oldShowVariations != this.showVariations)
-      this.getShoppingCartData(temp);
-
-    this.oldShowVariations = this.showVariations;
   }
+
+  return variations;
+}
+
+onShowVariations(event) {
+  // Check if shoppingCartTreeNodes is an array
+ 
+   if (event?.target?.checked) {
+    if (Array.isArray(this.shoppingCartTreeNodes)) {
+      // Get the third-level variations from the shoppingCartTreeNodes
+      const thirdLevelVariations = this.shoppingCartTreeNodes.map((rootNode) => {
+        return this.getThirdLevelVariations(rootNode);
+      }).flat(); // Flatten the array to get a single list of third-level variations
+  
+      console.log('Third-Level Variations:', thirdLevelVariations); 
+      this.shoppingCartTreeNodes = thirdLevelVariations
+  
+      // Now, you can use `thirdLevelVariations` to display the variations or process them
+    } 
+   } else {
+    this.getShoppingCartData();
+   }
+
+}
+
 
   onContinueShopping() {
     if (this.validateOrder && this.shoppingCartTreeNodes)
