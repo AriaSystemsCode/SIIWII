@@ -51,7 +51,7 @@
                 <div class="d-flex">
                 <div class="py-2 px-0 d-flex ">
                     <label class="pt-2 mr-1 font-weight-bold purpleColor"> {{l("Status")}} </label>
-                    <div class="status   pt-2">
+                    <div class="   pt-2" [ngClass]=" appTransactionsForViewDto?.entityStatusCode == 'CANCELLED' ? 'Canstatus' :'status'">
                         <p style="white-space: nowrap;"> {{appTransactionsForViewDto?.entityStatusCode}}</p>
                        
                     </div>
@@ -455,10 +455,10 @@
                                                             {{ rowData[col.field] }}</label>
 
                                                         <label *ngIf="col.field=='image'">
-                                                            <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                                            <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                                 class="imgIcon" />
 
-                                                                  <img *ngIf="rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  selectedImg"
+                                                                  <img *ngIf="rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  selectedImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
                                                                 class="imgIcon" />
                                                         </label>
 
@@ -1208,8 +1208,11 @@ height: 48px;"
                                                         {{ rowData[col.field] }}</label>
 
                                                     <label *ngIf="col.field=='image'">
-                                                        <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
-                                                            class="imgIcon" />
+                                                        <img *ngIf="!rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  rowData[col.field]" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                                class="imgIcon" />
+
+                                                                  <img *ngIf="rowNode.node.data.added" [src]="attachmentBaseUrl + '/' +  selectedImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                                                class="imgIcon" />
                                                     </label>
 
                                                     <label

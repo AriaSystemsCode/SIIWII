@@ -240,7 +240,16 @@ color: #9E9E9E !important;
     background: white !important;
     border-color: #7d5e7a !important;
 }
-
+.Canstatus {
+    border-radius: 4px;
+    background: #D0D0D0;
+    width: 90px;
+    height: 30px;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
 .status {
     border-radius: 4px;
     background: #D0D0D0;

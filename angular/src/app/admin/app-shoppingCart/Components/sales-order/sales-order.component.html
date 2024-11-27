@@ -500,6 +500,8 @@ Cancel
                                 [(ngModel)]="enteredDate"
                                 [showIcon]="true"
                                 (ngModelChange)="onChangeDate()"
+                                [showOtherMonths]="true"
+                                [selectOtherMonths]="true"
                             ></p-calendar>
                            
                         <img src="../../../../../assets/icons/calendar.png"    alt="" srcset="">
@@ -525,6 +527,8 @@ Cancel
                             [(ngModel)]="startDate"
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
 
@@ -549,6 +553,8 @@ Cancel
                             [showIcon]="true"
                             (ngModelChange)="onChangeDate()"
                             [minDate]="startDate"
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
 
@@ -576,6 +582,8 @@ Cancel
                             (onSelect)="changeCompleteDate(completeDate)"
                             (ngModelChange)="changeCompleteDate(completeDate)"
                             [minDate]="availableDate"
+                            [showOtherMonths]="true"
+                            [selectOtherMonths]="true"
                         ></p-calendar>
                         <img src="../../../../../assets/icons/calendar.png"   alt="" srcset="">
 

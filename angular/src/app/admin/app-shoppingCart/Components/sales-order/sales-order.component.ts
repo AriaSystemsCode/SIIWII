@@ -622,6 +622,16 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.appTransactionsForViewDto.startDate = moment(startDate);
         this.appTransactionsForViewDto.availableDate = moment(availableDate);
         this.appTransactionsForViewDto.completeDate = moment(completeDate);
+        //         let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+        // let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+        // let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+        // let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+    
+    
+        // this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+        // this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+        // this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+        // this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
         console.log(this.appTransactionsForViewDto.enteredDate,'this.appTransactionsForViewDto.enteredDate')
 
     }
@@ -635,7 +645,17 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
 
     createOrEditTransaction() {
         // this.showMainSpinner();
-        this.onChangeDate();
+        // this.onChangeDate();
+        let enteredDate = this.appTransactionsForViewDto.enteredDate.toLocaleString();
+        let startDate = this.appTransactionsForViewDto.startDate.toLocaleString();
+        let availableDate = this.appTransactionsForViewDto.availableDate.toLocaleString();
+        let completeDate = this.appTransactionsForViewDto.completeDate.toLocaleString();
+    
+    
+        this.appTransactionsForViewDto.enteredDate = moment.utc(enteredDate);
+        this.appTransactionsForViewDto.startDate = moment.utc(startDate);
+        this.appTransactionsForViewDto.availableDate = moment.utc(availableDate);
+        this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
 
          this.appTransactionsForViewDto.reference = this.reference;
          this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 

@@ -221,77 +221,87 @@ namespace onetouch.AppSubScriptionPlan
         public async Task<FileDto> GetAppTenantActivitiesLogToExcel(GetAllAppTenantActivitiesLogForExcelInput input)
         {
 
-            var filteredAppTenantActivitiesLog = _appTenantActivityLogRepository.GetAll()
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.Contains(input.Filter) || e.ActivityType.Contains(input.Filter) || e.AppSubscriptionPlanCode.Contains(input.Filter) || e.UserName.Contains(input.Filter) || e.FeatureCode.Contains(input.Filter) || e.FeatureName.Contains(input.Filter) || e.Reference.Contains(input.Filter) || e.InvoiceNumber.Contains(input.Filter) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
-                        .WhereIf(input.MinTenantIdFilter != null, e => e.TenantId >= input.MinTenantIdFilter)
-                        .WhereIf(input.MaxTenantIdFilter != null, e => e.TenantId <= input.MaxTenantIdFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName == input.TenantNameFilter)
-                        .WhereIf(input.MinUserIdFilter != null, e => e.UserId >= input.MinUserIdFilter)
-                        .WhereIf(input.MaxUserIdFilter != null, e => e.UserId <= input.MaxUserIdFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.ActivityTypeFilter), e => e.ActivityType == input.ActivityTypeFilter)
-                        .WhereIf(input.MinAppSubscriptionPlanHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId >= input.MinAppSubscriptionPlanHeaderIdFilter)
-                        .WhereIf(input.MaxAppSubscriptionPlanHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId <= input.MaxAppSubscriptionPlanHeaderIdFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanCodeFilter), e => e.AppSubscriptionPlanCode == input.AppSubscriptionPlanCodeFilter)
-                        .WhereIf(input.MinActivityDateTimeFilter != null, e => e.ActivityDateTime >= input.MinActivityDateTimeFilter)
-                        .WhereIf(input.MaxActivityDateTimeFilter != null, e => e.ActivityDateTime <= input.MaxActivityDateTimeFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.UserNameFilter), e => e.UserName == input.UserNameFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCodeFilter), e => e.FeatureCode == input.FeatureCodeFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureNameFilter), e => e.FeatureName == input.FeatureNameFilter)
-                        .WhereIf(input.BillableFilter.HasValue && input.BillableFilter > -1, e => (input.BillableFilter == 1 && e.Billable) || (input.BillableFilter == 0 && !e.Billable))
-                        .WhereIf(input.InvoicedFilter.HasValue && input.InvoicedFilter > -1, e => (input.InvoicedFilter == 1 && e.Invoiced) || (input.InvoicedFilter == 0 && !e.Invoiced))
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.ReferenceFilter), e => e.Reference == input.ReferenceFilter)
-                        .WhereIf(input.MinQtyFilter != null, e => e.Qty >= input.MinQtyFilter)
-                        .WhereIf(input.MaxQtyFilter != null, e => e.Qty <= input.MaxQtyFilter)
-                        .WhereIf(input.MinConsumedQtyFilter != null, e => e.ConsumedQty >= input.MinConsumedQtyFilter)
-                        .WhereIf(input.MaxConsumedQtyFilter != null, e => e.ConsumedQty <= input.MaxConsumedQtyFilter)
-                        .WhereIf(input.MinRemainingQtyFilter != null, e => e.RemainingQty >= input.MinRemainingQtyFilter)
-                        .WhereIf(input.MaxRemainingQtyFilter != null, e => e.RemainingQty <= input.MaxRemainingQtyFilter)
-                        .WhereIf(input.MinPriceFilter != null, e => e.Price >= input.MinPriceFilter)
-                        .WhereIf(input.MaxPriceFilter != null, e => e.Price <= input.MaxPriceFilter)
-                        .WhereIf(input.MinAmountFilter != null, e => e.Amount >= input.MinAmountFilter)
-                        .WhereIf(input.MaxAmountFilter != null, e => e.Amount <= input.MaxAmountFilter)
-                        .WhereIf(input.MinInvoiceDateFilter != null, e => e.InvoiceDate >= input.MinInvoiceDateFilter)
-                        .WhereIf(input.MaxInvoiceDateFilter != null, e => e.InvoiceDate <= input.MaxInvoiceDateFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.InvoiceNumberFilter), e => e.InvoiceNumber == input.InvoiceNumberFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.CreditOrUsageFilter), e => e.CreditOrUsage == input.CreditOrUsageFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.MonthFilter), e => e.Month == input.MonthFilter)
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.YearFilter), e => e.Year == input.YearFilter);
+            GetAllAppTenantActivitiesLogInput inp = ObjectMapper.Map<GetAllAppTenantActivitiesLogInput>(input);
+            inp.MaxResultCount = 0;
+            var appTenantActivityLogListDtos = await GetAll(inp);
+            inp.MaxResultCount = appTenantActivityLogListDtos.TotalCount;
+            appTenantActivityLogListDtos = await GetAll(inp);
+            // var x = res.TotalCount;
+            //var filteredAppTenantActivitiesLog = _appTenantActivityLogRepository.GetAll(); 
+            //  .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.Contains(input.Filter) ||
+            //   e.ActivityType.Contains(input.Filter) || (e.AppSubscriptionPlanCode != null && e.AppSubscriptionPlanCode.Contains(input.Filter)) || e.UserName.Contains(input.Filter)
+            //    || e.FeatureCode.Contains(input.Filter) || e.FeatureName.Contains(input.Filter) ||
+            //    (e.Reference != null && e.Reference.Contains(input.Filter)) || e.InvoiceNumber.Contains(input.Filter) ||
+            //    e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
+            //  .WhereIf(input.MinTenantIdFilter != null, e => e.TenantId >= input.MinTenantIdFilter)
+            // .WhereIf(input.MaxTenantIdFilter != null, e => e.TenantId <= input.MaxTenantIdFilter)
+            // .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName == input.TenantNameFilter)
+            // .WhereIf(input.MinUserIdFilter != null, e => e.UserId >= input.MinUserIdFilter)
+            // .WhereIf(input.MaxUserIdFilter != null, e => e.UserId <= input.MaxUserIdFilter)
+            // .WhereIf(!string.IsNullOrWhiteSpace(input.ActivityTypeFilter), e => e.ActivityType == input.ActivityTypeFilter)
+            //  .WhereIf(input.MinAppSubscriptionPlanHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId!=null? e.AppSubscriptionPlanHeaderId >= input.MinAppSubscriptionPlanHeaderIdFilter: false)
+            //  .WhereIf(input.MaxAppSubscriptionPlanHeaderIdFilter != null, e => e.AppSubscriptionPlanHeaderId != null ? e.AppSubscriptionPlanHeaderId <= input.MaxAppSubscriptionPlanHeaderIdFilter : false)
+            //   .WhereIf(!string.IsNullOrWhiteSpace(input.AppSubscriptionPlanCodeFilter), e => e.AppSubscriptionPlanCode == input.AppSubscriptionPlanCodeFilter)
+            //   .WhereIf(input.MinActivityDateTimeFilter != null, e => e.ActivityDateTime >= input.MinActivityDateTimeFilter)
+            //  .WhereIf(input.MaxActivityDateTimeFilter != null, e => e.ActivityDateTime <= input.MaxActivityDateTimeFilter)
+            //  .WhereIf(!string.IsNullOrWhiteSpace(input.UserNameFilter), e => e.UserName == input.UserNameFilter)
+            //  .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureCodeFilter), e => e.FeatureCode == input.FeatureCodeFilter)
+            // .WhereIf(!string.IsNullOrWhiteSpace(input.FeatureNameFilter), e => e.FeatureName == input.FeatureNameFilter)
+            //   .WhereIf(input.BillableFilter.HasValue && input.BillableFilter > -1, e => (input.BillableFilter == 1 && e.Billable) || (input.BillableFilter == 0 && !e.Billable))
+            //    .WhereIf(input.InvoicedFilter.HasValue && input.InvoicedFilter > -1, e => (input.InvoicedFilter == 1 && e.Invoiced) || (input.InvoicedFilter == 0 && !e.Invoiced))
+            //    .WhereIf(!string.IsNullOrWhiteSpace(input.ReferenceFilter), e => e.Reference == input.ReferenceFilter)
+            //   .WhereIf(input.MinQtyFilter != null, e => e.Qty >= input.MinQtyFilter)
+            //    .WhereIf(input.MaxQtyFilter != null, e => e.Qty <= input.MaxQtyFilter)
+            //   .WhereIf(input.MinConsumedQtyFilter != null, e => e.ConsumedQty >= input.MinConsumedQtyFilter)
+            //   .WhereIf(input.MaxConsumedQtyFilter != null, e => e.ConsumedQty <= input.MaxConsumedQtyFilter)
+            //   .WhereIf(input.MinRemainingQtyFilter != null, e => e.RemainingQty >= input.MinRemainingQtyFilter)
+            //   .WhereIf(input.MaxRemainingQtyFilter != null, e => e.RemainingQty <= input.MaxRemainingQtyFilter)
+            //   .WhereIf(input.MinPriceFilter != null, e => e.Price >= input.MinPriceFilter)
+            //   .WhereIf(input.MaxPriceFilter != null, e => e.Price <= input.MaxPriceFilter)
+            // .WhereIf(input.MinAmountFilter != null, e => e.Amount >= input.MinAmountFilter)
+            //     .WhereIf(input.MaxAmountFilter != null, e => e.Amount <= input.MaxAmountFilter)
+            //    .WhereIf(input.MinInvoiceDateFilter != null, e => e.InvoiceDate!=null? e.InvoiceDate >= input.MinInvoiceDateFilter: false)
+            //   .WhereIf(input.MaxInvoiceDateFilter != null, e => e.InvoiceDate != null ? e.InvoiceDate <= input.MaxInvoiceDateFilter: false)
+            //     .WhereIf(!string.IsNullOrWhiteSpace(input.InvoiceNumberFilter), e => e.InvoiceNumber == input.InvoiceNumberFilter)
+            //   .WhereIf(!string.IsNullOrWhiteSpace(input.CreditOrUsageFilter), e => e.CreditOrUsage == input.CreditOrUsageFilter)
+            //    .WhereIf(!string.IsNullOrWhiteSpace(input.MonthFilter), e => e.Month == input.MonthFilter)
+            //    .WhereIf(!string.IsNullOrWhiteSpace(input.YearFilter), e => e.Year == input.YearFilter);
 
-            var query = (from o in filteredAppTenantActivitiesLog
-                         select new GetAppTenantActivityLogForViewDto()
-                         {
-                             AppTenantActivityLog = new AppTenantActivityLogDto
-                             {
-                                 TenantId = long.Parse(o.TenantId.ToString()),
-                                 TenantName = o.TenantName,
-                                 UserId = o.UserId,
-                                 ActivityType = o.ActivityType,
-                                 AppSubscriptionPlanHeaderId = long.Parse(o.AppSubscriptionPlanHeaderId.ToString()),
-                                 AppSubscriptionPlanCode = o.AppSubscriptionPlanCode,
-                                 ActivityDateTime = o.ActivityDateTime,
-                                 UserName = o.UserName,
-                                 FeatureCode = o.FeatureCode,
-                                 FeatureName = o.FeatureName,
-                                 Billable = o.Billable,
-                                 Invoiced = o.Invoiced,
-                                 Reference = o.Reference,
-                                 Qty = o.Qty,
-                                 ConsumedQty = o.ConsumedQty,
-                                 RemainingQty = o.RemainingQty,
-                                 Price = o.Price,
-                                 Amount = o.Amount,
-                                 InvoiceDate = o.InvoiceDate,
-                                 InvoiceNumber = o.InvoiceNumber,
-                                 CreditOrUsage = o.CreditOrUsage,
-                                 Month = o.Month,
-                                 Year = o.Year,
-                                 Id = o.Id
-                             }
-                         });
+            /*  var query = (from o in filteredAppTenantActivitiesLog
+                           select new GetAppTenantActivityLogForViewDto()
+                           {
+                               AppTenantActivityLog = new AppTenantActivityLogDto
+                               {
+                                   TenantId = long.Parse(o.TenantId.ToString()),
+                                   TenantName = o.TenantName,
+                                   UserId = o.UserId,
+                                   ActivityType = o.ActivityType,
+                                   AppSubscriptionPlanHeaderId = long.Parse(o.AppSubscriptionPlanHeaderId.ToString()),
+                                   AppSubscriptionPlanCode = o.AppSubscriptionPlanCode,
+                                   ActivityDateTime = o.ActivityDateTime,
+                                   UserName = o.UserName,
+                                   FeatureCode = o.FeatureCode,
+                                   FeatureName = o.FeatureName,
+                                   Billable = o.Billable,
+                                   Invoiced = o.Invoiced,
+                                   Reference = o.Reference,
+                                   Qty = o.Qty,
+                                   ConsumedQty = o.ConsumedQty,
+                                   RemainingQty = o.RemainingQty,
+                                   Price = o.Price,
+                                   Amount = o.Amount,
+                                   InvoiceDate = o.InvoiceDate,
+                                   InvoiceNumber = o.InvoiceNumber,
+                                   CreditOrUsage = o.CreditOrUsage,
+                                   Month = o.Month,
+                                   Year = o.Year,
+                                   Id = o.Id
+                               }
+                           });
+            */
+            // var appTenantActivityLogListDtos = await query.ToListAsync();
 
-            var appTenantActivityLogListDtos = await query.ToListAsync();
-
-            return _appTenantActivitiesLogExcelExporter.ExportToFile(appTenantActivityLogListDtos);
+            return _appTenantActivitiesLogExcelExporter.ExportToFile(appTenantActivityLogListDtos.Items.ToList());
         }
         public async Task<bool> IsFeatureAvailable(string featureCode)
         {

@@ -75690,6 +75690,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
     appSubscriptionPlanHeaderId!: number;
     appFeatureId!: number | undefined;
     appSubscriptionPlanHeaderCode!: string | undefined;
+    appSubscriptionPlanHeaderName!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -75729,6 +75730,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
             this.appSubscriptionPlanHeaderId = _data["appSubscriptionPlanHeaderId"];
             this.appFeatureId = _data["appFeatureId"];
             this.appSubscriptionPlanHeaderCode = _data["appSubscriptionPlanHeaderCode"];
+            this.appSubscriptionPlanHeaderName = _data["appSubscriptionPlanHeaderName"];
             this.id = _data["id"];
         }
     }
@@ -75766,6 +75768,7 @@ export class AppSubscriptionPlanDetailDto implements IAppSubscriptionPlanDetailD
         data["appSubscriptionPlanHeaderId"] = this.appSubscriptionPlanHeaderId;
         data["appFeatureId"] = this.appFeatureId;
         data["appSubscriptionPlanHeaderCode"] = this.appSubscriptionPlanHeaderCode;
+        data["appSubscriptionPlanHeaderName"] = this.appSubscriptionPlanHeaderName;
         data["id"] = this.id;
         return data;
     }
@@ -75792,6 +75795,7 @@ export interface IAppSubscriptionPlanDetailDto {
     appSubscriptionPlanHeaderId: number;
     appFeatureId: number | undefined;
     appSubscriptionPlanHeaderCode: string | undefined;
+    appSubscriptionPlanHeaderName: string | undefined;
     id: number;
 
     [key: string]: any;
