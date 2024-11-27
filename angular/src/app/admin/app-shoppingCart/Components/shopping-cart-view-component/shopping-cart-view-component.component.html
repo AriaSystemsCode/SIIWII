@@ -442,7 +442,7 @@
                                             <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
                                                 <tr [ttRow]="rowNode">
                                               
-                                                    <td *ngFor="let col of cols; let i = index" class="p-treeTable"
+                                                    <td *ngFor="let col of cols; let i = index"   style="width: 7rem;" class="p-treeTable"
                                                         [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                         <p-treeTableToggler [rowNode]="rowNode"
                                                             *ngIf="i === 0"></p-treeTableToggler>
@@ -488,7 +488,7 @@
                                                         </label>
                                                     </td>
 
-                                                    <td class="p-treeTable text-center" *ngIf="canChange">
+                                                    <td class="p-treeTable text-center"  style="width: 5rem;"  *ngIf="canChange">
                                                         <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
                                                     class="imgIcon" (click)="onDelete(rowNode)" />
                                                 <img *ngIf="rowNode?.node?.data?.editQty" src=""
@@ -1195,7 +1195,7 @@ height: 48px;"
                                         <td>{{ rowData.amount }}</td>
                                         <td>{{ rowData.image }}</td> -->
                                                 <!-- style="white-space: nowrap;  overflow: hidden;" -->
-                                                <td *ngFor="let col of cols; let i = index" class="p-treeTable"
+                                                <td *ngFor="let col of cols; let i = index"  style="width: 7rem;"  class="p-treeTable"
                                                     [ngClass]="{'col-2':col.field=='manufacturerCode'}">
                                                     <p-treeTableToggler [rowNode]="rowNode"
                                                         *ngIf="i === 0"></p-treeTableToggler>
@@ -1241,7 +1241,7 @@ height: 48px;"
                                                     </label>
                                                 </td>
 
-                                                <td class="p-treeTable" *ngIf="canChange">
+                                                <td class="p-treeTable"  style="width: 5rem;"  *ngIf="canChange">
                                                     <!--    <img src="../../../../../assets/shoppingCart/Order-Details-Table-Delete_Btn.svg"
                                                 class="imgIcon" (click)="onDelete(rowNode)" />
                                             <img *ngIf="rowNode?.node?.data?.editQty" src=""
