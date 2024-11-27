@@ -201,7 +201,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
             filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter, false,
-            undefined,
+            undefined,undefined,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount
