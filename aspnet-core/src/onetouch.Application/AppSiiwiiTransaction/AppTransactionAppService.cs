@@ -70,6 +70,7 @@ using Abp.AspNetZeroCore.Timing;
 using System.Drawing.Imaging;
 using Abp.AutoMapper;
 using Namotion.Reflection;
+using onetouch.Globals;
 
 
 //using NUglify.Helpers;
@@ -122,6 +123,7 @@ namespace onetouch.AppSiiwiiTransaction
         //MMT45
         private readonly IRepository<AppContactAddress, long> _appContactAddressRepository;
         private readonly IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> _sycCurrencyExchangeRateRepository;
+        private readonly TimeZoneInfoAppService _timeZoneInfoAppService;
         //MMT45
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
@@ -144,7 +146,8 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppEntityExtraData, long> appEntityExtraData, IEmailSender emailSender, IAppEntitiesAppService appEntitiesAppService,
              IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<SycEntityObjectClassification, long> sycEntityObjectClassificationRepository, IAccountsAppService accountAppService,
              IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, ISycIdentifierDefinitionsAppService sycIdentifierDefinitionsAppService,
-             IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository
+             IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
+             TimeZoneInfoAppService timeZoneInfoAppService
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
@@ -189,6 +192,7 @@ namespace onetouch.AppSiiwiiTransaction
             //MMT37[End]
             _appContactAddressRepository = appContactAddressRepository;
             _sycCurrencyExchangeRateRepository = sycCurrencyExchangeRateRepository;
+            _timeZoneInfoAppService = timeZoneInfoAppService;
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -1120,7 +1124,7 @@ namespace onetouch.AppSiiwiiTransaction
                     if (appContSeller != null)
                     {
                         var shipFromContact = appTrans.AppTransactionContacts.FirstOrDefault(a => a.ContactRole == ContactRoleEnum.ShipFromContact.ToString());
-                        if (shipFromContact != null && (string.IsNullOrEmpty(shipFromContact.BranchName) || shipFromContact.ContactAddressId == null))
+                        if (shipFromContact != null && (string.IsNullOrEmpty(shipFromContact.BranchName) || string.IsNullOrEmpty(shipFromContact.ContactAddressCode)))
                         {
                             string shipperBranch = string.IsNullOrEmpty(shipFromContact.BranchName) ? appContSeller.BranchName : shipFromContact.BranchName;
                             string shipperBranchSSIN = string.IsNullOrEmpty(shipFromContact.BranchSSIN) ? appContSeller.BranchSSIN : shipFromContact.BranchSSIN;
@@ -1203,7 +1207,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         //AR Contact [Start]
                         var arContact = appTrans.AppTransactionContacts.FirstOrDefault(a => a.ContactRole == ContactRoleEnum.ARContact.ToString());
-                        if (arContact != null && (string.IsNullOrEmpty(arContact.BranchName) || arContact.ContactAddressId == null))
+                        if (arContact != null && (string.IsNullOrEmpty(arContact.BranchName) || string.IsNullOrEmpty(arContact.ContactAddressCode)))
                         {
                             string shipperBranch = string.IsNullOrEmpty(arContact.BranchName) ? appContSeller.BranchName : arContact.BranchName;
                             string shipperBranchSSIN = string.IsNullOrEmpty(arContact.BranchSSIN) ? appContSeller.BranchSSIN : arContact.BranchSSIN;
@@ -1293,7 +1297,7 @@ namespace onetouch.AppSiiwiiTransaction
                     {
 
                         var shiToContact = appTrans.AppTransactionContacts.FirstOrDefault(a => a.ContactRole == ContactRoleEnum.ShipToContact.ToString());
-                        if (shiToContact != null && (string.IsNullOrEmpty(shiToContact.BranchSSIN) || shiToContact.ContactAddressId == null))
+                        if (shiToContact != null && (string.IsNullOrEmpty(shiToContact.BranchSSIN) || string.IsNullOrEmpty(shiToContact.ContactAddressCode)))
                         {
                             string shipToBranch = string.IsNullOrEmpty(shiToContact.BranchName) ? appContBuyer.BranchName : shiToContact.BranchName;
                             string shipToBranchSSIN = string.IsNullOrEmpty(shiToContact.BranchSSIN) ? appContBuyer.BranchSSIN : shiToContact.BranchSSIN;
@@ -1377,7 +1381,7 @@ namespace onetouch.AppSiiwiiTransaction
                         }
                         //AP Contact[Start]
                         var apContact = appTrans.AppTransactionContacts.FirstOrDefault(a => a.ContactRole == ContactRoleEnum.APContact.ToString());
-                        if (apContact != null && (string.IsNullOrEmpty(apContact.BranchSSIN) || apContact.ContactAddressId == null))
+                        if (apContact != null && (string.IsNullOrEmpty(apContact.BranchSSIN) || string.IsNullOrEmpty(apContact.ContactAddressCode)))
                         {
                             string shipToBranch = string.IsNullOrEmpty(apContact.BranchName) ? appContBuyer.BranchName : apContact.BranchName;
                             string shipToBranchSSIN = string.IsNullOrEmpty(apContact.BranchSSIN) ? appContBuyer.BranchSSIN : apContact.BranchSSIN;
@@ -3377,6 +3381,7 @@ namespace onetouch.AppSiiwiiTransaction
                     entityMain.EntityCategories = null;
                     entityMain.TenantId = tenantId;
                     entityMain.Code = nextCode;
+                    entityMain.TenantOwner = marketplaceItem.TenantOwner;
                     //   var entityId = await _appEntity.InsertAsync(entityMain);
                     var itemObjectId = await _helper.SystemTables.GetObjectItemId();
                     entityMain.ObjectId = itemObjectId;
@@ -3465,6 +3470,7 @@ namespace onetouch.AppSiiwiiTransaction
                         entityVar.EntityClassifications = null;
                         entityVar.EntityCategories = null;
                         entityVar.TenantId = tenantId;
+                        entityVar.TenantOwner = variation.TenantOwner;
                         varItem.EntityFk = entityVar;
                         varItem.ParentEntityFk = item.EntityFk;
                         varItem.ItemPricesFkList = new List<AppItemPrices>();
@@ -4233,6 +4239,14 @@ namespace onetouch.AppSiiwiiTransaction
                         };
                         //iteration#45[Start]
                         viewTrans.LastModifiedDate = (transOrg.LastModificationTime == null ? transOrg.CreationTime : DateTime.Parse(transOrg.LastModificationTime.ToString()));
+                        //
+                        if (viewTrans.LastModifiedDate != null && input != null && !string.IsNullOrEmpty(input.TimeZoneValue))
+                        {
+                            var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                            var utcValue = _timeZoneInfoAppService.GetUTCDatetimeValue(viewTrans.LastModifiedDate, currentTimeZone);
+                            viewTrans.LastModifiedDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+                        }
+                        //
                         var marketplaceTransaction = await _appMarketplaceTransactionHeadersRepository.GetAll().AsNoTracking().Where(z => z.SSIN == transOrg.SSIN && z.TenantId == null).FirstOrDefaultAsync();
                         if (marketplaceTransaction == null)
                         {

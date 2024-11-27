@@ -764,7 +764,7 @@ namespace onetouch
             configuration.CreateMap<AppTransactionHeaders, GetAppTransactionsForViewDto>()
             .ForMember(a => a.AppTransactionContacts, b => b.MapFrom(ent => ent.AppTransactionContacts))
             .ForMember(a => a.AppTransactionsDetails, b => b.MapFrom(ent => ent.AppTransactionDetails))
-            .ForMember(a => a.EnteredDate, b => b.MapFrom(z => z.CreationTime))
+            .ForMember(a => a.EnteredDate, b => b.MapFrom(z => z.EnteredDate))
             .ForMember(a => a.CreatorUserId, b => b.MapFrom(z => z.CreatorUserId));
 
             configuration.CreateMap<GetOrderDetailsForViewDto, AppTransactionHeaders>()

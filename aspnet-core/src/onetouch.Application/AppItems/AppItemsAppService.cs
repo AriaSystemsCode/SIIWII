@@ -2160,7 +2160,8 @@ namespace onetouch.AppItems
             entity.SSIN = appItem.SSIN;
             entity.Code = input.Code;
             entity.ObjectId = itemObjectId;
-            entity.TenantId = AbpSession.TenantId;
+            if(entity.TenantId==null)
+                entity.TenantId = AbpSession.TenantId;
             entity.EntityObjectStatusId = itemStatusId;
             entity.Id = appItem.EntityId;
             try
@@ -2223,7 +2224,8 @@ namespace onetouch.AppItems
             //MMT30[Start]
             appItem.TimeStamp = timeStamp;
             entity.TimeStamp = timeStamp;
-            appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+            if(appItem.TenantOwner==null)
+                appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
             if (string.IsNullOrEmpty(appItem.SSIN))
             {
                 appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(entity));
@@ -2491,7 +2493,13 @@ namespace onetouch.AppItems
                                         if (string.IsNullOrEmpty(colorImage.AttributeValue) || !System.IO.File.Exists(path.Replace(@"\", @"\")))
                                         {
                                             if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
-                                                MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
+                                            {
+                                                if(input.TenantId==null)
+                                                  MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
+                                                else
+                                                    MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId,int.Parse(input.TenantId.ToString()));
+
+                                            }
                                             colorImage.AttributeValue = colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
                                         }
                                     }
@@ -2550,7 +2558,10 @@ namespace onetouch.AppItems
                                         if (colorImage != null)
                                         {
                                             colorImage.AttributeValue = Path.GetFileName(extraNonLookup.Image);
-                                            MoveFile(colorImage.AttributeValue, AbpSession.TenantId, AbpSession.TenantId);
+                                            if(input.TenantId==null)
+                                              MoveFile(colorImage.AttributeValue, AbpSession.TenantId, AbpSession.TenantId);
+                                            else
+                                                MoveFile(colorImage.AttributeValue, AbpSession.TenantId, int.Parse(input.TenantId.ToString()));
                                         }
 
                                     }
@@ -2571,7 +2582,8 @@ namespace onetouch.AppItems
 
                     appItemChild.TimeStamp = timeStamp;
                     childEntity.TimeStamp = timeStamp;
-                    appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
+                    if(appItemChild.TenantOwner==null)
+                        appItemChild.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                     if (string.IsNullOrEmpty(appItemChild.SSIN))
                     {
                         appItemChild.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(childEntity));
@@ -2818,7 +2830,8 @@ namespace onetouch.AppItems
                     var itemPriceObj = ObjectMapper.Map<AppItemPrices>(itemPrice);
                     itemPriceObj.AppItemCode = input.Code;
                     itemPriceObj.AppItemId = appItem.Id;
-                    itemPriceObj.TenantId = AbpSession.TenantId;
+                    if(itemPriceObj.TenantId==null)
+                        itemPriceObj.TenantId = AbpSession.TenantId;
                     // appItem.ItemPricesFkList.Add(itemPriceObj);
                     if (itemPriceObj.Id == 0)
                         await _appItemPricesRepository.InsertAsync(itemPriceObj);

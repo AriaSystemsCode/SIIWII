@@ -658,6 +658,7 @@ export class SalesOrderComponent extends AppComponentBase implements OnInit, OnC
         this.appTransactionsForViewDto.completeDate = moment.utc(completeDate);
 
          this.appTransactionsForViewDto.reference = this.reference;
+         this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
 

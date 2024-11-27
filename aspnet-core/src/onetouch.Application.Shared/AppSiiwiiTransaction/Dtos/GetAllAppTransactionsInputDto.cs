@@ -28,6 +28,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public long StatusId { get; set; }
         public bool fromExport { set; get; } = false;
         public bool hasParentItems { set; get; } = false;
+        public string? TimeZoneValue { get; set; }
     }
   
 }
