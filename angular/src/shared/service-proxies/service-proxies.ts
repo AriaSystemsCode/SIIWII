@@ -79457,7 +79457,6 @@ export interface IAppTransactionContactDto {
 export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewDto {
     lastRecord!: boolean;
     firstRecord!: boolean;
-    enteredDate!: moment.Moment;
     creatorUserId!: number;
     orderConfirmationFile!: string | undefined;
     sharedWithUsers!: ContactInformationOutputDto[] | undefined;
@@ -79514,6 +79513,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     lFromPlaceOrder!: boolean;
     currencyExchangeRate!: number;
     reference!: string | undefined;
+    enteredDate!: moment.Moment;
     createManualAccount!: boolean;
     createManualContact!: boolean;
     tenantId!: number | undefined;
@@ -79560,7 +79560,6 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             }
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
-            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
             this.orderConfirmationFile = _data["orderConfirmationFile"];
             if (Array.isArray(_data["sharedWithUsers"])) {
@@ -79629,6 +79628,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.lFromPlaceOrder = _data["lFromPlaceOrder"];
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
+            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.createManualAccount = _data["createManualAccount"];
             this.createManualContact = _data["createManualContact"];
             this.tenantId = _data["tenantId"];
@@ -79701,7 +79701,6 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         }
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
-        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
         data["orderConfirmationFile"] = this.orderConfirmationFile;
         if (Array.isArray(this.sharedWithUsers)) {
@@ -79770,6 +79769,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["lFromPlaceOrder"] = this.lFromPlaceOrder;
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
+        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["createManualAccount"] = this.createManualAccount;
         data["createManualContact"] = this.createManualContact;
         data["tenantId"] = this.tenantId;
@@ -79831,7 +79831,6 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
 export interface IGetAppTransactionsForViewDto {
     lastRecord: boolean;
     firstRecord: boolean;
-    enteredDate: moment.Moment;
     creatorUserId: number;
     orderConfirmationFile: string | undefined;
     sharedWithUsers: ContactInformationOutputDto[] | undefined;
@@ -79888,6 +79887,7 @@ export interface IGetAppTransactionsForViewDto {
     lFromPlaceOrder: boolean;
     currencyExchangeRate: number;
     reference: string | undefined;
+    enteredDate: moment.Moment;
     createManualAccount: boolean;
     createManualContact: boolean;
     tenantId: number | undefined;
@@ -80506,7 +80506,6 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     netDueDays!: number;
     lastRecord!: boolean;
     firstRecord!: boolean;
-    enteredDate!: moment.Moment;
     creatorUserId!: number;
     orderConfirmationFile!: string | undefined;
     sharedWithUsers!: ContactInformationOutputDto[] | undefined;
@@ -80563,6 +80562,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     lFromPlaceOrder!: boolean;
     currencyExchangeRate!: number;
     reference!: string | undefined;
+    enteredDate!: moment.Moment;
     createManualAccount!: boolean;
     createManualContact!: boolean;
     tenantId!: number | undefined;
@@ -80618,7 +80618,6 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.netDueDays = _data["netDueDays"];
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
-            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.creatorUserId = _data["creatorUserId"];
             this.orderConfirmationFile = _data["orderConfirmationFile"];
             if (Array.isArray(_data["sharedWithUsers"])) {
@@ -80687,6 +80686,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.lFromPlaceOrder = _data["lFromPlaceOrder"];
             this.currencyExchangeRate = _data["currencyExchangeRate"];
             this.reference = _data["reference"];
+            this.enteredDate = _data["enteredDate"] ? moment(_data["enteredDate"].toString()) : <any>undefined;
             this.createManualAccount = _data["createManualAccount"];
             this.createManualContact = _data["createManualContact"];
             this.tenantId = _data["tenantId"];
@@ -80768,7 +80768,6 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["netDueDays"] = this.netDueDays;
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
-        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["creatorUserId"] = this.creatorUserId;
         data["orderConfirmationFile"] = this.orderConfirmationFile;
         if (Array.isArray(this.sharedWithUsers)) {
@@ -80837,6 +80836,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["lFromPlaceOrder"] = this.lFromPlaceOrder;
         data["currencyExchangeRate"] = this.currencyExchangeRate;
         data["reference"] = this.reference;
+        data["enteredDate"] = this.enteredDate ? this.enteredDate.toISOString() : <any>undefined;
         data["createManualAccount"] = this.createManualAccount;
         data["createManualContact"] = this.createManualContact;
         data["tenantId"] = this.tenantId;
@@ -80907,7 +80907,6 @@ export interface IGetAllAppTransactionsForViewDto {
     netDueDays: number;
     lastRecord: boolean;
     firstRecord: boolean;
-    enteredDate: moment.Moment;
     creatorUserId: number;
     orderConfirmationFile: string | undefined;
     sharedWithUsers: ContactInformationOutputDto[] | undefined;
@@ -80964,6 +80963,7 @@ export interface IGetAllAppTransactionsForViewDto {
     lFromPlaceOrder: boolean;
     currencyExchangeRate: number;
     reference: string | undefined;
+    enteredDate: moment.Moment;
     createManualAccount: boolean;
     createManualContact: boolean;
     tenantId: number | undefined;

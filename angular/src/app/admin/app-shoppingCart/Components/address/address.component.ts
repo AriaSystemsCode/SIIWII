@@ -447,6 +447,8 @@ savetempAddress(addressForm: NgForm) {
         }
     } else {
         this.savedAddressesList.push({ ...this.address }); // Add new address to the list
+        this.selectAddress(this.address.id)
+        // this.selectedAddress = this.savedAddressesList[0]
     }
 
     this.saving = false;

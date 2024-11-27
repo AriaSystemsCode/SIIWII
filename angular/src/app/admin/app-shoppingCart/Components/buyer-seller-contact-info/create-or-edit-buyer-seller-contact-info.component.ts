@@ -139,6 +139,7 @@ export class CreateOrEditBuyerSellerContactInfoComponent extends AppComponentBas
   createOrEditTransaction() {
     this.synchronizeContactDetails();
     this.showMainSpinner()
+    this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
     this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
       .pipe(finalize(() =>  {this.hideMainSpinner();
         // this.generatOrderReport.emit(true); 

@@ -876,6 +876,7 @@ this.hideMainSpinner();
     //   if (result.isConfirmed) {
         this.showMainSpinner();
         this.appTransactionsForViewDto.lFromPlaceOrder = true;
+        this.appTransactionsForViewDto.timeZoneValue = Intl.DateTimeFormat().resolvedOptions().timeZone; 
         this._AppTransactionServiceProxy.createOrEditTransaction(this.appTransactionsForViewDto)
           .pipe(finalize(() => {
 
@@ -1234,11 +1235,14 @@ addNewLine() {
   // this.getSellerVariations()
   this.addLine = false
 }
-handleVarSearch(event: any, dropdown: any) {
-  this.currentFilter = event.filter; // Store the current filter
-  this.allVariations = [];
-  this.displayedVariations = [];
-  this.loadMore(new MouseEvent('click'), dropdown, this.currentFilter);
+handleVarSearch(event: any, dropdown?: any) {
+  const filterText = event.filter?.trim();
+  this.currentFilter = filterText; // Store the current filter text
+  this.allVariations = []; // Reset all variations for new filter
+  this.displayedVariations = []; // Clear displayed variations
+
+  // Load initial set of items matching the filter
+  this.loadMore(new MouseEvent('click'), dropdown, filterText);
 }
 
 getSellerVariations(
@@ -1249,7 +1253,7 @@ getSellerVariations(
   this._AppTransactionServiceProxy
     .getAllSellerVariations(
       this.appTransactionsForViewDto?.sellerCompanySSIN,
-      filter, // Pass the filter to the API
+      filter, // Pass filter to the backend
       this.appTransactionsForViewDto?.buyerContactSSIN,
       this.appTransactionsForViewDto?.currencyCode,
       undefined,
@@ -1261,36 +1265,37 @@ getSellerVariations(
       this.totalVariationsCount = res.totalCount;
 
       if (filter && skipCount === 0) {
-        // If a new filter is applied, replace `allVariations` and `displayedVariations`
+        // Replace variations on new filter
         this.allVariations = res.items;
       } else {
-        // Otherwise, append the new items
-        this.allVariations = this.allVariations.concat(res.items);
+        // Append new items otherwise
+        this.allVariations = [...this.allVariations, ...res.items];
       }
 
-      // Update the displayed variations
+      // Update displayed variations
       this.displayedVariations = [...this.allVariations];
     });
 }
 
 
 loadMore(event: MouseEvent, dropdown: any, filter: string = '') {
-  // Prevent the dropdown from closing
+  // Prevent dropdown from closing
   event.stopPropagation();
 
-  // Calculate the `skipCount` based on whether a filter is applied
-  const nextSkipCount = filter ? this.displayedVariations.length : this.allVariations.length;
+  // Determine the next `skipCount` based on the filter and loaded variations
+  const nextSkipCount = this.allVariations.length;
 
-  // Check if more variations can be loaded
+  // Check if there are more items to load or if filtering is applied
   if (this.displayedVariations.length < this.totalVariationsCount || filter) {
     this.getSellerVariations(nextSkipCount, this.incrementCount, filter);
 
-    // Ensure the dropdown remains open after loading more items
+    // Keep the dropdown open after fetching more items
     setTimeout(() => {
       dropdown.overlayVisible = true;
     }, 0);
   }
 }
+
 
 onVariationSelect(event: any) {
   // Reset quantity and price when a new variation is selected  

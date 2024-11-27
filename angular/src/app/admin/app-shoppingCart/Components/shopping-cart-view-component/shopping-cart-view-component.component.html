@@ -556,6 +556,7 @@
                                                 optionLabel="appItem.manufacturerCode"
                                                 placeholder="Please Select"
                                                 [(ngModel)]="selectedVariation"
+                                             (onFilter)="handleVarSearch($event, dropdown)"
                                                 formControlName="selectedVariation"
                                                 (onChange)="onVariationSelect($event)"
                                                 #dropdown
@@ -1300,7 +1301,7 @@ height: 48px;"
                                           <p-dropdown
                                           [options]="displayedVariations"
                                           [filter]="true"
-                                          optionLabel="appItem.code"
+                                          optionLabel="appItem.manufacturerCode"
                                           placeholder="Please Select"
                                           [(ngModel)]="selectedVariation"
                                           (onChange)="onVariationSelect($event)"
@@ -1308,7 +1309,7 @@ height: 48px;"
                                           #dropdown
                                         >
                                           <ng-template let-option pTemplate="item">
-                                            <div>{{ option.appItem.code }} - {{ option.appItem.name }}</div>
+                                            <div>{{ option.appItem.manufacturerCode }} - {{ option.appItem.name }}</div>
                                           </ng-template>
                                           <ng-template pTemplate="footer">
                                             <div
