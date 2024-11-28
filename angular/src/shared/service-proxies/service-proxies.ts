@@ -77093,8 +77093,8 @@ export class AppTenantInvoiceDto implements IAppTenantInvoiceDto {
     invoiceNumber!: string | undefined;
     invoiceDate!: moment.Moment;
     amount!: number;
-    dueDate!: moment.Moment;
-    payDate!: moment.Moment;
+    dueDate!: moment.Moment | undefined;
+    payDate!: moment.Moment | undefined;
     attachment!: string | undefined;
     displayName!: string | undefined;
     tenantName!: string | undefined;
@@ -77159,8 +77159,8 @@ export interface IAppTenantInvoiceDto {
     invoiceNumber: string | undefined;
     invoiceDate: moment.Moment;
     amount: number;
-    dueDate: moment.Moment;
-    payDate: moment.Moment;
+    dueDate: moment.Moment | undefined;
+    payDate: moment.Moment | undefined;
     attachment: string | undefined;
     displayName: string | undefined;
     tenantName: string | undefined;
@@ -77282,8 +77282,8 @@ export class CreateOrEditAppTenantInvoiceDto implements ICreateOrEditAppTenantIn
     invoiceNumber!: string;
     invoiceDate!: moment.Moment;
     amount!: number;
-    dueDate!: moment.Moment;
-    payDate!: moment.Moment;
+    dueDate!: moment.Moment | undefined;
+    payDate!: moment.Moment | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     id!: number | undefined;
 
@@ -77353,8 +77353,8 @@ export interface ICreateOrEditAppTenantInvoiceDto {
     invoiceNumber: string;
     invoiceDate: moment.Moment;
     amount: number;
-    dueDate: moment.Moment;
-    payDate: moment.Moment;
+    dueDate: moment.Moment | undefined;
+    payDate: moment.Moment | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     id: number | undefined;
 
@@ -79480,6 +79480,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     entityClassificationsNames!: PagedResultDtoOfString;
     showSync!: boolean;
     lastModifiedDate!: moment.Moment;
+    shipViaName!: string | undefined;
+    paymentTermsName!: string | undefined;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -79587,6 +79589,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.entityClassificationsNames = _data["entityClassificationsNames"] ? PagedResultDtoOfString.fromJS(_data["entityClassificationsNames"]) : <any>undefined;
             this.showSync = _data["showSync"];
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsName = _data["paymentTermsName"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -79728,6 +79732,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["entityClassificationsNames"] = this.entityClassificationsNames ? this.entityClassificationsNames.toJSON() : <any>undefined;
         data["showSync"] = this.showSync;
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsName"] = this.paymentTermsName;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -79854,6 +79860,8 @@ export interface IGetAppTransactionsForViewDto {
     entityClassificationsNames: PagedResultDtoOfString;
     showSync: boolean;
     lastModifiedDate: moment.Moment;
+    shipViaName: string | undefined;
+    paymentTermsName: string | undefined;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
@@ -80529,6 +80537,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     entityClassificationsNames!: PagedResultDtoOfString;
     showSync!: boolean;
     lastModifiedDate!: moment.Moment;
+    shipViaName!: string | undefined;
+    paymentTermsName!: string | undefined;
     enteredByUserRole!: string | undefined;
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
@@ -80645,6 +80655,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.entityClassificationsNames = _data["entityClassificationsNames"] ? PagedResultDtoOfString.fromJS(_data["entityClassificationsNames"]) : <any>undefined;
             this.showSync = _data["showSync"];
             this.lastModifiedDate = _data["lastModifiedDate"] ? moment(_data["lastModifiedDate"].toString()) : <any>undefined;
+            this.shipViaName = _data["shipViaName"];
+            this.paymentTermsName = _data["paymentTermsName"];
             this.enteredByUserRole = _data["enteredByUserRole"];
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
@@ -80795,6 +80807,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["entityClassificationsNames"] = this.entityClassificationsNames ? this.entityClassificationsNames.toJSON() : <any>undefined;
         data["showSync"] = this.showSync;
         data["lastModifiedDate"] = this.lastModifiedDate ? this.lastModifiedDate.toISOString() : <any>undefined;
+        data["shipViaName"] = this.shipViaName;
+        data["paymentTermsName"] = this.paymentTermsName;
         data["enteredByUserRole"] = this.enteredByUserRole;
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
@@ -80930,6 +80944,8 @@ export interface IGetAllAppTransactionsForViewDto {
     entityClassificationsNames: PagedResultDtoOfString;
     showSync: boolean;
     lastModifiedDate: moment.Moment;
+    shipViaName: string | undefined;
+    paymentTermsName: string | undefined;
     enteredByUserRole: string | undefined;
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
