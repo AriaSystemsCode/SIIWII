@@ -48,6 +48,7 @@ export class CreateOrEditAppTenantInvoiceComponent extends AppComponentBase impl
 
     ngOnInit(): void {
         this.show(this._activatedRoute.snapshot.queryParams['id']);
+        this.initUploaders();
         this._appTenantSubscriptionPlansServiceProxy.getTenantsList()
         .subscribe((tenantLst: any) => {
             this.TenantList = tenantLst;
@@ -88,7 +89,11 @@ export class CreateOrEditAppTenantInvoiceComponent extends AppComponentBase impl
     
     save(): void {
         this.saving = true;
-        
+        if (this.uploader.isUploading) {
+            return this.notify.error(
+                this.l("PleaseWait,SomeAttachmentsAreStillUploading")
+            );
+        }
         this._appTenantInvoicesServiceProxy.createOrEdit(this.appTenantInvoice)
             .pipe(finalize(() => {
                 this.saving = false;

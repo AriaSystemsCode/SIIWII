@@ -501,7 +501,7 @@
                             {{l('NoData')}}
                         </div>
                         <div class="primeng-paging-container">
-                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                            <!-- <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
                                          #paginator
                                          (onPageChange)="getAppTenantActivitiesLog($event)"
                                          [totalRecords]="primengTableHelper.totalRecordsCount"
@@ -509,7 +509,16 @@
                                          [showCurrentPageReport]="true"
                                          [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
                             >
+                            </p-paginator> -->
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getAppTenantActivitiesLog($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
                             </p-paginator>
+                            <span class="total-records-count">
+                                {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
+                            </span>
                         </div>
                     </div>
                     <!--<Primeng-Datatable-End>-->
