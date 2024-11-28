@@ -42,6 +42,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         //Iteration45[Start]
         public virtual bool ShowSync { set; get; } = false;
         public virtual DateTime LastModifiedDate { set; get; }
+        public virtual string ShipViaName { set; get; }
+        public virtual string PaymentTermsName { get; set; }
         //Iteration45[End]
     }
 
