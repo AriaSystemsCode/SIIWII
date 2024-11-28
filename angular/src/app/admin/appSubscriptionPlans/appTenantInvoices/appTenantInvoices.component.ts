@@ -19,7 +19,12 @@ import * as moment from 'moment';
 @Component({
     templateUrl: './appTenantInvoices.component.html',
     encapsulation: ViewEncapsulation.None,
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()],
+    styles: [`
+        .p-icon-wrapper {
+            position: initial !important;
+        }
+    `]
 })
 export class AppTenantInvoicesComponent extends AppComponentBase {
     
