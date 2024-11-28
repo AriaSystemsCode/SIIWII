@@ -585,10 +585,18 @@ namespace onetouch.AppSiiwiiTransaction
 
                 var appTrans = ObjectMapper.Map<AppTransactionHeaders>(input);
                 //Iteration#37 -MMT [Start]
-                if (appTrans.ShipViaFk != null)
-                    appTrans.ShipViaName = appTrans.ShipViaFk.Name;
-                if (appTrans.PaymentTermsFk != null)
-                    appTrans.PaymentTermsName = appTrans.PaymentTermsFk.Name;
+                if (appTrans.ShipViaId != null)
+                {
+                    var ent= await _appEntity.GetAll().Where(z => z.Id == appTrans.ShipViaId).FirstOrDefaultAsync();
+                    if (ent != null)
+                        appTrans.ShipViaName = ent.Name;
+                }
+                if (appTrans.PaymentTermsId!= null)
+                {
+                    var ent = await _appEntity.GetAll().Where(z => z.Id == appTrans.PaymentTermsId).FirstOrDefaultAsync();
+                    if (ent != null)
+                        appTrans.PaymentTermsName = ent.Name;
+                }
                 //Iteration#37 -MMT [End]
                 if (input.lFromPlaceOrder)
                 {
@@ -1537,6 +1545,18 @@ namespace onetouch.AppSiiwiiTransaction
                 //Iteration45[Start]         
                 appTrans.TimeStamp = DateTime.Now;
                 //Iteration45[End]
+                if (appTrans.ShipViaId != null)
+                {
+                    var ent = await _appEntity.GetAll().Where(z => z.Id == appTrans.ShipViaId).FirstOrDefaultAsync();
+                    if (ent != null)
+                        appTrans.ShipViaName = ent.Name;
+                }
+                if (appTrans.PaymentTermsId != null)
+                {
+                    var ent = await _appEntity.GetAll().Where(z => z.Id == appTrans.PaymentTermsId).FirstOrDefaultAsync();
+                    if (ent != null)
+                        appTrans.PaymentTermsName = ent.Name;
+                }
 
                 appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
