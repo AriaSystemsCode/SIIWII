@@ -155,8 +155,9 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityObjectTypeCode == input.AccountType)
                             .WhereIf(input.AccountTypes != null && input.AccountTypes.Count(x => x > 0) > 0, x =>
                            input.AccountTypes.Length > 0 && input.AccountTypes.Contains(x.EntityObjectTypeId))
-                           .Where(e => (e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ||
-                           (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
+                           .Where(e => (e.IsProfileData && e.ParentId == null) && ((e.IsHidden != true) ));
+                           
+                           //||  (_appContactRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && x.SSIN == e.SSIN).Count() > 0)));
 
                     var pagedAndFilteredAccounts = filteredAccounts
                     .OrderBy(input.Sorting ?? "name asc")
