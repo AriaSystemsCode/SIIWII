@@ -112,28 +112,70 @@
                               <ng-template pTemplate="header">
                                   <tr>
                                       
-                                      <th style="width: 150px" pSortableColumn="invoiceNumber">
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="invoiceNumber">
                                           {{l('InvoiceNumber')}}
                                           <p-sortIcon field="appTenantInvoice.invoiceNumber"></p-sortIcon>
                                       </th>
-                                      <th style="width: 150px" pSortableColumn="amount">
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="amount">
                                         {{l('Amount')}}
                                         <p-sortIcon field="appTenantInvoice.amount"></p-sortIcon>
                                       </th>
-                                      <th style="width: 150px" pSortableColumn="invoiceDate">
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="invoiceDate">
                                           {{l('InvoiceDate')}}
                                           <p-sortIcon field="appTenantInvoice.invoiceDate"></p-sortIcon>
                                       </th>
                                       
-                                      <th style="width: 150px" pSortableColumn="dueDate">
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="dueDate">
                                           {{l('DueDate')}}
                                           <p-sortIcon field="appTenantInvoice.dueDate"></p-sortIcon>
                                       </th>
-                                      <th style="width: 150px" pSortableColumn="payDate">
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;" pSortableColumn="payDate">
                                           {{l('PayDate')}}
                                           <p-sortIcon field="appTenantInvoice.payDate"></p-sortIcon>
                                       </th>
-                                      <th style="width: 130px">{{l('Actions')}}</th> 
+                                      <th style="width: 150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 600;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;
+                                      color:#1B101B;">{{l('Actions')}}</th> 
                                   </tr>
                               </ng-template>                           
                               <ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
@@ -168,15 +210,33 @@
                                               </ul>
                                           </div>
                                       </td> -->
-                                      <td style="width:150px">
+                                      <td style="width:150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 500;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;color:#595959;">
                                               <!-- <span class="ui-column-title"> {{l('InvoiceNumber')}}</span> -->
                                               {{record.appTenantInvoice.invoiceNumber}}
                                           </td>
-                                          <td style="width:150px">
+                                          <td style="width:150px;font-family: Poppins;
+                                          font-size: 12px;
+                                          font-weight: 500;
+                                          line-height: 18px;
+                                          text-align: left;
+                                          text-underline-position: from-font;
+                                          text-decoration-skip-ink: none;color:#595959;">
                                             <!-- <span class="ui-column-title"> {{l('Amount')}}</span> -->
                                             {{record.appTenantInvoice.amount}}
                                         </td>
-                                      <td style="width:150px">
+                                      <td style="width:150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 500;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;color:#595959;">
                                           <!-- <span class="ui-column-title"> {{l('InvoiceDate')}}</span> -->
                                           <span *ngIf="record.appTenantInvoice.invoiceDate">
                                               {{record.appTenantInvoice.invoiceDate |  momentFormat:'L' }}
@@ -184,14 +244,26 @@
                                           <span *ngIf="!record.appTenantInvoice.invoiceDate">-</span>
                                       </td>
                                       
-                                      <td style="width:150px">
+                                      <td style="width:150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 500;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;color:#595959;">
                                           <!-- <span class="ui-column-title"> {{l('DueDate')}}</span> -->
                                           <span *ngIf="record.appTenantInvoice.dueDate">
                                               {{record.appTenantInvoice.dueDate |  momentFormat:'L' }}
                                           </span>
                                           <span *ngIf="!record.appTenantInvoice.dueDate">-</span>
                                       </td>
-                                      <td style="width:150px">
+                                      <td style="width:150px;font-family: Poppins;
+                                      font-size: 12px;
+                                      font-weight: 500;
+                                      line-height: 18px;
+                                      text-align: left;
+                                      text-underline-position: from-font;
+                                      text-decoration-skip-ink: none;color:#595959;">
                                           <!-- <span class="ui-column-title"> {{l('PayDate')}}</span> -->
                                           <span *ngIf="record.appTenantInvoice.payDate">
                                               {{record.appTenantInvoice.payDate |  momentFormat:'L' }}
@@ -199,7 +271,13 @@
                                           <span *ngIf="!record.appTenantInvoice.payDate">-</span>
                                       </td>
  
-                                        <td style="width: 130px">
+                                        <td style="width:150px;font-family: Poppins;
+                                        font-size: 12px;
+                                        font-weight: 500;
+                                        line-height: 18px;
+                                        text-align: left;
+                                        text-underline-position: from-font;
+                                        text-decoration-skip-ink: none;color:#595959;">
                                          <div  container="body">
                                              
                                               <button class="btn download-btn" 
@@ -218,7 +296,7 @@
                               {{l('NoData')}}
                           </div>
                           <div class="primeng-paging-container">
-                              <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                              <!-- <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
                                            #paginator
                                            (onPageChange)="getAppTenantInvoices($event)"
                                            [totalRecords]="primengTableHelper.totalRecordsCount"
@@ -226,7 +304,16 @@
                                            [showCurrentPageReport]="true"
                                            [currentPageReportTemplate]="'TotalRecordsCount' | localize:primengTableHelper.totalRecordsCount"    
                               >
-                              </p-paginator>
+                              </p-paginator> -->
+                              <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                              #paginator
+                              (onPageChange)="getAppTenantInvoices($event)"
+                              [totalRecords]="primengTableHelper.totalRecordsCount"
+                              [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
+                 </p-paginator>
+                 <span class="total-records-count">
+                     {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
+                 </span>
                           </div>
                       </div>
                       <!--<Primeng-Datatable-End>-->

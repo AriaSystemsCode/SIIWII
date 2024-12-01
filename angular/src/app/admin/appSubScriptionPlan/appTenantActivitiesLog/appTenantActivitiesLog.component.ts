@@ -22,7 +22,12 @@ import { AppSessionService } from '@shared/common/session/app-session.service';
     selector:'app-tenantactivitieslog',
     templateUrl: './appTenantActivitiesLog.component.html',
     encapsulation: ViewEncapsulation.None,
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()], 
+    styles: [`
+        .p-icon-wrapper {
+            position: initial !important;
+        }
+    `]
 })
 export class AppTenantActivitiesLogComponent extends AppComponentBase {
     

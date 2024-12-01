@@ -48,7 +48,7 @@
           <td class="plan-header">-</td>
         </tr>
         <tr>
-          <td class="head-c plan-header"  [style.fontSize]="getFontSize()">Description</td>
+          <td class="head-c plan-header"  >Description</td>
           
           <td *ngFor="let plan of plans"  [ngClass]="plan?.appSubscriptionPlanHeader?.appTenantSubscriptionPlanId != null ? 'seletd-plan' :'plan-header'" class="text-col">{{ plan?.appSubscriptionPlanHeader?.description }}</td>
           <td class="plan-header">
