@@ -128,7 +128,13 @@ fileChange(
 ) {
     this.formTouched = true;
     if (event.target.value) {
-        let { onCropDone, data } = this.openImageCropper(
+        this.tempUploadImage(
+            event,
+            attachmentCategory,
+            event.target.data,
+            index
+        );
+       /*  let { onCropDone, data } = this.openImageCropper(
             event,
             aspectRatio,
             cropWithoutOptions
@@ -141,11 +147,11 @@ fileChange(
                     data,
                     index
                 );
-            }
+            } */
             // reset input
             event.target.value = null;
-            subs.unsubscribe();
-        });
+           // subs.unsubscribe();
+        ///});
     }
 }
 
@@ -153,12 +159,12 @@ imageCategory: GetSycAttachmentCategoryForViewDto =
 new GetSycAttachmentCategoryForViewDto({
     imgURL: null,
     sycAttachmentCategory: new SycAttachmentCategoryDto({
-        code: "IMAGE",
-        name: "Image",
+        code: "FILE",
+        name: "file",
         attributes: null,
         parentCode: null,
         parentId: null,
-        id: 3,
+        id: 6,
     } as any),
     sycAttachmentCategoryName: "",
 });
@@ -171,8 +177,8 @@ tempUploadImage(
     index?: number
 ) {
     const file = (event.target as HTMLInputElement).files[0];
-    attachmentCategory.imgURL =
-        croppedImageContent.croppedImageAsBase64 as string;
+    // attachmentCategory.imgURL =
+        // croppedImageContent.croppedImageAsBase64 as string;
 
     if (
         this.appTenantInvoice.entityAttachments == null ||
@@ -191,12 +197,12 @@ tempUploadImage(
     const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
     this.addTempAttachments([tempFile]);
     // save image as a base64
-    this.attachmentsSrcs[index] =
-        croppedImageContent.croppedImageAsBase64 as string;
+    //this.attachmentsSrcs[index] =
+      //  croppedImageContent.croppedImageAsBase64 as string;
     this.appTenantInvoice.entityAttachments[index] = att;
     
 
-    this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+    this.uploadFileAttachment(file, att);
 
     // if all is filled with images add new input
     if (
