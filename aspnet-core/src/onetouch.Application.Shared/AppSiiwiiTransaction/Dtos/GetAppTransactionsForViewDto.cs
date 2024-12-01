@@ -236,4 +236,11 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public long TransactionId { get; set; }
     }
+    //MMT-OC
+    public class TenantContactRole
+    {
+        public string ContactRole { set; get; }  
+        public string ContactName { set; get; }
+    }
+    //MMT-OC
 }
