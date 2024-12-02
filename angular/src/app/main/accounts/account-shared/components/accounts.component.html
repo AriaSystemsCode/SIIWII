@@ -1,13 +1,13 @@
 ﻿<form [formGroup]="filterForm">
     <div [@routerTransition] style="margin-top: -90px" class="wrapper">
-        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor mt-md-4 marginMob">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
                         <div class="row">
-                            <div class="col-12 list-toolbar pb-4">
+                            <div class="col-12 list-toolbar pb-md-4">
                                 <div class="row mb-3 justify-content-between mt-3">
-                                    <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
+                                    <div class="col-6 col-md-3 col-sm-3 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                             *ngIf="showMainFiltersOptions">
                                             <button class="dropdown-toggle btn btn-sm  p-0"
@@ -54,7 +54,7 @@
                                             {{ mainFilterCtrl?.value?.label | localize }}
                                         </div>
                                     </div>
-                                    <div class="mb-4 mb-md-0 list-toolbar-search">
+                                    <div class="col-6 mb-4 mb-md-0 list-toolbar-search">
                                         <div class="kt-input-icon kt-input-icon--left">
                                             <input type="text" formControlName="search" class="form-control"
                                                 [placeholder]="
@@ -68,7 +68,7 @@
                                         </div>
                                     </div>
                                     <div class="" *ngIf="showAddButton"></div>
-                                    <div class="mb-4 mb-md-0 text-center">
+                                    <div class="mb-lg-4 mb-0 text-center">
                                         <a class="btn   toolbar-btn btn_Primary"
                                         style="background-color: #4A0D4A !important;
                                         border-radius: 6px;
@@ -127,21 +127,37 @@
                                     </div>
                                     <div class=""></div>
 
-                                    <div class="text-center">
-                                        <a [title]="'ResetData' | localize"
-                                            class="btn   text-center text-primary toolbar-btn ResetData_btn transparent-button"
+                                    <div class="text-center d-flex " style="height: 40px; width: 160px;">
+                                        <a 
+                                            class="btn d-block d-md-none  text-center t"
                                             style="background-color: #FFFFFF !important;
                                             border: 1px solid #EEEEEEEE !important;
                                             color: #4A0D4A !important;
-                                            padding: 10px;
+                                       
                                             border-radius: 6px;
                                             margin-left: 10px;"
-                                            (click)="resetList()"> <img src="../../assets/img/input_icons/repeat.png"
-                                                class="alarmInfo">
-                                            <!-- <i
-                                                class="d-inline-block w-100 flaticon2-reload icon-center"
-                                            ></i> -->
+                                              (click)="toggleFilter()"> 
+                                              <svg width="18" height="22" viewBox="0 0 18 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.586 0C12.0556 0.000114731 12.5101 0.165434 12.87 0.467L13 0.586L17.414 5C17.746 5.33202 17.9506 5.77028 17.992 6.238L18 6.414V18C18.0002 18.5046 17.8096 18.9906 17.4665 19.3605C17.1234 19.7305 16.6532 19.9572 16.15 19.995L16 20H10V18H16V8H11.5C11.1271 7.99998 10.7676 7.86108 10.4916 7.61038C10.2156 7.35968 10.0428 7.01516 10.007 6.644L10 6.5V2H4V10H2V2C1.99984 1.49542 2.19041 1.00943 2.5335 0.639452C2.87659 0.269471 3.34684 0.0428433 3.85 0.00500011L4 0H11.586ZM5.707 12.465L8.536 15.293C8.72347 15.4805 8.82879 15.7348 8.82879 16C8.82879 16.2652 8.72347 16.5195 8.536 16.707L5.707 19.535C5.61475 19.6305 5.50441 19.7067 5.3824 19.7591C5.2604 19.8115 5.12918 19.8391 4.9964 19.8403C4.86362 19.8414 4.73194 19.8161 4.60905 19.7658C4.48615 19.7155 4.3745 19.6413 4.2806 19.5474C4.18671 19.4535 4.11246 19.3419 4.06218 19.219C4.0119 19.0961 3.9866 18.9644 3.98775 18.8316C3.9889 18.6988 4.01649 18.5676 4.0689 18.4456C4.12131 18.3236 4.19749 18.2132 4.293 18.121L5.414 17H1C0.734784 17 0.48043 16.8946 0.292893 16.7071C0.105357 16.5196 0 16.2652 0 16C0 15.7348 0.105357 15.4804 0.292893 15.2929C0.48043 15.1054 0.734784 15 1 15H5.414L4.293 13.879C4.20009 13.7862 4.12638 13.6759 4.07607 13.5546C4.02576 13.4333 3.99984 13.3032 3.9998 13.1719C3.9997 12.9066 4.10499 12.6521 4.2925 12.4645C4.48001 12.2769 4.73438 12.1714 4.99965 12.1713C5.131 12.1713 5.26107 12.1971 5.38243 12.2473C5.5038 12.2975 5.61409 12.3712 5.707 12.464V12.465ZM12 2.414V6H15.586L12 2.414Z" fill="#4A0D4A"/>
+                                                </svg>
+                                                
+                                        
                                         </a>
+
+                                        <a [title]="'ResetData' | localize"
+                                        class="btn   text-center text-primary toolbar-btn ResetData_btn transparent-button"
+                                        style="background-color: #FFFFFF !important;
+                                        border: 1px solid #EEEEEEEE !important;
+                                        color: #4A0D4A !important;
+                                        padding: 10px;
+                                        border-radius: 6px;
+                                        margin-left: 10px;"
+                                        (click)="resetList()"> <img src="../../assets/img/input_icons/repeat.png"
+                                            class="alarmInfo">
+                                        <!-- <i
+                                            class="d-inline-block w-100 flaticon2-reload icon-center"
+                                        ></i> -->
+                                    </a>
                                         <a style="padding-left: 10px;background-color: #4A0D4A !important;
                                         color: white !important;
                                         border-radius: 6px;" [title]="'ToggleView' | localize"
@@ -158,11 +174,11 @@
                                 </div>
                             
                             </div>
-                            <div class="col-6 col-md-3 col-sm-4 left-aside-filters pt-4 mt-2 filters_container">
+                            <div class="d-md-block d-none col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters pt-4 mt-2 filters_container">
                                 <app-accounts-list-filters [filterForm]="filterForm"></app-accounts-list-filters>
                             </div> 
-                            <div class="col">
-                                <div class="d-flex justify-content-between">
+                            <div class="col-12 col-md-7 col-lg-9">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
                                     <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
                                         {{
                                         paginator.getPage() *
@@ -232,18 +248,12 @@
                                 </div>
                                 <div class="col d-flex flex-column justify-content-between">
                              
-                                    <div class="row  pl-5 pr-2">
+                                    <div class="row  pl-1 pr-2">
                                         <div *ngFor="
                                                 let account of accounts;
                                                 index as i;
                                                 let last = last
-                                            " class="col-12 mb-5" [ngClass]="{
-                                                'col-md-12 single-item-per-row-layout':
-                                                    singleItemPerRowMode,
-                                                'col-md-6': !singleItemPerRowMode,
-                                                ' pb-5':
-                                                    singleItemPerRowMode && !last
-                                            }">
+                                            " class="col-12 mb-5 col-md-11 col-lg-6" >
                                             <app-account-card [account]="account" [fromMarketplace]="fromMarketplace"
                                                 [singleItemPerRowMode]="
                                                     singleItemPerRowMode
@@ -300,3 +310,13 @@
     <MainImportModal #ImportAccountsModal (finishImport)="onFinishImport($event)"></MainImportModal>
     <!-- Iteration-8 -->
 </form>
+
+
+
+
+<div *ngIf=" filterVisible" class="overlay d-md-none d-block" (click)="toggleFilter()"></div>
+
+<!-- The filter panel -->
+<div class="col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters filter-sm" [ngClass]="{'active': filterVisible}">
+  <app-accounts-list-filters [filterForm]="filterForm"></app-accounts-list-filters>
+</div>
