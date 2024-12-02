@@ -59,7 +59,7 @@ export class AccountsComponent
    // accounts: GetAccountForViewDto[] = [];
     accounts:GetAccountForViewDto[]=[];
     sortingOptions: SelectItem[];
-
+    filterVisible = false; // To toggle the filter visibility
     active: boolean = false;
     loading: boolean = false;
     @Input() defaultMainFilter: AccountMainFilterEnum;
@@ -120,6 +120,10 @@ export class AccountsComponent
             this.applyFiltersOnChange();
         }
     }
+
+      toggleFilter(): void {
+    this.filterVisible = !this.filterVisible;
+  }
     setMainPageFilter(filter: AccountMainFilterEnum) {
         const selectedfilter = this.pageMainFilters.filter(
             (item) => filter == item.value

@@ -42,3 +42,56 @@
 .list-toolbar-dropdown{
     font-weight: 700 !important;
 }
+
+/* Default styles for the filters - visible on larger screens */
+.left-aside-filters {
+    display: block;
+  }
+  
+  /* Mobile screens - Hide filters by default */
+  @media (max-width: 767px) {
+    .left-aside-filters {
+      position: fixed;
+      bottom: 0;
+      left: 15px;
+      right: 0;
+      top: 20%;
+      background-color: white;
+      z-index: 9999;
+      transform: translateY(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+  
+    /* When the overlay is active, show it */
+    .left-aside-filters.active {
+      transform: translateY(0);
+    }
+  
+    /* Optional: Add a background overlay when the filter is open */
+    .overlay {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0px;
+      right: 0px;
+      bottom: 0;
+    //   top: 20%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9998;
+    }
+  }
+  .filter-sm {
+    padding-top: 15px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    overflow-y: scroll !important; 
+  }
+
+
+  @media (max-width: 576px) { 
+
+    
+    .marginMob {
+margin-top: 25px;
+    }
+  }
